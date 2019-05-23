@@ -9,7 +9,7 @@
 #include "base/common/component/Impl/ITask.h"
 #include <iostream>
 
-#pragma region 系统支持
+#pragma region 
 #ifdef _WIN32
 #include <process.h>     // 
 #endif
@@ -133,7 +133,7 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
         {
             auto task = taskList.front();
             taskList.pop_front();
-            isEmpty = false;   // 
+            isEmpty = false;
             locker.Unlock();
             task->Run();
             task->Release();
