@@ -12,11 +12,13 @@
 
 **CreateTime**: 03/14/2019
 
+# 构建状态
+
 [![License](https://img.shields.io/github/license/ericyonng/FrightenStone.svg?style=popout "https://shields.io/category/license")](https://opensource.org/licenses/MIT) 
 
-|**Linux**| [![Build](https://travis-ci.com/ericyonng/FrightenStone.svg?branch=master)](http://travis-ci.com)
+| **Linux** |: [![Build](https://travis-ci.com/ericyonng/FrightenStone.svg?branch=master)](http://travis-ci.com)
 
-|**Windows**|[![Build](https://ci.appveyor.com/api/projects/status/l9um5wrap00ndvf8?svg=true)](https://ci.appveyor.com)
+| **Windows** |: [![Build](https://ci.appveyor.com/api/projects/status/l9um5wrap00ndvf8?svg=true)](https://ci.appveyor.com)
 --------
 
 * 惊石框架是一个简易轻量的服务端框架，基于C++11及以上
