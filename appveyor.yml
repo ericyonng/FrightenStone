@@ -1,4 +1,14 @@
 version: 1.0.{build}
+image: Visual Studio 2017
+configuration: e.g. Debug,Release
+platform: x64
 build:
-    verbosity: normal
-    project: sln\windows\frightenstone.sln
+  verbosity: normal
+  project: sln\windows\frightenstone.sln
+notifications:
+- provider: Email
+  to:
+  - 120453674@qq.com
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: false    
