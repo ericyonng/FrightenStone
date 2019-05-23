@@ -89,7 +89,7 @@ json array_not_object = json::array({ {"currency", "USD"}, {"value", 42.99} });
 
 > 再次感谢nlohmann提供的开源json库
 >
-> __作者__：[风焱辰](<https://github.com/ericyonng> "Github:ericyonng")
+> __作者__：[ericyonng](<https://github.com/ericyonng> "Github:ericyonng")
 >
 > __联系方式__: <120453674@qq.com>
 >
