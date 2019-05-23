@@ -43,7 +43,7 @@ rem 下面是准备删除【debug】和【release】文件夹的内容，但谨慎删除！！
 
 rem rd /s/q Release
 rem rd /s/q Release_Unicode
-rd /s/q Debug
+rem rd /s/q Debug
 rd /s/q ipch
 
 
