@@ -11,7 +11,7 @@
 **Author**: Huiya Song
 
 **CreateTime**: 03/14/2019
-![Build](https://travis-ci.com/ericyonng/choosealicense.com.svg?branch=gh-pages)
+![GitHub](https://img.shields.io/github/license/ericyonng/FrightenStone.svg?style=popout)
 --------
 
 * 惊石框架是一个简易轻量的服务端框架，基于C++11及以上
