@@ -1,1 +1,0 @@
-#define FrightenStone 1
