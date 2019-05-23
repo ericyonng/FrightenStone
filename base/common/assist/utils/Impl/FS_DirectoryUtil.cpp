@@ -24,7 +24,6 @@ FS_NAMESPACE_BEGIN
 
 bool FS_DirectoryUtil::CreateDir(const FS_String &path)
 {
-    //提取盘符
     FS_String rootDir, subDir;
     auto startPos = path.GetRaw().find(':', 0);    // judge if include path
     if(startPos == std::string::npos)
@@ -111,14 +110,12 @@ bool FS_DirectoryUtil::_CreateRecursiveDir(const FS_String &masterDir, const FS_
     const int revSpritLen = static_cast<int>(strlen("/"));
     while(true)
     {
-        // 正斜杆 反斜杆
         startPos = static_cast<int>(subDir.GetRaw().find("\\", startPos));
         revStartPos = static_cast<int>(subDir.GetRaw().find("/", revStartPos));
         if(startPos == std::string::npos && 
            revStartPos == std::string::npos) 
             break;
 
-        // 反斜杆正斜杆只可能有一种
         if(startPos == std::string::npos && revStartPos != std::string::npos)
         {
             revEndPos = static_cast<int>(subDir.GetRaw().find("/", revStartPos + revSpritLen));
@@ -209,7 +206,6 @@ bool FS_DirectoryUtil::_CreateRecursiveDir(const FS_String &masterDir, const FS_
             revStartPos += revSpritLen;
         }
 
-        // 创建子目录
         strtocreate.clear();
         dir = strMasterPath;
         if(dir.length() != 0) 
@@ -239,7 +235,6 @@ bool fs::FS_DirectoryUtil::_CreateSubDir(const std::string &subDir)
 #if defined(linux)|defined(__CYGWIN__)
     if(mkdir(strDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
     {
-        // 文件夹找不到
         if(access(strDir.c_str(), 0) == -1)
             return false;
     }
@@ -247,7 +242,6 @@ bool fs::FS_DirectoryUtil::_CreateSubDir(const std::string &subDir)
 #else
     if(::_mkdir(subDir.c_str()) != 0)
     {
-        // 文件夹找不到
         if(::_access(subDir.c_str(), 0) == -1)
             return false;
     }

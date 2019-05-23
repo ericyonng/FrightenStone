@@ -15,7 +15,6 @@
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
 
-// Ç°ÖÃÉùÃ÷
 FS_NAMESPACE_BEGIN
 class FS_String;
 FS_NAMESPACE_END
