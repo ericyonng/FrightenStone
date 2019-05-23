@@ -18,20 +18,20 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT FS_DirectoryUtil
 {
 public:
-    // 递归创建目录
+    // create folder
     static bool CreateDir(const FS_String &path);
 
-    //路径中截取文件
+    // get file/dir from path
     static FS_String GetFileNameInPath(const FS_String &path);
     static FS_String GetFileNameInPath(const char *path);
     static FS_String GetFileDirInPath(const FS_String &path);
     static FS_String GetFileDirInPath(const char *path);
 
 private:
-    // 创建子文件夹
+    // create sub dir
     static bool _CreateSubDir(const FS_String &subDir);
     static bool _CreateSubDir(const std::string &subDir);
-    // 递归创建子目录
+    // recursive create dir
     static bool _CreateRecursiveDir(const FS_String &masterDir, const FS_String &subDir);
 };
 

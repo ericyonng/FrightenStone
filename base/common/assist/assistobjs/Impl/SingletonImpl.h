@@ -11,7 +11,6 @@ std::auto_ptr<T> Singleton<T>::_pObj{NULL};
 template<typename T>
 inline T *Singleton<T>::GetInstance()
 {
-    // 判断指针是否存在存在则返回不存在则创建
     _locker.Lock();
     T *pObj = _pObj.get();
     if(NULL != pObj)

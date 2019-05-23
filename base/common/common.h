@@ -13,7 +13,7 @@
 // Impl ...
 // Interface ...
 #include "base/common/basedefs/Resource/Resource.h"
-#pragma region 基础库代码(对内部模块屏蔽)
+#pragma region base code
 #ifndef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
 #include<base/common/socket/socket.h>
 #include <base/common/net/net.h>

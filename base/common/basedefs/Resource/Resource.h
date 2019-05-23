@@ -9,10 +9,10 @@
 
 #pragma once
 
-// 内部模块使用
+// inner use
 #include "base/common/basedefs/Resource/Inner/InnerResource.h"
 
-// 通用模块使用
+// common
 #include "base/common/basedefs/Resource/ForAll/ForAllResource.h"
 
 #endif

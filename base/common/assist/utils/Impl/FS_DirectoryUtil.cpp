@@ -15,8 +15,8 @@
 #include<sys/types.h>
 #include<unistd.h>
 #else
-#include<direct.h>	//mkdir函数
-#include<io.h>//access函数
+#include<direct.h>	//mkdir func
+#include<io.h>//access func
 #endif
 
 
@@ -26,7 +26,7 @@ bool FS_DirectoryUtil::CreateDir(const FS_String &path)
 {
     //提取盘符
     FS_String rootDir, subDir;
-    auto startPos = path.GetRaw().find(':', 0);    // 判断是否带盘符的路径
+    auto startPos = path.GetRaw().find(':', 0);    // judge if include path
     if(startPos == std::string::npos)
     {
         rootDir = "";

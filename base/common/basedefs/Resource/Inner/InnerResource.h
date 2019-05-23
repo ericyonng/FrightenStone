@@ -11,7 +11,7 @@
 
 #ifdef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
 
-// #pragma region OpenSSL支持
+// #pragma region OpenSSL
 // #ifdef _DEBUG
 // #include "3rd/openssl/staticlib/debug/include/openssl/md5.h"
 // #pragma comment(lib, "staticlib\\debug\\lib\\libeay32.lib")
@@ -23,7 +23,7 @@
 // #endif
 // #pragma endregion
 
-#pragma region 创建文件夹支持
+#pragma region create folder
 #include "shlwapi.h"
 #pragma comment(lib,"shlwapi.lib")
 #pragma endregion
