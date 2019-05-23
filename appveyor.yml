@@ -10,13 +10,18 @@ install:
     - cmd: >-
         git submodule update --init --recursive
 image: Visual Studio 2017
-configuration: Debug,Release
+configuration: 
+    - Debug
+    - Release
 platform: x64
 for:
 -
     matrix:
         exclude:
-            - configuration: e.g. Debug,Release
+            - configuration: Debug
+              platform: x64
+              
+            - configuration: Release
               platform: x64
 
 build:
