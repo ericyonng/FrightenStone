@@ -37,13 +37,13 @@ public:
 template<typename Value, typename less = BALess<Value>>
 class BinaryArray
 {
-#pragma region 迭代器
+#pragma region 
 public:
     typedef typename std::vector<Value>::iterator ArrayIterator;
     typedef typename std::vector<Value>::const_iterator ConstArrayIterator;
 
 #pragma endregion 
-    #pragma region 增删查排序通用接口
+    #pragma region 
 public:
     BinaryArray();
 

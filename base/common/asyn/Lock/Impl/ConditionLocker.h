@@ -4,7 +4,7 @@
 * @file ConditionLocker.h
 * @auther Huiya Song <120453674@qq.com>
 * @date 2019/04/28
-* @brief 条件锁（带唤醒与等待）
+* @brief
 */
 
 #pragma once

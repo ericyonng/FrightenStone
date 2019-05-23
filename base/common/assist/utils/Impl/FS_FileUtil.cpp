@@ -100,7 +100,6 @@ FILE *FS_FileUtil::OpenFile(const char *fileName, bool isCreate /*= false*/, con
 
 bool FS_FileUtil::CopyFIle(const char *srcFile, const char *destFile)
 {
-    //参数校验
     if(UNLIKELY(!srcFile || !destFile))
         return false;
 
