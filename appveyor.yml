@@ -21,7 +21,7 @@ for:
 
 build:
     verbosity: normal
-    project: sln\windows\frightenstone.sln
+    project: sln\windows\frightenstone\frightenstone.sln
     
 notifications:
 - provider: Email
