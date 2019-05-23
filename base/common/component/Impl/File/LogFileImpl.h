@@ -15,7 +15,7 @@ FS_NAMESPACE_BEGIN
 template<typename T>
 inline Int64 LogFile::Write(FS_String &logStr)
 {
-    logStr <<"<"<<typeid(T).name()<< ">" << reinterpret_cast<const char *>(buffer) << FS_String::endl;
+    logStr <<"<"<<typeid(T).name()<< ">" << FS_String::endl;
     return FS_File::Write(logStr.c_str(), logStr.GetLength());
 }
 
