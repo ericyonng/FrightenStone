@@ -1,10 +1,28 @@
 version: 1.0.{build}
+max_jobs: 8
+branches:
+    only:
+        - master
+
+clone_depth: 50
+clone_folder: c:\projects\frightenstone
+install:
+    - cmd: >-
+        git submodule update --init --recursive
 image: Visual Studio 2017
 configuration: e.g. Debug,Release
 platform: x64
+for:
+-
+    matrix:
+        exclude:
+            - configuration: e.g. Debug,Release
+              platform: x64
+
 build:
-  verbosity: normal
-  project: sln\windows\frightenstone.sln
+    verbosity: normal
+    project: sln\windows\frightenstone.sln
+    
 notifications:
 - provider: Email
   to:
