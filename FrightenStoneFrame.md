@@ -1,16 +1,16 @@
-# 框架名:惊石
+# 惊石框架
 
-**作者**: 宋惠雅
+**作者**: ericyonng
 
-**时间**:2019.03.14
+**时间**: 2019.03.14
 
-**联系方式**:<120453674@qq.com>
+**联系方式**: <120453674@qq.com>
 
-**FrameName**:FrightenStone
+**FrameName**: FrightenStone
 
-**Author**:Huiya Song
+**Author**: Huiya Song
 
-CreateTime**:03/14/2019
+**CreateTime**: 03/14/2019
 
 --------
 
