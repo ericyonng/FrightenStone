@@ -9,6 +9,7 @@ clone_folder: c:\projects\frightenstone
 install:
     - cmd: >-
         git submodule update --init --recursive
+        
 image: Visual Studio 2017
 configuration: 
     - Debug
@@ -19,10 +20,10 @@ for:
     matrix:
         exclude:
             - configuration: Debug
-              platform: x64
+              platform: x86
               
             - configuration: Release
-              platform: x64
+              platform: x86
 
 build:
     verbosity: normal
