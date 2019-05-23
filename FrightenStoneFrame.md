@@ -1,14 +1,17 @@
 # 框架名:惊石
 
-__作者__: 宋惠雅
-__时间__:2019.03.14
-__联系方式__:<120453674@qq.com>
-__FrameName__:FrightenStone
-__Author__:Huiya Song
-__CreateTime__:03/14/2019
- 
+**作者**: 宋惠雅
 
+**时间**:2019.03.14
+
+**联系方式**:<120453674@qq.com>
+
+**FrameName**:FrightenStone
+
+**Author**:Huiya Song
+
+CreateTime**:03/14/2019
 
 --------
 
-__跨平台，代码简洁，可读性高，高效__
+**跨平台，代码简洁，可读性高，高效**
