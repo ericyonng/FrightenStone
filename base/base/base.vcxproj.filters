@@ -1,0 +1,516 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{777e07d8-cb04-49d3-8da9-164bf4db7931}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\asyn">
+      <UniqueIdentifier>{edf5b12a-d432-4d0c-8e93-59a6e43c7433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs">
+      <UniqueIdentifier>{c43d8347-fe6a-49f4-bd5d-fab39098884e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\heap">
+      <UniqueIdentifier>{97414d0a-bebd-47f3-8350-c4524a093363}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\log">
+      <UniqueIdentifier>{810ca3e8-2eb4-4e07-b399-ab0e656bf6f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\memmory">
+      <UniqueIdentifier>{d238b98b-5ffa-4aec-8b4f-7ccda6619e61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\memobj">
+      <UniqueIdentifier>{5096802b-a348-4e83-9905-d6cf37c5a395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\net">
+      <UniqueIdentifier>{aa15d339-ad04-4b12-93f0-ce903993404b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\platform">
+      <UniqueIdentifier>{84cf871c-4b80-4b9e-99fb-8d2172e59c27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\src">
+      <UniqueIdentifier>{902a7c3c-3155-4929-9903-ff2d63ff9138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\thread">
+      <UniqueIdentifier>{bcf49660-b219-4497-ab56-fef3474adbc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\net\protocol">
+      <UniqueIdentifier>{56074ffa-0446-4294-83e8-251343d6c292}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\net\protocol\defs">
+      <UniqueIdentifier>{b36ac5e9-afe9-4544-bc97-2aa60bd3bb8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\net\protocol\Impl">
+      <UniqueIdentifier>{68f16aa7-f267-4ea8-b6b5-fa9e04dbe4e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\net\protocol\Interface">
+      <UniqueIdentifier>{766794fb-60f4-46ab-9860-5e2147256101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\socket">
+      <UniqueIdentifier>{5f70353f-68fe-4c9b-9f05-052483b65d6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\socket\Defs">
+      <UniqueIdentifier>{b9d7ba0c-5318-4bd4-9c88-75e1dc6974ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\socket\Impl">
+      <UniqueIdentifier>{0bcce8d7-519e-46b4-a8a8-704e11db38b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\socket\Interface">
+      <UniqueIdentifier>{14024526-cb3e-4b84-bb4c-708df72c8ea7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\status">
+      <UniqueIdentifier>{f216bc90-209f-4002-a3f9-e1fb800741b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\status\Defs">
+      <UniqueIdentifier>{7e5b7e66-e926-422f-8318-855cbd0c189f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\asyn\Lock">
+      <UniqueIdentifier>{c7c8ce16-a661-4135-9f72-df9505c409d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component">
+      <UniqueIdentifier>{cfa78993-4d56-4c2d-80ab-139dcb5b5c36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\asyn\Lock\Defs">
+      <UniqueIdentifier>{d2b2e51d-c5c6-4a38-aa0a-d29763412f4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\asyn\Lock\Impl">
+      <UniqueIdentifier>{d67d1383-fa35-4cca-ad5d-d5f1b4674dee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\asyn\Lock\Interface">
+      <UniqueIdentifier>{8ed84726-226a-417f-bb92-ad7dfd6734fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\DataType">
+      <UniqueIdentifier>{88e82840-3c40-4d73-b45a-23e3bf21330f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\DataType\InnerDataType">
+      <UniqueIdentifier>{586c06a2-14ab-44b2-aabc-646d57151846}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\DataType\InnerDataType\Defs">
+      <UniqueIdentifier>{d52e7085-2de1-43e6-a9d4-82dd928d3296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\DataType\ExportDataType">
+      <UniqueIdentifier>{87fd8d3d-5b9c-4f70-8bac-20f731c68428}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\DataType\ExportDataType\Defs">
+      <UniqueIdentifier>{2d5eab5f-f499-474c-9ec0-e4597c05948c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Macro">
+      <UniqueIdentifier>{f1d20d10-48d6-485c-88bf-9d35dd9277b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Macro\Export">
+      <UniqueIdentifier>{8bac1264-5df6-409b-a2b0-30c48f550a88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Macro\Inner">
+      <UniqueIdentifier>{6296af31-3c2c-462e-9758-a2aaf16fbdc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Macro\Inner\Defs">
+      <UniqueIdentifier>{326284a7-8746-4a30-ba4d-0753026dc524}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Macro\Export\Defs">
+      <UniqueIdentifier>{cad770d3-716f-4dcf-95fd-43f893f2d2c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist">
+      <UniqueIdentifier>{bba59957-753c-411d-8a6f-2c56ed4718b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist\utils">
+      <UniqueIdentifier>{d2f2c2fc-4c1e-491c-8661-6a5abe246a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist\utils\Defs">
+      <UniqueIdentifier>{fc95aeeb-7d27-4711-8588-d947191cd454}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist\utils\Impl">
+      <UniqueIdentifier>{0a6b5b4b-1af7-49fd-9ef2-509835c53a4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist\utils\Interface">
+      <UniqueIdentifier>{1792ba5e-0030-41d2-81a5-45d68de199c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist\assistobjs">
+      <UniqueIdentifier>{e5cd95d2-b122-4b09-8bed-c24035eb0d19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist\assistobjs\Defs">
+      <UniqueIdentifier>{cbb05526-3f0d-4cba-aa39-ef6a046a1c35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist\assistobjs\Impl">
+      <UniqueIdentifier>{6acd6e3d-4a89-4c3e-9d5a-45f1fcf153a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\assist\assistobjs\Interface">
+      <UniqueIdentifier>{b7d5ebee-400b-42c2-a1b7-c1b26d2fd099}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Macro\ForAll">
+      <UniqueIdentifier>{2bc42240-6896-4867-a13a-a0ce580a0204}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\DataType\ForAll">
+      <UniqueIdentifier>{f87faf12-6c57-42e7-99c3-48a392dce00b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\DataType\ForAll\Defs">
+      <UniqueIdentifier>{ad50b3f8-f1b9-41c7-962a-e9306f949fe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Structure">
+      <UniqueIdentifier>{ff652b77-eede-4878-9ac3-b6615d97e9a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Defs">
+      <UniqueIdentifier>{45b5cd3a-3a12-43c5-b461-98301b315205}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl">
+      <UniqueIdentifier>{e248f19d-577c-42f6-afc7-4a9ded8bf9ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Interface">
+      <UniqueIdentifier>{0400030c-ed0e-4167-8be9-f08ff83963d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Structure\Defs">
+      <UniqueIdentifier>{2708cd1a-ee22-4e24-a523-5592a12090a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Resource">
+      <UniqueIdentifier>{a15e6911-e015-422b-ab75-d6f516ed37f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Resource\Inner">
+      <UniqueIdentifier>{29bd43fa-93ac-4b7e-9e3c-dab7a3cd68bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\basedefs\Resource\ForAll">
+      <UniqueIdentifier>{1a8f4efb-e125-4a73-bb8e-2a134e46e37b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\File">
+      <UniqueIdentifier>{053ee315-37b1-40df-8e92-e61db0ac1b24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\File\Defs">
+      <UniqueIdentifier>{0bf615db-72d8-40dd-bc8a-43ca4fe0e690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd">
+      <UniqueIdentifier>{3fca1d3a-5785-44fd-9203-f8c8d708c41e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\net.h">
+      <Filter>common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\protocol\protocol.h">
+      <Filter>common\net\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h">
+      <Filter>common\net\protocol\defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\exportbase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\socket\socket.h">
+      <Filter>common\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\socket\Impl\SocketUtil.h">
+      <Filter>common\socket\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\status\status.h">
+      <Filter>common\status</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\status\Defs\StatusDefs.h">
+      <Filter>common\status\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\asyn\Lock\Lock.h">
+      <Filter>common\asyn\Lock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\asyn\Lock\Defs\MetaLocker.h">
+      <Filter>common\asyn\Lock\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\BaseDefs.h">
+      <Filter>common\basedefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\DataType\DataType.h">
+      <Filter>common\basedefs\DataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\DataType\InnerDataType\InnerDataType.h">
+      <Filter>common\basedefs\DataType\InnerDataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\DataType\ExportDataType\ExportDataType.h">
+      <Filter>common\basedefs\DataType\ExportDataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\DataType\InnerDataType\Defs\LockerHandle.h">
+      <Filter>common\basedefs\DataType\InnerDataType\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Macro\MacroDefs.h">
+      <Filter>common\basedefs\Macro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Macro\Inner\InnerMacro.h">
+      <Filter>common\basedefs\Macro\Inner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Macro\Export\ExportMacro.h">
+      <Filter>common\basedefs\Macro\Export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\asyn\asyn.h">
+      <Filter>common\asyn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\utils.h">
+      <Filter>common\assist\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\assist.h">
+      <Filter>common\assist</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\ToolUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\ToolUtilImpl.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\asyn\Lock\Impl\Locker.h">
+      <Filter>common\asyn\Lock\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\ThreadUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\asyn\Lock\Impl\ConditionLocker.h">
+      <Filter>common\asyn\Lock\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\assistobjs\assistobjs.h">
+      <Filter>common\assist\assistobjs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtr.h">
+      <Filter>common\assist\assistobjs\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtrImpl.h">
+      <Filter>common\assist\assistobjs\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.h">
+      <Filter>common\assist\assistobjs\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Macro\ForAll\ForAllMacro.h">
+      <Filter>common\basedefs\Macro\ForAll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\DataType\ForAll\ForAll.h">
+      <Filter>common\basedefs\DataType\ForAll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\assistobjs\Defs\AssistObjsDefsImpl.h">
+      <Filter>common\assist\assistobjs\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\assistobjs\Impl\Singleton.h">
+      <Filter>common\assist\assistobjs\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\assistobjs\Impl\SingletonImpl.h">
+      <Filter>common\assist\assistobjs\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\Trigger.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Structure\structure.h">
+      <Filter>common\basedefs\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Structure\Defs\BinaryArray.h">
+      <Filter>common\basedefs\Structure\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Structure\Defs\BinaryArrayImpl.h">
+      <Filter>common\basedefs\Structure\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Structure\Defs\SquareBinaryArray.h">
+      <Filter>common\basedefs\Structure\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\component.h">
+      <Filter>common\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Defs\TriggerDefs.h">
+      <Filter>common\component\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\STLUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\STLUtilImpl.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\Time.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_String.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_StringImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\BufferAddapter.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\BufferAddapterImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\TimeUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_Delegate.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_DelegateImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_ClassFactory.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_ClassFactoryImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_ArgsExpander.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_ArgsExpanderImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\StringUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_ThreadPool.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\ITask.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_FileUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\WidthUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\WidthUtilImpl.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_CpuUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Resource\Resource.h">
+      <Filter>common\basedefs\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Resource\Inner\InnerResource.h">
+      <Filter>common\basedefs\Resource\Inner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\basedefs\Resource\ForAll\ForAllResource.h">
+      <Filter>common\basedefs\Resource\ForAll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\TimeSlice.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\TimeSliceImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SmartVar.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SmartVarImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\File\FS_File.h">
+      <Filter>common\component\Impl\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\File\LogFile.h">
+      <Filter>common\component\Impl\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\File\Defs\FileDefs.h">
+      <Filter>common\component\Impl\File\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\File\LogFileImpl.h">
+      <Filter>common\component\Impl\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rd\3rd.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\socket\Impl\SocketUtil.cpp">
+      <Filter>common\socket\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\asyn\Lock\Defs\MetaLocker.cpp">
+      <Filter>common\asyn\Lock\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\basedefs\DataType\InnerDataType\Defs\LockerHandle.cpp">
+      <Filter>common\basedefs\DataType\InnerDataType\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\ToolUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\asyn\Lock\Impl\Locker.cpp">
+      <Filter>common\asyn\Lock\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\ThreadUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\asyn\Lock\Impl\ConditionLocker.cpp">
+      <Filter>common\asyn\Lock\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.cpp">
+      <Filter>common\assist\assistobjs\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\Trigger.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Defs\TriggerDefs.cpp">
+      <Filter>common\component\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp">
+      <Filter>common\net\protocol\defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\Time.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\FS_String.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\TimeUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\StringUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\FS_ThreadPool.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\FS_DirectoryUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\WidthUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\FS_CpuUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\TimeSlice.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\SmartVar.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\File\FS_File.cpp">
+      <Filter>common\component\Impl\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\File\LogFile.cpp">
+      <Filter>common\component\Impl\File</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

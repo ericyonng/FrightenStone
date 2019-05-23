@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{EC2A6471-30B0-4314-8B4E-0305F9EF6AD8}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>base</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)D</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;BASE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;BASE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\..\;$(SolutionDir)..\..\..\3rd\openSSL\staticlib\$(Configuration)\include\;$(ProjectDir);</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>$(TargetName).def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\..\3rd\openssL\;</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;BASE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;BASE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\..\;$(SolutionDir)..\..\..\3rd\openSSL\staticlib\$(Configuration)\include\;$(ProjectDir);</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>$(TargetName).def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\..\3rd\openssL\;</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\3rd\3rd.h" />
+    <ClInclude Include="..\common\assist\assist.h" />
+    <ClInclude Include="..\common\assist\assistobjs\assistobjs.h" />
+    <ClInclude Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.h" />
+    <ClInclude Include="..\common\assist\assistobjs\Defs\AssistObjsDefsImpl.h" />
+    <ClInclude Include="..\common\assist\assistobjs\Impl\Singleton.h" />
+    <ClInclude Include="..\common\assist\assistobjs\Impl\SingletonImpl.h" />
+    <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtr.h" />
+    <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtrImpl.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\FS_CpuUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\FS_FileUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\STLUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\STLUtilImpl.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\StringUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\ThreadUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\TimeUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\ToolUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\ToolUtilImpl.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\WidthUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\WidthUtilImpl.h" />
+    <ClInclude Include="..\common\assist\utils\utils.h" />
+    <ClInclude Include="..\common\asyn\asyn.h" />
+    <ClInclude Include="..\common\asyn\Lock\Defs\MetaLocker.h" />
+    <ClInclude Include="..\common\asyn\Lock\Impl\ConditionLocker.h" />
+    <ClInclude Include="..\common\asyn\Lock\Impl\Locker.h" />
+    <ClInclude Include="..\common\asyn\Lock\Lock.h" />
+    <ClInclude Include="..\common\basedefs\BaseDefs.h" />
+    <ClInclude Include="..\common\basedefs\DataType\DataType.h" />
+    <ClInclude Include="..\common\basedefs\DataType\ExportDataType\ExportDataType.h" />
+    <ClInclude Include="..\common\basedefs\DataType\ForAll\ForAll.h" />
+    <ClInclude Include="..\common\basedefs\DataType\InnerDataType\Defs\LockerHandle.h" />
+    <ClInclude Include="..\common\basedefs\DataType\InnerDataType\InnerDataType.h" />
+    <ClInclude Include="..\common\basedefs\Macro\Export\ExportMacro.h" />
+    <ClInclude Include="..\common\basedefs\Macro\ForAll\ForAllMacro.h" />
+    <ClInclude Include="..\common\basedefs\Macro\Inner\InnerMacro.h" />
+    <ClInclude Include="..\common\basedefs\Macro\MacroDefs.h" />
+    <ClInclude Include="..\common\basedefs\Resource\ForAll\ForAllResource.h" />
+    <ClInclude Include="..\common\basedefs\Resource\Inner\InnerResource.h" />
+    <ClInclude Include="..\common\basedefs\Resource\Resource.h" />
+    <ClInclude Include="..\common\basedefs\Structure\Defs\BinaryArray.h" />
+    <ClInclude Include="..\common\basedefs\Structure\Defs\BinaryArrayImpl.h" />
+    <ClInclude Include="..\common\basedefs\Structure\Defs\SquareBinaryArray.h" />
+    <ClInclude Include="..\common\basedefs\Structure\structure.h" />
+    <ClInclude Include="..\common\common.h" />
+    <ClInclude Include="..\common\component\component.h" />
+    <ClInclude Include="..\common\component\Defs\TriggerDefs.h" />
+    <ClInclude Include="..\common\component\Impl\BufferAddapter.h" />
+    <ClInclude Include="..\common\component\Impl\BufferAddapterImpl.h" />
+    <ClInclude Include="..\common\component\Impl\File\Defs\FileDefs.h" />
+    <ClInclude Include="..\common\component\Impl\File\FS_File.h" />
+    <ClInclude Include="..\common\component\Impl\File\LogFile.h" />
+    <ClInclude Include="..\common\component\Impl\File\LogFileImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_ArgsExpander.h" />
+    <ClInclude Include="..\common\component\Impl\FS_ArgsExpanderImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_ClassFactory.h" />
+    <ClInclude Include="..\common\component\Impl\FS_ClassFactoryImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_Delegate.h" />
+    <ClInclude Include="..\common\component\Impl\FS_DelegateImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_String.h" />
+    <ClInclude Include="..\common\component\Impl\FS_StringImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_ThreadPool.h" />
+    <ClInclude Include="..\common\component\Impl\ITask.h" />
+    <ClInclude Include="..\common\component\Impl\SmartVar.h" />
+    <ClInclude Include="..\common\component\Impl\SmartVarImpl.h" />
+    <ClInclude Include="..\common\component\Impl\Time.h" />
+    <ClInclude Include="..\common\component\Impl\TimeSlice.h" />
+    <ClInclude Include="..\common\component\Impl\TimeSliceImpl.h" />
+    <ClInclude Include="..\common\component\Impl\Trigger.h" />
+    <ClInclude Include="..\common\net\net.h" />
+    <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
+    <ClInclude Include="..\common\net\protocol\protocol.h" />
+    <ClInclude Include="..\common\socket\Impl\SocketUtil.h" />
+    <ClInclude Include="..\common\socket\socket.h" />
+    <ClInclude Include="..\common\status\Defs\StatusDefs.h" />
+    <ClInclude Include="..\common\status\status.h" />
+    <ClInclude Include="..\exportbase.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\FS_CpuUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\FS_DirectoryUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\StringUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\ThreadUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\TimeUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\ToolUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\WidthUtil.cpp" />
+    <ClCompile Include="..\common\asyn\Lock\Defs\MetaLocker.cpp" />
+    <ClCompile Include="..\common\asyn\Lock\Impl\ConditionLocker.cpp" />
+    <ClCompile Include="..\common\asyn\Lock\Impl\Locker.cpp" />
+    <ClCompile Include="..\common\basedefs\DataType\InnerDataType\Defs\LockerHandle.cpp" />
+    <ClCompile Include="..\common\component\Defs\TriggerDefs.cpp" />
+    <ClCompile Include="..\common\component\Impl\File\FS_File.cpp" />
+    <ClCompile Include="..\common\component\Impl\File\LogFile.cpp" />
+    <ClCompile Include="..\common\component\Impl\FS_String.cpp" />
+    <ClCompile Include="..\common\component\Impl\FS_ThreadPool.cpp" />
+    <ClCompile Include="..\common\component\Impl\SmartVar.cpp" />
+    <ClCompile Include="..\common\component\Impl\Time.cpp" />
+    <ClCompile Include="..\common\component\Impl\TimeSlice.cpp" />
+    <ClCompile Include="..\common\component\Impl\Trigger.cpp" />
+    <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
+    <ClCompile Include="..\common\socket\Impl\SocketUtil.cpp" />
+    <ClCompile Include="base.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
