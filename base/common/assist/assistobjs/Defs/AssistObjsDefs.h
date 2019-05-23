@@ -14,11 +14,10 @@
 
 #ifdef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
 
-// 内部使用
+// inner use
 
 #endif
 
-// 外部也可以使用
 class BASE_EXPORT AssistObjsDefs
 {
 public:
@@ -33,7 +32,7 @@ public:
 
 FS_NAMESPACE_BEGIN
 
-// 自动释放对象
+// auto free obj
 template<typename Type, AssistObjsDefs::DelMethods del>
 class AutoDelObj
 {

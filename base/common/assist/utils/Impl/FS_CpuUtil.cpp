@@ -38,14 +38,14 @@ Double FS_CpuUtil::GetUsage()
     if(!GetSystemTimes(&idleTime, &kernelTime, &userTime))
         return -1;
 
-    Int64 diffIdleTime = _CompareFileTime(_preidleTime, idleTime);          //空闲时间
-    Int64 diffKernelTime = _CompareFileTime(_preKernalTime, kernelTime);    //内核时间
-    Int64 diffUserTime = _CompareFileTime(_preUserTime, userTime);          //用户时间
+    Int64 diffIdleTime = _CompareFileTime(_preidleTime, idleTime);          // free time
+    Int64 diffKernelTime = _CompareFileTime(_preKernalTime, kernelTime);    // kernal time
+    Int64 diffUserTime = _CompareFileTime(_preUserTime, userTime);          // user time
 
     if(diffKernelTime + diffUserTime == 0)
         return -1;
 
-    // 占用cpu的时间 =（总的时间-空闲时间）/总的时间
+    // cpu usage =（total-idle）/total
     double usage = static_cast<Double>(diffKernelTime + diffUserTime - diffIdleTime) / (diffKernelTime + diffUserTime);
 
     _preidleTime = idleTime;
@@ -56,7 +56,7 @@ Double FS_CpuUtil::GetUsage()
 
 Int32 FS_CpuUtil::GetCpuCoreCnt()
 {
-    Int32 count = 1; // 至少一个
+    Int32 count = 1; // at least one
 #if defined (LINUX)  
     count = sysconf(_SC_NPROCESSORS_CONF);
 #elif defined(_WIN32)  

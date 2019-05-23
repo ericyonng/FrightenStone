@@ -10,14 +10,14 @@
 
 #ifdef __USE_FS_3RD_OPENSSL__
 #pragma region openssl
-// include Í·ÎÄ¼þ
+// include header
 #ifdef _DEBUG
 #include "3rd/openssl/staticlib/debug/include/openssl/md5.h"
 #else
 #include "3rd/openssl/staticlib/release/include/openssl/md5.h"
 #endif
 
-// lib ¾²Ì¬¿â
+// lib static lib
 #ifdef _DEBUG
 #pragma comment(lib, "staticlib\\debug\\lib\\libeay32.lib")
 #pragma comment(lib, "staticlib\\debug\\lib\\ssleay32.lib")

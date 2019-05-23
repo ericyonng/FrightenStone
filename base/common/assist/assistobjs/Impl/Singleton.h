@@ -30,7 +30,7 @@ private:
 
 private:
     static std::auto_ptr<T> _pObj;
-    static Locker          _locker;     // 担心释放的问题
+    static Locker          _locker;
 };
 
 FS_NAMESPACE_END

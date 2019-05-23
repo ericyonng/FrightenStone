@@ -14,7 +14,6 @@ inline void AutoDelObj<Type, delMethod>::Release()
 
 }
 
-// 自动释放对象 偏特化
 template<typename Type>
 class AutoDelObj<typename Type, AssistObjsDefs::Delete>
 {

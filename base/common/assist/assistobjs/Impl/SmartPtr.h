@@ -18,19 +18,19 @@ FS_NAMESPACE_BEGIN
 template<typename T, AssistObjsDefs::DelMethods delMethod = AssistObjsDefs::Delete>
 class SmartPtr
 {
-    #pragma region 构造/析构/弹出指针/释放（解除接管）
+    #pragma region constructor
     SmartPtr(const SmartPtr<T, delMethod> &obj) = delete;
     SmartPtr<T, delMethod> &operator =(const SmartPtr<T, delMethod> &ptr) = delete;
 public:
     SmartPtr();
     SmartPtr(T *ptr);
-    SmartPtr(SmartPtr<T, delMethod> &&obj);    // 外部T *会先构造一个SmartPtr临时对象再进行构造新对象
+    SmartPtr(SmartPtr<T, delMethod> &&obj);
     virtual ~SmartPtr();
     T *pop();
     void Release();
     #pragma endregion
 
-    #pragma region 操作符重载 指针符号, 下标索引等
+    #pragma region operations
 public:
     SmartPtr<T, delMethod> &operator =(T *ptr);
     SmartPtr<T, delMethod> &operator =(SmartPtr<T, delMethod> &&ptr) noexcept;
@@ -43,15 +43,15 @@ public:
     T *operator->();
     const T *operator->() const;
 
-    T& operator [](int index);    // 无越界检测
-    const T& operator [](int index) const;    // 无越界检测
+    T& operator [](int index);    // no out-range detect
+    const T& operator [](int index) const;    // no out-range detect
     T& operator *();
     const T& operator *() const;
 
     explicit operator bool();
     #pragma endregion
 
-    #pragma region 数据成员 指针/释放对象
+    #pragma region member
 protected:
     T *_ptr;
     AutoDelObj<T, delMethod> _delObj;
