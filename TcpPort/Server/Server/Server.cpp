@@ -1,5 +1,4 @@
-﻿// Server.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
+﻿//
 
 #include "pch.h"
 #include <iostream>
@@ -19,11 +18,11 @@ void cmdThread()
         if(0 == strcmp(cmdBuf, "exit"))
         {
             g_bRun = false;
-            printf("退出cmdThread线程\n");
+            printf("quit cmdThread \n");
             break;
         }
         else {
-            printf("不支持的命令。\n");
+            printf("unsurpport。\n");
         }
     }
 }
@@ -35,28 +34,15 @@ int main()
     server.Bind(nullptr, 4567);
     server.Listen(200);
 
-    //启动UI线程
     std::thread t1(cmdThread);
     t1.detach();
 
     while(g_bRun)
     {
         server.OnRun();
-        //printf("空闲时间处理其它业务..\n");
     }
     server.Close();
-    printf("已退出。\n");
+    printf("exit。\n");
     getchar();
     return 0;
 }
-
-// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
-// 调试程序: F5 或调试 >“开始调试”菜单
-
-// 入门提示: 
-//   1. 使用解决方案资源管理器窗口添加/管理文件
-//   2. 使用团队资源管理器窗口连接到源代码管理
-//   3. 使用输出窗口查看生成输出和其他消息
-//   4. 使用错误列表窗口查看错误
-//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
-//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件

@@ -18,7 +18,6 @@ FS_NAMESPACE_BEGIN
 
     class BASE_EXPORT TriggerOccasion;
 
-    // 同类型事件只允许注册一个
     class BASE_EXPORT Trigger
     {
     public:
@@ -30,11 +29,11 @@ FS_NAMESPACE_BEGIN
                    , Int32 triggerType
                    , const std::function<Int32(TriggerExecuteBody *)> &exec
                    , Int32 execTimes = 1
-                   , Int32 addType = TriggerDefs::AddIfExist); // 注册时机
+                   , Int32 addType = TriggerDefs::AddIfExist); // 
 
         Int32 Exec(Int32 occasion);
 
-        void EraseAllTrigger(Int32 triggerType); // 移除触发
+        void EraseAllTrigger(Int32 triggerType); // 
         void Clear();
         bool IsExist(Int32 occasionType, Int32 triggerType);
 
@@ -44,8 +43,8 @@ FS_NAMESPACE_BEGIN
     private:
         friend class TriggerOccasion;
         std::map<Int32, TriggerOccasion *> _occasions;     // key:occationtype
-        std::map<Int32, std::set<Int32>> _triggerTypeRefOccasions;        // key:triggerType, val:set(occations) 用于已知trigerType将任意时机的trigger清理
-        const std::function<bool(Int32 thisOccation)> _canInterrupt;        // 是否可被打断
+        std::map<Int32, std::set<Int32>> _triggerTypeRefOccasions;        // key:triggerType, val:set(occations) 
+        const std::function<bool(Int32 thisOccation)> _canInterrupt;        // 
     };
 
 FS_NAMESPACE_END

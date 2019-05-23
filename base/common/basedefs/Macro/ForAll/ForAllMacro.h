@@ -11,13 +11,11 @@
 
 // defs ...
 
-// 命名空间
 #undef FS_NAMESPACE_BEGIN
 #undef FS_NAMESPACE_END
 #define FS_NAMESPACE_BEGIN namespace fs {
 #define FS_NAMESPACE_END }
 
-// 禁用拷贝赋值转移
 #undef DISABLE_COPY_ASSIGN_MOVE
 #define DISABLE_COPY_ASSIGN_MOVE(cls)                   \
 cls &operator=(const cls &obj) = delete;                \
@@ -25,7 +23,6 @@ cls(const cls &obj) = delete;                           \
 cls &operator=(cls &&right) = delete;                   \
 cls(cls &&right) = delete;
 
-// 禁用拷贝
 #undef DISABLE_COPY
 #define DISABLE_COPY(cls)                               \
 cls(const cls &obj) = delete;
@@ -39,7 +36,6 @@ delete p
 if(p){ delete p;                                        \
 p = NULL;}
 
-// 安全释放
 #undef FsSafeMultiDelete
 #define FsSafeMultiDelete(p)                                 \
 if(p){ delete []p;                                        \
@@ -66,21 +62,21 @@ p = NULL;}
 #define NULL nullptr
 
 #undef MAX_NAME_LEN
-#define MAX_NAME_LEN 64                 // 名字长度
+#define MAX_NAME_LEN 64
 
 #undef MAX_PWD_LEN
-#define MAX_PWD_LEN 128                 // 密码长度
+#define MAX_PWD_LEN 128
 
 #undef MAX_CEIL_WIDE
-#define MAX_CEIL_WIDE 16                // 小数最大有效位数
+#define MAX_CEIL_WIDE 16
 
 #undef DOUBLE_FMT_STR
-#define DOUBLE_FMT_STR  "%.16lf"         // 双精度格式字符串
+#define DOUBLE_FMT_STR  "%.16lf"
 
 #undef FLOAT_FMT_STR
-#define FLOAT_FMT_STR  "%.8lf"         // 单精度格式字符串
+#define FLOAT_FMT_STR  "%.8lf"
 
-// The likely & unlikely builtin expect macro. 优化生成代码提升cpu效率
+// The likely & unlikely builtin expect macro.
 #ifdef __GNUC__
 #ifndef LIKELY
 #define LIKELY(x) __builtin_expect(!!(x), 1)
@@ -97,7 +93,7 @@ p = NULL;}
 #endif
 #endif // __GNUC__
 
-// c style 可变参数解析
+// c style
 #ifdef _WIN32
 
 #define __Fs_FmtArgs_WIN32(fmt, buf, len)                                    \
@@ -166,7 +162,7 @@ p = NULL;}
 
 #endif
 
-// c style 可变参数字符串组装
+// c style
 #ifdef _WIN32
 #define __FS_BuildFormatStr_   __Fs_FmtArgs_WIN32
 #else

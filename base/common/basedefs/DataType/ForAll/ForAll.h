@@ -11,7 +11,7 @@
 
 // defs ...
 
-#pragma region 基本数据类型
+#pragma region base data type
 typedef char Byte8;
 typedef unsigned char U8;
 typedef short Int16;
@@ -26,7 +26,7 @@ typedef float Float;
 typedef double Double;
 #pragma endregion
 
-// 缓冲
+// cache
 #define BUFFER_LEN4         4
 #define BUFFER_LEN8         8
 #define BUFFER_LEN16        16

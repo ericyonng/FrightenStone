@@ -18,7 +18,7 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT STLUtil
 {
 public:
-    // É¾³ýÈÝÆ÷
+    // del container
     template<typename _Type, AssistObjsDefs::DelMethods DelType = AssistObjsDefs::Delete>
     static void DelMapContainer(_Type &container);
 

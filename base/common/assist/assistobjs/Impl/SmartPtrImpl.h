@@ -11,7 +11,7 @@
 
 FS_NAMESPACE_BEGIN
 
-#pragma region 构造/析构/弹出指针/释放（解除接管）
+#pragma region constructor
 template<typename T, AssistObjsDefs::DelMethods delMethod>
 SmartPtr<T, delMethod>::SmartPtr()
     :_ptr(NULL)
@@ -54,7 +54,7 @@ inline void SmartPtr<T, delMethod>::Release()
 }
 #pragma endregion
 
-#pragma region 操作符重载 指针符号, 下标索引等
+#pragma region operations
 template<typename T, AssistObjsDefs::DelMethods delMethod>
 inline SmartPtr<T, delMethod> &SmartPtr<T, delMethod>::operator =(T *ptr)
 {

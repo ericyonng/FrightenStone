@@ -14,7 +14,7 @@ inline fs::FS_String &&GetString()
 
 inline fs::FS_String GetString(bool)
 {
-    fs::FS_String str = "ÎÒ°®Äã";
+    fs::FS_String str = "i love you";
     return str;
 }
 

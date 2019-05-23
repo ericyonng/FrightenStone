@@ -18,7 +18,7 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT TimeUtil
 {
 public:
-    static void SetTimeZone();    // 线程不安全只需设置一次
+    static void SetTimeZone();
     static Int32 GetTimeZone();
     static bool IsLeapYear(Int32 year);
     /**

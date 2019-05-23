@@ -15,7 +15,6 @@ public:
         j["pi"] = 3.141;
         j["name"] = "Niels";
         fs::FS_String p;
-        std::cout << p << "ÎÒÜ³" << std::endl;
         std::cout << p << std::endl;
         std::cout << j << std::endl;
     }

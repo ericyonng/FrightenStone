@@ -9,7 +9,7 @@
 
 #pragma once
 
-#pragma region ∫Í∂®“Â
+#pragma region 
 #define LOGFILE_SIZE_LIMIT 104857600 // 100*1024*1024=100MB
 #pragma endregion
 

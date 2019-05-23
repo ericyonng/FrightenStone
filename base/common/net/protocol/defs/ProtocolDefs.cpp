@@ -24,22 +24,18 @@ LoginReq::LoginReq()
 
 LoginRes::LoginRes()
 {
-    // 包头
     _packetLength = sizeof(LoginRes);
     _cmd = ProtocolCmd::LoginRes;
 
-    // 数据成员
     memset(_userName, 0, sizeof(_userName));
     _status = StatusDefs::Success;
 }
 
 LoginNty::LoginNty()
 {
-    // 包头
     _packetLength = sizeof(LoginNty);
     _cmd = ProtocolCmd::LoginNty;
 
-    // 数据成员
     memset(_userName, 0, sizeof(_userName));
     memset(_pwd, 0, sizeof(_pwd));
 }

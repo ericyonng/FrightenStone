@@ -13,7 +13,6 @@ InitProcess::InitProcess()
 {
     _locker.Lock();
 
-    // 1.初始化socket环境
     auto st = fs::SocketUtil::InitSocketEnv();
     if(st != StatusDefs::Success)
         printf("InitSocketEnv fail st[%d]", st);
@@ -27,7 +26,6 @@ InitProcess::~InitProcess()
 {
     _locker.Lock();
     
-    // 1.卸载socket环境
     auto st = fs::SocketUtil::ClearSocketEnv();
     if(st != StatusDefs::Success)
         printf("ClearSocketEnv fail st[%d]", st);

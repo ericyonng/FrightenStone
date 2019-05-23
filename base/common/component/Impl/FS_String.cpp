@@ -130,7 +130,6 @@ FS_String::_These FS_String::Split(const FS_String::_These &seps, FS_String::siz
                 minIdx.insert(findIdx);
         }
 
-        // 取最小位置
         if(!minIdx.empty())
             findIdx = *minIdx.begin();
 
@@ -337,10 +336,8 @@ FS_String &FS_String::FormatCStyle(const char *fmt, ...)
     return *this;
 }
 
-// 计算格式控制字符串占位符个数（%与%至少间隔一个字符，如：%s%l等%%则输出一个%，解析前）
 UInt64 FS_String::CalcPlaceHolderNum(const std::string &fmtStr)
 {
-    //找出不相邻的%个数
     UInt64 startPos = 0, nextPos = 0, cnt = 0;
 
     for(startPos = 0;
@@ -352,14 +349,11 @@ UInt64 FS_String::CalcPlaceHolderNum(const std::string &fmtStr)
             UInt64 diff = nextPos >= startPos ? (nextPos - startPos) : 0UL;
             if(LIKELY(diff > 1))
             {
-                //不相邻
                 cnt += 2;
                 startPos = nextPos + 1;
             }
             else
             {
-                // %号相邻或重叠
-                // 跳过这两个位置继续找
                 startPos = nextPos + 1;
                 continue;
             }
@@ -374,7 +368,6 @@ UInt64 FS_String::CalcPlaceHolderNum(const std::string &fmtStr)
     return cnt;
 }
 
-// 获取格式控制字符串第一个有效%位置
 bool FS_String::AppendFirstValidPlaceHolderString(const std::string &fmt, UInt64 &firstIndex, std::string &outStr)
 {
     if(UNLIKELY(fmt.length() <= 0))
@@ -394,7 +387,6 @@ bool FS_String::AppendFirstValidPlaceHolderString(const std::string &fmt, UInt64
     return true;
 }
 
-// 下一个格式控制字符串片段
 std::string FS_String::NextPlaceHolderPos(const std::string &strFmt, UInt64 startIndex, UInt64 &outIndex)
 {
     if( UNLIKELY((strFmt.length() <= 0) || 
@@ -410,16 +402,13 @@ std::string FS_String::NextPlaceHolderPos(const std::string &strFmt, UInt64 star
         if(outIndex == std::string::npos)
             return strFmt.substr(startIndex);
 
-        // 判断是否相邻不相邻直接取得字符串片段
         UInt64 diff = outIndex >= cacheStartIndex ? (outIndex - cacheStartIndex) : 0;
         if(diff > 1)
             return strFmt.substr(startIndex, outIndex - startIndex);
 
-        // 相邻或重叠,跳过这两个位置继续找
         ++cacheStartIndex;
     }
 
-    // 错误跳出
     outIndex = std::string::npos;
     return std::string();
 }

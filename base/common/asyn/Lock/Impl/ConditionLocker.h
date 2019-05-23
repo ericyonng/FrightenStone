@@ -20,21 +20,21 @@ public:
     ConditionLocker();
     virtual ~ConditionLocker();
 
-#pragma region 信号
+#pragma region sinal
 public:
-    int Wait(unsigned long milisec = INFINITE);     // 外部需要加锁
-    bool Sinal();                                   // 外部需要加锁
-    void Broadcast();                               // 唤醒所有
+    int Wait(unsigned long milisec = INFINITE);
+    bool Sinal();
+    void Broadcast();
     void ResetSinal();
 #pragma endregion
 
-    #pragma region 初始化以及销毁匿名event对象
+    #pragma region inner
 private:
     bool _InitAnonymousEvent();
     bool _DestroyEvent();
     #pragma endregion
 
-#pragma region 数据成员
+#pragma region member
 private:
     std::atomic<void *> _event;
     std::atomic<bool> _isSinal;

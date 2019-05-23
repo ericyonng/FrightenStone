@@ -12,8 +12,8 @@
 // defs ...
 #ifdef _WIN32
 #undef SPINNING_COUNT
-#define SPINNING_COUNT 8000                        // 自旋锁避免挂起轮询次数
+#define SPINNING_COUNT 8000
 #endif
 
-#define THREAD_POOL_WAIT_FOR_COMPLETED_TIME 5     // 5ms等待线程池完成任务
+#define THREAD_POOL_WAIT_FOR_COMPLETED_TIME 5     // 5ms
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_Inner_InnerMacro_H__

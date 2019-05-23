@@ -21,35 +21,29 @@ class TimeSlice;
 
 class BASE_EXPORT Time 
 {
-    #pragma region 时间单位互换
+    #pragma region 
 public:
-    // 天
     static const Int64 _hourPerDay;
     static const Int64 _minutePerDay;
     static const Int64 _secondPerDay;
     static const Int64 _milliSecondPerDay;
     static const Int64 _microSecondPerDay;
 
-    // 时
     static const Int64 _minutePerHour;
     static const Int64 _secondPerHour;
     static const Int64 _milliSecondPerHour;
     static const Int64 _microSecondPerHour;
 
-    // 分
     static const Int64 _secondPerMinute;
     static const Int64 _milliSecondPerMinute;
     static const Int64 _microSecondPerMinute;
 
-    // ->秒
     static const Int64 _microSecondPerSecond;
     static const Int64 _millisecondPerSecond;
 
-    // ->毫秒
     static const Int64 _microSecondPerMilliSecond;
 
-    // 系统时钟最小分辨率
-    static const Int64 _resolutionPerMicroSecond;    // （系统时间单位精确到微妙的十分之一，不是真正意义上的纳秒）
+    static const Int64 _resolutionPerMicroSecond;    
     #pragma endregion 
  
 public:
@@ -57,27 +51,27 @@ public:
     Time(const Time &other);
     virtual ~Time();
 
-    #pragma region 获取时间
+    #pragma region 
     static Time Now();
-    static Int64 NowTimestamp();            // 默认秒
-    static Int64 NowMilliTimestamp();       // 毫秒
-    static Int64 NowMicroTimestamp();       // 微秒
+    static Int64 NowTimestamp();            // 
+    static Int64 NowMilliTimestamp();       // 
+    static Int64 NowMicroTimestamp();       // 
     
     static Time FromSeconds(Int64 seconds);
     static Time FromMilliSeconds(Int64 milliSeconds);
     static Time FromMicroSeconds(Int64 microSeconds);
-    static Time FromFmtString(const fs::FS_String &fmt);    // fmt格式：1970-07-01 12:12:12.000000055 注:.后面是微妙
+    static Time FromFmtString(const fs::FS_String &fmt);    // fmt：1970-07-01 12:12:12.000000055 
     static Time FromTimeMoment(int year, int month, int day, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
     static Time FromTimeStruct(const tm &timeStruct, int milliSecond = 0, int microSecond = 0);
     #pragma endregion
 
-    #pragma region 获取时间戳
+    #pragma region 
     Int64 GetSecTimestamp() const;
     Int64 GetMilliTimestamp() const;
     Int64 GetMicroTimestamp() const;
     #pragma endregion
 
-    #pragma region 时间操作
+    #pragma region 
     const Time &FlushTime();
 
     bool operator ==(const Time &time) const;
@@ -90,7 +84,7 @@ public:
     Time &operator =(const Time &other);
     #pragma endregion
 
-    #pragma region 时间片段
+    #pragma region 
     /**
      * Get current time of day.
      * @return TimeSlice - the current time of day.
@@ -107,7 +101,7 @@ public:
      * @param[in] from        - from time.
      * @return TimeSlice - timeslice value.
      */
-    TimeSlice GetIntervalTo(const TimeSlice &slice) const;    // slice若小于当前时刻则计算下一天slice时刻距离当前的时间间隔
+    TimeSlice GetIntervalTo(const TimeSlice &slice) const;    // 
     TimeSlice GetIntervalTo(int hour, int minute, int second, int milliSecond = 0, int microSecond = 0) const;
     static TimeSlice GetIntervalTo(const Time &from, const TimeSlice &slice);
     static TimeSlice GetIntervalTo(const Time &from, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
@@ -121,7 +115,7 @@ public:
     Time operator -(const TimeSlice &span) const;
     #pragma endregion
 
-    #pragma region 本地时间
+    #pragma region 
     /**
      * Add specified time parts values.
      * Notes: These operations are thread-safe, all add parts added to new LLBC_Time object.
@@ -179,7 +173,7 @@ public:
     FS_String ToString() const;
     #pragma endregion
 
-    #pragma region 内部方法
+    #pragma region 
 private:
     explicit Time(Int64 microSecTimestamp);
     explicit Time(const std::chrono::system_clock::time_point &now);
@@ -188,9 +182,9 @@ private:
     #pragma endregion
 
 private:
-    Int64 _rawTime;    // microsecond (微妙级时间戳)
-    tm _gmtTimeStruct;  // 格林尼治时间
-    tm _localTimeStruct;    // 本地时间
+    Int64 _rawTime;    // microsecond ()
+    tm _gmtTimeStruct;  // 
+    tm _localTimeStruct;    // 
 };
 
 #pragma region Inline
@@ -330,7 +324,6 @@ inline Int32 Time::GetLocalSecond() const
 
 inline Int32 Time::GetLocalMilliSecond() const
 {
-    // 转化成本地时间
     auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
     return static_cast<Int32>(localTime%Time::_microSecondPerSecond / Time::_microSecondPerMilliSecond);
 }

@@ -10,7 +10,7 @@
 #include "base/common/component/Impl/FS_String.h"
 #include "base/common/common.h"
 
-#pragma region 使用第三方库
+#pragma region 3rd
 #define __USE_FS_3RD_OPENSSL__
 #include "3rd/3rd.h"
 #pragma endregion

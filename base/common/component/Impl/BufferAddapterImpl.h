@@ -416,7 +416,6 @@ struct GetBufferAddapterSize<float>
         if(integer == 0)
             return ++cnt;
 
-        // 整数部分
         while(true)
         {
             integer /= 10;
@@ -444,7 +443,6 @@ struct GetBufferAddapterSize<float &>
         if(integer == 0)
             return ++cnt;
 
-        // 整数部分
         while(true)
         {
             integer /= 10;
@@ -472,7 +470,6 @@ struct GetBufferAddapterSize<const float>
         if(integer == 0)
             return ++cnt;
 
-        // 整数部分
         while(true)
         {
             integer /= 10;
@@ -500,7 +497,6 @@ struct GetBufferAddapterSize<const float &>
         if(integer == 0)
             return ++cnt;
 
-        // 整数部分
         while(true)
         {
             integer /= 10;
@@ -531,7 +527,6 @@ struct GetBufferAddapterSize<double>
         if(integer == 0)
             return ++cnt;
 
-        // 整数部分
         while(true)
         {
             integer /= 10;
@@ -559,7 +554,6 @@ struct GetBufferAddapterSize<double &>
         if(integer == 0)
             return ++cnt;
 
-        // 整数部分
         while(true)
         {
             integer /= 10;
@@ -587,7 +581,6 @@ struct GetBufferAddapterSize<const double>
         if(integer == 0)
             return ++cnt;
 
-        // 整数部分
         while(true)
         {
             integer /= 10;
@@ -615,7 +608,6 @@ struct GetBufferAddapterSize<const double&>
         if(integer == 0)
             return ++cnt;
 
-        // 整数部分
         while(true)
         {
             integer /= 10;

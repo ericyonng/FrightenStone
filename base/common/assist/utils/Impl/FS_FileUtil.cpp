@@ -17,8 +17,8 @@
 #include<sys/types.h>
 #include<unistd.h>
 #else
-#include<direct.h>	//mkdir函数
-#include<io.h>//access函数
+#include<direct.h>	//mkdir
+#include<io.h>//access
 #endif
 
 FS_NAMESPACE_BEGIN
@@ -74,7 +74,6 @@ const char * FS_FileUtil::GenRandFileNameNoDir(char randName[L_tmpnam])
 
 FILE *FS_FileUtil::OpenFile(const char *fileName, bool isCreate /*= false*/, const char *openType /*= "rb+"*/)
 {
-    //参数校验
     if(fileName == 0 || openType == NULL)
         return NULL;
 
@@ -94,7 +93,6 @@ FILE *FS_FileUtil::OpenFile(const char *fileName, bool isCreate /*= false*/, con
         }
     }
 
-    // 错误清除和重定位光标至起始处
     clearerr(fp);
     rewind(fp);
     return fp;
@@ -116,13 +114,13 @@ bool FS_FileUtil::CopyFIle(const char *srcFile, const char *destFile)
 
     unsigned char get_c = 0;
     char count = 0, wrCount = 0;
-    const auto sizeByte = GetFileSize(*srcFp);  // 文件尺寸
+    const auto sizeByte = GetFileSize(*srcFp);  //
     while(!feof(srcFp))
     {
         get_c = 0;
         count = char(fread(&get_c, 1, 1, srcFp));
         if(count != 1)
-            break;  //判断读取是否出错或者到文件结尾feof会延迟
+            break;
 
         wrCount = char(fwrite(&get_c, 1, 1, destFp));
         if(wrCount != 1)
@@ -161,7 +159,6 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer)
                 ++bufferTmp;
                 ++cnt;
 
-                //防止溢出
                 if(bufferSize <= cnt) 
                     break;
             }
@@ -178,7 +175,6 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer)
                 ++bufferTmp;
                 ++cnt;
 
-                //防止溢出
                 if(readDataLen <= cnt) 
                     break;
             }
@@ -193,7 +189,6 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer)
         else
         {
             break;
-            //文件结尾
         }
     }
 
@@ -230,7 +225,6 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, FS_String &outBuffer)
                 ++bufferTmp;
                 ++cnt;
 
-                //防止溢出
                 if(readDataLen <= cnt)
                     break;
             }
@@ -245,7 +239,6 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, FS_String &outBuffer)
         else
         {
             break;
-            //文件结尾
         }
     }
 
@@ -269,14 +262,12 @@ UInt64 FS_FileUtil::ReadFile(FILE &fp, UInt64 bufferSize, char *&buffer)
             ++bufferTmp;
             ++readCnt;
 
-            //超过缓冲
             if(readCnt >= bufferSize)
                 break;
         }
         else
         {
             break;
-            //文件结尾
         }
     }
 
@@ -295,7 +286,6 @@ UInt64 FS_FileUtil::ReadFile(FILE &fp, FS_String &outString, Int64 sizeLimit)
             outString.AppendBitData(reinterpret_cast<const char *>(&get_c), 1);
             ++readCnt;
 
-            // 缓冲限制
             if(sizeLimit > 0 && 
                static_cast<Int64>(readCnt) >= sizeLimit)
                 break;
@@ -303,7 +293,6 @@ UInt64 FS_FileUtil::ReadFile(FILE &fp, FS_String &outString, Int64 sizeLimit)
         else
         {
             break;
-            //文件结尾
         }
     }
 
@@ -335,7 +324,7 @@ UInt64 FS_FileUtil::WriteFile(FILE &fp, const char *buffer, UInt64 dataLenToWrit
     }
 
     if(dataLenToWrite != cnt)
-        printf("文件写入出错");
+        printf("write error!");
 
     return cnt;
 }
@@ -363,7 +352,7 @@ UInt64 FS_FileUtil::WriteFile(FILE &fp, const FS_String &bitData)
     }
 
     if(dataLenToWrite != cnt)
-        printf("文件写入出错");
+        printf("write error!");
 
     return cnt;
 }
@@ -382,7 +371,6 @@ bool FS_FileUtil::IsFileExist(const char *fileName)
     if(UNLIKELY(!fileName))
         return false;
 
-    //文件
     if(::_access(fileName, 0) == -1)
     {
         return false;
@@ -460,7 +448,6 @@ void FS_FileUtil::InsertFileTail(const FS_String &extensionName, const char *tai
     fileName.GetRaw().insert(endPos, tail);
 }
 
-// 获取扩展名
 FS_String FS_FileUtil::ExtractFileExtension(const FS_String &fileName)
 {
     auto endPos = fileName.GetRaw().rfind('.', fileName.GetLength() - 1);

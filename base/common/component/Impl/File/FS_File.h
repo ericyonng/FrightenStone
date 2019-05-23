@@ -21,14 +21,12 @@ FS_NAMESPACE_BEGIN
 class Time;
 class FS_String;
 
-// 若需要考虑线程安全请手动使用锁
 class BASE_EXPORT FS_File
 {
 public:
     FS_File();
     virtual ~FS_File();
 
-    //打开，读，写，刷新，关闭
 public:
     virtual bool Open(const char *fileName, bool isCreate = false, const char *openMode = "ab+", bool useTimestampTailer = false);
     virtual bool Reopen();
@@ -59,7 +57,7 @@ protected:
     bool _useTimestampTailer = false;
     FS_String _path;
     FS_String _fileName;
-    FS_String _extensionName;       // 扩展名
+    FS_String _extensionName;       // 
     FS_String _openMode = "ab+";
     Locker  _locker;
 };

@@ -23,12 +23,11 @@ class BASE_EXPORT Trigger;
 class BASE_EXPORT TriggerDefs
 {
 public:
-    // 多个触发执行体加入方法
     enum AddMultiTriggerType
     {
-        NotAddIfExist = 0,              // 若存在则不添加
-        AddIfExist = 1,                 // 若存在也可以加入
-        EraseAllBeforeAdd = 2,          // 若存在则先移除所有
+        NotAddIfExist = 0,              // 
+        AddIfExist = 1,                 // 
+        EraseAllBeforeAdd = 2,          // 
     };
 
     enum
@@ -47,7 +46,6 @@ public:
     std::function<Int32(TriggerExecuteBody *)> _exec;
 };
 
-// 不支持时间顺序执行每个事件，同一triggerType每个时机中只能注册一次
 class BASE_EXPORT TriggerOccasion
 {
 public:
@@ -65,8 +63,8 @@ private:
 
 private:
     Trigger *_trigger;
-    Int32 _occasion;                                                    // 执行的时机
-    std::map<Int32, TriggerExecuteBody *> _triggerTypeRefBodys;         // 需要释放 
+    Int32 _occasion;                                                    // 
+    std::map<Int32, TriggerExecuteBody *> _triggerTypeRefBodys;         //  
 };
 
 

@@ -12,33 +12,27 @@
 
 FS_NAMESPACE_BEGIN
 
-#pragma region 时间单位互换
-// 天
+#pragma region 
 const Int64 Time::_hourPerDay = 24LL;
 const Int64 Time::_minutePerDay = 1440LL;              // 24*60
 const Int64 Time::_secondPerDay = 86400LL;             // 24*60*60
 const Int64 Time::_milliSecondPerDay = 86400000LL;     // 24*60*60*1000
 const Int64 Time::_microSecondPerDay = 86400000000LL;  // 24*60*60*1000*1000
 
-// 时
 const Int64 Time::_minutePerHour = 60L;
 const Int64 Time::_secondPerHour = 3600LL;
 const Int64 Time::_milliSecondPerHour = 3600000LL;
 const Int64 Time::_microSecondPerHour = 3600000000LL;
 
-// 分
 const Int64 Time::_secondPerMinute = 60LL;
 const Int64 Time::_milliSecondPerMinute = 60000LL;
 const Int64 Time::_microSecondPerMinute = 60000000LL;
 
-// 秒
 const Int64 Time::_microSecondPerSecond = 1000000LL;
 const Int64 Time::_millisecondPerSecond = 1000LL;
 
-// 微妙
 const Int64 Time::_microSecondPerMilliSecond = 1000LL;
 
-// 系统时钟最小分辨率
 const Int64 Time::_resolutionPerMicroSecond = 10LL;
 
 #pragma endregion
@@ -210,7 +204,7 @@ TimeSlice Time::GetIntervalTo(const TimeSlice &slice) const
     // Calculate span value.
     Int64 sliceVal = slice.GetTotalMicroSeconds() - todayElapsed;
     if(sliceVal < 0)
-        sliceVal = _microSecondPerDay + sliceVal;    // 第二天的slice时刻距离当天的微妙数
+        sliceVal = _microSecondPerDay + sliceVal;    // 
 
     return TimeSlice(sliceVal);
 }
@@ -384,7 +378,7 @@ Time::Time(Int64 microSecTimestamp)
 
 Time::Time(const std::chrono::system_clock::time_point &now)
 {
-    _rawTime = now.time_since_epoch().count() / _resolutionPerMicroSecond;    // （最小单位精确到微妙的十分之一，不是真正意义上的纳秒）
+    _rawTime = now.time_since_epoch().count() / _resolutionPerMicroSecond;    // 
     _UpdateTimeStructs();
 }
 

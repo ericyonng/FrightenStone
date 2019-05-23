@@ -10,14 +10,11 @@
 #pragma once
 
     #ifdef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-        // 内部模块使用
         #include "base/common/basedefs/DataType/InnerDataType/InnerDataType.h"
     #endif
 
-// 外部模块使用
 #include "base/common/basedefs/DataType/ExportDataType/ExportDataType.h"
 
-//  两者都可用
 #include "base/common/basedefs/DataType/ForAll/ForAll.h"
 
 #endif

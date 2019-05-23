@@ -4,7 +4,7 @@
 * @file Lock.h
 * @auther Huiya Song <120453674@qq.com>
 * @date 2019/04/25
-* @brief Ëø
+* @brief
 */
 
 #pragma once

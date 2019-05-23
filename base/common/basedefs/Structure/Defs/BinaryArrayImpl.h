@@ -3,7 +3,7 @@
  * @file    BinaryArrayImpl.h
  * @author  Huiya Song
  * @date    2019/03/24
- * @brief   随机访问型二分数组
+ * @brief
  */
 
 #pragma once
@@ -31,43 +31,36 @@ BinaryArray<Value, less>::BinaryArray()
     
 }
 
-#pragma region 增删查排序通用接口
+#pragma region add/recuse
 template<typename Value, typename less>
 int BinaryArray<Value, less>::Add(Value v)
 {
-    // 1.判断是否空序列
     if(_elements.empty())
     {
         _elements.push_back(v);
         return 0;
     }
 
-    // 2.初始化 pos 值
     const auto sz = static_cast<int>(_elements.size());
     _left = 0;
     _right = sz - 1;
 
-    // 3.比较左端点
     if(_IsLess(v, _elements[_left]))
     {
         _elements.insert(_elements.begin() + _left, v);
         return _left;
     }
 
-    // 4.比较右端点
     if(_IsBigger(v, _elements[_right]))
     {
         _elements.insert(_elements.begin() + _right + 1, v);
         return _right + 1;
     }
 
-    // 中间值位置
     _mid = (_left + _right) / 2;
 
-    // 3.寻找合适位置添加新值
     while(true)
     {
-        // a.在left mid之间?
         if(_IsLess(v, _elements[_mid]))
         {
             _right = _mid;
@@ -77,10 +70,8 @@ int BinaryArray<Value, less>::Add(Value v)
             _left = _mid;
         }
 
-        // b.更新中值
         _mid = (_left + _right) / 2;
 
-        // c.终止条件
         if(_mid == _left)
         {
             if(_IsEqual(v, _elements[_left]))
@@ -129,28 +120,22 @@ inline void BinaryArray<Value, less>::Clear()
     _elements.clear();
 }
 
-/* 采用二分查找法 */
 template<typename Value, typename less>
 int BinaryArray<Value, less>::Find(Value v)
 {
-    // 1.判断是否空序列
     if(_elements.empty())
         return BinaryArrayDefs::End;
 
-    // 2.初始化 pos 值
     const int sz = static_cast<int>(_elements.size());
     _left = 0;
     _right = sz - 1;
 
-    // 3.判断是否在范围内
     if(_IsLess(v, _elements[_left]) || _IsBigger(v, _elements[_right]))
         return BinaryArrayDefs::End;
 
-    // 4.终止条件：mid==left 或者 mid == right
     _mid = (_left + _right) / 2;
     while(true)
     {
-        // d.更新端点
         if(_IsLess(v, _elements[_mid]))
             _right = _mid;
         else
@@ -215,7 +200,6 @@ inline typename BinaryArray<Value, less>::ConstArrayIterator BinaryArray<Value, 
     return _elements.end();
 }
 
-// 消耗性能不建议用，建议先删除元素后Add
 template<typename Value, typename less>
 inline void BinaryArray<Value, less>::Sort()
 {
@@ -235,7 +219,7 @@ inline const Value * BinaryArray<Value, less>::Data()
 }
 #pragma endregion
 
-#pragma region 下标随机访问
+#pragma region 
 template<typename Value, typename less>
 inline const Value &BinaryArray<Value, less>::operator[](int k) const
 {
@@ -261,12 +245,11 @@ bool BinaryArray<Value, less>::operator<(const BinaryArray<Value, less> &other) 
     if(UNLIKELY(other._elements.empty()))
         return false;
 
-    // 队列比较需要大的一方的最小元素大于小的一方的最大元素
     return _IsLess(_elements.back(), other._elements.front());
 }
 #pragma endregion
 
-#pragma region 比较大小
+#pragma region 
 template<typename Value, typename less>
 inline bool BinaryArray<Value, less>::_IsLess(const Value &l, const Value &r) const
 {

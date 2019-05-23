@@ -8,7 +8,7 @@
 #include <TcpPort/Server/Impl/TcpServer.h>
 #include <TcpPort/Server/Impl/ClientSocket.h>
 
-#pragma region windows网络支持
+#pragma region 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #ifdef _WIN32
 // #include<windows.h>
@@ -29,7 +29,6 @@ TcpServer::~TcpServer()
 
 Int32 TcpServer::InitSocket(bool blockSocket)
 {
-    // 1.创建套接字
     if(_socket != MYINVALID_SOCKET)
         return StatusDefs::Repeat;
 
@@ -40,7 +39,6 @@ Int32 TcpServer::InitSocket(bool blockSocket)
         return StatusDefs::Socket_CreateFailure;
     }
 
-    // 设置阻塞模式
     if(blockSocket)
         fs::SocketUtil::SetBlock(_socket);
     else
@@ -53,7 +51,6 @@ Int32 TcpServer::InitSocket(bool blockSocket)
 
 Int32 TcpServer::Bind(const char* ip, unsigned short port) const
 {
-    // 1. bind 绑定用于接受客户端连接的网络端口
     sockaddr_in sin = {0};
     sin.sin_family = AF_INET;
     sin.sin_port = htons(port);    //host to net unsigned short
@@ -75,14 +72,13 @@ Int32 TcpServer::Bind(const char* ip, unsigned short port) const
     }
 #endif
 
-    // 3.绑定
     auto ret = bind(_socket, reinterpret_cast<sockaddr *>(&sin), sizeof(sin));
     if(SOCKET_ERROR == ret)
     {
-        printf("错误,绑定网络端口<%d>失败...\n", port);
+        printf("port has be binded<%d> fail...\n", port);
     }
     else {
-        printf("绑定网络端口<%d>成功...\n", port);
+        printf("bind net port<%d>suc...\n", port);
     }
 
     return ret;
@@ -90,14 +86,13 @@ Int32 TcpServer::Bind(const char* ip, unsigned short port) const
 
 Int32 TcpServer::Listen(Int32 backLog) const
 {
-    // 3 listen 监听网络端口
     auto ret = listen(_socket, backLog);
     if(SOCKET_ERROR == ret)
     {
-        printf("socket=<%llu>错误,监听网络端口失败...\n", _socket);
+        printf("socket=<%llu>error,listen fail...\n", _socket);
     }
     else {
-        printf("socket=<%llu>监听网络端口成功...\n", _socket);
+        printf("socket=<%llu>listen suc...\n", _socket);
     }
 
     return ret;
@@ -105,12 +100,10 @@ Int32 TcpServer::Listen(Int32 backLog) const
 
 MYSOCKET TcpServer::Accept()
 {
-    // 1. accept 等待接受客户端连接
     sockaddr_in clientAddr = {0};
     int addrLen = sizeof(sockaddr_in);
     MYSOCKET socket = MYINVALID_SOCKET;
 
-    // 2.accept监听链接
 #ifdef _WIN32
     socket = accept(_socket, reinterpret_cast<sockaddr *>(&clientAddr), &addrLen);
 #else
@@ -119,14 +112,14 @@ MYSOCKET TcpServer::Accept()
 
     if(MYINVALID_SOCKET == socket)
     {
-        printf("socket=<%d>错误,接受到无效客户端SOCKET...\n", static_cast<Int32>(_socket));
+        printf("socket=<%d>error,invalid SOCKET...\n", static_cast<Int32>(_socket));
     }
     else
     {
         CreatePlayerNty userJoin;
         SendToAll(&userJoin);
         _clients.push_back(new ClientSocket(socket));
-        printf("socket=<%llu>新客户端加入：socket = %llu,IP = %s \n", _socket, socket, inet_ntoa(clientAddr.sin_addr));
+        printf("socket=<%llu>new client join：socket = %llu,IP = %s \n", _socket, socket, inet_ntoa(clientAddr.sin_addr));
     }
 
     return socket;
@@ -143,7 +136,6 @@ void TcpServer::Close()
         ClientSocket *client = _clients[n];
         delete client;
     }
-    // 8 关闭套节字closesocket
     closesocket(_socket);
     //------------
 #else
@@ -151,7 +143,6 @@ void TcpServer::Close()
     {
         delete _clients[n];
     }
-    // 8 关闭套节字closesocket
     close(_socket);
 #endif
     _socket = MYINVALID_SOCKET;
@@ -178,39 +169,28 @@ void TcpServer::CloseClients()
 
 Int32 TcpServer::RecvData(ClientSocket *client)
 {
-    // 1. 接收客户端数据
     auto nLen = recv(client->GetSocket(), _recv, SOCKET_CACHE_SIZE, 0);
     //printf("nLen=%d\n", nLen);
     if(nLen <= 0)
     {
-        printf("客户端<Socket=%llu>已退出，任务结束。\n", client->GetSocket());
+        printf("client<Socket=%llu>exit，task end。\n", client->GetSocket());
         return -1;
     }
 
-    // 2.将收取到的数据拷贝到消息缓冲区
     memcpy(client->GetMsgBuf() + client->GetLastPos(), _recv, nLen);
-    // 3.消息缓冲区的数据尾部位置后移
     client->SetLastPos(client->GetLastPos() + nLen);
 
-    // 4.判断消息缓冲区的数据长度大于消息头DataHeader长度
     while(client->GetLastPos() >= sizeof(PacketHeader))
     {
-        // 这时就可以知道当前消息的长度
         auto *header = reinterpret_cast<PacketHeader *>(client->GetMsgBuf());
-        // 判断消息缓冲区的数据长度大于消息长度
         if(client->GetLastPos() >= header->_packetLength)
         {
-            // 消息缓冲区剩余未处理数据的长度
             Int32 nSize = client->GetLastPos() - header->_packetLength;
-            // 处理网络消息
             OnNetMsg(client->GetSocket(), header);
-            // 将消息缓冲区剩余未处理数据前移
             memcpy(client->GetMsgBuf(), client->GetMsgBuf() + header->_packetLength, nSize);
-            // 消息缓冲区的数据尾部位置前移
             client->SetLastPos(nSize);
         }
         else {
-            // 消息缓冲区剩余数据不够一条完整消息
             break;
         }
     }
@@ -236,16 +216,13 @@ bool TcpServer::OnRun()
     if(UNLIKELY(!IsRun()))
         return false;
 
-    //伯克利套接字 BSD socket
-    fd_set fdRead;//描述符（socket） 集合
+    fd_set fdRead;//
     fd_set fdWrite;
     fd_set fdExp;
-    //清理集合
     FD_ZERO(&fdRead);
     FD_ZERO(&fdWrite);
     FD_ZERO(&fdExp);
 
-    //将描述符（socket）加入集合
     FD_SET(_socket, &fdRead);
     FD_SET(_socket, &fdWrite);
     FD_SET(_socket, &fdExp);
@@ -259,18 +236,15 @@ bool TcpServer::OnRun()
             maxSock = _clients[n]->GetSocket();
         }
     }
-    ///nfds 是一个整数值 是指fd_set集合中所有描述符(socket)的范围，而不是数量
-    ///既是所有文件描述符最大值+1 在Windows中这个参数可以写0
     timeval t = {1, 0};
     auto ret = select(static_cast<Int32>(maxSock + 1), &fdRead, &fdWrite, &fdExp, &t); //
     //printf("select ret=%d count=%d\n", ret, _nCount++);
     if(ret < 0)
     {
-        printf("select任务结束。\n");
+        printf("select end。\n");
         CloseClients();
         return false;
     }
-    //判断描述符（socket）是否在集合中
     if(FD_ISSET(_socket, &fdRead))
     {
         FD_CLR(_socket, &fdRead);
@@ -308,9 +282,8 @@ void TcpServer::OnNetMsg(MYSOCKET socket, PacketHeader *header)
         {
 
             LoginReq *login = static_cast<LoginReq *>(header);
-            printf("收到客户端<Socket=%llu>请求：LoginReq,数据长度：%d,userName=%s PassWord=%s\n", socket, login->_packetLength, login->_userName, login->_pwd);
+            printf("recv<Socket=%llu>request：LoginReq, len：%d,userName=%s PassWord=%s\n", socket, login->_packetLength, login->_userName, login->_pwd);
 
-            // 数据
             LoginNty nty;
             memcpy(nty._userName, login->_userName, sizeof(login->_userName));
             memcpy(nty._pwd, login->_pwd, sizeof(login->_pwd));
@@ -324,7 +297,7 @@ void TcpServer::OnNetMsg(MYSOCKET socket, PacketHeader *header)
         break;
         default:
         {
-            printf("<socket=%llu>收到未定义消息,数据长度：%d\n", socket, header->_packetLength);
+            printf("<socket=%llu>recv unknown message, len：%d\n", socket, header->_packetLength);
             //DataHeader ret;
             //SendData(cSock, &ret);
         }

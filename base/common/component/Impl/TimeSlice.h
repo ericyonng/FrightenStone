@@ -21,7 +21,7 @@ class BASE_EXPORT TimeSlice
 {
 public:
     /**
-     * 默认构造，初始化0时间片对象.
+
      */
     TimeSlice();
 
