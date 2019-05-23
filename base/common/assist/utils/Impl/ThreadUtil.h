@@ -17,7 +17,6 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT ThreadUtil
 {
 public:
-    // 暂时让出线程调度
     static void YieldScheduler();
 };
 

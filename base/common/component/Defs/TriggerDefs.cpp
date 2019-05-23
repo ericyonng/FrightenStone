@@ -50,25 +50,20 @@ Int32 TriggerOccasion::Reg(Int32 triggerType, const std::function<Int32(TriggerE
 
 Int32 TriggerOccasion::Exec(std::set<Int32> &triggerType2Erase)
 {
-    // 遍历容器
     for(auto iterBody = _triggerTypeRefBodys.begin(); iterBody != _triggerTypeRefBodys.end();)
     {
-        // 判断是否执行次数为0
         Int32 ret = StatusDefs::Success;
         const Int32 triggerType = iterBody->first;
         auto body = iterBody->second;
         if(body->_execTimes != 0)
         {
-            // 不为0则执行
-            ret = body->_exec(body);    // todo callback 中有可能会执行erase本触发类型的操作，将body释放掉，register时候请避免这种操作
+            ret = body->_exec(body);    
 
-            // 若执行次数为非-1，且执行成功，则扣除次数
             if(body->_execTimes != TriggerDefs::Trig_Infinite &&
                ret == StatusDefs::Success)
                 body->_execTimes = std::max<Int32>(body->_execTimes - 1, 0);
         }
 
-        // 判断次数若为0则移除该事件
         if(body->_execTimes == 0)
         {
             triggerType2Erase.insert(triggerType);
@@ -79,7 +74,6 @@ Int32 TriggerOccasion::Exec(std::set<Int32> &triggerType2Erase)
             ++iterBody;
         }
 
-        // 判断返回值为非Status::Success且为可打断类型 则打断执行并返回状态码，打印日志
         if(ret != StatusDefs::Success)
         {
             if(_trigger->_canInterrupt(_occasion))

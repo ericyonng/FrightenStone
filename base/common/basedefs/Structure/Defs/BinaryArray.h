@@ -4,10 +4,7 @@
  * @file    BinaryArray.h
  * @author  Huiya Song
  * @date    2019/03/24
- * @brief   随机访问型二分数组
-            键查询效率o(1),值查询效率o(logn)
-            值插入效率逼近o(logn)（由于vector的数据拷贝问题会影响性能，若有所顾忌请自行考虑是否使用）
-            适用于中小数据规模
+ * @brief
  */
 
 #pragma once
@@ -19,7 +16,6 @@
 
 FS_NAMESPACE_BEGIN
 
-// 比较方法
 #pragma region BALess
 template<typename Value>
 class BALess
@@ -34,11 +30,10 @@ class BASE_EXPORT BinaryArrayDefs
 public:
     enum :int
     {
-        End = -1,           // 无效pos
+        End = -1,
     };
 };
 
-// 随机访问型二分数组
 template<typename Value, typename less = BALess<Value>>
 class BinaryArray
 {
@@ -52,8 +47,8 @@ public:
 public:
     BinaryArray();
 
-    int Add(Value v);                                                     // 相同的value加入将失败
-    void Erase(Value v);                                                        // v节点（包括v）之后节点key全部失效
+    int Add(Value v);
+    void Erase(Value v);
     void EraseByKey(int k);
     void Clear();
     int Find(Value v);
@@ -64,19 +59,19 @@ public:
     typename BinaryArray<Value, less>::ArrayIterator end();
     typename BinaryArray<Value, less>::ConstArrayIterator end() const;
 
-    void Sort();                                                                // 消耗性能不建议用，建议先删除元素后Add
+    void Sort();
     size_t Size();
     const Value *Data();
     #pragma endregion
 
-    #pragma region 下标随机访问
+    #pragma region index
 public:
     const Value &operator[](int k) const;
     Value &operator[](int k);
     bool operator <(const BinaryArray<Value, less> &other) const;
     #pragma endregion
 
-    #pragma region 比较大小
+    #pragma region compare
 private:
     bool _IsLess(const Value &l, const Value &r) const;
     bool _IsEqual(const Value &l, const Value &r) const;
@@ -84,7 +79,7 @@ private:
     #pragma endregion
 
 private:
-    std::vector<Value> _elements;    // value 默认按照pos升序
+    std::vector<Value> _elements;
     less _less;
     int _left;
     int _mid;

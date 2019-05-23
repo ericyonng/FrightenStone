@@ -19,7 +19,7 @@ void TimeUtil::SetTimeZone()
 #ifndef _WIN32
     tzset();
     time_t now = time(NULL);
-    __g_timezone = static_cast<Int32>(localtime(&now)->tm_gmtoff);// 线程不安全
+    __g_timezone = static_cast<Int32>(localtime(&now)->tm_gmtoff);
 #else // WIN32
     _tzset();
     __g_timezone = _timezone;

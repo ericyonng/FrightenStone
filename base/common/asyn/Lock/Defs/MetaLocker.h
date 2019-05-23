@@ -4,7 +4,7 @@
 * @file MetaLocker.h
 * @auther Huiya Song <120453674@qq.com>
 * @date 2019/04/25
-* @brief 使用windows临界区实现，轻量级锁
+* @brief
 */
 
 #pragma once
@@ -18,7 +18,7 @@ public:
     virtual ~MetaLocker();
 
 public:
-    LockerHandle _handle;    // 锁对象
+    LockerHandle _handle;
 };
 
 #endif // !__Base_Common_Asyn_Lock_Defs_MetaLocker_H__

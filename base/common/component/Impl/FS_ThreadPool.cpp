@@ -11,7 +11,7 @@
 
 #pragma region 系统支持
 #ifdef _WIN32
-#include <process.h>     // 多线程支持
+#include <process.h>     // 
 #endif
 #pragma endregion
 
@@ -27,7 +27,6 @@ FS_ThreadPool::FS_ThreadPool(Int32 minNum, Int32 maxNum)
     _minNum = minNum;
     _maxNum = maxNum;
 
-    // 初始化最小线程池
     if(_minNum)
         _CreateThread(_minNum);
 }
@@ -39,7 +38,6 @@ FS_ThreadPool::~FS_ThreadPool()
 
 void FS_ThreadPool::Clear()
 {
-    // 1.已清理过不在清理
     _locker.Lock();
     if(_isClearPool)
     {
@@ -47,13 +45,11 @@ void FS_ThreadPool::Clear()
         return;
     }
 
-    // 2.设置标志
     _isClearPool = true;
     _isStopAddingTask = true;
     _isDestroy = true;
     _locker.Unlock();
 
-    // 3.等待完成剩余任务
     while(true)
     {
         _locker.Lock();
@@ -70,14 +66,12 @@ void FS_ThreadPool::Clear()
         _locker.Unlock();
     }
 
-    // 4.等待线程全部退出
     // _locker.Broadcast();
     std::cout << "clear end" << std::endl;
 }
 
 bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
 {
-    // 1.判断是否可以添加任务
     _locker.Lock();
     if(_isDestroy || _isStopAddingTask || _isClearPool)
     {
@@ -85,12 +79,10 @@ bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 
         return false;
     }
 
-    // 2.校准可创建的线程数量
     const Int32 diffNum = _maxNum - _curTotalNum;
     numOfThreadToCreateIfNeed = diffNum > numOfThreadToCreateIfNeed ? numOfThreadToCreateIfNeed : diffNum;
 
-    // 3.判断是否有空闲线程若有则唤醒，且非强制需要创建线程
-    if(_waitNum > 0 && !forceNewThread)    // 若有空闲线程且不需要强制创建线程的唤醒线程
+    if(_waitNum > 0 && !forceNewThread)    // 
     {
         _tasks.push_back(&task);
         _locker.Sinal();
@@ -98,14 +90,12 @@ bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 
         return true;
     }
 
-    // 4.若当前线程已达到上限则添加失败
     if(UNLIKELY(_curTotalNum + numOfThreadToCreateIfNeed > _maxNum))
     {
         _locker.Unlock();
         return false;
     }
 
-    // 5.创建线程
     _tasks.push_back(&task);
     _CreateThread(numOfThreadToCreateIfNeed);
     _locker.Unlock();
@@ -131,12 +121,10 @@ void FS_ThreadPool::SetThreadLimit(Int32 minNum, Int32 maxNum)
 
 unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
 {
-    // 1.初始化变量
     FS_ThreadPool *pool = static_cast<FS_ThreadPool *>(param);
     auto &locker = pool->_locker;
     auto &taskList = pool->_tasks;
 
-    // 2.若未消耗则持续执行线程任务
     bool isEmpty = false;
     while(!pool->_isDestroy || !isEmpty)
     {
@@ -145,7 +133,7 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
         {
             auto task = taskList.front();
             taskList.pop_front();
-            isEmpty = false;   // 此时宁愿假设它是非空的
+            isEmpty = false;   // 
             locker.Unlock();
             task->Run();
             task->Release();
@@ -161,7 +149,6 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
 
     try
     {
-        // 3.任务结束需要退出并唤醒清理线程池等待
         locker.Lock();
         --pool->_curTotalNum;
         bool noThread = pool->_curTotalNum <= 0;
@@ -174,7 +161,6 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
         std::cout << "hello crash" << std::endl;
     }
 
-    // 4.退出线程
     std::cout << "_endthreadex end" << std::endl;
     _endthreadex(0L);
 

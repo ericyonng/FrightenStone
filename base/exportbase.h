@@ -20,13 +20,13 @@
 
 //定义文件名
 #ifdef _DEBUG
-    #define FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL_NAME                "baseD.dll"    //组件名字
+    #define FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL_NAME                "baseD.dll"    //
 #else
-    #define FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL_NAME                "base.dll"    //组件名字
+    #define FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL_NAME                "base.dll"    //
 #endif
 
 #pragma region Warning Disable
-#pragma warning(disable:4251)               // 禁用模版中dll要求导出部分不需要导出的类符号warning
+#pragma warning(disable:4251)               // 
 #define D_SCL_SECURE_NO_WARNINGS            // disable warning C4996
 #pragma endregion
 

@@ -8,7 +8,7 @@ class TestTask :public fs::ITask
 public:
     Int32 Run()
     {
-        std::cout << "ÄãºÃ" << *reinterpret_cast<Int32 *>(_arg) << std::endl;
+        std::cout << "hello" << *reinterpret_cast<Int32 *>(_arg) << std::endl;
         return 0;
     }
 };

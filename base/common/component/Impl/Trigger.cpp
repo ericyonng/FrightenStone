@@ -25,12 +25,10 @@ Trigger::~Trigger()
 
 Int32 Trigger::Reg(Int32 occasion, Int32 triggerType, const std::function<Int32(TriggerExecuteBody *)> &exec, Int32 execTimes /*= 1 */, Int32 addType /*= TriggerDefs::AddIfExist*/)
 {
-    // 触发类型是否允许全局重复
     switch(addType)
     {
         case TriggerDefs::NotAddIfExist:
         {
-            // 判断triggerType是否存在
             for(auto iterOccation = _occasions.begin(); iterOccation != _occasions.end(); ++iterOccation)
             {
                 if(UNLIKELY(iterOccation->second->IsExist(triggerType)))
@@ -44,7 +42,6 @@ Int32 Trigger::Reg(Int32 occasion, Int32 triggerType, const std::function<Int32(
         break;
         case TriggerDefs::EraseAllBeforeAdd:
         {
-            // 判断triggerType是否存在
             for(auto iterOccation = _occasions.begin(); iterOccation != _occasions.end(); ++iterOccation)
             {
                 if(iterOccation->second->IsExist(triggerType))
@@ -59,7 +56,6 @@ Int32 Trigger::Reg(Int32 occasion, Int32 triggerType, const std::function<Int32(
         break;
     }
 
-    // 注册事件
     auto iterBodys = _occasions.find(occasion);
     if(UNLIKELY(iterBodys == _occasions.end()))
     {
@@ -67,14 +63,12 @@ Int32 Trigger::Reg(Int32 occasion, Int32 triggerType, const std::function<Int32(
         iterBodys = _occasions.insert(std::make_pair(occasion, newOccasion)).first;
     }
 
-    // 保持每个时机触发器唯一性，给予警告
     if(addType == TriggerDefs::AddIfExist)
     {
         if(UNLIKELY(iterBodys->second->IsExist(triggerType)))
             return StatusDefs::Trigger_TriggerTypeRepeatInOccasion;
     }
 
-    // 注册并与occationtype进行关联
     const auto ret = iterBodys->second->Reg(triggerType, exec, execTimes);
     if(ret == StatusDefs::Success)
     {
@@ -92,11 +86,9 @@ Int32 Trigger::Reg(Int32 occasion, Int32 triggerType, const std::function<Int32(
 
 Int32 Trigger::Exec(Int32 occasion)
 {
-    // 判断occationType存在
     auto iterBodys = _occasions.find(occasion);
     if(LIKELY(iterBodys != _occasions.end()))
     {
-        // 执行并移除关联
         auto bodys = iterBodys->second;
         std::set<Int32> triggerType2Erase;
         const auto execSt = bodys->Exec(triggerType2Erase);
@@ -111,7 +103,6 @@ Int32 Trigger::Exec(Int32 occasion)
 
 void Trigger::EraseAllTrigger(Int32 triggerType)
 {
-    // 移除所有时机中的触发类型
     auto iterOccations = _triggerTypeRefOccasions.find(triggerType);
     if(UNLIKELY(iterOccations == _triggerTypeRefOccasions.end()))
         return;

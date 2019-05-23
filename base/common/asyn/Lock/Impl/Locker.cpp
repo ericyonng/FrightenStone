@@ -67,8 +67,7 @@ void Locker::_Init()
 
     _metaLocker = new MetaLocker;
 
-    //设置循环锁减少加锁时付出的上下文切换代价（上千个时钟周期）
-    auto spinCnt = static_cast<DWORD>(1 << (WidthUtil::GetBinaryWidth<DWORD>() - 1)) | static_cast<DWORD>(SPINNING_COUNT);     //最高位置1使内核对象进程加载时创建，避免内存不足时候创建失败
+    auto spinCnt = static_cast<DWORD>(1 << (WidthUtil::GetBinaryWidth<DWORD>() - 1)) | static_cast<DWORD>(SPINNING_COUNT);
     if(!InitializeCriticalSectionAndSpinCount(&(_metaLocker.load()->_handle), spinCnt))
         printf("MetaLocker create spinlock fail spinCnt[%lu]", spinCnt);
 }

@@ -20,7 +20,6 @@ FS_NAMESPACE_BEGIN
 class FS_String;
 FS_NAMESPACE_END
 
-// 声明FS_String 流输出
 extern BASE_EXPORT std::ostream &operator <<(std::ostream &stream, const fs::FS_String &);
 
 FS_NAMESPACE_BEGIN
@@ -56,17 +55,16 @@ public:
     FS_String &operator << (const Float &val);
     FS_String &operator << (const Double &val);
     FS_String &operator << (const Byte8 *val);
-    FS_String &operator << (const void *addr);    // 打印地址
-    FS_String &operator << (void *&&addr);    // 打印地址
+    FS_String &operator << (const void *addr);    // 
+    FS_String &operator << (void *&&addr);    // 
 
     char operator [] (Int32 index) const;
 
     bool operator == (const FS_String &index) const;
-    FS_String operator + (const FS_String &other) const; // 加法运算
-    FS_String operator + (const char *other) const; // 加法运算
-    FS_String operator + (const std::string &other) const; // 加法运算
+    FS_String operator + (const FS_String &other) const; // 
+    FS_String operator + (const char *other) const; // 
+    FS_String operator + (const std::string &other) const; // 
 
-    // 模版折叠保证左右值正确
     explicit operator std::string &();
     explicit operator const std::string &() const;
 
@@ -82,8 +80,8 @@ public:
 
     FS_String &AppendBitData(const char *bitData, Int64 dataSize);
 
-    _These Split(char sep, size_type max_split = -1) const;    // 仅支持ascii码的单字节字符分隔，不支持中文或者utf8等复杂字符分隔
-    _These Split(const char *sep, size_type max_split = -1) const;    // 仅支持ascii码的单字节字符分隔，不支持中文或者utf8等复杂字符分隔
+    _These Split(char sep, size_type max_split = -1) const;    // only ascii
+    _These Split(const char *sep, size_type max_split = -1) const;    // only ascii
     _These Split(const FS_String &sep, std::string::size_type max_split = -1, bool onlyLikely = false) const;
     _These Split(const _These &seps, size_type max_split = -1) const;
 
@@ -99,28 +97,22 @@ private:
     std::string::size_type _next_utf8_char_pos(std::string::size_type &beginBytePos) const;
     #pragma endregion
 
-    #pragma region 格式化字符串
+    #pragma region format
 public:
-    // 绑定的参数不可超过提供的可变参数个数 性能较低
     template<typename... Args>
     FS_String &Format(const char *fmt, Args&&... rest);
     template< typename... Args>
     FS_String &Append(Args&&... rest);
-
-    // 高性能版本
     FS_String &FormatCStyle(const char *fmt, ...);
 
-    // 计算格式控制字符串占位符个数（%与%至少间隔一个字符，如：%s%l等%%则输出一个%，解析前）
     static UInt64 CalcPlaceHolderNum(const std::string &fmtStr);
-    // 获取格式控制字符串第一个有效%位置
     static bool AppendFirstValidPlaceHolderString(const std::string &fmt, UInt64 &firstIndex, std::string &outStr);
-    // 下一个格式控制字符串片段
     static std::string NextPlaceHolderPos(const std::string &strFmt, UInt64 startIndex, UInt64 &outIndex);
 private:
     template<typename T>
-    void _AppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);     //特例函数模板终止递归
+    void _AppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);
     template<typename T, typename... Args>
-    void _AppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val, Args&&... rest);   //Args&...对 参数包Args进行扩展，得到函数参数包：rest
+    void _AppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val, Args&&... rest);   //Args&...
     template<typename T>
     void _DoAppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);
     template< typename T>
@@ -141,7 +133,7 @@ private:
     BUFFER32 _cache;
 };
 
-#pragma region << 多种数据类型版本
+#pragma region << 
 inline FS_String &FS_String::operator = (const Byte8 *str)
 {
     _buffer = str;
@@ -247,14 +239,12 @@ inline FS_String &FS_String::operator << (const Byte8 *val)
     return *this;
 }
 
-// 打印地址
 inline FS_String &FS_String::operator << (const void *addr)
 {
     _append_fmt_str("%p", addr);
     return *this;
 }
 
-// 打印地址
 inline FS_String &FS_String::operator << (void *&&addr)
 {
     _append_fmt_str("%p", addr);

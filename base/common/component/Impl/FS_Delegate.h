@@ -26,7 +26,6 @@ private:
     R(T::*_f)(Args...);
 };
 
-// 委托创建工厂
 class BASE_EXPORT DelegateFactory
 {
 public:

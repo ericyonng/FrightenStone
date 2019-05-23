@@ -11,15 +11,12 @@
 
 #ifdef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
 
-// 内部模块使用
 #include "base/common/basedefs/Macro/Inner/InnerMacro.h"
 
 #endif
 
-// 外部模块使用
 #include "base/common/basedefs/Macro/Export/ExportMacro.h"
 
-// 两者都可使用
 #include "base/common/basedefs/Macro/ForAll/ForAllMacro.h"
 
 #endif

@@ -21,12 +21,10 @@ public:
     void SetLastPos(Int32 pos);
 
 private:
-    #pragma region 消息缓冲区
+    #pragma region 
     // socket fd_set  file desc set
     MYSOCKET _socket = MYINVALID_SOCKET;
-    // 第二缓冲区 消息缓冲区
     char _msgBuf[SOCKET_CACHE_SIZE * 10] = {0};
-    // 消息缓冲区的数据尾部位置，最新的未使用的第一个位置
     Int32 _lastPos = 0;
     #pragma region
 };

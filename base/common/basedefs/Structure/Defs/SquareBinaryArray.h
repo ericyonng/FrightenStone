@@ -7,9 +7,7 @@
  * @file    SquareBinaryArray.h
  * @author  Huiya Song
  * @date    2019/03/24
- * @brief   随机访问型二分数组,
-            需求解决BinaryArray在大数据量逆序插入效率不高的问题
-            方案：通过构建二维表，将一次的内存拷贝分解到x,y方向，大幅降低内存拷贝对性能的影响（耗时接近减半）
+ * @brief 
  */
 
 #pragma once

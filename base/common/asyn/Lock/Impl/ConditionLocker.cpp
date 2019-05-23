@@ -2,7 +2,7 @@
 * @file ConditionLocker.cpp
 * @auther Huiya Song <120453674@qq.com>
 * @date 2019/04/28
-* @brief 条件锁（带唤醒与等待）
+* @brief
 */
 
 #include "stdafx.h"
@@ -52,7 +52,6 @@ int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
             return StatusDefs::WaitEventFailure;
         }
 
-        // 没有被人唤醒 一般做超时等待的比较少所以这边，超时等待的情形的性能相较于其他性能低一点点
         if(UNLIKELY(!_isSinal &&
                     milisec != INFINITE))
             break;
@@ -103,8 +102,7 @@ void ConditionLocker::ResetSinal()
 
 bool ConditionLocker::_InitAnonymousEvent()
 {
-    // 这里创建一个嗯匿名的event对象主要是为了避免具名带来的冲突
-    _event = CreateEvent(NULL, true, false, NULL);    // 创建一个匿名的手动重置的event对象，初始无状态
+    _event = CreateEvent(NULL, true, false, NULL);
     if(UNLIKELY(!_event))
         return false;
 
