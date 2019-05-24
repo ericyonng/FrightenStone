@@ -394,6 +394,13 @@ FS_String Time::ToString() const
     return repr.Format("%s.%06d", Format().c_str(), localTime%_microSecondPerSecond);
 }
 
+FS_String Time::ToStringOfMillSecondPrecision() const
+{
+    FS_String repr;
+    auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
+    return repr.Format("%s.%03d", Format().c_str(), localTime%_microSecondPerSecond / _microSecondPerMilliSecond);
+}
+
 Time::Time(Int64 microSecTimestamp)
     :_rawTime(microSecTimestamp)
 {

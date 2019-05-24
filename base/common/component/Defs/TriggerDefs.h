@@ -31,8 +31,6 @@
  */
 #ifndef __Base_Common_Component_Defs_TriggerDefs_H__
 #define __Base_Common_Component_Defs_TriggerDefs_H__
-
-
 #pragma once
 
 #include "base/exportbase.h"

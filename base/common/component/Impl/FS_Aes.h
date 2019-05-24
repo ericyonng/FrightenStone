@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_CpuUtil.h
+ * @file  : FS_Aes.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,37 +29,20 @@
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Impl_FS_CpuUtil_H__
-#define __Base_Common_Assist_Utils_Impl_FS_CpuUtil_H__
+#ifndef __Base_Common_Component_Impl_FS_Aes_H__
+#define __Base_Common_Component_Impl_FS_Aes_H__
 #pragma once
 
 #include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
 #include "base/common/basedefs/DataType/DataType.h"
+#include "base/common/basedefs/Macro/MacroDefs.h"
 
-FS_NAMESPACE_BEGIN
-
-class BASE_EXPORT FS_CpuUtil
+class BASE_EXPORT FS_Aes
 {
 public:
-    static bool Initialize();
-    static Double GetUsage();
-    static Int32 GetCpuCoreCnt();
 
 private:
-    static Int64 _CompareFileTime(FILETIME time1, FILETIME time2);
-
-private:
-    static FILETIME _preidleTime;
-    static FILETIME _preKernalTime;
-    static FILETIME _preUserTime;
-    static bool _isInit;
+public:
 };
-
-#pragma region Inline
-
-#pragma endregion
-
-FS_NAMESPACE_END
 
 #endif

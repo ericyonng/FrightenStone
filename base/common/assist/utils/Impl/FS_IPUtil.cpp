@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_CpuUtil.h
+ * @file  : FS_IPUtil.cpp
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,37 +29,26 @@
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Impl_FS_CpuUtil_H__
-#define __Base_Common_Assist_Utils_Impl_FS_CpuUtil_H__
-#pragma once
+#include "stdafx.h"
+#pragma region winsock 2
+#include <winsock2.h>
+// #include <MSWSock.h>
+#include<ws2tcpip.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#pragma comment(lib,"ws2_32.lib")
+#pragma endregion
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
-#include "base/common/basedefs/DataType/DataType.h"
+#include "base/common/component/Impl/FS_String.h"
+#include "base/common/assist/utils/Defs/FS_IPUtilDefs.h"
+#include "base/common/assist/utils/Impl/FS_IPUtil.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_CpuUtil
+bool FS_IPUtil::GetLocalIP(FS_String &ip, Int32 netCardNo, bool isToBind, bool isStreamSock, bool isIpv4)
 {
-public:
-    static bool Initialize();
-    static Double GetUsage();
-    static Int32 GetCpuCoreCnt();
-
-private:
-    static Int64 _CompareFileTime(FILETIME time1, FILETIME time2);
-
-private:
-    static FILETIME _preidleTime;
-    static FILETIME _preKernalTime;
-    static FILETIME _preUserTime;
-    static bool _isInit;
-};
-
-#pragma region Inline
-
-#pragma endregion
+    return false;
+}
 
 FS_NAMESPACE_END
-
-#endif

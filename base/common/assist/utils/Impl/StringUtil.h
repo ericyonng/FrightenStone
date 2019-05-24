@@ -47,6 +47,7 @@
 FS_NAMESPACE_BEGIN
 
 class FS_String;
+class Time;
 
 class BASE_EXPORT StringUtil
 {
@@ -60,6 +61,7 @@ public:
     static Double StringToDouble(const char *str);
     static bool MakeMd5(const FS_String &src, FS_String &outMd5);
     static bool ToHexString(const FS_String &src, FS_String &outHexString);
+    static void PreInstertTime(const Time &time, FS_String &src);
 };
 
 #pragma region Inline
