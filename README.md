@@ -1,5 +1,7 @@
 # 惊石框架
 
+[![License](https://img.shields.io/github/license/ericyonng/FrightenStone.svg?style=popout "https://shields.io/category/license")](https://opensource.org/licenses/MIT) 
+
 **作者**: ericyonng
 
 **时间**: 2019.03.14
@@ -13,8 +15,6 @@
 **CreateTime**: 03/14/2019
 
 # 构建状态
-
-[![License](https://img.shields.io/github/license/ericyonng/FrightenStone.svg?style=popout "https://shields.io/category/license")](https://opensource.org/licenses/MIT) 
 
 **Linux**: [![Build](https://travis-ci.com/ericyonng/FrightenStone.svg?branch=master)](http://travis-ci.com)
 
