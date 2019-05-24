@@ -39,10 +39,11 @@
 #include "TestSuit/TestSuit/TestInst/TestCpuUtil.h"
 #include "TestSuit/TestSuit/TestInst/TestFile.h"
 #include "TestSuit/TestSuit/TestInst/TestJson.h"
+#include "TestSuit/TestSuit/TestInst/TestLogFile.h"
 
 int main()
 {
-    TestJson::Run();
+    TestLogFile::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;

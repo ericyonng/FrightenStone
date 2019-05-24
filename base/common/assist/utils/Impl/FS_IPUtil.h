@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_CpuUtil.h
+ * @file  : FS_IPUtil.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,36 +29,22 @@
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Impl_FS_CpuUtil_H__
-#define __Base_Common_Assist_Utils_Impl_FS_CpuUtil_H__
+#ifndef __Base_Common_Assist_Utils_Impl_FS_IPUtil_H__
+#define __Base_Common_Assist_Utils_Impl_FS_IPUtil_H__
 #pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
+#include<base/exportbase.h>
 #include "base/common/basedefs/DataType/DataType.h"
+#include "base/common/basedefs/Macro/ForAll/ForAllMacro.h"
 
 FS_NAMESPACE_BEGIN
+class FS_String;
 
-class BASE_EXPORT FS_CpuUtil
+class BASE_EXPORT FS_IPUtil
 {
 public:
-    static bool Initialize();
-    static Double GetUsage();
-    static Int32 GetCpuCoreCnt();
-
-private:
-    static Int64 _CompareFileTime(FILETIME time1, FILETIME time2);
-
-private:
-    static FILETIME _preidleTime;
-    static FILETIME _preKernalTime;
-    static FILETIME _preUserTime;
-    static bool _isInit;
+    static bool GetLocalIP(FS_String &ip, Int32 netCardNo = 0, bool isToBind = true, bool isStreamSock = true, bool isIpv4 = true);
 };
-
-#pragma region Inline
-
-#pragma endregion
 
 FS_NAMESPACE_END
 

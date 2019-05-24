@@ -429,6 +429,24 @@
     <ClInclude Include="..\..\3rd\3rd.h">
       <Filter>3rd</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\File\FS_IniFile.h">
+      <Filter>common\component\Impl\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_IPUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\FS_IPUtilDefs.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_Aes.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Defs\FS_AesDefs.h">
+      <Filter>common\component\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\AesHandle.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -511,6 +529,18 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\File\LogFile.cpp">
       <Filter>common\component\Impl\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\File\FS_IniFile.cpp">
+      <Filter>common\component\Impl\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\FS_Aes.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\AesHandle.cpp">
+      <Filter>common\component\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

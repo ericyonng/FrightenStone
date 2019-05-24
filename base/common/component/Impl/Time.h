@@ -196,6 +196,7 @@ public:
      * @return FS_String - the object string representation.
      */
     FS_String ToString() const;
+    FS_String ToStringOfMillSecondPrecision() const;
     #pragma endregion
 
     #pragma region 

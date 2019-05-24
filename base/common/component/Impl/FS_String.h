@@ -83,13 +83,14 @@ public:
     FS_String &operator << (const void *addr);    // 
     FS_String &operator << (void *&&addr);    // 
 
-    char operator [] (Int32 index) const;
+    char operator [] (Int32 index) const;    // no out range detect
 
     bool operator == (const FS_String &index) const;
     FS_String operator + (const FS_String &other) const; // 
     FS_String operator + (const char *other) const; // 
     FS_String operator + (const std::string &other) const; // 
 
+    bool operator <(const FS_String &right) const;
     explicit operator std::string &();
     explicit operator const std::string &() const;
 
@@ -304,6 +305,11 @@ inline FS_String FS_String::operator + (const std::string &other) const
 #pragma endregion
 
 #pragma region Inline
+inline bool FS_String::operator <(const FS_String &right) const
+{
+    return _buffer < right._buffer;
+}
+
 inline FS_String::operator std::string &()
 {
     return _buffer;

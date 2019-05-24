@@ -38,10 +38,11 @@
 FS_NAMESPACE_BEGIN
 
 template<typename T>
-inline Int64 LogFile::Write(FS_String &logStr)
+inline Int64 LogFile::Write(const FS_String &logStr)
 {
-    logStr <<"<"<<typeid(T).name()<< ">" << FS_String::endl;
-    return FS_File::Write(logStr.c_str(), logStr.GetLength());
+    FS_String logCache;
+    logCache << "<" << typeid(T).name() << ">: " << logStr << FS_String::endl;
+    return FS_File::Write(logCache.c_str(), logCache.GetLength());
 }
 
 FS_NAMESPACE_END

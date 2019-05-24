@@ -47,7 +47,7 @@ public:
 
 public:
     template<typename T>
-    Int64 Write(FS_String &logStr);
+    Int64 Write(const FS_String &logStr);
     bool IsDayPass(const Time &lastModifyTime) const;
     void UpdateLastTimestamp();
 

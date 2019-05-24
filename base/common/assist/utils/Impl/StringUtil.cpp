@@ -30,8 +30,9 @@
  * 
  */
 #include "stdafx.h"
-#include "base/common/assist/utils/Impl/StringUtil.h"
 #include "base/common/component/Impl/FS_String.h"
+#include "base/common/component/Impl/Time.h"
+#include "base/common/assist/utils/Impl/StringUtil.h"
 #include "base/common/common.h"
 
 #pragma region 3rd
@@ -78,4 +79,8 @@ bool StringUtil::ToHexString(const FS_String &src, FS_String &outHexString)
     return true;
 }
 
+void StringUtil::PreInstertTime(const Time &time, FS_String &src)
+{
+    src << time.ToStringOfMillSecondPrecision();
+}
 FS_NAMESPACE_END
