@@ -190,6 +190,9 @@
     <Filter Include="3rd">
       <UniqueIdentifier>{3fca1d3a-5785-44fd-9203-f8c8d708c41e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\component\Impl\Aes">
+      <UniqueIdentifier>{0d117e2d-20b4-4411-a80b-a8339e332a3c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -438,14 +441,20 @@
     <ClInclude Include="..\common\assist\utils\Defs\FS_IPUtilDefs.h">
       <Filter>common\assist\utils\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\FS_Aes.h">
-      <Filter>common\component\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\component\Defs\FS_AesDefs.h">
       <Filter>common\component\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\AesHandle.h">
+    <ClInclude Include="..\common\component\Impl\FS_Random.h">
       <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_RandomImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\Aes\AesHandle.h">
+      <Filter>common\component\Impl\Aes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\Aes\FS_Aes.h">
+      <Filter>common\component\Impl\Aes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -536,11 +545,11 @@
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\component\Impl\FS_Aes.cpp">
-      <Filter>common\component\Impl</Filter>
+    <ClCompile Include="..\common\component\Impl\Aes\AesHandle.cpp">
+      <Filter>common\component\Impl\Aes</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\component\Impl\AesHandle.cpp">
-      <Filter>common\component\Impl</Filter>
+    <ClCompile Include="..\common\component\Impl\Aes\FS_Aes.cpp">
+      <Filter>common\component\Impl\Aes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

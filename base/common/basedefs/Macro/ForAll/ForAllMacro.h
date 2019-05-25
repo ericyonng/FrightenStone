@@ -207,4 +207,7 @@ private:\
 private:\
     x();
 
+#undef MAX_I64_NUM
+#define MAX_I64_NUM	0x7FFFFFFFFFFFFFFF
+
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__
