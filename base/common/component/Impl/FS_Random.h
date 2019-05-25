@@ -38,6 +38,10 @@
 #include "base/common/basedefs/Macro/MacroDefs.h"
 #include <chrono>
 #include <random>
+#include <limits>
+#include <numeric>
+
+FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_RandomDefs
 {
@@ -81,15 +85,15 @@ public:
 
 };
 
-template<typename RandValType = Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE RanmdomGenType = FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64, FS_RandomDefs::RAND_DIS_TYPE DisType = FS_RandomDefs::RAND_DIS_TYPE_NORMAL>
-class BASE_EXPORT FS_Random
+template<typename RandValType = Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE RanmdomGenType = FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64, FS_RandomDefs::RAND_DIS_TYPE DisType = FS_RandomDefs::RAND_DIS_TYPE_INT>
+class FS_Random
 {
 public:
     FS_Random();
-    FS_Random(RandValType minVal, RandValType maxVal, RandValType srandVal);
+    FS_Random(RandValType minVal, RandValType maxVal, RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()));
     virtual ~FS_Random();
     // 随机数发生
-    operator typename RandValType()() const;
+    typename RandValType operator()();
 
 private:
     // 随机数分布器
@@ -106,10 +110,159 @@ private:
 
     };
 
+    #pragma region 随机数分布器/随机数发生源 偏特化
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_SMALLINT>
+   {
+        std::uniform_int<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_INT>
+    {
+        std::uniform_int_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_REAL>
+    {
+        std::uniform_real_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_BERNOULLI>
+    {
+        std::bernoulli_distribution _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_GEOMETRIC>
+    {
+        std::geometric_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_EXPONENTIAL>
+    {
+        std::exponential_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_NORMAL>
+    {
+        std::normal_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_LOGNORMAL>
+    {
+        std::lognormal_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_BINOMIAL>
+    {
+        std::binomial_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_CAUCHY>
+    {
+        std::cauchy_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_DISCRETE>
+    {
+        std::discrete_distribution<RandValType> _generator;
+        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+            :_generator(minVal, maxVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct RandomSource<RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937>
+    {
+        std::mt19937 _generator;
+        RandomSource(const RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()))
+            :_generator(srandVal)
+        {
+
+        }
+    };
+
+    template<typename RandValType>
+    struct RandomSource<RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64>
+    {
+        std::mt19937_64 _generator;
+        RandomSource(const RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()))
+            :_generator(srandVal)
+        {
+
+        }
+    };
+    #pragma endregion
+
 private:
     Distributor<RandValType, DisType>           _distributor;
     RandomSource<RandValType, RanmdomGenType>   _randomSource;
 };
+
+typedef FS_Random<> FS_Int64Random;
+
+FS_NAMESPACE_END
 
 #include "base/common/component/Impl/FS_RandomImpl.h"
 
