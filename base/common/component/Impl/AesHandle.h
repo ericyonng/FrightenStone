@@ -41,6 +41,52 @@ class FS_String;
 class AesHandle
 {
 public:
+    static bool GenerateKey(FS_String &key);
+
+    // 加密解密
+public:
+    void Encrypt_ecb(const FS_String &key, const FS_String &plaintext, FS_String &cyphertext);
+    void Decrypt_ecb(const FS_String &key, const FS_String &cyphertext, FS_String &plaintext);
+
+private:
+    // 扩展加密密钥
+    bool _ExpandEncKey(uint8_t *k, uint8_t *rc);
+    // 轮密钥加拷贝
+    void _AddRoundKey_cpy(uint8_t *buf, uint8_t *key, uint8_t *cpk);
+
+    // 字节代替
+    void _SubBytes(uint8_t *buf);
+    // 正向行移位
+    void _ShiftRows(uint8_t *buf);
+    // 正向列混淆
+    void _MixColumns(uint8_t *buf);
+    // 轮密码加
+    void _AddRoundKey(uint8_t *buf, uint8_t *key);
+
+    // 逆向行移位
+    void _ShiftRows_Inv(uint8_t *buf);
+    // 逆向字节代替
+    void _SubBytes_Inv(uint8_t *buf);
+    // 解密密钥扩展
+    void _ExpandDecKey(uint8_t *k, uint8_t *rc);
+    // 逆向列混淆
+    void _MixColumns_Inv(uint8_t *buf);
+
+    // s盒计算
+#ifndef BACK_TO_TABLES
+    // s盒中取相应的值
+    uint8_t _RJ_SBox(uint8_t x);
+    // 计算在伽罗瓦域上的乘逆
+    uint8_t _GF_MulInv(uint8_t x); // calculate multiplicative inverse
+    // 在GF域上计算对数
+    uint8_t _GF_Log(uint8_t x); // calculate logarithm gen 3
+    // 在GF域上计算对数的反函数
+    uint8_t _GF_ALog(uint8_t x); // calculate anti-logarithm gen 3
+    // s盒的逆中取相应的值
+    uint8_t _RJ_SBox_Inv(uint8_t x);
+#endif
+    // 求指数
+    uint8_t _RJ_xTime(uint8_t x);
 };
 
 #endif
