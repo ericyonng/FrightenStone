@@ -40,10 +40,11 @@
 #include "TestSuit/TestSuit/TestInst/TestFile.h"
 #include "TestSuit/TestSuit/TestInst/TestJson.h"
 #include "TestSuit/TestSuit/TestInst/TestLogFile.h"
+#include "TestSuit/TestSuit/TestInst/TestRandom.h"
 
 int main()
 {
-    TestLogFile::Run();
+    TestRandom::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;
