@@ -21,32 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : FS_Random.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/05/26
  * @brief :
  * 
  *
  * 
  */
-#include "TestSuit/TestSuit/TestInst/TestDelegate.h"
-#include "TestSuit/TestSuit/TestInst/TestString.h"
-#include "TestSuit/TestSuit/TestInst/TestTime.h"
-#include "TestSuit/TestSuit/TestInst/TestTrigger.h"
-#include "TestSuit/TestSuit/TestInst/TestThreadPool.h"
-#include "TestSuit/TestSuit/TestInst/TestFSDirectory.h"
-#include "TestSuit/TestSuit/TestInst/TestFSFileUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestCpuUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestFile.h"
-#include "TestSuit/TestSuit/TestInst/TestJson.h"
-#include "TestSuit/TestSuit/TestInst/TestLogFile.h"
-#include "TestSuit/TestSuit/TestInst/TestRandom.h"
-#include "TestSuit/TestSuit/TestInst/TestAes.h"
-
-int main()
-{
-    TestAes::Run();
-    std::cout << "main end" << std::endl;
-    getchar();
-    return 0;
-}
+#include "stdafx.h"
+#include "base/common/asyn/Lock/Lock.h"
+#include "base/common/component/Impl/FS_Random.h"
+fs::Locker g_RandomLocker;
+fs::MT1993764RandSrc g_RandomSeed;

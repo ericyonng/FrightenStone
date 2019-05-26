@@ -83,6 +83,7 @@ public:
     FS_String &operator << (const void *addr);    // 
     FS_String &operator << (void *&&addr);    // 
 
+    char &operator [] (Int32 index);    // no out range detect
     char operator [] (Int32 index) const;    // no out range detect
 
     bool operator == (const FS_String &index) const;
@@ -103,9 +104,9 @@ public:
     size_t GetLength() const;
     void Clear();
     void Swap(FS_String &&str);
+    FS_String ToHexString() const;
 
     FS_String &AppendBitData(const char *bitData, Int64 dataSize);
-
     _These Split(char sep, size_type max_split = -1) const;    // only ascii
     _These Split(const char *sep, size_type max_split = -1) const;    // only ascii
     _These Split(const FS_String &sep, std::string::size_type max_split = -1, bool onlyLikely = false) const;
@@ -275,6 +276,11 @@ inline FS_String &FS_String::operator << (void *&&addr)
 {
     _append_fmt_str("%p", addr);
     return *this;
+}
+
+inline char &FS_String::operator [] (Int32 index)
+{
+    return _buffer[index];
 }
 
 inline char FS_String::operator [] (Int32 index) const

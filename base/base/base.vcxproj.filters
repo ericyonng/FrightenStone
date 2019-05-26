@@ -551,5 +551,8 @@
     <ClCompile Include="..\common\component\Impl\Aes\FS_Aes.cpp">
       <Filter>common\component\Impl\Aes</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\component\Impl\FS_Random.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

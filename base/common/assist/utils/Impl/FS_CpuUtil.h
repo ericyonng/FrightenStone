@@ -37,6 +37,7 @@
 #include "base/common/basedefs/Macro/MacroDefs.h"
 #include "base/common/basedefs/DataType/DataType.h"
 
+
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_CpuUtil

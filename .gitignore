@@ -46,3 +46,8 @@ CTestTestfile.cmake
 /sln/windows/frightenstone/x64/Debug/*.dll
 /sln/windows/frightenstone/x64/Debug/*.exe
 /sln/windows/frightenstone/x64/Debug/*.exp
+/sln/windows/frightenstone/.vs/frightenstone/v15/ipch/AutoPCH/50d43ef4c5bdde7e/*.ipch
+/sln/windows/frightenstone/.vs/frightenstone/v15/ipch/AutoPCH/63b2a99485b08d15/*.ipch
+/sln/windows/frightenstone/.vs/frightenstone/v15/ipch/AutoPCH/84abb1df9dcef19c/*.ipch
+/sln/windows/frightenstone/.vs/frightenstone/v15/ipch/AutoPCH/b8577f80ffb156f/*.ipch
+/sln/windows/frightenstone/.vs/frightenstone/v15/ipch/AutoPCH/c9b4e5540166e45f/*.ipch

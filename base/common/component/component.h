@@ -48,6 +48,7 @@
 #include "base/common/component/Impl/File/FS_File.h"
 #include "base/common/component/Impl/File/LogFile.h"
 #include "base/common/component/Impl/SmartVar.h"
+#include "base/common/component/Defs/FS_AesDefs.h"
 #include "base/common/component/Impl/Aes/FS_Aes.h"
 #include "base/common/component/Impl/FS_Random.h"
 

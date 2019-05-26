@@ -21,32 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : TestAes.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/05/27
  * @brief :
  * 
  *
  * 
  */
-#include "TestSuit/TestSuit/TestInst/TestDelegate.h"
-#include "TestSuit/TestSuit/TestInst/TestString.h"
-#include "TestSuit/TestSuit/TestInst/TestTime.h"
-#include "TestSuit/TestSuit/TestInst/TestTrigger.h"
-#include "TestSuit/TestSuit/TestInst/TestThreadPool.h"
-#include "TestSuit/TestSuit/TestInst/TestFSDirectory.h"
-#include "TestSuit/TestSuit/TestInst/TestFSFileUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestCpuUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestFile.h"
-#include "TestSuit/TestSuit/TestInst/TestJson.h"
-#include "TestSuit/TestSuit/TestInst/TestLogFile.h"
-#include "TestSuit/TestSuit/TestInst/TestRandom.h"
-#include "TestSuit/TestSuit/TestInst/TestAes.h"
+#ifndef __Test_TestAes_H__
+#define __Test_TestAes_H__
 
-int main()
+#pragma once
+#include "stdafx.h"
+#include "rijndael.h"
+
+class TestAes
 {
-    TestAes::Run();
-    std::cout << "main end" << std::endl;
-    getchar();
-    return 0;
-}
+public:
+    static void Run()
+    {
+        U8 plaintext[17] = "3456789123456780";
+        U8 key[16] = "fasdfasdfadfas9";
+        aes_encrypt_ecb(AES_CYPHER_256, plaintext, 16, key);
+        fs::FS_String strcach;
+        strcach.AppendBitData(reinterpret_cast<const char *>( plaintext), 16);
+        std::cout << "plaintext:" << "3456789123456780" << std::endl;
+        std::cout << "cypher:" << strcach.ToHexString().c_str() << std::endl;
+
+        aes_decrypt_ecb(AES_CYPHER_256, plaintext, 16, key);
+        strcach.Clear();
+        strcach.AppendBitData(reinterpret_cast<const char *>(plaintext), 16);
+        std::cout << "plaintext:" << "3456789123456780" << std::endl;
+        std::cout << "plaintext:" << strcach.ToHexString().c_str() << std::endl;
+    }
+};
+
+#endif

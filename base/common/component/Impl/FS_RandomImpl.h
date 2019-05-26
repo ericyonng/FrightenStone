@@ -31,30 +31,58 @@
  */
 #ifdef __Base_Common_Component_Impl_FS_Random_H__
 #pragma once
+#include <algorithm>
 
 FS_NAMESPACE_BEGIN
 
-template<typename RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE RanmdomGenType, FS_RandomDefs::RAND_DIS_TYPE DisType>
-inline FS_Random<RandValType, RanmdomGenType, DisType>::FS_Random()
+template<typename RandValType>
+struct RandomSource<RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937>
+{
+    std::mt19937 _generator;
+    RandomSource(const RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()))
+        :_generator(srandVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct RandomSource<RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64>
+{
+    std::mt19937_64 _generator;
+    RandomSource(const RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()))
+        :_generator(srandVal)
+    {
+
+    }
+};
+
+template<typename RandValType, FS_RandomDefs::RAND_DIS_TYPE DisType>
+inline FS_Random<RandValType, DisType>::FS_Random()
 {
 }
 
-template<typename RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE RanmdomGenType, FS_RandomDefs::RAND_DIS_TYPE DisType>
-inline FS_Random<RandValType, RanmdomGenType, DisType>::FS_Random(RandValType minVal, RandValType maxVal, RandValType srandVal)
-    :_distributor(minVal, maxVal)
-    ,_randomSource(srandVal)
+template<typename RandValType , FS_RandomDefs::RAND_DIS_TYPE DisType>
+inline FS_Random<RandValType, DisType>::FS_Random(RandValType minVal, RandValType maxVal)
+    :_distributor(std::min<RandValType>(minVal, maxVal), std::max<RandValType>(minVal, maxVal))
 {
 }
 
-template<typename RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE RanmdomGenType, FS_RandomDefs::RAND_DIS_TYPE DisType>
-inline FS_Random<RandValType, RanmdomGenType, DisType>::~FS_Random()
+template<typename RandValType , FS_RandomDefs::RAND_DIS_TYPE DisType>
+inline FS_Random<RandValType, DisType>::~FS_Random()
 {
 }
 
-template<typename RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE RanmdomGenType, FS_RandomDefs::RAND_DIS_TYPE DisType>
-inline typename RandValType FS_Random<RandValType, RanmdomGenType, DisType>::operator ()()
+template<typename RandValType , FS_RandomDefs::RAND_DIS_TYPE DisType>
+inline typename RandValType FS_Random<RandValType, DisType>::operator ()(MT1993764RandSrc &randomSrc)
 {
-     return  static_cast<RandValType>(_distributor._generator(_randomSource._generator));
+     return  static_cast<RandValType>(_distributor._generator(randomSrc._generator));
+}
+
+template<typename RandValType, FS_RandomDefs::RAND_DIS_TYPE DisType>
+inline typename RandValType FS_Random<RandValType, DisType>::operator ()(MT19937RandSrc &randomSrc)
+{
+    return  static_cast<RandValType>(_distributor._generator(randomSrc._generator));
 }
 
 FS_NAMESPACE_END

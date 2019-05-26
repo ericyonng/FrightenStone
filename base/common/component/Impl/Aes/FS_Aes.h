@@ -36,13 +36,30 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
+#include "base/common/component/Defs/FS_AesDefs.h"
 
+FS_NAMESPACE_BEGIN
+class AesHandle;
+class FS_String;
 class BASE_EXPORT FS_Aes
 {
 public:
+    FS_Aes();
+    virtual ~FS_Aes();
+
+    // 产生密钥
+    static bool GenerateKey(FS_AesDefs::Aes256Context &key);
+    //加密 需要是128bit 16字节的倍数
+    bool Encrypt_Data(const FS_AesDefs::Aes256Context &key, const FS_String &plaintext, FS_String &cyphertext);
+    //解密 需要是128bit 16字节的倍数
+    bool Decrypt_Data(const FS_AesDefs::Aes256Context &key, const FS_String &cyphertext, FS_String &plaintext);
 
 private:
-public:
+    AesHandle *_handle;
+    FS_String _cache;
+    FS_String _cache2;
 };
+
+FS_NAMESPACE_END
 
 #endif
