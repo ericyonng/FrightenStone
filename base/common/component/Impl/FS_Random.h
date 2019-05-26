@@ -40,8 +40,11 @@
 #include <random>
 #include <limits>
 #include <numeric>
+#include <atomic>
 
 FS_NAMESPACE_BEGIN
+
+class Locker;
 
 class BASE_EXPORT FS_RandomDefs
 {
@@ -77,35 +80,42 @@ public:
     };
 
 #undef RAND_DIS_NUM_SCOPE_MIN
-#undef RAND_DIS_NUM_SCOPE_I64MAX
-#undef RAND_DIS_NUM_SCOPE_I32MAX
+#undef RAND_DIS_NUM_SCOPE_INT64MAX
+#undef RAND_DIS_NUM_SCOPE_INT32MAX
 #define RAND_DIS_NUM_SCOPE_MIN          0LL
 #define RAND_DIS_NUM_SCOPE_INT64MAX     1152921504606846976LL
 #define RAND_DIS_NUM_SCOPE_INT32MAX     1073741824
 
 };
 
-template<typename RandValType = Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE RanmdomGenType = FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64, FS_RandomDefs::RAND_DIS_TYPE DisType = FS_RandomDefs::RAND_DIS_TYPE_INT>
+// 随机数源
+template<typename RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE>
+struct RandomSource
+{
+
+};
+
+#pragma region TypeDefine RandomSource
+typedef RandomSource<Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64> MT1993764RandSrc;
+typedef RandomSource<Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937> MT19937RandSrc;
+#pragma endregion
+
+template<typename RandValType = Int64, FS_RandomDefs::RAND_DIS_TYPE DisType = FS_RandomDefs::RAND_DIS_TYPE_INT>
 class FS_Random
 {
 public:
     FS_Random();
-    FS_Random(RandValType minVal, RandValType maxVal, RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()));
+    FS_Random(RandValType minVal, RandValType maxVal);
     virtual ~FS_Random();
+
     // 随机数发生
-    typename RandValType operator()();
+    typename RandValType operator()(MT1993764RandSrc &randomSrc);
+    typename RandValType operator()(MT19937RandSrc &randomSrc);
 
 private:
     // 随机数分布器
     template<typename RandValType, FS_RandomDefs::RAND_DIS_TYPE>
     struct Distributor
-    {
-
-    };
-
-    // 随机数源
-    template<typename RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE>
-    struct RandomSource
     {
 
     };
@@ -231,38 +241,18 @@ private:
 
         }
     };
-
-    template<typename RandValType>
-    struct RandomSource<RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937>
-    {
-        std::mt19937 _generator;
-        RandomSource(const RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()))
-            :_generator(srandVal)
-        {
-
-        }
-    };
-
-    template<typename RandValType>
-    struct RandomSource<RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64>
-    {
-        std::mt19937_64 _generator;
-        RandomSource(const RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()))
-            :_generator(srandVal)
-        {
-
-        }
-    };
     #pragma endregion
 
 private:
     Distributor<RandValType, DisType>           _distributor;
-    RandomSource<RandValType, RanmdomGenType>   _randomSource;
 };
 
 typedef FS_Random<> FS_Int64Random;
 
 FS_NAMESPACE_END
+
+extern BASE_EXPORT fs::Locker g_RandomLocker;
+extern BASE_EXPORT fs::MT1993764RandSrc g_RandomSeed;
 
 #include "base/common/component/Impl/FS_RandomImpl.h"
 

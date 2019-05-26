@@ -124,6 +124,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TestInst\rijndael.h" />
+    <ClInclude Include="TestInst\TestAes.h" />
     <ClInclude Include="TestInst\TestCpuUtil.h" />
     <ClInclude Include="TestInst\TestDelegate.h" />
     <ClInclude Include="TestInst\TestFile.h" />
@@ -139,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TestInst\rijndael.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

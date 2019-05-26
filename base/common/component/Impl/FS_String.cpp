@@ -76,6 +76,22 @@ FS_String::FS_String(const char *other)
     _cache[0] = 0;
 }
 
+FS_String FS_String::ToHexString() const
+{
+    FS_String info;
+    char cache[4] = {0};
+    const Int64 bufferSize = static_cast<Int64>(_buffer.size());
+    for(Int64 i = 0; i < bufferSize; ++i)
+    {
+        cache[0] = 0;
+        const Int32 len = sprintf_s(cache, sizeof(cache), "%02x", static_cast<U8>(_buffer[i]));
+        cache[len] = 0;
+        info << cache;
+    }
+
+    return info;
+}
+
 FS_String::_These FS_String::Split(char sep, size_type max_split) const
 {
     return this->Split(FS_String(sep), max_split);

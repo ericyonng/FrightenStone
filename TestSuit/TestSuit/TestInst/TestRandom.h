@@ -8,11 +8,12 @@ class TestRandom
 public:
     static void Run()
     {
-        fs::FS_Int64Random random(28000000000, 58000000000, time(0));
-        std::cout << random() << std::endl;
-        std::cout << random() << std::endl;
-        std::cout << random() << std::endl;
-        std::cout << random() << std::endl;
+        fs::FS_Int64Random random(-100000000, -200000000);
+        fs::FS_Int64Random randOmdd;
+        std::cout << random(g_RandomSeed) << std::endl;
+        std::cout << random(g_RandomSeed) << std::endl;
+        std::cout << random(g_RandomSeed) << std::endl;
+        std::cout << random(g_RandomSeed) << std::endl;
     }
 };
 

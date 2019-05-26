@@ -35,7 +35,6 @@
 #pragma once
 #include "stdafx.h"
 
-
 class TestTime
 {
 public:

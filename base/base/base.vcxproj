@@ -266,6 +266,7 @@
     <ClCompile Include="..\common\component\Impl\File\FS_File.cpp" />
     <ClCompile Include="..\common\component\Impl\File\FS_IniFile.cpp" />
     <ClCompile Include="..\common\component\Impl\File\LogFile.cpp" />
+    <ClCompile Include="..\common\component\Impl\FS_Random.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_String.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_ThreadPool.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar.cpp" />
