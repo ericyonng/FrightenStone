@@ -84,7 +84,7 @@ public:
     FS_String &operator << (void *&&addr);    // 
 
     char &operator [] (Int32 index);    // no out range detect
-    char operator [] (Int32 index) const;    // no out range detect
+    const char &operator [] (Int32 index) const;    // no out range detect
 
     bool operator == (const FS_String &index) const;
     FS_String operator + (const FS_String &other) const; // 
@@ -283,7 +283,7 @@ inline char &FS_String::operator [] (Int32 index)
     return _buffer[index];
 }
 
-inline char FS_String::operator [] (Int32 index) const
+inline const char &FS_String::operator [] (Int32 index) const
 {
     return _buffer[index];
 }

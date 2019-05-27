@@ -14,12 +14,14 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_AesDefs
 {
-public:
-    typedef struct {
-        U8 key[FS_AES_256_KEY_LEN];
-        U8 enckey[FS_AES_256_KEY_LEN];
-        U8 deckey[FS_AES_256_KEY_LEN];
-    } Aes256Context;
+public:     
+    // √‹Œƒ¿‡–Õ
+    enum AES_CYPHER_T_TYPE
+    {
+        AES_CYPHER_128 = 0,
+        AES_CYPHER_192,
+        AES_CYPHER_256,
+    };
 };
 FS_NAMESPACE_END
 #endif

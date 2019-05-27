@@ -34,26 +34,30 @@
 
 #pragma once
 #include "stdafx.h"
-#include "rijndael.h"
 
 class TestAes
 {
 public:
     static void Run()
     {
-        U8 plaintext[17] = "3456789123456780";
-        U8 key[16] = "fasdfasdfadfas9";
-        aes_encrypt_ecb(AES_CYPHER_256, plaintext, 16, key);
-        fs::FS_String strcach;
-        strcach.AppendBitData(reinterpret_cast<const char *>( plaintext), 16);
-        std::cout << "plaintext:" << "3456789123456780" << std::endl;
-        std::cout << "cypher:" << strcach.ToHexString().c_str() << std::endl;
-
-        aes_decrypt_ecb(AES_CYPHER_256, plaintext, 16, key);
-        strcach.Clear();
-        strcach.AppendBitData(reinterpret_cast<const char *>(plaintext), 16);
-        std::cout << "plaintext:" << "3456789123456780" << std::endl;
-        std::cout << "plaintext:" << strcach.ToHexString().c_str() << std::endl;
+        fs::FS_String plaintext, cyphertext, key;
+        plaintext = "ÎÒ°¦ni";
+        plaintext.GetRaw().resize(16, 0);
+        cyphertext = plaintext;
+        std::cout << fs::FS_Aes::GenerateKey(fs::FS_AesDefs::AES_CYPHER_192, key) << std::endl;
+        fs::FS_Aes aesHandler;
+        fs::Time nowTime, nextTime;
+        nowTime.FlushTime();
+        for(Int32 i = 0; i < 1000000; ++i)
+        {
+            aesHandler.Encrypt_Data(fs::FS_AesDefs::AES_CYPHER_192, key, plaintext, cyphertext);
+            aesHandler.Decrypt_Data(fs::FS_AesDefs::AES_CYPHER_192, key, cyphertext, plaintext);
+        }
+        nextTime.FlushTime();
+        std::cout << "before:" << nowTime.ToStringOfMillSecondPrecision() << std::endl;
+        std::cout << "after:" << nextTime.ToStringOfMillSecondPrecision() << std::endl;
+        std::cout << "cyphertext:" << cyphertext.ToHexString() << ",len:" << cyphertext.size() << std::endl;
+        std::cout << "plaintext:" << plaintext << ",len:" << plaintext.size() << std::endl;
     }
 };
 

@@ -450,9 +450,6 @@
     <ClInclude Include="..\common\component\Impl\FS_RandomImpl.h">
       <Filter>common\component\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\Aes\AesHandle.h">
-      <Filter>common\component\Impl\Aes</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\component\Impl\Aes\FS_Aes.h">
       <Filter>common\component\Impl\Aes</Filter>
     </ClInclude>
@@ -544,9 +541,6 @@
     </ClCompile>
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\component\Impl\Aes\AesHandle.cpp">
-      <Filter>common\component\Impl\Aes</Filter>
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\Aes\FS_Aes.cpp">
       <Filter>common\component\Impl\Aes</Filter>
