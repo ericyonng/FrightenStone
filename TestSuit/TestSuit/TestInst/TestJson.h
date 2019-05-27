@@ -42,7 +42,7 @@ class TestJson
 public:
     static void Run()
     {
-        nlohmann::json j;
+        fs::json j;
         j["pi"] = 3.141;
         j["name"] = "Niels";
         fs::FS_String p;
