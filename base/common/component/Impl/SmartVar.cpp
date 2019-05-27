@@ -30,4 +30,46 @@
  * 
  */
 #include "stdafx.h"
+#include "base/common/component/Impl/FS_String.h"
 #include "base/common/component/Impl/SmartVar.h"
+
+FS_NAMESPACE_BEGIN
+std::map<unsigned int, FS_String> SmartVarRtti::_rttiTypeRefString;
+const FS_String SmartVarRtti::_nullString;
+
+const FS_String &SmartVarRtti::GetTypeName(unsigned int rttiType)
+{
+    auto iterStr = _rttiTypeRefString.find(rttiType);
+    if(iterStr == _rttiTypeRefString.end())
+        return _nullString;
+
+    return iterStr->second;
+}
+
+void SmartVarRtti::InitRttiTypeNames()
+{
+    if(LIKELY(_rttiTypeRefString.empty()))
+    {
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_BOOL, "bool"));
+
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_INT8, "Byte8"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_UINT8, "U8"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_INT16, "Int16"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_UINT16, "UInt16"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_INT32, "Int32"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_UINT32, "UInt32"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_LONG, "Long"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_ULONG, "ULong"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_PTR, "Pointer"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_INT64, "Int64"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_UINT64, "UInt64"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_FLOAT, "Float"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_DOUBLE, "Double"));
+        _rttiTypeRefString.insert(std::make_pair(SV_STRING_DEF, "string"));
+
+        _rttiTypeRefString.insert(std::make_pair(SV_DICTIONARY_DEF, "dictionary"));
+        _rttiTypeRefString.insert(std::make_pair(SV_NIL, "NULL"));
+    }
+}
+
+FS_NAMESPACE_END

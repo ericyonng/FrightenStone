@@ -81,7 +81,8 @@ SOFTWARE.
 
 #include <cstddef> // size_t
 
-namespace nlohmann
+// namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -106,7 +107,8 @@ struct position_t
 } // namespace nlohmann
 
 
-namespace nlohmann
+// namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -612,7 +614,8 @@ class other_error : public exception
 #include <cstddef> // size_t
 #include <type_traits> // conditional, enable_if, false_type, integral_constant, is_constructible, is_integral, is_same, remove_cv, remove_reference, true_type
 
-namespace nlohmann
+// namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -686,7 +689,8 @@ constexpr T static_const<T>::value;
 // #include <nlohmann/detail/meta/void_t.hpp>
 
 
-namespace nlohmann
+// namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -701,7 +705,8 @@ template <typename ...Ts> using void_t = typename make_void<Ts...>::type;
 // #include <nlohmann/detail/meta/cpp_future.hpp>
 
 
-namespace nlohmann
+// namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -759,7 +764,8 @@ struct iterator_traits<T*, enable_if_t<std::is_object<T>::value>>
 
 
 // http://en.cppreference.com/w/cpp/experimental/is_detected
-namespace nlohmann
+// namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -826,7 +832,8 @@ using is_detected_convertible =
 @see https://github.com/nlohmann
 @since version 1.0.0
 */
-namespace nlohmann
+// namespace nlohmann
+namespace fs
 {
 /*!
 @brief default JSONSerializer template argument
@@ -878,7 +885,7 @@ using json = basic_json<>;
 #endif  // INCLUDE_NLOHMANN_JSON_FWD_HPP_
 
 
-namespace nlohmann
+namespace fs
 {
 /*!
 @brief detail namespace with internal helper functions
@@ -1236,7 +1243,7 @@ struct is_compatible_type
 #include <cstdint> // uint8_t
 #include <string> // string
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -1307,7 +1314,7 @@ inline bool operator<(const value_t lhs, const value_t rhs) noexcept
 }  // namespace nlohmann
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -1702,7 +1709,7 @@ constexpr const auto& from_json = detail::static_const<detail::from_json_fn>::va
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -1820,7 +1827,7 @@ template<typename IteratorType> class iteration_proxy
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
 // And see https://github.com/nlohmann/json/pull/1391
 template <std::size_t N, typename IteratorType, enable_if_t<N == 0, int> = 0>
-auto get(const nlohmann::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.key())
+auto get(const fs::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.key())
 {
     return i.key();
 }
@@ -1828,7 +1835,7 @@ auto get(const nlohmann::detail::iteration_proxy_value<IteratorType>& i) -> decl
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
 // And see https://github.com/nlohmann/json/pull/1391
 template <std::size_t N, typename IteratorType, enable_if_t<N == 1, int> = 0>
-auto get(const nlohmann::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.value())
+auto get(const fs::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.value())
 {
     return i.value();
 }
@@ -1847,16 +1854,16 @@ namespace std
     #pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
 template <typename IteratorType>
-class tuple_size<::nlohmann::detail::iteration_proxy_value<IteratorType>>
+class tuple_size<::fs::detail::iteration_proxy_value<IteratorType>>
             : public std::integral_constant<std::size_t, 2> {};
 
 template <std::size_t N, typename IteratorType>
-class tuple_element<N, ::nlohmann::detail::iteration_proxy_value<IteratorType >>
+class tuple_element<N, ::fs::detail::iteration_proxy_value<IteratorType >>
 {
   public:
     using type = decltype(
                      get<N>(std::declval <
-                            ::nlohmann::detail::iteration_proxy_value<IteratorType >> ()));
+                            ::fs::detail::iteration_proxy_value<IteratorType >> ()));
 };
 #if defined(__clang__)
     #pragma clang diagnostic pop
@@ -1870,7 +1877,7 @@ class tuple_element<N, ::nlohmann::detail::iteration_proxy_value<IteratorType >>
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -2199,7 +2206,7 @@ constexpr const auto& to_json = detail::static_const<detail::to_json_fn>::value;
 }  // namespace nlohmann
 
 
-namespace nlohmann
+namespace fs
 {
 
 template<typename, typename>
@@ -2216,10 +2223,10 @@ struct adl_serializer
     */
     template<typename BasicJsonType, typename ValueType>
     static auto from_json(BasicJsonType&& j, ValueType& val) noexcept(
-        noexcept(::nlohmann::from_json(std::forward<BasicJsonType>(j), val)))
-    -> decltype(::nlohmann::from_json(std::forward<BasicJsonType>(j), val), void())
+        noexcept(::fs::from_json(std::forward<BasicJsonType>(j), val)))
+    -> decltype(::fs::from_json(std::forward<BasicJsonType>(j), val), void())
     {
-        ::nlohmann::from_json(std::forward<BasicJsonType>(j), val);
+        ::fs::from_json(std::forward<BasicJsonType>(j), val);
     }
 
     /*!
@@ -2233,10 +2240,10 @@ struct adl_serializer
     */
     template <typename BasicJsonType, typename ValueType>
     static auto to_json(BasicJsonType& j, ValueType&& val) noexcept(
-        noexcept(::nlohmann::to_json(j, std::forward<ValueType>(val))))
-    -> decltype(::nlohmann::to_json(j, std::forward<ValueType>(val)), void())
+        noexcept(::fs::to_json(j, std::forward<ValueType>(val))))
+    -> decltype(::fs::to_json(j, std::forward<ValueType>(val)), void())
     {
-        ::nlohmann::to_json(j, std::forward<ValueType>(val));
+        ::fs::to_json(j, std::forward<ValueType>(val));
     }
 };
 
@@ -2287,7 +2294,7 @@ struct adl_serializer
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -2723,7 +2730,7 @@ class input_adapter
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 
 /*!
@@ -3427,7 +3434,7 @@ class json_sax_acceptor
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -3564,7 +3571,7 @@ struct is_sax_static_asserts
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -5551,7 +5558,7 @@ class binary_reader
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -7066,7 +7073,7 @@ scan_number_done:
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -7554,7 +7561,7 @@ class parser
 #include <cstddef> // ptrdiff_t
 #include <limits>  // numeric_limits
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -7671,7 +7678,7 @@ class primitive_iterator_t
 }  // namespace nlohmann
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -7715,7 +7722,7 @@ template<typename BasicJsonType> struct internal_iterator
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -8324,7 +8331,7 @@ class iter_impl
 #include <iterator> // reverse_iterator
 #include <utility> // declval
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -8457,7 +8464,7 @@ class json_reverse_iterator : public std::reverse_iterator<Base>
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 template<typename BasicJsonType>
 class json_pointer
@@ -9393,7 +9400,7 @@ class json_pointer
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -9486,7 +9493,7 @@ class json_ref
 #include <string> // basic_string
 #include <vector> // vector
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -9596,7 +9603,7 @@ class output_adapter
 }  // namespace nlohmann
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -10951,7 +10958,7 @@ class binary_writer
 #include <limits> // numeric_limits
 #include <type_traits> // conditional
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -12051,7 +12058,7 @@ char* to_chars(char* first, const char* last, FloatType value)
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace nlohmann
+namespace fs
 {
 namespace detail
 {
@@ -12733,7 +12740,7 @@ class serializer
     void dump_float(number_float_t x, std::true_type /*is_ieee_single_or_double*/)
     {
         char* begin = number_buffer.data();
-        char* end = ::nlohmann::detail::to_chars(begin, begin + number_buffer.size(), x);
+        char* end = ::fs::detail::to_chars(begin, begin + number_buffer.size(), x);
 
         o->write_characters(begin, static_cast<size_t>(end - begin));
     }
@@ -12878,7 +12885,7 @@ class serializer
 @see https://github.com/nlohmann
 @since version 1.0.0
 */
-namespace nlohmann
+namespace fs
 {
 
 /*!
@@ -12967,48 +12974,48 @@ class basic_json
 {
   private:
     template<detail::value_t> friend struct detail::external_constructor;
-    friend ::nlohmann::json_pointer<basic_json>;
-    friend ::nlohmann::detail::parser<basic_json>;
-    friend ::nlohmann::detail::serializer<basic_json>;
+    friend ::fs::json_pointer<basic_json>;
+    friend ::fs::detail::parser<basic_json>;
+    friend ::fs::detail::serializer<basic_json>;
     template<typename BasicJsonType>
-    friend class ::nlohmann::detail::iter_impl;
+    friend class ::fs::detail::iter_impl;
     template<typename BasicJsonType, typename CharType>
-    friend class ::nlohmann::detail::binary_writer;
+    friend class ::fs::detail::binary_writer;
     template<typename BasicJsonType, typename SAX>
-    friend class ::nlohmann::detail::binary_reader;
+    friend class ::fs::detail::binary_reader;
     template<typename BasicJsonType>
-    friend class ::nlohmann::detail::json_sax_dom_parser;
+    friend class ::fs::detail::json_sax_dom_parser;
     template<typename BasicJsonType>
-    friend class ::nlohmann::detail::json_sax_dom_callback_parser;
+    friend class ::fs::detail::json_sax_dom_callback_parser;
 
     /// workaround type for MSVC
     using basic_json_t = NLOHMANN_BASIC_JSON_TPL;
 
     // convenience aliases for types residing in namespace detail;
-    using lexer = ::nlohmann::detail::lexer<basic_json>;
-    using parser = ::nlohmann::detail::parser<basic_json>;
+    using lexer = ::fs::detail::lexer<basic_json>;
+    using parser = ::fs::detail::parser<basic_json>;
 
-    using primitive_iterator_t = ::nlohmann::detail::primitive_iterator_t;
+    using primitive_iterator_t = ::fs::detail::primitive_iterator_t;
     template<typename BasicJsonType>
-    using internal_iterator = ::nlohmann::detail::internal_iterator<BasicJsonType>;
+    using internal_iterator = ::fs::detail::internal_iterator<BasicJsonType>;
     template<typename BasicJsonType>
-    using iter_impl = ::nlohmann::detail::iter_impl<BasicJsonType>;
+    using iter_impl = ::fs::detail::iter_impl<BasicJsonType>;
     template<typename Iterator>
-    using iteration_proxy = ::nlohmann::detail::iteration_proxy<Iterator>;
-    template<typename Base> using json_reverse_iterator = ::nlohmann::detail::json_reverse_iterator<Base>;
+    using iteration_proxy = ::fs::detail::iteration_proxy<Iterator>;
+    template<typename Base> using json_reverse_iterator = ::fs::detail::json_reverse_iterator<Base>;
 
     template<typename CharType>
-    using output_adapter_t = ::nlohmann::detail::output_adapter_t<CharType>;
+    using output_adapter_t = ::fs::detail::output_adapter_t<CharType>;
 
-    using binary_reader = ::nlohmann::detail::binary_reader<basic_json>;
-    template<typename CharType> using binary_writer = ::nlohmann::detail::binary_writer<basic_json, CharType>;
+    using binary_reader = ::fs::detail::binary_reader<basic_json>;
+    template<typename CharType> using binary_writer = ::fs::detail::binary_writer<basic_json, CharType>;
 
-    using serializer = ::nlohmann::detail::serializer<basic_json>;
+    using serializer = ::fs::detail::serializer<basic_json>;
 
   public:
     using value_t = detail::value_t;
-    /// JSON Pointer, see @ref nlohmann::json_pointer
-    using json_pointer = ::nlohmann::json_pointer<basic_json>;
+    /// JSON Pointer, see @ref fs::json_pointer
+    using json_pointer = ::fs::json_pointer<basic_json>;
     template<typename T, typename SFINAE>
     using json_serializer = JSONSerializer<T, SFINAE>;
     /// how to treat decoding errors
@@ -13017,7 +13024,7 @@ class basic_json
     using initializer_list_t = std::initializer_list<detail::json_ref<basic_json>>;
 
     using input_format_t = detail::input_format_t;
-    /// SAX interface type, see @ref nlohmann::json_sax
+    /// SAX interface type, see @ref fs::json_sax
     using json_sax_t = json_sax<basic_json>;
 
     ////////////////
@@ -20778,17 +20785,17 @@ namespace std
 
 /// hash value for JSON objects
 template<>
-struct hash<nlohmann::json>
+struct hash<fs::json>
 {
     /*!
     @brief return a hash value for a JSON object
 
     @since version 1.0.0
     */
-    std::size_t operator()(const nlohmann::json& j) const
+    std::size_t operator()(const fs::json& j) const
     {
         // a naive hashing via the string representation
-        const auto& h = hash<nlohmann::json::string_t>();
+        const auto& h = hash<fs::json::string_t>();
         return h(j.dump());
     }
 };
@@ -20797,16 +20804,16 @@ struct hash<nlohmann::json>
 /// @note: do not remove the space after '<',
 ///        see https://github.com/nlohmann/json/pull/679
 template<>
-struct less< ::nlohmann::detail::value_t>
+struct less< ::fs::detail::value_t>
 {
     /*!
     @brief compare two value_t enum values
     @since version 3.0.0
     */
-    bool operator()(nlohmann::detail::value_t lhs,
-                    nlohmann::detail::value_t rhs) const noexcept
+    bool operator()(fs::detail::value_t lhs,
+                    fs::detail::value_t rhs) const noexcept
     {
-        return nlohmann::detail::operator<(lhs, rhs);
+        return fs::detail::operator<(lhs, rhs);
     }
 };
 
@@ -20816,9 +20823,9 @@ struct less< ::nlohmann::detail::value_t>
 @since version 1.0.0
 */
 template<>
-inline void swap<nlohmann::json>(nlohmann::json& j1, nlohmann::json& j2) noexcept(
-    is_nothrow_move_constructible<nlohmann::json>::value and
-    is_nothrow_move_assignable<nlohmann::json>::value
+inline void swap<fs::json>(fs::json& j1, fs::json& j2) noexcept(
+    is_nothrow_move_constructible<fs::json>::value and
+    is_nothrow_move_assignable<fs::json>::value
 )
 {
     j1.swap(j2);
@@ -20839,9 +20846,9 @@ if no parse error occurred.
 
 @since version 1.0.0
 */
-inline nlohmann::json operator "" _json(const char* s, std::size_t n)
+inline fs::json operator "" _json(const char* s, std::size_t n)
 {
-    return nlohmann::json::parse(s, s + n);
+    return fs::json::parse(s, s + n);
 }
 
 /*!
@@ -20857,9 +20864,9 @@ object if no parse error occurred.
 
 @since version 2.0.0
 */
-inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
+inline fs::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
 {
-    return nlohmann::json::json_pointer(std::string(s, n));
+    return fs::json::json_pointer(std::string(s, n));
 }
 
 // #include <nlohmann/detail/macro_unscope.hpp>
