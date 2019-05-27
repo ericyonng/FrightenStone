@@ -42,27 +42,31 @@ public:
     enum StatusEnum:int
     {
         #pragma region [-1-499]
-        Error = -1,                                             // 
-        Success = 0,                                            // 
-        WaitEventFailure = 1,                                   // 
-        WaitEventTimeOut = 2,                                   // 
-        Repeat = 3,                                             // 
-        ParamError = 4,                                         // 
+        Error = -1,                                             // 错误
+        Success = 0,                                            // 成功
+        WaitEventFailure = 1,                                   // 等待错误
+        WaitEventTimeOut = 2,                                   // 等待超时
+        Repeat = 3,                                             // 重复
+        ParamError = 4,                                         // 参数错误
         #pragma endregion
 
         #pragma region SOCKET[500-599]
-        Socket_CreateFailure = 500,                             // 
-        Socket_NotInit = 501,                                   // 
+        Socket_CreateFailure = 500,                             // 套接字创建失败
+        Socket_NotInit = 501,                                   // 套接字未初始化
         #pragma endregion
 
         #pragma region [600-699]
-        Trigger_InvalidOccasion = 600,                          // 
-        Trigger_InvalidTriggerType = 601,                       // 
-        Trigger_UnkownAddType = 602,                            // 
-        Trigger_TriggerTypeRepeatInOccasion = 603,              // 
+        Trigger_InvalidOccasion = 600,                          // 无效的时机
+        Trigger_InvalidTriggerType = 601,                       // 无效的触发类型
+        Trigger_UnkownAddType = 602,                            // 未知的添加方式
+        Trigger_TriggerTypeRepeatInOccasion = 603,              // 触发类型已存在，请不要重复添加
         #pragma endregion 
 
-        #pragma region [600-699]
+        #pragma region [700-799]
+        Aes_TextLengthNotEnough = 700,                          // 长度不足
+        Aes_Not16BytesMultiple = 701,                           // 不是16字节倍数
+        Aes_CyphertextIsEmpty = 702,                            // 密文不能为空
+        Aes_PlaintextIsEmpty = 703,                             // 明文不能为空
         #pragma endregion
     };
 };

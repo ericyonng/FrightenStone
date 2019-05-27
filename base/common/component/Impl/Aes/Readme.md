@@ -1,3 +1,7 @@
+# 概述
+
+本算法基于openssl的aes封装
+
 # Aes算法介绍
 
 *   Byte-oriented AES-256 implementation.
@@ -45,3 +49,4 @@ AES的基本要求是，采用对称分组密码体制，密钥长度的最少�
 **AES加密数据块分组长度必须为128比特**
 密钥长度可以是128比特、192比特、256比特中的任意一个（**如果数据块及密钥长度不足时，会补齐**）。
 AES加密有很多轮的重复和变换。大致步骤如下：**1、密钥扩展（KeyExpansion），2、初始轮（Initial Round），3、重复轮（Rounds 每一轮又包括：SubBytes、ShiftRows、MixColumns、AddRoundKey)，4、最终轮（Final Round 最终轮没有MixColumns)**
+

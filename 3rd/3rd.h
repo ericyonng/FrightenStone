@@ -43,8 +43,11 @@
 // include header
 #ifdef _DEBUG
 #include "3rd/openssl/staticlib/debug/include/openssl/md5.h"
+#include "3rd/openssl/staticlib/debug/include/openssl/aes.h"
+
 #else
 #include "3rd/openssl/staticlib/release/include/openssl/md5.h"
+#include "3rd/openssl/staticlib/release/include/openssl/aes.h"
 #endif
 
 // lib static lib

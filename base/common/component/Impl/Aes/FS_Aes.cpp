@@ -30,147 +30,106 @@
  * 
  */
 #include "stdafx.h"
+#include "base/common/asyn/asyn.h"
 #include "base/common/component/Impl/FS_Random.h"
 #include "base/common/component/Impl/FS_String.h"
-#include "base/common/component/Impl/Aes/AesHandle.h"
 #include "base/common/component/Impl/Aes/FS_Aes.h"
+#include "base/common/status/status.h"
 
-#define AES_KEY_NUM_LEN             10
-#define AES_KEY_CHAR_LEN            52
-#define AES_KEY_SYMBOL_LEN          32
-#define AES_NUM_KIND                0           // 数字
-#define AES_CHAR_KIND               1           // 英文
-#define AES_SYMBOL_KIND             2           // 字符
-#define AES_KEY_KIND_COUNT          3
+#define __USE_FS_3RD_OPENSSL__
+#include "3rd/3rd.h"
 
-// key 表
-// 数值表
-static const char AesKeyNumTable[AES_KEY_NUM_LEN] = {'0', '1', '2', '3', '4'
-, '5', '6', '7', '8', '9'};
+#pragma region defines
+static const int g_aes_key_bytes[] = {
+    /* AES_CYPHER_128 */  16,
+    /* AES_CYPHER_192 */  24,
+    /* AES_CYPHER_256 */  32,
+};
 
-// 英文表
-static const char AesKeyCharTable[AES_KEY_CHAR_LEN] = {'a', 'b', 'c', 'd', 'e'
-, 'f', 'g', 'h', 'i', 'j'
-, 'k', 'l', 'm', 'n', 'o'
-, 'p', 'q', 'r', 's', 't'
-, 'u', 'v', 'w', 'x', 'y'
-, 'z'
-, 'A', 'B', 'C', 'D', 'E'
-, 'F', 'G', 'H', 'I', 'J'
-, 'K', 'L', 'M', 'N', 'O'
-, 'P', 'Q', 'R', 'S', 'T'
-, 'U', 'V', 'W', 'X', 'Y'
-, 'Z'};
-
-// 其他符号
-static const char AesKeySymbolTable[AES_KEY_SYMBOL_LEN] = { '`', '!', '@', '#', '$', '%', '^'
-, '&', '*', '(', ')', '-', '=', '~', '_'
-, '+', '[', ']', '{', '}', ';', '\'', '\\'
-, ':', '"', '|', ',', '.', '/', '<', '>'
-, '?'};
 ///////////////////////////////////////////////////////////////////////////
 
 FS_NAMESPACE_BEGIN
 
-FS_Aes::FS_Aes()
+Int32 FS_Aes::GenerateKey(Int32 mode, FS_String &key)
 {
-    _handle = new AesHandle;
-}
-
-FS_Aes::~FS_Aes()
-{
-    delete _handle;
-}
-
-bool FS_Aes::GenerateKey(FS_AesDefs::Aes256Context &key)
-{
-    memset(&key, 0, sizeof(key));
-
     Int64 m = 0;
-    FS_Int64Random randomCh(0, AES_KEY_CHAR_LEN - 1);
-    FS_Int64Random randomNum(0, AES_KEY_NUM_LEN - 1);
-    FS_Int64Random randomSym(0, AES_KEY_SYMBOL_LEN - 1);
-    FS_Int64Random genRandom(0, 2);
+    FS_Int64Random genRandom(0, 127);
     g_RandomLocker.Lock();
-    for(int i = 0; i < FS_AES_256_KEY_LEN; i++)
-    {
-        //选区种类
-        m = genRandom(g_RandomSeed);
-        switch(m)
-        {
-            case AES_NUM_KIND:
-            {
-                //选取数字
-                char ch = AesKeyNumTable[randomNum(g_RandomSeed)];
-                key.key[i] = ch;
-                key.enckey[i] = ch;
-                key.deckey[i] = ch;
-                break;
-            }
-            case AES_CHAR_KIND:
-            {
-                // 选取英文
-                char ch = AesKeyCharTable[randomCh(g_RandomSeed)];
-                key.key[i] = ch;
-                key.enckey[i] = ch;
-                key.deckey[i] = ch;
-                break;
-            }
-            case AES_SYMBOL_KIND:
-            {
-                //选取字符
-                char ch = AesKeySymbolTable[randomSym(g_RandomSeed)];
-                key.key[i] = ch;
-                key.enckey[i] = ch;
-                key.deckey[i] = ch;
-                break;
-            }
-        }
-    }
+    for(int i = 0; i < g_aes_key_bytes[mode]; i++)
+        key.GetRaw().push_back(static_cast<U8>(genRandom(g_RandomSeed)));
+
     g_RandomLocker.Unlock();
 
-    return true;
+    return StatusDefs::Success;
 }
 
-bool FS_Aes::Encrypt_Data(const FS_AesDefs::Aes256Context &key, const FS_String &plaintext, FS_String &cyphertext)
+Int32 FS_Aes::Encrypt_Data(Int32 mode, const FS_String &key, const FS_String &plaintext, FS_String &cyphertext)
 {
-    // 参数校验
-    const Int64 plaintextSize = static_cast<Int64>(plaintext.size());
-    if(plaintext.empty() || plaintext.size() % 16 != 0)
-        return false;
-    
-    Int64 blockCnt = plaintextSize / 16;
-    for(Int64 i = 0; i < blockCnt; ++i)
-    {
-        // 一次加密16字节
-        _cache.Clear();
-        _cache2.Clear();
-        _cache.AppendBitData(plaintext.c_str() + i * 16, 16);
-        _handle->Encrypt(key, _cache, _cache2);
-        cyphertext.AppendBitData(_cache2.c_str(), _cache2.size());
-    }
+    const Int32 textSize = static_cast<Int32>(plaintext.size());
+    if(UNLIKELY(plaintext.empty()))
+        return StatusDefs::Aes_PlaintextIsEmpty;
 
-    return true;
+    if(UNLIKELY(textSize < 16))
+        return StatusDefs::Aes_TextLengthNotEnough;
+
+    if(UNLIKELY(textSize % 16 != 0))
+        return StatusDefs::Aes_Not16BytesMultiple;
+
+    Int32 i = 0;
+    if(cyphertext.size() < textSize)
+        cyphertext.GetRaw().resize(textSize, 0);
+
+    _locker.Lock();
+    static AES_KEY innerKey;
+    AES_set_encrypt_key(reinterpret_cast<const unsigned char *>(key.c_str()), g_aes_key_bytes[mode] * 8, &innerKey);
+    while(i < textSize)
+    {
+        AES_encrypt(reinterpret_cast<const unsigned char *>(&plaintext[i]), reinterpret_cast<unsigned char *>(&cyphertext[i]), &innerKey);
+        i += AES_BLOCK_SIZE;
+    }
+    _locker.Unlock();
+
+    return StatusDefs::Success;
 }
 
-bool FS_Aes::Decrypt_Data(const FS_AesDefs::Aes256Context &key, const FS_String &cyphertext, FS_String &plaintext)
+Int32 FS_Aes::Decrypt_Data(Int32 mode, const FS_String &key,  const FS_String &cyphertext, FS_String &plaintext)
 {
-    //参数校验
-    const Int64 cypherSize = static_cast<Int64>(cyphertext.size());
-    if(cyphertext.empty() || cypherSize % 16 != 0)
-        return false;
+    const Int32 textSize = static_cast<Int32>(cyphertext.size());
+    if(UNLIKELY(cyphertext.empty()))
+        return StatusDefs::Aes_CyphertextIsEmpty;
 
-    Int64 blockCnt = cypherSize / 16;
-    for(Int64 i = 0; i < blockCnt; i++)
+    if(UNLIKELY(textSize < 16))
+        return StatusDefs::Aes_TextLengthNotEnough;
+
+    if(UNLIKELY(textSize % 16 != 0))
+        return StatusDefs::Aes_Not16BytesMultiple;
+
+    Int32 i = 0;
+    if(UNLIKELY(plaintext.size() < textSize))
+        plaintext.GetRaw().resize(textSize, 0);
+
+    _locker.Lock();
+    static AES_KEY innerKey;
+    AES_set_decrypt_key(reinterpret_cast<const unsigned char *>(key.c_str()), g_aes_key_bytes[mode] * 8, &innerKey);
+    while(i < textSize)
     {
-        // 一次解密16字节
-        _cache.Clear();
-        _cache2.Clear();
-        _cache.AppendBitData(cyphertext.c_str() + i * 16, 16);
-        _handle->Decrypt(key, _cache, _cache2);
-        plaintext.AppendBitData(_cache2.c_str(), 16);
+        AES_decrypt(reinterpret_cast<const unsigned char *>(&cyphertext[i]), reinterpret_cast<unsigned char *>(&plaintext[i]), &innerKey);
+        i += AES_BLOCK_SIZE;
     }
+    _locker.Unlock();
 
-    return true;
+    return StatusDefs::Success;
 }
+
+void FS_Aes::Lock()
+{
+    _locker.Lock();
+}
+
+void FS_Aes::Unlock()
+{
+    _locker.Unlock();
+}
+
 FS_NAMESPACE_END
+

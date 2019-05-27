@@ -25,7 +25,7 @@
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
- * 
+ *          base on the aes of openssl
  *
  * 
  */
@@ -39,25 +39,24 @@
 #include "base/common/component/Defs/FS_AesDefs.h"
 
 FS_NAMESPACE_BEGIN
-class AesHandle;
 class FS_String;
+class Locker;
 class BASE_EXPORT FS_Aes
 {
 public:
-    FS_Aes();
-    virtual ~FS_Aes();
-
     // 产生密钥
-    static bool GenerateKey(FS_AesDefs::Aes256Context &key);
-    //加密 需要是128bit 16字节的倍数
-    bool Encrypt_Data(const FS_AesDefs::Aes256Context &key, const FS_String &plaintext, FS_String &cyphertext);
-    //解密 需要是128bit 16字节的倍数
-    bool Decrypt_Data(const FS_AesDefs::Aes256Context &key, const FS_String &cyphertext, FS_String &plaintext);
+    static Int32 GenerateKey(Int32 mode, FS_String &key);
+    // 加密 需要是128bit 16字节的倍数
+    Int32 Encrypt_Data(Int32 mode, const FS_String &key, const FS_String &plaintext, FS_String &cyphertext);
+    // 解密 需要是128bit 16字节的倍数
+    Int32 Decrypt_Data(Int32 mode, const FS_String &key,  const FS_String &cyphertext, FS_String &plaintext);
+
+    // openssl加密算法线程不安全需要加锁
+    void Lock();
+    void Unlock();
 
 private:
-    AesHandle *_handle;
-    FS_String _cache;
-    FS_String _cache2;
+    Locker _locker;
 };
 
 FS_NAMESPACE_END

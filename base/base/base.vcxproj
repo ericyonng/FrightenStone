@@ -207,7 +207,6 @@
     <ClInclude Include="..\common\component\component.h" />
     <ClInclude Include="..\common\component\Defs\FS_AesDefs.h" />
     <ClInclude Include="..\common\component\Defs\TriggerDefs.h" />
-    <ClInclude Include="..\common\component\Impl\Aes\AesHandle.h" />
     <ClInclude Include="..\common\component\Impl\Aes\FS_Aes.h" />
     <ClInclude Include="..\common\component\Impl\BufferAddapter.h" />
     <ClInclude Include="..\common\component\Impl\BufferAddapterImpl.h" />
@@ -261,7 +260,6 @@
     <ClCompile Include="..\common\asyn\Lock\Impl\Locker.cpp" />
     <ClCompile Include="..\common\basedefs\DataType\InnerDataType\Defs\LockerHandle.cpp" />
     <ClCompile Include="..\common\component\Defs\TriggerDefs.cpp" />
-    <ClCompile Include="..\common\component\Impl\Aes\AesHandle.cpp" />
     <ClCompile Include="..\common\component\Impl\Aes\FS_Aes.cpp" />
     <ClCompile Include="..\common\component\Impl\File\FS_File.cpp" />
     <ClCompile Include="..\common\component\Impl\File\FS_IniFile.cpp" />
