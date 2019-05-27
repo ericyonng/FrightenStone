@@ -70,7 +70,7 @@ public:
         RAND_DIS_TYPE_DISCRETE,     // 离散分布
     };
 
-    //随机数源产生算法 算法速度有高到低，算法质量由低到高
+    // 随机数源产生算法 算法速度有高到低，算法质量由低到高
     enum  RAND_GEN_ALGORITHM_TYPE
     {
         RAND_GEN_ALGORITHM_TYPE_RAND48 = 0,             // rand48算法随机数发生器
@@ -120,7 +120,7 @@ private:
 
     };
 
-    #pragma region 随机数分布器/随机数发生源 偏特化
+    #pragma region dstributor/part template
     template<typename RandValType>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_SMALLINT>
    {
