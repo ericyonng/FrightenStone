@@ -1,5 +1,6 @@
 # 概述
-[![openssl](resource/frightenstone/openssl.jpg)](https://github.com/openssl/openssl)
+[![openssl](https://github.com/ericyonng/resource/blob/master/frightenstone/openssl.jpg)](https://github.com/openssl/openssl)
+
 本算法基于openssl的aes封装
 
 # Aes算法介绍
