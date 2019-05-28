@@ -37,6 +37,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
+#include "base/common/basedefs/DataType/DataType.h"
 #include <map>
 
 FS_NAMESPACE_BEGIN
@@ -100,12 +101,37 @@ private:
 };
 FS_NAMESPACE_END
 
+FS_NAMESPACE_BEGIN
+
 class BASE_EXPORT SmartVar
 {
 public:
-    
-private:
+    typedef std::map<SmartVar, SmartVar> Dict;
+    typedef FS_String Str;
 
+public:
+    struct BASE_EXPORT Raw
+    {
+        Raw();
+        ~Raw();
+        UInt32 _type;
+        union
+        {
+            UInt64 _uint64;
+            double _double;
+
+            Dict *_dict;
+            Str *_str;
+        }_data;
+    };
+
+public:
+
+
+private:
+    Raw _raw;
 };
+
+FS_NAMESPACE_END
 
 #endif
