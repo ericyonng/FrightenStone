@@ -73,3 +73,22 @@ void SmartVarRtti::InitRttiTypeNames()
 }
 
 FS_NAMESPACE_END
+
+FS_NAMESPACE_BEGIN
+
+SmartVar::Raw::Raw()
+    :_type(SmartVarRtti::SV_NIL)
+{
+    memset(&_data, 0, sizeof(_data));
+}
+
+SmartVar::Raw::~Raw()
+{
+    if(_type&SmartVarRtti::SV_STRING_DEF)
+        Fs_SafeFree(_data._str);
+
+    if(_type&SmartVarRtti::SV_DICTIONARY_DEF)
+        Fs_SafeFree(_data._dict);
+}
+
+FS_NAMESPACE_END
