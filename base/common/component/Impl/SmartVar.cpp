@@ -84,10 +84,10 @@ SmartVar::Raw::Raw()
 
 SmartVar::Raw::~Raw()
 {
-    if(_type&SmartVarRtti::SV_STRING_DEF)
+    if(_type & SmartVarRtti::SV_STRING_DEF)
         Fs_SafeFree(_data._str);
 
-    if(_type&SmartVarRtti::SV_DICTIONARY_DEF)
+    if(_type & SmartVarRtti::SV_DICTIONARY_DEF)
         Fs_SafeFree(_data._dict);
 }
 
