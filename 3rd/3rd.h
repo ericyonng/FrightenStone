@@ -61,5 +61,10 @@
 #pragma endregion
 #endif
 
+//  π”√utf8_string
+#ifdef __USE_FS_TINY_UTF8__
+#include "3rd/tiny-utf8/include/tinyutf8.hpp"
+#endif
+
 #endif
 

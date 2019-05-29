@@ -36,21 +36,21 @@ template<typename T>
 Locker Singleton<T>::_locker;
 
 template<typename T>
-std::auto_ptr<T> Singleton<T>::_pObj{NULL};
+SmartPtr<T> Singleton<T>::_pObj = NULL;
 
 template<typename T>
 inline T *Singleton<T>::GetInstance()
 {
     _locker.Lock();
-    T *pObj = _pObj.get();
+    T *pObj = _pObj;
     if(NULL != pObj)
     {
         _locker.Unlock();
         return pObj;
     }
 
-    _pObj = std::auto_ptr<T>(new T);
-    pObj = _pObj.get();
+    _pObj = new T;
+    pObj = _pObj;
     _locker.Unlock();
 
     return pObj;

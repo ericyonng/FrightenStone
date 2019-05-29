@@ -193,6 +193,12 @@
     <Filter Include="common\component\Impl\Aes">
       <UniqueIdentifier>{0d117e2d-20b4-4411-a80b-a8339e332a3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3rd\tiny-utf8">
+      <UniqueIdentifier>{6433c550-12d3-4cd1-8827-d24479f7722f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd\tiny-utf8\lib">
+      <UniqueIdentifier>{58eebbba-10e3-45b0-8e15-2626e8a06d79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -547,6 +553,9 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\FS_Random.cpp">
       <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rd\tiny-utf8\lib\tinyutf8.cpp">
+      <Filter>3rd\tiny-utf8\lib</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
