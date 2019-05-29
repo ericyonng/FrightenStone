@@ -39,7 +39,9 @@
 
 #pragma once
 
-#include<base\exportbase.h>
+#include<base/exportbase.h>
+#include "base/common/assist/assistobjs/Impl/SmartPtr.h"
+#include <memory>
 #include "base/common/asyn/asyn.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
 
@@ -59,7 +61,7 @@ private:
     Singleton& operator = (const Singleton<T>&) = delete;
 
 private:
-    static std::auto_ptr<T> _pObj;
+    static SmartPtr<T> _pObj;
     static Locker          _locker;
 };
 
