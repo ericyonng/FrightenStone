@@ -459,6 +459,12 @@
     <ClInclude Include="..\common\component\Impl\Aes\FS_Aes.h">
       <Filter>common\component\Impl\Aes</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtilImpl.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -556,6 +562,9 @@
     </ClCompile>
     <ClCompile Include="..\..\3rd\tiny-utf8\lib\tinyutf8.cpp">
       <Filter>3rd\tiny-utf8\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\FS_BitUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

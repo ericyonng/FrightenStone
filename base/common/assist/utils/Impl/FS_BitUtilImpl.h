@@ -21,33 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : FS_BitUtilImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/5/30
  * @brief :
  * 
  *
  * 
  */
-#include "TestSuit/TestSuit/TestInst/TestDelegate.h"
-#include "TestSuit/TestSuit/TestInst/TestString.h"
-#include "TestSuit/TestSuit/TestInst/TestTime.h"
-#include "TestSuit/TestSuit/TestInst/TestTrigger.h"
-#include "TestSuit/TestSuit/TestInst/TestThreadPool.h"
-#include "TestSuit/TestSuit/TestInst/TestFSDirectory.h"
-#include "TestSuit/TestSuit/TestInst/TestFSFileUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestCpuUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestFile.h"
-#include "TestSuit/TestSuit/TestInst/TestJson.h"
-#include "TestSuit/TestSuit/TestInst/TestLogFile.h"
-#include "TestSuit/TestSuit/TestInst/TestRandom.h"
-#include "TestSuit/TestSuit/TestInst/TestAes.h"
-#include "TestSuit/TestSuit/TestInst/TestUtf8.h"
+#ifdef __Base_Common_Assist_Utils_Impl_FS_BitUtil_H__
+#pragma once
 
-int main()
+template <typename T>
+inline bool FS_BitUtil::IsSet(T val, UInt32 pos)
 {
-    TestUtf8::Run();
-    std::cout << "main end" << std::endl;
-    getchar();
-    return 0;
+    return (val & (static_cast<T>(1) << pos)) != 0;
 }
+
+template <typename T>
+inline T FS_BitUtil::Set(T val, UInt32 pos, bool flag)
+{
+    if(flag)
+        return val | (static_cast<T>(1) << pos);
+
+    return val &= ~(static_cast<T>(1) << pos);
+}
+
+#endif // __Base_Common_Assist_Utils_Impl_FS_BitUtil_H__
+
