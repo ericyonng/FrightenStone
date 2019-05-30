@@ -134,29 +134,29 @@ public:
     };
 
 public:
-    SmartVar();
+//    SmartVar();
 
     // Constructors(all parameter constructors is explicit, copy constructor is non-explicit).
-    explicit SmartVar(const bool &boolVal);
-    explicit SmartVar(const Byte8 &sint8Val);
-    explicit SmartVar(const U8 &uint8Val);
-    explicit SmartVar(const Int16 &sint16Val);
-    explicit SmartVar(const UInt16 &uint16Val);
-    explicit SmartVar(const Int32 &sint32Val);
-    explicit SmartVar(const UInt32 &uint32Val);
-    explicit SmartVar(const Long &longVal);
-    explicit SmartVar(const ULong &ulongVal);
-    template <typename _T>
-    explicit SmartVar(const _T * const &ptrVal);
-    explicit SmartVar(const Int64 &int64Val);
-    explicit SmartVar(const UInt64 &uint64Val);
-    explicit SmartVar(const Float &floatVal);
-    explicit SmartVar(const Double &doubleVal);
-    explicit SmartVar(const Byte *cstrVal);
-    explicit SmartVar(const std::string &strVal);
-    explicit SmartVar(const FS_String &strVal);
-    explicit SmartVar(const Dict &dictVal);
-    SmartVar(const SmartVar &varVal);
+//     explicit SmartVar(const bool &boolVal);
+//     explicit SmartVar(const Byte8 &sint8Val);
+//     explicit SmartVar(const U8 &uint8Val);
+//     explicit SmartVar(const Int16 &sint16Val);
+//     explicit SmartVar(const UInt16 &uint16Val);
+//     explicit SmartVar(const Int32 &sint32Val);
+//     explicit SmartVar(const UInt32 &uint32Val);
+//     explicit SmartVar(const Long &longVal);
+//     explicit SmartVar(const ULong &ulongVal);
+//     template <typename _T>
+//     explicit SmartVar(const _T * const &ptrVal);
+//     explicit SmartVar(const Int64 &int64Val);
+//     explicit SmartVar(const UInt64 &uint64Val);
+//     explicit SmartVar(const Float &floatVal);
+//     explicit SmartVar(const Double &doubleVal);
+//     explicit SmartVar(const Byte *cstrVal);
+//     explicit SmartVar(const std::string &strVal);
+//     explicit SmartVar(const FS_String &strVal);
+//     explicit SmartVar(const Dict &dictVal);
+//     SmartVar(const SmartVar &varVal);
 
 private:
     Raw _raw;
