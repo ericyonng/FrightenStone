@@ -169,6 +169,8 @@
     <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtr.h" />
     <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtrImpl.h" />
     <ClInclude Include="..\common\assist\utils\Defs\FS_IPUtilDefs.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_CpuUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_FileUtil.h" />
@@ -249,6 +251,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\3rd\tiny-utf8\lib\tinyutf8.cpp" />
     <ClCompile Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\FS_BitUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_CpuUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_DirectoryUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
