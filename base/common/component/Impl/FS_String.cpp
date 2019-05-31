@@ -65,8 +65,9 @@ FS_String::FS_String(char other)
 }
 
 FS_String::FS_String(const std::string &other)
+    :_buffer(other.data(), other.size())
 {
-    _buffer = other;
+    // _buffer = other;
     _cache[0] = 0;
 }
 

@@ -199,6 +199,9 @@
     <Filter Include="3rd\tiny-utf8\lib">
       <UniqueIdentifier>{58eebbba-10e3-45b0-8e15-2626e8a06d79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\component\Impl\SmartVar">
+      <UniqueIdentifier>{7e62026f-5d58-47ed-899e-a115914734cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -417,12 +420,6 @@
     <ClInclude Include="..\common\component\Impl\TimeSliceImpl.h">
       <Filter>common\component\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\SmartVar.h">
-      <Filter>common\component\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\component\Impl\SmartVarImpl.h">
-      <Filter>common\component\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\component\Impl\File\FS_File.h">
       <Filter>common\component\Impl\File</Filter>
     </ClInclude>
@@ -464,6 +461,15 @@
     </ClInclude>
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtilImpl.h">
       <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarImpl.h">
+      <Filter>common\component\Impl\SmartVar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SmartVar\SmartVar.h">
+      <Filter>common\component\Impl\SmartVar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarTraits.h">
+      <Filter>common\component\Impl\SmartVar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -539,9 +545,6 @@
     <ClCompile Include="..\common\component\Impl\TimeSlice.cpp">
       <Filter>common\component\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\component\Impl\SmartVar.cpp">
-      <Filter>common\component\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\component\Impl\File\FS_File.cpp">
       <Filter>common\component\Impl\File</Filter>
     </ClCompile>
@@ -565,6 +568,12 @@
     </ClCompile>
     <ClCompile Include="..\common\assist\utils\Impl\FS_BitUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\SmartVar\SmartVar.cpp">
+      <Filter>common\component\Impl\SmartVar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarTraits.cpp">
+      <Filter>common\component\Impl\SmartVar</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
