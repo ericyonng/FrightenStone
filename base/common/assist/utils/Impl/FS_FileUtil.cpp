@@ -241,7 +241,6 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, FS_String &outBuffer)
             {
                 break;
             }
-
 #else
             if(get_c != '\n')
             {
@@ -258,7 +257,6 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, FS_String &outBuffer)
                 break;
             }
 #endif
-
         }
         else
         {
