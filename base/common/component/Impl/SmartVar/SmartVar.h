@@ -48,7 +48,7 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT SmartVarRtti
 {
 public:
-    // 类型识别信息32bit 
+    // 类型识别信息32bit 每个数据类型都有独立的mask 互斥
     // [high eight bits][middle 23 bits][first bit]
     // [    类型信息   ][ 具体类型枚举 ][  符号位 ]
     enum RttiType:unsigned int
@@ -69,7 +69,7 @@ public:
         SV_BRIEF_SIGHED_DATA        = SV_BRIEF_DATA     | SV_SIGHED,                        // 有符号简单数据类型
         SV_BRIEF_UNSIGHED_DATA      = SV_BRIEF_DATA     | SV_UNSIGHED,                      // 无符号简单数据类型
         SV_BRIEF_BOOL       = SV_BRIEF_SIGHED_DATA      | (0x1U << 1),                     // bool类型
-        SV_BRIEF_INT8       = SV_BRIEF_SIGHED_DATA      | (0x1U << 2),                     // I8
+        SV_BRIEF_BYTE8      = SV_BRIEF_SIGHED_DATA      | (0x1U << 2),                     // Byte8
         SV_BRIEF_UINT8      = SV_BRIEF_UNSIGHED_DATA    | (0x1U << 3),                     // U8
         SV_BRIEF_INT16      = SV_BRIEF_SIGHED_DATA      | (0x1U << 4),                     // INT16
         SV_BRIEF_UINT16     = SV_BRIEF_UNSIGHED_DATA    | (0x1U << 5),                     // UINT16
@@ -156,6 +156,88 @@ public:
     explicit SmartVar(const FS_String &strVal);
     explicit SmartVar(const Dict &dictVal);
     SmartVar(const SmartVar &varVal);
+
+    // Fetch smartvar data type and raw data.
+    UInt32 GetType() const;
+    const struct Raw &GetRaw() const;
+
+    // Type diagnose.
+    bool IsNil() const;
+    bool IsBriefData() const;
+    bool IsSignedBriefData() const;
+    bool IsUnsignedBriefData() const;
+//     bool IsBool() const;
+//     bool IsByte8() const;
+//     bool IsUInt8() const;
+//     bool IsInt16() const;
+//     bool IsUInt16() const;
+//     bool IsInt32() const;
+//     bool IsUInt32() const;
+//     bool IsLong() const;
+//     bool IsULong() const;
+//     bool IsPtr() const;
+//     bool IsInt64() const;
+//     bool IsUInt64() const;
+//     bool IsFloat() const;
+//     bool IsDouble() const;
+//     bool IsStr() const;
+//     bool IsDict() const;
+// 
+//     // Type convert.
+//     SmartVar &BecomeNil();
+//     SmartVar &BecomeBool();
+//     SmartVar &BecomeInt8();
+//     SmartVar &BecomeUInt8();
+//     SmartVar &BecomeInt16();
+//     SmartVar &BecomeUInt16();
+//     SmartVar &BecomeInt32();
+//     SmartVar &BecomeUInt32();
+//     SmartVar &BecomeLong();
+//     SmartVar &BecomeULong();
+//     SmartVar &BecomePtr();
+//     LLBC_Variant &BecomeInt64();
+//     LLBC_Variant &BecomeUInt64();
+//     LLBC_Variant &BecomeFloat();
+//     LLBC_Variant &BecomeDouble();
+//     LLBC_Variant &BecomeStr();
+//     LLBC_Variant &BecomeDict();
+// 
+//     // Real data fetch.
+//     bool AsBool() const;
+//     sint8 AsInt8() const;
+//     uint8 AsUInt8() const;
+//     sint16 AsInt16() const;
+//     uint16 AsUInt16() const;
+//     sint32 AsInt32() const;
+//     uint32 AsUInt32() const;
+//     long AsLong() const;
+//     unsigned long AsULong() const;
+//     template <typename _T>
+//     _T *AsPtr() const;
+//     sint64 AsInt64() const;
+//     uint64 AsUInt64() const;
+//     float AsFloat() const;
+//     double AsDouble() const;
+//     LLBC_String AsStr() const;
+//     const Dict &AsDict() const;
+// 
+//     operator bool() const;
+//     operator sint8 () const;
+//     operator uint8 () const;
+//     operator sint16 () const;
+//     operator uint16 () const;
+//     operator sint32 () const;
+//     operator uint32 () const;
+//     operator long() const;
+//     operator ulong () const;
+//     template <typename _T>
+//     operator _T * () const;
+//     operator sint64 () const;
+//     operator uint64 () const;
+//     operator float() const;
+//     operator double() const;
+//     operator LLBC_String () const;
+//     operator const Dict &() const;
 
 private:
     Raw _raw;
