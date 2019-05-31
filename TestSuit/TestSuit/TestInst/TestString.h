@@ -54,18 +54,10 @@ class TestString
 public:
     static void Run()
     {
-        fs::FS_String str1, str2, cache, md5str, hexstr, hex2;
-        auto fp = fs::FS_FileUtil::OpenFile("./log/woai.txt");
-        fs::FS_FileUtil::ReadFile(*fp, str1);
-        str2 = str1;
-        fs::StringUtil::MakeMd5(str1, md5str);
-        fs::StringUtil::ToHexString(md5str, hexstr);
-        md5str.Clear();
-        fs::StringUtil::MakeMd5(str2, md5str);
-        fs::StringUtil::ToHexString(md5str, hex2);
-        std::cout << hex2.c_str() << std::endl;
-        std::cout << hexstr.c_str() << std::endl;
-        std::cout << (hex2 == hexstr) << std::endl;
+        char ww[10] = {1, 7, 99, 100, 5, 5, 6, 3, 7, 9};
+        char ss[10] = {'w', 'o', ' ', 'c', 'a', 'i'};
+        std::string strx = ss;
+        fs::FS_String str1 = strx;
     }
 };
 
