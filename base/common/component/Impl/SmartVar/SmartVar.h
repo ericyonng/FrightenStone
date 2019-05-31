@@ -29,20 +29,17 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_SmartVar__H__
-#define __Base_Common_Component_Impl_SmartVar__H__
-
-
+#ifndef __Base_Common_Component_Impl_SmartVar_SmartVar__H__
+#define __Base_Common_Component_Impl_SmartVar_SmartVar__H__
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
 #include "base/common/basedefs/DataType/DataType.h"
+#include "base/common/component/Impl/FS_String.h"
 #include <map>
 
 FS_NAMESPACE_BEGIN
-
-class FS_String;
 
 // RawData
 // RTTI
@@ -123,45 +120,49 @@ public:
         Raw();
         ~Raw();
         UInt32 _type;
+
         union
         {
-            UInt64 _uint64;
-            double _double;
+            Int64 _int64Data;
+            UInt64 _uint64Data;
+            Double _doubleData;
 
-            Dict *_dict;
-            Str *_str;
+            Dict *_dictData;
+            Str *_strData;
         }_data;
     };
 
 public:
-//    SmartVar();
+   SmartVar();
 
     // Constructors(all parameter constructors is explicit, copy constructor is non-explicit).
-//     explicit SmartVar(const bool &boolVal);
-//     explicit SmartVar(const Byte8 &sint8Val);
-//     explicit SmartVar(const U8 &uint8Val);
-//     explicit SmartVar(const Int16 &sint16Val);
-//     explicit SmartVar(const UInt16 &uint16Val);
-//     explicit SmartVar(const Int32 &sint32Val);
-//     explicit SmartVar(const UInt32 &uint32Val);
-//     explicit SmartVar(const Long &longVal);
-//     explicit SmartVar(const ULong &ulongVal);
-//     template <typename _T>
-//     explicit SmartVar(const _T * const &ptrVal);
-//     explicit SmartVar(const Int64 &int64Val);
-//     explicit SmartVar(const UInt64 &uint64Val);
-//     explicit SmartVar(const Float &floatVal);
-//     explicit SmartVar(const Double &doubleVal);
-//     explicit SmartVar(const Byte *cstrVal);
-//     explicit SmartVar(const std::string &strVal);
-//     explicit SmartVar(const FS_String &strVal);
-//     explicit SmartVar(const Dict &dictVal);
-//     SmartVar(const SmartVar &varVal);
+    explicit SmartVar(const bool &boolVal);
+    explicit SmartVar(const Byte8 &byte8Val);
+    explicit SmartVar(const U8 &uint8Val);
+    explicit SmartVar(const Int16 &int16Val);
+    explicit SmartVar(const UInt16 &uint16Val);
+    explicit SmartVar(const Int32 &int32Val);
+    explicit SmartVar(const UInt32 &uint32Val);
+    explicit SmartVar(const Long &longVal);
+    explicit SmartVar(const ULong &ulongVal);
+    template <typename _T>
+    explicit SmartVar(const _T * const &ptrVal);
+    explicit SmartVar(const Int64 &int64Val);
+    explicit SmartVar(const UInt64 &uint64Val);
+    explicit SmartVar(const Float &floatVal);
+    explicit SmartVar(const Double &doubleVal);
+    explicit SmartVar(const Byte8 *cstrVal);
+    explicit SmartVar(const std::string &strVal);
+    explicit SmartVar(const FS_String &strVal);
+    explicit SmartVar(const Dict &dictVal);
+    SmartVar(const SmartVar &varVal);
 
 private:
     Raw _raw;
 };
 
 FS_NAMESPACE_END
+
+#include "base/common/component/Impl/SmartVar/SmartVarImpl.h"
 
 #endif

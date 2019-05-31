@@ -31,7 +31,8 @@
  */
 #include "stdafx.h"
 #include "base/common/component/Impl/FS_String.h"
-#include "base/common/component/Impl/SmartVar.h"
+#include "base/common/component/Impl/SmartVar/SmartVarTraits.h"
+#include "base/common/component/Impl/SmartVar/SmartVar.h"
 
 FS_NAMESPACE_BEGIN
 std::map<unsigned int, FS_String> SmartVarRtti::_rttiTypeRefString;
@@ -85,10 +86,28 @@ SmartVar::Raw::Raw()
 SmartVar::Raw::~Raw()
 {
     if(_type & SmartVarRtti::SV_STRING_DEF)
-        Fs_SafeFree(_data._str);
+        Fs_SafeFree(_data._strData);
 
     if(_type & SmartVarRtti::SV_DICTIONARY_DEF)
-        Fs_SafeFree(_data._dict);
+        Fs_SafeFree(_data._dictData);
+}
+
+SmartVar::SmartVar(const Byte8 *cstrVal)
+{
+    _raw._type = SmartVarRtti::SV_STRING_DEF;
+    if(LIKELY(cstrVal != NULL))
+    {
+        auto strLen = ::strlen(cstrVal);
+        if(LIKELY(strLen != 0))
+        {
+            _raw._data._strData = new FS_String(cstrVal);
+        }
+    }
+}
+
+SmartVar::SmartVar(const SmartVar &varVal)
+{
+    SmartVarTraits::assign(*this, varVal);
 }
 
 FS_NAMESPACE_END
