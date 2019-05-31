@@ -53,7 +53,7 @@ void SmartVarRtti::InitRttiTypeNames()
     {
         _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_BOOL, "bool"));
 
-        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_INT8, "Byte8"));
+        _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_BYTE8, "Byte8"));
         _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_UINT8, "U8"));
         _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_INT16, "Int16"));
         _rttiTypeRefString.insert(std::make_pair(SV_BRIEF_UINT16, "UInt16"));

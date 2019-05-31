@@ -47,7 +47,7 @@ inline SmartVar::SmartVar(const bool &boolVal)
 
 inline SmartVar::SmartVar(const Byte8 &byte8Val)
 {
-    _raw._type = SmartVarRtti::SV_BRIEF_INT8;
+    _raw._type = SmartVarRtti::SV_BRIEF_BYTE8;
     _raw._data._int64Data = static_cast<Int64>(byte8Val);
 }
 
@@ -144,6 +144,37 @@ inline SmartVar::SmartVar(const Dict &dictVal)
     _raw._type = SmartVarRtti::SV_DICTIONARY_DEF;
     if(!dictVal.empty())
         _raw._data._dictData = new Dict(dictVal);
+}
+
+// Fetch smartvar data type and raw data.
+inline UInt32 SmartVar::GetType() const
+{
+    return _raw._type;
+}
+
+inline const SmartVar::Raw &SmartVar::GetRaw() const
+{
+    return _raw;
+}
+
+inline bool SmartVar::IsNil() const
+{
+    return _raw._type == SmartVarRtti::SV_NIL;
+}
+
+inline bool SmartVar::IsBriefData() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_DATA) != 0U;
+}
+
+inline bool SmartVar::IsSignedBriefData() const
+{
+    return (IsBriefData() && ((_raw._type & SmartVarRtti::SV_SIGHED) != 0U));
+}
+
+inline bool SmartVar::IsUnsignedBriefData() const
+{
+    return (IsBriefData() && ((_raw._type & SmartVarRtti::SV_UNSIGHED) != 0U));
 }
 
 FS_NAMESPACE_END
