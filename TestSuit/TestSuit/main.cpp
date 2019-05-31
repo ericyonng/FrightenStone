@@ -46,7 +46,7 @@
 
 int main()
 {
-    TestUtf8::Run();
+    TestString::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;
