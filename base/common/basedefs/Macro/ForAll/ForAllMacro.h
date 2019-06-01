@@ -210,4 +210,9 @@ private:\
 #undef MAX_I64_NUM
 #define MAX_I64_NUM	0x7FFFFFFFFFFFFFFF
 
+// openssl locker
+extern Locker g_OpenSSL_Locker;
+#undef OPENSSL_LOCKER
+#define OPENSSL_LOCKER 
+
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__
