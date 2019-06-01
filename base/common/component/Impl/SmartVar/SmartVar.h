@@ -166,60 +166,60 @@ public:
     bool IsBriefData() const;
     bool IsSignedBriefData() const;
     bool IsUnsignedBriefData() const;
-//     bool IsBool() const;
-//     bool IsByte8() const;
-//     bool IsUInt8() const;
-//     bool IsInt16() const;
-//     bool IsUInt16() const;
-//     bool IsInt32() const;
-//     bool IsUInt32() const;
-//     bool IsLong() const;
-//     bool IsULong() const;
-//     bool IsPtr() const;
-//     bool IsInt64() const;
-//     bool IsUInt64() const;
-//     bool IsFloat() const;
-//     bool IsDouble() const;
-//     bool IsStr() const;
-//     bool IsDict() const;
-// 
-//     // Type convert.
-//     SmartVar &BecomeNil();
-//     SmartVar &BecomeBool();
-//     SmartVar &BecomeInt8();
-//     SmartVar &BecomeUInt8();
-//     SmartVar &BecomeInt16();
-//     SmartVar &BecomeUInt16();
-//     SmartVar &BecomeInt32();
-//     SmartVar &BecomeUInt32();
-//     SmartVar &BecomeLong();
-//     SmartVar &BecomeULong();
-//     SmartVar &BecomePtr();
-//     LLBC_Variant &BecomeInt64();
-//     LLBC_Variant &BecomeUInt64();
-//     LLBC_Variant &BecomeFloat();
-//     LLBC_Variant &BecomeDouble();
-//     LLBC_Variant &BecomeStr();
-//     LLBC_Variant &BecomeDict();
-// 
-//     // Real data fetch.
-//     bool AsBool() const;
-//     sint8 AsInt8() const;
-//     uint8 AsUInt8() const;
-//     sint16 AsInt16() const;
-//     uint16 AsUInt16() const;
-//     sint32 AsInt32() const;
-//     uint32 AsUInt32() const;
-//     long AsLong() const;
-//     unsigned long AsULong() const;
-//     template <typename _T>
-//     _T *AsPtr() const;
-//     sint64 AsInt64() const;
-//     uint64 AsUInt64() const;
-//     float AsFloat() const;
-//     double AsDouble() const;
-//     LLBC_String AsStr() const;
-//     const Dict &AsDict() const;
+    bool IsBool() const;
+    bool IsByte8() const;
+    bool IsUInt8() const;
+    bool IsInt16() const;
+    bool IsUInt16() const;
+    bool IsInt32() const;
+    bool IsUInt32() const;
+    bool IsLong() const;
+    bool IsULong() const;
+    bool IsPtr() const;
+    bool IsInt64() const;
+    bool IsUInt64() const;
+    bool IsFloat() const;
+    bool IsDouble() const;
+    bool IsStr() const;
+    bool IsDict() const;
+
+    // Type convert.
+    SmartVar &BecomeNil();
+    SmartVar &BecomeBool();
+    SmartVar &BecomeByte8();
+    SmartVar &BecomeUInt8();
+    SmartVar &BecomeInt16();
+    SmartVar &BecomeUInt16();
+    SmartVar &BecomeInt32();
+    SmartVar &BecomeUInt32();
+    SmartVar &BecomeLong();
+    SmartVar &BecomeULong();
+    SmartVar &BecomePtr();
+    SmartVar &BecomeInt64();
+    SmartVar &BecomeUInt64();
+    SmartVar &BecomeFloat();
+    SmartVar &BecomeDouble();
+    SmartVar &BecomeStr();
+    SmartVar &BecomeDict();
+
+    // Real data fetch.
+    bool    AsBool() const;
+    Byte8   AsByte8() const;
+    U8      AsUInt8() const;
+    Int16   AsInt16() const;
+    UInt16  AsUInt16() const;
+    Int32   AsInt32() const;
+    UInt32  AsUInt32() const;
+    Long    AsLong() const;
+    ULong   AsULong() const;
+    template <typename _T>
+    _T *    AsPtr() const;
+    Int64   AsInt64() const;
+    UInt64  AsUInt64() const;
+    Float   AsFloat() const;
+    Double  AsDouble() const;
+    FS_String AsStr() const;
+    const Dict &AsDict() const;
 // 
 //     operator bool() const;
 //     operator sint8 () const;
@@ -238,6 +238,19 @@ public:
 //     operator double() const;
 //     operator LLBC_String () const;
 //     operator const Dict &() const;
+
+private:
+        friend class SmartVarTraits;
+
+        void SetType(int type);
+
+        Raw &_GetRaw();
+
+        void _CleanBriefData();
+        void _CleanStrData();
+        void _CleanDictData();
+        void _CleanTypeData(int type);
+        void _OptimizePerformance();
 
 private:
     Raw _raw;
