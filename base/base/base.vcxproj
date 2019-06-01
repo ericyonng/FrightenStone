@@ -198,6 +198,7 @@
     <ClInclude Include="..\common\basedefs\DataType\InnerDataType\InnerDataType.h" />
     <ClInclude Include="..\common\basedefs\Macro\Export\ExportMacro.h" />
     <ClInclude Include="..\common\basedefs\Macro\ForAll\ForAllMacro.h" />
+    <ClInclude Include="..\common\basedefs\Macro\ForAll\GlobalDefs.h" />
     <ClInclude Include="..\common\basedefs\Macro\Inner\InnerMacro.h" />
     <ClInclude Include="..\common\basedefs\Macro\MacroDefs.h" />
     <ClInclude Include="..\common\basedefs\Resource\ForAll\ForAllResource.h" />
