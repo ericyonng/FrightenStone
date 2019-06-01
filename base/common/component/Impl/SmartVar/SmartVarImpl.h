@@ -177,6 +177,137 @@ inline bool SmartVar::IsUnsignedBriefData() const
     return (IsBriefData() && ((_raw._type & SmartVarRtti::SV_UNSIGHED) != 0U));
 }
 
+inline bool SmartVar::IsBool() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_BOOL) != 0U;
+}
+
+inline bool SmartVar::IsByte8() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_BYTE8) != 0U;
+}
+
+inline bool SmartVar::IsUInt8() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT8) != 0U;
+}
+
+inline bool SmartVar::IsInt16() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_INT16) != 0U;
+}
+
+inline bool SmartVar::IsUInt16() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT16) != 0U;
+}
+
+inline bool SmartVar::IsInt32() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_INT32) != 0U;
+}
+
+inline bool SmartVar::IsUInt32() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT32) != 0U;
+}
+
+inline bool SmartVar::IsLong() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_LONG) != 0U;
+}
+
+inline bool SmartVar::IsULong() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_ULONG) != 0U;
+}
+
+inline bool SmartVar::IsPtr() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_PTR) != 0U;
+}
+
+inline bool SmartVar::IsInt64() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_INT64) != 0U;
+}
+
+inline bool SmartVar::IsUInt64() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT64) != 0U;
+}
+
+inline bool SmartVar::IsFloat() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_FLOAT) != 0U;
+}
+
+inline bool SmartVar::IsDouble() const
+{
+    return (_raw._type & SmartVarRtti::SV_BRIEF_DOUBLE) != 0U;
+}
+
+inline bool SmartVar::IsStr() const
+{
+    return (_raw._type & SmartVarRtti::SV_STRING_DEF) != 0U;
+}
+
+inline bool SmartVar::IsDict() const
+{
+    return (_raw._type & SmartVarRtti::SV_DICTIONARY_DEF) != 0U;
+}
+
+inline SmartVar &SmartVar::BecomeNil()
+{
+    if(IsNil())
+        return *this;
+
+    _CleanTypeData(_raw._type);
+    _raw._type = SmartVarRtti::SV_NIL;
+
+    return *this;
+}
+
+inline SmartVar &SmartVar::BecomeBool()
+{
+    if(!IsBool())
+        *this = SmartVar(AsBool());
+
+    return *this;
+}
+
+inline SmartVar &SmartVar::BecomeByte8()
+{
+    if(!IsByte8())
+        *this = SmartVar(AsByte8());
+
+    return *this;
+}
+
+inline SmartVar &SmartVar::BecomeUInt8()
+{
+    if(!IsUInt8())
+        *this = SmartVar(AsUInt8());
+
+    return *this;
+}
+
+inline SmartVar &SmartVar::BecomeInt16()
+{
+    if(!IsInt16())
+        *this = SmartVar(AsInt16());
+
+    return *this;
+}
+
+inline SmartVar &SmartVar::BecomeUInt16()
+{
+    if(!IsUInt16())
+        *this = SmartVar(AsUInt16());
+
+    return *this;
+}
+
 FS_NAMESPACE_END
 
 #endif
