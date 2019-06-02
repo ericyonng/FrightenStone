@@ -85,6 +85,8 @@ public:
 
     char &operator [] (Int32 index);    // no out range detect
     const char &operator [] (Int32 index) const;    // no out range detect
+    char &operator [] (size_type index);    // no out range detect
+    const char &operator [] (size_type index) const;    // no out range detect
 
     bool operator == (const FS_String &index) const;
     FS_String operator + (const FS_String &other) const; // 
@@ -111,6 +113,48 @@ public:
     _These Split(const char *sep, size_type max_split = -1) const;    // only ascii
     _These Split(const FS_String &sep, std::string::size_type max_split = -1, bool onlyLikely = false) const;
     _These Split(const _These &seps, size_type max_split = -1) const;
+
+    // strip operation: strip left. 去首部连续字符
+    FS_String &lstrip(const FS_String &chars = FS_String());
+    FS_String lstrip(const FS_String &chars = FS_String()) const;
+
+    // strip operation: strip right. 去尾部连续字符
+    FS_String &rstrip(const FS_String &chars = FS_String());
+    FS_String rstrip(const FS_String &chars = FS_String()) const;
+
+    // strip operation: 去除首尾字符
+    FS_String &strip(const FS_String &chars = FS_String());
+    FS_String strip(const FS_String &chars = FS_String()) const;
+
+
+    // isalpha/isupper/islower 是否字母
+    static bool isalpha(const char &c);
+    static bool isalpha(const FS_String &s);
+    bool isalpha() const;
+    static bool islower(const char &c);
+    static bool islower(const FS_String &s);
+    bool islower() const;
+    static bool isupper(const char &c);
+    static bool isupper(const FS_String &s);
+    bool isupper() const;
+
+    // 是否数值
+    static bool isdigit(const char &c);
+    static bool isdigit(const FS_String &s);
+    bool isdigit() const;
+
+    // isspace: space[' '], carriage return['\r'], line feed['\n'], form feed['\f'], horizontal tab['\t'], vertical tab['\v']
+    static bool isspace(const char &c);
+    static bool isspace(const FS_String &s);
+    bool isspace() const;
+
+    // startswith/endswith
+    bool IsStartsWith(const FS_String &s) const;
+    bool IsEndsWith(const FS_String &s) const;
+
+    // tolower/toupper operations. 请确保是英文字符串 isalpha
+    FS_String tolower() const;
+    FS_String toupper() const;
 
     #pragma region UTF8 Surport
     void add_utf8_bomb();
@@ -288,6 +332,16 @@ inline const char &FS_String::operator [] (Int32 index) const
     return _buffer[index];
 }
 
+inline char &FS_String::operator [] (size_type index)
+{
+    return _buffer[index];
+}
+
+inline const char &FS_String::operator [] (size_type index) const
+{
+    return _buffer[index];
+}
+
 inline bool FS_String::operator == (const FS_String &index) const
 {
     return _buffer == index._buffer;
@@ -377,6 +431,57 @@ inline FS_String &FS_String::AppendBitData(const char *bitData, Int64 dataSize)
     _buffer.append(bitData, dataSize);
     return *this;
 }
+
+inline bool FS_String::isalpha(const char &c)
+{
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+}
+
+inline bool FS_String::isalpha() const
+{
+    return isalpha(*this);
+}
+
+inline bool FS_String::islower(const char &c)
+{
+    return 'a' <= c && c <= 'z';
+}
+
+inline bool FS_String::islower() const
+{
+    return islower(*this);
+}
+
+inline bool FS_String::isupper(const char &c)
+{
+    return 'A' <= c && c <= 'Z';
+}
+
+inline bool FS_String::isupper() const
+{
+    return isupper(*this);
+}
+
+inline bool FS_String::isdigit(const char &c)
+{
+    return '0' <= c && c <= '9';
+}
+
+inline bool FS_String::isdigit() const
+{
+    return isdigit(*this);
+}
+
+inline bool FS_String::isspace(const char &c)
+{
+    return  c == ' ' || c == '\t' || c == '\v' || c == '\r' || c == '\n' || c == '\f';
+}
+
+inline bool FS_String::isspace() const
+{
+    return isspace(*this);
+}
+
 #pragma endregion
 
 FS_NAMESPACE_END

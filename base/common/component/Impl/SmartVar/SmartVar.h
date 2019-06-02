@@ -121,40 +121,43 @@ public:
         ~Raw();
         UInt32 _type;
 
-        union
+        union BriefDataType
         {
             Int64 _int64Data;
             UInt64 _uint64Data;
             Double _doubleData;
+        }_briefData;
 
+        union ObjType
+        {
             Dict *_dictData;
             Str *_strData;
-        }_data;
+        }_obj;
     };
 
 public:
    SmartVar();
 
     // Constructors(all parameter constructors is explicit, copy constructor is non-explicit).
-    explicit SmartVar(const bool &boolVal);
-    explicit SmartVar(const Byte8 &byte8Val);
-    explicit SmartVar(const U8 &uint8Val);
-    explicit SmartVar(const Int16 &int16Val);
-    explicit SmartVar(const UInt16 &uint16Val);
-    explicit SmartVar(const Int32 &int32Val);
-    explicit SmartVar(const UInt32 &uint32Val);
-    explicit SmartVar(const Long &longVal);
-    explicit SmartVar(const ULong &ulongVal);
+    SmartVar(const bool &boolVal);
+    SmartVar(const Byte8 &byte8Val);
+    SmartVar(const U8 &uint8Val);
+    SmartVar(const Int16 &int16Val);
+    SmartVar(const UInt16 &uint16Val);
+    SmartVar(const Int32 &int32Val);
+    SmartVar(const UInt32 &uint32Val);
+    SmartVar(const Long &longVal);
+    SmartVar(const ULong &ulongVal);
     template <typename _T>
-    explicit SmartVar(const _T * const &ptrVal);
-    explicit SmartVar(const Int64 &int64Val);
-    explicit SmartVar(const UInt64 &uint64Val);
-    explicit SmartVar(const Float &floatVal);
-    explicit SmartVar(const Double &doubleVal);
-    explicit SmartVar(const Byte8 *cstrVal);
-    explicit SmartVar(const std::string &strVal);
-    explicit SmartVar(const FS_String &strVal);
-    explicit SmartVar(const Dict &dictVal);
+    SmartVar(const _T * const &ptrVal);
+    SmartVar(const Int64 &int64Val);
+    SmartVar(const UInt64 &uint64Val);
+    SmartVar(const Float &floatVal);
+    SmartVar(const Double &doubleVal);
+    SmartVar(const Byte8 *cstrVal);
+    SmartVar(const std::string &strVal);
+    SmartVar(const FS_String &strVal);
+    SmartVar(const Dict &dictVal);
     SmartVar(const SmartVar &varVal);
 
     // Fetch smartvar data type and raw data.
@@ -239,18 +242,114 @@ public:
 //     operator LLBC_String () const;
 //     operator const Dict &() const;
 
-private:
-        friend class SmartVarTraits;
-
-        void SetType(int type);
-
-        Raw &_GetRaw();
-
+        // Dictionary type variant object specify operate methods.
+//     DictIter Begin();
+//     DictIter End();
+//     DictConstIter Begin() const;
+//     DictConstIter End() const;
+//     DictReverseIter ReverseBegin();
+//     DictReverseIter ReverseEnd();
+//     DictConstReverseIter ReverseBegin() const;
+//     DictConstReverseIter ReverseEnd() const;
+// 
+//     std::pair<DictIter, bool> Insert(const Dict::key_type &key, const Dict::mapped_type &val);
+//     std::pair<DictIter, bool> Insert(const Dict::value_type &val);
+// 
+//     template <typename _Kty, typename _Ty>
+//     std::pair<DictIter, bool> Insert(const _Kty &key, const _Ty &val);
+// 
+//     DictIter Find(const Dict::key_type &key);
+//     DictConstIter Find(const Dict::key_type &key) const;
+// 
+//     template <typename _Kty>
+//     DictIter Find(const _Kty &key);
+//     template <typename _Kty>
+//     DictConstIter Find(const _Kty &key) const;
+// 
+//     void Erase(DictIter it);
+//     Dict::size_type Erase(const Dict::key_type &key);
+//     void Erase(DictIter first, DictIter last);
+// 
+//     template <typename _Kty>
+//     Dict::size_type Erase(const _Kty &key);
+// 
+//     Dict::mapped_type &operator [](const Dict::key_type &key);
+//     const Dict::mapped_type &operator [](const Dict::key_type &key) const;
+// 
+//     template <typename _Kty>
+//     Dict::mapped_type &operator [](const _Kty &key);
+//     template <typename _Kty>
+//     const Dict::mapped_type &operator [](const _Kty &key) const;
+// 
+//     // assignment operators.
+//     LLBC_Variant &operator =(sint8 val);
+//     LLBC_Variant &operator =(uint8 val);
+//     LLBC_Variant &operator =(sint16 val);
+//     LLBC_Variant &operator =(uint16 val);
+//     LLBC_Variant &operator =(sint32 val);
+//     LLBC_Variant &operator =(uint32 val);
+//     LLBC_Variant &operator =(long val);
+//     LLBC_Variant &operator =(unsigned long val);
+//     template <typename _T>
+//     LLBC_Variant &operator =(const _T * const &val);
+//     LLBC_Variant &operator =(const sint64 &val);
+//     LLBC_Variant &operator =(const uint64 &val);
+//     LLBC_Variant &operator =(float val);
+//     LLBC_Variant &operator =(const double &val);
+//     LLBC_Variant &operator =(const LLBC_String &val);
+//     LLBC_Variant &operator =(const Dict &val);
+//     LLBC_Variant &operator =(const LLBC_Variant &val);
+// 
+//     // Relational operators.
+//     bool operator ==(const LLBC_Variant &another) const;
+//     bool operator !=(const LLBC_Variant &another) const;
+// 
+//     bool operator <(const LLBC_Variant &another) const;
+//     bool operator >(const LLBC_Variant &another) const;
+//     bool operator <=(const LLBC_Variant &another) const;
+//     bool operator >=(const LLBC_Variant &another) const;
+// 
+//     // Arithmetic operators.
+//     LLBC_Variant operator +(const LLBC_Variant &another) const;
+//     LLBC_Variant operator -(const LLBC_Variant &another) const;
+//     LLBC_Variant operator *(const LLBC_Variant &another) const;
+//     LLBC_Variant operator /(const LLBC_Variant &another) const;
+// 
+//     LLBC_Variant &operator +=(const LLBC_Variant &another);
+//     LLBC_Variant &operator -=(const LLBC_Variant &another);
+//     LLBC_Variant &operator *=(const LLBC_Variant &another);
+//     LLBC_Variant &operator /=(const LLBC_Variant &another);
+// 
+//     // Type to string.
+//     const LLBC_String &TypeToString() const;
+//     // Value to string.
+//     LLBC_String ValueToString() const;
+//     // To string.
+//     LLBC_String ToString() const;
+// 
+//     // Serialize / DeSerialize support.
+//     void Serialize(LLBC_Stream &stream) const;
+//     bool DeSerialize(LLBC_Stream &stream);
+// 
+//     // SerializeEx / DeSerializeEx support.
+//     void SerializeEx(LLBC_Stream &stream) const;
+//     bool DeSerializeEx(LLBC_Stream &stream);
+// 
+// public:
+//     friend std::ostream &::operator <<(std::ostream &o, const LLBC_Variant &variant);
+// 
+// private:
+//         friend class SmartVarTraits;
+// 
+//         void SetType(int type);
+// 
+//         Raw &_GetRaw();
+// 
         void _CleanBriefData();
         void _CleanStrData();
         void _CleanDictData();
-        void _CleanTypeData(int type);
-        void _OptimizePerformance();
+         void _CleanTypeData(UInt32 type);
+//         void _OptimizePerformance();
 
 private:
     Raw _raw;

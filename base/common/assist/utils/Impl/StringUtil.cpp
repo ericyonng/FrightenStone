@@ -42,6 +42,88 @@
 
 FS_NAMESPACE_BEGIN
 
+FS_String StringUtil::I64toA(Int64 value, Int32 radix)
+{
+    char *p;
+    char *firstDigit;
+    char temp;
+    unsigned int digval;
+    char buf[64] = {0};
+
+    p = buf;
+    firstDigit = p;
+
+    if(value < 0)
+    {
+        p[0] = '-';
+        firstDigit = ++p;
+
+        value = -value;
+    }
+
+    do
+    {
+        digval = (unsigned int)(value % radix);
+        value /= radix;
+
+        if(digval > 9)
+            *p++ = (char)(digval - 10 + 'a');
+        else
+            *p++ = (char)(digval + '0');
+    } while(value > 0);
+
+    *p-- = '\0';
+
+    do
+    {
+        temp = *p;
+        *p = *firstDigit;
+        *firstDigit = temp;
+
+        --p;
+        ++firstDigit;
+    } while(firstDigit < p);
+
+    return buf;
+}
+
+FS_String StringUtil::UI64toA(UInt64 value, Int32 radix)
+{
+    char *p;
+    char *firstDigit;
+    char temp;
+    unsigned int digval;
+    char buf[64] = {0};
+
+    p = buf;
+    firstDigit = p;
+
+    do
+    {
+        digval = (unsigned int)(value % radix);
+        value /= radix;
+
+        if(digval > 9)
+            *p++ = (char)(digval - 10 + 'a');
+        else
+            *p++ = (char)(digval + '0');
+    } while(value > 0);
+
+    *p-- = '\0';
+
+    do
+    {
+        temp = *p;
+        *p = *firstDigit;
+        *firstDigit = temp;
+
+        --p;
+        ++firstDigit;
+    } while(firstDigit < p);
+
+    return buf;
+}
+
 bool StringUtil::MakeMd5(const FS_String &src, FS_String &outMd5)
 {
     if(UNLIKELY(!src.GetLength()))

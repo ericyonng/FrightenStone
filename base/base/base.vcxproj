@@ -178,6 +178,7 @@
     <ClInclude Include="..\common\assist\utils\Impl\STLUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\STLUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\StringUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\StringUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\ThreadUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\TimeUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\ToolUtil.h" />
@@ -267,6 +268,7 @@
     <ClCompile Include="..\common\asyn\Lock\Impl\ConditionLocker.cpp" />
     <ClCompile Include="..\common\asyn\Lock\Impl\Locker.cpp" />
     <ClCompile Include="..\common\basedefs\DataType\InnerDataType\Defs\LockerHandle.cpp" />
+    <ClCompile Include="..\common\basedefs\Macro\ForAll\GlobalDefs.cpp" />
     <ClCompile Include="..\common\component\Defs\TriggerDefs.cpp" />
     <ClCompile Include="..\common\component\Impl\Aes\FS_Aes.cpp" />
     <ClCompile Include="..\common\component\Impl\File\FS_File.cpp" />

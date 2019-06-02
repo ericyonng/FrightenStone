@@ -79,7 +79,6 @@ Int32 FS_Aes::Encrypt_Data(Int32 mode, const FS_String &key, const FS_String &pl
     if(cyphertext.size() < textSize)
         cyphertext.GetRaw().resize(textSize, 0);
 
-    _locker.Lock();
     static AES_KEY innerKey;
     AES_set_encrypt_key(reinterpret_cast<const unsigned char *>(key.c_str()), g_aes_key_bytes[mode] * 8, &innerKey);
     while(i < textSize)
@@ -87,7 +86,6 @@ Int32 FS_Aes::Encrypt_Data(Int32 mode, const FS_String &key, const FS_String &pl
         AES_encrypt(reinterpret_cast<const unsigned char *>(&plaintext[i]), reinterpret_cast<unsigned char *>(&cyphertext[i]), &innerKey);
         i += AES_BLOCK_SIZE;
     }
-    _locker.Unlock();
 
     return StatusDefs::Success;
 }
@@ -108,7 +106,6 @@ Int32 FS_Aes::Decrypt_Data(Int32 mode, const FS_String &key,  const FS_String &c
     if(UNLIKELY(plaintext.size() < textSize))
         plaintext.GetRaw().resize(textSize, 0);
 
-    _locker.Lock();
     static AES_KEY innerKey;
     AES_set_decrypt_key(reinterpret_cast<const unsigned char *>(key.c_str()), g_aes_key_bytes[mode] * 8, &innerKey);
     while(i < textSize)
@@ -116,19 +113,8 @@ Int32 FS_Aes::Decrypt_Data(Int32 mode, const FS_String &key,  const FS_String &c
         AES_decrypt(reinterpret_cast<const unsigned char *>(&cyphertext[i]), reinterpret_cast<unsigned char *>(&plaintext[i]), &innerKey);
         i += AES_BLOCK_SIZE;
     }
-    _locker.Unlock();
 
     return StatusDefs::Success;
-}
-
-void FS_Aes::Lock()
-{
-    _locker.Lock();
-}
-
-void FS_Aes::Unlock()
-{
-    _locker.Unlock();
 }
 
 FS_NAMESPACE_END

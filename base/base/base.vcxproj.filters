@@ -474,6 +474,9 @@
     <ClInclude Include="..\common\basedefs\Macro\ForAll\GlobalDefs.h">
       <Filter>common\basedefs\Macro\ForAll</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\StringUtilImpl.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -577,6 +580,9 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarTraits.cpp">
       <Filter>common\component\Impl\SmartVar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\basedefs\Macro\ForAll\GlobalDefs.cpp">
+      <Filter>common\basedefs\Macro\ForAll</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
