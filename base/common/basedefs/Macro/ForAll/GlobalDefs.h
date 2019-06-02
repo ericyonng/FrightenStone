@@ -32,5 +32,16 @@
 #ifndef __Base_Common_BaseDefs_Macro_MacroDefs_ForAll_GlobalDefs_H__
 #define __Base_Common_BaseDefs_Macro_MacroDefs_ForAll_GlobalDefs_H__
 #pragma once
-extern 
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/Macro/MacroDefs.h"
+
+FS_NAMESPACE_BEGIN
+
+// opensslÈ«¾ÖËø
+class BASE_EXPORT Locker;
+extern Locker g_OpenSSL_Locker;
+
+FS_NAMESPACE_END
+
 #endif

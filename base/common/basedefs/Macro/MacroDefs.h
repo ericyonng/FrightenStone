@@ -44,5 +44,6 @@
 #include "base/common/basedefs/Macro/Export/ExportMacro.h"
 
 #include "base/common/basedefs/Macro/ForAll/ForAllMacro.h"
+#include "base/common/basedefs/Macro/ForAll/GlobalDefs.h"
 
 #endif

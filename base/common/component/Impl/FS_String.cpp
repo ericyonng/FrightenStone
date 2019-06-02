@@ -191,6 +191,222 @@ FS_String::_These FS_String::Split(const FS_String::_These &seps, FS_String::siz
     return substrs;
 }
 
+FS_String &FS_String::lstrip(const FS_String &chars)
+{
+    FS_String willStripChars;
+    if(chars.empty())
+        willStripChars._buffer.append(reinterpret_cast<const char *>(" \t\v\r\n\f"));
+
+    FS_String &thisRef = *this;
+    typename FS_String::size_type stripTo = 0;
+    for(typename FS_String::size_type i = 0; i != thisRef.size(); ++i)
+    {
+        bool found = false;
+        const char &now = thisRef[i];
+        for(typename FS_String::size_type j = 0; j != willStripChars.size(); j++)
+        {
+            if(now == willStripChars[j])
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if(found)
+            stripTo = i + 1;
+        else
+            break;
+    }
+
+    if(stripTo != 0)
+        this->_buffer.erase(0, stripTo);
+
+    return *this;
+}
+
+FS_String FS_String::lstrip(const FS_String &chars) const
+{
+    FS_String copyThis(*this);
+    return copyThis.lstrip(chars);
+}
+
+FS_String &FS_String::rstrip(const FS_String &chars)
+{
+    FS_String willStripChars;
+    if(chars.empty())
+        willStripChars._buffer.append(reinterpret_cast<const char *>(" \t\v\r\n\f"));
+
+    FS_String &thisRef = *this;
+    const long thisSize = static_cast<long>(thisRef.size());
+
+    long stripFrom = thisSize;
+    for(long i = thisSize - 1; i >= 0; i--)
+    {
+        bool found = false;
+        const char &now = thisRef[i];
+        for(FS_String::size_type j = 0; j != willStripChars.size(); j++)
+        {
+            if(now == willStripChars[j])
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if(found)
+            stripFrom = i;
+        else
+            break;
+    }
+
+    if(stripFrom != thisSize)
+        thisRef._buffer.erase(stripFrom, std::string::npos);
+
+    return thisRef;
+}
+
+FS_String FS_String::rstrip(const FS_String &chars) const
+{
+    FS_String copyThis(*this);
+    return copyThis.rstrip(chars);
+}
+
+FS_String &FS_String::strip(const FS_String &chars)
+{
+    return this->lstrip(chars).rstrip(chars);
+}
+
+FS_String FS_String::strip(const FS_String &chars) const
+{
+    FS_String copyThis(*this);
+    return copyThis.lstrip(chars).rstrip(chars);
+}
+
+bool FS_String::isalpha(const FS_String &s)
+{
+    if(s.empty())
+        return false;
+
+    for(size_t i = 0; i < s.size(); i++)
+    {
+        if(!isalpha(s[i]))
+            return false;
+    }
+
+    return true;
+}
+
+bool FS_String::islower(const FS_String &s)
+{
+    if(s.empty())
+        return false;
+
+    bool foundLower = false;
+    for(size_type i = 0; i < s.size(); i++)
+    {
+        if(isupper(s[i]))
+            return false;
+        else if(islower(s[i]))
+            foundLower = true;
+    }
+
+    return foundLower;
+}
+
+bool FS_String::isupper(const FS_String &s)
+{
+    if(s.empty())
+        return false;
+
+    bool foundUpper = false;
+    for(size_type i = 0; i < s.size(); i++)
+    {
+        if(islower(s[i]))
+            return false;
+        else if(isupper(s[i]))
+            foundUpper = true;
+    }
+
+    return foundUpper;
+}
+
+bool FS_String::isdigit(const FS_String &s)
+{
+    if(s.empty())
+        return false;
+
+    for(size_type i = 0; i < s.size(); i++)
+    {
+        if(!isdigit(s[i]))
+            return false;
+    }
+
+    return true;
+}
+
+bool FS_String::isspace(const FS_String &s)
+{
+    if(s.empty())
+        return false;
+
+    for(size_type i = 0; i < s.size(); i++)
+    {
+        if(!isspace((s)[i]))
+            return false;
+    }
+
+    return false;
+}
+
+bool FS_String::IsStartsWith(const FS_String &s) const
+{
+    if(s.empty())
+        return true;
+
+    return (this->size() >= s.size() && memcmp(s.GetRaw().data(), _buffer.data(), s.size()) == 0);
+}
+
+bool FS_String::IsEndsWith(const FS_String &s) const
+{
+    if(s.empty())
+        return true;
+
+    return (this->size() >= s.size() &&
+            memcmp(s.GetRaw().data(), _buffer.data() + (this->size() - s.size()), s.size()) == 0);
+}
+
+FS_String FS_String::tolower() const
+{
+    const char *buf = _buffer.data();
+    const size_type size = this->size();
+
+    FS_String lower;
+    lower._buffer.resize(size);
+    for(size_type i = 0; i < size; i++)
+        if(buf[i] >= 0x41 && buf[i] <= 0x5A)
+            lower[i] = buf[i] + 0x20;
+        else
+            lower[i] = buf[i];
+
+    return lower;
+}
+
+FS_String FS_String::toupper() const
+{
+    const char *buf = _buffer.data();
+    const size_type size = this->size();
+
+    FS_String upper;
+    upper._buffer.resize(size);
+    for(size_type i = 0; i < size; i++)
+        if(buf[i] >= 0x61 && buf[i] <= 0x7a)
+            upper[i] = buf[i] - 0x20;
+        else
+            upper[i] = buf[i];
+
+    return upper;
+}
+
 void FS_String::add_utf8_bomb()
 {
     if(!has_utf8_bomb())
