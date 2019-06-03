@@ -448,6 +448,46 @@ inline Float SmartVar::AsFloat() const
     return static_cast<Float>(AsDouble());
 }
 
+inline SmartVar::operator bool() const
+{
+    return AsBool();
+}
+
+inline SmartVar::operator Byte8 () const
+{
+    return AsByte8();
+}
+
+inline SmartVar::operator U8 () const
+{
+    return AsUInt8();
+}
+
+inline SmartVar::operator Int16 () const
+{
+    return AsInt16();
+}
+
+inline SmartVar::operator UInt16 () const
+{
+    return AsUInt16();
+}
+
+inline SmartVar::operator Int32 () const
+{
+    return AsInt32();
+}
+
+inline SmartVar::operator UInt32 () const
+{
+    return AsUInt32();
+}
+
+inline SmartVar::operator Long() const
+{
+    return AsLong();
+}
+
 inline void SmartVar::_CleanBriefData()
 {
     _raw._briefData._uint64Data = 0;
