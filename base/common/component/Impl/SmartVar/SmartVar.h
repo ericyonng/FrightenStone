@@ -223,24 +223,24 @@ public:
     Double  AsDouble() const;
     FS_String AsStr() const;
     const Dict &AsDict() const;
-// 
-//     operator bool() const;
-//     operator sint8 () const;
-//     operator uint8 () const;
-//     operator sint16 () const;
-//     operator uint16 () const;
-//     operator sint32 () const;
-//     operator uint32 () const;
-//     operator long() const;
-//     operator ulong () const;
-//     template <typename _T>
-//     operator _T * () const;
-//     operator sint64 () const;
-//     operator uint64 () const;
-//     operator float() const;
-//     operator double() const;
-//     operator LLBC_String () const;
-//     operator const Dict &() const;
+
+    operator bool() const;
+    operator Byte8 () const;
+    operator U8 () const;
+    operator Int16 () const;
+    operator UInt16 () const;
+    operator Int32 () const;
+    operator UInt32 () const;
+    operator Long() const;
+    operator ULong () const;
+    template <typename _T>
+    operator _T * () const;
+    operator Int64 () const;
+    operator UInt64 () const;
+    operator Float() const;
+    operator Double() const;
+    operator FS_String () const;
+    operator const Dict &() const;
 
         // Dictionary type variant object specify operate methods.
 //     DictIter Begin();
