@@ -79,6 +79,14 @@ FS_NAMESPACE_END
 
 FS_NAMESPACE_BEGIN
 
+static void BecomeAndAllocDict(SmartVar &var, SmartVar::Raw &raw)
+{
+    if(!var.IsDict())
+        var.BecomeDict();
+    if(!raw._obj._dictData)
+        raw._obj._dictData = new (SmartVar::Dict);
+}
+
 static const SmartVar::Str __g_nullStr;
 static const SmartVar::Str __g_trueStr = "true";
 static const SmartVar::Dict __g_nullDict;
@@ -225,6 +233,142 @@ const SmartVar::Dict &SmartVar::AsDict() const
         return *_raw._obj._dictData;
 
     return __g_nullDict;
+}
+
+SmartVar::DictIter SmartVar::Begin()
+{
+    if(IsDict() && _raw._obj._dictData)
+        return _raw._obj._dictData->begin();
+    else
+        return const_cast<Dict &>(__g_nullDict).begin();
+}
+
+SmartVar::DictConstIter SmartVar::Begin() const
+{
+    if(IsDict() &&  _raw._obj._dictData)
+        return  _raw._obj._dictData->begin();
+    else
+        return __g_nullDict.begin();
+}
+
+SmartVar::DictIter SmartVar::End()
+{
+    if(IsDict() &&  _raw._obj._dictData)
+        return  _raw._obj._dictData->end();
+    else
+        return const_cast<Dict &>(__g_nullDict).end();
+}
+
+SmartVar::DictConstIter SmartVar::End() const
+{
+    if(IsDict() && _raw._obj._dictData)
+        return  _raw._obj._dictData->end();
+    else
+        return __g_nullDict.end();
+}
+
+SmartVar::DictReverseIter SmartVar::ReverseBegin()
+{
+    if(IsDict() && _raw._obj._dictData)
+        return _raw._obj._dictData->rbegin();
+    else
+        return const_cast<Dict &>(__g_nullDict).rbegin();
+}
+
+SmartVar::DictConstReverseIter SmartVar::ReverseBegin() const
+{
+    if(IsDict() && _raw._obj._dictData)
+        return _raw._obj._dictData->rbegin();
+    else
+        return __g_nullDict.rbegin();
+}
+
+SmartVar::DictReverseIter SmartVar::ReverseEnd()
+{
+    if(IsDict() && _raw._obj._dictData)
+        return _raw._obj._dictData->rend();
+    else
+        return const_cast<Dict &>(__g_nullDict).rend();
+}
+
+SmartVar::DictConstReverseIter SmartVar::ReverseEnd() const
+{
+    if(IsDict() && _raw._obj._dictData)
+        return _raw._obj._dictData->rend();
+    else
+        return __g_nullDict.rend();
+}
+
+std::pair<SmartVar::DictIter, bool> SmartVar::Insert(const Dict::key_type &key, const Dict::mapped_type &val)
+{
+    return Insert(Dict::value_type(key, val));
+}
+
+std::pair<SmartVar::DictIter, bool> SmartVar::Insert(const SmartVar::Dict::value_type &val)
+{
+    BecomeAndAllocDict(*this, _raw);
+    return _raw._obj._dictData->insert(val);
+}
+
+SmartVar::DictIter SmartVar::Find(const Dict::key_type &key)
+{
+    if(IsDict() && _raw._obj._dictData)
+        return _raw._obj._dictData->find(key);
+    else
+        return const_cast<Dict &>(__g_nullDict).end();
+}
+
+SmartVar::DictConstIter SmartVar::Find(const Dict::key_type &key) const
+{
+    if(IsDict() && _raw._obj._dictData)
+        return _raw._obj._dictData->find(key);
+    else
+        return __g_nullDict.end();
+}
+
+void SmartVar::Erase(SmartVar::DictIter it)
+{
+    if(IsDict() && _raw._obj._dictData)
+       _raw._obj._dictData->erase(it);
+}
+
+SmartVar::Dict::size_type SmartVar::Erase(const SmartVar::Dict::key_type &key)
+{
+    if(IsDict() && _raw._obj._dictData)
+        return _raw._obj._dictData->erase(key);
+    else
+        return 0;
+}
+
+void SmartVar::Erase(SmartVar::DictIter first, SmartVar::DictIter last)
+{
+    if(IsDict() && _raw._obj._dictData)
+        _raw._obj._dictData->erase(first, last);
+}
+
+SmartVar::Dict::mapped_type &SmartVar::operator [](const SmartVar &key)
+{
+    BecomeAndAllocDict(*this, _raw);
+    return (*_raw._obj._dictData)[key];
+}
+
+const SmartVar::Dict::mapped_type &SmartVar::operator [](const SmartVar &key) const
+{
+    if(IsDict() && _raw._obj._dictData)
+    {
+        Dict::const_iterator it = _raw._obj._dictData->find(key);
+        if(it == _raw._obj._dictData->end())
+            return __g_nilVariant;
+        else
+            return it->second;
+    }
+
+    return __g_nilVariant;
+}
+
+bool SmartVar::operator <(const SmartVar &another) const
+{
+    return SmartVarTraits::lt(*this, another);
 }
 
 void SmartVar::_CleanTypeData(UInt32 type)

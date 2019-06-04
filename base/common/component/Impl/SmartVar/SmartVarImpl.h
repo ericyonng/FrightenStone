@@ -488,6 +488,53 @@ inline SmartVar::operator Long() const
     return AsLong();
 }
 
+inline SmartVar::operator ULong () const
+{
+    return AsULong();
+}
+
+template <typename _T>
+inline SmartVar::operator _T * () const
+{
+    return AsPtr<_T>();
+}
+
+inline SmartVar::operator Int64 () const
+{
+    return AsInt64();
+}
+
+inline SmartVar::operator UInt64 () const
+{
+    return AsUInt64();
+}
+
+inline SmartVar::operator Float() const
+{
+    return AsFloat();
+}
+
+inline SmartVar::operator Double() const
+{
+    return AsDouble();
+}
+
+
+inline SmartVar::operator FS_String () const
+{
+    return AsStr();
+}
+
+inline SmartVar::operator std::string() const
+{
+    return static_cast<std::string>(AsStr());
+}
+
+inline SmartVar::operator const SmartVar::Dict &() const
+{
+    return AsDict();
+}
+
 inline void SmartVar::_CleanBriefData()
 {
     _raw._briefData._uint64Data = 0;
