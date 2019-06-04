@@ -240,48 +240,49 @@ public:
     operator Float() const;
     operator Double() const;
     operator FS_String () const;
-    operator const Dict &() const;
+    operator std::string () const;
+    operator const SmartVar::Dict &() const;
+    
+    // Dictionary type variant object specify operate methods.
+    DictIter Begin();
+    DictIter End();
+    DictConstIter Begin() const;
+    DictConstIter End() const;
+    DictReverseIter ReverseBegin();
+    DictReverseIter ReverseEnd();
+    DictConstReverseIter ReverseBegin() const;
+    DictConstReverseIter ReverseEnd() const;
 
-        // Dictionary type variant object specify operate methods.
-//     DictIter Begin();
-//     DictIter End();
-//     DictConstIter Begin() const;
-//     DictConstIter End() const;
-//     DictReverseIter ReverseBegin();
-//     DictReverseIter ReverseEnd();
-//     DictConstReverseIter ReverseBegin() const;
-//     DictConstReverseIter ReverseEnd() const;
-// 
-//     std::pair<DictIter, bool> Insert(const Dict::key_type &key, const Dict::mapped_type &val);
-//     std::pair<DictIter, bool> Insert(const Dict::value_type &val);
-// 
-//     template <typename _Kty, typename _Ty>
-//     std::pair<DictIter, bool> Insert(const _Kty &key, const _Ty &val);
-// 
-//     DictIter Find(const Dict::key_type &key);
-//     DictConstIter Find(const Dict::key_type &key) const;
-// 
-//     template <typename _Kty>
-//     DictIter Find(const _Kty &key);
-//     template <typename _Kty>
-//     DictConstIter Find(const _Kty &key) const;
-// 
-//     void Erase(DictIter it);
-//     Dict::size_type Erase(const Dict::key_type &key);
-//     void Erase(DictIter first, DictIter last);
-// 
-//     template <typename _Kty>
-//     Dict::size_type Erase(const _Kty &key);
-// 
-//     Dict::mapped_type &operator [](const Dict::key_type &key);
-//     const Dict::mapped_type &operator [](const Dict::key_type &key) const;
-// 
-//     template <typename _Kty>
-//     Dict::mapped_type &operator [](const _Kty &key);
-//     template <typename _Kty>
-//     const Dict::mapped_type &operator [](const _Kty &key) const;
-// 
-//     // assignment operators.
+    std::pair<DictIter, bool> Insert(const Dict::key_type &key, const Dict::mapped_type &val);
+    std::pair<DictIter, bool> Insert(const Dict::value_type &val);
+
+    template <typename _Kty, typename _Ty>
+    std::pair<DictIter, bool> Insert(const _Kty &key, const _Ty &val);
+
+    DictIter Find(const Dict::key_type &key);
+    DictConstIter Find(const Dict::key_type &key) const;
+
+    template <typename _Kty>
+    DictIter Find(const _Kty &key);
+    template <typename _Kty>
+    DictConstIter Find(const _Kty &key) const;
+
+    void Erase(DictIter it);
+    Dict::size_type Erase(const Dict::key_type &key);
+    void Erase(DictIter first, DictIter last);
+
+    template <typename _Kty>
+    Dict::size_type Erase(const _Kty &key);
+
+    Dict::mapped_type &operator [](const Dict::key_type &key);
+    const Dict::mapped_type &operator [](const Dict::key_type &key) const;
+
+    template <typename _Kty>
+    Dict::mapped_type &operator [](const _Kty &key);
+    template <typename _Kty>
+    const Dict::mapped_type &operator [](const _Kty &key) const;
+
+    // assignment operators.
 //     LLBC_Variant &operator =(sint8 val);
 //     LLBC_Variant &operator =(uint8 val);
 //     LLBC_Variant &operator =(sint16 val);
@@ -304,7 +305,7 @@ public:
 //     bool operator ==(const LLBC_Variant &another) const;
 //     bool operator !=(const LLBC_Variant &another) const;
 // 
-//     bool operator <(const LLBC_Variant &another) const;
+     bool operator <(const SmartVar &another) const;
 //     bool operator >(const LLBC_Variant &another) const;
 //     bool operator <=(const LLBC_Variant &another) const;
 //     bool operator >=(const LLBC_Variant &another) const;
@@ -344,7 +345,7 @@ public:
 //         void SetType(int type);
 // 
 //         Raw &_GetRaw();
-// 
+
         void _CleanBriefData();
         void _CleanStrData();
         void _CleanDictData();
