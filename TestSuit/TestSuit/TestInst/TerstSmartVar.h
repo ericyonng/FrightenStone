@@ -11,16 +11,11 @@ public:
     {
         fs::SmartVarRtti::InitRttiTypeNames();
         fs::SmartVar var;
-        std::cout << sizeof(var) << std::endl;
-        std::cout << sizeof(var.GetRaw()) << std::endl;
-        std::cout << sizeof(var.GetRaw()._briefData) << std::endl;
-        std::cout << sizeof(var.GetRaw()._obj) << std::endl;
-        std::cout << sizeof(var.GetRaw()._type) << std::endl;
-        var = 11;
+        var["Insert"] = 11;
+        var["Insert2"] = fs::FS_String("wo");
+        bool isInsert = var["Insert"].AsBool();
         std::cout << var.ToString() << std::endl;
-        var["Insert"] = fs::FS_String("wo");
-        std::cout << var.ToString() << std::endl;
-        std::cout << var["Insert"].AsStr() << std::endl;
+        std::cout << isInsert << std::endl;
 
     }
 };
