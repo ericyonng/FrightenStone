@@ -43,10 +43,11 @@
 #include "TestSuit/TestSuit/TestInst/TestRandom.h"
 #include "TestSuit/TestSuit/TestInst/TestAes.h"
 #include "TestSuit/TestSuit/TestInst/TestUtf8.h"
+#include "TestSuit/TestSuit/TestInst/TerstSmartVar.h"
 
 int main()
 {
-    TestString::Run();
+    TestSmartVar::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;

@@ -108,10 +108,9 @@ SmartVar::Raw::Raw()
 
 SmartVar::Raw::~Raw()
 {
-    if(_type & SmartVarRtti::SV_STRING_DEF)
+    if(_type == SmartVarRtti::SV_STRING_DEF)
         Fs_SafeFree(_obj._strData);
-
-    if(_type & SmartVarRtti::SV_DICTIONARY_DEF)
+    else if(_type == SmartVarRtti::SV_DICTIONARY_DEF)
         Fs_SafeFree(_obj._dictData);
 }
 
@@ -621,7 +620,6 @@ SmartVar &SmartVar::operator /=(const SmartVar &another)
     return *this;
 }
 
-
 const FS_String &SmartVar::TypeToString() const
 {
     return SmartVarRtti::GetTypeName(_raw._type);
@@ -721,7 +719,7 @@ void SmartVar::_CleanTypeData(UInt32 type)
 {
     typedef SmartVarRtti _RttiType;
 
-    const int topType = (type & _RttiType::SV_TYPEINFO_MASK);
+    const auto topType = (type & _RttiType::SV_TYPEINFO_MASK);
     switch(topType)
     {
         case _RttiType::SV_BRIEF_DATA:

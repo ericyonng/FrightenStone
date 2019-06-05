@@ -234,6 +234,8 @@
     <ClInclude Include="..\common\component\Impl\FS_ThreadPool.h" />
     <ClInclude Include="..\common\component\Impl\ITask.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVar.h" />
+    <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.h" />
+    <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmeticImpl.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarImpl.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarTraits.h" />
     <ClInclude Include="..\common\component\Impl\Time.h" />
@@ -278,6 +280,7 @@
     <ClCompile Include="..\common\component\Impl\FS_String.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_ThreadPool.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVar.cpp" />
+    <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarTraits.cpp" />
     <ClCompile Include="..\common\component\Impl\Time.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeSlice.cpp" />

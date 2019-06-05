@@ -126,6 +126,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TestInst\TerstSmartVar.h" />
     <ClInclude Include="TestInst\TestAes.h" />
     <ClInclude Include="TestInst\TestCpuUtil.h" />
     <ClInclude Include="TestInst\TestDelegate.h" />

@@ -48,6 +48,30 @@ const char *FS_String::endl = "\r\n";
 #else
 const char *FS_String::endl = "\n";
 #endif
+
+FS_String &FS_String::operator *=(size_t right)
+{
+    if(this->empty() || right == 1)
+        return *this;
+
+    if(right == 0)
+    {
+        this->Clear();
+        return *this;
+    }
+
+    FS_String unitStr(*this);
+    const char *unitStrBuf = unitStr._buffer.data();
+    typename FS_String::size_type unitStrSize = unitStr.size();
+
+    _buffer.resize(unitStrSize * right);
+    char *buf = const_cast<char *>(_buffer.data());
+    for(size_t i = 1; i < right; i++)
+        ::memcpy(buf + i * unitStrSize, unitStrBuf, unitStrSize * sizeof(char));
+
+    return *this;
+}
+
 FS_String FS_String::ToHexString() const
 {
     FS_String info;
@@ -358,10 +382,16 @@ FS_String FS_String::tolower() const
     FS_String lower;
     lower._buffer.resize(size);
     for(size_type i = 0; i < size; i++)
+    {
         if(buf[i] >= 0x41 && buf[i] <= 0x5A)
+        {
             lower[i] = buf[i] + 0x20;
+        }
         else
+        {
             lower[i] = buf[i];
+        }
+    }
 
     return lower;
 }
@@ -374,10 +404,16 @@ FS_String FS_String::toupper() const
     FS_String upper;
     upper._buffer.resize(size);
     for(size_type i = 0; i < size; i++)
+    {
         if(buf[i] >= 0x61 && buf[i] <= 0x7a)
+        {
             upper[i] = buf[i] - 0x20;
+        }
         else
+        {
             upper[i] = buf[i];
+        }
+    }
 
     return upper;
 }

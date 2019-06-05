@@ -54,9 +54,23 @@ class TestString
 public:
     static void Run()
     {
-        fs::FS_String str = "  daat !  ";
-        std::cout << str.lstrip(" ") << std::endl;
-        std::cout << str.rstrip(" ") << std::endl;
+        fs::FS_String str = "  daat   ";
+        std::cout << str.islower() << std::endl;
+        std::cout << str.isupper() << std::endl;
+        std::cout << str.isdigit() << std::endl;
+        std::cout << str.isspace() << std::endl;
+        std::cout << str.IsEndsWith("  ") << std::endl;
+        std::cout << str.IsStartsWith("  ") << std::endl;
+        std::cout << str.strip() << std::endl;
+        std::cout << str.tolower() << std::endl;        
+        std::cout << str.toupper() << std::endl;
+        std::cout << str.islower() << std::endl;
+        std::cout << str.isupper() << std::endl;
+        std::cout << str.isdigit() << std::endl;
+        std::cout << str.isspace() << std::endl;
+        std::cout << str.IsEndsWith("  ") << std::endl;
+        std::cout << str.IsStartsWith("  ") << std::endl;
+        std::cout << str.isalpha() << std::endl;
     }
 };
 

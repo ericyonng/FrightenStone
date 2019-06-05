@@ -165,4 +165,64 @@ void StringUtil::PreInstertTime(const Time &time, FS_String &src)
 {
     src << time.ToStringOfMillSecondPrecision();
 }
+
+void StringUtil::SplitString(const FS_String &str, const FS_String &separator, std::vector<FS_String> &destStrList, bool justSplitFirst /*= false*/, char escapeChar /*= '\0'*/)
+{
+    if(UNLIKELY(str.empty()))
+    {
+        return;
+    }
+
+    if(UNLIKELY(separator.empty()))
+    {
+        destStrList.push_back(str);
+    }
+
+    FS_String::size_type curPos = 0;
+    FS_String::size_type prevPos = 0;
+
+    FS_String strInternal = str;
+    while((curPos = strInternal.GetRaw().find(separator.GetRaw(), curPos)) != std::string::npos)
+    {
+        if(curPos != 0 && strInternal[curPos - 1] == escapeChar)
+        {
+            strInternal.GetRaw().erase(--curPos, 1);
+            curPos += separator.size();
+            continue;
+        }
+
+        FS_String temp = strInternal.GetRaw().substr(prevPos, curPos - prevPos);
+        destStrList.push_back(temp);
+
+        if(justSplitFirst)
+        {
+            destStrList.push_back(strInternal.GetRaw().substr(curPos + separator.size()));
+            return;
+        }
+
+        curPos += separator.size();
+        prevPos = curPos;
+    }
+
+    FS_String temp = strInternal.GetRaw().substr(prevPos);
+    if(!temp.empty())
+    {
+        destStrList.push_back(temp);
+    }
+}
+
+FS_String StringUtil::FilterOutString(const FS_String &str, const FS_String &filterStr)
+{
+    std::vector<FS_String> strings;
+    SplitString(str, filterStr, strings);
+
+    FS_String retStr;
+    for(size_t i = 0; i < strings.size(); i++)
+    {
+        retStr += strings[i];
+    }
+
+    return retStr;
+}
+
 FS_NAMESPACE_END

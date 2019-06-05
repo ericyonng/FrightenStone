@@ -39,7 +39,8 @@
 
 #undef FS_NAMESPACE_BEGIN
 #undef FS_NAMESPACE_END
-#define FS_NAMESPACE_BEGIN namespace fs {
+#define FS_NAMESPACE_BEGIN namespace fs {    \
+
 #define FS_NAMESPACE_END }
 
 #undef FS_NS

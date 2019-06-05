@@ -136,18 +136,18 @@ public:
         ~Raw();
         UInt32 _type;
 
+        union ObjType
+        {
+            Dict *_dictData;
+            Str *_strData;
+        }_obj;
+
         union BriefDataType
         {
             Int64 _int64Data;
             UInt64 _uint64Data;
             Double _doubleData;
         }_briefData;
-
-        union ObjType
-        {
-            Dict *_dictData;
-            Str *_strData;
-        }_obj;
     };
 
 public:
