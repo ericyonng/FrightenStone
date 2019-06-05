@@ -535,6 +535,67 @@ inline SmartVar::operator const SmartVar::Dict &() const
     return AsDict();
 }
 
+template <typename _Kty, typename _Ty>
+inline std::pair<SmartVar::DictIter, bool> SmartVar::Insert(const _Kty &key, const _Ty &val)
+{
+    return this->Insert(SmartVar::Dict::key_type(key),
+                        SmartVar::Dict::mapped_type(val));
+}
+
+
+template <typename _Kty>
+inline SmartVar::DictIter SmartVar::Find(const _Kty &key)
+{
+    return this->Find(SmartVar::Dict::key_type(key));
+}
+
+template <typename _Kty>
+inline SmartVar::DictConstIter SmartVar::Find(const _Kty &key) const
+{
+    return this->Find(SmartVar::Dict::key_type(key));
+}
+
+template <typename _Kty>
+inline SmartVar::Dict::size_type SmartVar::Erase(const _Kty &key)
+{
+    return this->Erase(SmartVar::Dict::key_type(key));
+}
+
+template <typename _Kty>
+inline SmartVar::Dict::mapped_type &SmartVar::operator [](const _Kty &key)
+{
+    return this->operator [](SmartVar::Dict::key_type(key));
+}
+
+template <typename _Kty>
+inline const SmartVar::Dict::mapped_type &SmartVar::operator [](const _Kty &key) const
+{
+    return this->operator [](SmartVar::Dict::key_type(key));
+}
+
+template <typename _T>
+inline SmartVar &SmartVar::operator =(const _T * const &val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_PTR;
+
+    _raw._briefData._uint64Data = 0;
+    ::memcpy(&_raw._briefData._uint64Data, &val, sizeof(_T *));
+
+    return *this;
+}
+
+inline void SmartVar::_SetType(int type)
+{
+    _raw._type = static_cast<SmartVarRtti::RttiType>(type);
+}
+
+inline SmartVar::Raw &SmartVar::_GetRaw()
+{
+    return _raw;
+}
+
 inline void SmartVar::_CleanBriefData()
 {
     _raw._briefData._uint64Data = 0;

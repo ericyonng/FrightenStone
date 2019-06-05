@@ -48,35 +48,6 @@ const char *FS_String::endl = "\r\n";
 #else
 const char *FS_String::endl = "\n";
 #endif
-
-FS_String::FS_String()
-{
-    _cache[0] = 0;
-}
-FS_String::~FS_String()
-{
-    
-}
-
-FS_String::FS_String(char other)
-{
-    _buffer = other;
-    _cache[0] = 0;
-}
-
-FS_String::FS_String(const std::string &other)
-    :_buffer(other)
-{
-    // _buffer = other;
-    _cache[0] = 0;
-}
-
-FS_String::FS_String(const char *other)
-{
-    _buffer = other;
-    _cache[0] = 0;
-}
-
 FS_String FS_String::ToHexString() const
 {
     FS_String info;
@@ -196,6 +167,8 @@ FS_String &FS_String::lstrip(const FS_String &chars)
     FS_String willStripChars;
     if(chars.empty())
         willStripChars._buffer.append(reinterpret_cast<const char *>(" \t\v\r\n\f"));
+    else
+        willStripChars = chars;
 
     FS_String &thisRef = *this;
     typename FS_String::size_type stripTo = 0;
@@ -235,6 +208,8 @@ FS_String &FS_String::rstrip(const FS_String &chars)
     FS_String willStripChars;
     if(chars.empty())
         willStripChars._buffer.append(reinterpret_cast<const char *>(" \t\v\r\n\f"));
+    else
+        willStripChars = chars;
 
     FS_String &thisRef = *this;
     const long thisSize = static_cast<long>(thisRef.size());

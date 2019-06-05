@@ -104,6 +104,21 @@ FS_NAMESPACE_END
 
 FS_NAMESPACE_BEGIN
 
+/**
+ * Pre-declare LLBC_Variant class.
+ */
+class SmartVar;
+
+FS_NAMESPACE_END
+
+/**
+ * \brief SmartVar stream output function.
+ */
+extern BASE_EXPORT std::ostream &operator <<(std::ostream &o, const FS_NS SmartVar &smartVar);
+
+
+FS_NAMESPACE_BEGIN
+
 class BASE_EXPORT SmartVar
 {
 public:
@@ -283,74 +298,73 @@ public:
     const Dict::mapped_type &operator [](const _Kty &key) const;
 
     // assignment operators.
-//     LLBC_Variant &operator =(sint8 val);
-//     LLBC_Variant &operator =(uint8 val);
-//     LLBC_Variant &operator =(sint16 val);
-//     LLBC_Variant &operator =(uint16 val);
-//     LLBC_Variant &operator =(sint32 val);
-//     LLBC_Variant &operator =(uint32 val);
-//     LLBC_Variant &operator =(long val);
-//     LLBC_Variant &operator =(unsigned long val);
-//     template <typename _T>
-//     LLBC_Variant &operator =(const _T * const &val);
-//     LLBC_Variant &operator =(const sint64 &val);
-//     LLBC_Variant &operator =(const uint64 &val);
-//     LLBC_Variant &operator =(float val);
-//     LLBC_Variant &operator =(const double &val);
-//     LLBC_Variant &operator =(const LLBC_String &val);
-//     LLBC_Variant &operator =(const Dict &val);
-//     LLBC_Variant &operator =(const LLBC_Variant &val);
-// 
-//     // Relational operators.
-//     bool operator ==(const LLBC_Variant &another) const;
-//     bool operator !=(const LLBC_Variant &another) const;
-// 
-     bool operator <(const SmartVar &another) const;
-//     bool operator >(const LLBC_Variant &another) const;
-//     bool operator <=(const LLBC_Variant &another) const;
-//     bool operator >=(const LLBC_Variant &another) const;
-// 
-//     // Arithmetic operators.
-//     LLBC_Variant operator +(const LLBC_Variant &another) const;
-//     LLBC_Variant operator -(const LLBC_Variant &another) const;
-//     LLBC_Variant operator *(const LLBC_Variant &another) const;
-//     LLBC_Variant operator /(const LLBC_Variant &another) const;
-// 
-//     LLBC_Variant &operator +=(const LLBC_Variant &another);
-//     LLBC_Variant &operator -=(const LLBC_Variant &another);
-//     LLBC_Variant &operator *=(const LLBC_Variant &another);
-//     LLBC_Variant &operator /=(const LLBC_Variant &another);
-// 
-//     // Type to string.
-//     const LLBC_String &TypeToString() const;
-//     // Value to string.
-//     LLBC_String ValueToString() const;
-//     // To string.
-//     LLBC_String ToString() const;
-// 
-//     // Serialize / DeSerialize support.
+    SmartVar &operator =(Byte8 val);
+    SmartVar &operator =(U8 val);
+    SmartVar &operator =(Int16 val);
+    SmartVar &operator =(UInt16 val);
+    SmartVar &operator =(Int32 val);
+    SmartVar &operator =(UInt32 val);
+    SmartVar &operator =(Long val);
+    SmartVar &operator =(ULong val);
+    template <typename _T>
+    SmartVar &operator =(const _T * const &val);
+    SmartVar &operator =(const Int64 &val);
+    SmartVar &operator =(const UInt64 &val);
+    SmartVar &operator =(Float val);
+    SmartVar &operator =(const Double &val);
+    SmartVar &operator =(const FS_String &val);
+    SmartVar &operator =(const SmartVar::Dict &val);
+    SmartVar &operator =(const SmartVar &val);
+
+    // Relational operators.
+    bool operator ==(const SmartVar &another) const;
+    bool operator !=(const SmartVar &another) const;
+
+    bool operator <(const SmartVar &another) const;
+    bool operator >(const SmartVar &another) const;
+    bool operator <=(const SmartVar &another) const;
+    bool operator >=(const SmartVar &another) const;
+
+    // Arithmetic operators.
+    SmartVar operator +(const SmartVar &another) const;
+    SmartVar operator -(const SmartVar &another) const;
+    SmartVar operator *(const SmartVar &another) const;
+    SmartVar operator /(const SmartVar &another) const;
+
+    SmartVar &operator +=(const SmartVar &another);
+    SmartVar &operator -=(const SmartVar &another);
+    SmartVar &operator *=(const SmartVar &another);
+    SmartVar &operator /=(const SmartVar &another);
+
+    // Type to string.
+    const FS_String &TypeToString() const;
+    // Value to string.
+    FS_String ValueToString() const;
+    // To string.
+    FS_String ToString() const;
+
+    // Serialize / DeSerialize support.
 //     void Serialize(LLBC_Stream &stream) const;
 //     bool DeSerialize(LLBC_Stream &stream);
 // 
 //     // SerializeEx / DeSerializeEx support.
 //     void SerializeEx(LLBC_Stream &stream) const;
 //     bool DeSerializeEx(LLBC_Stream &stream);
-// 
-// public:
-//     friend std::ostream &::operator <<(std::ostream &o, const LLBC_Variant &variant);
-// 
-// private:
-//         friend class SmartVarTraits;
-// 
-//         void SetType(int type);
-// 
-//         Raw &_GetRaw();
+
+public:
+    friend std::ostream &::operator <<(std::ostream &o, const SmartVar &variant);
+
+private:
+        friend class SmartVarTraits;
+
+        void _SetType(int type);
+        Raw &_GetRaw();
 
         void _CleanBriefData();
         void _CleanStrData();
         void _CleanDictData();
-         void _CleanTypeData(UInt32 type);
-//         void _OptimizePerformance();
+        void _CleanTypeData(UInt32 type);
+        void _OptimizePerformance();
 
 private:
     Raw _raw;

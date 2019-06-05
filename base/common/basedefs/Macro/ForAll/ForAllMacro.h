@@ -42,6 +42,9 @@
 #define FS_NAMESPACE_BEGIN namespace fs {
 #define FS_NAMESPACE_END }
 
+#undef FS_NS
+#define FS_NS ::fs::
+
 #undef DISABLE_COPY_ASSIGN_MOVE
 #define DISABLE_COPY_ASSIGN_MOVE(cls)                   \
 cls &operator=(const cls &obj) = delete;                \
