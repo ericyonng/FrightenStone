@@ -98,6 +98,8 @@ public:
     FS_String &operator += (const char *other); // 
     FS_String &operator += (const std::string &other); // 
 
+    FS_String &operator *=(size_t right);
+
     bool operator <(const FS_String &right) const;
     explicit operator std::string &();
     explicit operator const std::string &() const;

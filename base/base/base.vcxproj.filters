@@ -477,6 +477,12 @@
     <ClInclude Include="..\common\assist\utils\Impl\StringUtilImpl.h">
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.h">
+      <Filter>common\component\Impl\SmartVar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmeticImpl.h">
+      <Filter>common\component\Impl\SmartVar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -583,6 +589,9 @@
     </ClCompile>
     <ClCompile Include="..\common\basedefs\Macro\ForAll\GlobalDefs.cpp">
       <Filter>common\basedefs\Macro\ForAll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.cpp">
+      <Filter>common\component\Impl\SmartVar</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

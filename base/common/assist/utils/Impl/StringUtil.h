@@ -69,6 +69,13 @@ public:
     static bool MakeMd5(const FS_String &src, FS_String &outMd5);
     static bool ToHexString(const FS_String &src, FS_String &outHexString);
     static void PreInstertTime(const Time &time, FS_String &src);
+
+    static void SplitString(const FS_String &str,
+                     const FS_String &separator,
+                     std::vector<FS_String> &destStrList,
+                     bool justSplitFirst = false,
+                     char escapeChar = '\0');
+    static FS_String FilterOutString(const FS_String &str, const FS_String &filterStr);
 };
 
 FS_NAMESPACE_END

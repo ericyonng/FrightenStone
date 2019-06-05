@@ -164,97 +164,97 @@ inline bool SmartVar::IsNil() const
 
 inline bool SmartVar::IsBriefData() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_DATA) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_DATA) == SmartVarRtti::SV_BRIEF_DATA;
 }
 
 inline bool SmartVar::IsSignedBriefData() const
 {
-    return (IsBriefData() && ((_raw._type & SmartVarRtti::SV_SIGHED) != 0U));
+    return (IsBriefData() && ((_raw._type & SmartVarRtti::SV_SIGHED) == SmartVarRtti::SV_SIGHED));
 }
 
 inline bool SmartVar::IsUnsignedBriefData() const
 {
-    return (IsBriefData() && ((_raw._type & SmartVarRtti::SV_UNSIGHED) != 0U));
+    return (IsBriefData() && ((_raw._type & SmartVarRtti::SV_UNSIGHED) == SmartVarRtti::SV_UNSIGHED));
 }
 
 inline bool SmartVar::IsBool() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_BOOL) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_BOOL) == SmartVarRtti::SV_BRIEF_BOOL;
 }
 
 inline bool SmartVar::IsByte8() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_BYTE8) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_BYTE8) == SmartVarRtti::SV_BRIEF_BYTE8;
 }
 
 inline bool SmartVar::IsUInt8() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT8) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT8) == SmartVarRtti::SV_BRIEF_UINT8;
 }
 
 inline bool SmartVar::IsInt16() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_INT16) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_INT16) == SmartVarRtti::SV_BRIEF_INT16;
 }
 
 inline bool SmartVar::IsUInt16() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT16) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT16) == SmartVarRtti::SV_BRIEF_UINT16;
 }
 
 inline bool SmartVar::IsInt32() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_INT32) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_INT32) == SmartVarRtti::SV_BRIEF_INT32;
 }
 
 inline bool SmartVar::IsUInt32() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT32) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT32) == SmartVarRtti::SV_BRIEF_UINT32;
 }
 
 inline bool SmartVar::IsLong() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_LONG) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_LONG) == SmartVarRtti::SV_BRIEF_LONG;
 }
 
 inline bool SmartVar::IsULong() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_ULONG) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_ULONG) == SmartVarRtti::SV_BRIEF_ULONG;
 }
 
 inline bool SmartVar::IsPtr() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_PTR) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_PTR) == SmartVarRtti::SV_BRIEF_PTR;
 }
 
 inline bool SmartVar::IsInt64() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_INT64) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_INT64) == SmartVarRtti::SV_BRIEF_INT64;
 }
 
 inline bool SmartVar::IsUInt64() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT64) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_UINT64) == SmartVarRtti::SV_BRIEF_UINT64;
 }
 
 inline bool SmartVar::IsFloat() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_FLOAT) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_FLOAT) == SmartVarRtti::SV_BRIEF_FLOAT;
 }
 
 inline bool SmartVar::IsDouble() const
 {
-    return (_raw._type & SmartVarRtti::SV_BRIEF_DOUBLE) != 0U;
+    return (_raw._type & SmartVarRtti::SV_BRIEF_DOUBLE) == SmartVarRtti::SV_BRIEF_DOUBLE;
 }
 
 inline bool SmartVar::IsStr() const
 {
-    return (_raw._type & SmartVarRtti::SV_STRING_DEF) != 0U;
+    return (_raw._type & SmartVarRtti::SV_STRING_DEF) == SmartVarRtti::SV_STRING_DEF;
 }
 
 inline bool SmartVar::IsDict() const
 {
-    return (_raw._type & SmartVarRtti::SV_DICTIONARY_DEF) != 0U;
+    return (_raw._type & SmartVarRtti::SV_DICTIONARY_DEF) == SmartVarRtti::SV_DICTIONARY_DEF;
 }
 
 inline SmartVar &SmartVar::BecomeNil()
@@ -519,7 +519,6 @@ inline SmartVar::operator Double() const
     return AsDouble();
 }
 
-
 inline SmartVar::operator FS_String () const
 {
     return AsStr();
@@ -541,7 +540,6 @@ inline std::pair<SmartVar::DictIter, bool> SmartVar::Insert(const _Kty &key, con
     return this->Insert(SmartVar::Dict::key_type(key),
                         SmartVar::Dict::mapped_type(val));
 }
-
 
 template <typename _Kty>
 inline SmartVar::DictIter SmartVar::Find(const _Kty &key)
