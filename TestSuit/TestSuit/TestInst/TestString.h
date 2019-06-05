@@ -54,10 +54,9 @@ class TestString
 public:
     static void Run()
     {
-        char ww[10] = {1, 7, 99, 100, 5, 5, 6, 3, 7, 9};
-        char ss[10] = {'w', 'o', ' ', 'c', 'a', 'i'};
-        std::string strx = ss;
-        fs::FS_String str1 = strx;
+        fs::FS_String str = "  daat !  ";
+        std::cout << str.lstrip(" ") << std::endl;
+        std::cout << str.rstrip(" ") << std::endl;
     }
 };
 

@@ -77,6 +77,13 @@ void SmartVarRtti::InitRttiTypeNames()
 
 FS_NAMESPACE_END
 
+std::ostream &operator <<(std::ostream &o, const FS_NS SmartVar &smartVar)
+{
+    FS_NS FS_String str = smartVar.ToString();
+    o.write(str.c_str(), str.GetLength());
+    return o;
+}
+
 FS_NAMESPACE_BEGIN
 
 static void BecomeAndAllocDict(SmartVar &var, SmartVar::Raw &raw)
@@ -366,9 +373,348 @@ const SmartVar::Dict::mapped_type &SmartVar::operator [](const SmartVar &key) co
     return __g_nilVariant;
 }
 
+SmartVar &SmartVar::operator =(Byte8 val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_BYTE8;
+    _raw._briefData._int64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(U8 val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_UINT8;
+    _raw._briefData._uint64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(Int16 val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_INT16;
+    _raw._briefData._int64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(UInt16 val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_UINT16;
+    _raw._briefData._uint64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(Int32 val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_INT32;
+    _raw._briefData._int64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(UInt32 val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_UINT32;
+    _raw._briefData._uint64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(Long val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_LONG;
+    _raw._briefData._int64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(ULong val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_ULONG;
+    _raw._briefData._uint64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(const Int64 &val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_INT64;
+    _raw._briefData._int64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(const UInt64 &val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_UINT64;
+    _raw._briefData._uint64Data = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(Float val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_FLOAT;
+    _raw._briefData._doubleData = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(const Double &val)
+{
+    _CleanTypeData(_raw._type);
+
+    _raw._type = SmartVarRtti::SV_BRIEF_DOUBLE;
+    _raw._briefData._doubleData = val;
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(const FS_String &val)
+{
+    if(!IsStr())
+    {
+        _CleanTypeData(_raw._type);
+        _raw._type = SmartVarRtti::SV_STRING_DEF;
+    }
+
+    if(val.empty())
+    {
+        if(_raw._obj._strData)
+            _raw._obj._strData->Clear();
+    }
+    else
+    {
+        if(_raw._obj._strData)
+            *_raw._obj._strData = val;
+        else
+            _raw._obj._strData = new FS_String(val);
+    }
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(const SmartVar::Dict &val)
+{
+    if(!IsDict())
+    {
+        _CleanTypeData(_raw._type);
+        _raw._type = SmartVarRtti::SV_DICTIONARY_DEF;
+    }
+
+    if(val.empty())
+    {
+        if(_raw._obj._dictData)
+            _raw._obj._dictData->clear();
+    }
+    else
+    {
+        if(_raw._obj._dictData)
+            *_raw._obj._dictData = val;
+        else
+            _raw._obj._dictData = new Dict(val);
+    }
+
+    return *this;
+}
+
+SmartVar &SmartVar::operator =(const SmartVar &val)
+{
+    SmartVarTraits::assign(*this, val);
+    return *this;
+}
+
+bool SmartVar::operator ==(const SmartVar &another) const
+{
+    return SmartVarTraits::eq(*this, another);
+}
+
+bool SmartVar::operator !=(const SmartVar &another) const
+{
+    return SmartVarTraits::ne(*this, another);
+}
+
 bool SmartVar::operator <(const SmartVar &another) const
 {
     return SmartVarTraits::lt(*this, another);
+}
+
+bool SmartVar::operator >(const SmartVar &another) const
+{
+    return SmartVarTraits::gt(*this, another);
+}
+
+bool SmartVar::operator <=(const SmartVar &another) const
+{
+    return SmartVarTraits::le(*this, another);
+}
+
+bool SmartVar::operator >=(const SmartVar &another) const
+{
+    return SmartVarTraits::ge(*this, another);
+}
+
+SmartVar SmartVar::operator +(const SmartVar &another) const
+{
+    return SmartVarTraits::add(*this, another);
+}
+
+SmartVar SmartVar::operator -(const SmartVar &another) const
+{
+    return SmartVarTraits::sub(*this, another);
+}
+
+SmartVar SmartVar::operator *(const SmartVar &another) const
+{
+    return SmartVarTraits::mul(*this, another);
+}
+
+SmartVar SmartVar::operator /(const SmartVar &another) const
+{
+    return SmartVarTraits::div(*this, another);
+}
+
+SmartVar &SmartVar::operator +=(const SmartVar &another)
+{
+    SmartVarTraits::add_equal(*this, another);
+    return *this;
+}
+
+SmartVar &SmartVar::operator -=(const SmartVar &another)
+{
+    SmartVarTraits::sub_equal(*this, another);
+    return *this;
+}
+
+SmartVar &SmartVar::operator *=(const SmartVar &another)
+{
+    SmartVarTraits::mul_equal(*this, another);
+    return *this;
+}
+
+SmartVar &SmartVar::operator /=(const SmartVar &another)
+{
+    SmartVarTraits::div_equal(*this, another);
+    return *this;
+}
+
+
+const FS_String &SmartVar::TypeToString() const
+{
+    return SmartVarRtti::GetTypeName(_raw._type);
+}
+
+FS_String SmartVar::ValueToString() const
+{
+    if(IsStr())
+    {
+        return _raw._obj._strData ? *_raw._obj._strData : __g_nullStr;
+    }
+    else if(IsDict())
+    {
+
+        FS_String content;
+        content << "{";
+
+        if(_raw._obj._dictData)
+        {
+            for(DictConstIter it = _raw._obj._dictData->begin();
+                it != _raw._obj._dictData->end();
+                )
+            {
+                content << it->first.ValueToString() << ":" << it->second.ValueToString();
+
+                if(++it != _raw._obj._dictData->end())
+                    content << "|";
+            }
+        }
+
+        content << "}";
+        return content;
+    }
+    else if(IsNil())
+    {
+        return "nil";
+    }
+
+    // RAW type var data.
+    switch(_raw._type)
+    {
+        case SmartVarRtti::SV_BRIEF_BOOL:
+            return _raw._briefData._int64Data != 0 ? "true" : "false";
+
+        case SmartVarRtti::SV_BRIEF_BYTE8:
+        case SmartVarRtti::SV_BRIEF_INT16:
+        case SmartVarRtti::SV_BRIEF_INT32:
+        case SmartVarRtti::SV_BRIEF_LONG:
+        case SmartVarRtti::SV_BRIEF_INT64:
+            return StringUtil::Num2Str(_raw._briefData._int64Data);
+
+        case SmartVarRtti::SV_BRIEF_UINT8:
+        case SmartVarRtti::SV_BRIEF_UINT16:
+        case SmartVarRtti::SV_BRIEF_UINT32:
+        case SmartVarRtti::SV_BRIEF_ULONG:
+        case SmartVarRtti::SV_BRIEF_UINT64:
+            return StringUtil::Num2Str(_raw._briefData._uint64Data);
+
+        case SmartVarRtti::SV_BRIEF_PTR:
+            return FS_String().Format("0x%p", _raw._briefData._uint64Data);
+
+        case SmartVarRtti::SV_BRIEF_FLOAT:
+        case SmartVarRtti::SV_BRIEF_DOUBLE:
+            return StringUtil::Num2Str( _raw._briefData._doubleData);
+
+        default:
+            break;
+    }
+
+    return "";
+}
+
+FS_String SmartVar::ToString() const
+{
+    FS_String desc = "type:";
+    desc += TypeToString();
+    desc += ", value:";
+    desc += ValueToString();
+    return desc;
+}
+
+void SmartVar::_OptimizePerformance()
+{
+    if(IsStr())
+    {
+        if(_raw._obj._strData && _raw._obj._strData->empty())
+            Fs_SafeFree(_raw._obj._strData);
+    }
+    else if(IsDict())
+    {
+        if(_raw._obj._dictData && _raw._obj._dictData->empty())
+            Fs_SafeFree(_raw._obj._dictData);
+    }
 }
 
 void SmartVar::_CleanTypeData(UInt32 type)
