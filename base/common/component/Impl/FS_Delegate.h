@@ -60,6 +60,53 @@ public:
     static FS_Delegate<T, R, Args...> *Create(T *obj, R(T::*f)(Args...));
 };
 
+// R回调返回值类型，Args回调函数参数包 委托基类 用于解耦具体类型，创建类型无关的委托
+template <class R, typename... Args>
+class IDelegatePlus
+{
+public:
+    IDelegatePlus();
+    virtual ~IDelegatePlus();
+    virtual R operator()(Args&&... args) = 0;
+};
+
+template <class T, class R, typename... Args>
+class DelegateClassPlus : public IDelegatePlus<R, Args...>
+{
+public:
+    DelegateClassPlus(T *t, R(T::*f)(Args...));
+    virtual ~DelegateClassPlus();
+
+    virtual R operator()(Args&&... args);
+
+private:
+    T *_obj;
+    R(T::*_f)(Args...);
+};
+
+template <class R, typename... Args>
+class DelegateFunctionPlus : public IDelegatePlus<R, Args...>
+{
+public:
+    DelegateFunctionPlus(R(*f)(Args...));
+    virtual ~DelegateFunctionPlus();
+
+    virtual R operator()(Args&&... args);
+
+private:
+    R(*_f)(Args...);
+};
+
+class BASE_EXPORT DelegatePlusFactory
+{
+public:
+    template <class T, class R, typename... Args>
+    static IDelegatePlus<R, Args...> *Create(T *obj, R(T::*f)(Args...));
+
+    template <class R, typename... Args>
+    static IDelegatePlus<R, Args...> *Create(R(*f)(Args...));
+};
+
 FS_NAMESPACE_END
 
 #include "base/common/component/Impl/FS_DelegateImpl.h"

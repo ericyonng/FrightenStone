@@ -47,7 +47,7 @@
 
 int main()
 {
-    TestSmartVar::Run();
+    TestDelegate::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;

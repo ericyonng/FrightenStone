@@ -34,60 +34,41 @@
 
 #pragma once
 #include "stdafx.h"
-#include "base/common/component/Impl/FS_ClassFactory.h"
-#include "base/common/component/Impl/FS_Delegate.h"
 
-template <class T, class R, typename... Args>
-class  MyDelegate
+class Test1
 {
 public:
-    MyDelegate(T* t, R(T::*f)(Args...)):m_t(t), m_f(f) {}
-
-    R operator()(Args&&... args)
+    void print()
     {
-        return (m_t->*m_f)(std::forward<Args>(args) ...);
+        std::cout << "hello world"<< std::endl;
     }
 
-private:
-    T* m_t;
-    R(T::*m_f)(Args...);
-};
-
-template <class T, class R, typename... Args>
-MyDelegate<T, R, Args...> CreateDelegate(T* t, R(T::*f)(Args...))
-{
-    return MyDelegate<T, R, Args...>(t, f);
-}
-
-struct A
-{
-    void Fun(int i) { std::cout << i << std::endl; }
-    int Fun1(int &i, double &j) { std::cout << i + j << std::endl; return 0; }
-};
-
-struct bbs
-{
-    union
+    static void print2()
     {
-        void *_voidPtr;
-        std::map<int, int> *_mapPtr;
-        double *_doublePtr;
-    }_ptr;
-
-    double _raw;
+        std::cout << "print2" << std::endl;
+    }
 };
+
+static void print3()
+{
+    std::cout << "print3" << std::endl;
+}
 
 class TestDelegate
 {
 public:
     static void Run()
     {
-        bbs ddn;
-        memset(&ddn, 0, sizeof(ddn));
-        ddn._ptr._voidPtr = new bbs;
-        ddn._ptr._mapPtr->insert(std::make_pair(1, 1));
-        std::map<int, int> a;
-        std::cout << sizeof(a) << std::endl;
+        Test1 test1;
+        fs::IDelegatePlus<void> *delegate = fs::DelegatePlusFactory::Create(&test1, &Test1::print);
+        (*delegate)();
+        delete delegate;
+        auto delegate3 = fs::DelegatePlusFactory::Create(print3);
+        (*delegate3)();
+        auto delegate4 = fs::DelegatePlusFactory::Create(&print3);
+        (*delegate4)();
+        auto delegate5 = fs::DelegatePlusFactory::Create(&Test1::print2);
+        (*delegate5)();
     }
 };
 

@@ -38,36 +38,36 @@
 #include <list>
 
 FS_NAMESPACE_BEGIN
-
-class TimeWheel;
-
-template<typename T>
-struct TimeDelegate
-{
-    TimeDelegate();
-    virtual ~TimeDelegate();
-
-    std::list<TimeDelegate *>::iterator _timeDelegateIter;
-    Int32 _times;           // 执行次数
-    bool _isCancel;         // 是否取消
-    FS_Delegate<T, void, TimeWheel *> *_delegate;
-};
-
-class TimeWheelEventList
-{
-public:
-
-public:
-    std::list<TimeDelegate *> _Delegates;
-};
-
-class TimeWheelMoment
-{
-public:
-private:
-    Int64 _rawTime;                     // 时刻
-    TimeWheelEventList *_eventList;     // 事件队列
-};
+// 
+// class TimeWheel;
+// 
+// template<typename T>
+// struct TimeDelegate
+// {
+//     TimeDelegate();
+//     virtual ~TimeDelegate();
+// 
+//     std::list<TimeDelegate *>::iterator _timeDelegateIter;
+//     Int32 _times;           // 执行次数
+//     bool _isCancel;         // 是否取消
+//     FS_Delegate<T, void, TimeWheel *> *_delegate;
+// };
+// 
+// class TimeWheelEventList
+// {
+// public:
+// 
+// public:
+//     std::list<TimeDelegate *> _Delegates;
+// };
+// 
+// class TimeWheelMoment
+// {
+// public:
+// private:
+//     Int64 _rawTime;                     // 时刻
+//     TimeWheelEventList *_eventList;     // 事件队列
+// };
 
 FS_NAMESPACE_END
 
