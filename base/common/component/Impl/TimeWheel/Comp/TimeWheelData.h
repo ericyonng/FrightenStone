@@ -21,47 +21,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_Delegate.h
+ * @file  : TimeWheelData.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/6/6
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_Delegate__H__
-#define __Base_Common_Component_Impl_FS_Delegate__H__
-
-
+#ifndef __Base_Common_Component_Impl_TimeWheel_Comp_TimeWheelData_H__
+#define __Base_Common_Component_Impl_TimeWheel_Comp_TimeWheelData_H__
 #pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include <list>
 
 FS_NAMESPACE_BEGIN
 
-// T:类，R回调返回值类型，Args回调函数参数包
-template <class T, class R, typename... Args>
-class FS_Delegate
-{
-public:
-    FS_Delegate(T *t, R(T::*f)(Args...));
-    R operator()(Args&&... args);
+class TimeWheel;
 
-private:
-    T *_obj;
-    R(T::*_f)(Args...);
+template<typename T>
+struct TimeDelegate
+{
+    TimeDelegate();
+    virtual ~TimeDelegate();
+
+    std::list<TimeDelegate *>::iterator _timeDelegateIter;
+    Int32 _times;           // 执行次数
+    bool _isCancel;         // 是否取消
+    FS_Delegate<T, void, TimeWheel *> *_delegate;
 };
 
-class BASE_EXPORT DelegateFactory
+class TimeWheelEventList
 {
 public:
-    template <class T, class R, typename... Args>
-    static FS_Delegate<T, R, Args...> *Create(T *obj, R(T::*f)(Args...));
+
+public:
+    std::list<TimeDelegate *> _Delegates;
+};
+
+class TimeWheelMoment
+{
+public:
+private:
+    Int64 _rawTime;                     // 时刻
+    TimeWheelEventList *_eventList;     // 事件队列
 };
 
 FS_NAMESPACE_END
-
-#include "base/common/component/Impl/FS_DelegateImpl.h"
 
 #endif

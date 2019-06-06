@@ -202,6 +202,12 @@
     <Filter Include="common\component\Impl\SmartVar">
       <UniqueIdentifier>{7e62026f-5d58-47ed-899e-a115914734cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\component\Impl\TimeWheel">
+      <UniqueIdentifier>{6629919e-7527-4c75-a005-501c58436a0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\TimeWheel\Comp">
+      <UniqueIdentifier>{c82f828d-c985-4ad6-87da-65f1117d5770}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -483,6 +489,15 @@
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmeticImpl.h">
       <Filter>common\component\Impl\SmartVar</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWeel.h">
+      <Filter>common\component\Impl\TimeWheel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWeelImpl.h">
+      <Filter>common\component\Impl\TimeWheel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\TimeWheel\Comp\TimeWheelData.h">
+      <Filter>common\component\Impl\TimeWheel\Comp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -592,6 +607,12 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.cpp">
       <Filter>common\component\Impl\SmartVar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWeel.cpp">
+      <Filter>common\component\Impl\TimeWheel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\TimeWheel\Comp\TimeWheelData.cpp">
+      <Filter>common\component\Impl\TimeWheel\Comp</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
