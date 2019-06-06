@@ -54,6 +54,11 @@ static void print3()
     std::cout << "print3" << std::endl;
 }
 
+static void print4(int a, int b)
+{
+    std::cout << "print3"<< a << b << std::endl;
+}
+
 class TestDelegate
 {
 public:
@@ -69,6 +74,9 @@ public:
         (*delegate4)();
         auto delegate5 = fs::DelegatePlusFactory::Create(&Test1::print2);
         (*delegate5)();
+
+        auto delegate6 = fs::DelegatePlusFactory::Create(&print4);
+        (*delegate6)(1, 10);
     }
 };
 
