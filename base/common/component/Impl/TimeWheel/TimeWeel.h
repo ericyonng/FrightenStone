@@ -38,24 +38,24 @@
 #include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
-
-class TimeWheelMoment;
-class TimeSlice;
-
-class TimeWheel
-{
-public:
-    explicit TimeWheel(const TimeSlice &slice);
-    virtual ~TimeWheel();
-
-    void RotateWheel();
-
-private:
-    TimeSlice _slicePerWheel;       // 每一轮时间切片长度
-    Time _curTime;                  // 当前时间戳
-    Time _lastTime;                 // 最后一次时间
-    std::map<Int64, TimeWheelMoment *> _rawTimeRefMoments;
-};
+// 
+// class TimeWheelMoment;
+// class TimeSlice;
+// 
+// class TimeWheel
+// {
+// public:
+//     explicit TimeWheel(const TimeSlice &slice);
+//     virtual ~TimeWheel();
+// 
+//     void RotateWheel();
+// 
+// private:
+//     TimeSlice _slicePerWheel;       // 每一轮时间切片长度
+//     Time _curTime;                  // 当前时间戳
+//     Time _lastTime;                 // 最后一次时间
+//     std::map<Int64, TimeWheelMoment *> _rawTimeRefMoments;
+// };
 
 FS_NAMESPACE_END
 
