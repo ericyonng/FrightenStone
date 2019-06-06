@@ -21,47 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_Delegate.h
+ * @file  : TimeWeelImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/6/6
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_Delegate__H__
-#define __Base_Common_Component_Impl_FS_Delegate__H__
-
-
+#ifdef __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
 #pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
 
-FS_NAMESPACE_BEGIN
+#endif // __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
 
-// T:类，R回调返回值类型，Args回调函数参数包
-template <class T, class R, typename... Args>
-class FS_Delegate
-{
-public:
-    FS_Delegate(T *t, R(T::*f)(Args...));
-    R operator()(Args&&... args);
-
-private:
-    T *_obj;
-    R(T::*_f)(Args...);
-};
-
-class BASE_EXPORT DelegateFactory
-{
-public:
-    template <class T, class R, typename... Args>
-    static FS_Delegate<T, R, Args...> *Create(T *obj, R(T::*f)(Args...));
-};
-
-FS_NAMESPACE_END
-
-#include "base/common/component/Impl/FS_DelegateImpl.h"
-
-#endif

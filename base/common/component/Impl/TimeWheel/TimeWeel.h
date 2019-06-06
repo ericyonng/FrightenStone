@@ -21,47 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_Delegate.h
+ * @file  : TimeWeel.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/6/6
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_Delegate__H__
-#define __Base_Common_Component_Impl_FS_Delegate__H__
-
+#ifndef __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
+#define __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
 
 #pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
+#include "base/common/component/Impl/Time.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-// T:类，R回调返回值类型，Args回调函数参数包
-template <class T, class R, typename... Args>
-class FS_Delegate
+class TimeWheelMoment;
+class TimeSlice;
+
+class TimeWheel
 {
 public:
-    FS_Delegate(T *t, R(T::*f)(Args...));
-    R operator()(Args&&... args);
+    explicit TimeWheel(const TimeSlice &slice);
+    virtual ~TimeWheel();
+
+    void RotateWheel();
 
 private:
-    T *_obj;
-    R(T::*_f)(Args...);
-};
-
-class BASE_EXPORT DelegateFactory
-{
-public:
-    template <class T, class R, typename... Args>
-    static FS_Delegate<T, R, Args...> *Create(T *obj, R(T::*f)(Args...));
+    TimeSlice _slicePerWheel;       // 每一轮时间切片长度
+    Time _curTime;                  // 当前时间戳
+    Time _lastTime;                 // 最后一次时间
+    std::map<Int64, TimeWheelMoment *> _rawTimeRefMoments;
 };
 
 FS_NAMESPACE_END
 
-#include "base/common/component/Impl/FS_DelegateImpl.h"
+#include "base/common/component/Impl/TimeWheel/TimeWeelImpl.h"
 
 #endif
