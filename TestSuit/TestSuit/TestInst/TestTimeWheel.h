@@ -38,8 +38,7 @@ class TestWheel1
 public:
     void TimeOut(fs::FS_Timer *&timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
     {
-        std::cout << "test wheel1 :" << "lastWheelTime:" << lastWheelTime.GetMicroTimestamp()<<" fmt:"<<lastWheelTime.ToString().c_str() << std::endl;
-        std::cout << "test wheel1 : curTime:" << curTime.GetMicroTimestamp() << " fmt: " << curTime.ToString().c_str() << std::endl;
+        std::cout << "TestWheel1" << std::endl;
 
         if(lastWheelTime.GetLocalMinute() != curTime.GetLocalMinute())
         {
@@ -50,8 +49,7 @@ public:
 
 static void TimeOut(fs::FS_Timer *&timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
 {
-    std::cout << "static test :" << "lastWheelTime:" << lastWheelTime.GetMicroTimestamp() << " fmt:" << lastWheelTime.ToString().c_str() << std::endl;
-    std::cout << "static test : curTime:" << curTime.GetMicroTimestamp() << " fmt: " << curTime.ToString().c_str() << std::endl;
+    std::cout << "static test :" << std::endl;
 
     if(lastWheelTime.GetLocalMinute() != curTime.GetLocalMinute())
     {
@@ -59,12 +57,14 @@ static void TimeOut(fs::FS_Timer *&timer, const fs::Time &lastWheelTime, const f
     }
 
     timer->Cancel();
-    timer->Schedule(1000);
+    static Int32 cnt = 5;
+    if(cnt-->0)
+        timer->Schedule(1000);
 }
 
 static void Cancel(fs::FS_Timer *&timer)
 {
-    std::cout << "cancel a timer" << std::endl << timer->ToString().c_str() << std::endl;
+    std::cout << "cancel a timer" << std::endl;
 }
 
 class TestTimeWheel
@@ -73,10 +73,10 @@ public:
     static void Run()
     {
         // 设置时间轮盘参数
-        fs::TimeSlice resolution(0, 100);
-        fs::TimeWheel timeWheel(resolution);
-        fs::FS_Timer timer(&timeWheel);
-        fs::FS_Timer timer2(&timeWheel);
+//         fs::TimeSlice resolution(0, 100);
+//         fs::TimeWheel timeWheel(resolution);
+        fs::FS_Timer timer;
+        fs::FS_Timer timer2;
 
         // 设置超时执行函数
         TestWheel1 test1;
@@ -88,10 +88,10 @@ public:
 
         while(true)
         {
-            Sleep(static_cast<DWORD>(resolution.GetTotalMilliSeconds()));
+            Sleep(static_cast<DWORD>(fs::g_TimeWheel.GetTimeWheelResolution().GetTotalMilliSeconds()));
 
             // 转动时间轮盘
-            timeWheel.RotateWheel();
+            fs::g_TimeWheel.RotateWheel();
             static bool isOnce = false;
             if(!isOnce)
             {
