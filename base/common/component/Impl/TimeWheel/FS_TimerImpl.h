@@ -41,51 +41,41 @@ FS_NAMESPACE_BEGIN
 // }
 
 template<typename T>
-inline void FS_Timer::SetTimeOutHandler(T *objType, void (T::*handler)(FS_Timer *&, const Time &, const Time &))
+inline void FS_Timer::SetTimeOutHandler(T *objType, void (T::*handler)(FS_Timer *, const Time &, const Time &))
 {
-    if(UNLIKELY(_timeData->_timeOutDelegate))
-        Fs_SafeFree(_timeData->_timeOutDelegate);
+    if(UNLIKELY(_timeOutDelegate))
+        Fs_SafeFree(_timeOutDelegate);
 
     if(objType && handler)
-        _timeData->_timeOutDelegate = DelegatePlusFactory::Create(objType, handler);
+        _timeOutDelegate = DelegatePlusFactory::Create(objType, handler);
 }
 
-inline void FS_Timer::SetTimeOutHandler(void(*handler)(FS_Timer *&, const Time &, const Time &))
+inline void FS_Timer::SetTimeOutHandler(void(*handler)(FS_Timer *, const Time &, const Time &))
 {
-    if(UNLIKELY(_timeData->_timeOutDelegate))
-        Fs_SafeFree(_timeData->_timeOutDelegate);
+    if(UNLIKELY(_timeOutDelegate))
+        Fs_SafeFree(_timeOutDelegate);
 
     if(handler)
-        _timeData->_timeOutDelegate = DelegatePlusFactory::Create(handler);
+        _timeOutDelegate = DelegatePlusFactory::Create(handler);
 }
 
 template<typename T>
-inline void FS_Timer::SetCancelHandler(T *objType, void (T::*handler)(FS_Timer *&))
+inline void FS_Timer::SetCancelHandler(T *objType, void (T::*handler)(FS_Timer *))
 {
-    if(UNLIKELY(_timeData->_cancelTimerDelegate))
-        Fs_SafeFree(_timeData->_cancelTimerDelegate);
+    if(UNLIKELY(_cancelTimerDelegate))
+        Fs_SafeFree(_cancelTimerDelegate);
 
     if(objType && handler)
-        _timeData->_cancelTimerDelegate = DelegatePlusFactory::Create(objType, handler);
+        _cancelTimerDelegate = DelegatePlusFactory::Create(objType, handler);
 }
 
-inline void FS_Timer::SetCancelHandler(void(*handler)(FS_Timer *&))
+inline void FS_Timer::SetCancelHandler(void(*handler)(FS_Timer *))
 {
-    if(UNLIKELY(_timeData->_cancelTimerDelegate))
-        Fs_SafeFree(_timeData->_cancelTimerDelegate);
+    if(UNLIKELY(_cancelTimerDelegate))
+        Fs_SafeFree(_cancelTimerDelegate);
 
     if(handler)
-        _timeData->_cancelTimerDelegate = DelegatePlusFactory::Create(handler);
-}
-
-inline void FS_Timer::UpdateLastTimeOutTime(const Time &lastTime)
-{
-    _lastTimeOutTime = lastTime;
-}
-
-inline const Time &FS_Timer::GetLastTimeOutTime() const
-{
-    return _lastTimeOutTime;
+        _cancelTimerDelegate = DelegatePlusFactory::Create(handler);
 }
 
 FS_NAMESPACE_END

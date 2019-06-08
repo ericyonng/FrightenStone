@@ -36,7 +36,7 @@
 class TestWheel1
 {
 public:
-    void TimeOut(fs::FS_Timer *&timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
+    void TimeOut(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
     {
         std::cout << "TestWheel1" << std::endl;
 
@@ -47,7 +47,7 @@ public:
     }
 };
 
-static void TimeOut(fs::FS_Timer *&timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
+static void TimeOut(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
 {
     std::cout << "static test :" << std::endl;
 
@@ -62,7 +62,7 @@ static void TimeOut(fs::FS_Timer *&timer, const fs::Time &lastWheelTime, const f
         timer->Schedule(1000);
 }
 
-static void Cancel(fs::FS_Timer *&timer)
+static void Cancel(fs::FS_Timer *timer)
 {
     std::cout << "cancel a timer" << std::endl;
 }

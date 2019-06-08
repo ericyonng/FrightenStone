@@ -36,6 +36,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/component/Impl/TimeWheel/TimeWheel.h"
 #include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
 
@@ -57,16 +58,15 @@ public:
 
     // 设置超时执行函数
     template<typename T>
-    void SetTimeOutHandler(T *objType, void (T::*handler)(FS_Timer *&, const Time &, const Time &));
-    void SetTimeOutHandler(void(*handler)(FS_Timer *&, const Time &, const Time &));
+    void SetTimeOutHandler(T *objType, void (T::*handler)(FS_Timer *, const Time &, const Time &));
+    void SetTimeOutHandler(void(*handler)(FS_Timer *, const Time &, const Time &));
     // 设置cancel执行函数
     template<typename T>
-    void SetCancelHandler(T *objType, void (T::*handler)(FS_Timer *&));
-    void SetCancelHandler(void(*handler)(FS_Timer *&));
+    void SetCancelHandler(T *objType, void (T::*handler)(FS_Timer *));
+    void SetCancelHandler(void(*handler)(FS_Timer *));
 
-    // 更新与获取最后一次timeout时间
-    void UpdateLastTimeOutTime(const Time &lastTime);
-    const Time &GetLastTimeOutTime() const;
+    // 由timewheel调用超时
+    void OnTimeOut(const Time &curWheelTIme);
 
     FS_String ToString() const;
 
@@ -74,6 +74,10 @@ private:
     Time _lastTimeOutTime;
     TimeWheel *_timeWheel;
     TimeData *_timeData;
+    // 超时委托 param1:返回值, param2:FS_Timer, param3:lastWheelTime, param4:curTime
+    IDelegatePlus<void, FS_Timer *, const Time &, const Time &> *_timeOutDelegate;
+    // 注销委托
+    IDelegatePlus<void, FS_Timer *> *_cancelTimerDelegate;
 };
 
 FS_NAMESPACE_END

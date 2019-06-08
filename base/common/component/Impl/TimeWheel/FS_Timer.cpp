@@ -38,6 +38,8 @@ FS_NAMESPACE_BEGIN
 FS_Timer::FS_Timer(TimeWheel *timeWheel)
     :_timeData(new TimeData(this))
     ,_timeWheel(timeWheel)
+    , _timeOutDelegate(NULL)
+    , _cancelTimerDelegate(NULL)
 {
     if(!_timeWheel)
         _timeWheel = &g_TimeWheel;
@@ -45,6 +47,8 @@ FS_Timer::FS_Timer(TimeWheel *timeWheel)
 
 FS_Timer::~FS_Timer()
 {
+    Fs_SafeFree(_timeOutDelegate);
+    Fs_SafeFree(_cancelTimerDelegate);
     Fs_SafeFree(_timeData);
 }
 
@@ -54,10 +58,9 @@ void FS_Timer::Cancel()
     _timeData->_isCancel = true;
 
     if(isCancel != _timeData->_isCancel && 
-       _timeData->_cancelTimerDelegate)
+       _cancelTimerDelegate)
     {
-        FS_Timer *timer = this;
-        (*_timeData->_cancelTimerDelegate)(timer);
+        (*_cancelTimerDelegate)(this);
     }
 }
 
@@ -84,10 +87,24 @@ Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
     return _timeWheel->Register(_timeData);
 }
 
+void FS_Timer::OnTimeOut(const Time &curWheelTIme)
+{
+    if(_lastTimeOutTime == 0)
+        _lastTimeOutTime = curWheelTIme - _timeData->_period;
+
+    if(_timeOutDelegate)
+        (*_timeOutDelegate)(this, _lastTimeOutTime, curWheelTIme);
+    
+    // 更新上次超时时间
+    _lastTimeOutTime = curWheelTIme;
+}
+
 FS_String FS_Timer::ToString() const
 {
     FS_String info;
-    info.Format("Timer:_lastTimeOutTime:%lld|\n%s", _lastTimeOutTime.GetMicroTimestamp(), _timeData->ToString().c_str());
+    info.Format("Timer:_lastTimeOutTime:%lld|_timeOutDelegate:0x%p|_cancelTimerDelegate:0x%p\n%s"
+                , _lastTimeOutTime.GetMicroTimestamp(), _timeOutDelegate, _cancelTimerDelegate
+                , _timeData->ToString().c_str());
     return info;
 }
 
