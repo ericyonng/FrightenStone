@@ -66,7 +66,6 @@ private:
 private:
     const TimeSlice _resolutionSlice;       // 每一轮时间切片长度
     Time _curTime;                  // 当前时间戳
-    Time _lastTime;                 // 最后一次时间
     std::set<TimeData *, TimeDataLess> _timeDatas;
 
     Int64 _increaseId;              // 递增id

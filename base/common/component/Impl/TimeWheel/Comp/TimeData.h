@@ -35,14 +35,11 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/component/Impl/TimeSlice.h"
 #include <list>
 
 FS_NAMESPACE_BEGIN
 
-class TimeWheelMoment;
-class TimeWheel;
 class TimeSlice;
 class Time;
 class TimeData;
@@ -74,10 +71,6 @@ public:
     FS_Timer *_timer;
     // 超时周期
     TimeSlice _period;
-    // 超时委托 param1:返回值, param2:timewheel, param3:lastWheelTime, param4:curTime
-    IDelegatePlus<void, FS_Timer *&, const Time &, const Time &> *_timeOutDelegate;
-    // 注销委托
-    IDelegatePlus<void, FS_Timer *&> *_cancelTimerDelegate;
 };
 
 FS_NAMESPACE_END

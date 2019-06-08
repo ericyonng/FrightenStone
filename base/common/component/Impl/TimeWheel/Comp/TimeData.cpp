@@ -53,25 +53,21 @@ TimeData::TimeData(FS_Timer *timer)
     ,_isRotatingWheel(false)
     ,_timeWheelUniqueId(0)
     ,_timer(timer)
-    ,_timeOutDelegate(NULL)
-    ,_cancelTimerDelegate(NULL)
 {
 
 }
 
 TimeData::~TimeData()
 {
-    Fs_SafeFree(_timeOutDelegate);
-    Fs_SafeFree(_cancelTimerDelegate);
 }
 
 FS_String TimeData::ToString() const
 {
     FS_String info;
     info.Format("timeData: _expiredTime:%lld|_isCancel:%d|_timeWheelUniqueId:%lld|"
-                "_period:%lld|_timeOutDelegate:0x%p|_cancelTimerDelegate:0x%p"
+                "_period:%lld"
                 , _expiredTime.GetMicroTimestamp(), _isCancel, _timeWheelUniqueId
-                , _period.GetTotalMicroSeconds(), _timeOutDelegate, _cancelTimerDelegate);
+                , _period.GetTotalMicroSeconds());
 
     return info;
 }

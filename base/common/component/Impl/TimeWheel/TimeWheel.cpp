@@ -55,7 +55,6 @@ TimeWheel::~TimeWheel()
 void TimeWheel::RotateWheel()
 {
     // 更新时间
-    _lastTime = _curTime;
     if(_curTime == 0)
         _curTime.FlushTime(Time::NowMicroTimestamp());
 
@@ -71,15 +70,10 @@ void TimeWheel::RotateWheel()
             break;
 
         // 执行超时delegate
-        if(timeData->_timeOutDelegate)
+        if(timeData->_timer)
         {
             timeData->_isRotatingWheel = true;
-            const auto &lastTimeOutTime = timeData->_timer->GetLastTimeOutTime();
-            if(lastTimeOutTime == 0)
-                timeData->_timer->UpdateLastTimeOutTime(_curTime - timeData->_period);
-
-            (*timeData->_timeOutDelegate)(timeData->_timer, timeData->_timer->GetLastTimeOutTime(), _curTime);
-            timeData->_timer->UpdateLastTimeOutTime(_curTime);
+            timeData->_timer->OnTimeOut(_curTime);
             timeData->_isRotatingWheel = false;
         }
 
