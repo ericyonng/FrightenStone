@@ -489,14 +489,23 @@
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmeticImpl.h">
       <Filter>common\component\Impl\SmartVar</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWeel.h">
+    <ClInclude Include="..\common\component\Impl\TimeWheel\FS_Timer.h">
       <Filter>common\component\Impl\TimeWheel</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWeelImpl.h">
+    <ClInclude Include="..\common\component\Impl\TimeWheel\FS_TimerImpl.h">
       <Filter>common\component\Impl\TimeWheel</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\TimeWheel\Comp\TimeWheelData.h">
+    <ClInclude Include="..\common\component\Impl\TimeWheel\Comp\TimeData.h">
       <Filter>common\component\Impl\TimeWheel\Comp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\TimeWheel\Comp\TimeDataImpl.h">
+      <Filter>common\component\Impl\TimeWheel\Comp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheel.h">
+      <Filter>common\component\Impl\TimeWheel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h">
+      <Filter>common\component\Impl\TimeWheel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -608,11 +617,14 @@
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.cpp">
       <Filter>common\component\Impl\SmartVar</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWeel.cpp">
+    <ClCompile Include="..\common\component\Impl\TimeWheel\FS_Timer.cpp">
       <Filter>common\component\Impl\TimeWheel</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\component\Impl\TimeWheel\Comp\TimeWheelData.cpp">
+    <ClCompile Include="..\common\component\Impl\TimeWheel\Comp\TimeData.cpp">
       <Filter>common\component\Impl\TimeWheel\Comp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWheel.cpp">
+      <Filter>common\component\Impl\TimeWheel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

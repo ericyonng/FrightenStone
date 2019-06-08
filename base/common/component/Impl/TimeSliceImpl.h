@@ -43,7 +43,7 @@ inline TimeSlice::TimeSlice()
 
 }
 
-inline TimeSlice::TimeSlice(int seconds, int milliSeconds /*= 0*/, int microSeconds /*= 0*/)
+inline TimeSlice::TimeSlice(int seconds, Int64 milliSeconds /*= 0*/, Int64 microSeconds /*= 0*/)
 {
     _slice = seconds * Time::_microSecondPerSecond +
         milliSeconds * Time::_microSecondPerMilliSecond + microSeconds;
@@ -54,7 +54,7 @@ inline TimeSlice::TimeSlice(const TimeSlice &slice)
 {
 }
 
-inline TimeSlice::TimeSlice(int days, int hours, int minutes, int seconds, int milliSeconds /* = 0 */, int microSeconds /* = 0 */)
+inline TimeSlice::TimeSlice(int days, int hours, int minutes, Int64 seconds, Int64 milliSeconds /* = 0 */, Int64 microSeconds /* = 0 */)
 {
     _slice = static_cast<Int64>((((((days * 24) + hours) * 60) + minutes) * 60) + seconds) *
         Time::_microSecondPerSecond + milliSeconds * Time::_microSecondPerMilliSecond + microSeconds;
@@ -183,6 +183,12 @@ inline bool TimeSlice::operator >=(const TimeSlice &slice) const
 inline TimeSlice &TimeSlice::operator =(const TimeSlice &slice)
 {
     _slice = slice._slice;
+    return *this;
+}
+
+inline TimeSlice &TimeSlice::operator =(Int64 microSecSlice)
+{
+    _slice = microSecSlice;
     return *this;
 }
 

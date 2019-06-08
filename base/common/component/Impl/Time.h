@@ -98,8 +98,10 @@ public:
 
     #pragma region 
     const Time &FlushTime();
+    const Time &FlushTime(Int64 microSecTime);
 
     bool operator ==(const Time &time) const;
+    bool operator ==(const Int64 &microSecondTimestamp) const;
     bool operator !=(const Time &time) const;
     bool operator <(const Time &time) const;
     bool operator >(const Time &time) const;
@@ -137,7 +139,7 @@ public:
     TimeSlice operator -(const Time &time) const;
 
     Time operator +(const TimeSlice &slice) const;
-    Time operator -(const TimeSlice &span) const;
+    Time operator -(const TimeSlice &slice) const;
     #pragma endregion
 
     #pragma region 
@@ -258,9 +260,21 @@ inline const Time &Time::FlushTime()
     return *this;
 }
 
+inline const Time &Time::FlushTime(Int64 microSecTime)
+{
+    _rawTime = microSecTime;
+    _UpdateTimeStructs();
+    return *this;
+}
+
 inline bool Time::operator ==(const Time &time) const
 {
     return _rawTime == time._rawTime;
+}
+
+inline bool Time::operator ==(const Int64 &microSecondTimestamp) const
+{
+    return _rawTime == microSecondTimestamp;
 }
 
 inline bool Time::operator !=(const Time &time) const

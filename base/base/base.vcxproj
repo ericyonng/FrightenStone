@@ -241,9 +241,12 @@
     <ClInclude Include="..\common\component\Impl\Time.h" />
     <ClInclude Include="..\common\component\Impl\TimeSlice.h" />
     <ClInclude Include="..\common\component\Impl\TimeSliceImpl.h" />
-    <ClInclude Include="..\common\component\Impl\TimeWheel\Comp\TimeWheelData.h" />
-    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWeel.h" />
-    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWeelImpl.h" />
+    <ClInclude Include="..\common\component\Impl\TimeWheel\Comp\TimeData.h" />
+    <ClInclude Include="..\common\component\Impl\TimeWheel\Comp\TimeDataImpl.h" />
+    <ClInclude Include="..\common\component\Impl\TimeWheel\FS_Timer.h" />
+    <ClInclude Include="..\common\component\Impl\TimeWheel\FS_TimerImpl.h" />
+    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheel.h" />
+    <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h" />
     <ClInclude Include="..\common\component\Impl\Trigger.h" />
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
@@ -287,8 +290,9 @@
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarTraits.cpp" />
     <ClCompile Include="..\common\component\Impl\Time.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeSlice.cpp" />
-    <ClCompile Include="..\common\component\Impl\TimeWheel\Comp\TimeWheelData.cpp" />
-    <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWeel.cpp" />
+    <ClCompile Include="..\common\component\Impl\TimeWheel\Comp\TimeData.cpp" />
+    <ClCompile Include="..\common\component\Impl\TimeWheel\FS_Timer.cpp" />
+    <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWheel.cpp" />
     <ClCompile Include="..\common\component\Impl\Trigger.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
     <ClCompile Include="..\common\socket\Impl\SocketUtil.cpp" />

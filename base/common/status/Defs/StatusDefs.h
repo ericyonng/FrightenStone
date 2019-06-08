@@ -68,6 +68,11 @@ public:
         Aes_CyphertextIsEmpty = 702,                            // 密文不能为空
         Aes_PlaintextIsEmpty = 703,                             // 明文不能为空
         #pragma endregion
+
+        #pragma region [800-899]
+        TimeWheel_ExpiredTimeIsNull = 800,                      // 过期时间为空
+        TimeWheel_RegisterAExistsTimeData = 801,                // 重复注册
+        #pragma endregion
     };
 };
 

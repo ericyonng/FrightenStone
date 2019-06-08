@@ -214,5 +214,8 @@ private:\
 #undef MAX_I64_NUM
 #define MAX_I64_NUM	0x7FFFFFFFFFFFFFFF
 
+// 时间轮盘默认精度
+#undef TIME_WHEEL_RESOLUTION_DEF
+#define TIME_WHEEL_RESOLUTION_DEF 100LL
 
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__

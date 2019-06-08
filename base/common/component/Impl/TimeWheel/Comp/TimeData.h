@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TimeWeelImpl.h
+ * @file  : TimeWheelData.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/6/6
  * @brief :
@@ -29,9 +29,51 @@
  *
  * 
  */
-#ifdef __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
+#ifndef __Base_Common_Component_Impl_TimeWheel_Comp_TimeData_H__
+#define __Base_Common_Component_Impl_TimeWheel_Comp_TimeData_H__
 #pragma once
 
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/component/Impl/TimeSlice.h"
+#include <list>
 
-#endif // __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
+FS_NAMESPACE_BEGIN
 
+class TimeWheelMoment;
+class TimeWheel;
+class TimeSlice;
+class Time;
+class TimeData;
+class FS_Timer;
+
+class BASE_EXPORT TimeDataLess
+{
+public:
+    bool operator ()(const TimeData *l, const TimeData *r) const;
+};
+
+class BASE_EXPORT TimeData
+{
+public:
+    explicit TimeData(FS_Timer *timer);
+    virtual ~TimeData();
+
+    // 超时时间
+    Time _expiredTime;
+    // timewheel给的唯一id，由timewheel更新
+    Int64 _timeWheelUniqueId;
+    // timer
+    FS_Timer *_timer;
+    // 超时周期
+    TimeSlice _period;
+    // 超时委托 param1:返回值, param2:timewheel, param3:lastWheelTime, param4:curTime
+    IDelegatePlus<void, FS_Timer *&, const Time &, const Time &> *_timeOutDelegate;
+    // 注销委托
+    IDelegatePlus<void, FS_Timer *&> *_cancelTimerDelegate;
+};
+
+FS_NAMESPACE_END
+
+#endif
