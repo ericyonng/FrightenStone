@@ -57,7 +57,7 @@ public:
     // 取消注册
     void UnRegister(TimeData *timeData);
     // 当前时间轮盘精度 @return:返回微妙
-    // Int64 GetTimeWheelResolution() const;
+     const TimeSlice &GetTimeWheelResolution() const;
 
 private:
     // 产生timewheel生命周期中唯一id

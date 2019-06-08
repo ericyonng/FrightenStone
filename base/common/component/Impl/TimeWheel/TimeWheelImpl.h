@@ -42,10 +42,10 @@ inline void TimeWheel::UnRegister(TimeData *timeData)
      _timeDatas.erase(timeData);
 }
 
-// inline Int64 TimeWheel::GetTimeWheelResolution() const
-// {
-//     return _resolutionSlice.GetTotalMicroSeconds();
-// }
+inline const TimeSlice &TimeWheel::GetTimeWheelResolution() const
+{
+    return _resolutionSlice;
+}
 
 inline Int64 TimeWheel::_NewIncreasId()
 {
