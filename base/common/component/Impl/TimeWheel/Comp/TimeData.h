@@ -60,8 +60,14 @@ public:
     explicit TimeData(FS_Timer *timer);
     virtual ~TimeData();
 
+    FS_String ToString() const;
+
     // 超时时间
     Time _expiredTime;
+    // 是否取消
+    bool _isCancel;
+    // 是否正在转动时间轮盘
+    bool _isRotatingWheel;
     // timewheel给的唯一id，由timewheel更新
     Int64 _timeWheelUniqueId;
     // timer

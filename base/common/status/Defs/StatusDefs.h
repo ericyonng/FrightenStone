@@ -72,6 +72,7 @@ public:
         #pragma region [800-899]
         TimeWheel_ExpiredTimeIsNull = 800,                      // 过期时间为空
         TimeWheel_RegisterAExistsTimeData = 801,                // 重复注册
+        TimeWheel_CantRegisterWhenRotatingWheel = 802,          // 转动轮盘时不可在非转动转盘的其他地方注册定时器
         #pragma endregion
     };
 };

@@ -48,6 +48,25 @@ public:
     }
 };
 
+static void TimeOut(fs::FS_Timer *&timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
+{
+    std::cout << "static test :" << "lastWheelTime:" << lastWheelTime.GetMicroTimestamp() << " fmt:" << lastWheelTime.ToString().c_str() << std::endl;
+    std::cout << "static test : curTime:" << curTime.GetMicroTimestamp() << " fmt: " << curTime.ToString().c_str() << std::endl;
+
+    if(lastWheelTime.GetLocalMinute() != curTime.GetLocalMinute())
+    {
+        std::cout << "cross minitue" << std::endl;
+    }
+
+    timer->Cancel();
+    timer->Schedule(1000);
+}
+
+static void Cancel(fs::FS_Timer *&timer)
+{
+    std::cout << "cancel a timer" << std::endl << timer->ToString().c_str() << std::endl;
+}
+
 class TestTimeWheel
 {
 public:
@@ -56,15 +75,16 @@ public:
         // 设置时间轮盘参数
         fs::TimeSlice resolution(0, 100);
         fs::TimeWheel timeWheel(resolution);
-        fs::FS_Timer timer;
-
-        // 设置时间轮盘
-        timer.SetTimeWheel(&timeWheel);
+        fs::FS_Timer timer(&timeWheel);
+        fs::FS_Timer timer2(&timeWheel);
 
         // 设置超时执行函数
         TestWheel1 test1;
         timer.SetTimeOutHandler(&test1, &TestWheel1::TimeOut);
         timer.Schedule(1000);
+
+        timer2.SetTimeOutHandler(&TimeOut);
+        timer2.SetCancelHandler(&Cancel);
 
         while(true)
         {
@@ -72,6 +92,12 @@ public:
 
             // 转动时间轮盘
             timeWheel.RotateWheel();
+            static bool isOnce = false;
+            if(!isOnce)
+            {
+                isOnce = true;
+                timer2.Schedule(10000);
+            }
         }
     }
 };
