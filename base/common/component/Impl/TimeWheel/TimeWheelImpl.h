@@ -39,12 +39,18 @@ inline void TimeWheel::UnRegister(TimeData *timeData)
     if(UNLIKELY(timeData->_isRotatingWheel))
         return;
 
-     _timeDatas.erase(timeData);
+    if(LIKELY(timeData->_timeWheelUniqueId))
+        _timeDatas.erase(timeData);
 }
 
 inline const TimeSlice &TimeWheel::GetTimeWheelResolution() const
 {
     return _resolutionSlice;
+}
+
+inline const Time &TimeWheel::GetCurTime() const
+{
+    return _curTime;
 }
 
 inline Int64 TimeWheel::_NewIncreasId()

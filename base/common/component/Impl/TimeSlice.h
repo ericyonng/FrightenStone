@@ -103,18 +103,18 @@ public:
     Int64 GetTotalMilliSeconds() const;
     const Int64 &GetTotalMicroSeconds() const;
 
-    TimeSlice operator +(const TimeSlice &span) const;
-    TimeSlice operator -(const TimeSlice &span) const;
+    TimeSlice operator +(const TimeSlice &slice) const;
+    TimeSlice operator -(const TimeSlice &slice) const;
 
-    TimeSlice &operator +=(const TimeSlice &span);
-    TimeSlice &operator -=(const TimeSlice &span);
+    TimeSlice &operator +=(const TimeSlice &slice);
+    TimeSlice &operator -=(const TimeSlice &slice);
 
-    bool operator ==(const TimeSlice &span) const;
-    bool operator !=(const TimeSlice &span) const;
-    bool operator <(const TimeSlice &span)const;
-    bool operator >(const TimeSlice &span) const;
-    bool operator <=(const TimeSlice &span) const;
-    bool operator >=(const TimeSlice &span) const;
+    bool operator ==(const TimeSlice &slice) const;
+    bool operator !=(const TimeSlice &slice) const;
+    bool operator <(const TimeSlice &slice)const;
+    bool operator >(const TimeSlice &slice) const;
+    bool operator <=(const TimeSlice &slice) const;
+    bool operator >=(const TimeSlice &slice) const;
 
     TimeSlice &operator =(const TimeSlice &slice);
     TimeSlice &operator =(Int64 microSecSlice);

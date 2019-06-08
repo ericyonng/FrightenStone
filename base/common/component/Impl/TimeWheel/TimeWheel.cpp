@@ -55,8 +55,13 @@ TimeWheel::~TimeWheel()
 void TimeWheel::RotateWheel()
 {
     // 更新时间
-    if(_curTime == 0)
+    if(UNLIKELY(_curTime == 0))
         _curTime.FlushTime(Time::NowMicroTimestamp());
+
+    // 轮盘滚动时间需要大于等于最小扫描时间精度才处理
+    _nowTimeToJudgeWheelTimeOut.FlushTime();
+    if(UNLIKELY((_nowTimeToJudgeWheelTimeOut - _curTime) < _resolutionSlice))
+        return;
 
     _curTime.FlushTime();
 
@@ -70,12 +75,9 @@ void TimeWheel::RotateWheel()
             break;
 
         // 执行超时delegate
-        if(timeData->_timer)
-        {
-            timeData->_isRotatingWheel = true;
-            timeData->_timer->OnTimeOut(_curTime);
-            timeData->_isRotatingWheel = false;
-        }
+        timeData->_isRotatingWheel = true;
+        timeData->_timer->OnTimeOut(_curTime);
+        timeData->_isRotatingWheel = false;
 
         // 重新加入
         if(!timeData->_isCancel)
