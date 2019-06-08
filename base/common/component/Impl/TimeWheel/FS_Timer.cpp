@@ -49,6 +49,8 @@ FS_Timer::~FS_Timer()
 {
     Fs_SafeFree(_timeOutDelegate);
     Fs_SafeFree(_cancelTimerDelegate);
+    Cancel();
+    _timeWheel->UnRegister(_timeData);
     Fs_SafeFree(_timeData);
 }
 

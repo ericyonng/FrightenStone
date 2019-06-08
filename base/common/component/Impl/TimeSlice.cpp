@@ -46,7 +46,7 @@ TimeSlice::TimeSlice(const FS_String &fmtSlice)
     if(spaceIdx != std::string::npos)
         sliceRepr = fmtSlice.GetRaw().substr(spaceIdx + 1);
 
-    // If the slice string is empty, set span value to 0.
+    // If the slice string is empty, set slice value to 0.
     if(sliceRepr.empty())
     {
         _slice = 0;

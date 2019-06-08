@@ -38,7 +38,7 @@ class TestWheel1
 public:
     void TimeOut(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
     {
-        std::cout << "TestWheel1" << std::endl;
+        std::cout << "TestWheel1 curTime:"<< curTime.ToString() << std::endl;
 
         if(lastWheelTime.GetLocalMinute() != curTime.GetLocalMinute())
         {
@@ -86,9 +86,10 @@ public:
         timer2.SetTimeOutHandler(&TimeOut);
         timer2.SetCancelHandler(&Cancel);
 
+        Int64 waitMilliSec = 10;
         while(true)
         {
-            Sleep(static_cast<DWORD>(fs::g_TimeWheel.GetTimeWheelResolution().GetTotalMilliSeconds()));
+            Sleep(static_cast<DWORD>(waitMilliSec));
 
             // 转动时间轮盘
             fs::g_TimeWheel.RotateWheel();
@@ -98,6 +99,13 @@ public:
                 isOnce = true;
                 timer2.Schedule(10000);
             }
+
+            // 修正下一帧时间
+            auto modifySlice = fs::Time::Now() - fs::g_TimeWheel.GetCurTime();
+            auto leftWaitTime = (fs::g_TimeWheel.GetTimeWheelResolution() - modifySlice);
+            fs::TimeSlice zeroSlice;
+            waitMilliSec = leftWaitTime <= zeroSlice ? zeroSlice.GetTotalMilliSeconds() : leftWaitTime.GetTotalMilliSeconds();
+           //std::cout << "waitMilliSec:"<< waitMilliSec << std::endl;
         }
     }
 };
