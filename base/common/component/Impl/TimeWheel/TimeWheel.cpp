@@ -59,7 +59,7 @@ void TimeWheel::RotateWheel()
     if(_curTime == 0)
         _curTime.FlushTime(Time::NowMicroTimestamp());
 
-    _curTime.FlushTime(_curTime.GetMicroTimestamp() + _resolutionSlice.GetTotalMicroSeconds());
+    _curTime.FlushTime();
 
     // 遍历
     std::set<TimeData *> timeDataToRefresh;
@@ -70,20 +70,25 @@ void TimeWheel::RotateWheel()
         if(timeData->_expiredTime > _curTime)
             break;
 
-        // 移除节点并放入待更新
-        iterUniqueRefTimeDatas = _timeDatas.erase(iterUniqueRefTimeDatas);
-        timeDataToRefresh.insert(timeData);
-
         // 执行超时delegate
         if(timeData->_timeOutDelegate)
         {
+            timeData->_isRotatingWheel = true;
             const auto &lastTimeOutTime = timeData->_timer->GetLastTimeOutTime();
             if(lastTimeOutTime == 0)
                 timeData->_timer->UpdateLastTimeOutTime(_curTime - timeData->_period);
 
             (*timeData->_timeOutDelegate)(timeData->_timer, timeData->_timer->GetLastTimeOutTime(), _curTime);
             timeData->_timer->UpdateLastTimeOutTime(_curTime);
+            timeData->_isRotatingWheel = false;
         }
+
+        // 重新加入
+        if(!timeData->_isCancel)
+            timeDataToRefresh.insert(timeData);
+
+        // 移除
+        iterUniqueRefTimeDatas = _timeDatas.erase(iterUniqueRefTimeDatas);
     }
 
     // 更新超时时间并重新加入
@@ -97,6 +102,9 @@ void TimeWheel::RotateWheel()
 
 Int32 TimeWheel::Register(TimeData *timeData)
 {
+    if(timeData->_isRotatingWheel)
+        return StatusDefs::TimeWheel_CantRegisterWhenRotatingWheel;
+
     const auto expiredTime = timeData->_expiredTime.GetMicroTimestamp();
     if(UNLIKELY(!expiredTime))
         return StatusDefs::TimeWheel_ExpiredTimeIsNull;

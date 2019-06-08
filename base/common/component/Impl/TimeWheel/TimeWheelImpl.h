@@ -36,6 +36,9 @@ FS_NAMESPACE_BEGIN
 
 inline void TimeWheel::UnRegister(TimeData *timeData)
 {
+    if(UNLIKELY(timeData->_isRotatingWheel))
+        return;
+
      _timeDatas.erase(timeData);
 }
 

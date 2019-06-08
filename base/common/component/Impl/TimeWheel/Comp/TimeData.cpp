@@ -31,7 +31,7 @@
  */
 #include "stdafx.h"
 #include "base/common/component/Impl/TimeSlice.h"
-#include "base/common/component/Impl/TimeWheel/TimeWeel.h"
+#include "base/common/component/Impl/TimeWheel/TimeWheel.h"
 #include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
 #include "base/common/component/Impl/TimeWheel/FS_Timer.h"
 
@@ -42,14 +42,16 @@ bool TimeDataLess::operator ()(const TimeData *l, const TimeData *r) const
     if(l == r)
         return l < r;
 
-    if(l->_expiredTime == l->_expiredTime)
+    if(l->_expiredTime == r->_expiredTime)
         return l->_timeWheelUniqueId < r->_timeWheelUniqueId;
 
     return l->_expiredTime < r->_expiredTime;
 }
 
 TimeData::TimeData(FS_Timer *timer)
-    :_timeWheelUniqueId(0)
+    :_isCancel(false)
+    ,_isRotatingWheel(false)
+    ,_timeWheelUniqueId(0)
     ,_timer(timer)
     ,_timeOutDelegate(NULL)
     ,_cancelTimerDelegate(NULL)
@@ -63,5 +65,15 @@ TimeData::~TimeData()
     Fs_SafeFree(_cancelTimerDelegate);
 }
 
+FS_String TimeData::ToString() const
+{
+    FS_String info;
+    info.Format("timeData: _expiredTime:%lld|_isCancel:%d|_timeWheelUniqueId:%lld|"
+                "_period:%lld|_timeOutDelegate:0x%p|_cancelTimerDelegate:0x%p"
+                , _expiredTime.GetMicroTimestamp(), _isCancel, _timeWheelUniqueId
+                , _period.GetTotalMicroSeconds(), _timeOutDelegate, _cancelTimerDelegate);
+
+    return info;
+}
 
 FS_NAMESPACE_END

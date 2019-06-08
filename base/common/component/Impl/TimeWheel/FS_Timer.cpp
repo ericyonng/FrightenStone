@@ -50,14 +50,15 @@ FS_Timer::~FS_Timer()
 
 void FS_Timer::Cancel()
 {
-    if(_timeData->_cancelTimerDelegate)
+    bool isCancel = _timeData->_isCancel;
+    _timeData->_isCancel = true;
+
+    if(isCancel != _timeData->_isCancel && 
+       _timeData->_cancelTimerDelegate)
     {
         FS_Timer *timer = this;
         (*_timeData->_cancelTimerDelegate)(timer);
     }
-
-    // 移除
-    _timeWheel->UnRegister(_timeData);
 }
 
 Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
@@ -68,13 +69,14 @@ Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
     // 过期时间
     auto nowTime = Time::Now();
     _lastTimeOutTime = nowTime;
-    const auto &expiredTime = nowTime + slice;
+    const auto &expiredTime = _timeData->_isRotatingWheel ? nowTime : (nowTime + slice);
 
     // 送时间轮盘中移除
     if(_timeData->_timeWheelUniqueId)
         _timeWheel->UnRegister(_timeData);
 
     // 更新数据
+    _timeData->_isCancel = false;
     _timeData->_period = slice;
     _timeData->_expiredTime = expiredTime;
 
@@ -82,5 +84,11 @@ Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
     return _timeWheel->Register(_timeData);
 }
 
+FS_String FS_Timer::ToString() const
+{
+    FS_String info;
+    info.Format("Timer:_lastTimeOutTime:%lld|\n%s", _lastTimeOutTime.GetMicroTimestamp(), _timeData->ToString().c_str());
+    return info;
+}
 
 FS_NAMESPACE_END

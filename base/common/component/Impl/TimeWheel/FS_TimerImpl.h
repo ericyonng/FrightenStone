@@ -35,10 +35,10 @@
 
 FS_NAMESPACE_BEGIN
 
-inline void FS_Timer::SetTimeWheel(TimeWheel *timeWheel)
-{
-    _timeWheel = timeWheel;
-}
+// inline void FS_Timer::SetTimeWheel(TimeWheel *timeWheel)
+// {
+//     _timeWheel = timeWheel;
+// }
 
 template<typename T>
 inline void FS_Timer::SetTimeOutHandler(T *objType, void (T::*handler)(FS_Timer *&, const Time &, const Time &))

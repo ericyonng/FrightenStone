@@ -51,7 +51,7 @@ public:
     // 取消
     void Cancel();
     // 设置时间轮盘
-    void SetTimeWheel(TimeWheel *timeWheel);
+    // void SetTimeWheel(TimeWheel *timeWheel);
     // 以当前时间为基准，设置超时周期
     Int32 Schedule(Int64 milliSecPeriod);
 
@@ -67,6 +67,8 @@ public:
     // 更新与获取最后一次timeout时间
     void UpdateLastTimeOutTime(const Time &lastTime);
     const Time &GetLastTimeOutTime() const;
+
+    FS_String ToString() const;
 
 private:
     Time _lastTimeOutTime;
