@@ -51,5 +51,8 @@
 #include "base/common/component/Defs/FS_AesDefs.h"
 #include "base/common/component/Impl/Aes/FS_Aes.h"
 #include "base/common/component/Impl/FS_Random.h"
+#include "base/common/component/Impl/TimeWheel/FS_Timer.h"
+#include "base/common/component/Impl/TimeWheel/TimeWheel.h"
+#include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
 
 #endif

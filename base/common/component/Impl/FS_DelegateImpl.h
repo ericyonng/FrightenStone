@@ -38,7 +38,7 @@
 
 FS_NAMESPACE_BEGIN
 
-template <class T, class R, typename ... Args>
+template <typename T, typename R, typename ... Args>
 inline FS_Delegate<T, R, Args...>::FS_Delegate(T *obj, R(T::*f)(Args...))
 :_obj(obj)
 ,_f(f)
@@ -46,71 +46,71 @@ inline FS_Delegate<T, R, Args...>::FS_Delegate(T *obj, R(T::*f)(Args...))
     
 }
 
-template <class T, class R, typename ... Args>
+template <typename T, typename R, typename ... Args>
 inline R FS_Delegate<T, R, Args...>::operator()(Args&&... args)
 {
     return (_obj->*_f)(std::forward<Args>(args)...);
 }
 
-template <class T, class R, typename ... Args>
+template <typename T, typename R, typename ... Args>
 inline FS_Delegate<T, R, Args...>* DelegateFactory::Create(T *obj, R ( T::*f)(Args ...))
 {
     return new FS_Delegate<T, R, Args...>(obj, f);
 }
 
-template <class R, typename... Args>
+template <typename R, typename... Args>
 inline IDelegatePlus<R, Args...>::IDelegatePlus()
 {
 }
 
-template <class R, typename... Args>
+template <typename R, typename... Args>
 inline IDelegatePlus<R, Args...>::~IDelegatePlus()
 {
 }
 
-template <class T, class R, typename... Args>
+template <typename T, class R, typename... Args>
 inline DelegateClassPlus<T, R, Args...>::DelegateClassPlus(T *t, R(T::*f)(Args...))
     :_obj(t)
     ,_f(f)
 {
 }
 
-template <class T, class R, typename... Args>
+template <typename T, typename R, typename... Args>
 inline DelegateClassPlus<T, R, Args...>::~DelegateClassPlus()
 {
 
 }
 
-template <class T, class R, typename... Args>
+template <typename T, typename R, typename... Args>
 inline R DelegateClassPlus<T, R, Args...>::operator()(Args&&... args)
 {
     return (_obj->*_f)(std::forward<Args>(args)...);
 }
 
-template <class R, typename... Args>
+template <typename R, typename... Args>
 inline DelegateFunctionPlus<R, Args...>::DelegateFunctionPlus(R(*f)(Args...))
     :_f(f)
 {
 }
 
-template <class R, typename... Args>
+template <typename R, typename... Args>
 inline DelegateFunctionPlus<R, Args...>::~DelegateFunctionPlus()
 {
 }
 
-template <class R, typename... Args>
+template <typename R, typename... Args>
 inline R DelegateFunctionPlus<R, Args...>::operator()(Args&&... args)
 {
     return (*_f)(std::forward<Args>(args)...);
 }
 
-template <class T, class R, typename... Args>
+template <typename T, typename R, typename... Args>
 inline IDelegatePlus<R, Args...> *DelegatePlusFactory::Create(T *obj, R(T::*f)(Args...))
 {
     return new DelegateClassPlus<T, R, Args...>(obj, f);
 }
 
-template <class R, typename... Args>
+template <typename R, typename... Args>
 inline IDelegatePlus<R, Args...> *DelegatePlusFactory::Create(R(*f)(Args...))
 {
     return new DelegateFunctionPlus<R, Args...>(f);

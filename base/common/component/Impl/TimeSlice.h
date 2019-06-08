@@ -56,7 +56,7 @@ public:
      * @param[in] milliSeconds - the slice milli-seconds part.
      * @param[in] microSeconds - the slice micro-seconds part.
      */
-    explicit TimeSlice(int seconds, int milliSeconds = 0, int microSeconds = 0);
+    explicit TimeSlice(int seconds, Int64 milliSeconds = 0, Int64 microSeconds = 0);
 
     /**
      * Construct by slice string representation(fmt: 00:00:00.xxxxxx).
@@ -78,7 +78,7 @@ public:
      * @param[in] milliSeconds - the milli-seconds part, default is 0.
      * @param[in] microSeconds - the micro-seconds part, default is 0.
      */
-    TimeSlice(int days, int hours, int minutes, int seconds, int milliSeconds = 0, int microSeconds = 0);
+    TimeSlice(int days, int hours, int minutes, Int64 seconds, Int64 milliSeconds = 0, Int64 microSeconds = 0);
 
     /**
      * Destructor.
@@ -116,7 +116,8 @@ public:
     bool operator <=(const TimeSlice &span) const;
     bool operator >=(const TimeSlice &span) const;
 
-    TimeSlice &operator =(const TimeSlice &span);
+    TimeSlice &operator =(const TimeSlice &slice);
+    TimeSlice &operator =(Int64 microSecSlice);
 
     FS_String ToString() const;
 private:

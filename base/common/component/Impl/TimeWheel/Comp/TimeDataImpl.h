@@ -21,13 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TimeWeel.cpp
+ * @file  : TimeWheelDataImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/6
+ * @date  : 2019/06/08
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/component/Impl/TimeWheel/TimeWeel.h"
+#ifdef __Base_Common_Component_Impl_TimeWheel_Comp_TimeData_H__
+#pragma once
+
+#endif

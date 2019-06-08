@@ -21,13 +21,66 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TimeWheelData.cpp
+ * @file  : FS_Timer.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/6
+ * @date  : 2019/06/08
  * @brief :
  * 
  *
  * 
  */
 #include "stdafx.h"
-#include "base/common/component/Impl/TimeWheel/Comp/TimeWheelData.h"
+#include "base/common/component/Impl/Time.h"
+#include "base/common/component/Impl/TimeWheel/FS_Timer.h"
+
+FS_NAMESPACE_BEGIN
+
+FS_Timer::FS_Timer(TimeWheel *timeWheel)
+    :_timeData(new TimeData(this))
+    ,_timeWheel(timeWheel)
+{
+    if(!_timeWheel)
+        _timeWheel = &g_TimeWheel;
+}
+
+FS_Timer::~FS_Timer()
+{
+    Fs_SafeFree(_timeData);
+}
+
+void FS_Timer::Cancel()
+{
+    if(_timeData->_cancelTimerDelegate)
+    {
+        FS_Timer *timer = this;
+        (*_timeData->_cancelTimerDelegate)(timer);
+    }
+
+    // 移除
+    _timeWheel->UnRegister(_timeData);
+}
+
+Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
+{
+    // 精度与周期
+    TimeSlice slice(0, milliSecPeriod, 0);
+
+    // 过期时间
+    auto nowTime = Time::Now();
+    _lastTimeOutTime = nowTime;
+    const auto &expiredTime = nowTime + slice;
+
+    // 送时间轮盘中移除
+    if(_timeData->_timeWheelUniqueId)
+        _timeWheel->UnRegister(_timeData);
+
+    // 更新数据
+    _timeData->_period = slice;
+    _timeData->_expiredTime = expiredTime;
+
+    // 注册时间轮盘
+    return _timeWheel->Register(_timeData);
+}
+
+
+FS_NAMESPACE_END

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TimeWheelData.h
+ * @file  : TimeWeel.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/6/6
  * @brief :
@@ -29,46 +29,52 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_TimeWheel_Comp_TimeWheelData_H__
-#define __Base_Common_Component_Impl_TimeWheel_Comp_TimeWheelData_H__
+#ifndef __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
+#define __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
+
 #pragma once
 
+#include "base/exportbase.h"
+#include "base/common/component/Impl/Time.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_Delegate.h"
-#include <list>
+#include "base/common/component/Impl/TimeSlice.h"
+#include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
+#include <set>
 
 FS_NAMESPACE_BEGIN
-// 
-// class TimeWheel;
-// 
-// template<typename T>
-// struct TimeDelegate
-// {
-//     TimeDelegate();
-//     virtual ~TimeDelegate();
-// 
-//     std::list<TimeDelegate *>::iterator _timeDelegateIter;
-//     Int32 _times;           // 执行次数
-//     bool _isCancel;         // 是否取消
-//     FS_Delegate<T, void, TimeWheel *> *_delegate;
-// };
-// 
-// class TimeWheelEventList
-// {
-// public:
-// 
-// public:
-//     std::list<TimeDelegate *> _Delegates;
-// };
-// 
-// class TimeWheelMoment
-// {
-// public:
-// private:
-//     Int64 _rawTime;                     // 时刻
-//     TimeWheelEventList *_eventList;     // 事件队列
-// };
+
+class BASE_EXPORT TimeWheel
+{
+public:
+    explicit TimeWheel(const TimeSlice &resolutionSlice);
+    virtual ~TimeWheel();
+
+    // 转动时间轮盘
+    void RotateWheel();
+
+    // 注册超时数据
+    Int32 Register(TimeData *timeData);
+    // 取消注册
+    void UnRegister(TimeData *timeData);
+    // 当前时间轮盘精度 @return:返回微妙
+    // Int64 GetTimeWheelResolution() const;
+
+private:
+    // 产生timewheel生命周期中唯一id
+    Int64 _NewIncreasId();
+
+private:
+    const TimeSlice _resolutionSlice;       // 每一轮时间切片长度
+    Time _curTime;                  // 当前时间戳
+    Time _lastTime;                 // 最后一次时间
+    std::set<TimeData *, TimeDataLess> _timeDatas;
+
+    Int64 _increaseId;              // 递增id
+};
 
 FS_NAMESPACE_END
+
+
+#include "base/common/component/Impl/TimeWheel/TimeWheelImpl.h"
 
 #endif

@@ -139,6 +139,7 @@
     <ClInclude Include="TestInst\TestString.h" />
     <ClInclude Include="TestInst\TestThreadPool.h" />
     <ClInclude Include="TestInst\TestTime.h" />
+    <ClInclude Include="TestInst\TestTimeWheel.h" />
     <ClInclude Include="TestInst\TestTrigger.h" />
     <ClInclude Include="TestInst\TestUtf8.h" />
   </ItemGroup>

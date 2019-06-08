@@ -225,7 +225,7 @@ TimeSlice Time::GetIntervalTo(const TimeSlice &slice) const
     Int64 localTime = _rawTime - TimeUtil::GetTimeZone() * _microSecondPerSecond;
     Int64 todayElapsed = localTime % _microSecondPerDay;
 
-    // Calculate span value.
+    // Calculate slice value.
     Int64 sliceVal = slice.GetTotalMicroSeconds() - todayElapsed;
     if(sliceVal < 0)
         sliceVal = _microSecondPerDay + sliceVal;    // 

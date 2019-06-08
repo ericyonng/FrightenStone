@@ -41,7 +41,7 @@
 FS_NAMESPACE_BEGIN
 
 // T:类，R回调返回值类型，Args回调函数参数包
-template <class T, class R, typename... Args>
+template <typename T, typename R, typename... Args>
 class FS_Delegate
 {
 public:
@@ -56,12 +56,12 @@ private:
 class BASE_EXPORT DelegateFactory
 {
 public:
-    template <class T, class R, typename... Args>
+    template <typename T, typename R, typename... Args>
     static FS_Delegate<T, R, Args...> *Create(T *obj, R(T::*f)(Args...));
 };
 
 // R回调返回值类型，Args回调函数参数包 委托基类 用于解耦具体类型，创建类型无关的委托
-template <class R, typename... Args>
+template <typename R, typename... Args>
 class IDelegatePlus
 {
 public:
@@ -70,7 +70,7 @@ public:
     virtual R operator()(Args&&... args) = 0;
 };
 
-template <class T, class R, typename... Args>
+template <typename T, typename R, typename... Args>
 class DelegateClassPlus : public IDelegatePlus<R, Args...>
 {
 public:
@@ -84,7 +84,7 @@ private:
     R(T::*_f)(Args...);
 };
 
-template <class R, typename... Args>
+template <typename R, typename... Args>
 class DelegateFunctionPlus : public IDelegatePlus<R, Args...>
 {
 public:
@@ -100,10 +100,10 @@ private:
 class BASE_EXPORT DelegatePlusFactory
 {
 public:
-    template <class T, class R, typename... Args>
+    template <typename T, typename R, typename... Args>
     static IDelegatePlus<R, Args...> *Create(T *obj, R(T::*f)(Args...));
 
-    template <class R, typename... Args>
+    template <typename R, typename... Args>
     static IDelegatePlus<R, Args...> *Create(R(*f)(Args...));
 };
 

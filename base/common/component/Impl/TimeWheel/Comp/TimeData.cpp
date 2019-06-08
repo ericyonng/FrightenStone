@@ -21,35 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : TimeWheelData.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/6/6
  * @brief :
  * 
  *
  * 
  */
-#include "TestSuit/TestSuit/TestInst/TestDelegate.h"
-#include "TestSuit/TestSuit/TestInst/TestString.h"
-#include "TestSuit/TestSuit/TestInst/TestTime.h"
-#include "TestSuit/TestSuit/TestInst/TestTrigger.h"
-#include "TestSuit/TestSuit/TestInst/TestThreadPool.h"
-#include "TestSuit/TestSuit/TestInst/TestFSDirectory.h"
-#include "TestSuit/TestSuit/TestInst/TestFSFileUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestCpuUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestFile.h"
-#include "TestSuit/TestSuit/TestInst/TestJson.h"
-#include "TestSuit/TestSuit/TestInst/TestLogFile.h"
-#include "TestSuit/TestSuit/TestInst/TestRandom.h"
-#include "TestSuit/TestSuit/TestInst/TestAes.h"
-#include "TestSuit/TestSuit/TestInst/TestUtf8.h"
-#include "TestSuit/TestSuit/TestInst/TerstSmartVar.h"
-#include "TestSuit/TestSuit/TestInst/TestTimeWheel.h"
+#include "stdafx.h"
+#include "base/common/component/Impl/TimeSlice.h"
+#include "base/common/component/Impl/TimeWheel/TimeWeel.h"
+#include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
+#include "base/common/component/Impl/TimeWheel/FS_Timer.h"
 
-int main()
+FS_NAMESPACE_BEGIN
+
+bool TimeDataLess::operator ()(const TimeData *l, const TimeData *r) const
 {
-    TestTimeWheel::Run();
-    std::cout << "main end" << std::endl;
-    getchar();
-    return 0;
+    if(l == r)
+        return l < r;
+
+    if(l->_expiredTime == l->_expiredTime)
+        return l->_timeWheelUniqueId < r->_timeWheelUniqueId;
+
+    return l->_expiredTime < r->_expiredTime;
 }
+
+TimeData::TimeData(FS_Timer *timer)
+    :_timeWheelUniqueId(0)
+    ,_timer(timer)
+    ,_timeOutDelegate(NULL)
+    ,_cancelTimerDelegate(NULL)
+{
+
+}
+
+TimeData::~TimeData()
+{
+    Fs_SafeFree(_timeOutDelegate);
+    Fs_SafeFree(_cancelTimerDelegate);
+}
+
+
+FS_NAMESPACE_END

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TimeWeel.h
+ * @file  : TimeWeelImpl.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/6/6
  * @brief :
@@ -29,36 +29,27 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
-#define __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
-
+#ifdef __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
 #pragma once
 
-#include "base/common/component/Impl/Time.h"
-#include "base/common/basedefs/BaseDefs.h"
-
 FS_NAMESPACE_BEGIN
-// 
-// class TimeWheelMoment;
-// class TimeSlice;
-// 
-// class TimeWheel
+
+inline void TimeWheel::UnRegister(TimeData *timeData)
+{
+     _timeDatas.erase(timeData);
+}
+
+// inline Int64 TimeWheel::GetTimeWheelResolution() const
 // {
-// public:
-//     explicit TimeWheel(const TimeSlice &slice);
-//     virtual ~TimeWheel();
-// 
-//     void RotateWheel();
-// 
-// private:
-//     TimeSlice _slicePerWheel;       // 每一轮时间切片长度
-//     Time _curTime;                  // 当前时间戳
-//     Time _lastTime;                 // 最后一次时间
-//     std::map<Int64, TimeWheelMoment *> _rawTimeRefMoments;
-// };
+//     return _resolutionSlice.GetTotalMicroSeconds();
+// }
+
+inline Int64 TimeWheel::_NewIncreasId()
+{
+    return ++_increaseId;
+}
 
 FS_NAMESPACE_END
 
-#include "base/common/component/Impl/TimeWheel/TimeWeelImpl.h"
+#endif // __Base_Common_Component_Impl_TimeWheel_TimeWheel_H__
 
-#endif
