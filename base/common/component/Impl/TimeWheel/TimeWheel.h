@@ -58,6 +58,8 @@ public:
     void UnRegister(TimeData *timeData);
     // 当前时间轮盘精度 @return:返回微妙
      const TimeSlice &GetTimeWheelResolution() const;
+     // 下一帧轮盘扫描时间修正值
+     void GetModifiedResolution(TimeSlice &modifiedResolution) const;
      // 当前时间
      const Time &GetCurTime() const;
 
@@ -67,7 +69,7 @@ private:
 
 private:
     const TimeSlice _resolutionSlice;       // 每一轮时间切片长度
-    Time _nowTimeToJudgeWheelTimeOut;   // 当前时间用于判断是否达到轮盘处理的最小扫描时间
+    // Time _nowTimeToJudgeWheelTimeOut;   // 当前时间用于判断是否达到轮盘处理的最小扫描时间
     Time _curTime;                  // 当前时间戳
     std::set<TimeData *, TimeDataLess> _timeDatas;
 

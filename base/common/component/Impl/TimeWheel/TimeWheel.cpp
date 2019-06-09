@@ -56,14 +56,19 @@ void TimeWheel::RotateWheel()
 {
     // 更新时间
     if(UNLIKELY(_curTime == 0))
+    {
         _curTime.FlushTime(Time::NowMicroTimestamp());
+    }
+    else
+    {
+        _curTime.FlushTime();
+    }
 
     // 轮盘滚动时间需要大于等于最小扫描时间精度才处理
-    _nowTimeToJudgeWheelTimeOut.FlushTime();
-    if(UNLIKELY((_nowTimeToJudgeWheelTimeOut - _curTime) < _resolutionSlice))
-        return;
+//     _nowTimeToJudgeWheelTimeOut.FlushTime();
+//     if(UNLIKELY((_nowTimeToJudgeWheelTimeOut - _curTime) < _resolutionSlice))
+//         return;
 
-    _curTime.FlushTime();
 
     // 遍历
     std::set<TimeData *> timeDataToRefresh;

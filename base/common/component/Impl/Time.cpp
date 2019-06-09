@@ -389,6 +389,9 @@ FS_String Time::FormatAsGmt(const char *outFmt) const
 
 FS_String Time::ToString() const
 {
+    if(UNLIKELY(!_rawTime))
+        return "1970-01-01 00:00:00.000000";
+
     FS_String repr;
     auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
     return repr.Format("%s.%06d", Format().c_str(), localTime%_microSecondPerSecond);

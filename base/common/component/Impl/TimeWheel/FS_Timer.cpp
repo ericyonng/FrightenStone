@@ -66,15 +66,15 @@ void FS_Timer::Cancel()
     }
 }
 
-Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
+Int32 FS_Timer::Schedule(const Time &startTime, Int64 milliSecPeriod)
 {
     // 精度与周期
-    TimeSlice slice(0, milliSecPeriod, 0);
+    _periodCache = milliSecPeriod * Time::_microSecondPerMilliSecond;
+    // TimeSlice slice(0, milliSecPeriod, 0);
 
     // 过期时间
-    auto nowTime = Time::Now();
-    _lastTimeOutTime = nowTime;
-    const auto &expiredTime = _timeData->_isRotatingWheel ? nowTime : (nowTime + slice);
+    _lastTimeOutTime = startTime;
+    const auto &expiredTime = _timeData->_isRotatingWheel ? startTime : (startTime + _periodCache);
 
     // 送时间轮盘中移除
     if(_timeData->_timeWheelUniqueId)
@@ -82,7 +82,7 @@ Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
 
     // 更新数据
     _timeData->_isCancel = false;
-    _timeData->_period = slice;
+    _timeData->_period = _periodCache;
     _timeData->_expiredTime = expiredTime;
 
     // 注册时间轮盘
@@ -104,8 +104,9 @@ void FS_Timer::OnTimeOut(const Time &curWheelTIme)
 FS_String FS_Timer::ToString() const
 {
     FS_String info;
-    info.Format("Timer:_lastTimeOutTime:%lld|_timeOutDelegate:0x%p|_cancelTimerDelegate:0x%p\n%s"
-                , _lastTimeOutTime.GetMicroTimestamp(), _timeOutDelegate, _cancelTimerDelegate
+    info.Format("Timer:[_lastTimeOutTime:%lld fmt:%s\n|_timeOutDelegate:0x%p|_cancelTimerDelegate:0x%p\n%s]\n"
+                , _lastTimeOutTime.GetMicroTimestamp(),_lastTimeOutTime.ToString().c_str()
+                ,_timeOutDelegate, _cancelTimerDelegate
                 , _timeData->ToString().c_str());
     return info;
 }
