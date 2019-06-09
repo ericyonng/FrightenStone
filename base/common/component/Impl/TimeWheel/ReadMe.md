@@ -1,4 +1,4 @@
-![时间表盘](https://github.com/ericyonng/resource/blob/master/frightenstone/timeplate.gif"时间轮盘")
+<center>![时间表盘](https://github.com/ericyonng/resource/blob/master/frightenstone/timeplate.gif)</center>
 
 # 高精度时间轮盘
 
