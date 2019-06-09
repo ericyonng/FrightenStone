@@ -38,7 +38,8 @@ class TestWheel1
 public:
     void TimeOut(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
     {
-        std::cout << "TestWheel1 curTime:"<< curTime.ToString() << std::endl;
+        std::cout << "TestWheel1 curTime:" << curTime.ToString() << std::endl;
+        std::cout << "TestWheel1 timer:" << timer->ToString() << std::endl;
 
         if(lastWheelTime.GetLocalMinute() != curTime.GetLocalMinute())
         {
@@ -49,17 +50,21 @@ public:
 
 static void TimeOut(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
 {
-    std::cout << "static test :" << std::endl;
+    std::cout << "static test TimeOut :" << std::endl;
 
-    if(lastWheelTime.GetLocalMinute() != curTime.GetLocalMinute())
-    {
-        std::cout << "cross minitue" << std::endl;
-    }
+    std::cout << "static test TimeOut : curTime:" << curTime.ToString() << std::endl;
+    std::cout << "static test TimeOut : timer:" << timer->ToString() << std::endl;
+}
 
-    timer->Cancel();
+static void TimeOut2(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
+{
+    std::cout << "static test TimeOut2:" << std::endl;
+
+    std::cout << "static test TimeOut2 : curTime:" << curTime.ToString() << std::endl;
+    std::cout << "static test TimeOut2 : timer:" << timer->ToString() << std::endl;
     static Int32 cnt = 5;
-    if(cnt-->0)
-        timer->Schedule(1000);
+    if(--cnt <= 0)
+        timer->Cancel();
 }
 
 static void Cancel(fs::FS_Timer *timer)
@@ -77,35 +82,29 @@ public:
 //         fs::TimeWheel timeWheel(resolution);
         fs::FS_Timer timer;
         fs::FS_Timer timer2;
+        fs::FS_Timer timer3;
 
         // 设置超时执行函数
         TestWheel1 test1;
         timer.SetTimeOutHandler(&test1, &TestWheel1::TimeOut);
-        timer.Schedule(1000);
+        timer.Schedule(fs::Time::FromFmtString(fs::FS_String("2019-06-09 16:02:59.000000")), 4000);
 
         timer2.SetTimeOutHandler(&TimeOut);
-        timer2.SetCancelHandler(&Cancel);
+        timer2.Schedule(2000);
 
-        Int64 waitMilliSec = 10;
+        timer3.SetTimeOutHandler(&TimeOut2);
+        timer3.Schedule(3000);
+
+        fs::TimeSlice waitMilliSec = fs::g_TimeWheel.GetTimeWheelResolution();
         while(true)
         {
-            Sleep(static_cast<DWORD>(waitMilliSec));
+            Sleep(static_cast<DWORD>(waitMilliSec.GetTotalMilliSeconds()));
 
             // 转动时间轮盘
             fs::g_TimeWheel.RotateWheel();
-            static bool isOnce = false;
-            if(!isOnce)
-            {
-                isOnce = true;
-                timer2.Schedule(10000);
-            }
 
             // 修正下一帧时间
-            auto modifySlice = fs::Time::Now() - fs::g_TimeWheel.GetCurTime();
-            auto leftWaitTime = (fs::g_TimeWheel.GetTimeWheelResolution() - modifySlice);
-            fs::TimeSlice zeroSlice;
-            waitMilliSec = leftWaitTime <= zeroSlice ? zeroSlice.GetTotalMilliSeconds() : leftWaitTime.GetTotalMilliSeconds();
-           //std::cout << "waitMilliSec:"<< waitMilliSec << std::endl;
+            fs::g_TimeWheel.GetModifiedResolution(waitMilliSec);
         }
     }
 };

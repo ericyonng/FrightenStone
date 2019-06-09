@@ -48,6 +48,23 @@ inline const TimeSlice &TimeWheel::GetTimeWheelResolution() const
     return _resolutionSlice;
 }
 
+// 下一帧轮盘扫描时间修正值
+inline void TimeWheel::GetModifiedResolution(TimeSlice &modifiedResolution) const
+{
+    const TimeData *firstTimeData = NULL;
+    if(!_timeDatas.empty())
+        firstTimeData = *_timeDatas.begin();
+
+    // 若轮盘容器中有待过期的定时数据则使用定时数据作为修正依据，其他情况使用_curTime作为修正依据
+    const auto &nowTimeToModify = firstTimeData ? (firstTimeData->_expiredTime - firstTimeData->_period) : _curTime;
+    const auto &modifyResolution = fs::Time::Now() - nowTimeToModify;
+    
+    const auto &leftWaitTime = _resolutionSlice - modifyResolution;
+    static const TimeSlice zeroSlice;
+
+    modifiedResolution = leftWaitTime <= zeroSlice ? zeroSlice : leftWaitTime;
+}
+
 inline const Time &TimeWheel::GetCurTime() const
 {
     return _curTime;

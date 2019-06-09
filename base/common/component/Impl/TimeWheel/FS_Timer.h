@@ -55,6 +55,7 @@ public:
     // void SetTimeWheel(TimeWheel *timeWheel);
     // 以当前时间为基准，设置超时周期
     Int32 Schedule(Int64 milliSecPeriod);
+    Int32 Schedule(const Time &startTime, Int64 milliSecPeriod);
 
     // 设置超时执行函数
     template<typename T>
@@ -74,6 +75,7 @@ private:
     Time _lastTimeOutTime;
     TimeWheel *_timeWheel;
     TimeData *_timeData;
+    TimeSlice _periodCache;     // schedule时使用的周期缓冲
     // 超时委托 param1:返回值, param2:FS_Timer, param3:lastWheelTime, param4:curTime
     IDelegatePlus<void, FS_Timer *, const Time &, const Time &> *_timeOutDelegate;
     // 注销委托

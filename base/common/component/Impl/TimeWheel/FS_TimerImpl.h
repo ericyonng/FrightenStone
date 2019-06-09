@@ -40,6 +40,11 @@ FS_NAMESPACE_BEGIN
 //     _timeWheel = timeWheel;
 // }
 
+inline Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
+{
+    return Schedule(Time::Now(), milliSecPeriod);
+}
+
 template<typename T>
 inline void FS_Timer::SetTimeOutHandler(T *objType, void (T::*handler)(FS_Timer *, const Time &, const Time &))
 {
