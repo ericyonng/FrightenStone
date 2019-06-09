@@ -87,7 +87,8 @@ public:
         // 设置超时执行函数
         TestWheel1 test1;
         timer.SetTimeOutHandler(&test1, &TestWheel1::TimeOut);
-        timer.Schedule(fs::Time::FromFmtString(fs::FS_String("2019-06-09 16:02:59.000000")), 4000);
+        // timer.Schedule(fs::Time::FromFmtString(fs::FS_String("2019-06-09 16:02:59.000000")), 4000);
+        timer.Schedule(4000);
 
         timer2.SetTimeOutHandler(&TimeOut);
         timer2.Schedule(2000);
@@ -95,7 +96,8 @@ public:
         timer3.SetTimeOutHandler(&TimeOut2);
         timer3.Schedule(3000);
 
-        fs::TimeSlice waitMilliSec = fs::g_TimeWheel.GetTimeWheelResolution();
+        fs::TimeSlice waitMilliSec;
+        fs::g_TimeWheel.GetModifiedResolution(waitMilliSec);
         while(true)
         {
             Sleep(static_cast<DWORD>(waitMilliSec.GetTotalMilliSeconds()));
