@@ -34,8 +34,6 @@
 
 #pragma once
 #include "stdafx.h"
-
-
 #include <limits>
 
 inline fs::FS_String &&GetString()

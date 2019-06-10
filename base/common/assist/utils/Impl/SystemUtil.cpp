@@ -39,6 +39,7 @@
 #include "tchar.h"
 #include "Psapi.h"
 #include "tlhelp32.h"
+#include "process.h"
 #endif
 #pragma endregion
 
@@ -90,7 +91,7 @@ UInt64 SystemUtil::GetProcessAvailMemSize()
     return status.dwAvailVirtual;
 }
 
-UInt64 SystemUtil::GetProcessTotalSize()
+UInt64 SystemUtil::GetProcessTotalMemSize()
 {
     MEMORYSTATUS status;
     auto ret = GetMemoryStatus(status);
@@ -114,15 +115,14 @@ bool SystemUtil::GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &pro
     __try
     {
         if(!isCurrentProcess && !pid)
-        {
             __leave;
-        }
 
         if(isCurrentProcess)
         {
             if(!GetModuleFileName(NULL, pathName, MAX_PATH))
                 __leave;
 
+            processPath << pathName;
             ret = true;
             __leave;
         }
@@ -142,6 +142,7 @@ bool SystemUtil::GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &pro
             if(!QueryFullProcessImageName(hProc, 0, pathName, &dwProcPathLen))
                 __leave;
 
+            processPath << pathName;
             ret = true;
             __leave;
         }
@@ -150,6 +151,7 @@ bool SystemUtil::GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &pro
         if(!GetProcessImageFileName(hProc, procPathDev, MAX_PATH))
             __leave;
 
+        //盘符
         _tcscat_s(volName, MAX_PATH, TEXT("A:"));
         for(; *volName <= _T('Z'); (*volName)++)
         {
@@ -177,6 +179,7 @@ bool SystemUtil::GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &pro
             _tcscat_s(pathName, MAX_PATH / sizeof(Byte8), volName);
             // 盘符后的路径
             _tcscat_s(pathName, MAX_PATH / sizeof(Byte8), procPathDev + _tcslen(volNameDev));
+            processPath << pathName;
         }
     }
     __finally
@@ -241,6 +244,39 @@ HWND SystemUtil::GetWindowHwndByPID(DWORD dwProcessID)
         hwndRet = ewa.hwndWindow;
     }
     return hwndRet;
+}
+
+Int32 SystemUtil::GetProcessId()
+{
+    return _getpid();
+}
+
+void SystemUtil::BringWindowsToTop(HWND curWin)
+{
+    ::BringWindowToTop(curWin);
+    ::ShowWindow(curWin, SW_SHOW);
+}
+
+bool SystemUtil::IsProcessExist(const FS_String &processName)
+{
+    // 遍历进程
+    auto hProcModule = CreateProcessSnapshot();
+    auto pid = GetFirstProcessPid(hProcModule);
+    bool isFirst = true;
+    fs::FS_String pachCache;
+    for(; isFirst ? isFirst : (pid > 0); pid = GetNextProcessPid(hProcModule))
+    {
+        isFirst = false;
+        pachCache.Clear();
+        if(!fs::SystemUtil::GetProgramPath(false, pid, pachCache))
+            continue;
+
+        auto iterExist = pachCache.GetRaw().find(processName.GetRaw());
+        if(iterExist != std::string::npos)
+            return true;
+    }
+
+    return false;
 }
 
 ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
