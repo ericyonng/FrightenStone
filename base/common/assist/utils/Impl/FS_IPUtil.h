@@ -44,6 +44,19 @@ class BASE_EXPORT FS_IPUtil
 {
 public:
     static bool GetLocalIP(FS_String &ip, Int32 netCardNo = 0, bool isToBind = true, bool isStreamSock = true, bool isIpv4 = true);
+    static bool GetIPByDomain(
+        P_IN const char *&domain                                                // 域名或主机名
+        , P_IN const char *&service                                             /* 端口号“80”等、服务名 如"ftp", "http"等 */
+        , P_OUT char *&ip                                                       // 输出
+        , P_OUT const Int32 ipSize                                              // 输出缓存的大小
+        , Int32 netCardCount = 0                                                // 若获取的是本地的地址，为选择网址列表的某一个网址
+        , Int32 eFlags = FS_IPUtilDefs::AI_FLAGS_TYPE_AI_PASSIVE                 // FS_IPUtilDefs::AI_FLAGS_TYPE 各个位的组合 默认AI_PASSIVE 即用于bind绑定 不设置则用于connect
+        , FS_IPUtilDefs::SOCK_TYPE eSockType = FS_IPUtilDefs::SOCK_TYPE_SOCK_STREAM	        // 默认流数据
+        , FS_IPUtilDefs::FAMILY_TYPE eFamily = FS_IPUtilDefs::FAMILY_TYPE_AF_INET           // 默认ipv4
+        , FS_IPUtilDefs::PROTOCOL_TYPE eProtocol = FS_IPUtilDefs::PROTOCOL_TYPE_IPPROTO_IP  // 默认任意协议 即ip协议
+    );
+
+    Int32 GetPeerAddr(UInt64 sSocket, P_OUT char *&ip, const UInt64 sizeIp, P_OUT UInt16 &port);
 };
 
 FS_NAMESPACE_END

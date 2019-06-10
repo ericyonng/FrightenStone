@@ -53,6 +53,7 @@ public:
         #pragma region SOCKET[500-599]
         Socket_CreateFailure = 500,                             // 套接字创建失败
         Socket_NotInit = 501,                                   // 套接字未初始化
+        Socket_ParamError = 502,                                // 套接字参数错误
         #pragma endregion
 
         #pragma region Trigger[600-699]

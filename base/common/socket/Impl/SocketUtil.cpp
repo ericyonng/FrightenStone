@@ -33,8 +33,11 @@
 #include "base/common/socket/Impl/SocketUtil.h"
 #include <base/common/status/status.h>
 
+#pragma region windows
 #include<WinSock2.h>
+#include "ws2tcpip.h"
 #pragma comment(lib,"ws2_32.lib")
+#pragma endregion
 
 #include <memory.h>
 
@@ -99,6 +102,27 @@ bool SocketUtil::SetBlock(MYSOCKET socket)
         return false;
 
     return true;
+}
+
+Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, P_OUT char *&ip, const UInt64 szIp, P_OUT UInt16& port)
+{
+    if(!sSocket || sSocket == INVALID_SOCKET || !szIp)
+        return StatusDefs::Socket_ParamError;
+
+    //¶¨Òå
+    struct sockaddr_in dstadd_in;
+    memset(&dstadd_in, 0, sizeof(dstadd_in));
+    socklen_t  len = sizeof(dstadd_in);
+
+    if(getpeername(sSocket, (struct sockaddr*)&dstadd_in, &len) >= 0)
+        return WSAGetLastError();
+
+    if(inet_ntop(dstadd_in.sin_family, &dstadd_in.sin_addr.s_addr, ip, szIp) == NULL)
+        return StatusDefs::ParamError;
+
+    port = ntohs(dstadd_in.sin_port);
+
+    return StatusDefs::Success;
 }
 
 FS_NAMESPACE_END

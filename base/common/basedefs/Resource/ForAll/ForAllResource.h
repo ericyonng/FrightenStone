@@ -40,6 +40,7 @@
 #include <atomic>
 #include <thread>
 #include<algorithm>
+#include <stdexcept>
 #pragma endregion
 
 
