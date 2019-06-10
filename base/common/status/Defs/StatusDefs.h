@@ -78,6 +78,7 @@ public:
         #pragma region SystemUtil[900-999]
         SystemUtil_GetKernel32HandleFailed = 900,               // 获取kernel32句柄失败
         SystemUtil_GetGlobalMemoryStatusExFuncFailed = 901,     // 获取globalmemorystatusex函数失败
+        SystemUtil_GetGlobalMemoryStatusExFailed = 902,         // 获取内存信息失败
         #pragma endregion
 
     };

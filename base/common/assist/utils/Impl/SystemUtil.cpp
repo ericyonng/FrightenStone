@@ -40,32 +40,36 @@
 #include "Psapi.h"
 #include "tlhelp32.h"
 #include "process.h"
+#include "sysinfoapi.h"
 #endif
 #pragma endregion
 
 #pragma region defines
 // 获取内存状态函数函数原型指针
-typedef   void(WINAPI *__GlobalMemoryStatusExFunc)(LPMEMORYSTATUS);
+// typedef   void(WINAPI *__GlobalMemoryStatusExFunc)(LPMEMORYSTATUSEX);
 
-static Int32 GetMemoryStatus(MEMORYSTATUS &status)
+static Int32 GetMemoryStatus(MEMORYSTATUSEX &status)
 {
     // 载入动态链接库kernel32.dll，返回它的句柄
-    HMODULE hModule;
-    hModule = LoadLibrary("kernel32.dll");
-    if(UNLIKELY(!hModule))
-        return StatusDefs::SystemUtil_GetKernel32HandleFailed;
+//     HMODULE hModule;
+//     hModule = LoadLibrary("kernel32.dll");
+//     if(UNLIKELY(!hModule))
+//         return StatusDefs::SystemUtil_GetKernel32HandleFailed;
 
     // 在kernel32.dll句柄里查找GlobalMemoryStatusEx函数，获取函数指针
-    status.dwLength = sizeof(status);
-    __GlobalMemoryStatusExFunc globalMemoryStatusEx = reinterpret_cast<__GlobalMemoryStatusExFunc>(GetProcAddress(hModule, "GlobalMemoryStatusEx"));
-    if(UNLIKELY(!globalMemoryStatusEx))
-        return StatusDefs::SystemUtil_GetGlobalMemoryStatusExFuncFailed;
+//     __GlobalMemoryStatusExFunc globalMemoryStatusEx = (__GlobalMemoryStatusExFunc)GetProcAddress(hModule, "GlobalMemoryStatusEx");
+//     if(UNLIKELY(!globalMemoryStatusEx))
+//         return StatusDefs::SystemUtil_GetGlobalMemoryStatusExFuncFailed;
 
+//      globalMemoryStatusEx(&status);
+// 
+//     // 释放链接库句柄
+//     FreeLibrary(hModule);
     // 调用函数取得系统的内存情况
-    globalMemoryStatusEx(&status);
+    status.dwLength = sizeof(status);
+    if(!GlobalMemoryStatusEx(&status))
+        return StatusDefs::SystemUtil_GetGlobalMemoryStatusExFailed;
 
-    // 释放链接库句柄
-    FreeLibrary(hModule);
 
     return StatusDefs::Success;
 }
@@ -81,24 +85,34 @@ typedef struct
 }EnumWindowsArg;
 #pragma endregion
 
-UInt64 SystemUtil::GetProcessAvailMemSize()
+UInt64 SystemUtil::GetAvailPhysMemSize()
 {
-    MEMORYSTATUS status;
+    MEMORYSTATUSEX status;
     auto ret = GetMemoryStatus(status);
     if(ret != StatusDefs::Success)
         return 0;
 
-    return status.dwAvailVirtual;
+    return status.ullAvailPhys;
 }
 
-UInt64 SystemUtil::GetProcessTotalMemSize()
+UInt64 SystemUtil::GetTotalPhysMemSize()
 {
-    MEMORYSTATUS status;
+    MEMORYSTATUSEX status;
     auto ret = GetMemoryStatus(status);
     if(ret != StatusDefs::Success)
         return 0;
 
-    return status.dwTotalVirtual;
+    return status.ullTotalPhys;
+}
+
+ULong SystemUtil::GetMemoryLoad()
+{
+    MEMORYSTATUSEX status;
+    auto ret = GetMemoryStatus(status);
+    if(ret != StatusDefs::Success)
+        return 0;
+
+    return status.dwMemoryLoad;
 }
 
 bool SystemUtil::GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &processPath)
