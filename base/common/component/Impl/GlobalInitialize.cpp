@@ -21,35 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : GlobalDefs.h
+ * @file  : GolbalInitialize.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/05/31
+ * @date  : 2019/6/10
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_BaseDefs_Macro_MacroDefs_ForAll_GlobalDefs_H__
-#define __Base_Common_BaseDefs_Macro_MacroDefs_ForAll_GlobalDefs_H__
-#pragma once
+#include "stdafx.h"
+#include "base/common/component/Impl/GlobalInitialize.h"
+#include "base/common/status/status.h"
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-// openssl全局锁
-class BASE_EXPORT Locker;
-extern BASE_EXPORT Locker g_OpenSSL_Locker;
+GlobalInitialize::GlobalInitialize()
+{
 
-// 默认的时间轮盘对象
-class BASE_EXPORT TimeWheel;
-extern BASE_EXPORT TimeWheel g_TimeWheel;
+}
 
-// 全局初始化对象
-class BASE_EXPORT GlobalInitialize;
-extern BASE_EXPORT GlobalInitialize *g_GlobalInitialzie;
+GlobalInitialize::~GlobalInitialize()
+{
+
+}
+
+Int32 GlobalInitialize::Init()
+{
+    // TODO:some init ...
+    return StatusDefs::Success;
+}
 
 FS_NAMESPACE_END
-
-#endif
