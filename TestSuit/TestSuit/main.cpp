@@ -45,10 +45,11 @@
 #include "TestSuit/TestSuit/TestInst/TestUtf8.h"
 #include "TestSuit/TestSuit/TestInst/TerstSmartVar.h"
 #include "TestSuit/TestSuit/TestInst/TestTimeWheel.h"
+#include "TestSuit/TestSuit/TestInst/TestSystemUtil.h"
 
 int main()
 {
-    TestTimeWheel::Run();
+    TestSysTemUtil::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;

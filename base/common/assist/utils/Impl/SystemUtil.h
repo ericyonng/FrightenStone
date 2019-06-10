@@ -45,7 +45,7 @@ public:
     // 获取可用的进程内存大小
     static UInt64 GetProcessAvailMemSize();
     // 获取进程空间总的内存大小
-    static UInt64 GetProcessTotalSize();
+    static UInt64 GetProcessTotalMemSize();
     // 获取程序目录
     static bool GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &processPath);
     // 创建进程快照（遍历进程相关）
@@ -58,6 +58,12 @@ public:
 //     static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
     // 通过进程ID获取窗口句柄
     static HWND GetWindowHwndByPID(DWORD dwProcessID);
+    // 获取进程id
+    static Int32 GetProcessId();
+    // 将窗口设置顶层
+    static void BringWindowsToTop(HWND curWin);
+    // 遍历进程判断某进程是否在进程列表
+    static bool IsProcessExist(const FS_String &processName);
 };
 
 FS_NAMESPACE_END
