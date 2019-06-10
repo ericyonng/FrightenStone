@@ -55,25 +55,31 @@ public:
         Socket_NotInit = 501,                                   // 套接字未初始化
         #pragma endregion
 
-        #pragma region [600-699]
+        #pragma region Trigger[600-699]
         Trigger_InvalidOccasion = 600,                          // 无效的时机
         Trigger_InvalidTriggerType = 601,                       // 无效的触发类型
         Trigger_UnkownAddType = 602,                            // 未知的添加方式
         Trigger_TriggerTypeRepeatInOccasion = 603,              // 触发类型已存在，请不要重复添加
         #pragma endregion 
 
-        #pragma region [700-799]
+        #pragma region Aes[700-799]
         Aes_TextLengthNotEnough = 700,                          // 长度不足
         Aes_Not16BytesMultiple = 701,                           // 不是16字节倍数
         Aes_CyphertextIsEmpty = 702,                            // 密文不能为空
         Aes_PlaintextIsEmpty = 703,                             // 明文不能为空
         #pragma endregion
 
-        #pragma region [800-899]
+        #pragma region TimeWheel[800-899]
         TimeWheel_ExpiredTimeIsNull = 800,                      // 过期时间为空
         TimeWheel_RegisterAExistsTimeData = 801,                // 重复注册
         TimeWheel_CantRegisterWhenRotatingWheel = 802,          // 转动轮盘时不可在非转动转盘的其他地方注册定时器
         #pragma endregion
+
+        #pragma region SystemUtil[900-999]
+        SystemUtil_GetKernel32HandleFailed = 900,               // 获取kernel32句柄失败
+        SystemUtil_GetGlobalMemoryStatusExFuncFailed = 901,     // 获取globalmemorystatusex函数失败
+        #pragma endregion
+
     };
 };
 

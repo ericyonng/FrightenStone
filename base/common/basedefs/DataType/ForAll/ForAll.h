@@ -82,4 +82,8 @@ public:
     };
 };
 
+#ifndef _WIN32
+typedef void* HANDLE;
+#endif
+
 #endif // !__Base_Common_BaseDefs_DataType_InnerDataType_InnerDataType_H__

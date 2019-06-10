@@ -179,6 +179,8 @@
     <ClInclude Include="..\common\assist\utils\Impl\STLUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\StringUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\StringUtilImpl.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\SystemUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\SystemUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\ThreadUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\TimeUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\ToolUtil.h" />
@@ -269,6 +271,7 @@
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\StringUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\SystemUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\ThreadUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\TimeUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\ToolUtil.cpp" />

@@ -21,32 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : utils.h
+ * @file  : SystemUtil.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/6/10
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Utils_H__
-#define __Base_Common_Assist_Utils_Utils_H__
-
+#ifndef __Base_Common_Assist_Utils_Impl_SystemUtil_H__
+#define __Base_Common_Assist_Utils_Impl_SystemUtil_H__
 
 #pragma once
 
-// defs ...
-// Impl ...
-// Interface ...
-#include "base/common/assist/utils/Impl/ToolUtil.h"
-#include "base/common/assist/utils/Impl/ThreadUtil.h"
-#include "base/common/assist/utils/Impl/STLUtil.h"
-#include "base/common/assist/utils/Impl/TimeUtil.h"
-#include "base/common/assist/utils/Impl/StringUtil.h"
-#include "base/common/assist/utils/Impl/FS_DirectoryUtil.h"
-#include "base/common/assist/utils/Impl/FS_FileUtil.h"
-#include "base/common/assist/utils/Impl/WidthUtil.h"
-#include "base/common/assist/utils/Impl/FS_CpuUtil.h"
-#include "base/common/assist/utils/Impl/SystemUtil.h"
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
-#endif // !__Base_Common_Assist_Utils_Utils_H__
+FS_NAMESPACE_BEGIN
+class FS_String;
+class BASE_EXPORT SystemUtil
+{
+public:
+    // 获取可用的进程内存大小
+    static UInt64 GetProcessAvailMemSize();
+    // 获取进程空间总的内存大小
+    static UInt64 GetProcessTotalSize();
+    // 获取程序目录
+    static bool GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &processPath);
+    // 创建进程快照（遍历进程相关）
+    static HANDLE CreateProcessSnapshot();
+    // 获取第一个进程id
+    static ULong GetFirstProcessPid(HANDLE &hSnapshot);
+    // 获取下一个进程id
+    static ULong GetNextProcessPid(HANDLE &hSnapshot);
+//     // 枚举窗口回调函数
+//     static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
+    // 通过进程ID获取窗口句柄
+    static HWND GetWindowHwndByPID(DWORD dwProcessID);
+};
+
+FS_NAMESPACE_END
+
+#include "base/common/assist/utils/Impl/SystemUtilImpl.h"
+
+#endif
