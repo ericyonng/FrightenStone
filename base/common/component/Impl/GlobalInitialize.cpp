@@ -30,8 +30,14 @@
  * 
  */
 #include "stdafx.h"
+#include "assert.h"
 #include "base/common/component/Impl/GlobalInitialize.h"
 #include "base/common/status/status.h"
+
+#pragma region to initialize
+#include "base/common/component/Impl/SmartVar/SmartVar.h"
+#include "base/common/socket/socket.h"
+#pragma endregion
 
 
 FS_NAMESPACE_BEGIN
@@ -49,6 +55,20 @@ GlobalInitialize::~GlobalInitialize()
 Int32 GlobalInitialize::Init()
 {
     // TODO:some init ...
+    Int32 ret = StatusDefs::Success;
+
+    // 智能变量运行期类型识别
+    SmartVarRtti::InitRttiTypeNames();
+
+    // socket环境
+    ret = SocketUtil::InitSocketEnv();
+    if(ret != StatusDefs::Success)
+    {
+        throw std::logic_error("Socket init socket env failed");
+        // assert(!"Socket init socket env failed");
+        return ret;
+    }
+
     return StatusDefs::Success;
 }
 

@@ -218,4 +218,18 @@ private:\
 #undef TIME_WHEEL_RESOLUTION_DEF
 #define TIME_WHEEL_RESOLUTION_DEF 100LL    // 毫秒
 
+//参数的输入输出标识
+#undef	P_OUT
+#define  P_OUT  /* 输出 */
+
+#undef P_OUTSIZE
+#define P_OUTSIZE /* 输出目标尺寸 */
+
+#undef	P_IN
+#define  P_IN   /*输入*/
+
+#undef P_INSIZE
+#define P_INSIZE    /*输入目标尺寸*/
+
+
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__
