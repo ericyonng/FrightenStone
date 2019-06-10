@@ -54,5 +54,6 @@
 #include "base/common/component/Impl/TimeWheel/FS_Timer.h"
 #include "base/common/component/Impl/TimeWheel/TimeWheel.h"
 #include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
+#include "base/common/component/Impl/GlobalInitialize.h"
 
 #endif

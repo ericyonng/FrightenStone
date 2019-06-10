@@ -31,7 +31,9 @@
  */
 #include "stdafx.h"
 #include "base/common/asyn/Lock/Lock.h"
+#include "base/common/assist/assistobjs/assistobjs.h"
 #include "base/common/component/Impl/TimeWheel/TimeWheel.h"
+#include "base/common/component/Impl/GlobalInitialize.h"
 #include "base/common/basedefs/Macro/ForAll/GlobalDefs.h"
 
 FS_NAMESPACE_BEGIN
@@ -39,5 +41,7 @@ FS_NAMESPACE_BEGIN
 Locker g_OpenSSL_Locker;
 
 TimeWheel g_TimeWheel(TimeSlice(0, TIME_WHEEL_RESOLUTION_DEF, 0));
+
+GlobalInitialize *g_GlobalInitialzie = fs::Singleton<fs::GlobalInitialize>::GetInstance();
 
 FS_NAMESPACE_END

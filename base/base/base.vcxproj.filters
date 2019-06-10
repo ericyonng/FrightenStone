@@ -507,6 +507,9 @@
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h">
       <Filter>common\component\Impl\TimeWheel</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\GlobalInitialize.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -625,6 +628,9 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWheel.cpp">
       <Filter>common\component\Impl\TimeWheel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\GlobalInitialize.cpp">
+      <Filter>common\component\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
