@@ -42,10 +42,12 @@ class FS_String;
 class BASE_EXPORT SystemUtil
 {
 public:
-    // 获取可用的进程内存大小
-    static UInt64 GetProcessAvailMemSize();
-    // 获取进程空间总的内存大小
-    static UInt64 GetProcessTotalMemSize();
+    // 获取可用的内存大小
+    static UInt64 GetAvailPhysMemSize();
+    // 获取内存大小
+    static UInt64 GetTotalPhysMemSize();
+    // 内存使用率
+    static ULong GetMemoryLoad();
     // 获取程序目录
     static bool GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &processPath);
     // 创建进程快照（遍历进程相关）

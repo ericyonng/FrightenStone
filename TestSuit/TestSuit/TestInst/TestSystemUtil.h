@@ -40,8 +40,9 @@ public:
     static void Run()
     {
         // 内存情况
-        std::cout << "cur process avail mem size:" << fs::SystemUtil::GetProcessAvailMemSize() << std::endl;
-        std::cout << "cur process total mem size: "<< fs::SystemUtil::GetProcessTotalMemSize() << std::endl;
+        std::cout << "cur process avail mem size:" << fs::SystemUtil::GetAvailPhysMemSize() << std::endl;
+        std::cout << "cur process total mem size: " << fs::SystemUtil::GetTotalPhysMemSize() << std::endl;
+        std::cout << "cur process mem in used: " << fs::SystemUtil::GetMemoryLoad() << std::endl;
         // 当前进程
         fs::FS_String path;
         fs::SystemUtil::GetProgramPath(true, fs::SystemUtil::GetProcessId(), path);

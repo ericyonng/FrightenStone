@@ -81,6 +81,5 @@ public:
 
 FS_NAMESPACE_END
 
-
 #include "base/common/assist/assistobjs/Defs/AssistObjsDefsImpl.h"
 #endif // !__Base_Common_Assist_AssistObjs_Defs_AssistObjsDefs_H__
