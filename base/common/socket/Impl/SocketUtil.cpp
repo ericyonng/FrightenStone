@@ -104,9 +104,10 @@ bool SocketUtil::SetBlock(MYSOCKET socket)
     return true;
 }
 
-Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, P_OUT char *&ip, const UInt64 szIp, P_OUT UInt16& port)
+
+Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError)
 {
-    if(!sSocket || sSocket == INVALID_SOCKET || !szIp)
+    if(!sSocket || sSocket == INVALID_SOCKET)
         return StatusDefs::Socket_ParamError;
 
     //¶¨Òå
@@ -114,15 +115,33 @@ Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, P_OUT char *&ip, const UInt64 szIp
     memset(&dstadd_in, 0, sizeof(dstadd_in));
     socklen_t  len = sizeof(dstadd_in);
 
-    if(getpeername(sSocket, (struct sockaddr*)&dstadd_in, &len) >= 0)
-        return WSAGetLastError();
+    if(getpeername(sSocket, (struct sockaddr*)&dstadd_in, &len) != 0)
+    {
+        lastError = WSAGetLastError();
+        return StatusDefs::FS_IPUtil_GetPeerNameFailed;
+    }
 
-    if(inet_ntop(dstadd_in.sin_family, &dstadd_in.sin_addr.s_addr, ip, szIp) == NULL)
-        return StatusDefs::ParamError;
+    if(inet_ntop(dstadd_in.sin_family, &dstadd_in.sin_addr.s_addr, ip, sizeIp) == NULL)
+        return -1;
 
     port = ntohs(dstadd_in.sin_port);
 
     return StatusDefs::Success;
 }
+// 
+// bool SocketUtil::FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, SOCKADDR_IN &addrObj)
+// {
+//     if(!ip || strlen(ip) == 0)
+//         return false;
+// 
+//     memset(&addrObj, 0, sizeof(addrObj));
+//     addrObj.sin_family = family;
+//     if(inet_pton(addrObj.sin_family, ip, &addrObj.sin_addr.s_addr) != 1)
+//         return false;
+// 
+//     addrObj.sin_port = htons(port);
+// 
+//     return true;
+// }
 
 FS_NAMESPACE_END

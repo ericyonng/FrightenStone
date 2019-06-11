@@ -65,11 +65,11 @@ static Int32 GetMemoryStatus(MEMORYSTATUSEX &status)
 // 
 //     // 释放链接库句柄
 //     FreeLibrary(hModule);
+
     // 调用函数取得系统的内存情况
     status.dwLength = sizeof(status);
     if(!GlobalMemoryStatusEx(&status))
         return StatusDefs::SystemUtil_GetGlobalMemoryStatusExFailed;
-
 
     return StatusDefs::Success;
 }
@@ -115,106 +115,96 @@ ULong SystemUtil::GetMemoryLoad()
     return status.dwMemoryLoad;
 }
 
-bool SystemUtil::GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &processPath)
+Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, ULong pid)
 {
-    bool ret = false;
     HMODULE hModule = NULL;
-    HANDLE  hProc = NULL;
-    DWORD   dwProcPathLen = 0;
-    Byte8   procPathDev[MAX_PATH] = {0};
-    Byte8   volNameDev[MAX_PATH] = { 0};
-    Byte8   volName[MAX_PATH] = {0};
-    Byte8   pathName[MAX_PATH] = {0};
+    HANDLE hProc = NULL;
 
-    __try
+    do
     {
-        if(!isCurrentProcess && !pid)
-            __leave;
+        if(UNLIKELY(!isCurrentProcess && !pid))
+            return StatusDefs::ParamError;
 
+        // 若是当前进程
+        Byte8   pathName[MAX_PATH] = {0};
         if(isCurrentProcess)
         {
-            if(!GetModuleFileName(NULL, pathName, MAX_PATH))
-                __leave;
+            if(UNLIKELY(!GetModuleFileName(NULL, pathName, MAX_PATH)))
+                return StatusDefs::SystemUtil_GetModuleFileNameFailed;
 
-            processPath << pathName;
-            ret = true;
-            __leave;
+            processPath.AppendBitData(pathName, MAX_PATH);
+            break;
         }
 
         hProc = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
-        if(!hProc)
-            __leave;
+        if(UNLIKELY(!hProc))
+            return StatusDefs::SystemUtil_OpenProcessQueryInfomationFailed;
 
         hModule = LoadLibrary(TEXT("Kernel32.dll"));
-        if(!hModule)
-            __leave;
+        if(UNLIKELY(!hModule))
+            return StatusDefs::SystemUtil_LoadKernel32LibraryFailed;
 
         // 获取QueryFullProcessImageNameA函数
         if(GetProcAddress(hModule, "QueryFullProcessImageNameA"))
         {
-            dwProcPathLen = MAX_PATH / sizeof(Byte8);
+            DWORD dwProcPathLen = MAX_PATH / sizeof(Byte8);
             if(!QueryFullProcessImageName(hProc, 0, pathName, &dwProcPathLen))
-                __leave;
+                return StatusDefs::SystemUtil_QueryFullProcessImageNameFailed;
 
-            processPath << pathName;
-            ret = true;
-            __leave;
+            processPath.AppendBitData(pathName, MAX_PATH);
+            break;
         }
 
-        // 获取进程路径
-        if(!GetProcessImageFileName(hProc, procPathDev, MAX_PATH))
-            __leave;
+        // 获取进程带驱动器名的路径（驱动器名：\\Device\\HardwareVolume1）
+        if(!GetProcessImageFileName(hProc, pathName, MAX_PATH))
+            return StatusDefs::SystemUtil_GetProcessImageFileNameFailed;
 
-        //盘符
+        // 遍历确认驱动器名对应的盘符名
+        Byte8   volNameDev[MAX_PATH] = {0};
+        Byte8   volName[MAX_PATH] = {0};
         _tcscat_s(volName, MAX_PATH, TEXT("A:"));
+        bool isFound = false;
         for(; *volName <= _T('Z'); (*volName)++)
         {
             // 获取盘符
-            memset(volNameDev, 0, MAX_PATH * sizeof(Byte8));
             if(!QueryDosDevice(volName, volNameDev, MAX_PATH))
             {
-                if(GetLastError() == 2)
+                auto lastError = GetLastError();
+                if(lastError == 2)
                     continue;
 
-                __leave;
+                return StatusDefs::SystemUtil_QueryDosDeviceError;
             }
 
-            // 进程映象名和
-            if(_tcsncmp(procPathDev, volNameDev, _tcslen(volNameDev)) == 0)
+            // 确认是否驱动器名一样
+            if(_tcsncmp(pathName, volNameDev, _tcslen(volNameDev)) == 0)
             {
-                ret = true;
+                isFound = true;
                 break;
             }
         }
 
-        if(ret)
-        {
-            // 盘符
-            _tcscat_s(pathName, MAX_PATH / sizeof(Byte8), volName);
-            // 盘符后的路径
-            _tcscat_s(pathName, MAX_PATH / sizeof(Byte8), procPathDev + _tcslen(volNameDev));
-            processPath << pathName;
-        }
-    }
-    __finally
-    {
-        if(hModule)
-            FreeLibrary(hModule);
+        if(!isFound)
+            return StatusDefs::SystemUtil_GetDriveError;
 
-        if(hProc)
-            CloseHandle(hProc);
-    }
+        processPath.AppendBitData(volName, _tcslen(volName));
+        processPath.AppendBitData(pathName + _tcslen(volNameDev), _tcslen(pathName) - _tcslen(volNameDev));
+    } while(0);
 
-    return ret;
+    if(hModule)
+        FreeLibrary(hModule);
+
+    if(hProc)
+        CloseHandle(hProc);
+
+    return StatusDefs::Success;
 }
 
 HANDLE SystemUtil::CreateProcessSnapshot()
 {
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if(INVALID_HANDLE_VALUE == hSnapshot)
-    {
         return NULL;
-    }
 
     return hSnapshot;
 }
@@ -282,7 +272,7 @@ bool SystemUtil::IsProcessExist(const FS_String &processName)
     {
         isFirst = false;
         pachCache.Clear();
-        if(!fs::SystemUtil::GetProgramPath(false, pid, pachCache))
+        if(GetProgramPath(false, pachCache, pid) != StatusDefs::Success)
             continue;
 
         auto iterExist = pachCache.GetRaw().find(processName.GetRaw());
