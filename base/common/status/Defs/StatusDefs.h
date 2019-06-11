@@ -41,7 +41,7 @@ class BASE_EXPORT StatusDefs
 public:
     enum StatusEnum:int
     {
-        #pragma region [-1-499]
+        #pragma region [-1, 499]
         Error = -1,                                             // 错误
         Success = 0,                                            // 成功
         WaitEventFailure = 1,                                   // 等待错误
@@ -50,13 +50,13 @@ public:
         ParamError = 4,                                         // 参数错误
         #pragma endregion
 
-        #pragma region SOCKET[500-599]
+        #pragma region SOCKET[500, 599]
         Socket_CreateFailure = 500,                             // 套接字创建失败
         Socket_NotInit = 501,                                   // 套接字未初始化
         Socket_ParamError = 502,                                // 套接字参数错误
         #pragma endregion
 
-        #pragma region Trigger[600-699]
+        #pragma region Trigger[600, 699]
         Trigger_InvalidOccasion = 600,                          // 无效的时机
         Trigger_InvalidTriggerType = 601,                       // 无效的触发类型
         Trigger_UnkownAddType = 602,                            // 未知的添加方式
@@ -76,11 +76,25 @@ public:
         TimeWheel_CantRegisterWhenRotatingWheel = 802,          // 转动轮盘时不可在非转动转盘的其他地方注册定时器
         #pragma endregion
 
-        #pragma region SystemUtil[900-999]
+        #pragma region SystemUtil[900, 999]
         SystemUtil_GetKernel32HandleFailed = 900,               // 获取kernel32句柄失败
         SystemUtil_GetGlobalMemoryStatusExFuncFailed = 901,     // 获取globalmemorystatusex函数失败
         SystemUtil_GetGlobalMemoryStatusExFailed = 902,         // 获取内存信息失败
+        SystemUtil_GetModuleFileNameFailed = 903,               // 获取模块名失败
+        SystemUtil_OpenProcessQueryInfomationFailed = 904,      // 查询进程信息失败
+        SystemUtil_LoadKernel32LibraryFailed = 905,             // 加载kernel32.dll失败
+        SystemUtil_QueryFullProcessImageNameFailed = 906,       // 查询全进程镜像名失败
+        SystemUtil_GetProcessImageFileNameFailed = 907,         // 获取进程镜像文件名失败
+        SystemUtil_QueryDosDeviceError = 908,                   // 查询驱动器错误
+        SystemUtil_GetDriveError = 909,                         // 获取盘符失败
         #pragma endregion
+
+#pragma region FS_IPUtil[1000, 1099]
+        FS_IPUtil_ParamError = 1000,                            // 参数错误
+        FS_IPUtil_NotFound = 1001,                              // 未找到
+        FS_IPUtil_GetAddrInfoFailed = 1002,                     // 获取地址信息出错
+        FS_IPUtil_GetPeerNameFailed = 1003,                     // 获取对方地址信息失败
+#pragma endregion
 
     };
 };

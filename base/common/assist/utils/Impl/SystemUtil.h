@@ -49,7 +49,7 @@ public:
     // 内存使用率
     static ULong GetMemoryLoad();
     // 获取程序目录
-    static bool GetProgramPath(bool isCurrentProcess, ULong pid, FS_String &processPath);
+    static Int32 GetProgramPath(bool isCurrentProcess, FS_String &processPath, ULong pid = 0);
     // 创建进程快照（遍历进程相关）
     static HANDLE CreateProcessSnapshot();
     // 获取第一个进程id

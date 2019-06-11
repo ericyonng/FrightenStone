@@ -45,7 +45,7 @@ public:
         std::cout << "cur process mem in used: " << fs::SystemUtil::GetMemoryLoad() << std::endl;
         // 当前进程
         fs::FS_String path;
-        fs::SystemUtil::GetProgramPath(true, fs::SystemUtil::GetProcessId(), path);
+        fs::SystemUtil::GetProgramPath(true,path);
         std::cout <<"current process id:"<<fs::SystemUtil::GetProcessId()<< " current process path:" << path << std::endl;
 
 //         // 遍历进程
