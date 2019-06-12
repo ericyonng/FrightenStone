@@ -208,6 +208,15 @@
     <Filter Include="common\component\Impl\TimeWheel\Comp">
       <UniqueIdentifier>{c82f828d-c985-4ad6-87da-65f1117d5770}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\log\Defs">
+      <UniqueIdentifier>{603879b2-5592-4bee-90a1-bec46537e03a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\log\Impl">
+      <UniqueIdentifier>{f7c3671c-c44b-4909-a2a9-f192d0e6a065}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\log\Interface">
+      <UniqueIdentifier>{1475fba0-52d9-4a66-ac7e-47921d954ea7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -528,6 +537,18 @@
     <ClInclude Include="..\common\socket\Defs\SocketDefs.h">
       <Filter>common\socket\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\log\Log.h">
+      <Filter>common\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\log\Interface\ILog.h">
+      <Filter>common\log\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\log\Impl\FS_Log.h">
+      <Filter>common\log\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\log\Impl\FS_LogImpl.h">
+      <Filter>common\log\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -655,6 +676,9 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\FS_List.cpp">
       <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\log\Impl\FS_Log.cpp">
+      <Filter>common\log\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

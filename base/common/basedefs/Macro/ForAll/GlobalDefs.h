@@ -50,6 +50,9 @@ extern BASE_EXPORT TimeWheel g_TimeWheel;
 class BASE_EXPORT GlobalInitialize;
 extern BASE_EXPORT GlobalInitialize *g_GlobalInitialzie;
 
+class BASE_EXPORT ILog;
+extern BASE_EXPORT ILog *g_Log;
+
 FS_NAMESPACE_END
 
 #endif
