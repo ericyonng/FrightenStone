@@ -36,6 +36,7 @@
 #pragma once
 
 // defs ...
+#include "base/common/basedefs/DataType/ForAll/Defs/NetDataType.h"
 
 #pragma region base data type
 typedef char Byte8;
@@ -84,6 +85,7 @@ public:
 
 #ifndef _WIN32
 typedef void* HANDLE;
+
 #endif
 
 #endif // !__Base_Common_BaseDefs_DataType_InnerDataType_InnerDataType_H__

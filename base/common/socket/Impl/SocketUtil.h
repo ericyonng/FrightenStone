@@ -38,6 +38,9 @@
 #include "base/common/basedefs/Macro/MacroDefs.h"
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/net/net.h"
+#include "base/common/socket/Defs/SocketDefs.h"
+
+// struct sockaddr_in;
 
 FS_NAMESPACE_BEGIN
 
@@ -52,17 +55,27 @@ public:
     // 获取对象地址信息 0表示成功其他值为错误信息
     static Int32 GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError);
     // 转换为网络字节序
-    //static bool FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, SOCKADDR_IN &addrObj);
+    static bool FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, sockaddr_in &addrObj);
     // 转换为主机信息
-//    static bool GetAddrInfoFromNetInfo(const SOCKADDR_IN &addrObj, UInt64 szip, char *&ip, , P_OUT U16& port);
+    static bool GetAddrInfoFromNetInfo(const sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port);
+    // 套接字等待超时
+    static bool IsDetectTimeOut(
+        SOCKET &socket
+        , fd_set &readableSet
+        , fd_set &writableSet
+        , long tv_sec
+        , long tv_usec
+        , bool enableReadableDetect = true
+        , bool enableWriteableDetect = false
+        , int *errOut = NULL
+        , bool setOneAtLeast = false
+        , bool isInfiniteWaiting = false);
 
-//     static bool IsDetectTimeOut(SOCKET& rSocket, fd_set&rReadableSet, fd_set&rWritableSet, long tv_sec, long tv_usec, bool bReadableDetect = true, bool bWriteableDetect = false, int *pErrOut = NULL, bool bSetOneAtLeast = false, bool bInfiniteWaiting = false);
-// 
-//     //设置socket缓冲区大小
-//     static bool SetSocketCacheSize(SOCKET& rSocket, SOCKET_CACHE_TYPE eType, const I64 nSize);
-// 
-//     //获取socket缓冲区大小
-//     static bool GetSocketCacheSize(SOCKET& rSocket, SOCKET_CACHE_TYPE eType, I64& nSize);
+    // 设置socket缓冲区大小
+    static Int32 SetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 cacheSize);
+
+    // 获取socket缓冲区大小
+    static Int32 GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 &cacheSize);
 
 private:
     static bool _isInitEnv;

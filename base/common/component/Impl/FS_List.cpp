@@ -21,40 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : component.h
+ * @file  : FS_List.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/6/12
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Component_Component_H__
-#define __Base_Common_Component_Component_H__
-
-#pragma once
-
-// defs...
-#include "base/common/component/Impl/FS_String.h"
-#include "base/common/component/Impl/Trigger.h"
-#include "base/common/component/Impl/Time.h"
-#include "base/common/component/Impl/TimeSlice.h"
-#include "base/common/component/Impl/BufferAddapter.h"
-#include "base/common/component/Impl/FS_ArgsExpander.h"
-#include "base/common/component/Impl/FS_ClassFactory.h"
-#include "base/common/component/Impl/FS_Delegate.h"
-#include "base/common/component/Impl/ITask.h"
-#include "base/common/component/Impl/FS_ThreadPool.h"
-#include "base/common/component/Impl/File/FS_File.h"
-#include "base/common/component/Impl/File/LogFile.h"
-#include "base/common/component/Impl/SmartVar/SmartVar.h"
-#include "base/common/component/Defs/FS_AesDefs.h"
-#include "base/common/component/Impl/Aes/FS_Aes.h"
-#include "base/common/component/Impl/FS_Random.h"
-#include "base/common/component/Impl/TimeWheel/FS_Timer.h"
-#include "base/common/component/Impl/TimeWheel/TimeWheel.h"
-#include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
-#include "base/common/component/Impl/GlobalInitialize.h"
+#include "stdafx.h"
 #include "base/common/component/Impl/FS_List.h"
-
-#endif

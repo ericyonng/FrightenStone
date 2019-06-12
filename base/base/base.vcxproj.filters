@@ -516,6 +516,18 @@
     <ClInclude Include="..\common\assist\utils\Impl\SystemUtilImpl.h">
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\basedefs\DataType\ForAll\Defs\NetDataType.h">
+      <Filter>common\basedefs\DataType\ForAll\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_List.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_ListImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\socket\Defs\SocketDefs.h">
+      <Filter>common\socket\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -640,6 +652,9 @@
     </ClCompile>
     <ClCompile Include="..\common\assist\utils\Impl\SystemUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\FS_List.cpp">
+      <Filter>common\component\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
