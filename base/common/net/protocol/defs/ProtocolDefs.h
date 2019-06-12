@@ -39,14 +39,6 @@
 #include "base/common/status/status.h"
 
 #pragma region 
-
-#ifdef _WIN32
-typedef unsigned long long MYSOCKET;
-#else
-typedef int MYSOCKET;
-
-#endif
-
 #ifndef SOCKET_CACHE_SIZE
 #define SOCKET_CACHE_SIZE 102400
 #endif // !SOCKET_CACHE_SIZE

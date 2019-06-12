@@ -196,6 +196,7 @@
     <ClInclude Include="..\common\basedefs\BaseDefs.h" />
     <ClInclude Include="..\common\basedefs\DataType\DataType.h" />
     <ClInclude Include="..\common\basedefs\DataType\ExportDataType\ExportDataType.h" />
+    <ClInclude Include="..\common\basedefs\DataType\ForAll\Defs\NetDataType.h" />
     <ClInclude Include="..\common\basedefs\DataType\ForAll\ForAll.h" />
     <ClInclude Include="..\common\basedefs\DataType\InnerDataType\Defs\LockerHandle.h" />
     <ClInclude Include="..\common\basedefs\DataType\InnerDataType\InnerDataType.h" />
@@ -229,6 +230,8 @@
     <ClInclude Include="..\common\component\Impl\FS_ClassFactoryImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_Delegate.h" />
     <ClInclude Include="..\common\component\Impl\FS_DelegateImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_List.h" />
+    <ClInclude Include="..\common\component\Impl\FS_ListImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_Random.h" />
     <ClInclude Include="..\common\component\Impl\FS_RandomImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_String.h" />
@@ -254,6 +257,7 @@
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
     <ClInclude Include="..\common\net\protocol\protocol.h" />
+    <ClInclude Include="..\common\socket\Defs\SocketDefs.h" />
     <ClInclude Include="..\common\socket\Impl\SocketUtil.h" />
     <ClInclude Include="..\common\socket\socket.h" />
     <ClInclude Include="..\common\status\Defs\StatusDefs.h" />
@@ -286,6 +290,7 @@
     <ClCompile Include="..\common\component\Impl\File\FS_File.cpp" />
     <ClCompile Include="..\common\component\Impl\File\FS_IniFile.cpp" />
     <ClCompile Include="..\common\component\Impl\File\LogFile.cpp" />
+    <ClCompile Include="..\common\component\Impl\FS_List.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_Random.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_String.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_ThreadPool.cpp" />

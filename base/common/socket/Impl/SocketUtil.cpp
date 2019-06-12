@@ -35,6 +35,7 @@
 
 #pragma region windows
 #include<WinSock2.h>
+#include <ws2def.h>
 #include "ws2tcpip.h"
 #pragma comment(lib,"ws2_32.lib")
 #pragma endregion
@@ -128,20 +129,160 @@ Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &
 
     return StatusDefs::Success;
 }
-// 
-// bool SocketUtil::FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, SOCKADDR_IN &addrObj)
-// {
-//     if(!ip || strlen(ip) == 0)
-//         return false;
-// 
-//     memset(&addrObj, 0, sizeof(addrObj));
-//     addrObj.sin_family = family;
-//     if(inet_pton(addrObj.sin_family, ip, &addrObj.sin_addr.s_addr) != 1)
-//         return false;
-// 
-//     addrObj.sin_port = htons(port);
-// 
-//     return true;
-// }
+
+bool SocketUtil::FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, sockaddr_in &addrObj)
+{
+    if(!ip || strlen(ip) == 0)
+        return false;
+
+    memset(&addrObj, 0, sizeof(addrObj));
+    addrObj.sin_family = family;
+    if(inet_pton(addrObj.sin_family, ip, &addrObj.sin_addr.s_addr) != 1)
+        return false;
+
+    addrObj.sin_port = htons(port);
+
+    return true;
+}
+
+bool SocketUtil::GetAddrInfoFromNetInfo(const sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port)
+{
+    if(inet_ntop(addrObj.sin_family, &addrObj.sin_addr.s_addr, ip, szip) == NULL)
+        return false;
+    port = ntohs(addrObj.sin_port);
+
+    return true;
+}
+
+bool SocketUtil::IsDetectTimeOut(
+    SOCKET &socket
+    , fd_set &readableSet
+    , fd_set &writableSet
+    , long tv_sec
+    , long tv_usec
+    , bool enableReadableDetect
+    , bool enableWriteableDetect
+    , int *errOut
+    , bool setOneAtLeast
+    , bool isInfiniteWaiting)
+{
+    //清理
+    FD_ZERO(&readableSet);
+    FD_ZERO(&writableSet);
+    FD_SET(socket, &readableSet);
+    FD_SET(socket, &writableSet);
+
+    // 超时监控参数初始化 秒/微妙
+    timeval timeout;
+    timeout.tv_sec = tv_sec;
+    timeout.tv_usec = tv_usec;
+
+    int ret = SOCKET_ERROR;
+    if(isInfiniteWaiting) { //永久阻塞
+        // 0表示超时，否则返回SOCKET_ERROR 当返回为-1时，所有描述符集清0。 
+        // 当返回为正数时，表示已经准备好的描述符数。
+        ret = select(static_cast<Int32>(socket + 1), &readableSet, &writableSet, NULL, NULL); 
+    }
+    else {
+        // 0表示超时，否则返回SOCKET_ERROR 当返回为-1时，所有描述符集清0。
+        // 当返回为正数时，表示已经准备好的描述符数。
+        ret = select(static_cast<Int32>(socket + 1), &readableSet, &writableSet, NULL, &timeout); 
+    }
+
+    //出错带出
+    if(errOut) 
+        *errOut = ret;
+
+    if(ret == SOCKET_ERROR) {
+        FD_CLR(socket, &readableSet);
+        FD_CLR(socket, &writableSet);
+        return true;
+    }
+
+    // 监听状态导出
+    bool isTimeOut = false;
+    if(setOneAtLeast) {
+        isTimeOut = (!FD_ISSET(socket, &readableSet) || !FD_ISSET(socket, &writableSet));
+    }
+    else {
+        if(enableReadableDetect && !enableWriteableDetect) {
+            isTimeOut = !FD_ISSET(socket, &readableSet);
+        }
+        else if(!enableReadableDetect && enableWriteableDetect) {
+            isTimeOut = !FD_ISSET(socket, &writableSet);
+        }
+        else {
+            isTimeOut = (!FD_ISSET(socket, &readableSet) && !FD_ISSET(socket, &writableSet));
+        }
+    }
+
+    return isTimeOut;
+}
+
+Int32 SocketUtil::SetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 cacheSize)
+{
+    if(UNLIKELY(!IS_VALID_SOCKET_IDD(socket)))
+        return StatusDefs::Socket_InvalidSocket;
+
+    switch(eType)
+    {
+        case SocketDefs:: SOCKET_CACHE_TYPE_RECV:
+        {
+            auto ret = setsockopt(socket, SOL_SOCKET, SO_RCVBUF, (char *)(&cacheSize), sizeof(cacheSize));
+            auto err = WSAGetLastError();
+            if(ret != 0)
+                return StatusDefs::Socket_SetSockOptFailed;
+        }
+        break;
+        case SocketDefs::SOCKET_CACHE_TYPE_SEND:
+        {
+            auto ret = setsockopt(socket, SOL_SOCKET, SO_SNDBUF, (char *)(&cacheSize), sizeof(cacheSize));
+            auto err = WSAGetLastError();
+            if(ret != 0)
+                return StatusDefs::Socket_SetSockOptFailed;
+        }
+        break;
+        default:
+        {
+            return StatusDefs::Socket_ParamError;
+        }
+    }
+
+    return StatusDefs::Success;
+}
+
+Int32 SocketUtil::GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 &cacheSize)
+{
+    if(UNLIKELY(!IS_VALID_SOCKET_IDD(socket)))
+        return StatusDefs::Socket_InvalidSocket;
+
+    switch(eType)
+    {
+        case SocketDefs::SOCKET_CACHE_TYPE_RECV:
+        {
+            Int32 Len = sizeof(cacheSize);
+            auto nRet = getsockopt(socket, SOL_SOCKET, SO_RCVBUF, (char *)(&cacheSize), &Len);
+            auto nErr = WSAGetLastError();
+            if(nRet != 0)
+                return StatusDefs::Socket_GetsockoptFailed;
+        }
+        break;
+        case SocketDefs::SOCKET_CACHE_TYPE_SEND:
+        {
+            Int32 Len = sizeof(cacheSize);
+            auto ret = getsockopt(socket, SOL_SOCKET, SO_SNDBUF, (char *)(&cacheSize), &Len);
+            auto err = WSAGetLastError();
+            if(ret != 0)
+                return StatusDefs::Socket_GetsockoptFailed;
+        }
+        break;
+        default:
+        {
+            return StatusDefs::Socket_Unknown;
+        }
+    }
+
+    return StatusDefs::Success;
+}
 
 FS_NAMESPACE_END

@@ -54,6 +54,10 @@ public:
         Socket_CreateFailure = 500,                             // 套接字创建失败
         Socket_NotInit = 501,                                   // 套接字未初始化
         Socket_ParamError = 502,                                // 套接字参数错误
+        Socket_InvalidSocket = 503,                             // 无效套接字
+        Socket_SetSockOptFailed = 504,                          // 设置套接字参数失败
+        Socket_GetsockoptFailed = 505,                          // 获取套接字参数时出错
+        Socket_Unknown = 506,                                   // 未知
         #pragma endregion
 
         #pragma region Trigger[600, 699]
@@ -89,12 +93,16 @@ public:
         SystemUtil_GetDriveError = 909,                         // 获取盘符失败
         #pragma endregion
 
-#pragma region FS_IPUtil[1000, 1099]
+        #pragma region FS_IPUtil[1000, 1099]
         FS_IPUtil_ParamError = 1000,                            // 参数错误
         FS_IPUtil_NotFound = 1001,                              // 未找到
         FS_IPUtil_GetAddrInfoFailed = 1002,                     // 获取地址信息出错
         FS_IPUtil_GetPeerNameFailed = 1003,                     // 获取对方地址信息失败
-#pragma endregion
+        #pragma endregion
+
+        #pragma region Socket[1100, 1199]
+
+        #pragma endregion
 
     };
 };
