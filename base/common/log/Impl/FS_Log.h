@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : common.h
+ * @file  : FS_Log.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/6/12
  * @brief :
@@ -29,31 +29,23 @@
  *
  * 
  */
-#ifndef __Base_Common_Common_H__
-#define __Base_Common_Common_H__
-/**
-* @file net.h
-* @auther Huiya Song <120453674@qq.com>
-* @date 2019/04/18
-* @brief
-*/
-
+#ifndef __Base_Common_Log_Impl_Log_H__
+#define __Base_Common_Log_Impl_Log_H__
 #pragma once
 
-// defs ...
-// Impl ...
-// Interface ...
-#include "base/common/basedefs/Resource/Resource.h"
-#pragma region base code
-#ifndef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-#include<base/common/socket/socket.h>
-#include <base/common/net/net.h>
-#include <base/common/status/status.h>
-#include "base/common/asyn/asyn.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/assist/assist.h"
-#include "base/common/component/component.h"
-#endif
-#pragma endregion
+#include "base/common/log/Interface/ILog.h"
 
-#endif // !__Base_Common_Common_H__
+FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT FS_Log : public ILog
+{
+public:
+    FS_Log() {}
+    virtual ~FS_Log() {}
+};
+
+FS_NAMESPACE_END
+
+#include "base/common/log/Impl/FS_LogImpl.h"
+
+#endif
