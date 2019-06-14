@@ -254,6 +254,7 @@
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheel.h" />
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h" />
     <ClInclude Include="..\common\component\Impl\Trigger.h" />
+    <ClInclude Include="..\common\log\Defs\LogData.h" />
     <ClInclude Include="..\common\log\Impl\FS_Log.h" />
     <ClInclude Include="..\common\log\Impl\FS_LogImpl.h" />
     <ClInclude Include="..\common\log\Interface\ILog.h" />
@@ -308,6 +309,7 @@
     <ClCompile Include="..\common\component\Impl\TimeWheel\FS_Timer.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWheel.cpp" />
     <ClCompile Include="..\common\component\Impl\Trigger.cpp" />
+    <ClCompile Include="..\common\log\Defs\LogData.cpp" />
     <ClCompile Include="..\common\log\Impl\FS_Log.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
     <ClCompile Include="..\common\socket\Impl\SocketUtil.cpp" />
