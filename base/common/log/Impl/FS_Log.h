@@ -25,9 +25,25 @@
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/6/12
  * @brief :
- * 
- *
- * 
+ *          1.提供写日志接口（传入任意参数）
+ *          2.分目录日志 crash, system, netlayerlog（协议信息）业务层日志等
+ *          3.按照文件大小分文件
+ *          4.按照问题的优先级分:warning,error,debug,info等
+ *          5.支持json log 风格：
+ *                              {
+                                    time:(精确到微妙)fmt:1970-01-01 00:00:00.123456
+                                    class name:
+                                    function:
+                                    line:
+                                    level:
+                                    content:
+                                    {
+                                        op:
+                                        status:statusCode
+                                        ecxceptioninfo:
+                                        stackinfo:
+                                    }
+                                }
  */
 #ifndef __Base_Common_Log_Impl_Log_H__
 #define __Base_Common_Log_Impl_Log_H__
@@ -42,6 +58,26 @@ class BASE_EXPORT FS_Log : public ILog
 public:
     FS_Log() {}
     virtual ~FS_Log() {}
+
+    // json日志
+    template<typename T>
+    void Ji();
+    template<typename T>
+    void Jd();
+    template<typename T>
+    void Jw();
+    template<typename T>
+    void Je();
+    
+    // 普通日志
+    template<typename T>
+    void i();
+    template<typename T>
+    void d();
+    template<typename T>
+    void w();
+    template<typename T>
+    void e();
 };
 
 FS_NAMESPACE_END
