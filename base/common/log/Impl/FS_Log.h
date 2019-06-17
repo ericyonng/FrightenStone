@@ -78,6 +78,9 @@ public:
     void w();
     template<typename T>
     void e();
+
+    // …Ë÷√ªÿµ˜
+    void InstallCallBack()
 };
 
 FS_NAMESPACE_END
