@@ -32,12 +32,35 @@
 #ifndef __Base_Common_Log_Defs_LogData_H__
 #define __Base_Common_Log_Defs_LogData_H__
 #pragma once
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
+class FS_String;
+class Time;
 
-struct LogData
+class BASE_EXPORT LogLevel
 {
-    FS_String _content;
+public:
+    enum LevelEnums
+    {
+        Begin = 0,          // 开始
+        Warning = Begin,
+        Debug,
+        Info,
+        Error,
+        End,
+    };
+};
+
+struct BASE_EXPORT LogData
+{
+    FS_String _content;             // 日志内容
+    Time _logTime;                  // 时间
+    FS_String _className;           // 类名
+    FS_String _funcName;            // 函数名
+    Int32 _line;                    // 写日志行数
+    Int32 _level;                   // 日志级别
 };
 
 FS_NAMESPACE_END
