@@ -44,6 +44,26 @@ public:
     ILog() {}
     virtual ~ILog() {}
 
+    // json日志
+    template<typename T>
+    virtual void Ji() = 0;
+    template<typename T>
+    virtual void Jd() = 0;
+    template<typename T>
+    virtual void Jw() = 0;
+    template<typename T>
+    virtual void Je() = 0;
+
+    // 普通日志
+    template<typename T>
+    virtual void i() = 0;
+    template<typename T>
+    virtual void d() = 0;
+    template<typename T>
+    virtual void w() = 0;
+    template<typename T>
+    virtual void e() = 0;
+
 private:
 };
 
