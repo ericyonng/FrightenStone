@@ -80,7 +80,7 @@ public:
     void e();
 
     // …Ë÷√ªÿµ˜
-    void InstallCallBack()
+    void InstallCallBack();
 };
 
 FS_NAMESPACE_END
