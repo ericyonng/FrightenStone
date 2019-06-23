@@ -42,6 +42,5 @@ Locker g_OpenSSL_Locker;
 
 TimeWheel g_TimeWheel(TimeSlice(0, TIME_WHEEL_RESOLUTION_DEF, 0));
 
-GlobalInitialize *g_GlobalInitialzie = fs::Singleton<fs::GlobalInitialize>::GetInstance();
 
 FS_NAMESPACE_END

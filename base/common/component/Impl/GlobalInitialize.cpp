@@ -60,7 +60,7 @@ Int32 GlobalInitialize::Init()
     // 智能变量运行期类型识别
     SmartVarRtti::InitRttiTypeNames();
 
-    // socket环境
+    // socket环境 进程中唯一
     ret = SocketUtil::InitSocketEnv();
     if(ret != StatusDefs::Success)
     {
