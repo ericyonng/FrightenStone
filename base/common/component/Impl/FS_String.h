@@ -183,21 +183,25 @@ public:
     FS_String &Append(Args&&... rest);
     FS_String &FormatCStyle(const char *fmt, ...);
 
+    // 兼容格式字符串中没有占位符情况
+    template<typename... Args>
+    FS_String &FormatCompatibilityNoFmt(std::string &fmt, const Args&... rest);
+
     // 计算占位符个数
     static UInt64 CalcPlaceHolderNum(const std::string &fmtStr);
     // 获取第一个占位符位置
     static UInt64 GetFirstValidPlaceHolderIndex(const std::string &fmt);
-    // 讲格式符初始化给outStr，解析时必须做的
-    static void InitFmtToOutStrFirst(const std::string &fmt, std::string &outStr);
+    // 讲格式符初始化给outStr，解析时必须做的 返回第一个占位符位置
+    static UInt64 InitFmtToOutStrFirst(const std::string &fmt, std::string &outStr);
     // startIndex 必须为当前要格式化的%所在位置 NextPlaceHolderPos输出下一个未被格式化的位置outIndex 输出std::string::npos表示结束
     static std::string NextPlaceHolderPos(const std::string &strFmt, UInt64 startIndex, UInt64 &outIndex);
 private:
     template<typename T>
-    void _AppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);
+    void _AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);
     template<typename T, typename... Args>
-    void _AppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val, Args&&... rest);   //Args&...
+    void _AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val, Args&&... rest);   //Args&...
     template<typename T>
-    void _DoAppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);
+    void _DoAppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);
     template< typename T>
     void _Append(T &&arg);
     template<typename T, typename... Args>

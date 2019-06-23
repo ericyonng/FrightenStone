@@ -421,21 +421,42 @@ inline FS_String &FS_String::Append(Args&&... rest)
     return *this;
 }
 
-template<typename T>
-inline void FS_String::_AppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val)
+template<typename... Args>
+inline FS_String &FS_String::FormatCompatibilityNoFmt(std::string &fmt, const Args&... rest)
 {
-    _DoAppendFormat(strLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, val);
+    UInt64 firstIndex = 0, nextIndex = 0;
+
+    // 初始化格式字符串
+    firstIndex = InitFmtToOutStrFirst(fmt, _buffer);
+    NextPlaceHolderPos(fmt, firstIndex, nextIndex);
+
+    // 判断需不需要解析
+    if(firstIndex != std::string::npos)
+    {
+        //解析
+        _AppendFormat(fmt, firstIndex, nextIndex, *this, rest...);
+        return *this;
+    }
+
+    // 不用解析控制字符
+    return Append(rest...);
+}
+
+template<typename T>
+inline void FS_String::_AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val)
+{
+    _DoAppendFormat(fmtLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, val);
 }
 
 template<typename T, typename... Args>
-inline void FS_String::_AppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val, Args&&... rest)
+inline void FS_String::_AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val, Args&&... rest)
 {
-    _DoAppendFormat(strLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, val);
-    _AppendFormat(strLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, std::forward<Args>(rest)...);
+    _DoAppendFormat(fmtLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, val);
+    _AppendFormat(fmtLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, std::forward<Args>(rest)...);
 }
 
 template<typename T>
-inline void FS_String::_DoAppendFormat(const std::string &strLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val)
+inline void FS_String::_DoAppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val)
 {
     if(startPlaceHolderIndex == std::string::npos)
     {
@@ -444,8 +465,8 @@ inline void FS_String::_DoAppendFormat(const std::string &strLeft, UInt64 &start
     }
 
     const std::string &strCache = (nextPlaceHolderIndex != std::string::npos) ? \
-        strLeft.substr(startPlaceHolderIndex, nextPlaceHolderIndex - startPlaceHolderIndex):\
-        strLeft.substr(startPlaceHolderIndex);
+        fmtLeft.substr(startPlaceHolderIndex, nextPlaceHolderIndex - startPlaceHolderIndex):\
+        fmtLeft.substr(startPlaceHolderIndex);
 
     {
         UInt64 bufferSize = strCache.length() + 1 + GetBufferAddapterSize<T>::GetBufferNeeded(std::forward<T>(val)) + 1;
@@ -457,7 +478,7 @@ inline void FS_String::_DoAppendFormat(const std::string &strLeft, UInt64 &start
     }
      
     startPlaceHolderIndex = nextPlaceHolderIndex;   //
-    NextPlaceHolderPos(strLeft, startPlaceHolderIndex, nextPlaceHolderIndex);
+    NextPlaceHolderPos(fmtLeft, startPlaceHolderIndex, nextPlaceHolderIndex);
 }
 
 template< typename T>
