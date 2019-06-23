@@ -34,6 +34,8 @@
 #pragma once
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_String.h"
+#include "base/common/component/Impl/Time.h"
 
 FS_NAMESPACE_BEGIN
 class FS_String;
@@ -49,18 +51,23 @@ public:
         Debug,
         Info,
         Error,
+        Crash,
+
         End,
     };
+
+    static const char *GetDescription(Int32 level);
 };
 
 struct BASE_EXPORT LogData
 {
-    FS_String _content;             // 日志内容
-    Time _logTime;                  // 时间
-    FS_String _className;           // 类名
-    FS_String _funcName;            // 函数名
-    Int32 _line;                    // 写日志行数
-    Int32 _level;                   // 日志级别
+    FS_String _processName;         // 进程名
+    FS_String _className;           // 类名 Input from outside
+    FS_String _funcName;            // 函数名 Input from outside
+    FS_String _content;             // 日志内容 Input from outside
+    Int32 _line;                    // 写日志行数 Input from outside
+    Time _logTime;                  // 时间 generate inside
+    Int32 _level;                   // 日志级别 Input from log func level
 };
 
 FS_NAMESPACE_END

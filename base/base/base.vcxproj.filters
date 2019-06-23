@@ -552,6 +552,9 @@
     <ClInclude Include="..\common\log\Defs\LogData.h">
       <Filter>common\log\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\log\Interface\ILogImpl.h">
+      <Filter>common\log\Interface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -685,6 +688,9 @@
     </ClCompile>
     <ClCompile Include="..\common\log\Defs\LogData.cpp">
       <Filter>common\log\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\log\Interface\ILog.cpp">
+      <Filter>common\log\Interface</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

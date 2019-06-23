@@ -31,6 +31,72 @@
  */
 #include "stdafx.h"
 #include "base/common/log/Impl/FS_Log.h"
+#include "base/common/assist/utils/utils.h"
+#include "base/common/component/Impl/File/LogFile.h"
+#include "base/common/status/status.h"
 
-// 全局唯一
-fs::ILog *fs::g_Log = new fs::FS_Log;
+FS_NAMESPACE_BEGIN
+
+FS_Log::FS_Log(const Byte8 *processName)
+    :_processName(processName)
+{
+
+}
+
+FS_Log::~FS_Log()
+{
+    FinishModule();
+}
+
+void FS_Log::InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate)
+{
+    UnInstallLogHook(level);
+    _levelRefDelegate.insert(std::make_pair(level, delegate));
+}
+
+void FS_Log::UnInstallLogHook(Int32 level)
+{
+    auto iterDelegate = _levelRefDelegate.find(level);
+    if(iterDelegate == _levelRefDelegate.end())
+        return;
+
+    Fs_SafeFree(iterDelegate->second);
+    _levelRefDelegate.erase(iterDelegate);
+}
+
+void FS_Log::FinishModule()
+{
+    // 唤醒线程池
+    // 清理数据
+    fs::STLUtil::DelMapContainer(_levelRefDelegate);
+}
+
+void FS_Log::SetFlushInterval(Int32 interval)
+{
+
+}
+
+Int32 FS_Log::AddLog(Int32 fileUnqueIndex, const char *logPath, const char *fileName)
+{
+    return StatusDefs::Success;
+}
+
+LogData *FS_Log::_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel)
+{
+    LogData *newLogData = new LogData;
+    newLogData->_className = className;
+    newLogData->_funcName = funcName;
+    newLogData->_content = content;
+    newLogData->_line = codeLine;
+    newLogData->_level = logLevel;
+    newLogData->_processName = _processName;
+    newLogData->_logTime = Time::Now();
+    return newLogData;
+}
+
+void FS_Log::_WriteLog(Int32 fileUniqueIndex, LogData *logData)
+{
+}
+
+FS_NAMESPACE_END
+

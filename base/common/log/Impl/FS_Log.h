@@ -50,37 +50,42 @@
 #pragma once
 
 #include "base/common/log/Interface/ILog.h"
+#include "base/common/log/Defs/LogData.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
+class FS_ThreadPool;
+class LogFile;
 class BASE_EXPORT FS_Log : public ILog
 {
 public:
-    FS_Log() {}
-    virtual ~FS_Log() {}
+    FS_Log(const Byte8 *processName);
+    virtual ~FS_Log();
 
-    // json日志
-    template<typename T>
-    void Ji();
-    template<typename T>
-    void Jd();
-    template<typename T>
-    void Jw();
-    template<typename T>
-    void Je();
+    /* 日志hook */
+    virtual void InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate);    // 抽象的delegate
+    void UnInstallLogHook(Int32 level);
+
+    /* 功能函数 */
+    virtual void FinishModule();
+    void SetFlushInterval(Int32 interval);
+    Int32 AddLog(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     
-    // 普通日志
-    template<typename T>
-    void i();
-    template<typename T>
-    void d();
-    template<typename T>
-    void w();
-    template<typename T>
-    void e();
+protected:
+    virtual LogData *_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel);
+    virtual void _WriteLog(Int32 fileUniqueIndex, LogData *logData);
 
-    // 设置回调
-    void InstallCallBack();
+private:
+    FS_ThreadPool *_threadPool;
+    FS_String _processName;
+    std::map<Int32, IDelegatePlus<void, const LogData *> *> _levelRefDelegate;
+
+    /* 日志文件内容 */
+    ConditionLocker _locker;
+    std::map<Int32, LogFile *> _fileUniqueIndexRefLogFiles;
+    std::map<Int32, std::list<LogData *> *> _fileUniqueIndexRefLogDatas;
 };
 
 FS_NAMESPACE_END
