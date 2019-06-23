@@ -46,10 +46,6 @@ extern BASE_EXPORT Locker g_OpenSSL_Locker;
 class BASE_EXPORT TimeWheel;
 extern BASE_EXPORT TimeWheel g_TimeWheel;
 
-// 全局初始化对象
-class BASE_EXPORT GlobalInitialize;
-extern BASE_EXPORT GlobalInitialize *g_GlobalInitialzie;
-
 FS_NAMESPACE_END
 
 #endif
