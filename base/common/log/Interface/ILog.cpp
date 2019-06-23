@@ -1,4 +1,4 @@
-/*!
+s/*!
  * MIT License
  *
  * Copyright (c) 2019 ericyonng<120453674@qq.com>
@@ -21,35 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : GlobalDefs.h
+ * @file  : ILog.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/05/31
+ * @date  : 2019/06/24
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_BaseDefs_Macro_MacroDefs_ForAll_GlobalDefs_H__
-#define __Base_Common_BaseDefs_Macro_MacroDefs_ForAll_GlobalDefs_H__
-#pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
+#include "stdafx.h"
+#include "base/common/log/Interface/ILog.h"
+#include "base/common/log/Impl/FS_Log.h"
 
 FS_NAMESPACE_BEGIN
 
-// openssl全局锁
-class BASE_EXPORT Locker;
-extern BASE_EXPORT Locker g_OpenSSL_Locker;
-
-// 默认的时间轮盘对象
-class BASE_EXPORT TimeWheel;
-extern BASE_EXPORT TimeWheel g_TimeWheel;
-
-// 全局初始化对象
-class BASE_EXPORT GlobalInitialize;
-extern BASE_EXPORT GlobalInitialize *g_GlobalInitialzie;
+ILog *ILog::InitModule(const Byte8 *processName)
+{
+    return new FS_Log(processName);
+}
 
 FS_NAMESPACE_END
-
-#endif

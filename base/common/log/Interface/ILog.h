@@ -35,38 +35,46 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/log/Defs/LogData.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT ILog
 {
 public:
-    ILog() {}
-    virtual ~ILog() {}
+    ILog();
+    virtual ~ILog();
+
+    static ILog *InitModule(const Byte8 *processName);
+    virtual void FinishModule() = 0;
 
     // json日志
-    template<typename T>
-    virtual void Ji() = 0;
-    template<typename T>
-    virtual void Jd() = 0;
-    template<typename T>
-    virtual void Jw() = 0;
-    template<typename T>
-    virtual void Je() = 0;
 
     // 普通日志
-    template<typename T>
-    virtual void i() = 0;
-    template<typename T>
-    virtual void d() = 0;
-    template<typename T>
-    virtual void w() = 0;
-    template<typename T>
-    virtual void e() = 0;
+    template<typename ObjType, typename... Args>
+    void i(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    template<typename ObjType, typename... Args>
+    void d(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    template<typename ObjType, typename... Args>
+    void w(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    template<typename ObjType, typename... Args>
+    void e(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    template<typename ObjType, typename... Args>
+    void crash(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
 
-private:
+    /* 功能函数 */
+    template<typename ObjType>
+    void InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData));
+    virtual void InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate) = 0;
+
+protected:
+    virtual LogData *_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel) = 0;
+    virtual void _WriteLog(Int32 fileUniqueIndex, LogData *logData) = 0;
 };
 
 FS_NAMESPACE_END
+
+#include "base/common/log/Interface/ILogImpl.h"
 
 #endif
