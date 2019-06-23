@@ -183,8 +183,13 @@ public:
     FS_String &Append(Args&&... rest);
     FS_String &FormatCStyle(const char *fmt, ...);
 
+    // 计算占位符个数
     static UInt64 CalcPlaceHolderNum(const std::string &fmtStr);
-    static bool AppendFirstValidPlaceHolderString(const std::string &fmt, UInt64 &firstIndex, std::string &outStr);
+    // 获取第一个占位符位置
+    static UInt64 GetFirstValidPlaceHolderIndex(const std::string &fmt);
+    // 讲格式符初始化给outStr，解析时必须做的
+    static void InitFmtToOutStrFirst(const std::string &fmt, std::string &outStr);
+    // startIndex 必须为当前要格式化的%所在位置 NextPlaceHolderPos输出下一个未被格式化的位置outIndex 输出std::string::npos表示结束
     static std::string NextPlaceHolderPos(const std::string &strFmt, UInt64 startIndex, UInt64 &outIndex);
 private:
     template<typename T>
