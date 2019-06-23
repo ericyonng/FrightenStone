@@ -636,23 +636,27 @@ UInt64 FS_String::CalcPlaceHolderNum(const std::string &fmtStr)
     return cnt;
 }
 
-bool FS_String::AppendFirstValidPlaceHolderString(const std::string &fmt, UInt64 &firstIndex, std::string &outStr)
+UInt64 FS_String::GetFirstValidPlaceHolderIndex(const std::string &fmt)
 {
     if(UNLIKELY(fmt.length() <= 0))
-        return false;
+        return std::string::npos;
 
-    firstIndex = 0;
-    firstIndex = fmt.find_first_of('%', firstIndex);
-    if(firstIndex == std::string::npos)
+    UInt64 firstIndex = 0;
+    return fmt.find_first_of('%', firstIndex);
+}
+
+void FS_String::InitFmtToOutStrFirst(const std::string &fmt, std::string &outStr)
+{
+    const UInt64 fistPlaceHolderIndex = GetFirstValidPlaceHolderIndex(fmt);
+    if(fistPlaceHolderIndex == std::string::npos)
     {
-        outStr += fmt.substr(0);
-        return true;
+        outStr += fmt;
+        return;
     }
 
-    if(firstIndex != 0)
-        outStr += fmt.substr(0, firstIndex);
-
-    return true;
+    // ÓÐÕ¼Î»·û
+    if(fistPlaceHolderIndex != 0)
+        outStr += fmt.substr(0, fistPlaceHolderIndex);
 }
 
 std::string FS_String::NextPlaceHolderPos(const std::string &strFmt, UInt64 startIndex, UInt64 &outIndex)
