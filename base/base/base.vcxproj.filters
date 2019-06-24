@@ -555,6 +555,15 @@
     <ClInclude Include="..\common\log\Interface\ILogImpl.h">
       <Filter>common\log\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\log\Defs\LogDefs.h">
+      <Filter>common\log\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\log\Defs\LogDefsImpl.h">
+      <Filter>common\log\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\log\Defs\CreateLogFileMacro.h">
+      <Filter>common\log\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

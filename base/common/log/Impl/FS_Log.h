@@ -71,7 +71,7 @@ public:
     /* ¹¦ÄÜº¯Êý */
     virtual void FinishModule();
     void SetFlushInterval(Int32 interval);
-    Int32 AddLog(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
+    Int32 AddLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     
 protected:
     virtual LogData *_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel);
