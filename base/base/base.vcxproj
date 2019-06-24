@@ -254,7 +254,10 @@
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheel.h" />
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h" />
     <ClInclude Include="..\common\component\Impl\Trigger.h" />
+    <ClInclude Include="..\common\log\Defs\CreateLogFileMacro.h" />
     <ClInclude Include="..\common\log\Defs\LogData.h" />
+    <ClInclude Include="..\common\log\Defs\LogDefs.h" />
+    <ClInclude Include="..\common\log\Defs\LogDefsImpl.h" />
     <ClInclude Include="..\common\log\Impl\FS_Log.h" />
     <ClInclude Include="..\common\log\Impl\FS_LogImpl.h" />
     <ClInclude Include="..\common\log\Interface\ILog.h" />

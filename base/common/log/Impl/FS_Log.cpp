@@ -34,13 +34,15 @@
 #include "base/common/assist/utils/utils.h"
 #include "base/common/component/Impl/File/LogFile.h"
 #include "base/common/status/status.h"
+#include "base/common/log/Defs/LogDefs.h"
 
 FS_NAMESPACE_BEGIN
 
 FS_Log::FS_Log(const Byte8 *processName)
     :_processName(processName)
 {
-
+    // 初始化日志文件
+    LogDefs::LogInitHelper<LogDefs::LOG_NUM_MAX>::InitLog(this);
 }
 
 FS_Log::~FS_Log()
@@ -76,7 +78,7 @@ void FS_Log::SetFlushInterval(Int32 interval)
 
 }
 
-Int32 FS_Log::AddLog(Int32 fileUnqueIndex, const char *logPath, const char *fileName)
+Int32 FS_Log::AddLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName)
 {
     return StatusDefs::Success;
 }
