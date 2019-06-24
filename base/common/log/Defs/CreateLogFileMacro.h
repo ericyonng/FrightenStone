@@ -54,11 +54,11 @@ static const int _##log_path##_##log_name##_ = ExcludeCommentHelper<line>::realv
 template<>                                                                                      \
 struct LogInitHelper<_##log_path##_##log_name##_>                                               \
 {                                                                                               \
-    static bool InitLog(ILog *logMgr)                                                           \
+    static bool InitLog(FS_Log *logMgr)                                                           \
     {                                                                                           \
         if (_##log_path##_##log_name##_ > base)                                                 \
-             LogInitHelper<_##log_path##_##log_name##_-1>::InitLog(logMgr));                    \
-        logMgr->AddLog(_##log_path##_##log_name##_,".\\"#log_path"\\", #log_name".log"));       \
+             LogInitHelper<_##log_path##_##log_name##_-1>::InitLog(logMgr);                     \
+        logMgr->AddLogFile(_##log_path##_##log_name##_,".\\"#log_path"\\", #log_name".log");    \
         return true;                                                                            \
     }                                                                                           \
 };
