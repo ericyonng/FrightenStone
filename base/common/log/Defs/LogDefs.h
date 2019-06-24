@@ -13,7 +13,7 @@ public:
     template <int i>
     struct LogInitHelper
     {
-        static bool InitLog(ILog *logMgr) { return true; }
+        static bool InitLog(FS_Log *logMgr) { return true; }
     };
 
     template<int i>
