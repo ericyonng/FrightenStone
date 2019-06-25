@@ -38,7 +38,8 @@
 #include "base/common/log/Defs/LogTask.h"
 #include "base/common/assist/utils/Impl/FS_FileUtil.h"
 
-#define LOG_THREAD_INTERVAL_MS_TIME 1000    // 日志线程写日志间隔时间
+#define LOG_THREAD_INTERVAL_MS_TIME 0    // 日志线程写日志间隔时间
+#define LOG_SIZE_LIMIT  -1            // 日志尺寸限制10MB
 
 FS_NAMESPACE_BEGIN
 
@@ -81,7 +82,8 @@ Int32 FS_Log::InitModule()
     _threadPool = new FS_ThreadPool(1, 1);
     _threadWriteLogDelegate = DelegatePlusFactory::Create(this, &FS_Log::_OnThreadWriteLog);
     ITask *logTask = new LogTask(_threadPool, _threadWriteLogDelegate, _threadWorkIntervalMsTime);
-    _threadPool->AddTask(*logTask);
+    ASSERT(_threadPool->AddTask(*logTask));
+    return StatusDefs::Success;
 }
 
 void FS_Log::FinishModule()
@@ -97,12 +99,10 @@ void FS_Log::FinishModule()
     Fs_SafeFree(_threadPool);
 }
 
-Int32 FS_Log::AddLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName)
+Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName)
 {
-    _locker.Lock();
-
     Int32 ret = StatusDefs::Success;
-
+    _locker.Lock();
     do 
     {
         // 1.是否创建过
@@ -111,7 +111,8 @@ Int32 FS_Log::AddLogFile(Int32 fileUnqueIndex, const char *logPath, const char *
             break;
 
         // 2.创建文件夹
-        FS_String logName = _processName + "\\" + logPath;
+        FS_String logName = ".\\";
+        logName += (_processName + "\\" + logPath);
         if(!FS_DirectoryUtil::CreateDir(logName))
         {
             ret = StatusDefs::Log_CreateDirFail;
@@ -124,6 +125,7 @@ Int32 FS_Log::AddLogFile(Int32 fileUnqueIndex, const char *logPath, const char *
         if(!logFile->Open(logName.c_str(), true, "ab+", true))
         {
             ret = StatusDefs::Log_CreateLogFileFail;
+            ASSERT(!"log file open fail");
             break;
         }
 
@@ -133,7 +135,7 @@ Int32 FS_Log::AddLogFile(Int32 fileUnqueIndex, const char *logPath, const char *
     
     _locker.Unlock();
 
-    return StatusDefs::Success;
+    return ret;
 }
 
 LogData *FS_Log::_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel)
@@ -149,14 +151,24 @@ LogData *FS_Log::_BuildLogData(const Byte8 *className, const Byte8 *funcName, co
     return newLogData;
 }
 
-void FS_Log::_WriteLog(Int32 fileUniqueIndex, LogData *logData)
+void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
 {
     _locker.Lock();
+
+    // 1.将日志数据放入队列
     auto logList = _GetLogDataList(fileUniqueIndex);
     if(UNLIKELY(!logList))
         logList = _NewLogDataList(fileUniqueIndex);
     
     logList->push_back(logData);
+
+    // 2.根据level不同调用不同的hook
+    auto iterHook = _levelRefHook.find(level);
+    if(iterHook != _levelRefHook.end())
+    {
+        auto hook = iterHook->second;
+        (*hook)(std::move(logData));
+    }
     _locker.Unlock();
 }
 
@@ -180,8 +192,70 @@ void FS_Log::_OnThreadWriteLog()
 {
     // 线程操作需要枷锁
     // 将日志内容移出到缓冲
+
+    // 1.转移到缓冲区
+    static std::map<Int32, std::list<LogData *> *> logDatasToWrite;
+    static Int32 fileIndex = 0;
+
     _locker.Lock();
+    if(_fileUniqueIndexRefLogDatas.empty())
+    {
+        _locker.Unlock();
+        return;
+    }
+    logDatasToWrite = _fileUniqueIndexRefLogDatas;
+    _fileUniqueIndexRefLogDatas.clear();
     _locker.Unlock();
+
+    // 2.写日志
+    static std::map<Int32, LogFile *>::iterator iterLogFile;
+    static LogFile * logFile = NULL;
+    static std::list<LogData *> * logDataList = NULL;
+    static FS_String cache;
+    for(auto &iterLogDatas : logDatasToWrite)
+    {
+        fileIndex = iterLogDatas.first;
+        logDataList = iterLogDatas.second;
+
+        iterLogFile = _fileUniqueIndexRefLogFiles.find(fileIndex);
+        logFile = iterLogFile->second;
+
+        logFile->Lock();
+        for(auto &iterLog : *logDataList)
+        {
+            if(logFile->IsDayPass(iterLog->_logTime))
+            {
+                ASSERT(logFile->Reopen());
+                logFile->UpdateLastTimestamp();
+            }
+            else
+            {
+                // 文件过大转储到分立文件
+                if(logFile->IsTooLarge(LOG_SIZE_LIMIT))
+                    logFile->PartitionFile();
+            }
+
+            // 构造日志正文
+            cache.Clear();
+            cache.Format("%s<%s>[%s][%s]line:%d %s"
+                         , iterLog->_logTime.ToString().c_str()
+                         , LogLevel::GetDescription(iterLog->_level)
+                         , iterLog->_className.c_str()
+                         , iterLog->_funcName.c_str()
+                         , iterLog->_line
+                         , iterLog->_content.c_str());
+
+            // 写入文件
+            ASSERT(logFile->Write(cache.c_str(), cache.GetLength()) == cache.GetLength());
+            logFile->Flush();
+        }
+
+        STLUtil::DelListContainer(*logDataList);
+        logFile->UnLock();
+    }
+
+    // 3.清理
+    STLUtil::DelMapContainer(logDatasToWrite);
 }
 FS_NAMESPACE_END
 

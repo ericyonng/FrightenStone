@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include <assert.h>
+
 // defs ...
 
 #undef FS_NAMESPACE_BEGIN
@@ -230,6 +232,12 @@ private:\
 
 #undef P_INSIZE
 #define P_INSIZE    /* ‰»Îƒø±Í≥ﬂ¥Á*/
+
+#ifdef _WIN32
+#define ASSERT(x)   assert(x)
+#else
+ASSERT(x)   throw std::logic_error(#x)
+#endif
 
 
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__

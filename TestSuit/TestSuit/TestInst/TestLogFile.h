@@ -43,7 +43,7 @@ public:
         fs::LogFile logFile;
         logFile.Open("./log2.log", true);
         fs::FS_String logStr = "hello test log file";
-        logFile.Write<TestLogFile>(logStr);
+        logFile.Write(logStr.c_str(), logStr.GetLength());
         logFile.Flush();
         fs::FS_FileUtil::ResetFileCursor(*static_cast<FILE *>(logFile));
         fs::FS_String strRead;

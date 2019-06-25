@@ -567,6 +567,9 @@
     <ClInclude Include="..\common\log\Defs\LogTask.h">
       <Filter>common\log\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\SystemUtilDefs.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -706,6 +709,9 @@
     </ClCompile>
     <ClCompile Include="..\common\log\Defs\LogTask.cpp">
       <Filter>common\log\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Defs\SystemUtilDefs.cpp">
+      <Filter>common\assist\utils\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

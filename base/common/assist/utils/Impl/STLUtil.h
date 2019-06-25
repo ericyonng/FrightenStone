@@ -50,6 +50,9 @@ public:
 
     template<typename _Type, AssistObjsDefs::DelMethods DelType = AssistObjsDefs::Delete>
     static void DelSetContainer(_Type &container);
+
+    template<typename _Type, AssistObjsDefs::DelMethods DelType = AssistObjsDefs::Delete>
+    static void DelListContainer(_Type &container);
 };
 
 FS_NAMESPACE_END

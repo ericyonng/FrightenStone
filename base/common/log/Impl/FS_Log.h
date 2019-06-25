@@ -44,6 +44,7 @@
                                         stackinfo:
                                     }
                                 }
+            6.日志是单线程日志，请注意，在日志线程中使用static变量，固不可扩展成多线程日志
  */
 #ifndef __Base_Common_Log_Impl_Log_H__
 #define __Base_Common_Log_Impl_Log_H__
@@ -71,11 +72,11 @@ public:
     /* 功能函数 */
     Int32 InitModule();
     virtual void FinishModule();
-    Int32 AddLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
+    virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     
 protected:
     virtual LogData *_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel);
-    virtual void _WriteLog(Int32 fileUniqueIndex, LogData *logData);
+    virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData);
 
     std::list<LogData *> *_GetLogDataList(Int32 fileIndex);
     std::list<LogData *> *_NewLogDataList(Int32 fileIndex);
@@ -92,7 +93,7 @@ private:
 
     /* 日志文件内容 */
     ConditionLocker _locker;                                                // 锁
-    std::map<Int32, LogFile *> _fileUniqueIndexRefLogFiles;                 // 日志id日志文件
+    std::map<Int32, LogFile *> _fileUniqueIndexRefLogFiles;                 // 日志id日志文件 创建后文件只允许读不允许增删
     std::map<Int32, std::list<LogData *> *> _fileUniqueIndexRefLogDatas;    // 日志id日志内容
     IDelegatePlus<void> *_threadWriteLogDelegate;                           // 日志线程写日志委托
 

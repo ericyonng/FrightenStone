@@ -48,6 +48,7 @@ public:
         WaitEventTimeOut = 2,                                   // 等待超时
         Repeat = 3,                                             // 重复
         ParamError = 4,                                         // 参数错误
+        Failed = 5,                                             // 失败
         #pragma endregion
 
         #pragma region SOCKET[500, 599]

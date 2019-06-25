@@ -32,13 +32,19 @@ s/*!
 #include "stdafx.h"
 #include "base/common/log/Interface/ILog.h"
 #include "base/common/log/Impl/FS_Log.h"
+#include "base/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
 ILog *ILog::InitModule(const Byte8 *processName)
 {
     auto logMgr = new FS_Log(processName);
-    return return logMgr;
+    if(logMgr->InitModule() != StatusDefs::Success)
+    {
+        Fs_SafeFree(logMgr);
+        return NULL;
+    }
+    return logMgr;
 }
 
 FS_NAMESPACE_END

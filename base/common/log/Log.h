@@ -34,6 +34,7 @@
 #pragma once
 
 // defs...
+#include "base/common/log/Defs/LogDefs.h"
 // interface...
 #include "base/common/log/Interface/ILog.h"
 

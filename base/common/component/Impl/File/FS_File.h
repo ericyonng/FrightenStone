@@ -68,8 +68,9 @@ public:
     void UnLock();
 
     bool IsOpen() const;
-    const char *GetPath() const;
-    const char *GetFileName() const;
+    const FS_String &GetPath() const;
+    const FS_String &GetFileName() const;
+    Int64 GetSize() const;
 
 public:
     operator bool() const;
@@ -78,12 +79,13 @@ public:
 
 protected:
     FILE *_fp = NULL;
+    Int64 _fileSize;
     Time _createFileTime;
     Time _modifyFileTime;
     bool _useTimestampTailer = false;
     FS_String _path;
     FS_String _fileName;
-    FS_String _extensionName;       // 
+    FS_String _extensionName;       // À©Õ¹Ãû
     FS_String _openMode = "ab+";
     Locker  _locker;
 };
@@ -105,14 +107,19 @@ inline bool FS_File::IsOpen() const
     return _fp != NULL;
 }
 
-inline const char *FS_File::GetPath() const
+inline const FS_String &FS_File::GetPath() const
 {
-    return _path.c_str();
+    return _path;
 }
 
-inline const char *FS_File::GetFileName() const
+inline const FS_String &FS_File::GetFileName() const
 {
-    return _fileName.c_str();
+    return _fileName;
+}
+
+inline Int64 FS_File::GetSize() const
+{
+    return _fileSize;
 }
 
 inline FS_File::operator bool() const
