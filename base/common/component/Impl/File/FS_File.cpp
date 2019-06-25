@@ -41,6 +41,7 @@ FS_NAMESPACE_BEGIN
 
 FS_File::FS_File()
     :_fp(NULL)
+    ,_fileSize(0)
     ,_useTimestampTailer(false)
     ,_openMode("ab+")
 {
@@ -62,7 +63,7 @@ bool FS_File::Open(const char *fileName, bool isCreate /*= false*/, const char *
     if(UNLIKELY(_fp))
     {
         printf("always open");
-        assert(!"always open");
+        ASSERT(!"always open");
         return false;
     }
 
@@ -83,12 +84,15 @@ bool FS_File::Open(const char *fileName, bool isCreate /*= false*/, const char *
             _fp = FS_FileUtil::OpenFile(fileNameCache.c_str(), isCreate, openMode);
     }
 
-    if(_fp)
+    if(LIKELY(_fp))
     {
-        _fileName = FS_DirectoryUtil::GetFileNameInPath(fileNameCache);
+        _fileName = FS_DirectoryUtil::GetFileNameInPath(fileName);
         _path = FS_DirectoryUtil::GetFileDirInPath(fileNameCache);
         _openMode = openMode;
     }
+
+    _fileSize = static_cast<Int64>(FS_FileUtil::GetFileSize(*_fp));
+    ASSERT(_fileSize >= 0);
 
     return _fp != NULL;
 }
@@ -125,6 +129,7 @@ bool FS_File::Close()
     }
 
     _fp = NULL;
+    _fileSize = 0;
     return true;
 }
 
@@ -137,6 +142,7 @@ Int64 FS_File::Write(const void *buffer, UInt64 writeDataLen)
     if(wrLen != 0)
         _modifyFileTime.FlushTime();
 
+    _fileSize += wrLen;
     return static_cast<Int64>(wrLen);
 }
 

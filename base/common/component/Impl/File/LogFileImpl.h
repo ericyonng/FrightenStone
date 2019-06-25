@@ -37,12 +37,12 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename T>
-inline Int64 LogFile::Write(const FS_String &logStr)
+inline bool LogFile::IsTooLarge(Int64 limitSize) const
 {
-    FS_String logCache;
-    logCache << "<" << typeid(T).name() << ">: " << logStr << FS_String::endl;
-    return FS_File::Write(logCache.c_str(), logCache.GetLength());
+    if(limitSize <= 0)
+        return false;
+
+    return _fileSize >= limitSize;
 }
 
 FS_NAMESPACE_END

@@ -46,10 +46,11 @@
 #include "TestSuit/TestSuit/TestInst/TerstSmartVar.h"
 #include "TestSuit/TestSuit/TestInst/TestTimeWheel.h"
 #include "TestSuit/TestSuit/TestInst/TestSystemUtil.h"
+#include "TestSuit/TestSuit/TestInst/TestLogModule.h"
 
 int main()
 {
-    TestSysTemUtil::Run();
+    TestLogModule::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;

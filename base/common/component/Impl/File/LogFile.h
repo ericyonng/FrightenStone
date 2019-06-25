@@ -46,13 +46,16 @@ public:
     virtual ~LogFile();
 
 public:
-    template<typename T>
-    Int64 Write(const FS_String &logStr);
     bool IsDayPass(const Time &lastModifyTime) const;
     void UpdateLastTimestamp();
 
+    // ·Ö¸îÎÄ¼þ
+    bool IsTooLarge(Int64 limitSize) const;
+    void PartitionFile();
+
 protected:
-    Time    _lastModifyTime;
+    Int32 _partNo;
+    Time  _lastModifyTime;
 };
 
 FS_NAMESPACE_END

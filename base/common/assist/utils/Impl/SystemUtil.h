@@ -66,6 +66,10 @@ public:
     static void BringWindowsToTop(HWND curWin);
     // 遍历进程判断某进程是否在进程列表
     static bool IsProcessExist(const FS_String &processName);
+    // 设置控制台颜色
+    static Int32 SetConsoleColor(Int32 color);
+    // 获取控制台颜色
+    static Int32 GetConsoleColor();
 };
 
 FS_NAMESPACE_END

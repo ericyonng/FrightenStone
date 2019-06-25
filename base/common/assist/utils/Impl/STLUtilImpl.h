@@ -42,7 +42,7 @@
 FS_NAMESPACE_BEGIN
 
 template<typename _Type, AssistObjsDefs::DelMethods DelType>
-void STLUtil::DelMapContainer(_Type &container)
+inline void STLUtil::DelMapContainer(_Type &container)
 {
     AutoDelHelper<DelType> delObj;
     for(auto iterElement = container.begin(); iterElement != container.end(); ++iterElement)
@@ -50,7 +50,18 @@ void STLUtil::DelMapContainer(_Type &container)
 }
 
 template<typename _Type, AssistObjsDefs::DelMethods DelType>
-void STLUtil::DelSetContainer(_Type &container)
+inline void STLUtil::DelSetContainer(_Type &container)
+{
+    AutoDelHelper<DelType> delObj;
+    for(auto iterElement = container.begin(); iterElement != container.end(); ++iterElement)
+    {
+        auto element = *iterElement;
+        delObj.Release(element);
+    }
+}
+
+template<typename _Type, AssistObjsDefs::DelMethods DelType>
+inline void STLUtil::DelListContainer(_Type &container)
 {
     AutoDelHelper<DelType> delObj;
     for(auto iterElement = container.begin(); iterElement != container.end(); ++iterElement)

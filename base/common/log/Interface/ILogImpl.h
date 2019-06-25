@@ -49,7 +49,7 @@ inline void ILog::i(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, 
     content.Format(fmt, args...) << FS_String::endl;
     LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Info);
 
-    _WriteLog(fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Info, fileUnqueIndex, logData);
 }
 
 template<typename ObjType, typename... Args>
@@ -60,7 +60,7 @@ inline void ILog::d(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, 
     content.Format(fmt, args...) << FS_String::endl;
     LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Debug);
 
-    _WriteLog(fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Debug, fileUnqueIndex, logData);
 }
 
 template<typename ObjType, typename... Args>
@@ -71,7 +71,7 @@ inline void ILog::w(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, 
     content.Format(fmt, args...) << FS_String::endl;
     LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Warning);
 
-    _WriteLog(fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Warning, fileUnqueIndex, logData);
 }
 
 template<typename ObjType, typename... Args>
@@ -82,7 +82,7 @@ inline void ILog::e(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, 
     content.Format(fmt, args...) << FS_String::endl;
     LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Error);
 
-    _WriteLog(fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Error, fileUnqueIndex, logData);
 }
 
 template<typename ObjType, typename... Args>
@@ -93,7 +93,7 @@ inline void ILog::crash(Int32 fileUnqueIndex, const char *funcName, Int32 codeLi
     content.Format(fmt, args...) << FS_String::endl;
     LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Crash);
 
-    _WriteLog(fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Crash, fileUnqueIndex, logData);
 }
 
 template<typename ObjType>

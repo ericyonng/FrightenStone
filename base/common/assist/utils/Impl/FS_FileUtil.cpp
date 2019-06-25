@@ -123,7 +123,7 @@ FILE *FS_FileUtil::OpenFile(const char *fileName, bool isCreate /*= false*/, con
     return fp;
 }
 
-bool FS_FileUtil::CopyFIle(const char *srcFile, const char *destFile)
+bool FS_FileUtil::CopyFile(const char *srcFile, const char *destFile)
 {
     if(UNLIKELY(!srcFile || !destFile))
         return false;
@@ -155,6 +155,28 @@ bool FS_FileUtil::CopyFIle(const char *srcFile, const char *destFile)
 
     CloseFile(*srcFp);
     CloseFile(*destFp);
+    return true;
+}
+
+bool FS_FileUtil::CopyFile(FILE &src, FILE &dest)
+{
+    unsigned char get_c = 0;
+    char count = 0, wrCount = 0;
+    const auto sizeByte = GetFileSize(src);  //
+    while(!feof(&src))
+    {
+        get_c = 0;
+        count = char(fread(&get_c, 1, 1, &src));
+        if(count != 1)
+            break;
+
+        wrCount = char(fwrite(&get_c, 1, 1, &dest));
+        if(wrCount != 1)
+            break;
+
+        FlushFile(dest);
+    }
+
     return true;
 }
 
@@ -399,6 +421,11 @@ bool FS_FileUtil::IsFileExist(const char *fileName)
     }
 
     return true;
+}
+
+Int32 FS_FileUtil::GetFileCusorPos(FILE &fp)
+{
+    return ftell(&fp);
 }
 
 bool FS_FileUtil::SetFileCursor(FILE &fp, Int32 enumPos, long offset)

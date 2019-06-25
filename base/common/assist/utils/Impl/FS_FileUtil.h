@@ -53,7 +53,8 @@ public:
     static const char *GenRandFileName(char randName[L_tmpnam]);
     static const char *GenRandFileNameNoDir(char randName[L_tmpnam]);
     static FILE *OpenFile(const char *fileName, bool isCreate = false, const char *openType = "rb+");
-    static bool CopyFIle(const char *srcFile, const char *destFile);
+    static bool CopyFile(const char *srcFile, const char *destFile);
+    static bool CopyFile(FILE &src, FILE &dest);
     static UInt64 ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer);
     static UInt64 ReadOneLine(FILE &fp, FS_String &outBuffer);
     static UInt64 ReadFile(FILE &fp, UInt64 bufferSize, char *&buffer);
@@ -62,6 +63,7 @@ public:
     static UInt64 WriteFile(FILE &fp, const FS_String &bitData);
     static bool CloseFile(FILE &fp);
     static bool IsFileExist(const char *fileName);
+    static Int32 GetFileCusorPos(FILE &fp);
     static bool SetFileCursor(FILE &fp, Int32 enumPos, long offset);
     static void ResetFileCursor(FILE &fp);
     static bool FlushFile(FILE &fp);

@@ -34,10 +34,12 @@
 #include "base/common/component/Impl/Time.h"
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/component/Impl/File/LogFile.h"
+#include "base/common/assist/utils/Impl/FS_FileUtil.h"
 
 FS_NAMESPACE_BEGIN
 
 LogFile::LogFile()
+    :_partNo(0)
 {
     
 }
@@ -57,4 +59,32 @@ void LogFile::UpdateLastTimestamp()
     _lastModifyTime.FlushTime();
 }
 
+void LogFile::PartitionFile()
+{
+    // 构建文件名
+    FS_String fileNameCache = _path + _fileName;
+    const auto &extensionName = FS_FileUtil::ExtractFileExtension(fileNameCache);
+    if(_useTimestampTailer)
+        FS_FileUtil::InsertFileTime(extensionName, _createFileTime, fileNameCache);
+
+    // 查找不存在的文件名
+    FS_String wholeName;
+    wholeName.Format("%sOld%d", fileNameCache.c_str(), ++_partNo);
+    while(FS_FileUtil::IsFileExist(wholeName.c_str()))
+    {
+        wholeName.Clear();
+        wholeName.Format("%sOld%d", fileNameCache.c_str(), ++_partNo);
+    }
+
+    // 转储文件
+    auto dest = FS_FileUtil::OpenFile(wholeName.c_str(), true);
+    FS_FileUtil::ResetFileCursor(*_fp);
+    FS_FileUtil::CopyFile(*_fp, *dest);
+    FS_FileUtil::CloseFile(*dest);
+
+    // 删除并重开文件
+    Close();
+    FS_FileUtil::DelFile(fileNameCache.c_str());
+    ASSERT(Reopen());
+}
 FS_NAMESPACE_END
