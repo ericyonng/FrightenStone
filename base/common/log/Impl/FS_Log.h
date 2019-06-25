@@ -69,23 +69,33 @@ public:
     void UnInstallLogHook(Int32 level);
 
     /* 功能函数 */
+    Int32 InitModule();
     virtual void FinishModule();
-    void SetFlushInterval(Int32 interval);
     Int32 AddLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     
 protected:
     virtual LogData *_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel);
     virtual void _WriteLog(Int32 fileUniqueIndex, LogData *logData);
 
+    std::list<LogData *> *_GetLogDataList(Int32 fileIndex);
+    std::list<LogData *> *_NewLogDataList(Int32 fileIndex);
+
+    // 线程操作
 private:
-    FS_ThreadPool *_threadPool;
-    FS_String _processName;
-    std::map<Int32, IDelegatePlus<void, const LogData *> *> _levelRefDelegate;
+    void _OnThreadWriteLog();
+
+private:
+    FS_ThreadPool *_threadPool;                                                 // 线程池
+    FS_String _processName;                                                     // 进程名
+    std::map<Int32, IDelegatePlus<void, const LogData *> *> _levelRefHook;      // 日志级别对应的hook
+    Int32 _threadWorkIntervalMsTime;                                            // 日志线程工作间隔时间
 
     /* 日志文件内容 */
-    ConditionLocker _locker;
-    std::map<Int32, LogFile *> _fileUniqueIndexRefLogFiles;
-    std::map<Int32, std::list<LogData *> *> _fileUniqueIndexRefLogDatas;
+    ConditionLocker _locker;                                                // 锁
+    std::map<Int32, LogFile *> _fileUniqueIndexRefLogFiles;                 // 日志id日志文件
+    std::map<Int32, std::list<LogData *> *> _fileUniqueIndexRefLogDatas;    // 日志id日志内容
+    IDelegatePlus<void> *_threadWriteLogDelegate;                           // 日志线程写日志委托
+
 };
 
 FS_NAMESPACE_END

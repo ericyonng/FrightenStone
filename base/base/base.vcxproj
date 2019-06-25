@@ -258,6 +258,7 @@
     <ClInclude Include="..\common\log\Defs\LogData.h" />
     <ClInclude Include="..\common\log\Defs\LogDefs.h" />
     <ClInclude Include="..\common\log\Defs\LogDefsImpl.h" />
+    <ClInclude Include="..\common\log\Defs\LogTask.h" />
     <ClInclude Include="..\common\log\Impl\FS_Log.h" />
     <ClInclude Include="..\common\log\Impl\FS_LogImpl.h" />
     <ClInclude Include="..\common\log\Interface\ILog.h" />
@@ -314,6 +315,7 @@
     <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWheel.cpp" />
     <ClCompile Include="..\common\component\Impl\Trigger.cpp" />
     <ClCompile Include="..\common\log\Defs\LogData.cpp" />
+    <ClCompile Include="..\common\log\Defs\LogTask.cpp" />
     <ClCompile Include="..\common\log\Impl\FS_Log.cpp" />
     <ClCompile Include="..\common\log\Interface\ILog.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />

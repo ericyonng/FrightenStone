@@ -37,7 +37,8 @@ FS_NAMESPACE_BEGIN
 
 ILog *ILog::InitModule(const Byte8 *processName)
 {
-    return new FS_Log(processName);
+    auto logMgr = new FS_Log(processName);
+    return return logMgr;
 }
 
 FS_NAMESPACE_END

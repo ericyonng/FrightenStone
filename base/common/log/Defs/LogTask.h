@@ -21,40 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : LogFile.cpp
+ * @file  : LogTask.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/6/25
  * @brief :
  * 
  *
  * 
  */
+#ifndef __Base_Common_Log_Defs_LogTask_H__
+#define __Base_Common_Log_Defs_LogTask_H__
+#pragma once
 
-#include "stdafx.h"
-#include "base/common/component/Impl/Time.h"
-#include "base/common/component/Impl/TimeSlice.h"
-#include "base/common/component/Impl/File/LogFile.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/ITask.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
+// 日志任务
 FS_NAMESPACE_BEGIN
+class FS_ThreadPool;
 
-LogFile::LogFile()
+class LogTask :public ITask
 {
-    
-}
+public:
+    LogTask(FS_ThreadPool *pool, IDelegatePlus<void> *taskDelegate, Int32 workIntervalMsTime);
+    virtual ~LogTask();
 
-LogFile::~LogFile()
-{
+    // 任务执行体
+    virtual Int32 Run();
 
-}
+protected:
+    IDelegatePlus<void> *_taskDelegate;
+    FS_ThreadPool *_pool;
+    Int32 _workIntervalMsTime;    // 写日志时间间隔
+};
 
-bool LogFile::IsDayPass(const Time &lastModifyTime) const
-{
-    return _lastModifyTime.GetZeroTime() != lastModifyTime.GetZeroTime();
-}
-
-void LogFile::UpdateLastTimestamp()
-{
-    _lastModifyTime.FlushTime();
-}
 
 FS_NAMESPACE_END
+#endif

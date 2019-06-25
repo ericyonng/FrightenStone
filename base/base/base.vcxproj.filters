@@ -564,6 +564,9 @@
     <ClInclude Include="..\common\log\Defs\CreateLogFileMacro.h">
       <Filter>common\log\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\log\Defs\LogTask.h">
+      <Filter>common\log\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -700,6 +703,9 @@
     </ClCompile>
     <ClCompile Include="..\common\log\Interface\ILog.cpp">
       <Filter>common\log\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\log\Defs\LogTask.cpp">
+      <Filter>common\log\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
