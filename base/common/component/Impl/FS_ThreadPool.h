@@ -60,6 +60,9 @@ public:
     void SetThreadLimit(Int32 minNum, Int32 maxNum);
     static unsigned __stdcall ThreadHandler(void *param);
 
+    // ״̬
+    bool IsClearingPool() const;
+
 private:
     bool _CreateThread(Int32 numToCreate);    // 
 
@@ -84,6 +87,11 @@ inline void FS_ThreadPool::StopAdd()
 inline void FS_ThreadPool::EnableAdd()
 {
     _isStopAddingTask = false;
+}
+
+inline bool FS_ThreadPool::IsClearingPool() const
+{
+    return _isClearPool;
 }
 #pragma endregion
 

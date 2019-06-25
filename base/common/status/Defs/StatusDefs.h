@@ -104,6 +104,11 @@ public:
 
         #pragma endregion
 
+        #pragma region Log[1200, 1299]
+        Log_CreateDirFail = 1200,                               // 创建目录失败
+        Log_CreateLogFileFail = 1201,                           // 创建日志文件失败
+        #pragma endregion
+
     };
 };
 
