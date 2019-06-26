@@ -95,6 +95,7 @@ private:
     ConditionLocker _locker;                                                // 锁
     std::map<Int32, LogFile *> _fileUniqueIndexRefLogFiles;                 // 日志id日志文件 创建后文件只允许读不允许增删
     std::map<Int32, std::list<LogData *> *> _fileUniqueIndexRefLogDatas;    // 日志id日志内容
+    std::map<Int32, std::list<LogData *> *> _logDatasCache;                 // 日志内容缓冲
     IDelegatePlus<void> *_threadWriteLogDelegate;                           // 日志线程写日志委托
 
 };

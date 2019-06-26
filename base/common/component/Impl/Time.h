@@ -210,9 +210,9 @@ private:
     #pragma endregion
 
 private:
-    Int64 _rawTime;    // microsecond ()
-    tm _gmtTimeStruct;  // 
-    tm _localTimeStruct;    // 
+    Int64 _rawTime{0};    // microsecond ()
+    tm _gmtTimeStruct{0};  // 
+    tm _localTimeStruct{0};    // 
 };
 
 #pragma region Inline

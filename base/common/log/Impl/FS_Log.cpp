@@ -96,6 +96,7 @@ void FS_Log::FinishModule()
     fs::STLUtil::DelMapContainer(_fileUniqueIndexRefLogDatas);
     fs::STLUtil::DelMapContainer(_fileUniqueIndexRefLogFiles);
     fs::STLUtil::DelMapContainer(_levelRefHook);
+    fs::STLUtil::DelMapContainer(_logDatasCache);
     Fs_SafeFree(_threadPool);
 }
 
@@ -131,6 +132,9 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
 
         logFile->UpdateLastTimestamp();
         _fileUniqueIndexRefLogFiles.insert(std::make_pair(fileUnqueIndex, logFile));
+
+        // 4.创建日志缓冲
+        _NewLogDataList(fileUnqueIndex);
     } while(0);
     
     _locker.Unlock();
@@ -148,6 +152,13 @@ LogData *FS_Log::_BuildLogData(const Byte8 *className, const Byte8 *funcName, co
     newLogData->_level = logLevel;
     newLogData->_processName = _processName;
     newLogData->_logTime = Time::Now();
+    newLogData->_logToWrite.Format("%s<%s>[%s][%s]line:%d %s"
+                                   , newLogData->_logTime.ToString().c_str()
+                                   , LogLevel::GetDescription(logLevel)
+                                   , className
+                                   , funcName
+                                   , codeLine
+                                   , content.c_str());
     return newLogData;
 }
 
@@ -157,9 +168,6 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
 
     // 1.将日志数据放入队列
     auto logList = _GetLogDataList(fileUniqueIndex);
-    if(UNLIKELY(!logList))
-        logList = _NewLogDataList(fileUniqueIndex);
-    
     logList->push_back(logData);
 
     // 2.根据level不同调用不同的hook
@@ -194,8 +202,7 @@ void FS_Log::_OnThreadWriteLog()
     // 将日志内容移出到缓冲
 
     // 1.转移到缓冲区
-    static std::map<Int32, std::list<LogData *> *> logDatasToWrite;
-    static Int32 fileIndex = 0;
+    static std::map<Int32, std::list<LogData *> *>::iterator iterToWrite;
 
     _locker.Lock();
     if(_fileUniqueIndexRefLogDatas.empty())
@@ -203,16 +210,34 @@ void FS_Log::_OnThreadWriteLog()
         _locker.Unlock();
         return;
     }
-    logDatasToWrite = _fileUniqueIndexRefLogDatas;
-    _fileUniqueIndexRefLogDatas.clear();
+
+    static bool hasLog = false;
+    hasLog = false;
+    for(auto iterLogDatas = _fileUniqueIndexRefLogDatas.begin(); iterLogDatas != _fileUniqueIndexRefLogDatas.end(); ++iterLogDatas)
+    {
+        iterToWrite = _logDatasCache.find(iterLogDatas->first);
+        if(iterToWrite == _logDatasCache.end())
+            iterToWrite = _logDatasCache.insert(std::make_pair(iterLogDatas->first, new std::list<LogData *>)).first;
+
+        if(iterLogDatas->second->empty())
+            continue;
+        
+        hasLog = true;
+
+        std::swap(*iterToWrite->second, *iterLogDatas->second);
+    }
     _locker.Unlock();
+    if(!hasLog)
+        return;
 
     // 2.写日志
     static std::map<Int32, LogFile *>::iterator iterLogFile;
     static LogFile * logFile = NULL;
     static std::list<LogData *> * logDataList = NULL;
     static FS_String cache;
-    for(auto &iterLogDatas : logDatasToWrite)
+    static Int32 fileIndex = 0;
+    static Time cacheTIme;
+    for(auto &iterLogDatas : _logDatasCache)
     {
         fileIndex = iterLogDatas.first;
         logDataList = iterLogDatas.second;
@@ -237,25 +262,19 @@ void FS_Log::_OnThreadWriteLog()
 
             // 构造日志正文
             cache.Clear();
-            cache.Format("%s<%s>[%s][%s]line:%d %s"
-                         , iterLog->_logTime.ToString().c_str()
-                         , LogLevel::GetDescription(iterLog->_level)
-                         , iterLog->_className.c_str()
-                         , iterLog->_funcName.c_str()
-                         , iterLog->_line
-                         , iterLog->_content.c_str());
+            cache.Format("nowTime[%lld]%s"
+                         , cacheTIme.FlushTime().GetMicroTimestamp()
+                         , iterLog->_logToWrite.c_str());
 
             // 写入文件
             ASSERT(logFile->Write(cache.c_str(), cache.GetLength()) == cache.GetLength());
-            logFile->Flush();
+            Fs_SafeFree(iterLog);
         }
 
-        STLUtil::DelListContainer(*logDataList);
+        logFile->Flush();
+        logDataList->clear();
         logFile->UnLock();
     }
-
-    // 3.清理
-    STLUtil::DelMapContainer(logDatasToWrite);
 }
 FS_NAMESPACE_END
 
