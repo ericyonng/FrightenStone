@@ -10,6 +10,10 @@ public:
     {
         fs::TimeUtil::SetTimeZone();
         auto logMgr = fs::ILog::InitModule("main");
+        auto gateWay = fs::ILog::InitModule("Gateway");
+        auto gameServer = fs::ILog::InitModule("GameServer");
+        gateWay->w<TestLogModule>(fs::LogDefs::_SYSLOG_frameLayer_, __FUNCTION__, __LINE__, "hello world%s", "nihao");
+        gameServer->w<TestLogModule>(fs::LogDefs::_SYSLOG_frameLayer_, __FUNCTION__, __LINE__, "hello world%s", "nihao");
         fs::Time nowTime, nowTime2;
         nowTime.FlushTime();
         for(Int32 i = 0; i < 1000000; ++i)
