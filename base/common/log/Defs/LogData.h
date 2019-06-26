@@ -68,6 +68,7 @@ struct BASE_EXPORT LogData
     Int32 _line;                    // 写日志行数 Input from outside
     Time _logTime;                  // 时间 generate inside
     Int32 _level;                   // 日志级别 Input from log func level
+    FS_String _logToWrite;          // 格式化的日志字符串 %s<%s>[%s][%s]line:%d %s
 };
 
 FS_NAMESPACE_END
