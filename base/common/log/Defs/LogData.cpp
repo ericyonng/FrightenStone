@@ -35,7 +35,7 @@
 FS_NAMESPACE_BEGIN
 static const char *__g_LogLevelDescription[LogLevel::End + 1] = 
 {
-    "Warning",
+    "Warn",
     "Debug",
     "Info",
     "Error",

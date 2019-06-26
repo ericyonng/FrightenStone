@@ -59,8 +59,8 @@ public:
     static UInt64 ReadOneLine(FILE &fp, FS_String &outBuffer);
     static UInt64 ReadFile(FILE &fp, UInt64 bufferSize, char *&buffer);
     static UInt64 ReadFile(FILE &fp, FS_String &outString, Int64 sizeLimit = -1);
-    static UInt64 WriteFile(FILE &fp, const char *buffer, UInt64 dataLenToWrite);
-    static UInt64 WriteFile(FILE &fp, const FS_String &bitData);
+    static Int64 WriteFile(FILE &fp, const char *buffer, Int64 dataLenToWrite);
+    static Int64 WriteFile(FILE &fp, const FS_String &bitData);
     static bool CloseFile(FILE &fp);
     static bool IsFileExist(const char *fileName);
     static Int32 GetFileCusorPos(FILE &fp);

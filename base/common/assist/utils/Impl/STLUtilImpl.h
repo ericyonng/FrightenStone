@@ -71,6 +71,14 @@ inline void STLUtil::DelListContainer(_Type &container)
     }
 }
 
+template<typename _Type, AssistObjsDefs::DelMethods DelType>
+inline void STLUtil::DelArray(_Type &container)
+{
+    const Int32 sizeContainer = ARRAY_ELEM_COUNT(container);
+    for(Int32 i = 0; i < sizeContainer; ++i)
+        Fs_SafeFree(container[i]);
+}
+
 FS_NAMESPACE_END
 
 #endif

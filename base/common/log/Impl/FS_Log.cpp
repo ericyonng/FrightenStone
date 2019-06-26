@@ -37,6 +37,7 @@
 #include "base/common/log/Defs/LogDefs.h"
 #include "base/common/log/Defs/LogTask.h"
 #include "base/common/assist/utils/Impl/FS_FileUtil.h"
+#include "base/common/log/Defs/LogCaches.h"
 
 #define LOG_THREAD_INTERVAL_MS_TIME 0    // 日志线程写日志间隔时间
 #define LOG_SIZE_LIMIT  -1            // 日志尺寸限制10MB
@@ -45,9 +46,11 @@ FS_NAMESPACE_BEGIN
 
 FS_Log::FS_Log(const Byte8 *processName)
     :_processName(processName)
-    ,_threadPool(NULL)
-    ,_threadWorkIntervalMsTime(LOG_THREAD_INTERVAL_MS_TIME)
-    ,_threadWriteLogDelegate(NULL)
+    , _threadPool(NULL)
+    , _threadWorkIntervalMsTime(LOG_THREAD_INTERVAL_MS_TIME)
+    , _threadWriteLogDelegate(NULL)
+    , _logCaches(NULL)
+    , _levelRefHook{NULL}
 {
 
 }
@@ -57,25 +60,13 @@ FS_Log::~FS_Log()
     FinishModule();
 }
 
-void FS_Log::InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate)
-{
-    UnInstallLogHook(level);
-    _levelRefHook.insert(std::make_pair(level, delegate));
-}
-
-void FS_Log::UnInstallLogHook(Int32 level)
-{
-    auto iterDelegate = _levelRefHook.find(level);
-    if(iterDelegate == _levelRefHook.end())
-        return;
-
-    Fs_SafeFree(iterDelegate->second);
-    _levelRefHook.erase(iterDelegate);
-}
-
 Int32 FS_Log::InitModule()
 {
+    if(_isInit)
+        return StatusDefs::Success;
+
     // 初始化日志文件
+    _logCaches = new LogCaches;
     LogDefs::LogInitHelper<LogDefs::LOG_NUM_MAX>::InitLog(this);
 
     // 初始化线程池并添加写日志任务
@@ -83,11 +74,18 @@ Int32 FS_Log::InitModule()
     _threadWriteLogDelegate = DelegatePlusFactory::Create(this, &FS_Log::_OnThreadWriteLog);
     ITask *logTask = new LogTask(_threadPool, _threadWriteLogDelegate, _threadWorkIntervalMsTime);
     ASSERT(_threadPool->AddTask(*logTask));
+
+    _isInit = true;
     return StatusDefs::Success;
 }
 
 void FS_Log::FinishModule()
 {
+    if(_isFinish)
+        return;
+
+    _isFinish = true;
+
     // 关闭线程池
     _threadPool->Clear();
 
@@ -95,8 +93,8 @@ void FS_Log::FinishModule()
     Fs_SafeFree(_threadWriteLogDelegate);
     fs::STLUtil::DelMapContainer(_fileUniqueIndexRefLogDatas);
     fs::STLUtil::DelMapContainer(_fileUniqueIndexRefLogFiles);
-    fs::STLUtil::DelMapContainer(_levelRefHook);
-    fs::STLUtil::DelMapContainer(_logDatasCache);
+    fs::STLUtil::DelArray(_levelRefHook);
+    Fs_SafeFree(_logCaches);
     Fs_SafeFree(_threadPool);
 }
 
@@ -134,7 +132,7 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
         _fileUniqueIndexRefLogFiles.insert(std::make_pair(fileUnqueIndex, logFile));
 
         // 4.创建日志缓冲
-        _NewLogDataList(fileUnqueIndex);
+        _fileUniqueIndexRefLogDatas.insert(std::make_pair(fileUnqueIndex, new std::list<LogData *>));
     } while(0);
     
     _locker.Unlock();
@@ -142,138 +140,72 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
     return ret;
 }
 
-LogData *FS_Log::_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel)
-{
-    LogData *newLogData = new LogData;
-    newLogData->_className = className;
-    newLogData->_funcName = funcName;
-    newLogData->_content = content;
-    newLogData->_line = codeLine;
-    newLogData->_level = logLevel;
-    newLogData->_processName = _processName;
-    newLogData->_logTime = Time::Now();
-    newLogData->_logToWrite.Format("%s<%s>[%s][%s]line:%d %s"
-                                   , newLogData->_logTime.ToString().c_str()
-                                   , LogLevel::GetDescription(logLevel)
-                                   , className
-                                   , funcName
-                                   , codeLine
-                                   , content.c_str());
-    return newLogData;
-}
-
 void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
 {
     _locker.Lock();
 
     // 1.将日志数据放入队列
-    auto logList = _GetLogDataList(fileUniqueIndex);
+    auto logList = _fileUniqueIndexRefLogDatas.find(fileUniqueIndex)->second;
     logList->push_back(logData);
 
     // 2.根据level不同调用不同的hook
-    auto iterHook = _levelRefHook.find(level);
-    if(iterHook != _levelRefHook.end())
-    {
-        auto hook = iterHook->second;
-        (*hook)(std::move(logData));
-    }
+    if(_levelRefHook[level])
+        (*_levelRefHook[level])(std::move(logData));
     _locker.Unlock();
-}
-
-std::list<LogData *> * FS_Log::_GetLogDataList(Int32 fileIndex)
-{
-    auto iterLogDatas = _fileUniqueIndexRefLogDatas.find(fileIndex);
-    if(iterLogDatas == _fileUniqueIndexRefLogDatas.end())
-        return NULL;
-
-    return iterLogDatas->second;
-}
-
-std::list<LogData *> * FS_Log::_NewLogDataList(Int32 fileIndex)
-{
-    auto newList = new std::list<LogData *>;
-    _fileUniqueIndexRefLogDatas.insert(std::make_pair(fileIndex, newList));
-    return newList;
 }
 
 void FS_Log::_OnThreadWriteLog()
 {
-    // 线程操作需要枷锁
-    // 将日志内容移出到缓冲
-
     // 1.转移到缓冲区
-    static std::map<Int32, std::list<LogData *> *>::iterator iterToWrite;
-
     _locker.Lock();
-    if(_fileUniqueIndexRefLogDatas.empty())
+    _logCaches->_hasLog = false;
+    for(auto &iterLogSrc : _fileUniqueIndexRefLogDatas)
     {
-        _locker.Unlock();
-        return;
-    }
+        _logCaches->_iterToWrite = _logCaches->_logDatasCache.find(iterLogSrc.first);
+        if(_logCaches->_iterToWrite == _logCaches->_logDatasCache.end())
+            _logCaches->_iterToWrite = _logCaches->_logDatasCache.insert(std::make_pair(iterLogSrc.first, new std::list<LogData *>)).first;
 
-    static bool hasLog = false;
-    hasLog = false;
-    for(auto iterLogDatas = _fileUniqueIndexRefLogDatas.begin(); iterLogDatas != _fileUniqueIndexRefLogDatas.end(); ++iterLogDatas)
-    {
-        iterToWrite = _logDatasCache.find(iterLogDatas->first);
-        if(iterToWrite == _logDatasCache.end())
-            iterToWrite = _logDatasCache.insert(std::make_pair(iterLogDatas->first, new std::list<LogData *>)).first;
-
-        if(iterLogDatas->second->empty())
+        if(iterLogSrc.second->empty())
             continue;
-        
-        hasLog = true;
 
-        std::swap(*iterToWrite->second, *iterLogDatas->second);
+        _logCaches->_hasLog = true;
+
+        std::swap(*_logCaches->_iterToWrite->second, *iterLogSrc.second);
     }
     _locker.Unlock();
-    if(!hasLog)
+
+    if(!_logCaches->_hasLog)
         return;
 
     // 2.写日志
-    static std::map<Int32, LogFile *>::iterator iterLogFile;
-    static LogFile * logFile = NULL;
-    static std::list<LogData *> * logDataList = NULL;
-    static FS_String cache;
-    static Int32 fileIndex = 0;
-    static Time cacheTIme;
-    for(auto &iterLogDatas : _logDatasCache)
+    for(auto &iterToWrite : _logCaches->_logDatasCache)
     {
-        fileIndex = iterLogDatas.first;
-        logDataList = iterLogDatas.second;
+        if(iterToWrite.second->empty())
+            continue;
 
-        iterLogFile = _fileUniqueIndexRefLogFiles.find(fileIndex);
-        logFile = iterLogFile->second;
-
-        logFile->Lock();
-        for(auto &iterLog : *logDataList)
+        _logCaches->_logFile = _fileUniqueIndexRefLogFiles.find(iterToWrite.first)->second;
+        for(auto &iterLog : *iterToWrite.second)
         {
-            if(logFile->IsDayPass(iterLog->_logTime))
+            if(_logCaches->_logFile->IsDayPass(iterLog->_logTime))
             {
-                ASSERT(logFile->Reopen());
-                logFile->UpdateLastTimestamp();
+                ASSERT(_logCaches->_logFile->Reopen());
+                _logCaches->_logFile->UpdateLastTimestamp();
             }
             else
             {
                 // 文件过大转储到分立文件
-                if(logFile->IsTooLarge(LOG_SIZE_LIMIT))
-                    logFile->PartitionFile();
+                if(_logCaches->_logFile->IsTooLarge(LOG_SIZE_LIMIT))
+                    _logCaches->_logFile->PartitionFile();
             }
 
-            // 构造日志正文
-            cache.Clear();
-            cache.Format("nowTime[%lld]%s"
-                         , cacheTIme.FlushTime().GetMicroTimestamp()
-                         , iterLog->_logToWrite.c_str());
-
             // 写入文件
-            ASSERT(logFile->Write(cache.c_str(), cache.GetLength()) == cache.GetLength());
+            iterLog->_logToWrite << "nowTime:" << fs::Time::NowMicroTimestamp() << "\n";
+            _logCaches->_logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
             Fs_SafeFree(iterLog);
         }
 
-        logFile->Flush();
-        logDataList->clear();
-        logFile->UnLock();
+        _logCaches->_logFile->Flush();
+        iterToWrite.second->clear();
     }
 }
 FS_NAMESPACE_END

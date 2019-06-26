@@ -8,6 +8,7 @@ class TestLogModule
 public:
     static void Run()
     {
+        fs::TimeUtil::SetTimeZone();
         auto logMgr = fs::ILog::InitModule("main");
         fs::Time nowTime, nowTime2;
         nowTime.FlushTime();

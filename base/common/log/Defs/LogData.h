@@ -61,13 +61,7 @@ public:
 
 struct BASE_EXPORT LogData
 {
-    FS_String _processName;         // 进程名
-    FS_String _className;           // 类名 Input from outside
-    FS_String _funcName;            // 函数名 Input from outside
-    FS_String _content;             // 日志内容 Input from outside
-    Int32 _line;                    // 写日志行数 Input from outside
     Time _logTime;                  // 时间 generate inside
-    Int32 _level;                   // 日志级别 Input from log func level
     FS_String _logToWrite;          // 格式化的日志字符串 %s<%s>[%s][%s]line:%d %s
 };
 
