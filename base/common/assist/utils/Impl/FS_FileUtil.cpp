@@ -343,62 +343,33 @@ UInt64 FS_FileUtil::ReadFile(FILE &fp, FS_String &outString, Int64 sizeLimit)
     return readCnt;
 }
 
-UInt64 FS_FileUtil::WriteFile(FILE &fp, const char *buffer, UInt64 dataLenToWrite)
+Int64 FS_FileUtil::WriteFile(FILE &fp, const char *buffer, Int64 dataLenToWrite)
 {
-    if(!buffer || dataLenToWrite == 0)
-        return 0;
+//     if(!buffer || dataLenToWrite == 0)
+//         return 0;
 
-    UInt64 cnt = 0;
-    const unsigned char *dataToWr = reinterpret_cast<const unsigned char *>(buffer);
-    while(true)
+    Int64 cnt = 0;
+    while(dataLenToWrite != 0)
     {
-        if(fwrite(dataToWr, 1, 1, &fp) == 1)
+        --dataLenToWrite;
+        if(fwrite(buffer + cnt, 1, 1, &fp) == 1)
         {
-            ++dataToWr;
             ++cnt;
+            continue;
         }
-        else
-        {
-            break;
-        }
-        if(cnt >= dataLenToWrite)
-        {
-            break;
-        }
+
+        break;
     }
 
-    if(dataLenToWrite != cnt)
-        printf("write error!");
+//     if(dataLenToWrite != cnt)
+//         printf("write error!");
 
     return cnt;
 }
 
-UInt64 FS_FileUtil::WriteFile(FILE &fp, const FS_String &bitData)
+Int64 FS_FileUtil::WriteFile(FILE &fp, const FS_String &bitData)
 {
-    UInt64 cnt = 0;
-    UInt64 dataLenToWrite = static_cast<UInt64>(bitData.size());
-    const unsigned char *dataToWr = reinterpret_cast<const unsigned char *>(bitData.GetRaw().data());
-    while(true)
-    {
-        if(fwrite(dataToWr, 1, 1, &fp) == 1)
-        {
-            ++dataToWr;
-            ++cnt;
-        }
-        else
-        {
-            break;
-        }
-        if(cnt >= dataLenToWrite)
-        {
-            break;
-        }
-    }
-
-    if(dataLenToWrite != cnt)
-        printf("write error!");
-
-    return cnt;
+    return WriteFile(fp, bitData.GetRaw().data(), bitData.GetLength());
 }
 
 bool FS_FileUtil::CloseFile(FILE &fp)

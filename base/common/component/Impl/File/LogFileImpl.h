@@ -45,6 +45,16 @@ inline bool LogFile::IsTooLarge(Int64 limitSize) const
     return _fileSize >= limitSize;
 }
 
+inline bool LogFile::IsDayPass(const Time &lastModifyTime) const
+{
+    return _lastModifyTime.GetZeroTime() != lastModifyTime.GetZeroTime();
+}
+
+inline void LogFile::UpdateLastTimestamp()
+{
+    _lastModifyTime.FlushTime();
+}
+
 FS_NAMESPACE_END
 
 #endif

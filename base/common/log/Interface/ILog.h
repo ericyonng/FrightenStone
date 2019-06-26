@@ -70,7 +70,6 @@ public:
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName) = 0;
 
 protected:
-    virtual LogData *_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel) = 0;
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData) = 0;
 };
 

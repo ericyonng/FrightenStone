@@ -44,56 +44,86 @@ inline ILog::~ILog()
 template<typename ObjType, typename... Args>
 inline void ILog::i(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // 构建logdata
-    FS_String content;
-    content.Format(fmt, args...) << FS_String::endl;
-    LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Info);
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.Format("%s<%s>[%s][%s][line:%d]: "
+                                   , newLogData->_logTime.ToString().c_str()
+                                   , LogLevel::GetDescription(LogLevel::Info)
+                                   , typeid(ObjType).name()
+                                   , funcName
+                                   , codeLine);
+    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Info, fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Info, fileUnqueIndex, newLogData);
 }
 
 template<typename ObjType, typename... Args>
 inline void ILog::d(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // 构建logdata
-    FS_String content;
-    content.Format(fmt, args...) << FS_String::endl;
-    LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Debug);
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.Format("%s<%s>[%s][%s][line:%d]: "
+                                   , newLogData->_logTime.ToString().c_str()
+                                   , LogLevel::GetDescription(LogLevel::Debug)
+                                   , typeid(ObjType).name()
+                                   , funcName
+                                   , codeLine);
+    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Debug, fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Debug, fileUnqueIndex, newLogData);
 }
 
 template<typename ObjType, typename... Args>
 inline void ILog::w(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // 构建logdata
-    FS_String content;
-    content.Format(fmt, args...) << FS_String::endl;
-    LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Warning);
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.Format("%s<%s>[%s][%s][line:%d]: "
+                                   , newLogData->_logTime.ToString().c_str()
+                                   , LogLevel::GetDescription(LogLevel::Warning)
+                                   , typeid(ObjType).name()
+                                   , funcName
+                                   , codeLine)
+                            .Format(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Warning, fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Warning, fileUnqueIndex, newLogData);
 }
 
 template<typename ObjType, typename... Args>
 inline void ILog::e(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // 构建logdata
-    FS_String content;
-    content.Format(fmt, args...) << FS_String::endl;
-    LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Error);
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.Format("%s<%s>[%s][%s][line:%d]: "
+                                   , newLogData->_logTime.ToString().c_str()
+                                   , LogLevel::GetDescription(LogLevel::Error)
+                                   , typeid(ObjType).name()
+                                   , funcName
+                                   , codeLine);
+    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Error, fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Error, fileUnqueIndex, newLogData);
 }
 
 template<typename ObjType, typename... Args>
 inline void ILog::crash(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // 构建logdata
-    FS_String content;
-    content.Format(fmt, args...) << FS_String::endl;
-    LogData *logData = _BuildLogData(typeid(ObjType).name(), funcName, content, codeLine, LogLevel::Crash);
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.Format("%s<%s>[%s][%s][line:%d]: "
+                                   , newLogData->_logTime.ToString().c_str()
+                                   , LogLevel::GetDescription(LogLevel::Crash)
+                                   , typeid(ObjType).name()
+                                   , funcName
+                                   , codeLine);
+    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Crash, fileUnqueIndex, logData);
+    _WriteLog(LogLevel::Crash, fileUnqueIndex, newLogData);
 }
 
 template<typename ObjType>

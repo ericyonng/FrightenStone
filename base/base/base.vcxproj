@@ -256,6 +256,7 @@
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h" />
     <ClInclude Include="..\common\component\Impl\Trigger.h" />
     <ClInclude Include="..\common\log\Defs\CreateLogFileMacro.h" />
+    <ClInclude Include="..\common\log\Defs\LogCaches.h" />
     <ClInclude Include="..\common\log\Defs\LogData.h" />
     <ClInclude Include="..\common\log\Defs\LogDefs.h" />
     <ClInclude Include="..\common\log\Defs\LogDefsImpl.h" />
@@ -316,6 +317,7 @@
     <ClCompile Include="..\common\component\Impl\TimeWheel\FS_Timer.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWheel.cpp" />
     <ClCompile Include="..\common\component\Impl\Trigger.cpp" />
+    <ClCompile Include="..\common\log\Defs\LogCaches.cpp" />
     <ClCompile Include="..\common\log\Defs\LogData.cpp" />
     <ClCompile Include="..\common\log\Defs\LogTask.cpp" />
     <ClCompile Include="..\common\log\Impl\FS_Log.cpp" />

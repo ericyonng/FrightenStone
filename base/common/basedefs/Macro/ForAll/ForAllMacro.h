@@ -77,14 +77,9 @@ p = NULL;}
 #define Fs_Malloc(type, size)             (reinterpret_cast<type *>(malloc(size)))
 #define Fs_Calloc(type, size)             (reinterpret_cast<type *>(calloc(size, 1)))
 #define Fs_Realloc(type, memblock, size)  (reinterpret_cast<type *>(realloc((memblock), (size))))
-#define Fs_Free(memblock)                 (free(memblock))
+#define Fs_Free(memblock)                 delete(memblock)
 #define Fs_SafeFree(memblock)        \
-    do {                            \
-        if (LIKELY(memblock)) {     \
-            Fs_Free(memblock);      \
-            (memblock) = NULL;      \
-        }                           \
-    } while(0)                      \
+        (memblock?(Fs_Free(memblock), memblock = NULL):NULL)
 
 #ifndef INFINITE
 #define INFINITE    0xFFFFFFFF
@@ -239,5 +234,7 @@ private:\
 ASSERT(x)   throw std::logic_error(#x)
 #endif
 
+#undef ARRAY_ELEM_COUNT
+#define ARRAY_ELEM_COUNT(x) sizeof(x)/sizeof(x[0])
 
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__

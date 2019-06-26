@@ -32,4 +32,14 @@
 #ifdef __Base_Common_Log_Impl_Log_H__
 #pragma once
 
+FS_NAMESPACE_BEGIN
+
+inline void FS_Log::InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate)
+{
+    Fs_SafeFree(_levelRefHook[level]);
+    _levelRefHook[level] = delegate;
+}
+
+FS_NAMESPACE_END
+
 #endif

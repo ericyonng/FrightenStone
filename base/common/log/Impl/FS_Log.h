@@ -59,6 +59,8 @@ FS_NAMESPACE_BEGIN
 
 class FS_ThreadPool;
 class LogFile;
+class LogCaches;
+
 class BASE_EXPORT FS_Log : public ILog
 {
 public:
@@ -67,7 +69,6 @@ public:
 
     /* 日志hook */
     virtual void InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate);    // 抽象的delegate
-    void UnInstallLogHook(Int32 level);
 
     /* 功能函数 */
     Int32 InitModule();
@@ -75,28 +76,28 @@ public:
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     
 protected:
-    virtual LogData *_BuildLogData(const Byte8 *className, const Byte8 *funcName, const FS_String &content, Int32 codeLine, Int32 logLevel);
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData);
-
-    std::list<LogData *> *_GetLogDataList(Int32 fileIndex);
-    std::list<LogData *> *_NewLogDataList(Int32 fileIndex);
 
     // 线程操作
 private:
     void _OnThreadWriteLog();
 
 private:
+    std::atomic_bool _isInit{false};
+    std::atomic_bool _isFinish{false};
+
     FS_ThreadPool *_threadPool;                                                 // 线程池
     FS_String _processName;                                                     // 进程名
-    std::map<Int32, IDelegatePlus<void, const LogData *> *> _levelRefHook;      // 日志级别对应的hook
+    IDelegatePlus<void, const LogData *> *_levelRefHook[LogLevel::End];         // 日志级别对应的hook
     Int32 _threadWorkIntervalMsTime;                                            // 日志线程工作间隔时间
 
     /* 日志文件内容 */
     ConditionLocker _locker;                                                // 锁
     std::map<Int32, LogFile *> _fileUniqueIndexRefLogFiles;                 // 日志id日志文件 创建后文件只允许读不允许增删
     std::map<Int32, std::list<LogData *> *> _fileUniqueIndexRefLogDatas;    // 日志id日志内容
-    std::map<Int32, std::list<LogData *> *> _logDatasCache;                 // 日志内容缓冲
     IDelegatePlus<void> *_threadWriteLogDelegate;                           // 日志线程写日志委托
+
+    LogCaches *_logCaches;
 
 };
 

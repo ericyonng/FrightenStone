@@ -135,15 +135,15 @@ bool FS_File::Close()
 
 Int64 FS_File::Write(const void *buffer, UInt64 writeDataLen)
 {
-    if(UNLIKELY(!_fp))
-        return StatusDefs::Error;
+//     if(UNLIKELY(!_fp))
+//         return StatusDefs::Error;
 
     auto wrLen = FS_FileUtil::WriteFile(*_fp, reinterpret_cast<const char *>(buffer), writeDataLen);
     if(wrLen != 0)
         _modifyFileTime.FlushTime();
 
     _fileSize += wrLen;
-    return static_cast<Int64>(wrLen);
+    return wrLen;
 }
 
 Int64 FS_File::Read(FS_String &outBuffer)

@@ -21,60 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : LogFile.cpp
+ * @file  : LogCaches.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/06/27
  * @brief :
  * 
  *
  * 
  */
-
 #include "stdafx.h"
-#include "base/common/component/Impl/Time.h"
-#include "base/common/component/Impl/TimeSlice.h"
+#include "base/common/log/Defs/LogCaches.h"
+#include "base/common/log/Defs/LogData.h"
 #include "base/common/component/Impl/File/LogFile.h"
-#include "base/common/assist/utils/Impl/FS_FileUtil.h"
+#include "base/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
 
-LogFile::LogFile()
-    :_partNo(0)
-{
-    
-}
-
-LogFile::~LogFile()
+LogCaches::LogCaches()
 {
 
 }
 
-void LogFile::PartitionFile()
+LogCaches::~LogCaches()
 {
-    // 构建文件名
-    FS_String fileNameCache = _path + _fileName;
-    const auto &extensionName = FS_FileUtil::ExtractFileExtension(fileNameCache);
-    if(_useTimestampTailer)
-        FS_FileUtil::InsertFileTime(extensionName, _createFileTime, fileNameCache);
-
-    // 查找不存在的文件名
-    FS_String wholeName;
-    wholeName.Format("%sOld%d", fileNameCache.c_str(), ++_partNo);
-    while(FS_FileUtil::IsFileExist(wholeName.c_str()))
-    {
-        wholeName.Clear();
-        wholeName.Format("%sOld%d", fileNameCache.c_str(), ++_partNo);
-    }
-
-    // 转储文件
-    auto dest = FS_FileUtil::OpenFile(wholeName.c_str(), true);
-    FS_FileUtil::ResetFileCursor(*_fp);
-    FS_FileUtil::CopyFile(*_fp, *dest);
-    FS_FileUtil::CloseFile(*dest);
-
-    // 删除并重开文件
-    Close();
-    FS_FileUtil::DelFile(fileNameCache.c_str());
-    ASSERT(Reopen());
+    STLUtil::DelMapContainer(_logDatasCache);
 }
 FS_NAMESPACE_END
