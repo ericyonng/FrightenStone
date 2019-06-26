@@ -131,8 +131,10 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
         logFile->UpdateLastTimestamp();
         _fileUniqueIndexRefLogFiles.insert(std::make_pair(fileUnqueIndex, logFile));
 
-        // 4.创建日志缓冲
+        // 4.创建日志内容
         _fileUniqueIndexRefLogDatas.insert(std::make_pair(fileUnqueIndex, new std::list<LogData *>));
+        // 5.日志内容缓冲
+        _logCaches->_logDatasCache.insert(std::make_pair(fileUnqueIndex, new std::list<LogData *>));
     } while(0);
     
     _locker.Unlock();
@@ -159,18 +161,14 @@ void FS_Log::_OnThreadWriteLog()
     // 1.转移到缓冲区
     _locker.Lock();
     _logCaches->_hasLog = false;
-    for(auto &iterLogSrc : _fileUniqueIndexRefLogDatas)
+    for(auto &iterLogSrcList : _fileUniqueIndexRefLogDatas)
     {
-        _logCaches->_iterToWrite = _logCaches->_logDatasCache.find(iterLogSrc.first);
-        if(_logCaches->_iterToWrite == _logCaches->_logDatasCache.end())
-            _logCaches->_iterToWrite = _logCaches->_logDatasCache.insert(std::make_pair(iterLogSrc.first, new std::list<LogData *>)).first;
-
-        if(iterLogSrc.second->empty())
+        if(iterLogSrcList.second->empty())
             continue;
 
+        _logCaches->_iterToWrite = _logCaches->_logDatasCache.find(iterLogSrcList.first);
         _logCaches->_hasLog = true;
-
-        std::swap(*_logCaches->_iterToWrite->second, *iterLogSrc.second);
+        std::swap(*_logCaches->_iterToWrite->second, *iterLogSrcList.second);
     }
     _locker.Unlock();
 
@@ -199,7 +197,6 @@ void FS_Log::_OnThreadWriteLog()
             }
 
             // 写入文件
-            iterLog->_logToWrite << "nowTime:" << fs::Time::NowMicroTimestamp() << "\n";
             _logCaches->_logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
             Fs_SafeFree(iterLog);
         }
