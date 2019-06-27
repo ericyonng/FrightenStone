@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_SmartVar_SmartVarArithmetic__H__
-#define __Base_Common_Component_Impl_SmartVar_SmartVarArithmetic__H__
+#ifndef __Base_Common_Component_Impl_SmartVar_SmartVarArithmetic_H__
+#define __Base_Common_Component_Impl_SmartVar_SmartVarArithmetic_H__
 #pragma once
 
 #include "base/common/basedefs/Macro/MacroDefs.h"

@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Net_Protocol_Defs_ProtocolDefs__H__
-#define __Base_Common_Net_Protocol_Defs_ProtocolDefs__H__
+#ifndef __Base_Common_Net_Protocol_Defs_ProtocolDefs_H__
+#define __Base_Common_Net_Protocol_Defs_ProtocolDefs_H__
 
 #pragma once
 
@@ -110,4 +110,4 @@ struct BASE_EXPORT CreatePlayerNty : public PacketHeader
 
 #pragma endregion
 
-#endif // !__Base_Common_Net_Protocol_Defs_ProtocolDefs__H__
+#endif // !__Base_Common_Net_Protocol_Defs_ProtocolDefs_H__

@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_File_Defs_FileDefs__H__
-#define __Base_Common_Component_Impl_File_Defs_FileDefs__H__
+#ifndef __Base_Common_Component_Impl_File_Defs_FileDefs_H__
+#define __Base_Common_Component_Impl_File_Defs_FileDefs_H__
 
 
 #pragma once

@@ -417,9 +417,6 @@
     <ClInclude Include="..\common\assist\utils\Impl\WidthUtilImpl.h">
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\assist\utils\Impl\FS_CpuUtil.h">
-      <Filter>common\assist\utils\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\basedefs\Resource\Resource.h">
       <Filter>common\basedefs\Resource</Filter>
     </ClInclude>
@@ -573,6 +570,9 @@
     <ClInclude Include="..\common\log\Defs\LogCaches.h">
       <Filter>common\log\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_CpuInfo.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -639,9 +639,6 @@
       <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\assist\utils\Impl\WidthUtil.cpp">
-      <Filter>common\assist\utils\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\assist\utils\Impl\FS_CpuUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\TimeSlice.cpp">
@@ -718,6 +715,9 @@
     </ClCompile>
     <ClCompile Include="..\common\log\Defs\LogCaches.cpp">
       <Filter>common\log\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\FS_CpuInfo.cpp">
+      <Filter>common\component\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

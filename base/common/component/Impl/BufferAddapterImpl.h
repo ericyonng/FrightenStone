@@ -29,7 +29,7 @@
  *
  * 
  */
-#ifdef __Base_Common_Component_Impl_Buffer_Addapter__H__
+#ifdef __Base_Common_Component_Impl_Buffer_Addapter_H__
 
 #pragma once
 

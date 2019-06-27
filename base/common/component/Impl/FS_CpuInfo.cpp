@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_CpuUtil.cpp
+ * @file  : FS_CpuInfo.cpp
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -30,23 +30,27 @@
  * 
  */
 /**
-* @file CpuUtil.cpp
+* @file FS_CpuInfo.cpp
 * @auther Huiya Song <120453674@qq.com>
 * @date 2019/05/20
 * @brief
 */
 
 #include "stdafx.h"
-#include "base/common/assist/utils/Impl/FS_CpuUtil.h"
+#include "base/common/component/Impl/FS_CpuInfo.h"
 
 FS_NAMESPACE_BEGIN
 
-FILETIME FS_CpuUtil::_preidleTime = FILETIME{0};
-FILETIME FS_CpuUtil::_preKernalTime = FILETIME{0};
-FILETIME FS_CpuUtil::_preUserTime = FILETIME{0};
-bool FS_CpuUtil::_isInit = false;
+FS_CpuInfo::FS_CpuInfo()
+    :_preidleTime{0}
+    ,_preKernalTime{0}
+    , _preUserTime{0}
+    ,_isInit(false)
+{
 
-bool FS_CpuUtil::Initialize()
+}
+
+bool FS_CpuInfo::Initialize()
 {
     if(UNLIKELY(_isInit))
         return true;
@@ -58,7 +62,7 @@ bool FS_CpuUtil::Initialize()
     return true;
 }
 
-Double FS_CpuUtil::GetUsage()
+Double FS_CpuInfo::GetUsage()
 {
     if(!_isInit)
         return -1;
@@ -85,7 +89,7 @@ Double FS_CpuUtil::GetUsage()
     return usage;
 }
 
-Int32 FS_CpuUtil::GetCpuCoreCnt()
+Int32 FS_CpuInfo::GetCpuCoreCnt()
 {
     Int32 count = 1; // at least one
 #if defined (LINUX)  
@@ -98,7 +102,7 @@ Int32 FS_CpuUtil::GetCpuCoreCnt()
     return count;
 }
 
-Int64 FS_CpuUtil::_CompareFileTime(FILETIME time1, FILETIME time2)
+Int64 FS_CpuInfo::_CompareFileTime(FILETIME time1, FILETIME time2)
 {
     Int64 a = (static_cast<Int64>(time1.dwHighDateTime) << 32) | static_cast<Int64>(time1.dwLowDateTime);
     Int64 b = (static_cast<Int64>(time2.dwHighDateTime) << 32) | static_cast<Int64>(time2.dwLowDateTime);

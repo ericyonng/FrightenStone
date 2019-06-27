@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_ClassFactory__H__
-#define __Base_Common_Component_Impl_FS_ClassFactory__H__
+#ifndef __Base_Common_Component_Impl_FS_ClassFactory_H__
+#define __Base_Common_Component_Impl_FS_ClassFactory_H__
 
 #pragma once
 

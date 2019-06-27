@@ -48,7 +48,6 @@
 #include "base/common/assist/utils/Impl/FS_DirectoryUtil.h"
 #include "base/common/assist/utils/Impl/FS_FileUtil.h"
 #include "base/common/assist/utils/Impl/WidthUtil.h"
-#include "base/common/assist/utils/Impl/FS_CpuUtil.h"
 #include "base/common/assist/utils/Impl/SystemUtil.h"
 
 #endif // !__Base_Common_Assist_Utils_Utils_H__

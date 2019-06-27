@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_CpuUtil.h
+ * @file  : FS_CpuInfo.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Impl_FS_CpuUtil_H__
-#define __Base_Common_Assist_Utils_Impl_FS_CpuUtil_H__
+#ifndef __Base_Common_Component_Impl_FS_CpuInfo_H__
+#define __Base_Common_Component_Impl_FS_CpuInfo_H__
 #pragma once
 
 #include "base/exportbase.h"
@@ -40,21 +40,22 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_CpuUtil
+class BASE_EXPORT FS_CpuInfo
 {
 public:
-    static bool Initialize();
-    static Double GetUsage();
-    static Int32 GetCpuCoreCnt();
+    FS_CpuInfo();
+    bool Initialize();
+    Double GetUsage();
+    Int32 GetCpuCoreCnt();
 
 private:
-    static Int64 _CompareFileTime(FILETIME time1, FILETIME time2);
+    Int64 _CompareFileTime(FILETIME time1, FILETIME time2);
 
 private:
-    static FILETIME _preidleTime;
-    static FILETIME _preKernalTime;
-    static FILETIME _preUserTime;
-    static bool _isInit;
+    FILETIME _preidleTime;
+    FILETIME _preKernalTime;
+    FILETIME _preUserTime;
+    bool _isInit;
 };
 
 #pragma region Inline

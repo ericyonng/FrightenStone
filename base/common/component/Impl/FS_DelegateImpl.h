@@ -29,7 +29,7 @@
  *
  * 
  */
-#ifdef __Base_Common_Component_Impl_FS_Delegate__H__
+#ifdef __Base_Common_Component_Impl_FS_Delegate_H__
 
 
 #pragma once
