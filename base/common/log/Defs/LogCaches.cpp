@@ -36,14 +36,26 @@
 #include "base/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
+LogDataCache::LogDataCache()
+    :_cache{NULL}
+    ,_pos(0)
+{
+    for(Int32 i = 0; i < fs::LogDefs::LOG_QUANTITY; ++i)
+        _cache[i] = new std::list<LogData *>;
+}
+
+fs::LogDataCache::~LogDataCache()
+{
+    STLUtil::DelArray(_cache);
+}
 
 LogCaches::LogCaches()
+    :_swapCache(NULL)
 {
-
 }
 
 LogCaches::~LogCaches()
 {
-    STLUtil::DelMapContainer(_logDatasCache);
 }
+
 FS_NAMESPACE_END

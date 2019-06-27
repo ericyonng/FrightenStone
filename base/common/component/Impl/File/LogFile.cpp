@@ -53,9 +53,6 @@ void LogFile::PartitionFile()
 {
     // 构建文件名
     FS_String fileNameCache = _path + _fileName;
-    const auto &extensionName = FS_FileUtil::ExtractFileExtension(fileNameCache);
-    if(_useTimestampTailer)
-        FS_FileUtil::InsertFileTime(extensionName, _createFileTime, fileNameCache);
 
     // 查找不存在的文件名
     FS_String wholeName;

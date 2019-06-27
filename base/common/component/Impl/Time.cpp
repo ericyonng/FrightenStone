@@ -360,9 +360,9 @@ Time Time::GetZeroTime() const
     // 转换成本地时间
     Int64 zoneTime = static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
     Int64 localTime = _rawTime - zoneTime;
-    Int64 localZeroTime = localTime / _microSecondPerDay * _microSecondPerDay;
-    localZeroTime += zoneTime;
-    return Time(localZeroTime);
+    Int64 zeroTime = localTime / _microSecondPerDay * _microSecondPerDay;
+    zeroTime += zoneTime;
+    return Time(zeroTime);
 }
 
 FS_String Time::Format(const Byte8 *outFmt) const

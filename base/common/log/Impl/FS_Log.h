@@ -54,6 +54,7 @@
 #include "base/common/log/Defs/LogData.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/asyn/asyn.h"
+#include "base/common/log//Defs/LogDefs.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -64,7 +65,7 @@ class LogCaches;
 class BASE_EXPORT FS_Log : public ILog
 {
 public:
-    FS_Log(const Byte8 *processName);
+    FS_Log(const Byte8 *rootDirName);
     virtual ~FS_Log();
 
     /* 日志hook */
@@ -87,18 +88,17 @@ private:
     std::atomic_bool _isFinish{false};
 
     FS_ThreadPool *_threadPool;                                                 // 线程池
-    FS_String _processName;                                                     // 进程名
+    FS_String _rootDirName;                                                     // 进程名
     IDelegatePlus<void, const LogData *> *_levelRefHook[LogLevel::End];         // 日志级别对应的hook
     Int32 _threadWorkIntervalMsTime;                                            // 日志线程工作间隔时间
 
     /* 日志文件内容 */
     ConditionLocker _locker;                                                // 锁
-    std::map<Int32, LogFile *> _fileUniqueIndexRefLogFiles;                 // 日志id日志文件 创建后文件只允许读不允许增删
-    std::map<Int32, std::list<LogData *> *> _fileUniqueIndexRefLogDatas;    // 日志id日志内容
+    LogFile *_logFiles[LogDefs::LOG_QUANTITY];                  // 日志id日志文件 创建后文件只允许读不允许增删
+    std::list<LogData *> *_logDatas[LogDefs::LOG_QUANTITY];      // 日志id日志内容
     IDelegatePlus<void> *_threadWriteLogDelegate;                           // 日志线程写日志委托
 
     LogCaches *_logCaches;
-
 };
 
 FS_NAMESPACE_END

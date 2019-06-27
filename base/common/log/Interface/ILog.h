@@ -46,7 +46,7 @@ public:
     ILog();
     virtual ~ILog();
 
-    static ILog *InitModule(const Byte8 *processName);
+    static ILog *InitModule(const Byte8 *rootDir);
     virtual void FinishModule() = 0;
 
     // json»’÷æ

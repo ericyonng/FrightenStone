@@ -36,9 +36,9 @@ s/*!
 
 FS_NAMESPACE_BEGIN
 
-ILog *ILog::InitModule(const Byte8 *processName)
+ILog *ILog::InitModule(const Byte8 *rootDir)
 {
-    auto logMgr = new FS_Log(processName);
+    auto logMgr = new FS_Log(rootDir);
     if(logMgr->InitModule() != StatusDefs::Success)
     {
         Fs_SafeFree(logMgr);

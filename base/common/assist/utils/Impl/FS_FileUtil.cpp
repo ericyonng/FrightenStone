@@ -173,9 +173,9 @@ bool FS_FileUtil::CopyFile(FILE &src, FILE &dest)
         wrCount = char(fwrite(&get_c, 1, 1, &dest));
         if(wrCount != 1)
             break;
-
-        FlushFile(dest);
     }
+
+    FlushFile(dest);
 
     return true;
 }

@@ -44,13 +44,15 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_Log::FS_Log(const Byte8 *processName)
-    :_processName(processName)
+FS_Log::FS_Log(const Byte8 *rootDirName)
+    :_rootDirName(rootDirName)
     , _threadPool(NULL)
     , _threadWorkIntervalMsTime(LOG_THREAD_INTERVAL_MS_TIME)
     , _threadWriteLogDelegate(NULL)
     , _logCaches(NULL)
     , _levelRefHook{NULL}
+    , _logFiles{NULL}
+    ,_logDatas{NULL}
 {
 
 }
@@ -91,8 +93,8 @@ void FS_Log::FinishModule()
 
     // 清理数据
     Fs_SafeFree(_threadWriteLogDelegate);
-    fs::STLUtil::DelMapContainer(_fileUniqueIndexRefLogDatas);
-    fs::STLUtil::DelMapContainer(_fileUniqueIndexRefLogFiles);
+    fs::STLUtil::DelArray(_logDatas);
+    fs::STLUtil::DelArray(_logFiles);
     fs::STLUtil::DelArray(_levelRefHook);
     Fs_SafeFree(_logCaches);
     Fs_SafeFree(_threadPool);
@@ -105,13 +107,13 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
     do 
     {
         // 1.是否创建过
-        auto iterLogFile = _fileUniqueIndexRefLogFiles.find(fileUnqueIndex);
-        if(iterLogFile != _fileUniqueIndexRefLogFiles.end())
+        auto logFile = _logFiles[fileUnqueIndex];
+        if(logFile)
             break;
 
         // 2.创建文件夹
         FS_String logName = ".\\";
-        logName += (_processName + "\\" + logPath);
+        logName += (_rootDirName + "\\" + logPath);
         if(!FS_DirectoryUtil::CreateDir(logName))
         {
             ret = StatusDefs::Log_CreateDirFail;
@@ -120,8 +122,8 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
 
         // 3.创建文件
         logName += fileName;
-        auto logFile = new LogFile;
-        if(!logFile->Open(logName.c_str(), true, "ab+", true))
+        logFile = new LogFile;
+        if(!logFile->Open(logName.c_str(), true, "ab+", false))
         {
             ret = StatusDefs::Log_CreateLogFileFail;
             ASSERT(!"log file open fail");
@@ -129,12 +131,10 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
         }
 
         logFile->UpdateLastTimestamp();
-        _fileUniqueIndexRefLogFiles.insert(std::make_pair(fileUnqueIndex, logFile));
+        _logFiles[fileUnqueIndex] = logFile;
 
         // 4.创建日志内容
-        _fileUniqueIndexRefLogDatas.insert(std::make_pair(fileUnqueIndex, new std::list<LogData *>));
-        // 5.日志内容缓冲
-        _logCaches->_logDatasCache.insert(std::make_pair(fileUnqueIndex, new std::list<LogData *>));
+        _logDatas[fileUnqueIndex] = new std::list<LogData *>;
     } while(0);
     
     _locker.Unlock();
@@ -147,7 +147,7 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
     _locker.Lock();
 
     // 1.将日志数据放入队列
-    auto logList = _fileUniqueIndexRefLogDatas.find(fileUniqueIndex)->second;
+    auto logList = _logDatas[fileUniqueIndex];
     logList->push_back(logData);
 
     // 2.根据level不同调用不同的hook
@@ -160,41 +160,40 @@ void FS_Log::_OnThreadWriteLog()
 {
     // 1.转移到缓冲区
     _locker.Lock();
-    _logCaches->_hasLog = false;
-    for(auto &iterLogSrcList : _fileUniqueIndexRefLogDatas)
+    for(_logCaches->_increasePos=0, _logCaches->_pos = 0;
+        _logCaches->_pos < fs::LogDefs::LOG_QUANTITY; 
+        ++_logCaches->_pos)
     {
-        if(iterLogSrcList.second->empty())
+        if(_logDatas[_logCaches->_pos]->empty())
             continue;
 
-        _logCaches->_iterToWrite = _logCaches->_logDatasCache.find(iterLogSrcList.first);
-        _logCaches->_hasLog = true;
-        std::swap(*_logCaches->_iterToWrite->second, *iterLogSrcList.second);
+        // 只交换数据队列指针拷贝最少，最快，而且交换后_logDatas队列是空的相当于清空了数据 保证前几个都不为NULL, 碰到NULL表示结束
+        _logCaches->_swapCache = _logCaches->_logDataCache._cache[_logCaches->_increasePos];
+
+        _logCaches->_logDataCache._cache[_logCaches->_increasePos] = _logDatas[_logCaches->_pos];
+        _logCaches->_logDataCache._pos = _logCaches->_pos;
+
+        _logDatas[_logCaches->_pos] = _logCaches->_swapCache;
+
+        ++_logCaches->_increasePos;
     }
     _locker.Unlock();
 
-    if(!_logCaches->_hasLog)
+    if(_logCaches->_logDataCache._cache[0]->empty())
         return;
 
     // 2.写日志
-    for(auto &iterToWrite : _logCaches->_logDatasCache)
+    for(_logCaches->_pos = 0; _logCaches->_pos < fs::LogDefs::LOG_QUANTITY; ++_logCaches->_pos)
     {
-        if(iterToWrite.second->empty())
-            continue;
+        if(_logCaches->_logDataCache._cache[_logCaches->_pos]->empty())
+            break;
 
-        _logCaches->_logFile = _fileUniqueIndexRefLogFiles.find(iterToWrite.first)->second;
-        for(auto &iterLog : *iterToWrite.second)
+        _logCaches->_logFile = _logFiles[_logCaches->_logDataCache._pos];
+        for(auto &iterLog : *_logCaches->_logDataCache._cache[_logCaches->_pos])
         {
-            if(_logCaches->_logFile->IsDayPass(iterLog->_logTime))
-            {
-                ASSERT(_logCaches->_logFile->Reopen());
-                _logCaches->_logFile->UpdateLastTimestamp();
-            }
-            else
-            {
-                // 文件过大转储到分立文件
-                if(_logCaches->_logFile->IsTooLarge(LOG_SIZE_LIMIT))
-                    _logCaches->_logFile->PartitionFile();
-            }
+            // 文件过大转储到分立文件
+            if(_logCaches->_logFile->IsTooLarge(LOG_SIZE_LIMIT))
+                _logCaches->_logFile->PartitionFile();
 
             // 写入文件
             _logCaches->_logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
@@ -202,7 +201,7 @@ void FS_Log::_OnThreadWriteLog()
         }
 
         _logCaches->_logFile->Flush();
-        iterToWrite.second->clear();
+        _logCaches->_logDataCache._cache[_logCaches->_pos]->clear();
     }
 }
 FS_NAMESPACE_END
