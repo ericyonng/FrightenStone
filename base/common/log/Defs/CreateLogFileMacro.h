@@ -65,7 +65,8 @@ struct LogInitHelper<_##log_path##_##log_name##_>                               
 
 // log文件结束
 #define DECLEAR_LOG_END(LOG_NUMBER, line)                                                       \
-enum {LOG_NUMBER = ExcludeCommentHelper<line>::realvalue};
+enum {LOG_NUMBER = ExcludeCommentHelper<line>::realvalue};\
+enum {LOG_QUANTITY = ExcludeCommentHelper<line>::realvalue+1};
 
 // 便利宏
 #define DECLEAR_GENERAL_LOG_BEGIN() DECLEAR_LOG_BEGIN(LOG_NUM_BEGIN,  __LINE__, 0)

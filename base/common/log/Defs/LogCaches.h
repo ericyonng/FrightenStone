@@ -34,8 +34,18 @@
 #pragma once
 
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/log/Defs/LogDefs.h"
 
 FS_NAMESPACE_BEGIN
+
+struct LogDataCache
+{
+    LogDataCache();
+    ~LogDataCache();
+
+    std::list<LogData *> *_cache[fs::LogDefs::LOG_QUANTITY];    // 日志数据队列
+    Int32 _pos;             // 日志数据在原数据的位置
+};
 
 struct LogData;
 class LogFile;
@@ -47,9 +57,10 @@ public:
     virtual ~LogCaches();
 
 public:
-    std::map<Int32, std::list<LogData *> *> _logDatasCache;                 // 日志内容缓冲 key:fileindex
-    std::map<Int32, std::list<LogData *> *>::iterator _iterToWrite;
-    bool _hasLog{false};
+    LogDataCache _logDataCache;     // 日志内容缓冲
+    Int32 _pos{0};
+    Int32 _increasePos{0};
+    std::list<LogData *> *_swapCache;
 
     // logfile
     LogFile *_logFile{NULL};
