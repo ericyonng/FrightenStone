@@ -56,5 +56,6 @@
 #include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
 #include "base/common/component/Impl/GlobalInitialize.h"
 #include "base/common/component/Impl/FS_List.h"
+#include "base/common/component/Impl/FS_CpuInfo.h"
 
 #endif

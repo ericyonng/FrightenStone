@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_Buffer_Addapter__H__
-#define __Base_Common_Component_Impl_Buffer_Addapter__H__
+#ifndef __Base_Common_Component_Impl_Buffer_Addapter_H__
+#define __Base_Common_Component_Impl_Buffer_Addapter_H__
 
 
 #pragma once

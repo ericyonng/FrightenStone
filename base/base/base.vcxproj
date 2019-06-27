@@ -172,7 +172,6 @@
     <ClInclude Include="..\common\assist\utils\Defs\SystemUtilDefs.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtilImpl.h" />
-    <ClInclude Include="..\common\assist\utils\Impl\FS_CpuUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_FileUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_IPUtil.h" />
@@ -229,6 +228,7 @@
     <ClInclude Include="..\common\component\Impl\FS_ArgsExpanderImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_ClassFactory.h" />
     <ClInclude Include="..\common\component\Impl\FS_ClassFactoryImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_CpuInfo.h" />
     <ClInclude Include="..\common\component\Impl\FS_Delegate.h" />
     <ClInclude Include="..\common\component\Impl\FS_DelegateImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_List.h" />
@@ -283,7 +283,6 @@
     <ClCompile Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.cpp" />
     <ClCompile Include="..\common\assist\utils\Defs\SystemUtilDefs.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_BitUtil.cpp" />
-    <ClCompile Include="..\common\assist\utils\Impl\FS_CpuUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_DirectoryUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp" />
@@ -303,6 +302,7 @@
     <ClCompile Include="..\common\component\Impl\File\FS_File.cpp" />
     <ClCompile Include="..\common\component\Impl\File\FS_IniFile.cpp" />
     <ClCompile Include="..\common\component\Impl\File\LogFile.cpp" />
+    <ClCompile Include="..\common\component\Impl\FS_CpuInfo.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_List.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_Random.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_String.cpp" />

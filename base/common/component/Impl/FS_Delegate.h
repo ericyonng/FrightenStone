@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_Delegate__H__
-#define __Base_Common_Component_Impl_FS_Delegate__H__
+#ifndef __Base_Common_Component_Impl_FS_Delegate_H__
+#define __Base_Common_Component_Impl_FS_Delegate_H__
 
 
 #pragma once

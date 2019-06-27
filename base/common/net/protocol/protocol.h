@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Net_Protocol_Protocol__H__
-#define __Base_Common_Net_Protocol_Protocol__H__
+#ifndef __Base_Common_Net_Protocol_Protocol_H__
+#define __Base_Common_Net_Protocol_Protocol_H__
 
 #pragma once
 
@@ -38,4 +38,4 @@
 #include "base\common\net\protocol\Defs\ProtocolDefs.h"
 // Impl ...
 // Interface ...
-#endif // !__Base_Common_Net_Protocol_Protocol__H__
+#endif // !__Base_Common_Net_Protocol_Protocol_H__

@@ -29,7 +29,7 @@
  *
  * 
  */
-#ifdef __Base_Common_Component_Impl_SmartVar_SmartVarArithmetic__H__
+#ifdef __Base_Common_Component_Impl_SmartVar_SmartVarArithmetic_H__
 
 #pragma once
 

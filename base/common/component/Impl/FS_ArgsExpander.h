@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_ArgsExpander__H__
-#define __Base_Common_Component_Impl_FS_ArgsExpander__H__
+#ifndef __Base_Common_Component_Impl_FS_ArgsExpander_H__
+#define __Base_Common_Component_Impl_FS_ArgsExpander_H__
 
 
 #pragma once
