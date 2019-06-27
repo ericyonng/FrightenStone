@@ -51,22 +51,34 @@ public:
 
     // json日志
 
-    // 普通日志
+    // 
+    // 详细日志details.log
     template<typename ObjType, typename... Args>
-    void i(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    void i(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     template<typename ObjType, typename... Args>
-    void d(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    void d(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     template<typename ObjType, typename... Args>
-    void w(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    void w(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     template<typename ObjType, typename... Args>
-    void e(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    void e(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+
+    // crash日志
     template<typename ObjType, typename... Args>
-    void crash(Int32 fileUnqueIndex, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    void crash(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    // 网络日志
+    template<typename ObjType, typename... Args>
+    void net(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    // 内存泄漏日志
+    template<typename ObjType, typename... Args>
+    void memleak(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
 
     /* 功能函数 */
+    // hook与具体类型有关
     template<typename ObjType>
     void InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData));
+    // 与具体类型无关hook
     virtual void InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate) = 0;
+    // 创建日志文件调用 ！！！外部不可调用，由系统初始化时候调用
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName) = 0;
 
 protected:

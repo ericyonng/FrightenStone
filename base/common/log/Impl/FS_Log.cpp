@@ -39,8 +39,8 @@
 #include "base/common/assist/utils/Impl/FS_FileUtil.h"
 #include "base/common/log/Defs/LogCaches.h"
 
-#define LOG_THREAD_INTERVAL_MS_TIME 0    // 日志线程写日志间隔时间
-#define LOG_SIZE_LIMIT  -1            // 日志尺寸限制10MB
+#define LOG_THREAD_INTERVAL_MS_TIME 1000    // 日志线程写日志间隔时间
+#define LOG_SIZE_LIMIT  10240000            // 日志尺寸限制10MB
 
 FS_NAMESPACE_BEGIN
 
@@ -144,51 +144,54 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
 
 void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
 {
+    // 1.拷贝一次数据
+    LogData cache = *logData;
+
+    // 2.将日志数据放入队列
     _locker.Lock();
-
-    // 1.将日志数据放入队列
     _logDatas[fileUniqueIndex]->push_back(logData);
-
-    // 2.根据level不同调用不同的hook
-    if(_levelRefHook[level])
-        (*_levelRefHook[level])(std::move(logData));
     _locker.Unlock();
+    
+    // 3.根据level不同调用不同的hook
+    if(_levelRefHook[level])
+        (*_levelRefHook[level])(&cache);
 }
 
 void FS_Log::_OnThreadWriteLog()
 {
     // 1.转移到缓冲区（只交换list指针）
     _locker.Lock();
-    for(_logCaches->_increasePos = 0, _logCaches->_pos = 0;
-        _logCaches->_pos < fs::LogDefs::LOG_QUANTITY; 
-        ++_logCaches->_pos)
+    for(_logCaches->_increasePos = 0, _logCaches->_fileIndex = 0;
+        _logCaches->_fileIndex < fs::LogDefs::LOG_QUANTITY; 
+        ++_logCaches->_fileIndex)
     {
-        if(_logDatas[_logCaches->_pos]->empty())
+        if(_logDatas[_logCaches->_fileIndex]->empty())
             continue;
 
         // 只交换数据队列指针拷贝最少，最快，而且交换后_logDatas队列是空的相当于清空了数据 保证缓冲队列前几个都不为NULL, 碰到NULL表示结束
-        _logCaches->_swapCache = _logCaches->_logDataCache._cache[_logCaches->_increasePos];
+        _logCaches->_swapCache = _logCaches->_logDataCache[_logCaches->_increasePos]->_cache;
 
-        _logCaches->_logDataCache._cache[_logCaches->_increasePos] = _logDatas[_logCaches->_pos];
-        _logCaches->_logDataCache._pos = _logCaches->_pos;
+        _logCaches->_logDataCache[_logCaches->_increasePos]->_cache = _logDatas[_logCaches->_fileIndex];
+        _logCaches->_logDataCache[_logCaches->_increasePos]->_fileIndex = _logCaches->_fileIndex;
 
-        _logDatas[_logCaches->_pos] = _logCaches->_swapCache;
+        _logDatas[_logCaches->_fileIndex] = _logCaches->_swapCache;
 
         ++_logCaches->_increasePos;
     }
     _locker.Unlock();
 
-    if(_logCaches->_logDataCache._cache[0]->empty())
+    if(_logCaches->_logDataCache[0]->_cache->empty())
         return;
 
     // 2.写日志
+    static Time g_Time;
     for(_logCaches->_pos = 0; _logCaches->_pos < fs::LogDefs::LOG_QUANTITY; ++_logCaches->_pos)
     {
-        if(_logCaches->_logDataCache._cache[_logCaches->_pos]->empty())
+        if(_logCaches->_logDataCache[_logCaches->_pos]->_cache->empty())
             break;
 
-        _logCaches->_logFile = _logFiles[_logCaches->_logDataCache._pos];
-        for(auto &iterLog : *_logCaches->_logDataCache._cache[_logCaches->_pos])
+        _logCaches->_logFile = _logFiles[_logCaches->_logDataCache[_logCaches->_pos]->_fileIndex];
+        for(auto &iterLog : *_logCaches->_logDataCache[_logCaches->_pos]->_cache)
         {
             // 文件过大转储到分立文件
             if(_logCaches->_logFile->IsTooLarge(LOG_SIZE_LIMIT))
@@ -200,7 +203,7 @@ void FS_Log::_OnThreadWriteLog()
         }
 
         _logCaches->_logFile->Flush();
-        _logCaches->_logDataCache._cache[_logCaches->_pos]->clear();
+        _logCaches->_logDataCache[_logCaches->_pos]->_cache->clear();
     }
 }
 FS_NAMESPACE_END

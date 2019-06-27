@@ -185,7 +185,7 @@ public:
 
     // 兼容格式字符串中没有占位符情况
     template<typename... Args>
-    FS_String &FormatCompatibilityNoFmt(std::string &fmt, const Args&... rest);
+    FS_String &FormatCompatibilityNoFmt(const std::string &fmt, const Args&... rest);
 
     // 计算占位符个数
     static UInt64 CalcPlaceHolderNum(const std::string &fmtStr);

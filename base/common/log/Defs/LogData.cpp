@@ -40,6 +40,8 @@ static const char *__g_LogLevelDescription[LogLevel::End + 1] =
     "Info",
     "Error",
     "Crash",
+    "Net",
+    "Memleak",
 
     "Unknown"
 };
