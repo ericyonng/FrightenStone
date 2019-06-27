@@ -64,7 +64,7 @@ public:
     // 定义日志文件
     DECLEAR_GENERAL_LOG_BEGIN()
     GENERAL_ADDLOG(SYSLOG, crash)           // 崩溃
-    GENERAL_ADDLOG(SYSLOG, frameLayer)      // 框架层
+    GENERAL_ADDLOG(SYSLOG, details)         // 具体日志
     GENERAL_ADDLOG(SYSLOG, memleak)         // 内存泄露
     GENERAL_ADDLOG(SYSLOG, net)             // 网络层
     GENERAL_ADDLOG(TESTLOG, testcode)       // 代码测试

@@ -422,7 +422,7 @@ inline FS_String &FS_String::Append(Args&&... rest)
 }
 
 template<typename... Args>
-inline FS_String &FS_String::FormatCompatibilityNoFmt(std::string &fmt, const Args&... rest)
+inline FS_String &FS_String::FormatCompatibilityNoFmt(const std::string &fmt, const Args&... rest)
 {
     UInt64 firstIndex = 0, nextIndex = 0;
 

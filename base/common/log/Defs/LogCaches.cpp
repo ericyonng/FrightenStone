@@ -37,25 +37,26 @@
 
 FS_NAMESPACE_BEGIN
 LogDataCache::LogDataCache()
-    :_cache{NULL}
-    ,_pos(0)
+    :_cache{new std::list<LogData *>}
+    ,_fileIndex(0)
 {
-    for(Int32 i = 0; i < fs::LogDefs::LOG_QUANTITY; ++i)
-        _cache[i] = new std::list<LogData *>;
 }
 
 fs::LogDataCache::~LogDataCache()
 {
-    STLUtil::DelArray(_cache);
+    Fs_SafeFree(_cache);
 }
 
 LogCaches::LogCaches()
     :_swapCache(NULL)
 {
+    for(Int32 i = 0; i < LogDefs::LOG_QUANTITY; ++i)
+        _logDataCache[i] = new LogDataCache;
 }
 
 LogCaches::~LogCaches()
 {
+    STLUtil::DelArray(_logDataCache);
 }
 
 FS_NAMESPACE_END

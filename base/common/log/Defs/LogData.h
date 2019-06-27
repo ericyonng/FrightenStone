@@ -51,7 +51,10 @@ public:
         Debug,
         Info,
         Error,
+
         Crash,
+        Net,
+        Memleak,
 
         End,
     };
