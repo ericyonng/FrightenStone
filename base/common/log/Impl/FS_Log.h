@@ -44,7 +44,7 @@
                                         stackinfo:
                                     }
                                 }
-            6.日志是单线程日志，请注意，在日志线程中使用static变量，固不可扩展成多线程日志
+            6.日志是单线程日志
  */
 #ifndef __Base_Common_Log_Impl_Log_H__
 #define __Base_Common_Log_Impl_Log_H__
@@ -94,11 +94,11 @@ private:
 
     /* 日志文件内容 */
     ConditionLocker _locker;                                                // 锁
-    LogFile *_logFiles[LogDefs::LOG_QUANTITY];                  // 日志id日志文件 创建后文件只允许读不允许增删
-    std::list<LogData *> *_logDatas[LogDefs::LOG_QUANTITY];      // 日志id日志内容
+    LogFile *_logFiles[LogDefs::LOG_QUANTITY];                              // 日志id日志文件 创建后文件只允许读不允许增删改
+    std::list<LogData *> *_logDatas[LogDefs::LOG_QUANTITY];                 // 日志id日志内容
     IDelegatePlus<void> *_threadWriteLogDelegate;                           // 日志线程写日志委托
 
-    LogCaches *_logCaches;
+    LogCaches *_logCaches;                                                  // 缓冲变量，提高性能
 };
 
 FS_NAMESPACE_END
