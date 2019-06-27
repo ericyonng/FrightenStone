@@ -160,14 +160,14 @@ void FS_Log::_OnThreadWriteLog()
 {
     // 1.转移到缓冲区
     _locker.Lock();
-    for(_logCaches->_increasePos=0, _logCaches->_pos = 0;
+    for(_logCaches->_increasePos = 0, _logCaches->_pos = 0;
         _logCaches->_pos < fs::LogDefs::LOG_QUANTITY; 
         ++_logCaches->_pos)
     {
         if(_logDatas[_logCaches->_pos]->empty())
             continue;
 
-        // 只交换数据队列指针拷贝最少，最快，而且交换后_logDatas队列是空的相当于清空了数据 保证前几个都不为NULL, 碰到NULL表示结束
+        // 只交换数据队列指针拷贝最少，最快，而且交换后_logDatas队列是空的相当于清空了数据 保证缓冲队列前几个都不为NULL, 碰到NULL表示结束
         _logCaches->_swapCache = _logCaches->_logDataCache._cache[_logCaches->_increasePos];
 
         _logCaches->_logDataCache._cache[_logCaches->_increasePos] = _logDatas[_logCaches->_pos];
