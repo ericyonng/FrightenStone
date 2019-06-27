@@ -147,8 +147,7 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
     _locker.Lock();
 
     // 1.将日志数据放入队列
-    auto logList = _logDatas[fileUniqueIndex];
-    logList->push_back(logData);
+    _logDatas[fileUniqueIndex]->push_back(logData);
 
     // 2.根据level不同调用不同的hook
     if(_levelRefHook[level])
@@ -158,7 +157,7 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
 
 void FS_Log::_OnThreadWriteLog()
 {
-    // 1.转移到缓冲区
+    // 1.转移到缓冲区（只交换list指针）
     _locker.Lock();
     for(_logCaches->_increasePos = 0, _logCaches->_pos = 0;
         _logCaches->_pos < fs::LogDefs::LOG_QUANTITY; 
