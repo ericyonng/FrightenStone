@@ -69,12 +69,12 @@ public:
     // 请使用便利宏_LOGFMT_
     template<typename ObjType, typename... Args>
     void w(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    // 请使用便利宏_LOGFMT_
+    // 请使用便利宏_LOGFMT_ 会触发断言
     template<typename ObjType, typename... Args>
     void e(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
 
     // crash日志
-    // 请使用便利宏_LOGFMT_
+    // 请使用便利宏_LOGFMT_ 会触发断言
     template<typename ObjType, typename... Args>
     void crash(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     // 网络日志
