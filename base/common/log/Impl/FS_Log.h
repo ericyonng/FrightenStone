@@ -78,6 +78,8 @@ public:
     
 protected:
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData);
+    void _OutputToConsole(Int32 level, const FS_String &logStr);
+    void _SetConsoleColor(Int32 level);
 
     // Ïß³Ì²Ù×÷
 private:

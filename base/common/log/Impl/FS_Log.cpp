@@ -41,6 +41,7 @@
 
 #define LOG_THREAD_INTERVAL_MS_TIME 1000    // 日志线程写日志间隔时间
 #define LOG_SIZE_LIMIT  10240000            // 日志尺寸限制10MB
+#define ENABLE_OUTPUT_CONSOLE 1             // 开启控制台打印
 
 FS_NAMESPACE_BEGIN
 
@@ -130,6 +131,8 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
             break;
         }
 
+        // 系统启动备份旧日志
+        logFile->PartitionFile();
         logFile->UpdateLastTimestamp();
         _logFiles[fileUnqueIndex] = logFile;
 
@@ -151,10 +154,58 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
     _locker.Lock();
     _logDatas[fileUniqueIndex]->push_back(logData);
     _locker.Unlock();
+
+    // 3.打印到控制台
+#if ENABLE_OUTPUT_CONSOLE
+    _OutputToConsole(level, cache._logToWrite);
+#endif
     
-    // 3.根据level不同调用不同的hook
+    // 4.根据level不同调用不同的hook
     if(_levelRefHook[level])
         (*_levelRefHook[level])(&cache);
+}
+
+void FS_Log::_OutputToConsole(Int32 level,const FS_String &logStr)
+{
+    if(level != LogLevel::Net)
+    {
+        SystemUtil::LockConsole();
+        const Int32 oldColor = SystemUtil::GetConsoleColor();
+        _SetConsoleColor(level);
+        SystemUtil::OutputToConsole(logStr);
+        SystemUtil::SetConsoleColor(oldColor);
+        SystemUtil::UnlockConsole();
+    }
+}
+
+void FS_Log::_SetConsoleColor(Int32 level)
+{
+    switch(level)
+    {
+        case LogLevel::Debug:
+        case LogLevel::Info:
+        case LogLevel::Net:
+        {
+            SystemUtil::SetConsoleColor(FS_ConsoleColor::Fg_White | FS_ConsoleColor::Bg_Black);
+        }
+        break;
+        case LogLevel::Warning:
+        {
+            SystemUtil::SetConsoleColor(FS_ConsoleColor::Fg_LightYellow | FS_ConsoleColor::Bg_Black);
+        }
+        break;
+        case LogLevel::Error:
+        case LogLevel::Crash:
+        case LogLevel::Memleak:
+        {
+            SystemUtil::SetConsoleColor(FS_ConsoleColor::Fg_Red | FS_ConsoleColor::Bg_Black);
+        }
+        break;
+        default:
+        {
+            SystemUtil::SetConsoleColor(FS_ConsoleColor::Fg_White | FS_ConsoleColor::Bg_Black);
+        }
+    }
 }
 
 void FS_Log::_OnThreadWriteLog()

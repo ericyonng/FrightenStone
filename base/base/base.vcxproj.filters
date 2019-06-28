@@ -217,6 +217,18 @@
     <Filter Include="common\log\Interface">
       <UniqueIdentifier>{1475fba0-52d9-4a66-ac7e-47921d954ea7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\Global">
+      <UniqueIdentifier>{760850e3-8383-4e06-8941-d930303912d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\Global\Defs">
+      <UniqueIdentifier>{f623e4c6-6577-411b-b050-9cc71e9499a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\Global\Impl">
+      <UniqueIdentifier>{5ddd7b42-2d70-490c-8933-6a5534299e3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\Global\Interface">
+      <UniqueIdentifier>{48d4588b-b842-4e03-a387-158482876ccf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -572,6 +584,12 @@
     </ClInclude>
     <ClInclude Include="..\common\component\Impl\FS_CpuInfo.h">
       <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Global\EasyGlobal.h">
+      <Filter>common\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Global\Interface\IEasyGlobal.h">
+      <Filter>common\Global\Interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

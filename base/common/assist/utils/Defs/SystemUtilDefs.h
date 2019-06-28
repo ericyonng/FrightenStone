@@ -53,7 +53,7 @@ public:
         Fg_Purple,
         Fg_Cyan,
         Fg_White,
-        
+
         Bg_Black,
         Bg_Red,
         Bg_Green,
@@ -66,14 +66,16 @@ public:
         Highlight_Fg,
         Highlight_Bg,
 #else // WIN32
-        Fg_Black  = 0,
-        Fg_Red    = FOREGROUND_RED,
-        Fg_Green  = FOREGROUND_GREEN,
-        Fg_Blue   = FOREGROUND_BLUE,
-        Fg_Yellow = FOREGROUND_RED  | FOREGROUND_GREEN,
-        Fg_Purple = FOREGROUND_RED  | FOREGROUND_BLUE,
-        Fg_Cyan   = FOREGROUND_BLUE | FOREGROUND_GREEN,
-        Fg_White  = FOREGROUND_RED  | FOREGROUND_GREEN | FOREGROUND_BLUE,
+        Fg_Black = 0,
+        Fg_Red = FOREGROUND_RED,
+        Fg_Green = FOREGROUND_GREEN,
+        Fg_Blue = FOREGROUND_BLUE,
+        Fg_Yellow = FOREGROUND_RED | FOREGROUND_GREEN,
+        Fg_Purple = FOREGROUND_RED | FOREGROUND_BLUE,
+        Fg_Cyan = FOREGROUND_BLUE | FOREGROUND_GREEN,
+        Fg_White = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+        Fg_Gray = FOREGROUND_INTENSITY,
+        Fg_LightYellow = Fg_Gray | Fg_Yellow,
         
         Bg_Black  = 0,
         Bg_Red    = BACKGROUND_RED,

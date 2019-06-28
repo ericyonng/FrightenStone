@@ -54,6 +54,7 @@
 #include "base/common/assist/assist.h"
 #include "base/common/component/component.h"
 #include "base/common/log/Log.h"
+#include "base/common/Global/EasyGlobal.h"
 #endif
 #pragma endregion
 

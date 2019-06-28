@@ -216,7 +216,7 @@ private:\
 #define TIME_WHEEL_RESOLUTION_DEF 100LL    // 毫秒
 
 //参数的输入输出标识
-#undef	P_OUT
+#undef  P_OUT
 #define  P_OUT  /* 输出 */
 
 #undef P_OUTSIZE
@@ -228,10 +228,10 @@ private:\
 #undef P_INSIZE
 #define P_INSIZE    /*输入目标尺寸*/
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_DEBUG)
 #define ASSERT(x)   assert(x)
 #else
-ASSERT(x)   throw std::logic_error(#x)
+#define ASSERT(x)   
 #endif
 
 #undef ARRAY_ELEM_COUNT
