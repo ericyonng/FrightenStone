@@ -42,6 +42,9 @@
 #undef _FUNC_LINE_ARGS_
 #define _FUNC_LINE_ARGS_ __FUNCTION__, __LINE__
 
+#undef _LOG_FMT_STR_
+#define _LOG_FMT_STR_(x) _FUNC_LINE_ARGS_, x
+
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT ILog
@@ -57,38 +60,31 @@ public:
 
     // 
     // 详细日志details.log
+    // 请使用便利宏_LOG_FMT_STR_
     template<typename ObjType, typename... Args>
     void i(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename... Args>
-    void i2(const char *className, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    // 请使用便利宏_LOG_FMT_STR_
     template<typename ObjType, typename... Args>
     void d(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename... Args>
-    void d2(const char *className, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    // 请使用便利宏_LOG_FMT_STR_
     template<typename ObjType, typename... Args>
     void w(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename... Args>
-    void w2(const char *className, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    // 请使用便利宏_LOG_FMT_STR_
     template<typename ObjType, typename... Args>
     void e(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename... Args>
-    void e2(const char *className, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
 
     // crash日志
+    // 请使用便利宏_LOG_FMT_STR_
     template<typename ObjType, typename... Args>
     void crash(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename... Args>
-    void crash2(const char *className, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     // 网络日志
+    // 请使用便利宏_LOG_FMT_STR_
     template<typename ObjType, typename... Args>
     void net(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename... Args>
-    void net2(const char *className, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     // 内存泄漏日志
+    // 请使用便利宏_LOG_FMT_STR_
     template<typename ObjType, typename... Args>
     void memleak(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename... Args>
-    void memleak2(const char *className, const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
 
     /* 功能函数 */
     // hook与具体类型有关
