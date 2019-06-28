@@ -21,34 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : utils.h
+ * @file  : IEasyGlobal.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/6/28
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Utils_H__
-#define __Base_Common_Assist_Utils_Utils_H__
-
-
+#ifndef __Base_Common_Global_Interface_EasyGlobal_H__
+#define __Base_Common_Global_Interface_EasyGlobal_H__
 #pragma once
 
-// defs ...
-#include "base/common/assist/utils/Defs/SystemUtilDefs.h"
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
-// Impl ...
-// Interface ...
-#include "base/common/assist/utils/Impl/ToolUtil.h"
-#include "base/common/assist/utils/Impl/ThreadUtil.h"
-#include "base/common/assist/utils/Impl/STLUtil.h"
-#include "base/common/assist/utils/Impl/TimeUtil.h"
-#include "base/common/assist/utils/Impl/StringUtil.h"
-#include "base/common/assist/utils/Impl/FS_DirectoryUtil.h"
-#include "base/common/assist/utils/Impl/FS_FileUtil.h"
-#include "base/common/assist/utils/Impl/WidthUtil.h"
-#include "base/common/assist/utils/Impl/SystemUtil.h"
-#include "base/common/assist/utils/Defs/SystemUtilDefs.h"
+FS_NAMESPACE_BEGIN
+class ILog;
 
-#endif // !__Base_Common_Assist_Utils_Utils_H__
+class BASE_EXPORT IEasyGlobal
+{
+public:
+    IEasyGlobal() {}
+    virtual ~IEasyGlobal() {}
+
+    #pragma region init/finish
+public:
+    virtual Int32 Init() = 0;
+    virtual void Finish() = 0;
+    #pragma endregion
+
+    // 获取资源
+public:
+    virtual ILog *GetLog() = 0;
+};
+
+FS_NAMESPACE_END
+
+extern fs::IEasyGlobal *g_EasyGlobal;
+#define g_Log g_EasyGlobal->GetLog()
+
+#endif

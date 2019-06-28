@@ -12,11 +12,11 @@ public:
         auto logMgr = fs::ILog::InitModule("main");
         fs::Time nowTime, nowTime2;
         nowTime.FlushTime();
-        logMgr->w<TestLogModule>(__FUNCTION__, __LINE__
-                                 , "hello world%s", "wocao");
-        logMgr->crash<TestLogModule>(__FUNCTION__, __LINE__, "hello world%s", "wocao");
-        logMgr->memleak<TestLogModule>(__FUNCTION__, __LINE__, "hello world%s", "wocao");
-        logMgr->net<TestLogModule>(__FUNCTION__, __LINE__, "hello world%s", "wocao");
+        logMgr->w<TestLogModule>(_FUNC_LINE_ARGS_, "hello world%s", "wocao");
+        logMgr->e<TestLogModule>(_FUNC_LINE_ARGS_, "hello world%s", "wocao");
+        logMgr->crash<TestLogModule>(_FUNC_LINE_ARGS_, "hello world%s", "wocao");
+        logMgr->memleak<TestLogModule>(_FUNC_LINE_ARGS_, "hello world%s", "wocao");
+        logMgr->net<TestLogModule>(_FUNC_LINE_ARGS_, "hello world%s", "wocao");
         nowTime2.FlushTime();
         std::cout << (nowTime2 - nowTime).GetTotalMilliSeconds() << std::endl;
         logMgr->FinishModule();
