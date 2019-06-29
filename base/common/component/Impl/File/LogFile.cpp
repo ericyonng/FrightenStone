@@ -49,8 +49,11 @@ LogFile::~LogFile()
 
 }
 
-void LogFile::PartitionFile()
+void LogFile::PartitionFile(bool isSysFirstCreate)
 {
+    if(isSysFirstCreate)
+        return;
+
     // 构建文件名
     FS_String fileNameCache = _path + _fileName;
 

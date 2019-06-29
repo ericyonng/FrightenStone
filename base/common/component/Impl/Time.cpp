@@ -36,6 +36,8 @@
 
 FS_NAMESPACE_BEGIN
 
+static const FS_String __g_ZeroTimeString = "1970-01-01 00:00:00.000000";
+
 #pragma region 
 const Int64 Time::_hourPerDay = 24LL;
 const Int64 Time::_minutePerDay = 1440LL;              // 24*60
@@ -365,7 +367,7 @@ Time Time::GetZeroTime() const
     return Time(zeroTime);
 }
 
-FS_String Time::Format(const Byte8 *outFmt) const
+FS_String &Time::Format(const Byte8 *outFmt) const
 {
     BUFFER32 buf = {0};
     if(outFmt)
@@ -373,10 +375,11 @@ FS_String Time::Format(const Byte8 *outFmt) const
     else
         strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_localTimeStruct);
 
-    return buf;
+    *_GetCache(true) = buf;
+    return *_cache;
 }
 
-FS_String Time::FormatAsGmt(const char *outFmt) const
+FS_String &Time::FormatAsGmt(const char *outFmt) const
 {
     BUFFER32 buf = {0};
     if(outFmt)
@@ -384,25 +387,27 @@ FS_String Time::FormatAsGmt(const char *outFmt) const
     else
         strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_gmtTimeStruct);
 
-    return buf;
+    *_GetCache(true) = buf;
+
+    return *_cache;
 }
 
-FS_String Time::ToString() const
+const FS_String &Time::ToString() const
 {
     if(UNLIKELY(!_rawTime))
-        return "1970-01-01 00:00:00.000000";
+        return __g_ZeroTimeString;
 
-    FS_String repr;
+    auto &repr = *_GetCache(true);
     auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
     return repr.Format("%s.%06d", Format().c_str(), localTime%_microSecondPerSecond);
 }
 
-FS_String Time::ToStringOfMillSecondPrecision() const
+const FS_String &Time::ToStringOfMillSecondPrecision() const
 {
     if(UNLIKELY(!_rawTime))
-        return "1970-01-01 00:00:00.000";
+        return __g_ZeroTimeString;
 
-    FS_String repr;
+    auto &repr = *_GetCache(true);
     auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
     return repr.Format("%s.%03d", Format().c_str(), localTime%_microSecondPerSecond / _microSecondPerMilliSecond);
 }

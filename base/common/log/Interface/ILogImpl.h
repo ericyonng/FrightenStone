@@ -52,8 +52,8 @@ inline void ILog::i(const char *funcName, Int32 codeLine, const char *fmt, const
                                    , LogLevel::GetDescription(LogLevel::Info)
                                    , typeid(ObjType).name()
                                    , funcName
-                                   , codeLine);
-    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
+                                   , codeLine)
+                            .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Info, LogDefs::_SYSLOG_details_, newLogData);
 }
@@ -69,8 +69,8 @@ inline void ILog::d(const char *funcName, Int32 codeLine, const char *fmt, const
                                    , LogLevel::GetDescription(LogLevel::Debug)
                                    , typeid(ObjType).name()
                                    , funcName
-                                   , codeLine);
-    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
+                                   , codeLine)
+                            .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Debug, LogDefs::_SYSLOG_details_, newLogData);
 }
@@ -103,8 +103,8 @@ inline void ILog::e(const char *funcName, Int32 codeLine, const char *fmt, const
                                    , LogLevel::GetDescription(LogLevel::Error)
                                    , typeid(ObjType).name()
                                    , funcName
-                                   , codeLine);
-    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
+                                   , codeLine)
+                            .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Error, LogDefs::_SYSLOG_details_, newLogData);
     ASSERT(!"error");
@@ -121,8 +121,8 @@ inline void ILog::crash(const char *funcName, Int32 codeLine, const char *fmt, c
                                    , LogLevel::GetDescription(LogLevel::Crash)
                                    , typeid(ObjType).name()
                                    , funcName
-                                   , codeLine);
-    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
+                                   , codeLine)
+                            .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Crash, LogDefs::_SYSLOG_crash_, newLogData);
     ASSERT(!"crash");
@@ -139,8 +139,8 @@ inline void ILog::net(const char *funcName, Int32 codeLine, const char *fmt, con
                                    , LogLevel::GetDescription(LogLevel::Net)
                                    , typeid(ObjType).name()
                                    , funcName
-                                   , codeLine);
-    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
+                                   , codeLine)
+                            .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Net, LogDefs::_SYSLOG_net_, newLogData);
 }
@@ -156,8 +156,8 @@ inline void ILog::memleak(const char *funcName, Int32 codeLine, const char *fmt,
                                    , LogLevel::GetDescription(LogLevel::Memleak)
                                    , typeid(ObjType).name()
                                    , funcName
-                                   , codeLine);
-    newLogData->_logToWrite.Format(fmt, args...) << FS_String::endl;
+                                   , codeLine)
+                            .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Memleak, LogDefs::_SYSLOG_memleak_, newLogData);
 }
