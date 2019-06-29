@@ -39,9 +39,10 @@
 #include "base/common/assist/utils/Impl/FS_FileUtil.h"
 #include "base/common/log/Defs/LogCaches.h"
 
-#define LOG_THREAD_INTERVAL_MS_TIME 1000    // 日志线程写日志间隔时间
-#define LOG_SIZE_LIMIT  10240000            // 日志尺寸限制10MB
-#define ENABLE_OUTPUT_CONSOLE 1             // 开启控制台打印
+#define LOG_THREAD_INTERVAL_MS_TIME 0    // 日志线程写日志间隔时间
+// #define LOG_SIZE_LIMIT  10240000            // 日志尺寸限制10MB
+#define LOG_SIZE_LIMIT  -1            // 日志尺寸限制10MB
+#define ENABLE_OUTPUT_CONSOLE 0             // 开启控制台打印
 
 FS_NAMESPACE_BEGIN
 
@@ -121,8 +122,11 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
             break;
         }
 
-        // 3.创建文件
+        // 3.系统是否第一次创建
         logName += fileName;
+        bool isFirstCreate = !FS_FileUtil::IsFileExist(logName.c_str());
+
+        // 4.创建文件
         logFile = new LogFile;
         if(!logFile->Open(logName.c_str(), true, "ab+", false))
         {
@@ -132,7 +136,7 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
         }
 
         // 系统启动备份旧日志
-        logFile->PartitionFile();
+        logFile->PartitionFile(isFirstCreate);
         logFile->UpdateLastTimestamp();
         _logFiles[fileUnqueIndex] = logFile;
 
@@ -249,6 +253,7 @@ void FS_Log::_OnThreadWriteLog()
                 _logCaches->_logFile->PartitionFile();
 
             // 写入文件
+            iterLog->_logToWrite << g_Time.FlushTime().GetMicroTimestamp() << FS_String::endl;
             _logCaches->_logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
             Fs_SafeFree(iterLog);
         }

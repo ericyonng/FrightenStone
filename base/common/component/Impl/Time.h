@@ -187,18 +187,18 @@ public:
 
     Time GetZeroTime() const;
 
-    FS_String Format(const Byte8 *outFmt = NULL) const;
-    static FS_String Format(time_t timestamp, const Byte8 *outFmt);
+    FS_String &Format(const Byte8 *outFmt = NULL) const;
+    static FS_String &Format(time_t timestamp, const Byte8 *outFmt);
 
-    FS_String FormatAsGmt(const char *outFmt = NULL) const;
-    static FS_String FormatAsGmt(time_t timestamp, const char *outFmt);
+    FS_String &FormatAsGmt(const char *outFmt = NULL) const;
+    static FS_String &FormatAsGmt(time_t timestamp, const char *outFmt);
     
     /**
      * Get the time object string representation.
      * @return FS_String - the object string representation.
      */
-    FS_String ToString() const;
-    FS_String ToStringOfMillSecondPrecision() const;
+    const FS_String &ToString() const;
+    const FS_String &ToStringOfMillSecondPrecision() const;
     #pragma endregion
 
     #pragma region 
@@ -206,10 +206,12 @@ private:
     explicit Time(Int64 microSecTimestamp);
     explicit Time(const std::chrono::system_clock::time_point &now);
     void _UpdateTimeStructs();
-    // 
+    // »º³å
+    FS_String *_GetCache(bool isClear = false) const;
     #pragma endregion
 
 private:
+    mutable FS_String *_cache{NULL};
     Int64 _rawTime{0};    // microsecond ()
     tm _gmtTimeStruct{0};  // 
     tm _localTimeStruct{0};    // 
@@ -374,15 +376,26 @@ inline Int32 Time::GetLocalMicroSecond() const
     return static_cast<Int32>(microsecond % Time::_microSecondPerSecond);
 }
 
-inline FS_String Time::Format(time_t timestamp, const Byte8 *outFmt)
+inline FS_String &Time::Format(time_t timestamp, const Byte8 *outFmt)
 {
     return FromSeconds(timestamp).Format(outFmt);
 }
 
-inline FS_String Time::FormatAsGmt(time_t timestamp, const char *outFmt)
+inline FS_String &Time::FormatAsGmt(time_t timestamp, const char *outFmt)
 {
     return FromSeconds(timestamp).FormatAsGmt(outFmt);
 }
+
+inline FS_String *Time::_GetCache(bool isClear) const
+{
+    if(!_cache)
+        _cache = new FS_String;
+    else if(isClear)
+        _cache->Clear();
+
+    return _cache;
+}
+
 #pragma endregion
 
 FS_NAMESPACE_END

@@ -51,7 +51,7 @@ public:
 
     // ·Ö¸îÎÄ¼þ
     bool IsTooLarge(Int64 limitSize) const;
-    void PartitionFile();
+    void PartitionFile(bool isSysFirstCreate = false);
 
 protected:
     Int32 _partNo;
