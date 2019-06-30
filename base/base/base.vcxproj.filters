@@ -591,6 +591,9 @@
     <ClInclude Include="..\common\Global\Interface\IEasyGlobal.h">
       <Filter>common\Global\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\Global\Defs\EasyGlobalMacros.h">
+      <Filter>common\Global\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
