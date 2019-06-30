@@ -77,9 +77,15 @@ public:
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     
 protected:
+    // 日志相关
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData);
+
+    // 控制台相关
     void _OutputToConsole(Int32 level, const FS_String &logStr);
     void _SetConsoleColor(Int32 level);
+
+    // 杂项
+    void _ReadConfig();
 
     // 线程操作
 private:

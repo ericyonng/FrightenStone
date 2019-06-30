@@ -80,7 +80,8 @@ Time::Time(const Time &other)
 
 Time::~Time()
 {
-
+    Fs_SafeFree(_cache2);
+    Fs_SafeFree(_cache);
 }
 
 Time Time::FromSeconds(Int64 seconds)
@@ -397,9 +398,12 @@ const FS_String &Time::ToString() const
     if(UNLIKELY(!_rawTime))
         return __g_ZeroTimeString;
 
+    auto cache2 = _GetCache2(true);
+    cache2->Swap(std::move(Format()));
+
     auto &repr = *_GetCache(true);
-    auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
-    return repr.Format("%s.%06d", Format().c_str(), localTime%_microSecondPerSecond);
+    auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);    
+    return repr.Format("%s.%06d", cache2->c_str(), localTime%_microSecondPerSecond);
 }
 
 const FS_String &Time::ToStringOfMillSecondPrecision() const
@@ -407,9 +411,12 @@ const FS_String &Time::ToStringOfMillSecondPrecision() const
     if(UNLIKELY(!_rawTime))
         return __g_ZeroTimeString;
 
+    auto cache2 = _GetCache2(true);
+    cache2->Swap(std::move(Format()));
+
     auto &repr = *_GetCache(true);
     auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
-    return repr.Format("%s.%03d", Format().c_str(), localTime%_microSecondPerSecond / _microSecondPerMilliSecond);
+    return repr.Format("%s.%03d", cache2->c_str(), localTime%_microSecondPerSecond / _microSecondPerMilliSecond);
 }
 
 Time::Time(Int64 microSecTimestamp)

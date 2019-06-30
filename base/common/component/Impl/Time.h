@@ -208,10 +208,12 @@ private:
     void _UpdateTimeStructs();
     // »º³å
     FS_String *_GetCache(bool isClear = false) const;
+    FS_String *_GetCache2(bool isClear = false) const;
     #pragma endregion
 
 private:
     mutable FS_String *_cache{NULL};
+    mutable FS_String *_cache2{NULL};
     Int64 _rawTime{0};    // microsecond ()
     tm _gmtTimeStruct{0};  // 
     tm _localTimeStruct{0};    // 
@@ -394,6 +396,16 @@ inline FS_String *Time::_GetCache(bool isClear) const
         _cache->Clear();
 
     return _cache;
+}
+
+inline FS_String *Time::_GetCache2(bool isClear) const 
+{
+    if(!_cache2)
+        _cache2 = new FS_String;
+    else if(isClear)
+        _cache2->Clear();
+
+    return _cache2;
 }
 
 #pragma endregion

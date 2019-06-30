@@ -39,11 +39,11 @@
 FS_NAMESPACE_BEGIN
 class ILog;
 
-class BASE_EXPORT IEasyGlobal
+class IEasyGlobal
 {
 public:
-    IEasyGlobal() {}
-    virtual ~IEasyGlobal() {}
+    IEasyGlobal();
+    virtual ~IEasyGlobal();
 
     #pragma region init/finish
 public:
@@ -56,9 +56,15 @@ public:
     virtual ILog *GetLog() = 0;
 };
 
+inline IEasyGlobal::IEasyGlobal()
+{
+}
+
+inline IEasyGlobal::~IEasyGlobal() 
+{
+}
+
 FS_NAMESPACE_END
 
-extern fs::IEasyGlobal *g_EasyGlobal;
-#define g_Log g_EasyGlobal->GetLog()
 
 #endif

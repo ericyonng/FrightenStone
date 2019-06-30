@@ -21,20 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : EasyGlobal.h
+ * @file  : EasyGlobalMacros.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/28
+ * @date  : 2019/06/30
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Global_EasyGlobal_H__
-#define __Base_Common_Global_EasyGlobal_H__
-
+#ifndef __Base_Common_Global_Defs_EasyGlobalMacros_H__
+#define __Base_Common_Global_Defs_EasyGlobalMacros_H__
 #pragma once
 
-#include "base/common/Global/Defs/EasyGlobalMacros.h"
-#include "base/common/Global/Interface/IEasyGlobal.h"
+ // log±ãÀûºê
+#define g_Log g_EasyGlobal->GetLog()
+
+// ...
 
 #endif
