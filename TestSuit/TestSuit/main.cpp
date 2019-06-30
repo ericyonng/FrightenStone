@@ -47,10 +47,11 @@
 #include "TestSuit/TestSuit/TestInst/TestTimeWheel.h"
 #include "TestSuit/TestSuit/TestInst/TestSystemUtil.h"
 #include "TestSuit/TestSuit/TestInst/TestLogModule.h"
+#include "TestSuit/TestSuit/TestInst/TestXor.h"
 
 int main()
 {
-    TestLogModule::Run();
+    TestXor::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;
