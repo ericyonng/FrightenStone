@@ -39,10 +39,12 @@
 #include "base/common/assist/utils/Impl/FS_FileUtil.h"
 #include "base/common/log/Defs/LogCaches.h"
 
-#define LOG_THREAD_INTERVAL_MS_TIME 0    // 日志线程写日志间隔时间
-// #define LOG_SIZE_LIMIT  10240000            // 日志尺寸限制10MB
-#define LOG_SIZE_LIMIT  -1            // 日志尺寸限制10MB
-#define ENABLE_OUTPUT_CONSOLE 0             // 开启控制台打印
+#pragma region log config options
+#define LOG_THREAD_INTERVAL_MS_TIME 1000        // 日志线程写日志间隔时间
+#define LOG_SIZE_LIMIT  10240000                // 日志尺寸限制10MB
+// #define LOG_SIZE_LIMIT  -1                   // 无限制
+#define ENABLE_OUTPUT_CONSOLE 1                 // 开启控制台打印
+#pragma endregion
 
 FS_NAMESPACE_BEGIN
 
@@ -68,6 +70,9 @@ Int32 FS_Log::InitModule()
 {
     if(_isInit)
         return StatusDefs::Success;
+
+    // 初始化log config options
+    _ReadConfig();
 
     // 初始化日志文件
     _logCaches = new LogCaches;
@@ -212,6 +217,11 @@ void FS_Log::_SetConsoleColor(Int32 level)
     }
 }
 
+void FS_Log::_ReadConfig()
+{
+
+}
+
 void FS_Log::_OnThreadWriteLog()
 {
     // 1.转移到缓冲区（只交换list指针）
@@ -239,7 +249,6 @@ void FS_Log::_OnThreadWriteLog()
         return;
 
     // 2.写日志
-    static Time g_Time;
     for(_logCaches->_pos = 0; _logCaches->_pos < fs::LogDefs::LOG_QUANTITY; ++_logCaches->_pos)
     {
         if(_logCaches->_logDataCache[_logCaches->_pos]->_cache->empty())
@@ -253,7 +262,6 @@ void FS_Log::_OnThreadWriteLog()
                 _logCaches->_logFile->PartitionFile();
 
             // 写入文件
-            iterLog->_logToWrite << g_Time.FlushTime().GetMicroTimestamp() << FS_String::endl;
             _logCaches->_logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
             Fs_SafeFree(iterLog);
         }

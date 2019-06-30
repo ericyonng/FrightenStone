@@ -76,4 +76,6 @@ FS_NAMESPACE_END
 
 #include "base/common/log/Defs/LogDefsImpl.h"
 
+#define ASSERTLOG(x) (g_Log->e<decltype(x)>(_LOGFMT_("%s"), #x), ASSERT(!#x))
+
 #endif
