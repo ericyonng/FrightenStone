@@ -3,13 +3,49 @@
 #pragma once
 #include "stdafx.h"
 
+// 定义global
+
+class EasyGloal : public fs::IEasyGlobal
+{
+public:
+    EasyGloal() {}
+    virtual ~EasyGloal()
+    {}
+#pragma region init/finish
+public:
+    virtual Int32 Init() 
+    {
+        _log = fs::ILog::InitModule("main");
+        return StatusDefs::Success;
+    }
+    virtual void Finish()
+    {
+        // 释放组件
+        Fs_SafeFree(_log);
+    }
+#pragma endregion
+
+    // 获取资源
+public:
+    virtual fs::ILog *GetLog()
+    {
+        return _log;
+    }
+
+private:
+    fs::ILog *_log;
+};
+
+typedef fs::Singleton<EasyGloal> EasyGloalInstance;
+#define g_EasyGlobal EasyGloalInstance::GetInstance()
+
 class TestLogModule
 {
 public:
     static void Run()
     {
         fs::TimeUtil::SetTimeZone();
-        auto logMgr = fs::ILog::InitModule("main");
+        g_EasyGlobal->Init();
         fs::Time nowTime, nowTime2;
         nowTime.FlushTime();
 //         logMgr->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
@@ -17,12 +53,10 @@ public:
 //         logMgr->crash<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
 //         logMgr->memleak<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
 //         logMgr->net<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
-        for(Int32 i = 0; i < 1000000; ++i)
-            logMgr->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
+            g_Log->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
         nowTime2.FlushTime();
         std::cout << (nowTime2 - nowTime).GetTotalMilliSeconds() << std::endl;
-        logMgr->FinishModule();
-        Fs_SafeFree(logMgr);
+        g_EasyGlobal->Finish();
 
 //         std::cout << "-----------------------------------------" << std::endl;
 //         fs::Time nowTime, nowTime2, nowTime3;

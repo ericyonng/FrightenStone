@@ -255,6 +255,7 @@
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheel.h" />
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h" />
     <ClInclude Include="..\common\component\Impl\Trigger.h" />
+    <ClInclude Include="..\common\Global\Defs\EasyGlobalMacros.h" />
     <ClInclude Include="..\common\Global\EasyGlobal.h" />
     <ClInclude Include="..\common\Global\Interface\IEasyGlobal.h" />
     <ClInclude Include="..\common\log\Defs\CreateLogFileMacro.h" />
