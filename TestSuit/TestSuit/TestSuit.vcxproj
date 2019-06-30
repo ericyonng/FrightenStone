@@ -144,6 +144,7 @@
     <ClInclude Include="TestInst\TestTimeWheel.h" />
     <ClInclude Include="TestInst\TestTrigger.h" />
     <ClInclude Include="TestInst\TestUtf8.h" />
+    <ClInclude Include="TestInst\TestXor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
