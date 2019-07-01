@@ -175,6 +175,7 @@
     <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_FileUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_IPUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\KeyGeneratorUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\STLUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\STLUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\StringUtil.h" />
@@ -255,6 +256,7 @@
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheel.h" />
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h" />
     <ClInclude Include="..\common\component\Impl\Trigger.h" />
+    <ClInclude Include="..\common\component\Impl\XorEncrypt.h" />
     <ClInclude Include="..\common\Global\Defs\EasyGlobalMacros.h" />
     <ClInclude Include="..\common\Global\EasyGlobal.h" />
     <ClInclude Include="..\common\Global\Interface\IEasyGlobal.h" />
@@ -289,6 +291,7 @@
     <ClCompile Include="..\common\assist\utils\Impl\FS_DirectoryUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\KeyGeneratorUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\StringUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\SystemUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\ThreadUtil.cpp" />
@@ -320,6 +323,7 @@
     <ClCompile Include="..\common\component\Impl\TimeWheel\FS_Timer.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWheel.cpp" />
     <ClCompile Include="..\common\component\Impl\Trigger.cpp" />
+    <ClCompile Include="..\common\component\Impl\XorEncrypt.cpp" />
     <ClCompile Include="..\common\log\Defs\LogCaches.cpp" />
     <ClCompile Include="..\common\log\Defs\LogData.cpp" />
     <ClCompile Include="..\common\log\Defs\LogTask.cpp" />

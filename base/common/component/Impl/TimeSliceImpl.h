@@ -29,7 +29,7 @@
  *
  * 
  */
-#ifdef __Base_Common_Component_Impl_TimeSlice__H__
+#ifdef __Base_Common_Component_Impl_TimeSlice_H__
 
 #pragma once
 

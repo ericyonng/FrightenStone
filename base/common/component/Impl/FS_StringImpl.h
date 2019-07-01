@@ -29,7 +29,7 @@
  *
  * 
  */
-#ifdef __Base_Common_Component_Impl_FS_String__H__
+#ifdef __Base_Common_Component_Impl_FS_String_H__
 
 
 #pragma once

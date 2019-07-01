@@ -50,6 +50,17 @@ static const int g_aes_key_bytes[] = {
 
 FS_NAMESPACE_BEGIN
 
+FS_Aes::FS_Aes()
+    :_innerKey(NULL)
+{
+
+}
+
+FS_Aes::~FS_Aes()
+{
+    Fs_SafeFree(_innerKey);
+}
+
 Int32 FS_Aes::GenerateKey(Int32 mode, FS_String &key)
 {
     Int64 m = 0;
@@ -79,11 +90,11 @@ Int32 FS_Aes::Encrypt_Data(Int32 mode, const FS_String &key, const FS_String &pl
     if(cyphertext.size() < textSize)
         cyphertext.GetRaw().resize(textSize, 0);
 
-    static AES_KEY innerKey;
-    AES_set_encrypt_key(reinterpret_cast<const unsigned char *>(key.c_str()), g_aes_key_bytes[mode] * 8, &innerKey);
+    auto innerKey = _GetKeyCache();
+    AES_set_encrypt_key(reinterpret_cast<const unsigned char *>(key.c_str()), g_aes_key_bytes[mode] * 8, innerKey);
     while(i < textSize)
     {
-        AES_encrypt(reinterpret_cast<const unsigned char *>(&plaintext[i]), reinterpret_cast<unsigned char *>(&cyphertext[i]), &innerKey);
+        AES_encrypt(reinterpret_cast<const unsigned char *>(&plaintext[i]), reinterpret_cast<unsigned char *>(&cyphertext[i]), innerKey);
         i += AES_BLOCK_SIZE;
     }
 
@@ -106,15 +117,22 @@ Int32 FS_Aes::Decrypt_Data(Int32 mode, const FS_String &key,  const FS_String &c
     if(UNLIKELY(plaintext.size() < textSize))
         plaintext.GetRaw().resize(textSize, 0);
 
-    static AES_KEY innerKey;
-    AES_set_decrypt_key(reinterpret_cast<const unsigned char *>(key.c_str()), g_aes_key_bytes[mode] * 8, &innerKey);
+    auto innerKey = _GetKeyCache();
+    AES_set_decrypt_key(reinterpret_cast<const unsigned char *>(key.c_str()), g_aes_key_bytes[mode] * 8, innerKey);
     while(i < textSize)
     {
-        AES_decrypt(reinterpret_cast<const unsigned char *>(&cyphertext[i]), reinterpret_cast<unsigned char *>(&plaintext[i]), &innerKey);
+        AES_decrypt(reinterpret_cast<const unsigned char *>(&cyphertext[i]), reinterpret_cast<unsigned char *>(&plaintext[i]), innerKey);
         i += AES_BLOCK_SIZE;
     }
 
     return StatusDefs::Success;
+}
+
+AES_KEY *FS_Aes::_GetKeyCache()
+{
+    if(!_innerKey)
+        _innerKey = new AES_KEY;
+    return _innerKey;
 }
 
 FS_NAMESPACE_END

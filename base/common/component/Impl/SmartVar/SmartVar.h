@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_SmartVar_SmartVar__H__
-#define __Base_Common_Component_Impl_SmartVar_SmartVar__H__
+#ifndef __Base_Common_Component_Impl_SmartVar_SmartVar_H__
+#define __Base_Common_Component_Impl_SmartVar_SmartVar_H__
 #pragma once
 
 #include "base/exportbase.h"

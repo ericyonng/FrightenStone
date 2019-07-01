@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_String__H__
-#define __Base_Common_Component_Impl_FS_String__H__
+#ifndef __Base_Common_Component_Impl_FS_String_H__
+#define __Base_Common_Component_Impl_FS_String_H__
 
 
 #pragma once
@@ -224,4 +224,4 @@ FS_NAMESPACE_END
 
 #include "base/common/component/Impl/FS_StringImpl.h"
 
-#endif // !__Base_Common_Component_Impl_FS_String__H__
+#endif // !__Base_Common_Component_Impl_FS_String_H__

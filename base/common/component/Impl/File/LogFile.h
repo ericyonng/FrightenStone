@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_File_LogFile__H__
-#define __Base_Common_Component_Impl_File_LogFile__H__
+#ifndef __Base_Common_Component_Impl_File_LogFile_H__
+#define __Base_Common_Component_Impl_File_LogFile_H__
 
 
 #pragma once

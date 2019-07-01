@@ -29,7 +29,7 @@
  *
  * 
  */
-#ifdef __Base_Common_Component_Impl_File_LogFile__H__
+#ifdef __Base_Common_Component_Impl_File_LogFile_H__
 
 #pragma once
 

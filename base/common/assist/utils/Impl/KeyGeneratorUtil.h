@@ -21,59 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_Aes.h
+ * @file  : KeyGeneratorUtil.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/7/1
  * @brief :
- *          base on the aes of openssl
+ * 
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_Aes_H__
-#define __Base_Common_Component_Impl_FS_Aes_H__
+#ifndef __Base_Common_Assist_Utils_Impl_KeyGeneratorUtil_H__
+#define __Base_Common_Assist_Utils_Impl_KeyGeneratorUtil_H__
+
 #pragma once
 
 #include "base/exportbase.h"
-#include "base/common/basedefs/DataType/DataType.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
-#include "base/common/component/Defs/FS_AesDefs.h"
-
-typedef struct aes_key_st AES_KEY;
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
-class FS_String;
-class BASE_EXPORT FS_Aes
+
+class BASE_EXPORT KeyGeneratorUtil
 {
 public:
-    FS_Aes();
-    virtual ~FS_Aes();
-
-    // 产生密钥
-    static Int32 GenerateKey(Int32 mode, FS_String &key);
-    // 加密 需要是128bit 16字节的倍数
-    Int32 Encrypt_Data(Int32 mode, const FS_String &key, const FS_String &plaintext, FS_String &cyphertext);
-    // 解密 需要是128bit 16字节的倍数
-    Int32 Decrypt_Data(Int32 mode, const FS_String &key,  const FS_String &cyphertext, FS_String &plaintext);
-
-    // openssl加密算法线程不安全需要加锁
-    void Lock();
-    void Unlock();
-
-private:
-    AES_KEY *_GetKeyCache();
-private:
-    AES_KEY *_innerKey;
+    static void GetKey_128Bit(Byte8 *key);
 };
-
-inline void FS_Aes::Lock()
-{
-    g_OpenSSL_Locker.Lock();
-}
-
-inline void FS_Aes::Unlock()
-{
-    g_OpenSSL_Locker.Unlock();
-}
 
 FS_NAMESPACE_END
 
