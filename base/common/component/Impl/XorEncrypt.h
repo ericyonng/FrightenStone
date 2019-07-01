@@ -41,8 +41,8 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT XorEncrypt
 {
 public:
-    Int32 Encrypt(const Byte8 *plainText, Int32 plainSize, Byte8 *cypherText, Int32 cypherSize, const Byte8 *key, Int32 keySize);
-    Int32 Decrypt(const Byte8 *cypherText, Int32 cypherSize, Byte8 *plainText, Int32 plainSize, const Byte8 *key, Int32 keySize);
+    static Int32 Encrypt(const Byte8 *plainText, Int32 plainSize, Byte8 *cypherText, Int32 cypherSize, const Byte8 *key, Int32 keySize);
+    static Int32 Decrypt(const Byte8 *cypherText, Int32 cypherSize, Byte8 *plainText, Int32 plainSize, const Byte8 *key, Int32 keySize);
 };
 
 FS_NAMESPACE_END

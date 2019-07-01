@@ -37,6 +37,8 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 
+#define KEY_128BIT 16           // 128/8
+
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT KeyGeneratorUtil
