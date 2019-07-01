@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_Trigger__H__
-#define __Base_Common_Component_Impl_Trigger__H__
+#ifndef __Base_Common_Component_Impl_Trigger_H__
+#define __Base_Common_Component_Impl_Trigger_H__
 
 #pragma once
 
@@ -74,4 +74,4 @@ private:
 
 FS_NAMESPACE_END
 
-#endif // !__Base_Common_Component_Impl_Trigger__H__
+#endif // !__Base_Common_Component_Impl_Trigger_H__

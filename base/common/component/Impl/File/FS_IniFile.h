@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_File_FS_IniFile__H__
-#define __Base_Common_Component_Impl_File_FS_IniFile__H__
+#ifndef __Base_Common_Component_Impl_File_FS_IniFile_H__
+#define __Base_Common_Component_Impl_File_FS_IniFile_H__
 #pragma once
 
 #include <base/exportbase.h>

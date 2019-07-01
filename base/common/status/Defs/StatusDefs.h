@@ -110,6 +110,13 @@ public:
         Log_CreateLogFileFail = 1201,                           // 创建日志文件失败
         #pragma endregion
 
+        #pragma region XorEncrypt[1300, 1399]
+        XorEncrypt_PlainTextLenNotEnough = 1300,                // 明文数据块长度不够
+        XorEncrypt_CypherTextSizeNotEnough = 1301,              // 密文空间不足
+        XorEncrypt_CypherTextLenNotEnough = 1302,               // 密文数据块长度不够
+        XorEncrypt_PlainTextSizeNotEnough = 1303,               // 明文空间不足
+        #pragma endregion
+
     };
 };
 

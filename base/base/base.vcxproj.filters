@@ -594,6 +594,12 @@
     <ClInclude Include="..\common\Global\Defs\EasyGlobalMacros.h">
       <Filter>common\Global\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\XorEncrypt.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\KeyGeneratorUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -739,6 +745,12 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\FS_CpuInfo.cpp">
       <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\XorEncrypt.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\KeyGeneratorUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_TimeSlice__H__
-#define __Base_Common_Component_Impl_TimeSlice__H__
+#ifndef __Base_Common_Component_Impl_TimeSlice_H__
+#define __Base_Common_Component_Impl_TimeSlice_H__
 
 #pragma once
 

@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_Time__H__
-#define __Base_Common_Component_Impl_Time__H__
+#ifndef __Base_Common_Component_Impl_Time_H__
+#define __Base_Common_Component_Impl_Time_H__
 
 #pragma once
 

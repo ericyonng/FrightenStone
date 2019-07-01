@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_ThreadPool__H__
-#define __Base_Common_Component_Impl_FS_ThreadPool__H__
+#ifndef __Base_Common_Component_Impl_FS_ThreadPool_H__
+#define __Base_Common_Component_Impl_FS_ThreadPool_H__
 
 #pragma once
 
