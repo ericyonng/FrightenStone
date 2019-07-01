@@ -40,7 +40,7 @@ void KeyGeneratorUtil::GetKey_128Bit(Byte8 *key)
 {
     fs::FS_Int64Random random(0, 127);
     g_RandomLocker.Lock();
-    for(Int32 i = 0; i < 16; ++i)
+    for(Int32 i = 0; i < KEY_128BIT; ++i)
         key[i] = static_cast<Int32>(random(g_RandomSeed));
 
     g_RandomLocker.Unlock();

@@ -50,5 +50,6 @@
 #include "base/common/assist/utils/Impl/WidthUtil.h"
 #include "base/common/assist/utils/Impl/SystemUtil.h"
 #include "base/common/assist/utils/Defs/SystemUtilDefs.h"
+#include "base/common/assist/utils/Impl/KeyGeneratorUtil.h"
 
 #endif // !__Base_Common_Assist_Utils_Utils_H__
