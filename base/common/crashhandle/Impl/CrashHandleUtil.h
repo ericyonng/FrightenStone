@@ -53,7 +53,11 @@ class BASE_EXPORT CrashHandleUtil
 public:
     // 初始化crashdump信息
     static int InitCrashHandleParams(bool isUseSehExceptionHandler = false);
+
+    #ifdef _WIN32
     static Int32 RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo);
+    #endif
+
     // 初始化pdb等符号信息
     static Int32 InitSymbol();
     // 抓取堆栈快照

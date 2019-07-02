@@ -241,6 +241,7 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
     return StatusDefs::Success;
 }
 
+#ifdef _WIN32
 Int32 CrashHandleUtil::RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo)
 {
     __g_SehLocker.Lock();
@@ -248,6 +249,7 @@ Int32 CrashHandleUtil::RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo)
     __g_SehLocker.Unlock();
     return st;
 }
+#endif
 
 Int32 CrashHandleUtil::InitSymbol()
 {
