@@ -55,6 +55,7 @@ FS_Log::FS_Log(const Byte8 *rootDirName)
     , _threadWriteLogDelegate(NULL)
     , _logCaches(NULL)
     , _levelRefHook{NULL}
+    , _levelRefBeforeLogHook{NULL}
     , _logFiles{NULL}
     ,_logDatas{NULL}
 {
@@ -64,6 +65,42 @@ FS_Log::FS_Log(const Byte8 *rootDirName)
 FS_Log::~FS_Log()
 {
     FinishModule();
+}
+
+void FS_Log::UnInstallLogHookFunc(Int32 level, const IDelegatePlus<void, const LogData *> *delegate)
+{
+    if(!_levelRefHook[level])
+        return;
+
+    for(auto iterHook = _levelRefHook[level]->begin(); iterHook != _levelRefHook[level]->end(); )
+    {
+        if(*iterHook == delegate)
+        {
+            Fs_SafeFree(*iterHook);
+            iterHook = _levelRefHook[level]->erase(iterHook);
+            continue;
+        }
+
+        ++iterHook;
+    }
+}
+
+void FS_Log::UnInstallBeforeLogHookFunc(Int32 level, const IDelegatePlus<void, LogData *> *delegate)
+{
+    if(!_levelRefBeforeLogHook[level])
+        return;
+
+    for(auto iterHook = _levelRefBeforeLogHook[level]->begin(); iterHook != _levelRefBeforeLogHook[level]->end(); )
+    {
+        if(*iterHook == delegate)
+        {
+            Fs_SafeFree(*iterHook);
+            iterHook = _levelRefBeforeLogHook[level]->erase(iterHook);
+            continue;
+        }
+
+        ++iterHook;
+    }
 }
 
 Int32 FS_Log::InitModule()
@@ -102,7 +139,30 @@ void FS_Log::FinishModule()
     Fs_SafeFree(_threadWriteLogDelegate);
     fs::STLUtil::DelArray(_logDatas);
     fs::STLUtil::DelArray(_logFiles);
-    fs::STLUtil::DelArray(_levelRefHook);
+
+    // log后hook
+    for(Int32 i = 0; i < LogLevel::End; ++i)
+    {
+        if(!_levelRefHook[i])
+            continue;
+
+        for(auto iterHook = _levelRefHook[i]->begin(); iterHook != _levelRefHook[i]->end(); ++iterHook)
+            Fs_SafeFree(*iterHook);
+
+        Fs_SafeFree(_levelRefHook[i]);
+    }
+
+    // log前hook
+    for(Int32 i = 0; i < LogLevel::End; ++i)
+    {
+        if(!_levelRefBeforeLogHook[i])
+            continue;
+
+        for(auto iterHook = _levelRefBeforeLogHook[i]->begin(); iterHook != _levelRefBeforeLogHook[i]->end(); ++iterHook)
+            Fs_SafeFree(*iterHook);
+
+        Fs_SafeFree(_levelRefBeforeLogHook[i]);
+    }
     Fs_SafeFree(_logCaches);
     Fs_SafeFree(_threadPool);
 }
@@ -156,22 +216,40 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
 
 void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
 {
-    // 1.拷贝一次数据
+    // 1.根据level不同调用不同的log前hook 不可做影响log执行的其他事情
+    if(_levelRefBeforeLogHook[level])
+    {
+        for(auto iterHook = _levelRefBeforeLogHook[level]->begin();
+            iterHook != _levelRefBeforeLogHook[level]->end();
+            ++iterHook)
+        {
+            (*(*iterHook))(std::move(logData));
+        }
+    }
+
+    // 2.拷贝一次数据
     LogData cache = *logData;
 
-    // 2.将日志数据放入队列
+    // 3.将日志数据放入队列
     _locker.Lock();
     _logDatas[fileUniqueIndex]->push_back(logData);
     _locker.Unlock();
 
-    // 3.打印到控制台
+    // 4.打印到控制台
 #if ENABLE_OUTPUT_CONSOLE
     _OutputToConsole(level, cache._logToWrite);
 #endif
     
-    // 4.根据level不同调用不同的hook
+    // 5.根据level不同调用不同的hook
     if(_levelRefHook[level])
-        (*_levelRefHook[level])(&cache);
+    {
+        for(auto iterHook = _levelRefHook[level]->begin();
+            iterHook != _levelRefHook[level]->end();
+            ++iterHook)
+        {
+            (*(*iterHook))(&cache);
+        }
+    }
 }
 
 void FS_Log::_OutputToConsole(Int32 level,const FS_String &logStr)

@@ -89,13 +89,22 @@ public:
     /* 功能函数 */
     // hook与具体类型有关
     template<typename ObjType>
-    void InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData));
-    // 与具体类型无关hook
-    virtual void InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate) = 0;
+    const IDelegatePlus<void, const LogData *> * InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData));
+    const IDelegatePlus<void, const LogData *> * InstallLogHookFunc(Int32 level, void (*func)(const LogData *logData));
+    // hook与具体类型有关
+    template<typename ObjType>
+    const IDelegatePlus<void, LogData *> * InstallBeforeLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(LogData *logData));
+    virtual void UnInstallLogHookFunc(Int32 level, const IDelegatePlus<void, const LogData *> *delegate) = 0;
+    const IDelegatePlus<void, LogData *> * InstallBeforeLogHookFunc(Int32 level, void(*func)(LogData *logData));
+    virtual void UnInstallBeforeLogHookFunc(Int32 level, const IDelegatePlus<void, LogData *> *delegate) = 0;
+
     // 创建日志文件调用 ！！！外部不可调用，由系统初始化时候调用
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName) = 0;
 
 protected:
+    // 与具体类型无关hook
+    virtual const IDelegatePlus<void, const LogData *> *_InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate) = 0;
+    virtual const IDelegatePlus<void, LogData *> *_InstallBeforeLogHookFunc(Int32 level, IDelegatePlus<void, LogData *> *delegate) = 0;
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData) = 0;
 };
 
