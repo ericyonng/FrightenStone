@@ -38,6 +38,7 @@
 #include "base/common/log/Log.h"
 #include "base/common/status/status.h"
 #include "base/common/component/Impl/Time.h"
+#include "base/common/asyn/asyn.h"
 
 #define __USE_FS_DBGHELP__
 #include "3rd/3rd.h"
@@ -45,6 +46,7 @@
 FS_NAMESPACE_BEGIN
 
 static FS_String __dumpFileName;
+static Locker __g_SehLocker;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, FS_String &backTrace)
 {
@@ -153,8 +155,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 
     FS_String backTrace;
     __GetExceptionBackTrace(cache.ContextRecord, backTrace);
-    errMsg.Format("\nStack BackTrace:\n%s\n", backTrace.c_str());
-    ::MessageBoxA(NULL, errMsg.c_str(), NULL, MB_ICONERROR | MB_OK);
+    errMsg.Format("\nStack BackTrace:\n%s", backTrace.c_str());
     g_Log->crash("\n[ ******** crash info ******** ]%s\n[ ******** End ******** ]\n", errMsg.c_str());
 
     return EXCEPTION_EXECUTE_HANDLER;
@@ -193,7 +194,7 @@ static BOOL __PreventSetUnhandledExceptionFilter()
                                 &bytesWritten);
 }
 
-int CrashHandleUtil::InitCrashHandleParams()
+int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
 {
 #ifndef _WIN32
     return StatusDefs::Error;
@@ -223,18 +224,29 @@ int CrashHandleUtil::InitCrashHandleParams()
 
     __dumpFileName = fileName;
 
-    // ::SetUnhandledExceptionFilter(fs::__AppCrashHandler);
+    if(!isUseSehExceptionHandler)
+        ::SetUnhandledExceptionFilter(fs::__AppCrashHandler);
 
 #ifndef _DEBUG
-    // __PreventSetUnhandledExceptionFilter();
+    if(!isUseSehExceptionHandler)
+        __PreventSetUnhandledExceptionFilter();
 #endif // Release
+
+    ASSERT(InitSymbol() == StatusDefs::Success);
+
+    // 设置crashlog hook
+    g_Log->InstallBeforeLogHookFunc(LogLevel::Crash, &CrashHandleUtil::_OnBeforeCrashLogHook);
+    auto afterDelegate = g_Log->InstallLogHookFunc(LogLevel::Crash, &CrashHandleUtil::_OnAfterCrashLogHook);
 
     return StatusDefs::Success;
 }
 
 Int32 CrashHandleUtil::RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo)
 {
-    return __AppCrashHandler(&exceptionInfo);
+    __g_SehLocker.Lock();
+    const auto st = __AppCrashHandler(&exceptionInfo);
+    __g_SehLocker.Unlock();
+    return st;
 }
 
 Int32 CrashHandleUtil::InitSymbol()
@@ -249,49 +261,54 @@ Int32 CrashHandleUtil::InitSymbol()
 #endif
 }
 
-FS_String CrashHandleUtil::CaptureStackBackTrace(size_t skipFrames /*= 0*/, size_t captureFrames /*= FS_INFINITE*/)
+FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, size_t captureFrames /*= FS_INFINITE*/)
 {
-    FS_String backTrace;
-
+    // 快照帧数
     if(captureFrames == FS_INFINITE)
         captureFrames = SYMBOL_MAX_CAPTURE_FRAMES;
     else
-        captureFrames = std::min<Int32>(captureFrames, SYMBOL_MAX_CAPTURE_FRAMES);
+        captureFrames = std::min<size_t>(captureFrames, SYMBOL_MAX_CAPTURE_FRAMES);
 
     // 初始化堆栈结构
-    void *stack[SYMBOL_MAX_CAPTURE_FRAMES] = {0};
-    void **stackPtr = stack;
+    void *stackArray[SYMBOL_MAX_CAPTURE_FRAMES] = {0};
+    void **stack = stackArray;
     SYMBOL_INFO *win32Symboal = reinterpret_cast<SYMBOL_INFO *>(new char[sizeof(::SYMBOL_INFO) + (SYMBOL_MAX_SYMBOL_NAME + 1) * sizeof(char)]);
     memset(win32Symboal, 0, sizeof(SYMBOL_INFO));
-    win32Symboal.SizeOfStruct = sizeof(::SYMBOL_INFO);
-    win32Symboal.MaxNameLen = 
+    win32Symboal->SizeOfStruct = sizeof(::SYMBOL_INFO);
+    win32Symboal->MaxNameLen = SYMBOL_MAX_SYMBOL_NAME;
+    IMAGEHLP_LINE64 win32ImgHelpLine64;
+    ::memset(&win32ImgHelpLine64, 0, sizeof(win32ImgHelpLine64));
+    win32ImgHelpLine64.SizeOfStruct = sizeof(win32ImgHelpLine64);
 
 #ifdef _WIN32
+    // 抓取快照 取得各个展开的函数地址
     DWORD displacement;
     HANDLE curProc = ::GetCurrentProcess();
-    SYMBOL_INFO *symbol = &win32Symboal;
+    SYMBOL_INFO *symbol = win32Symboal;
     const WORD frames = ::CaptureStackBackTrace(static_cast<DWORD>(skipFrames) + 1,
                                                 static_cast<DWORD>(captureFrames),
-                                                stackPtr,
+                                                stack,
                                                 NULL);
 
+    // 构建快照字符串信息
+    FS_String backTrace;
     for(WORD frame = 0; frame != frames; frame++)
     {
         ::SymFromAddr(curProc, (DWORD64)stack[frame], 0, symbol);
-        IMAGEHLP_LINE64 &imgHelpLine64 = libTls->coreTls.symbol.win32ImgHelpLine64;
+        IMAGEHLP_LINE64 &imgHelpLine64 = win32ImgHelpLine64;
         if(::SymGetLineFromAddr64(curProc, symbol->Address, &displacement, &imgHelpLine64) == TRUE)
         {
-            backTrace.append_format("#%d 0x%x in %s at %s:%d", frames - frame - 1, (void *)symbol->Address,
+            backTrace.Format("#%d 0x%x in %s at %s:%d", frames - frame - 1, (void *)symbol->Address,
                                     symbol->Name, imgHelpLine64.FileName, imgHelpLine64.LineNumber);
         }
         else
         {
-            backTrace.append_format("#%d 0x%x in %s at %s:%d", frames - frame - 1,
+            backTrace.Format("#%d 0x%x in %s at %s:%d", frames - frame - 1,
                 (void *)symbol->Address, symbol->Name, "", 0);
         }
 
         if(frame != frames - 1)
-            backTrace.append(1, '\n');
+            backTrace.AppendBitData("\n", 1);
     }
 #else // Non-Win32
     const int frames = ::backtrace(stack, captureFrames + skipFrames);
@@ -300,7 +317,7 @@ FS_String CrashHandleUtil::CaptureStackBackTrace(size_t skipFrames /*= 0*/, size
     {
         for(int i = skipFrames; i < frames; i++)
         {
-            backTrace.append_format("#%d ", frames - i - 1);
+            backTrace.Format("#%d ", frames - i - 1);
 
             char *parenthesisEnd = NULL;
             char *parenthesisBeg = strchr(strs[i], '(');
@@ -326,29 +343,49 @@ FS_String CrashHandleUtil::CaptureStackBackTrace(size_t skipFrames /*= 0*/, size
                 *addrOffsetBeg = oldAddrOffsetBegCh;
                 if(status == 0)
                 {
-                    backTrace.append(strs[i], parenthesisBeg - strs[i]);
-                    backTrace.append(libTls->commonTls.rtti);
-                    backTrace.append(addrOffsetBeg);
+                    backTrace.AppendBitData(strs[i], parenthesisBeg - strs[i]);
+                    backTrace << libTls->commonTls.rtti;
+                    backTrace << addrOffsetBeg;
                 }
                 else
                 {
-                    backTrace.append_format("%s", strs[i]);
+                    backTrace.Format("%s", strs[i]);
                 }
             }
             else
             {
-                backTrace.append_format("%s", strs[i]);
+                backTrace.Format("%s", strs[i]);
             }
 
             if(i != frames - 1)
-                backTrace.append(1, '\n');
+                backTrace.AppendBitData("\n", 1);
         }
 
         free(strs);
     }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
+    if(win32Symboal)
+        delete[]win32Symboal;
+
     return backTrace;
+}
+
+void CrashHandleUtil::_OnBeforeCrashLogHook(LogData *logData)
+{
+    // 打印堆栈信息
+//     auto backStrace = FS_CaptureStackBackTrace();
+//     logData->_logToWrite.Format("\n[ ******* crash info ******* ]\n%s\n[ ******* End ******* ]\n"
+//                                 , backStrace.c_str());
+}
+
+void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
+{
+    // 弹窗堆栈信息
+    FS_String path;
+    SystemUtil::GetProgramPath(true, path);
+    auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);
+    ::MessageBoxA(NULL, logData->_logToWrite.c_str(), fileName.c_str(), MB_ICONERROR | MB_OK);
 }
 
 FS_NAMESPACE_END

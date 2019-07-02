@@ -47,17 +47,15 @@ public:
 //         g_EasyGlobal = new TestCrashEasyGloal;
 //         g_EasyGlobal->Init();
         fs::CrashHandleUtil::InitCrashHandleParams();
-
-        EXCEPTION_RECORD SavedExceptionRec;
-        CONTEXT SavedContextRec;
-        __try
-        {
-            Int32 *intPtr = NULL;
-            *intPtr = 89;
-        }
-        __except(fs::CrashHandleUtil::RecordExceptionInfo(*GET_EXCEPTION_INFO()))
-        {
-        }
+        Int32 *intPtr = NULL;
+        *intPtr = 89;
+//         __try
+//         {
+// 
+//         }
+//         __except(fs::CrashHandleUtil::RecordExceptionInfo(*GET_EXCEPTION_INFO()))
+//         {
+//         }
     }
 };
 

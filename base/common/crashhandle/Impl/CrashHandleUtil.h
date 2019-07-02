@@ -46,15 +46,22 @@ typedef struct _CONTEXT CONTEXT, *PCONTEXT;
 FS_NAMESPACE_BEGIN
 
 class FS_String;
+struct LogData;
 
 class BASE_EXPORT CrashHandleUtil
 {
 public:
-    static int InitCrashHandleParams();
+    // 初始化crashdump信息
+    static int InitCrashHandleParams(bool isUseSehExceptionHandler = false);
     static Int32 RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo);
+    // 初始化pdb等符号信息
     static Int32 InitSymbol();
-    static FS_String CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = FS_INFINITE);
+    // 抓取堆栈快照
+    static FS_String FS_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = FS_INFINITE);
 
+protected:
+    static void _OnBeforeCrashLogHook(LogData *logData);
+    static void _OnAfterCrashLogHook(const LogData *logData);
 };
 
 FS_NAMESPACE_END

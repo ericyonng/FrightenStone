@@ -34,10 +34,22 @@
 
 FS_NAMESPACE_BEGIN
 
-inline void FS_Log::InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate)
+inline IDelegatePlus<void, const LogData *> *FS_Log::_InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate)
 {
-    Fs_SafeFree(_levelRefHook[level]);
-    _levelRefHook[level] = delegate;
+    if(!_levelRefHook[level])
+        _levelRefHook[level] = new  std::list<IDelegatePlus<void, const LogData *> *>;
+
+    _levelRefHook[level]->push_back(delegate);
+    return delegate;
+}
+
+inline const IDelegatePlus<void, LogData *> *FS_Log::_InstallBeforeLogHookFunc(Int32 level, IDelegatePlus<void, LogData *> *delegate)
+{
+    if(!_levelRefBeforeLogHook[level])
+        _levelRefBeforeLogHook[level] = new  std::list<IDelegatePlus<void, LogData *> *>;
+
+    _levelRefBeforeLogHook[level]->push_back(delegate);
+    return delegate;
 }
 
 FS_NAMESPACE_END

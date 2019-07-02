@@ -157,10 +157,30 @@ inline void ILog::memleak(const char *funcName, Int32 codeLine, const char *fmt,
 }
 
 template<typename ObjType>
-inline void ILog::InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData))
+inline const IDelegatePlus<void, const LogData *> *ILog::InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData))
 {
-    IDelegatePlus<void, const LogData *> newDelegate = DelegatePlusFactory::Create(obj, func);
-    InstallLogHookFunc(level, newDelegate);
+    auto newDelegate = DelegatePlusFactory::Create(obj, func);
+    return _InstallLogHookFunc(level, newDelegate);
+}
+
+inline const IDelegatePlus<void, const LogData *> * ILog::InstallLogHookFunc(Int32 level, void(*func)(const LogData *logData))
+{
+    auto newDelegate = DelegatePlusFactory::Create(func);
+    return _InstallLogHookFunc(level, newDelegate);
+}
+
+// hook与具体类型有关
+template<typename ObjType>
+inline const IDelegatePlus<void, LogData *> * ILog::InstallBeforeLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(LogData *logData))
+{
+    auto newDelegate = DelegatePlusFactory::Create(obj, func);
+    return _InstallBeforeLogHookFunc(level, newDelegate);
+}
+
+inline const IDelegatePlus<void, LogData *> *ILog::InstallBeforeLogHookFunc(Int32 level, void(*func)(LogData *logData))
+{
+    auto newDelegate = DelegatePlusFactory::Create(func);
+    return _InstallBeforeLogHookFunc(level, newDelegate);
 }
 
 FS_NAMESPACE_END
