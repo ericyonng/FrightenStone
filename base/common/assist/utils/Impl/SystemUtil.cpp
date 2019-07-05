@@ -275,7 +275,7 @@ bool SystemUtil::IsProcessExist(const FS_String &processName)
         pachCache.Clear();
         if(GetProgramPath(false, pachCache, pid) != StatusDefs::Success)
             continue;
-
+        
         auto iterExist = pachCache.GetRaw().find(processName.GetRaw());
         if(iterExist != std::string::npos)
             return true;
@@ -324,6 +324,22 @@ Int32 SystemUtil::GetConsoleColor()
 void SystemUtil::OutputToConsole(const FS_String &outStr)
 {
     printf("%s", outStr.c_str());
+}
+
+Int32 SystemUtil::CloseProcess(ULong processId, ULong *lastError)
+{
+#ifdef _WIN32
+    if(!TerminateProcess(OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, false, processId), 0))
+    {
+        if(lastError)
+            *lastError = GetLastError();
+
+        return StatusDefs::Failed;
+    }
+#else
+#endif
+
+    return StatusDefs::Success;
 }
 
 ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)

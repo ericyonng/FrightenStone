@@ -274,6 +274,7 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
     // 初始化堆栈结构
     void *stackArray[SYMBOL_MAX_CAPTURE_FRAMES] = {0};
     void **stack = stackArray;
+    // name是个变长数组
     SYMBOL_INFO *win32Symboal = reinterpret_cast<SYMBOL_INFO *>(new char[sizeof(::SYMBOL_INFO) + (SYMBOL_MAX_SYMBOL_NAME + 1) * sizeof(char)]);
     memset(win32Symboal, 0, sizeof(SYMBOL_INFO));
     win32Symboal->SizeOfStruct = sizeof(::SYMBOL_INFO);

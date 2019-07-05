@@ -241,6 +241,18 @@
     <Filter Include="common\crashhandle\Interface">
       <UniqueIdentifier>{7cd21d8c-8b96-4933-8bfc-d8d2dc29ae24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\memorypool">
+      <UniqueIdentifier>{1a40d8be-6113-4334-b577-511fa2e5d13b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\memorypool\Defs">
+      <UniqueIdentifier>{dbaea5e7-33a2-4d62-b83d-bcff207384c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\memorypool\Impl">
+      <UniqueIdentifier>{a0219941-dc1c-4599-aec1-71f3f76f3240}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\memorypool\Interface">
+      <UniqueIdentifier>{e5d2f9c6-bbe1-483d-b424-3a64d098eabd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -618,6 +630,24 @@
     <ClInclude Include="..\common\crashhandle\Impl\CrashHandleUtil.h">
       <Filter>common\crashhandle\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\memorypool\memorypool.h">
+      <Filter>common\memorypool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctor.h">
+      <Filter>common\memorypool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\memorypool\Defs\MemoryBlock.h">
+      <Filter>common\memorypool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctorImpl.h">
+      <Filter>common\memorypool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\memorypool\Impl\MemoryPoolMgr.h">
+      <Filter>common\memorypool\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\memorypool\Interface\IMemoryPool.h">
+      <Filter>common\memorypool\Interface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -775,6 +805,18 @@
     </ClCompile>
     <ClCompile Include="..\common\crashhandle\Impl\IEasyGlobal.cpp">
       <Filter>common\Global\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\memorypool\Defs\MemoryAlloctor.cpp">
+      <Filter>common\memorypool\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\memorypool\Defs\MemoryBlock.cpp">
+      <Filter>common\memorypool\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\memorypool\Impl\MemoryPoolMgr.cpp">
+      <Filter>common\memorypool\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\memorypool\Interface\IMemoryPool.cpp">
+      <Filter>common\memorypool\Interface</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
