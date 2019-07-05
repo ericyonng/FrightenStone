@@ -74,6 +74,8 @@ public:
     static Int32 GetConsoleColor();
     // 输出给控制台
     static void OutputToConsole(const FS_String &outStr);
+    // 结束进程
+    static Int32 CloseProcess(ULong processId, ULong *lastError = NULL);
 };
 
 FS_NAMESPACE_END

@@ -134,7 +134,6 @@ public:
     FS_String &strip(const FS_String &chars = FS_String());
     FS_String strip(const FS_String &chars = FS_String()) const;
 
-
     // isalpha/isupper/islower ÊÇ·ñ×ÖÄ¸
     static bool isalpha(const char &c);
     static bool isalpha(const FS_String &s);
