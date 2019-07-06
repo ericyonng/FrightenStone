@@ -42,6 +42,7 @@ class ILog;
 class IEasyGlobal
 {
 public:
+    static IEasyGlobal *GetInstance();
     IEasyGlobal();
     virtual ~IEasyGlobal();
 
@@ -67,6 +68,6 @@ inline IEasyGlobal::~IEasyGlobal()
 FS_NAMESPACE_END
 
 // 全局类请每个进程对全局对象赋值
-extern BASE_EXPORT fs::IEasyGlobal *g_EasyGlobal;
+// #define g_EasyGlobal fs::IEasyGlobal::GetInstance()
 
 #endif

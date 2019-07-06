@@ -21,22 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IEasyGlobal.cpp
+ * @file  : MemoryPoolCreateDefs.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/2
+ * @date  : 2019/7/7
  * @brief :
  * 
  *
  * 
  */
 #include "stdafx.h"
-#include "base/common/Global/Interface/IEasyGlobal.h"
+#include "base/common/memorypool/Defs/MemoryPoolCreateDefs.h"
+#include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 
 FS_NAMESPACE_BEGIN
 
-IEasyGlobal *IEasyGlobal::GetInstance()
+MemoryPoolHelper::MemoryPoolHelper(const Byte8 *objName)
+    :_objName(objName)
 {
-    return NULL;
+
+}
+
+MemoryPoolHelper::~MemoryPoolHelper()
+{
+
+}
+
+void *MemoryPoolHelper::Alloc(const size_t &bytes)
+{
+    g_MemoryPool->Lock();
+    auto ptr = g_MemoryPool->Alloc(bytes, _objName);
+    g_MemoryPool->Unlock();
+    return ptr;
+}
+
+void MemoryPoolHelper::Free(void *ptr)
+{
+    g_MemoryPool->Lock();
+    g_MemoryPool->Free(ptr);
+    g_MemoryPool->Unlock();
+}
+
+void MemoryPoolHelper::AddRef(void *ptr)
+{
+    g_MemoryPool->Lock();
+    g_MemoryPool->AddRef(ptr);
+    g_MemoryPool->Unlock();
 }
 
 FS_NAMESPACE_END

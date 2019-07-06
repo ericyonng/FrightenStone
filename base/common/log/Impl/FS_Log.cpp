@@ -48,16 +48,15 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_Log::FS_Log(const Byte8 *rootDirName)
-    :_rootDirName(rootDirName)
-    , _threadPool(NULL)
+FS_Log::FS_Log()
+    : _threadPool(NULL)
     , _threadWorkIntervalMsTime(LOG_THREAD_INTERVAL_MS_TIME)
     , _threadWriteLogDelegate(NULL)
     , _logCaches(NULL)
     , _levelRefHook{NULL}
     , _levelRefBeforeLogHook{NULL}
     , _logFiles{NULL}
-    ,_logDatas{NULL}
+    , _logDatas{NULL}
 {
 
 }
@@ -103,10 +102,13 @@ void FS_Log::UnInstallBeforeLogHookFunc(Int32 level, const IDelegatePlus<void, L
     }
 }
 
-Int32 FS_Log::InitModule()
+Int32 FS_Log::InitModule(const Byte8 *rootDirName)
 {
     if(_isInit)
         return StatusDefs::Success;
+
+    // 根目录
+    _rootDirName = rootDirName;
 
     // 初始化log config options
     _ReadConfig();

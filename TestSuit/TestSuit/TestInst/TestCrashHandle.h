@@ -9,14 +9,15 @@
 class TestCrashEasyGloal : public fs::IEasyGlobal
 {
 public:
-    TestCrashEasyGloal() { g_EasyGlobal = this; Init(); }
+    TestCrashEasyGloal() { Init(); }
     virtual ~TestCrashEasyGloal()
     {}
 #pragma region init/finish
 public:
     virtual Int32 Init()
     {
-        _log = fs::ILog::InitModule("main");
+        _log = g_Log;
+        _log->InitModule("main");
         return StatusDefs::Success;
     }
     virtual void Finish()

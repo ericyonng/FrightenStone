@@ -21,22 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IEasyGlobal.cpp
+ * @file  : IMemoryPoolMgr.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/2
+ * @date  : 2019/7/6
  * @brief :
  * 
  *
  * 
  */
 #include "stdafx.h"
-#include "base/common/Global/Interface/IEasyGlobal.h"
+#include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
+#include "base/common/memorypool/Impl/MemoryPoolMgr.h"
 
 FS_NAMESPACE_BEGIN
 
-IEasyGlobal *IEasyGlobal::GetInstance()
+IMemoryPoolMgr::IMemoryPoolMgr()
 {
-    return NULL;
+
+}
+
+IMemoryPoolMgr::~IMemoryPoolMgr()
+{
+
+}
+
+IMemoryPoolMgr *IMemoryPoolMgr::GetInstance()
+{
+    return Singleton<MemoryPoolMgr>::GetInstance();
 }
 
 FS_NAMESPACE_END

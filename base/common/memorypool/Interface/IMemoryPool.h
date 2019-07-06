@@ -35,16 +35,16 @@
 #pragma once
 #include "base/exportbase.h"
 
-void *operator new(size_t bytes);
-
-void operator delete(void *ptr);
-
-void *operator new[](size_t bytes);
-
-void operator delete[](void *ptr);
-
-void *mem_alloc(size_t bytes);
-
-void mem_free(void *ptr);
+// void *operator new(size_t bytes);
+// 
+// void operator delete(void *ptr);
+// 
+// void *operator new[](size_t bytes);
+// 
+// void operator delete[](void *ptr);
+// 
+// void *mem_alloc(size_t bytes);
+// 
+// void mem_free(void *ptr);
 
 #endif

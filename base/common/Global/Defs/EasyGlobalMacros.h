@@ -33,9 +33,6 @@
 #define __Base_Common_Global_Defs_EasyGlobalMacros_H__
 #pragma once
 
- // log±ãÀûºê
-#define g_Log g_EasyGlobal->GetLog()
-
 // ...
 
 #endif

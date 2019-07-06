@@ -65,13 +65,13 @@ class LogCaches;
 class BASE_EXPORT FS_Log : public ILog
 {
 public:
-    FS_Log(const Byte8 *rootDirName);
+    FS_Log();
     virtual ~FS_Log();
 
     /* ¹¦ÄÜº¯Êý */
     virtual void UnInstallLogHookFunc(Int32 level, const IDelegatePlus<void, const LogData *> *delegate);
     virtual void UnInstallBeforeLogHookFunc(Int32 level, const IDelegatePlus<void, LogData *> *delegate);
-    Int32 InitModule();
+    virtual Int32 InitModule(const Byte8 *rootDirName);
     virtual void FinishModule();
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     

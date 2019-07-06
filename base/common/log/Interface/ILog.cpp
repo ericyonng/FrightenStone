@@ -36,15 +36,9 @@ s/*!
 
 FS_NAMESPACE_BEGIN
 
-ILog *ILog::InitModule(const Byte8 *rootDir)
+ILog *ILog::GetInstance()
 {
-    auto logMgr = new FS_Log(rootDir);
-    if(logMgr->InitModule() != StatusDefs::Success)
-    {
-        Fs_SafeFree(logMgr);
-        return NULL;
-    }
-    return logMgr;
+    return Singleton<FS_Log>::GetInstance();
 }
 
 FS_NAMESPACE_END

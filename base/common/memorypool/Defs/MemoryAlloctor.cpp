@@ -32,6 +32,7 @@
 #include "stdafx.h"
 #include "base/common/memorypool/Defs/MemoryAlloctor.h"
 #include "base/common/memorypool/Defs/MemoryBlock.h"
+#include "base/common/log/Log.h"
 
 #define BLOCK_AMOUNT_DEF    1024    // 默认内存块数量
 
@@ -48,16 +49,13 @@ IMemoryAlloctor::IMemoryAlloctor()
 
 IMemoryAlloctor::~IMemoryAlloctor()
 {
-    _FreeNotInPool();
-
-    if(_buf)
-      ::free(_buf);
+    _FinishMemory();
 }
 
-void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
+void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const FS_String &objName)
 {
-    if(UNLIKELY(!_buf))
-        _InitMemory();
+//     if(UNLIKELY(!_buf))
+//         _InitMemory();
 
     MemoryBlock *newBlock = NULL;
 
@@ -69,6 +67,11 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
         newBlock->_ref = 1;             // 记1次引用
         newBlock->_alloctor = this;     // 分配器
         newBlock->_nextBlock = 0;
+        auto len = sprintf(newBlock->_objName, "%s", objName.c_str());
+        if(len > 0)
+            newBlock->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
+        else
+            newBlock->_objName[0] = 0;
     }
     else
     {
@@ -79,6 +82,12 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
         newBlock->_alloctor =   this;
         newBlock->_isInPool = true;
+        auto len = sprintf(newBlock->_objName, "%s", objName.c_str());
+        if(len > 0)
+            newBlock->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
+        else
+            newBlock->_objName[0] = 0;
+
         ASSERT(newBlock->_ref == 0);
         newBlock->_ref = 1;
     }
@@ -99,10 +108,12 @@ void IMemoryAlloctor::FreeMemory(void *ptr)
     if (!blockHeader->_isInPool)
     {
         ::free(blockHeader);
+        blockHeader->_objName[0] = 0;
         return;
     }
 
     // 被释放的节点插到可用头节点之前
+    blockHeader->_objName[0] = 0;
     blockHeader->_nextBlock = _usableBlockHeader;
     _usableBlockHeader = blockHeader;
 }
@@ -122,6 +133,7 @@ void IMemoryAlloctor::_InitMemory()
     *   申请内存
     */
     _buf = reinterpret_cast<char*>(::malloc(bufSize));
+    memset(_buf, 0, bufSize);
 
     /**
     *   链表头和尾部指向同一位置
@@ -131,6 +143,7 @@ void IMemoryAlloctor::_InitMemory()
     _usableBlockHeader->_alloctor = this;
     _usableBlockHeader->_nextBlock = 0;
     _usableBlockHeader->_isInPool = true;
+    _usableBlockHeader->_objName[0] = 0;
     MemoryBlock *temp = _usableBlockHeader;
 
     // 构建内存块链表
@@ -142,24 +155,40 @@ void IMemoryAlloctor::_InitMemory()
         block->_isInPool = true;
         block->_alloctor = this;
         block->_nextBlock = 0;
+        block->_objName[0] = 0;
         temp->_nextBlock = block;
         temp = block;
     }
 }
 
-void IMemoryAlloctor::_FreeNotInPool()
+void IMemoryAlloctor::_FinishMemory()
 {
-    /**
-    *   将不在内存池中的临时内存删除掉 在内存池中的内存将由内存池统一释放
-    */
+    // 收集内存泄漏
+    std::map<FS_String, Int64> objNameRefAmount;
+    FS_String objName;
     while(_usableBlockHeader != 0)
     {
         MemoryBlock *header = _usableBlockHeader;
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
+
+        // 泄漏对象
+        objName = header->_objName;
+        auto iterAmount = objNameRefAmount.find(objName);
+        if(iterAmount == objNameRefAmount.end())
+            iterAmount = objNameRefAmount.insert(std::make_pair(objName, 0)).first;
+        iterAmount->second += 1;
+
         if(!header->_isInPool)
             ::free(header);
     }
     _usableBlockHeader = 0;
+
+    if(_buf)
+        ::free(_buf);
+
+    // 内存泄漏打印
+    for(auto &memleakObj : objNameRefAmount)
+        g_Log->memleak("objName[%s], amount[%lld];", memleakObj.first.c_str(), memleakObj.second);
 }
 
 size_t IMemoryAlloctor::_GetFreeBlock()

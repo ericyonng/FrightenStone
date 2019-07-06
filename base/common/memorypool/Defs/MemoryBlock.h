@@ -36,6 +36,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -44,15 +45,16 @@ class IMemoryAlloctor;
 class BASE_EXPORT MemoryBlock
 {
 public:
-    MemoryBlock(IMemoryAlloctor *alloctor);
+    MemoryBlock(IMemoryAlloctor *alloctor, const FS_String &objName);
 
-    size_t          _ref;
+    Int64           _ref;
     IMemoryAlloctor  *_alloctor;
     MemoryBlock     *_nextBlock;
     bool            _isInPool;
-    char            _reserver1;     // 保留位，用于内存对齐
-    char            _reserver2;     // 保留位，用于内存对齐
-    char            _reserver3;     // 保留位，用于内存对齐
+    BUFFER256       _objName;
+//     char            _reserver1;     // 保留位，用于内存对齐
+//     char            _reserver2;     // 保留位，用于内存对齐
+//     char            _reserver3;     // 保留位，用于内存对齐
 };
 
 FS_NAMESPACE_END

@@ -50,10 +50,11 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT ILog
 {
 public:
+    static ILog *GetInstance();
     ILog();
     virtual ~ILog();
 
-    static ILog *InitModule(const Byte8 *rootDir);
+    virtual Int32 InitModule(const Byte8 *rootDir) = 0;
     virtual void FinishModule() = 0;
 
     // json日志
@@ -83,8 +84,8 @@ public:
     void net(const char *fmt, const Args&... args);
     // 内存泄漏日志
     // 请使用便利宏_LOGFMT_
-    template<typename ObjType, typename... Args>
-    void memleak(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    template<typename... Args>
+    void memleak(const char *fmt, const Args&... args);
 
     /* 功能函数 */
     // hook与具体类型有关
@@ -111,5 +112,8 @@ protected:
 FS_NAMESPACE_END
 
 #include "base/common/log/Interface/ILogImpl.h"
+
+// 需要验证多进程下是否公用一个对象
+#define g_Log fs::ILog::GetInstance()
 
 #endif
