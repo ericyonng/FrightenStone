@@ -32,11 +32,22 @@
 #include "stdafx.h"
 #include "base/common/memorypool/Impl/MemoryPoolMgr.h"
 #include "base/common/memorypool/Defs/MemoryBlock.h"
+#include "base/common/component/Impl/FS_String.h"
+#include "base/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
 MemoryPoolMgr::MemoryPoolMgr()
     :_alloctors{NULL}
+{
+}
+
+MemoryPoolMgr::~MemoryPoolMgr()
+{
+
+}
+
+Int32 MemoryPoolMgr::InitPool()
 {
     _Init(0, 64, &_mem64);
     _Init(64, 128, &_mem128);
@@ -49,19 +60,32 @@ MemoryPoolMgr::MemoryPoolMgr()
     _Init(8192, 16384, &_mem16K);
     _Init(16384, 32768, &_mem32K);
     _Init(32768, 65536, &_mem64K);
+    return StatusDefs::Success;
 }
 
-MemoryPoolMgr::~MemoryPoolMgr()
+void MemoryPoolMgr::FinishPool()
 {
-
+    _locker.Lock();
+    _mem64._FinishMemory();
+    _mem128._FinishMemory();
+    _mem256._FinishMemory();
+    _mem512._FinishMemory();
+    _mem1024._FinishMemory();
+    _mem2048._FinishMemory();
+    _mem4096._FinishMemory();
+    _mem8192._FinishMemory();
+    _mem16K._FinishMemory();
+    _mem32K._FinishMemory();
+    _mem64K._FinishMemory();
+    _locker.Unlock();
 }
 
-void *MemoryPoolMgr::Alloc(size_t bytes)
+void *MemoryPoolMgr::Alloc(size_t bytes, const FS_String &objName)
 {
     // 判断是否内存池可分配
     if(bytes < sizeof(_alloctors) / sizeof(IMemoryAlloctor *))
     {
-        return  _alloctors[bytes]->AllocMemory(bytes);
+        return  _alloctors[bytes]->AllocMemory(bytes, objName);
     }
     else
     {
@@ -71,6 +95,11 @@ void *MemoryPoolMgr::Alloc(size_t bytes)
         block->_ref = 1;
         block->_alloctor = 0;
         block->_nextBlock = 0;
+        auto len = sprintf(block->_objName, "%s", objName.c_str());
+        if(len > 0)
+            block->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
+        else
+            block->_objName[0] = 0;
         return  cache + sizeof(MemoryBlock);
     }
 }
@@ -97,6 +126,7 @@ void MemoryPoolMgr::AddRef(void *ptr)
 
 void MemoryPoolMgr::_Init(size_t begin, size_t end, IMemoryAlloctor *alloctor)
 {
+    alloctor->_InitMemory();
     for(size_t i = begin; i < end; ++i)
         _alloctors[i] = alloctor;
 }

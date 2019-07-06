@@ -28,12 +28,6 @@
     <Filter Include="common\log">
       <UniqueIdentifier>{810ca3e8-2eb4-4e07-b399-ab0e656bf6f7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\memmory">
-      <UniqueIdentifier>{d238b98b-5ffa-4aec-8b4f-7ccda6619e61}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\memobj">
-      <UniqueIdentifier>{5096802b-a348-4e83-9905-d6cf37c5a395}</UniqueIdentifier>
-    </Filter>
     <Filter Include="common\net">
       <UniqueIdentifier>{aa15d339-ad04-4b12-93f0-ce903993404b}</UniqueIdentifier>
     </Filter>
@@ -242,16 +236,16 @@
       <UniqueIdentifier>{7cd21d8c-8b96-4933-8bfc-d8d2dc29ae24}</UniqueIdentifier>
     </Filter>
     <Filter Include="common\memorypool">
-      <UniqueIdentifier>{1a40d8be-6113-4334-b577-511fa2e5d13b}</UniqueIdentifier>
+      <UniqueIdentifier>{c1fc02ff-94e4-48fd-bafe-c23aeefd1ed6}</UniqueIdentifier>
     </Filter>
     <Filter Include="common\memorypool\Defs">
-      <UniqueIdentifier>{dbaea5e7-33a2-4d62-b83d-bcff207384c1}</UniqueIdentifier>
+      <UniqueIdentifier>{66ec1004-a762-47f3-a10a-3f56d5d0025d}</UniqueIdentifier>
     </Filter>
     <Filter Include="common\memorypool\Impl">
-      <UniqueIdentifier>{a0219941-dc1c-4599-aec1-71f3f76f3240}</UniqueIdentifier>
+      <UniqueIdentifier>{c16a3017-6e61-4316-8bc2-47af4e77537f}</UniqueIdentifier>
     </Filter>
     <Filter Include="common\memorypool\Interface">
-      <UniqueIdentifier>{e5d2f9c6-bbe1-483d-b424-3a64d098eabd}</UniqueIdentifier>
+      <UniqueIdentifier>{c6f99dbd-1143-4c4a-872c-2611a998d984}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -636,17 +630,20 @@
     <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctor.h">
       <Filter>common\memorypool\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\memorypool\Defs\MemoryBlock.h">
+    <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctorImpl.h">
       <Filter>common\memorypool\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctorImpl.h">
+    <ClInclude Include="..\common\memorypool\Defs\MemoryBlock.h">
       <Filter>common\memorypool\Defs</Filter>
     </ClInclude>
     <ClInclude Include="..\common\memorypool\Impl\MemoryPoolMgr.h">
       <Filter>common\memorypool\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\memorypool\Interface\IMemoryPool.h">
+    <ClInclude Include="..\common\memorypool\Interface\IMemoryPoolMgr.h">
       <Filter>common\memorypool\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\memorypool\Defs\MemoryPoolCreateDefs.h">
+      <Filter>common\memorypool\Defs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -815,8 +812,11 @@
     <ClCompile Include="..\common\memorypool\Impl\MemoryPoolMgr.cpp">
       <Filter>common\memorypool\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\memorypool\Interface\IMemoryPool.cpp">
+    <ClCompile Include="..\common\memorypool\Interface\IMemoryPoolMgr.cpp">
       <Filter>common\memorypool\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\memorypool\Defs\MemoryPoolCreateDefs.cpp">
+      <Filter>common\memorypool\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

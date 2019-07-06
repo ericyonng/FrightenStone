@@ -39,22 +39,27 @@
 #include "base/common/memorypool/Defs/MemoryAlloctor.h"
 #include "base/common/asyn/asyn.h"
 #include "base/common/assist/assistobjs/Impl/Singleton.h"
+#include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 
 FS_NAMESPACE_BEGIN
 
+class FS_String;
+
 // TODO 抽象一个IMemoryPoolMgr 提供给外部使用
-class BASE_EXPORT MemoryPoolMgr
+class BASE_EXPORT MemoryPoolMgr : public IMemoryPoolMgr
 {
 public:
     MemoryPoolMgr();
     virtual ~MemoryPoolMgr();
 
 public:
-    void *Alloc(size_t bytes);
-    void  Free(void *ptr);
-    void  AddRef(void *ptr);
-    void Lock();
-    void Unlock();
+    virtual Int32 InitPool();
+    virtual void FinishPool();
+    virtual void *Alloc(size_t bytes, const FS_String &objName);
+    virtual void  Free(void *ptr);
+    virtual void  AddRef(void *ptr);
+    virtual void Lock();
+    virtual void Unlock();
 
 private:
     void  _Init(size_t begin, size_t end, IMemoryAlloctor *alloctor);
@@ -88,8 +93,6 @@ inline void MemoryPoolMgr::Unlock()
 
 FS_NAMESPACE_END
 
-
-
-#define g_MemoryPoolMgr fs::Singleton<fs::MemoryPoolMgr>::GetInstance()
+// #define g_MemoryPoolMgr fs::Singleton<fs::MemoryPoolMgr>::GetInstance()
 
 #endif

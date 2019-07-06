@@ -21,22 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IEasyGlobal.cpp
+ * @file  : IMemoryPoolMgr.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/2
+ * @date  : 2019/7/6
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/Global/Interface/IEasyGlobal.h"
+#ifndef __Base_Common_MemoryPool_Interface_IMemoryPoolMgr_H__
+#define __Base_Common_MemoryPool_Interface_IMemoryPoolMgr_H__
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-IEasyGlobal *IEasyGlobal::GetInstance()
+class FS_String;
+
+class BASE_EXPORT IMemoryPoolMgr
 {
-    return NULL;
-}
+public:
+    IMemoryPoolMgr();
+    virtual ~IMemoryPoolMgr();
+
+public:
+    static IMemoryPoolMgr *GetInstance();
+    virtual Int32 InitPool() = 0;
+    virtual void FinishPool() = 0;
+    virtual void *Alloc(size_t bytes, const FS_String &objName) = 0;
+    virtual void  Free(void *ptr) = 0;
+    virtual void  AddRef(void *ptr) = 0;
+    virtual void Lock() = 0;
+    virtual void Unlock() = 0;
+};
 
 FS_NAMESPACE_END
+
+#define g_MemoryPool fs::IMemoryPoolMgr::GetInstance()
+
+#endif

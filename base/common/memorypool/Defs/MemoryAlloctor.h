@@ -24,7 +24,7 @@
  * @file  : MemoryAlloctor.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/7/5
- * @brief :
+ * @brief : 需要导出内存泄漏日志
  * 
  *
  * 
@@ -40,26 +40,23 @@
 FS_NAMESPACE_BEGIN
 
 class MemoryBlock;
+class FS_String;
 
 // 内存分配器基类
 class BASE_EXPORT IMemoryAlloctor
 {
+    friend class MemoryPoolMgr;
 public:
     IMemoryAlloctor();
     virtual ~IMemoryAlloctor();
 
 public:
-    void *AllocMemory(size_t bytesCnt);
+    void *AllocMemory(size_t bytesCnt, const FS_String &objName);
     void  FreeMemory(void *ptr);
 
 private:
     void  _InitMemory();
-
-    /**
-    *   释放所有数据
-    *   该函数目的是将所有的不在pool中的内存释放掉
-    */
-    void  _FreeNotInPool();
+    void _FinishMemory();
 
     /**
     *   得到当前池中可用的对象数
