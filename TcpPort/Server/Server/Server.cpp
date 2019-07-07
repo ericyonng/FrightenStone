@@ -57,21 +57,33 @@ void cmdThread()
     }
 }
 
+class TestServerPool
+{
+    MEM_POOL_CREATE(_memHelper)
+};
+
+MEMPOOL_CREATE_IMPL(TestServerPool, _memHelper)
+
 int main()
 {
-    TcpServer server;
-    server.InitSocket();
-    server.Bind(nullptr, 4567);
-    server.Listen(200);
-
-    std::thread t1(cmdThread);
-    t1.detach();
-
-    while(g_bRun)
-    {
-        server.OnRun();
-    }
-    server.Close();
+//     TcpServer server;
+//     server.InitSocket();
+//     server.Bind(nullptr, 4567);
+//     server.Listen(200);
+// 
+//     std::thread t1(cmdThread);
+//     t1.detach();
+// 
+//     while(g_bRun)
+//     {
+//         server.OnRun();
+//     }
+//     server.Close();
+    g_Log->InitModule("server");
+    g_MemoryPool->InitPool();
+    printf("mem:[%p]log[%p]", g_MemoryPool, g_Log);
+    TestServerPool *newObj = new TestServerPool;
+    g_MemoryPool->FinishPool();
     printf("exit。\n");
     getchar();
     return 0;

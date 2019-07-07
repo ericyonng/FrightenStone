@@ -36,6 +36,7 @@ FS_NAMESPACE_BEGIN
 
 MemoryBlock::MemoryBlock(IMemoryAlloctor *alloctor, const FS_String &objName)
     :_ref(0)
+    ,_objSize(0)
     ,_alloctor(alloctor)
     ,_nextBlock(NULL)
     ,_isInPool(false)
