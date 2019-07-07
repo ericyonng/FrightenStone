@@ -36,6 +36,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include <set>
 
 FS_NAMESPACE_BEGIN
 
@@ -64,10 +65,12 @@ private:
     size_t  _GetFreeBlock();
 
 protected:
+    bool            _isInit;
     char            *_buf;                  // 整个已申请的内存地址
     MemoryBlock     *_usableBlockHeader;    // 结点 next方向是可用的未分配的内存块，分配时候给_usableBlockHeader节点，释放时候要释放的节点插在_usableBlockHeader之前当作可用节点头
     size_t          _blockAmount;           // 内存块总数量
     size_t          _blockSize;             // 内存块大小
+    std::set<MemoryBlock *> _usingBlocks;   // 正在使用的内存块
 };
 
 template<size_t blockSize, size_t blockAmount>
@@ -75,6 +78,7 @@ class MemoryAlloctor : public IMemoryAlloctor
 {
 public:
     MemoryAlloctor();
+    virtual ~MemoryAlloctor();
 };
 
 FS_NAMESPACE_END
