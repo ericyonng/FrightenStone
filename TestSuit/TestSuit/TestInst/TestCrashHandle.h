@@ -5,7 +5,6 @@
 
 #include "stdafx.h"
 
-
 class TestCrashEasyGloal : public fs::IEasyGlobal
 {
 public:
