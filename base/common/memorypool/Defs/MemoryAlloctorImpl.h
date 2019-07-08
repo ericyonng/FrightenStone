@@ -42,6 +42,11 @@ inline MemoryAlloctor<blockSize, blockAmount>::MemoryAlloctor()
     _blockSize = _blockSize + sizeof(MemoryBlock);
 }
 
+template<size_t blockSize, size_t blockAmount>
+inline MemoryAlloctor<blockSize, blockAmount>::~MemoryAlloctor()
+{
+}
+
 FS_NAMESPACE_END
 
 #endif

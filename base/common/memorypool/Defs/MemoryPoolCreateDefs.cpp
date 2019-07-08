@@ -46,7 +46,7 @@ MemoryPoolHelper::~MemoryPoolHelper()
 
 }
 
-void *MemoryPoolHelper::Alloc(const size_t &bytes)
+void *MemoryPoolHelper::Alloc(size_t bytes)
 {
     g_MemoryPool->Lock();
     auto ptr = g_MemoryPool->Alloc(bytes, _objName);

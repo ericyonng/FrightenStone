@@ -48,6 +48,7 @@ public:
     MemoryBlock(IMemoryAlloctor *alloctor, const FS_String &objName);
 
     Int64           _ref;
+    Int64           _objSize;
     IMemoryAlloctor  *_alloctor;
     MemoryBlock     *_nextBlock;
     bool            _isInPool;
