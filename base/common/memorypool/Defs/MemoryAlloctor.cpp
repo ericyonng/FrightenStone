@@ -39,7 +39,8 @@
 FS_NAMESPACE_BEGIN
 
 IMemoryAlloctor::IMemoryAlloctor()
-    :_buf(NULL)
+    :_isInit(false)
+    ,_buf(NULL)
     ,_blockAmount(BLOCK_AMOUNT_DEF)
     ,_usableBlockHeader(NULL)
     ,_blockSize(0)
@@ -91,6 +92,12 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const FS_String &objName)
         ASSERT(newBlock->_ref == 0);
         newBlock->_ref = 1;
     }
+    if(newBlock)
+    {
+        newBlock->_objSize = static_cast<Int64>(bytesCnt);
+        _usingBlocks.insert(newBlock);
+    }
+
     return ((char*)newBlock) + sizeof(MemoryBlock);   // 从block的下一个地址开始才是真正的申请到的内存
 }
 
@@ -109,6 +116,7 @@ void IMemoryAlloctor::FreeMemory(void *ptr)
     {
         ::free(blockHeader);
         blockHeader->_objName[0] = 0;
+        _usingBlocks.erase(blockHeader);
         return;
     }
 
@@ -116,12 +124,16 @@ void IMemoryAlloctor::FreeMemory(void *ptr)
     blockHeader->_objName[0] = 0;
     blockHeader->_nextBlock = _usableBlockHeader;
     _usableBlockHeader = blockHeader;
+    _usingBlocks.erase(blockHeader);
 }
 
 void IMemoryAlloctor::_InitMemory()
 {
+    if(_isInit)
+        return;
+
     ASSERT(_buf == 0);
-    if(!_buf)
+    if(_buf)
         return;
 
     /**
@@ -159,36 +171,56 @@ void IMemoryAlloctor::_InitMemory()
         temp->_nextBlock = block;
         temp = block;
     }
+
+    _isInit = true;
 }
 
 void IMemoryAlloctor::_FinishMemory()
 {
-    // 收集内存泄漏
-    std::map<FS_String, Int64> objNameRefAmount;
+    if(!_isInit)
+        return;
+
+    _isInit = false;
+
+    // 收集并释放泄漏的内存
+    std::map<FS_String, std::pair<Int64, Int64>> objNameRefAmountSizePair;
     FS_String objName;
+    for(auto &block : _usingBlocks)
+    {
+        if(block->_ref)
+        {
+            objName = block->_objName;
+            auto iterAmount = objNameRefAmountSizePair.find(objName);
+            if(iterAmount == objNameRefAmountSizePair.end())
+                iterAmount = objNameRefAmountSizePair.insert(std::make_pair(objName, std::pair<Int64, Int64>())).first;
+            iterAmount->second.first += 1;
+            iterAmount->second.second = block->_objSize;
+            if(!block->_isInPool)
+                ::free(block);
+        }
+    }
+
+    // 使用系统的内存分配释放掉
     while(_usableBlockHeader != 0)
     {
         MemoryBlock *header = _usableBlockHeader;
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
-
-        // 泄漏对象
-        objName = header->_objName;
-        auto iterAmount = objNameRefAmount.find(objName);
-        if(iterAmount == objNameRefAmount.end())
-            iterAmount = objNameRefAmount.insert(std::make_pair(objName, 0)).first;
-        iterAmount->second += 1;
 
         if(!header->_isInPool)
             ::free(header);
     }
     _usableBlockHeader = 0;
 
+    // 释放本系统内存
     if(_buf)
+    {
         ::free(_buf);
+        _buf = NULL;
+    }
 
     // 内存泄漏打印
-    for(auto &memleakObj : objNameRefAmount)
-        g_Log->memleak("objName[%s], amount[%lld];", memleakObj.first.c_str(), memleakObj.second);
+    for(auto &memleakObj : objNameRefAmountSizePair)
+        g_Log->memleak("objName[%s], amount[%lld]*size[%lld];", memleakObj.first.c_str(), memleakObj.second.first, memleakObj.second.second);
 }
 
 size_t IMemoryAlloctor::_GetFreeBlock()
