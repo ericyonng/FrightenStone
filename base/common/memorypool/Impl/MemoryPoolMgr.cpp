@@ -35,6 +35,10 @@
 #include "base/common/component/Impl/FS_String.h"
 #include "base/common/status/status.h"
 
+#pragma region macro
+#define BLOCK_AMOUNT_DEF 10240      // 默认内存块数量
+#pragma endregion
+
 FS_NAMESPACE_BEGIN
 
 MemoryPoolMgr::MemoryPoolMgr()
@@ -49,38 +53,52 @@ MemoryPoolMgr::~MemoryPoolMgr()
 
 Int32 MemoryPoolMgr::InitPool()
 {
-    _Init(0, 64, &_mem64);
-    _Init(64, 128, &_mem128);
-    _Init(128, 256, &_mem256);
-    _Init(256, 512, &_mem512);
-    _Init(512, 1024, &_mem1024);
-    _Init(1024, 2048, &_mem2048);
-    _Init(2048, 4096, &_mem4096);
-    _Init(4096, 8192, &_mem8192);
-    _Init(8192, 16384, &_mem16K);
-    _Init(16384, 32768, &_mem32K);
-    _Init(32768, 65536, &_mem64K);
+    _locker.Lock();
+    _Init(0, 64,        _mem64 = new MemoryAlloctor(64, BLOCK_AMOUNT_DEF));
+    _Init(64, 128,      _mem128 = new MemoryAlloctor(64, BLOCK_AMOUNT_DEF));
+    _Init(128, 256,     _mem256 = new MemoryAlloctor(256, BLOCK_AMOUNT_DEF));
+    _Init(256, 512,     _mem512 = new MemoryAlloctor(512, BLOCK_AMOUNT_DEF));
+    _Init(512, 1024,    _mem1024 = new MemoryAlloctor(1024, BLOCK_AMOUNT_DEF));
+    _Init(1024, 2048,   _mem2048 = new MemoryAlloctor(2048, BLOCK_AMOUNT_DEF));
+    _Init(2048, 4096,   _mem4096 = new MemoryAlloctor(4096, BLOCK_AMOUNT_DEF));
+    _Init(4096, 8192,   _mem8192 = new MemoryAlloctor(8192, BLOCK_AMOUNT_DEF));
+    _Init(8192, 16384,  _mem16K = new MemoryAlloctor(16384, BLOCK_AMOUNT_DEF));
+    _Init(16384, 32768, _mem32K = new MemoryAlloctor(32768, BLOCK_AMOUNT_DEF));
+    _Init(32768, 65536, _mem64K = new MemoryAlloctor(65536, BLOCK_AMOUNT_DEF));
+    _locker.Unlock();
+
     return StatusDefs::Success;
 }
 
 void MemoryPoolMgr::FinishPool()
 {
     _locker.Lock();
-    _mem64._FinishMemory();
-    _mem128._FinishMemory();
-    _mem256._FinishMemory();
-    _mem512._FinishMemory();
-    _mem1024._FinishMemory();
-    _mem2048._FinishMemory();
-    _mem4096._FinishMemory();
-    _mem8192._FinishMemory();
-    _mem16K._FinishMemory();
-    _mem32K._FinishMemory();
-    _mem64K._FinishMemory();
+    _mem64->FinishMemory();
+    _mem128->FinishMemory();
+    _mem256->FinishMemory();
+    _mem512->FinishMemory();
+    _mem1024->FinishMemory();
+    _mem2048->FinishMemory();
+    _mem4096->FinishMemory();
+    _mem8192->FinishMemory();
+    _mem16K->FinishMemory();
+    _mem32K->FinishMemory();
+    _mem64K->FinishMemory();
+    Fs_SafeFree(_mem64);
+    Fs_SafeFree(_mem128);
+    Fs_SafeFree(_mem256);
+    Fs_SafeFree(_mem512);
+    Fs_SafeFree(_mem1024);
+    Fs_SafeFree(_mem2048);
+    Fs_SafeFree(_mem4096);
+    Fs_SafeFree(_mem8192);
+    Fs_SafeFree(_mem16K);
+    Fs_SafeFree(_mem32K);
+    Fs_SafeFree(_mem64K);
     _locker.Unlock();
 }
 
-void *MemoryPoolMgr::Alloc(size_t bytes, const FS_String &objName)
+void *MemoryPoolMgr::Alloc(size_t bytes, const Byte8 *objName)
 {
     // 判断是否内存池可分配
     if(bytes < sizeof(_alloctors) / sizeof(IMemoryAlloctor *))
@@ -95,7 +113,7 @@ void *MemoryPoolMgr::Alloc(size_t bytes, const FS_String &objName)
         block->_ref = 1;
         block->_alloctor = 0;
         block->_nextBlock = 0;
-        auto len = sprintf(block->_objName, "%s", objName.c_str());
+        auto len = sprintf(block->_objName, "%s", objName);
         if(len > 0)
             block->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
         else
@@ -126,7 +144,7 @@ void MemoryPoolMgr::AddRef(void *ptr)
 
 void MemoryPoolMgr::_Init(size_t begin, size_t end, IMemoryAlloctor *alloctor)
 {
-    alloctor->_InitMemory();
+    alloctor->InitMemory();
     for(size_t i = begin; i < end; ++i)
         _alloctors[i] = alloctor;
 }

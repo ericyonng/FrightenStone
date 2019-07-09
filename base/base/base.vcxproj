@@ -283,6 +283,11 @@
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
     <ClInclude Include="..\common\net\protocol\protocol.h" />
+    <ClInclude Include="..\common\objpool\Defs\ObjPoolHelper.h" />
+    <ClInclude Include="..\common\objpool\Impl\ObjPool.h" />
+    <ClInclude Include="..\common\objpool\Impl\ObjPoolImpl.h" />
+    <ClInclude Include="..\common\objpool\Interface\IObjPool.h" />
+    <ClInclude Include="..\common\objpool\objpool.h" />
     <ClInclude Include="..\common\socket\Defs\SocketDefs.h" />
     <ClInclude Include="..\common\socket\Impl\SocketUtil.h" />
     <ClInclude Include="..\common\socket\socket.h" />
@@ -346,6 +351,9 @@
     <ClCompile Include="..\common\memorypool\Impl\MemoryPoolMgr.cpp" />
     <ClCompile Include="..\common\memorypool\Interface\IMemoryPoolMgr.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
+    <ClCompile Include="..\common\objpool\Defs\ObjPoolHelper.cpp" />
+    <ClCompile Include="..\common\objpool\Impl\ObjPool.cpp" />
+    <ClCompile Include="..\common\objpool\Interface\IObjPool.cpp" />
     <ClCompile Include="..\common\socket\Impl\SocketUtil.cpp" />
     <ClCompile Include="base.cpp" />
     <ClCompile Include="dllmain.cpp" />

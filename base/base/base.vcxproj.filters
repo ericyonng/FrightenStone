@@ -247,6 +247,18 @@
     <Filter Include="common\memorypool\Interface">
       <UniqueIdentifier>{c6f99dbd-1143-4c4a-872c-2611a998d984}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\objpool">
+      <UniqueIdentifier>{a32b33ae-4c3e-4dc8-ac40-05435e742312}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\objpool\Defs">
+      <UniqueIdentifier>{ca40eb54-c7df-492b-86c0-4bf243424546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\objpool\Impl">
+      <UniqueIdentifier>{717ca05d-9514-49e7-ada4-4321845af827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\objpool\Interface">
+      <UniqueIdentifier>{6515b870-2772-4d46-8eb6-9f851841d58a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -645,6 +657,21 @@
     <ClInclude Include="..\common\memorypool\memorypool.h">
       <Filter>common\memorypool</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\objpool\objpool.h">
+      <Filter>common\objpool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Interface\IObjPool.h">
+      <Filter>common\objpool\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Impl\ObjPool.h">
+      <Filter>common\objpool\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Impl\ObjPoolImpl.h">
+      <Filter>common\objpool\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjPoolHelper.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -817,6 +844,15 @@
     </ClCompile>
     <ClCompile Include="..\common\memorypool\Defs\MemoryPoolCreateDefs.cpp">
       <Filter>common\memorypool\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\objpool\Interface\IObjPool.cpp">
+      <Filter>common\objpool\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\objpool\Impl\ObjPool.cpp">
+      <Filter>common\objpool\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\objpool\Defs\ObjPoolHelper.cpp">
+      <Filter>common\objpool\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

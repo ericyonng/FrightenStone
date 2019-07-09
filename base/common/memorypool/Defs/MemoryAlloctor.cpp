@@ -50,25 +50,24 @@ IMemoryAlloctor::IMemoryAlloctor()
 
 IMemoryAlloctor::~IMemoryAlloctor()
 {
-    _FinishMemory();
+    FinishMemory();
 }
 
-void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const FS_String &objName)
+void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const Byte8 *objName)
 {
 //     if(UNLIKELY(!_buf))
 //         _InitMemory();
 
-    MemoryBlock *newBlock = NULL;
-
     // 内存不足则使用系统内存分配方案
-    if (_usableBlockHeader == 0)
+    MemoryBlock *newBlock = NULL;
+    if(_usableBlockHeader == 0)
     {
         newBlock = reinterpret_cast<MemoryBlock *>(::malloc(bytesCnt + sizeof(MemoryBlock)));
         newBlock->_isInPool = false;    // 不在内存池内
         newBlock->_ref = 1;             // 记1次引用
         newBlock->_alloctor = this;     // 分配器
         newBlock->_nextBlock = 0;
-        auto len = sprintf(newBlock->_objName, "%s", objName.c_str());
+        auto len = sprintf(newBlock->_objName, "%s", objName);
         if(len > 0)
             newBlock->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
         else
@@ -83,7 +82,7 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const FS_String &objName)
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
         newBlock->_alloctor =   this;
         newBlock->_isInPool = true;
-        auto len = sprintf(newBlock->_objName, "%s", objName.c_str());
+        auto len = sprintf(newBlock->_objName, "%s", objName);
         if(len > 0)
             newBlock->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
         else
@@ -127,7 +126,7 @@ void IMemoryAlloctor::FreeMemory(void *ptr)
     _usingBlocks.erase(blockHeader);
 }
 
-void IMemoryAlloctor::_InitMemory()
+void IMemoryAlloctor::InitMemory()
 {
     if(_isInit)
         return;
@@ -175,7 +174,7 @@ void IMemoryAlloctor::_InitMemory()
     _isInit = true;
 }
 
-void IMemoryAlloctor::_FinishMemory()
+void IMemoryAlloctor::FinishMemory()
 {
     if(!_isInit)
         return;
@@ -234,6 +233,18 @@ size_t IMemoryAlloctor::_GetFreeBlock()
     }
     return  cnt;
 }
+
+MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount)
+{
+    _blockAmount = blockAmount;
+    _blockSize = blockSize / sizeof(void *) * sizeof(void *) + (blockSize % sizeof(void *) ? sizeof(void *) : 0);
+    _blockSize = _blockSize + sizeof(MemoryBlock);
+}
+
+MemoryAlloctor::~MemoryAlloctor()
+{
+}
+
 FS_NAMESPACE_END
 
 

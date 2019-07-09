@@ -55,7 +55,7 @@ public:
 public:
     virtual Int32 InitPool();
     virtual void FinishPool();
-    virtual void *Alloc(size_t bytes, const FS_String &objName);
+    virtual void *Alloc(size_t bytes, const Byte8 *objName);
     virtual void  Free(void *ptr);
     virtual void  AddRef(void *ptr);
     virtual void Lock();
@@ -65,17 +65,18 @@ private:
     void  _Init(size_t begin, size_t end, IMemoryAlloctor *alloctor);
 
 private:
-    MemoryAlloctor<64, 10240>       _mem64;        // 64字节分配器
-    MemoryAlloctor<128, 10240>      _mem128;       // 128字节分配器
-    MemoryAlloctor<256, 10240>      _mem256;
-    MemoryAlloctor<512, 10240>      _mem512;
-    MemoryAlloctor<1024, 10240>     _mem1024;
-    MemoryAlloctor<2048, 10240>     _mem2048;
-    MemoryAlloctor<4096, 10240>     _mem4096;
-    MemoryAlloctor<8192, 10240>     _mem8192;
-    MemoryAlloctor<16384, 10240>    _mem16K;
-    MemoryAlloctor<32768, 10240>    _mem32K;
-    MemoryAlloctor<65536, 10240>    _mem64K;
+    // MemoryAlloctor<64, 10240>       _mem64;        // 64字节分配器
+    MemoryAlloctor * _mem64;                         // 64字节分配器
+    MemoryAlloctor *_mem128;                         // 64字节分配器
+    MemoryAlloctor *_mem256;                         // 64字节分配器
+    MemoryAlloctor *_mem512;                         // 64字节分配器
+    MemoryAlloctor *_mem1024;                         // 64字节分配器
+    MemoryAlloctor *_mem2048;                         // 64字节分配器
+    MemoryAlloctor *_mem4096;                         // 64字节分配器
+    MemoryAlloctor *_mem8192;                         // 64字节分配器
+    MemoryAlloctor *_mem16K;                         // 64字节分配器
+    MemoryAlloctor *_mem32K;                         // 64字节分配器
+    MemoryAlloctor *_mem64K;                         // 64字节分配器
     IMemoryAlloctor                 *_alloctors[65536];  // 所有内存分配器
 
     Locker _locker;

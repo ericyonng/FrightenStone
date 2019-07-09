@@ -57,6 +57,7 @@
 #include "base/common/Global/EasyGlobal.h"
 #include "base/common/crashhandle/CrashHandle.h"
 #include "base/common/memorypool/memorypool.h"
+#include "base/common/objpool/objpool.h"
 #endif
 #pragma endregion
 
