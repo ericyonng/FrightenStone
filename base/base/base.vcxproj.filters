@@ -259,6 +259,18 @@
     <Filter Include="common\objpool\Interface">
       <UniqueIdentifier>{6515b870-2772-4d46-8eb6-9f851841d58a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\Application">
+      <UniqueIdentifier>{89351580-5cf3-4d3c-8ad8-435af77ce51d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\Application\Defs">
+      <UniqueIdentifier>{8f08010e-4f1d-4e6f-8e8e-8209c7fd56ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\Application\Interface">
+      <UniqueIdentifier>{deca58b3-3cb8-4933-a0da-ea6245ac18f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\Application\Impl">
+      <UniqueIdentifier>{dddf0f86-365e-4e74-886f-59865af77ed0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -672,6 +684,12 @@
     <ClInclude Include="..\common\objpool\Defs\ObjPoolHelper.h">
       <Filter>common\objpool\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\Application\Application.h">
+      <Filter>common\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Application\Interface\IApplication.h">
+      <Filter>common\Application\Interface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -853,6 +871,9 @@
     </ClCompile>
     <ClCompile Include="..\common\objpool\Defs\ObjPoolHelper.cpp">
       <Filter>common\objpool\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\Application\Interface\IApplication.cpp">
+      <Filter>common\Application\Interface</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

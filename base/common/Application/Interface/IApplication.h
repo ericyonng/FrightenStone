@@ -21,45 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : common.h
+ * @file  : IApplication.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/12
+ * @date  : 2019/7/9
  * @brief :
- * 
- *
- * 
+ *          1. log组件
+ *          2. 内存池组件
+ *          3. crashhandle组件
+ *          4. 线程池组件
+ *          5. 高精度定时器组件
+ *          6. 事件系统
+ *          7. 网络系统
  */
-#ifndef __Base_Common_Common_H__
-#define __Base_Common_Common_H__
-/**
-* @file net.h
-* @auther Huiya Song <120453674@qq.com>
-* @date 2019/04/18
-* @brief
-*/
+#ifndef __Base_Common_Application_Interface_IApplication_H__
+#define __Base_Common_Application_Interface_IApplication_H__
 
 #pragma once
 
-// defs ...
-// Impl ...
-// Interface ...
-#include "base/common/basedefs/Resource/Resource.h"
-#pragma region base code
-#ifndef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-#include<base/common/socket/socket.h>
-#include <base/common/net/net.h>
-#include <base/common/status/status.h>
-#include "base/common/asyn/asyn.h"
+#include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/assist/assist.h"
-#include "base/common/component/component.h"
-#include "base/common/log/Log.h"
-#include "base/common/Global/EasyGlobal.h"
-#include "base/common/crashhandle/CrashHandle.h"
-#include "base/common/memorypool/memorypool.h"
-#include "base/common/objpool/objpool.h"
-#include "base/common/Application/Application.h"
-#endif
-#pragma endregion
 
-#endif // !__Base_Common_Common_H__
+FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT IApplication
+{
+public:
+    IApplication();
+    virtual ~IApplication();
+
+public:
+    virtual Int32 Init();
+    virtual void Fini();
+};
+
+FS_NAMESPACE_END
+
+#endif
