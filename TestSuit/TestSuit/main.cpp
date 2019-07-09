@@ -50,10 +50,11 @@
 #include "TestSuit/TestSuit/TestInst/TestXor.h"
 #include "TestSuit/TestSuit/TestInst/TestCrashHandle.h"
 #include "TestSuit/TestSuit/TestInst/TestMemoryPool.h"
+#include "TestSuit/TestSuit/TestInst/TestObjPool.h"
 
 int main()
 {
-    TestMemoryPool::Run();
+    TestObjPool::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;
