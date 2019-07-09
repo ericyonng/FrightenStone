@@ -40,6 +40,7 @@
 #include "base/common/asyn/asyn.h"
 #include <atomic>
 #include <list>
+#include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,6 +48,7 @@ class BASE_EXPORT ITask;
 
 class BASE_EXPORT FS_ThreadPool
 {
+    OBJ_POOL_CREATE(_objPoolHelper)
 public:
     explicit FS_ThreadPool();
     explicit FS_ThreadPool(Int32 minNum, Int32 maxNum);    // 

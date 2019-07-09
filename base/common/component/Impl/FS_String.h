@@ -40,6 +40,7 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
+#include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 class FS_String;
@@ -51,6 +52,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_String
 {
+    OBJ_POOL_CREATE(_objPoolHelper)
 public:
     typedef std::vector<FS_String> _These, FS_Strings;
     typedef std::string::size_type size_type;

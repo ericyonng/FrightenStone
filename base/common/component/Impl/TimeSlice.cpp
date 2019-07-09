@@ -37,6 +37,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(TimeSlice, _objPoolHelper, 10240)
+
 TimeSlice::TimeSlice(const FS_String &fmtSlice)
 {
 

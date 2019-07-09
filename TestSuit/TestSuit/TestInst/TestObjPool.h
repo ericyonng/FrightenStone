@@ -15,7 +15,7 @@ private:
     // Int64 _cnt;
 };
 
-OBJPOOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10240)
+OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10240)
 
 class TestObjPool
 {

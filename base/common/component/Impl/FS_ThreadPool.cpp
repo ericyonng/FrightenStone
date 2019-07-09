@@ -42,6 +42,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(FS_ThreadPool, _objPoolHelper, 10240)
+
 FS_ThreadPool::FS_ThreadPool()
 {
 

@@ -36,6 +36,7 @@
 
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
+#include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -44,6 +45,7 @@ class FS_String;
 
 class BASE_EXPORT TimeSlice
 {
+    OBJ_POOL_CREATE(_objPoolHelper)
 public:
     /**
 
