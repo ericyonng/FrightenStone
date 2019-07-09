@@ -160,6 +160,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\3rd\3rd.h" />
+    <ClInclude Include="..\common\Application\Application.h" />
+    <ClInclude Include="..\common\Application\Interface\IApplication.h" />
     <ClInclude Include="..\common\assist\assist.h" />
     <ClInclude Include="..\common\assist\assistobjs\assistobjs.h" />
     <ClInclude Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.h" />
@@ -299,6 +301,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\3rd\tiny-utf8\lib\tinyutf8.cpp" />
+    <ClCompile Include="..\common\Application\Interface\IApplication.cpp" />
     <ClCompile Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.cpp" />
     <ClCompile Include="..\common\assist\utils\Defs\SystemUtilDefs.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_BitUtil.cpp" />
