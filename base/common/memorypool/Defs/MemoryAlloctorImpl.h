@@ -34,17 +34,9 @@
 
 FS_NAMESPACE_BEGIN
 
-template<size_t blockSize, size_t blockAmount>
-inline MemoryAlloctor<blockSize, blockAmount>::MemoryAlloctor()
+inline size_t IMemoryAlloctor::GetBlockSize() const
 {
-    _blockAmount = blockAmount;
-    _blockSize = blockSize / sizeof(void *) * sizeof(void *) + (blockSize % sizeof(void *) ? sizeof(void *) : 0);
-    _blockSize = _blockSize + sizeof(MemoryBlock);
-}
-
-template<size_t blockSize, size_t blockAmount>
-inline MemoryAlloctor<blockSize, blockAmount>::~MemoryAlloctor()
-{
+    return _blockSize;
 }
 
 FS_NAMESPACE_END

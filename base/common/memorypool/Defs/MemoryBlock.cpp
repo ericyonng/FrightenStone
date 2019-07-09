@@ -34,7 +34,7 @@
 
 FS_NAMESPACE_BEGIN
 
-MemoryBlock::MemoryBlock(IMemoryAlloctor *alloctor, const FS_String &objName)
+MemoryBlock::MemoryBlock(IMemoryAlloctor *alloctor, const Byte8 *objName)
     :_ref(0)
     ,_objSize(0)
     ,_alloctor(alloctor)
@@ -45,7 +45,7 @@ MemoryBlock::MemoryBlock(IMemoryAlloctor *alloctor, const FS_String &objName)
 //     ,_reserver2(0)
 //     ,_reserver3(0)
 {
-    auto len = sprintf(_objName, "%s", objName.c_str());
+    auto len = sprintf(_objName, "%s", objName);
     if(len < 0)
         _objName[0] = 0;
     else

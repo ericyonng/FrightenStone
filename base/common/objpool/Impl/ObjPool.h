@@ -21,57 +21,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryPoolCreateDefs.cpp
+ * @file  : ObjPool.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/7
+ * @date  : 2019/7/9
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/memorypool/Defs/MemoryPoolCreateDefs.h"
-#include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
+#ifndef __Base_Common_ObjPool_Impl_ObjPool_H__
+#define __Base_Common_ObjPool_Impl_ObjPool_H__
+
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/objpool/Interface/IObjPool.h"
+#include "base/common/memorypool/Defs/MemoryAlloctor.h"
+#include "base/common/asyn/asyn.h"
+#include "base/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
-MemoryPoolHelper::MemoryPoolHelper(const Byte8 *objName)
-    :_objName{0}
-{
-    auto len = sprintf(_objName, "%s", objName);
-    if(len < 0)
-        _objName[0] = 0;
-    else
-    {
-        _objName[len >= BUFFER_LEN256 ? (BUFFER_LEN256 - 1) : len] = 0;
-    }
-}
+class MemoryAlloctor;
 
-MemoryPoolHelper::~MemoryPoolHelper()
+class BASE_EXPORT ObjPool : public IObjPool
 {
+public:
+    ObjPool(size_t objSize, size_t objAmount);
+    virtual ~ObjPool();
 
-}
+    virtual Int32 InitPool();
+    virtual void FinishPool();
+    virtual void *Alloc(size_t bytes, const Byte8 *objName);
+    virtual void  Free(void *ptr);
+    virtual void  AddRef(void *ptr);
+    virtual void Lock();
+    virtual void Unlock();
 
-void *MemoryPoolHelper::Alloc(size_t bytes)
-{
-    g_MemoryPool->Lock();
-    auto ptr = g_MemoryPool->Alloc(bytes, _objName);
-    g_MemoryPool->Unlock();
-    return ptr;
-}
-
-void MemoryPoolHelper::Free(void *ptr)
-{
-    g_MemoryPool->Lock();
-    g_MemoryPool->Free(ptr);
-    g_MemoryPool->Unlock();
-}
-
-void MemoryPoolHelper::AddRef(void *ptr)
-{
-    g_MemoryPool->Lock();
-    g_MemoryPool->AddRef(ptr);
-    g_MemoryPool->Unlock();
-}
+private:
+    Locker _locker;
+    size_t _objSize;
+    size_t _objAmount;
+    MemoryAlloctor *_objAlloctor;
+};
 
 FS_NAMESPACE_END
+
+#include "base/common/objpool/Impl/ObjPoolImpl.h"
+
+#endif

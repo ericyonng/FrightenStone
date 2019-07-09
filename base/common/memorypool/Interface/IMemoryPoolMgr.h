@@ -50,7 +50,7 @@ public:
     static IMemoryPoolMgr *GetInstance();
     virtual Int32 InitPool() = 0;
     virtual void FinishPool() = 0;
-    virtual void *Alloc(size_t bytes, const FS_String &objName) = 0;
+    virtual void *Alloc(size_t bytes, const Byte8 *objName) = 0;
     virtual void  Free(void *ptr) = 0;
     virtual void  AddRef(void *ptr) = 0;
     virtual void Lock() = 0;

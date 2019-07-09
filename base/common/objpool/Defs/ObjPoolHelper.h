@@ -21,16 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryPoolCreateDefs.h
+ * @file  : ObjPoolHelper.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/7
+ * @date  : 2019/7/9
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_MemoryPool_Defs_MemoryPoolCreateDefs_H__
-#define __Base_Common_MemoryPool_Defs_MemoryPoolCreateDefs_H__
+#ifndef __Base_Common_ObjPool_Defs_ObjPoolHelper_H__
+#define __Base_Common_ObjPool_Defs_ObjPoolHelper_H__
 
 #pragma once
 
@@ -39,11 +39,13 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT MemoryPoolHelper
+class IObjPool;
+
+class BASE_EXPORT ObjPoolHelper
 {
 public:
-    MemoryPoolHelper(const Byte8 *objName);
-    virtual ~MemoryPoolHelper();
+    ObjPoolHelper(size_t objSize, size_t objAmount, const Byte8 *objName);
+    virtual ~ObjPoolHelper();
 
 public:
     void *Alloc(size_t bytes);
@@ -51,25 +53,27 @@ public:
     void AddRef(void *ptr);
 
     BUFFER256 _objName;
+    IObjPool *_objPool;
 };
 
 FS_NAMESPACE_END
 
 /// 内存池创建对象便利宏
 // 声明中需要添加
-#undef  MEM_POOL_CREATE
-#define MEM_POOL_CREATE(_mempool_helper)                                                        \
+#undef  OBJ_POOL_CREATE
+#define OBJ_POOL_CREATE(_objpool_helper)                                                        \
 public:                                                                                         \
-        void  *operator new(size_t bytes)       { return _mempool_helper.Alloc(bytes);}         \
-        void   operator delete(void *ptr)       { _mempool_helper.Free(ptr);}                   \
-        void  *operator new[](size_t bytes)     { return _mempool_helper.Alloc(bytes);}         \
-        void   operator delete[] (void *ptr)    { _mempool_helper.Free(ptr);}                   \
+        void  *operator new(size_t bytes)       { return _objpool_helper.Alloc(bytes);}         \
+        void   operator delete(void *ptr)       { _objpool_helper.Free(ptr);}                   \
+        void  *operator new[](size_t bytes)     { return _objpool_helper.Alloc(bytes);}         \
+        void   operator delete[] (void *ptr)    { _objpool_helper.Free(ptr);}                   \
 protected:                                                                                      \
-static fs::MemoryPoolHelper _mempool_helper;
+static fs::ObjPoolHelper _objpool_helper;
 
 // 在实现文件中需要添加
-#undef MEMPOOL_CREATE_IMPL
-#define MEMPOOL_CREATE_IMPL(objType, _mempool_helper)                                           \
-fs::MemoryPoolHelper objType::_mempool_helper(#objType);
+#undef OBJPOOL_CREATE_IMPL
+#define OBJPOOL_CREATE_IMPL(objType, _objpool_helper, objAmount)                                \
+fs::ObjPoolHelper objType::_objpool_helper(sizeof(objType), objAmount, #objType);
 
 #endif
+

@@ -45,7 +45,7 @@ class IMemoryAlloctor;
 class BASE_EXPORT MemoryBlock
 {
 public:
-    MemoryBlock(IMemoryAlloctor *alloctor, const FS_String &objName);
+    MemoryBlock(IMemoryAlloctor *alloctor, const Byte8 *objName);
 
     Int64           _ref;
     Int64           _objSize;

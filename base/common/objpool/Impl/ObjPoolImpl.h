@@ -21,57 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryPoolCreateDefs.cpp
+ * @file  : ObjPoolImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/7
+ * @date  : 2019/7/9
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/memorypool/Defs/MemoryPoolCreateDefs.h"
-#include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
+#ifdef __Base_Common_ObjPool_Impl_ObjPool_H__
+#pragma once
 
 FS_NAMESPACE_BEGIN
 
-MemoryPoolHelper::MemoryPoolHelper(const Byte8 *objName)
-    :_objName{0}
+inline Int32 ObjPool::InitPool()
 {
-    auto len = sprintf(_objName, "%s", objName);
-    if(len < 0)
-        _objName[0] = 0;
-    else
-    {
-        _objName[len >= BUFFER_LEN256 ? (BUFFER_LEN256 - 1) : len] = 0;
-    }
+    _locker.Lock();
+    _objAlloctor = new MemoryAlloctor(_objSize, _objAmount);
+    _objAlloctor->InitMemory();
+    _locker.Unlock();
+    return StatusDefs::Success;
 }
 
-MemoryPoolHelper::~MemoryPoolHelper()
+inline void ObjPool::FinishPool()
 {
-
+    if(_objAlloctor)
+        _objAlloctor->FinishMemory();
+    Fs_SafeFree(_objAlloctor);
 }
 
-void *MemoryPoolHelper::Alloc(size_t bytes)
+inline void ObjPool::Lock()
 {
-    g_MemoryPool->Lock();
-    auto ptr = g_MemoryPool->Alloc(bytes, _objName);
-    g_MemoryPool->Unlock();
-    return ptr;
+    _locker.Lock();
 }
 
-void MemoryPoolHelper::Free(void *ptr)
+inline void ObjPool::Unlock()
 {
-    g_MemoryPool->Lock();
-    g_MemoryPool->Free(ptr);
-    g_MemoryPool->Unlock();
-}
-
-void MemoryPoolHelper::AddRef(void *ptr)
-{
-    g_MemoryPool->Lock();
-    g_MemoryPool->AddRef(ptr);
-    g_MemoryPool->Unlock();
+    _locker.Unlock();
 }
 
 FS_NAMESPACE_END
+#endif

@@ -52,12 +52,13 @@ public:
     virtual ~IMemoryAlloctor();
 
 public:
-    void *AllocMemory(size_t bytesCnt, const FS_String &objName);
+    void *AllocMemory(size_t bytesCnt, const Byte8 *objName);
     void  FreeMemory(void *ptr);
+    size_t GetBlockSize() const;
 
-private:
-    void  _InitMemory();
-    void _FinishMemory();
+public:
+    void  InitMemory();
+    void FinishMemory();
 
     /**
     *   得到当前池中可用的对象数
@@ -73,11 +74,10 @@ protected:
     std::set<MemoryBlock *> _usingBlocks;   // 正在使用的内存块
 };
 
-template<size_t blockSize, size_t blockAmount>
 class MemoryAlloctor : public IMemoryAlloctor
 {
 public:
-    MemoryAlloctor();
+    MemoryAlloctor(size_t blockSize, size_t blockAmount);
     virtual ~MemoryAlloctor();
 };
 
