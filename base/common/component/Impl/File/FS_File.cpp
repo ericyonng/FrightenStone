@@ -39,6 +39,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(FS_File, _objPoolHelper, 10240)
+
 FS_File::FS_File()
     :_fp(NULL)
     ,_fileSize(0)

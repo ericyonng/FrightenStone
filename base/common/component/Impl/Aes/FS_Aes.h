@@ -37,6 +37,7 @@
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
 #include "base/common/component/Defs/FS_AesDefs.h"
+#include "base/common/objpool/objpool.h"
 
 typedef struct aes_key_st AES_KEY;
 
@@ -44,6 +45,7 @@ FS_NAMESPACE_BEGIN
 class FS_String;
 class BASE_EXPORT FS_Aes
 {
+    OBJ_POOL_CREATE(_objPoolHelper)
 public:
     FS_Aes();
     virtual ~FS_Aes();

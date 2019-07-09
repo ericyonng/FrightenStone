@@ -77,6 +77,7 @@ void SmartVarRtti::InitRttiTypeNames()
 
 FS_NAMESPACE_END
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 std::ostream &operator <<(std::ostream &o, const FS_NS SmartVar &smartVar)
 {
     FS_NS FS_String str = smartVar.ToString();
@@ -85,6 +86,8 @@ std::ostream &operator <<(std::ostream &o, const FS_NS SmartVar &smartVar)
 }
 
 FS_NAMESPACE_BEGIN
+
+OBJ_POOL_CREATE_IMPL(SmartVar, _objPoolHelper, 10240)
 
 static void BecomeAndAllocDict(SmartVar &var, SmartVar::Raw &raw)
 {

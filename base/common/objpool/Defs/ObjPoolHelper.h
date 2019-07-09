@@ -71,9 +71,8 @@ protected:                                                                      
 static fs::ObjPoolHelper _objpool_helper;
 
 // 在实现文件中需要添加
-#undef OBJPOOL_CREATE_IMPL
-#define OBJPOOL_CREATE_IMPL(objType, _objpool_helper, objAmount)                                \
+#undef OBJ_POOL_CREATE_IMPL
+#define OBJ_POOL_CREATE_IMPL(objType, _objpool_helper, objAmount)                                \
 fs::ObjPoolHelper objType::_objpool_helper(sizeof(objType), objAmount, #objType);
 
 #endif
-

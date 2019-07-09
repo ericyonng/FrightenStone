@@ -43,6 +43,8 @@ inline std::ostream &operator <<(std::ostream &stream, const fs::FS_String &str)
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(FS_String, _objPoolHelper, 10240)
+
 #ifdef _WIN32
 const char *FS_String::endl = "\r\n";
 #else

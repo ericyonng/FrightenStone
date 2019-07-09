@@ -40,6 +40,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(FS_IniFile, _objPoolHelper, 10240)
+
 FS_IniFile::FS_IniFile()
 {
 
