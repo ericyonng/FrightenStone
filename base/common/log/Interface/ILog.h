@@ -86,6 +86,10 @@ public:
     // 请使用便利宏_LOGFMT_
     template<typename... Args>
     void memleak(const char *fmt, const Args&... args);
+    // 系统分析日志
+    // 请使用便利宏_LOGFMT_
+    template<typename... Args>
+    void sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
 
     /* 功能函数 */
     // hook与具体类型有关

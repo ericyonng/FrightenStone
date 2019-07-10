@@ -22,7 +22,8 @@ public:
     virtual void Finish()
     {
         // ÊÍ·Å×é¼þ
-        Fs_SafeFree(_log);
+         _log->FinishModule();
+//         Fs_SafeFree(_log);
     }
 #pragma endregion
 
@@ -54,7 +55,9 @@ public:
 //         logMgr->crash<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
 //         logMgr->memleak<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
 //         logMgr->net<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
+
             g_Log->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
+            g_Log->sys(_LOGFMT_("time:%lld"), nowTime.GetMicroTimestamp());
         nowTime2.FlushTime();
         std::cout << (nowTime2 - nowTime).GetTotalMilliSeconds() << std::endl;
         g_EasyGlobal2->Finish();
