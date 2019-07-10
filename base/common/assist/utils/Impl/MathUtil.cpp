@@ -43,7 +43,7 @@ Int64 MathUtil::GetGcd(Int64 a, Int64 b)
         // 存b
         t = b;
         // b为a对b取模
-        b = (a%b);
+        b = ( a % b);
         // a为上一次的b
         a = t;
     }
