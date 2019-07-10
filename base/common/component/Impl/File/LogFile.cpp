@@ -38,6 +38,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(LogFile, _objPoolHelper, 10240)
+
 LogFile::LogFile()
     :_partNo(0)
 {

@@ -153,6 +153,22 @@ inline void ILog::memleak(const char *fmt, const Args&... args)
     _WriteLog(LogLevel::Memleak, LogDefs::_SYSLOG_memleak_, newLogData);
 }
 
+template<typename... Args>
+inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
+{
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.Format("%s<%s>[%s][line:%d]: "
+                                   , newLogData->_logTime.ToString().c_str()
+                                   , LogLevel::GetDescription(LogLevel::Sys)
+                                   , funcName
+                                   , codeLine)
+        .Format(fmt, args...) << FS_String::endl;
+
+    _WriteLog(LogLevel::Sys, LogDefs::_SYSLOG_sys_, newLogData);
+}
+
 template<typename ObjType>
 inline const IDelegatePlus<void, const LogData *> *ILog::InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData))
 {

@@ -54,7 +54,7 @@
 
 int main()
 {
-    TestObjPool::Run();
+    TestLogModule::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;

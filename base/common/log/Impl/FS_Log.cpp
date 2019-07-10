@@ -274,6 +274,7 @@ void FS_Log::_SetConsoleColor(Int32 level)
         case LogLevel::Debug:
         case LogLevel::Info:
         case LogLevel::Net:
+        case LogLevel::Sys:
         {
             SystemUtil::SetConsoleColor(FS_ConsoleColor::Fg_White | FS_ConsoleColor::Bg_Black);
         }
