@@ -21,36 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : utils.h
+ * @file  : MathUtil.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/7/10
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Utils_H__
-#define __Base_Common_Assist_Utils_Utils_H__
-
-
-#pragma once
-
-// defs ...
-#include "base/common/assist/utils/Defs/SystemUtilDefs.h"
-
-// Impl ...
-// Interface ...
-#include "base/common/assist/utils/Impl/ToolUtil.h"
-#include "base/common/assist/utils/Impl/ThreadUtil.h"
-#include "base/common/assist/utils/Impl/STLUtil.h"
-#include "base/common/assist/utils/Impl/TimeUtil.h"
-#include "base/common/assist/utils/Impl/StringUtil.h"
-#include "base/common/assist/utils/Impl/FS_DirectoryUtil.h"
-#include "base/common/assist/utils/Impl/FS_FileUtil.h"
-#include "base/common/assist/utils/Impl/WidthUtil.h"
-#include "base/common/assist/utils/Impl/SystemUtil.h"
-#include "base/common/assist/utils/Defs/SystemUtilDefs.h"
-#include "base/common/assist/utils/Impl/KeyGeneratorUtil.h"
+#include "stdafx.h"
 #include "base/common/assist/utils/Impl/MathUtil.h"
 
-#endif // !__Base_Common_Assist_Utils_Utils_H__
+FS_NAMESPACE_BEGIN
+
+Int64 MathUtil::GetGcd(Int64 a, Int64 b)
+{
+    // 当b为0时,得出结果,a既为结果
+    Int64 t = 0;
+    while(b)
+    {
+        // 存b
+        t = b;
+        // b为a对b取模
+        b = (a%b);
+        // a为上一次的b
+        a = t;
+    }
+
+    return a;
+}
+
+Int64 MathUtil::GetLcm(Int64 a, Int64 b)
+{
+    return a * b / GetGcd(a, b);
+}
+
+FS_NAMESPACE_END
+

@@ -690,6 +690,9 @@
     <ClInclude Include="..\common\Application\Interface\IApplication.h">
       <Filter>common\Application\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\MathUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -874,6 +877,9 @@
     </ClCompile>
     <ClCompile Include="..\common\Application\Interface\IApplication.cpp">
       <Filter>common\Application\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\MathUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
