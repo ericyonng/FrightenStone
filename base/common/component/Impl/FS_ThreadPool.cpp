@@ -185,6 +185,7 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
     }
     catch(...)
     {
+        throw std::logic_error("thread pool task thread crash");
         std::cout << "hello crash" << std::endl;
     }
 

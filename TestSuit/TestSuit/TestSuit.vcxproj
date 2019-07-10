@@ -137,6 +137,7 @@
     <ClInclude Include="TestInst\TestJson.h" />
     <ClInclude Include="TestInst\TestLogFile.h" />
     <ClInclude Include="TestInst\TestLogModule.h" />
+    <ClInclude Include="TestInst\TestMathUtil.h" />
     <ClInclude Include="TestInst\TestMemoryPool.h" />
     <ClInclude Include="TestInst\TestObjPool.h" />
     <ClInclude Include="TestInst\TestRandom.h" />

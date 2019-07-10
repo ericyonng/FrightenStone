@@ -178,6 +178,7 @@
     <ClInclude Include="..\common\assist\utils\Impl\FS_FileUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_IPUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\KeyGeneratorUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\MathUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\STLUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\STLUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\StringUtil.h" />
@@ -309,6 +310,7 @@
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\KeyGeneratorUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\MathUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\StringUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\SystemUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\ThreadUtil.cpp" />

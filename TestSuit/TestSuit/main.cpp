@@ -51,10 +51,11 @@
 #include "TestSuit/TestSuit/TestInst/TestCrashHandle.h"
 #include "TestSuit/TestSuit/TestInst/TestMemoryPool.h"
 #include "TestSuit/TestSuit/TestInst/TestObjPool.h"
+#include "TestSuit/TestSuit/TestInst/TestMathUtil.h"
 
 int main()
 {
-    TestLogModule::Run();
+    TestMathUtil::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;
