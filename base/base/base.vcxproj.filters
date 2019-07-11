@@ -271,6 +271,18 @@
     <Filter Include="common\Application\Impl">
       <UniqueIdentifier>{dddf0f86-365e-4e74-886f-59865af77ed0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\net\Defs">
+      <UniqueIdentifier>{479acf2e-d1a2-4b99-b808-9c52ae715215}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\net\Impl">
+      <UniqueIdentifier>{491a352e-61a4-4272-9411-bbebcf6445b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\net\Interface">
+      <UniqueIdentifier>{111663c4-6e64-4e51-85a5-183436914087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\net\Impl\Iocp">
+      <UniqueIdentifier>{b5dca95a-34d6-4f1a-a572-ac6f7dc14b16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -693,6 +705,9 @@
     <ClInclude Include="..\common\assist\utils\Impl\MathUtil.h">
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Impl\Iocp\Example.h">
+      <Filter>common\net\Impl\Iocp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -880,6 +895,9 @@
     </ClCompile>
     <ClCompile Include="..\common\assist\utils\Impl\MathUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp">
+      <Filter>common\net\Impl\Iocp</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
