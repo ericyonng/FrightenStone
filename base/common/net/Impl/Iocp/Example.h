@@ -21,23 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : net.h
+ * @file  : Example.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/7/11
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Net_H__
-#define __Base_Common_Net_Net_H__
+#ifndef __Base_Common_Net_Impl_Iocp_Example_H__
+#define __Base_Common_Net_Impl_Iocp_Example_H__
 #pragma once
 
- // defs ...
- // Impl ...
- // Interface ...
-#include <base\common\net\protocol\protocol.h>
-#include "base\common\net\Impl\Iocp\Example.h"
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+
+FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT Example
+{
+public:
+    static int Run();
+};
+
+FS_NAMESPACE_END
 
 #endif
-

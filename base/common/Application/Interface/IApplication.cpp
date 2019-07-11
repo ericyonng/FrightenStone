@@ -47,10 +47,40 @@ IApplication::~IApplication()
 
 Int32 IApplication::Init()
 {
+    // TODO:...
+    Int32 st = OnInit();
+    if(st != StatusDefs::Success)
+    {
+        // ...log
+        return StatusDefs::AppInitFail;
+    }
+
+    AfterInit();
     return StatusDefs::Success;
 }
 
 void IApplication::Fini()
+{
+    OnFinish();
+    AfterFinish();
+}
+
+Int32 IApplication::OnInit()
+{
+    return StatusDefs::Success;
+}
+
+void IApplication::AfterInit()
+{
+
+}
+
+void IApplication::OnFinish()
+{
+
+}
+
+void IApplication::AfterFinish()
 {
 
 }

@@ -283,6 +283,7 @@
     <ClInclude Include="..\common\memorypool\Impl\MemoryPoolMgr.h" />
     <ClInclude Include="..\common\memorypool\Interface\IMemoryPoolMgr.h" />
     <ClInclude Include="..\common\memorypool\memorypool.h" />
+    <ClInclude Include="..\common\net\Impl\Iocp\Example.h" />
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
     <ClInclude Include="..\common\net\protocol\protocol.h" />
@@ -355,6 +356,7 @@
     <ClCompile Include="..\common\memorypool\Defs\MemoryPoolCreateDefs.cpp" />
     <ClCompile Include="..\common\memorypool\Impl\MemoryPoolMgr.cpp" />
     <ClCompile Include="..\common\memorypool\Interface\IMemoryPoolMgr.cpp" />
+    <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
     <ClCompile Include="..\common\objpool\Defs\ObjPoolHelper.cpp" />
     <ClCompile Include="..\common\objpool\Impl\ObjPool.cpp" />

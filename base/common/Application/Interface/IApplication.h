@@ -50,8 +50,13 @@ public:
     virtual ~IApplication();
 
 public:
-    virtual Int32 Init();
-    virtual void Fini();
+    Int32 Init();
+    void Fini();
+
+    virtual Int32 OnInit();
+    virtual void AfterInit();
+    virtual void OnFinish();
+    virtual void AfterFinish();
 };
 
 FS_NAMESPACE_END

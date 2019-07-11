@@ -39,9 +39,9 @@
 class BASE_EXPORT StatusDefs
 {
 public:
-    enum StatusEnum:int
+    enum StatusEnum :int
     {
-        #pragma region [-1, 499]
+#pragma region [-1, 499]
         Error = -1,                                             // 错误
         Success = 0,                                            // 成功
         WaitEventFailure = 1,                                   // 等待错误
@@ -49,6 +49,7 @@ public:
         Repeat = 3,                                             // 重复
         ParamError = 4,                                         // 参数错误
         Failed = 5,                                             // 失败
+        AppInitFail = 6,                                        // 初始化失败
         #pragma endregion
 
         #pragma region SOCKET[500, 599]
