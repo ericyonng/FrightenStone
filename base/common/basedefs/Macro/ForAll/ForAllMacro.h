@@ -237,4 +237,9 @@ private:\
 #undef ARRAY_ELEM_COUNT
 #define ARRAY_ELEM_COUNT(x) sizeof(x)/sizeof(x[0])
 
+#ifdef _WIN32
+#define FS_INFINITE INFINITE
+#else
+#endif
+
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__

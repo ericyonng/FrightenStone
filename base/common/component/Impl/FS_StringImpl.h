@@ -217,6 +217,11 @@ inline bool FS_String::operator == (const FS_String &index) const
     return _buffer == index._buffer;
 }
 
+inline bool FS_String::operator != (const char *str) const
+{
+    return _buffer != str;
+}
+
 inline FS_String FS_String::operator + (const FS_String &other) const
 {
     return _buffer + other._buffer;

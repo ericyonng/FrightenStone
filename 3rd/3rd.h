@@ -66,5 +66,15 @@
 #include "3rd/tiny-utf8/include/tinyutf8.hpp"
 #endif
 
+//  π”√dbghelp
+#ifdef __USE_FS_DBGHELP__
+#include <DbgHelp.h>
+#ifdef _DEBUG
+#pragma comment(lib, "DbgHelp\\Debug\\DbgHelp.Lib")
+#else
+#pragma comment(lib, "DbgHelp\\Release\\DbgHelp.Lib")
+#endif
+#endif
+
 #endif
 

@@ -66,5 +66,7 @@ inline IEasyGlobal::~IEasyGlobal()
 
 FS_NAMESPACE_END
 
+// 全局类请每个进程对全局对象赋值
+extern BASE_EXPORT fs::IEasyGlobal *g_EasyGlobal;
 
 #endif

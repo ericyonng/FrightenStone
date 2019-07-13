@@ -129,6 +129,7 @@
     <ClInclude Include="TestInst\TerstSmartVar.h" />
     <ClInclude Include="TestInst\TestAes.h" />
     <ClInclude Include="TestInst\TestCpuUtil.h" />
+    <ClInclude Include="TestInst\TestCrashHandle.h" />
     <ClInclude Include="TestInst\TestDelegate.h" />
     <ClInclude Include="TestInst\TestFile.h" />
     <ClInclude Include="TestInst\TestFSDirectory.h" />

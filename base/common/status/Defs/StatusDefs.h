@@ -117,6 +117,10 @@ public:
         XorEncrypt_PlainTextSizeNotEnough = 1303,               // 明文空间不足
         #pragma endregion
 
+        #pragma region CrashHandleUtil[1400, 1499]
+        CrashHandleUtil_SymInitializeFail = 1400,               // 符号pdb初始化失败
+        #pragma endregion
+
     };
 };
 
