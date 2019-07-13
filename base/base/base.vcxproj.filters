@@ -229,6 +229,18 @@
     <Filter Include="common\Global\Interface">
       <UniqueIdentifier>{48d4588b-b842-4e03-a387-158482876ccf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\crashhandle">
+      <UniqueIdentifier>{7b21000e-dcc4-457d-954c-0ee3119e748a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\crashhandle\Defs">
+      <UniqueIdentifier>{c75bf1b2-0640-4778-8c18-f0a30c163047}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\crashhandle\Impl">
+      <UniqueIdentifier>{49a1c61e-38ca-4ec2-b2f7-ffa767d11a34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\crashhandle\Interface">
+      <UniqueIdentifier>{7cd21d8c-8b96-4933-8bfc-d8d2dc29ae24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -600,6 +612,12 @@
     <ClInclude Include="..\common\assist\utils\Impl\KeyGeneratorUtil.h">
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\crashhandle\CrashHandle.h">
+      <Filter>common\crashhandle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\crashhandle\Impl\CrashHandleUtil.h">
+      <Filter>common\crashhandle\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -751,6 +769,12 @@
     </ClCompile>
     <ClCompile Include="..\common\assist\utils\Impl\KeyGeneratorUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\crashhandle\Impl\CrashHandleUtil.cpp">
+      <Filter>common\crashhandle\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\crashhandle\Impl\IEasyGlobal.cpp">
+      <Filter>common\Global\Interface</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

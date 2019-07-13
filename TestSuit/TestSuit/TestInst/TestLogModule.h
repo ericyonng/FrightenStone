@@ -37,7 +37,7 @@ private:
 };
 
 typedef fs::Singleton<EasyGloal> EasyGloalInstance;
-#define g_EasyGlobal EasyGloalInstance::GetInstance()
+#define g_EasyGlobal2 EasyGloalInstance::GetInstance()
 
 class TestLogModule
 {
@@ -45,7 +45,7 @@ public:
     static void Run()
     {
         fs::TimeUtil::SetTimeZone();
-        g_EasyGlobal->Init();
+        g_EasyGlobal2->Init();
         fs::Time nowTime, nowTime2;
         nowTime.FlushTime();
 //         logMgr->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
@@ -56,7 +56,7 @@ public:
             g_Log->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
         nowTime2.FlushTime();
         std::cout << (nowTime2 - nowTime).GetTotalMilliSeconds() << std::endl;
-        g_EasyGlobal->Finish();
+        g_EasyGlobal2->Finish();
 
 //         std::cout << "-----------------------------------------" << std::endl;
 //         fs::Time nowTime, nowTime2, nowTime3;

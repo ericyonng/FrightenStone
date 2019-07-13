@@ -75,12 +75,12 @@ public:
 
     // crash日志
     // 请使用便利宏_LOGFMT_ 会触发断言
-    template<typename ObjType, typename... Args>
-    void crash(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    template<typename... Args>
+    void crash(const char *fmt, const Args&... args);
     // 网络日志
     // 请使用便利宏_LOGFMT_
-    template<typename ObjType, typename... Args>
-    void net(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+    template<typename... Args>
+    void net(const char *fmt, const Args&... args);
     // 内存泄漏日志
     // 请使用便利宏_LOGFMT_
     template<typename ObjType, typename... Args>

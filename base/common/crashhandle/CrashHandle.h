@@ -21,39 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : CrashHandle.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/7/2
  * @brief :
  * 
  *
  * 
  */
-#include "TestSuit/TestSuit/TestInst/TestDelegate.h"
-#include "TestSuit/TestSuit/TestInst/TestString.h"
-#include "TestSuit/TestSuit/TestInst/TestTime.h"
-#include "TestSuit/TestSuit/TestInst/TestTrigger.h"
-#include "TestSuit/TestSuit/TestInst/TestThreadPool.h"
-#include "TestSuit/TestSuit/TestInst/TestFSDirectory.h"
-#include "TestSuit/TestSuit/TestInst/TestFSFileUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestCpuUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestFile.h"
-#include "TestSuit/TestSuit/TestInst/TestJson.h"
-#include "TestSuit/TestSuit/TestInst/TestLogFile.h"
-#include "TestSuit/TestSuit/TestInst/TestRandom.h"
-#include "TestSuit/TestSuit/TestInst/TestAes.h"
-#include "TestSuit/TestSuit/TestInst/TestUtf8.h"
-#include "TestSuit/TestSuit/TestInst/TerstSmartVar.h"
-#include "TestSuit/TestSuit/TestInst/TestTimeWheel.h"
-#include "TestSuit/TestSuit/TestInst/TestSystemUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestLogModule.h"
-#include "TestSuit/TestSuit/TestInst/TestXor.h"
-#include "TestSuit/TestSuit/TestInst/TestCrashHandle.h"
+#ifndef __Base_Common_CrashHandle_CrashHandle_H__
+#define __Base_Common_CrashHandle_CrashHandle_H__
 
-int main()
-{
-    TestCrashHandle::Run();
-    std::cout << "main end" << std::endl;
-    getchar();
-    return 0;
-}
+#pragma once
+
+// ...defs
+// ...impls
+#include "base/common/crashhandle/Impl/CrashHandleUtil.h"
+// ...inteface
+#endif

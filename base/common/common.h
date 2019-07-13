@@ -55,6 +55,7 @@
 #include "base/common/component/component.h"
 #include "base/common/log/Log.h"
 #include "base/common/Global/EasyGlobal.h"
+#include "base/common/crashhandle/CrashHandle.h"
 #endif
 #pragma endregion
 

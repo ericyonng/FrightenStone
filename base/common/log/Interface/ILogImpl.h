@@ -110,36 +110,30 @@ inline void ILog::e(const char *funcName, Int32 codeLine, const char *fmt, const
     ASSERT(!"error");
 }
 
-template<typename ObjType, typename... Args>
-inline void ILog::crash(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
+template<typename... Args>
+inline void ILog::crash(const char *fmt, const Args&... args)
 {
     // 构建日志数据
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
-    newLogData->_logToWrite.Format("%s<%s>[%s][%s][line:%d]: "
+    newLogData->_logToWrite.Format("%s<%s>: "
                                    , newLogData->_logTime.ToString().c_str()
-                                   , LogLevel::GetDescription(LogLevel::Crash)
-                                   , typeid(ObjType).name()
-                                   , funcName
-                                   , codeLine)
+                                   , LogLevel::GetDescription(LogLevel::Crash))
                             .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Crash, LogDefs::_SYSLOG_crash_, newLogData);
     ASSERT(!"crash");
 }
 
-template<typename ObjType, typename... Args>
-inline void ILog::net(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
+template<typename... Args>
+inline void ILog::net(const char *fmt, const Args&... args)
 {
     // 构建日志数据
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
-    newLogData->_logToWrite.Format("%s<%s>[%s][%s][line:%d]: "
+    newLogData->_logToWrite.Format("%s<%s>: "
                                    , newLogData->_logTime.ToString().c_str()
-                                   , LogLevel::GetDescription(LogLevel::Net)
-                                   , typeid(ObjType).name()
-                                   , funcName
-                                   , codeLine)
+                                   , LogLevel::GetDescription(LogLevel::Net))
                             .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Net, LogDefs::_SYSLOG_net_, newLogData);

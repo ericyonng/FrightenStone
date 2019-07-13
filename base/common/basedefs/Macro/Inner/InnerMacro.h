@@ -41,4 +41,9 @@
 #endif
 
 #define THREAD_POOL_WAIT_FOR_COMPLETED_TIME 5     // 5ms
+
+// 100≤„øÏ’’
+#define SYMBOL_MAX_CAPTURE_FRAMES 100
+#define SYMBOL_MAX_SYMBOL_NAME  63
+
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_Inner_InnerMacro_H__

@@ -21,39 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : CrashHandleUtil.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/7/2
  * @brief :
  * 
  *
  * 
  */
-#include "TestSuit/TestSuit/TestInst/TestDelegate.h"
-#include "TestSuit/TestSuit/TestInst/TestString.h"
-#include "TestSuit/TestSuit/TestInst/TestTime.h"
-#include "TestSuit/TestSuit/TestInst/TestTrigger.h"
-#include "TestSuit/TestSuit/TestInst/TestThreadPool.h"
-#include "TestSuit/TestSuit/TestInst/TestFSDirectory.h"
-#include "TestSuit/TestSuit/TestInst/TestFSFileUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestCpuUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestFile.h"
-#include "TestSuit/TestSuit/TestInst/TestJson.h"
-#include "TestSuit/TestSuit/TestInst/TestLogFile.h"
-#include "TestSuit/TestSuit/TestInst/TestRandom.h"
-#include "TestSuit/TestSuit/TestInst/TestAes.h"
-#include "TestSuit/TestSuit/TestInst/TestUtf8.h"
-#include "TestSuit/TestSuit/TestInst/TerstSmartVar.h"
-#include "TestSuit/TestSuit/TestInst/TestTimeWheel.h"
-#include "TestSuit/TestSuit/TestInst/TestSystemUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestLogModule.h"
-#include "TestSuit/TestSuit/TestInst/TestXor.h"
-#include "TestSuit/TestSuit/TestInst/TestCrashHandle.h"
+#ifndef __Base_Common_CrashHandle_Impl_CrashHandleUtil_H__
+#define __Base_Common_CrashHandle_Impl_CrashHandleUtil_H__
 
-int main()
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+
+typedef struct _EXCEPTION_POINTERS EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
+typedef struct _EXCEPTION_RECORD EXCEPTION_RECORD, *PEXCEPTION_RECORD;
+typedef struct _CONTEXT CONTEXT, *PCONTEXT;
+
+#define GET_EXCEPTION_INFO() ((PEXCEPTION_POINTERS)(GetExceptionInformation()))
+
+FS_NAMESPACE_BEGIN
+
+class FS_String;
+
+class BASE_EXPORT CrashHandleUtil
 {
-    TestCrashHandle::Run();
-    std::cout << "main end" << std::endl;
-    getchar();
-    return 0;
-}
+public:
+    static int InitCrashHandleParams();
+    static Int32 RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo);
+    static Int32 InitSymbol();
+    static FS_String CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = FS_INFINITE);
+
+};
+
+FS_NAMESPACE_END
+
+#endif

@@ -114,7 +114,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>$(TargetName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\..\3rd\openssL\;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\..\3rd\openssL\;$(SolutionDir)..\..\..\3rd\;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,7 +155,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>$(TargetName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\..\3rd\openssL\;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\..\3rd\openssL\;$(SolutionDir)..\..\..\3rd\;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -257,6 +257,8 @@
     <ClInclude Include="..\common\component\Impl\TimeWheel\TimeWheelImpl.h" />
     <ClInclude Include="..\common\component\Impl\Trigger.h" />
     <ClInclude Include="..\common\component\Impl\XorEncrypt.h" />
+    <ClInclude Include="..\common\crashhandle\CrashHandle.h" />
+    <ClInclude Include="..\common\crashhandle\Impl\CrashHandleUtil.h" />
     <ClInclude Include="..\common\Global\Defs\EasyGlobalMacros.h" />
     <ClInclude Include="..\common\Global\EasyGlobal.h" />
     <ClInclude Include="..\common\Global\Interface\IEasyGlobal.h" />
@@ -324,6 +326,8 @@
     <ClCompile Include="..\common\component\Impl\TimeWheel\TimeWheel.cpp" />
     <ClCompile Include="..\common\component\Impl\Trigger.cpp" />
     <ClCompile Include="..\common\component\Impl\XorEncrypt.cpp" />
+    <ClCompile Include="..\common\crashhandle\Impl\CrashHandleUtil.cpp" />
+    <ClCompile Include="..\common\crashhandle\Impl\IEasyGlobal.cpp" />
     <ClCompile Include="..\common\log\Defs\LogCaches.cpp" />
     <ClCompile Include="..\common\log\Defs\LogData.cpp" />
     <ClCompile Include="..\common\log\Defs\LogTask.cpp" />
