@@ -39,7 +39,7 @@
 class TestCrashEasyGloal : public fs::IEasyGlobal
 {
 public:
-    TestCrashEasyGloal() { Init(); }
+    TestCrashEasyGloal() {  }
     virtual ~TestCrashEasyGloal()
     {}
 #pragma region init/finish
@@ -77,6 +77,7 @@ public:
     {
 //         g_EasyGlobal = new TestCrashEasyGloal;
 //         g_EasyGlobal->Init();
+        g_Global.Init();
         fs::CrashHandleUtil::InitCrashHandleParams();
         Int32 *intPtr = NULL;
         *intPtr = 89;

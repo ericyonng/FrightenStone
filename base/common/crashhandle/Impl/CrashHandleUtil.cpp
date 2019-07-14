@@ -39,6 +39,7 @@
 #include "base/common/status/status.h"
 #include "base/common/component/Impl/Time.h"
 #include "base/common/asyn/asyn.h"
+#include "iostream"
 
 #define __USE_FS_DBGHELP__
 #include "3rd/3rd.h"
@@ -231,8 +232,11 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
     if(!isUseSehExceptionHandler)
         __PreventSetUnhandledExceptionFilter();
 #endif // Release
-
-    ASSERT(InitSymbol() == StatusDefs::Success);
+    
+    const Int32 initSymbolRet = InitSymbol();
+    ASSERT(initSymbolRet != StatusDefs::Success);
+    if(initSymbolRet != StatusDefs::Success)
+        return initSymbolRet;
 
     // ÉèÖÃcrashlog hook
     g_Log->InstallBeforeLogHookFunc(LogLevel::Crash, &CrashHandleUtil::_OnBeforeCrashLogHook);
@@ -256,10 +260,15 @@ Int32 CrashHandleUtil::InitSymbol()
 #ifdef _WIN32
     // ³õÊ¼»¯pdb·ûºÅ
     if(::SymInitialize(::GetCurrentProcess(), NULL, TRUE) != TRUE)
+    {
+        const Int32 err = GetLastError();
+        printf("SymInitialize fail error[%d]\n", err);
         return StatusDefs::CrashHandleUtil_SymInitializeFail;
+    }
 
     return StatusDefs::Success;
 #else // Non-Win32
+    return StatusDefs::Failed;
 #endif
 }
 
@@ -384,11 +393,15 @@ void CrashHandleUtil::_OnBeforeCrashLogHook(LogData *logData)
 
 void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 {
+#ifdef _DEBUG
     // µ¯´°¶ÑÕ»ÐÅÏ¢
     FS_String path;
     SystemUtil::GetProgramPath(true, path);
     auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);
     ::MessageBoxA(NULL, logData->_logToWrite.c_str(), fileName.c_str(), MB_ICONERROR | MB_OK);
+#else
+    Sleep(1000);
+#endif
 }
 
 FS_NAMESPACE_END
