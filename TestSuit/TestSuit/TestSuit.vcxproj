@@ -134,6 +134,7 @@
     <ClInclude Include="TestInst\TestFile.h" />
     <ClInclude Include="TestInst\TestFSDirectory.h" />
     <ClInclude Include="TestInst\TestFSFileUtil.h" />
+    <ClInclude Include="TestInst\TestIocpExample.h" />
     <ClInclude Include="TestInst\TestJson.h" />
     <ClInclude Include="TestInst\TestLogFile.h" />
     <ClInclude Include="TestInst\TestLogModule.h" />
