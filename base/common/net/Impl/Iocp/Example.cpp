@@ -36,8 +36,53 @@
 #include <WinSock2.h>
 #pragma comment (lib, "ws2_32.lib")
 #include<MSWSock.h>
-
+#pragma comment (lib, "MSWSock.lib")
 FS_NAMESPACE_BEGIN
+
+#define IO_DATA_BUFF_SIZE 1024
+
+class IO_Defs
+{
+public:
+    enum IO_TYPE
+    {
+        IO_ACCEPT = 10,
+        IO_RECV,
+        IO_SEND,
+    };
+};
+
+struct IO_DATA_BASE
+{
+    // 重叠体
+    OVERLAPPED _overlapped;    // 使用重叠体可以关联到iodatabase
+    SOCKET _sock;
+    char _buff[IO_DATA_BUFF_SIZE];
+    Int32 _length;
+    IO_Defs::IO_TYPE _ioType;
+};
+
+void PostAccept(SOCKET sockServer, IO_DATA_BASE *ioData)
+{
+    ioData->_ioType = IO_Defs::IO_ACCEPT;
+    ioData->_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if(!AcceptEx(sockServer
+                 , ioData->_sock
+                 , ioData->_buff
+                 , 0
+                 , sizeof(sockaddr_in) + 16
+                 , sizeof(sockaddr_in) + 16
+                 , NULL
+                 , &ioData->_overlapped)) // 可以是自定义的结构体
+    {
+        auto error = WSAGetLastError();
+        if(error != ERROR_IO_PENDING)
+        {
+            printf("AcceptEx failed error[%d]", error);
+            return;
+        }
+    }
+}
 
 int Example::Run()
 {
@@ -85,7 +130,7 @@ int Example::Run()
 
     // 关联IOCP 与 ServerSocket
     // completionKey传入的一个数值，完成时会原样传回来; NumberOfConcurrentThreads这个参数在关联完成端口时被忽略
-    auto ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockServer), _completionPort, (ULONG_PTR)(sockServer), 0);
+    auto ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockServer), _completionPort, (ULONG_PTR)(sockServer), 0); // completekey可以是自定义的结构体指针或者其他数据的指针，便于获取完成状态时候识别
     if(!ret)
     {
         auto err = GetLastError();
@@ -97,27 +142,47 @@ int Example::Run()
     // sAcceptSocket预先创建的socket，创建socket会消耗系统资源，socket资源有限固需要创建一个socket池，避免资源过度消耗
     // dwReceiveDataLength 有效接受数据长度，若为0表示连接时不必等待客户端发送数据acceptex即完成，若有值表示需要等待客户端发送数据才完成
     // lpdwBytesReceived返回接受数据长度，若不想等待客户端发送数据，这个地方可以填0
-    auto acceptSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    char buffer[1024] = {};
-//    OVERLAPPED overLapped;
-//     if(!AcceptEx(sockServer
-//                  , acceptSocket
-//                  , buffer
-//                  , 0
-//                  , sizeof(sockaddr_in) + 16
-//                  , sizeof(sockaddr_in) + 16
-//                  , NULL
-//                  , &overLapped))
-//     {
-//         auto error = WSAGetLastError();
-//         if(error != ERROR_IO_PENDING)
-//         {
-//             printf("AcceptEx failed error[%d]", error);
-//         }
-//     }
+    IO_DATA_BASE ioData = {};
+    PostAccept(sockServer, &ioData);
+
     while(true)
     {
         // 获取完成端口状态
+        DWORD bytesTrans = 0;
+        SOCKET sock = INVALID_SOCKET;
+        IO_DATA_BASE *ioDataPtr = NULL;
+        // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
+        // 以及重叠结构ioDataPtr 用于获取数据
+        if(FALSE == GetQueuedCompletionStatus(_completionPort, &bytesTrans, (PULONG_PTR)&sock, (LPOVERLAPPED *)&ioDataPtr, INFINITE))
+        {
+            const Int32 error = GetLastError();
+            printf("GetQueuedCompletionStatus failed with error %d\n", error);
+            if(ERROR_NETNAME_DELETED == error)
+            {
+                printf("关闭 sockfd=%d\n", ioDataPtr->_sock);
+                closesocket(ioDataPtr->_sock);
+                continue;
+            }
+        }
+
+        // 有连接连入
+        if(ioDataPtr->_ioType == IO_Defs::IO_ACCEPT)
+        {
+            printf("新客户端连入 sockfd=%d", ioDataPtr->_sock);
+
+            // clientsocket关联完成端口
+            auto associateRet = CreateIoCompletionPort(reinterpret_cast<HANDLE>(ioDataPtr->_sock), _completionPort, (ULONG_PTR)(ioDataPtr->_sock), 0);
+            if(!associateRet)
+            {
+                auto err = GetLastError();
+                printf("CreateIoCompletionPort associated failure error code<%d>", err);
+                return err;
+            }
+        }
+        else
+        {
+            printf("未定义行为 sockefd=%d", sock);
+        }
         // 检查是否有事件发生，和selet,epoll_wait类似
         // 接受连接 完成
         // 接受数据 完成 completion

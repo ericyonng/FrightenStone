@@ -52,10 +52,11 @@
 #include "TestSuit/TestSuit/TestInst/TestMemoryPool.h"
 #include "TestSuit/TestSuit/TestInst/TestObjPool.h"
 #include "TestSuit/TestSuit/TestInst/TestMathUtil.h"
+#include "TestSuit/TestSuit/TestInst/TestIocpExample.h"
 
 int main()
 {
-    TestMathUtil::Run();
+    TestIocpExample::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;
