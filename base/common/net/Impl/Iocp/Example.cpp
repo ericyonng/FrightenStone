@@ -84,6 +84,27 @@ void PostAccept(SOCKET sockServer, IO_DATA_BASE *ioData)
     }
 }
 
+// 投递接收数据
+bool PostRecv(IO_DATA_BASE *ioData)
+{
+    ioData->_ioType = IO_Defs::IO_RECV;
+    WSABUF wsBuff = {};
+    wsBuff.buf = ioData->_buff;
+    wsBuff.len = sizeof(ioData->_buff);
+    DWORD flags = 0;
+    if(SOCKET_ERROR == WSARecv(ioData->_sock, &wsBuff, 1, NULL, &flags, &ioData->_overlapped, NULL))
+    {
+        auto error = WSAGetLastError();
+        if(error != ERROR_IO_PENDING)
+        {
+            printf("WSARecv failed error[%d]", error);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 int Example::Run()
 {
     WORD ver = MAKEWORD(2, 2);
@@ -145,6 +166,7 @@ int Example::Run()
     IO_DATA_BASE ioData = {};
     PostAccept(sockServer, &ioData);
 
+    Int32 msgCount = 0;
     while(true)
     {
         // 获取完成端口状态
@@ -159,29 +181,65 @@ int Example::Run()
             printf("GetQueuedCompletionStatus failed with error %d\n", error);
             if(ERROR_NETNAME_DELETED == error)
             {
-                printf("关闭 sockfd=%d\n", ioDataPtr->_sock);
+                printf("客户端断开，关闭 sockfd=%d\n", static_cast<Int32>(ioDataPtr->_sock));
                 closesocket(ioDataPtr->_sock);
                 continue;
             }
+            break;
         }
 
         // 有连接连入
         if(ioDataPtr->_ioType == IO_Defs::IO_ACCEPT)
         {
-            printf("新客户端连入 sockfd=%d", ioDataPtr->_sock);
+            printf("新客户端连入 sockfd=%d\n", static_cast<Int32>(ioDataPtr->_sock));
 
             // clientsocket关联完成端口
             auto associateRet = CreateIoCompletionPort(reinterpret_cast<HANDLE>(ioDataPtr->_sock), _completionPort, (ULONG_PTR)(ioDataPtr->_sock), 0);
             if(!associateRet)
             {
                 auto err = GetLastError();
-                printf("CreateIoCompletionPort associated failure error code<%d>", err);
-                return err;
+                printf("CreateIoCompletionPort associated clientsock[%d] failure error code<%d>", static_cast<Int32>(ioDataPtr->_sock), err);
+                closesocket(ioDataPtr->_sock);
+                continue;
             }
+
+            // 投递接收数据
+            if(!PostRecv(ioDataPtr))
+            {
+                printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
+                closesocket(ioDataPtr->_sock);
+                continue;
+            }
+
+            // 投递接收数据
+            for(Int32 i=0;i<10;++i)
+                if(!PostRecv(ioDataPtr))
+                {
+                    printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
+                    closesocket(ioDataPtr->_sock);
+                    continue;
+                }
+        }
+        else if(ioDataPtr->_ioType == IO_Defs::IO_RECV)
+        {
+            if(bytesTrans <= 0)
+            {
+                printf("recv error socket[%d], bytesTrans[%d]\n"
+                       , static_cast<Int32>(ioDataPtr->_sock), bytesTrans);
+                closesocket(ioDataPtr->_sock);
+                continue;
+            }
+
+            // 打印接收到的数据
+            printf("recv data :socket[%d], bytesTrans[%d] msgCount[%d]\n"
+                   , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, ++msgCount);
+
+            // 不停的接收数据
+            //PostRecv(ioDataPtr);
         }
         else
         {
-            printf("未定义行为 sockefd=%d", sock);
+            printf("未定义行为 sockefd=%d", static_cast<Int32>(sock));
         }
         // 检查是否有事件发生，和selet,epoll_wait类似
         // 接受连接 完成
