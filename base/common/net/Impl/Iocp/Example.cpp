@@ -212,13 +212,13 @@ int Example::Run()
             }
 
             // 投递接收数据
-            for(Int32 i=0;i<10;++i)
-                if(!PostRecv(ioDataPtr))
-                {
-                    printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
-                    closesocket(ioDataPtr->_sock);
-                    continue;
-                }
+//             for(Int32 i=0;i<10;++i)
+//                 if(!PostRecv(ioDataPtr))
+//                 {
+//                     printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
+//                     closesocket(ioDataPtr->_sock);
+//                     continue;
+//                 }
         }
         else if(ioDataPtr->_ioType == IO_Defs::IO_RECV)
         {
@@ -235,7 +235,7 @@ int Example::Run()
                    , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, ++msgCount);
 
             // 不停的接收数据
-            //PostRecv(ioDataPtr);
+            PostRecv(ioDataPtr);
         }
         else
         {
