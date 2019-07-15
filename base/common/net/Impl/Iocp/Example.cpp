@@ -40,6 +40,7 @@
 FS_NAMESPACE_BEGIN
 
 #define IO_DATA_BUFF_SIZE 1024
+#define CLIENT_QUANTITY 10
 
 class IO_Defs
 {
@@ -92,12 +93,34 @@ bool PostRecv(IO_DATA_BASE *ioData)
     wsBuff.buf = ioData->_buff;
     wsBuff.len = sizeof(ioData->_buff);
     DWORD flags = 0;
+    memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
     if(SOCKET_ERROR == WSARecv(ioData->_sock, &wsBuff, 1, NULL, &flags, &ioData->_overlapped, NULL))
     {
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
         {
             printf("WSARecv failed error[%d]", error);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool PostSend(IO_DATA_BASE *ioData)
+{
+    ioData->_ioType = IO_Defs::IO_SEND;
+    WSABUF wsBuff = {};
+    wsBuff.buf = ioData->_buff;
+    wsBuff.len = ioData->_length;
+    DWORD flags = 0;
+    memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
+    if(SOCKET_ERROR == WSASend(ioData->_sock, &wsBuff, 1, NULL, flags, &ioData->_overlapped, NULL))
+    {
+        auto error = WSAGetLastError();
+        if(error != ERROR_IO_PENDING)
+        {
+            printf("WSASend failed error[%d]", error);
             return false;
         }
     }
@@ -163,8 +186,9 @@ int Example::Run()
     // sAcceptSocket预先创建的socket，创建socket会消耗系统资源，socket资源有限固需要创建一个socket池，避免资源过度消耗
     // dwReceiveDataLength 有效接受数据长度，若为0表示连接时不必等待客户端发送数据acceptex即完成，若有值表示需要等待客户端发送数据才完成
     // lpdwBytesReceived返回接受数据长度，若不想等待客户端发送数据，这个地方可以填0
-    IO_DATA_BASE ioData = {};
-    PostAccept(sockServer, &ioData);
+    IO_DATA_BASE ioData[CLIENT_QUANTITY] = {};
+    for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
+        PostAccept(sockServer, &ioData[i]);
 
     Int32 msgCount = 0;
     while(true)
@@ -235,6 +259,24 @@ int Example::Run()
                    , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, ++msgCount);
 
             // 不停的接收数据
+            ioDataPtr->_length = bytesTrans;
+            PostSend(ioDataPtr);
+        }
+        else if(ioDataPtr->_ioType == IO_Defs::IO_SEND)
+        {
+            // 客户端断开处理
+            if(bytesTrans <= 0)
+            {
+                printf("send error socket[%d], bytesTrans[%d]\n"
+                       , static_cast<Int32>(ioDataPtr->_sock), bytesTrans);
+                closesocket(ioDataPtr->_sock);
+                continue;
+            }
+
+            // 打印发送的数据
+            printf("send data :socket[%d], bytesTrans[%d] msgCount[%d]\n"
+                   , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, msgCount);
+
             PostRecv(ioDataPtr);
         }
         else
@@ -250,6 +292,8 @@ int Example::Run()
 
     // ------------ IOCP end ------------ //
     // 关闭clientsocket
+    for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
+        closesocket(ioData[i]._sock);
     // 关闭serversocket
     closesocket(sockServer);
     // 关闭完成端口
