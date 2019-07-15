@@ -56,7 +56,7 @@
 
 int main()
 {
-    TestCrashHandle::Run();
+    TestIocpExample::Run();
     std::cout << "main end" << std::endl;
     getchar();
     return 0;
