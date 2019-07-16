@@ -42,6 +42,8 @@ FS_NAMESPACE_BEGIN
 #define IO_DATA_BUFF_SIZE 1024
 #define CLIENT_QUANTITY 10
 
+LPFN_ACCEPTEX __g_fnAccept = NULL;
+
 class IO_Defs
 {
 public:
@@ -63,11 +65,25 @@ struct IO_DATA_BASE
     IO_Defs::IO_TYPE _ioType;
 };
 
+void LoadAcceptEx(SOCKET listenSocket)
+{
+    DWORD dwBytes = 0;
+    GUID guidAcceptEx = WSAID_ACCEPTEX;
+    if(WSAIoctl(listenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
+             &guidAcceptEx, sizeof(guidAcceptEx),
+             &__g_fnAccept, sizeof(__g_fnAccept),
+             &dwBytes, NULL, NULL)!=0)
+    {
+        auto error = WSAGetLastError();
+        printf("load acceptex fail error[%d]", error);
+    }
+}
+
 void PostAccept(SOCKET sockServer, IO_DATA_BASE *ioData)
 {
     ioData->_ioType = IO_Defs::IO_ACCEPT;
     ioData->_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if(!AcceptEx(sockServer
+    if(!__g_fnAccept(sockServer
                  , ioData->_sock
                  , ioData->_buff
                  , 0
@@ -186,6 +202,7 @@ int Example::Run()
     // sAcceptSocket预先创建的socket，创建socket会消耗系统资源，socket资源有限固需要创建一个socket池，避免资源过度消耗
     // dwReceiveDataLength 有效接受数据长度，若为0表示连接时不必等待客户端发送数据acceptex即完成，若有值表示需要等待客户端发送数据才完成
     // lpdwBytesReceived返回接受数据长度，若不想等待客户端发送数据，这个地方可以填0
+    LoadAcceptEx(sockServer);
     IO_DATA_BASE ioData[CLIENT_QUANTITY] = {};
     for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
         PostAccept(sockServer, &ioData[i]);
