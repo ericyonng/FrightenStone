@@ -708,6 +708,12 @@
     <ClInclude Include="..\common\net\Impl\Iocp\Example.h">
       <Filter>common\net\Impl\Iocp</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Impl\Iocp\FS_Iocp.h">
+      <Filter>common\net\Impl\Iocp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Defs\IocpDefs.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -898,6 +904,12 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp">
       <Filter>common\net\Impl\Iocp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\Iocp\FS_Iocp.cpp">
+      <Filter>common\net\Impl\Iocp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Defs\IocpDefs.cpp">
+      <Filter>common\net\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
