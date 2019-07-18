@@ -122,6 +122,16 @@ public:
         CrashHandleUtil_SymInitializeFail = 1400,               // 符号pdb初始化失败
         #pragma endregion
 
+        #pragma region IOCP[1500, 1599]
+        IOCP_CreateCompletionPortFail = 1500,                   // 创建完成端口失败
+        IOCP_LoadAcceptExError = 1501,                          // 加载AcceptEx函数失败
+        IOCP_RegSocketToCompletionPortFail = 1502,              // 套接字关联到完成端口失败
+        IOCP_PostAcceptFail = 1503,                             // 向完成端口投递io连接请求失败
+        IOCP_PostRecvFail = 1504,                               // 向完成端口投递io接收请求失败
+        IOCP_PostSendFail = 1504,                               // 向完成端口投递io发送请求失败
+        IOCP_LoadAcceptExFailForListenSocketIsInvalid = 1505,   // 加载acceptex失败，监听端口无效
+        #pragma endregion
+
     };
 };
 
