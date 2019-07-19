@@ -130,6 +130,9 @@ public:
         IOCP_PostRecvFail = 1504,                               // 向完成端口投递io接收请求失败
         IOCP_PostSendFail = 1504,                               // 向完成端口投递io发送请求失败
         IOCP_LoadAcceptExFailForListenSocketIsInvalid = 1505,   // 加载acceptex失败，监听端口无效
+        IOCP_WaitTimeOut = 1506,                                // 超时等待
+        IOCP_IODisconnect = 1507,                               // io连接断开
+        IOCP_WaitOtherError = 1508,                             // 其他错误
         #pragma endregion
 
     };

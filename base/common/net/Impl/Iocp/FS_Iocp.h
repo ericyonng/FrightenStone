@@ -44,27 +44,28 @@ struct IO_DATA_BASE;
 class BASE_EXPORT FS_Iocp
 {
 public:
-    FS_Iocp(SOCKET listenSocket = INVALID_SOCKET);
+    FS_Iocp();
     virtual ~FS_Iocp();
 
     /* ³õÊ¼»¯Óë×¢²á */
     Int32 Create();
     void Destroy();
     Int32 Reg(SOCKET sockfd);
-    Int32 LoadAcceptEx();
+    Int32 LoadAcceptEx(SOCKET listenSocket);
 
     /* Post Request */
     Int32 PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData);
     Int32 PostRecv(IO_DATA_BASE *ioData);
     Int32 PostSend(IO_DATA_BASE *ioData);
 
-private:
+    Int32 WaitForMessage(ULong millisec = INFINITE);
 
+private:
+    Int32 _FS_GetQueuedCompletionStatus();
 
 private:
     HANDLE _completionPort = NULL;
     LPFN_ACCEPTEX _fnAcceptEx = NULL;
-    SOCKET _listenSocket;
 };
 
 FS_NAMESPACE_END

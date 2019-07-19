@@ -43,8 +43,7 @@
 #pragma endregion
 
 FS_NAMESPACE_BEGIN
-FS_Iocp::FS_Iocp(SOCKET listenSocket)
-    :_listenSocket(listenSocket)
+FS_Iocp::FS_Iocp()
 {
 
 }
@@ -74,11 +73,6 @@ Int32 FS_Iocp::Create()
 
 void FS_Iocp::Destroy()
 {
-    // 关闭监听socket
-    if(_listenSocket != INVALID_SOCKET)
-        closesocket(_listenSocket);
-    _listenSocket = INVALID_SOCKET;
-
     // 关闭完成端口
     if(LIKELY(_completionPort))
         CloseHandle(_completionPort);
@@ -102,21 +96,14 @@ Int32 FS_Iocp::Reg(SOCKET sockfd)
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::LoadAcceptEx()
+Int32 FS_Iocp::LoadAcceptEx(SOCKET listenSocket)
 {
-    if(_listenSocket == INVALID_SOCKET)
-    {
-        g_Log->e<FS_Iocp>(_LOGFMT_("load acceptex fail: listen socket is invalid statuscode[%d]")
-                          , StatusDefs::IOCP_LoadAcceptExFailForListenSocketIsInvalid);
-        return StatusDefs::IOCP_LoadAcceptExFailForListenSocketIsInvalid;
-    }
-
     if(_fnAcceptEx)
         return StatusDefs::Success;
 
     DWORD dwBytes = 0;
     GUID guidAcceptEx = WSAID_ACCEPTEX;
-    if(WSAIoctl(_listenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
+    if(WSAIoctl(listenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
                 &guidAcceptEx, sizeof(guidAcceptEx),
                 &_fnAcceptEx, sizeof(_fnAcceptEx),
                 &dwBytes, NULL, NULL) != 0)
@@ -199,6 +186,45 @@ Int32 FS_Iocp::PostSend(IO_DATA_BASE *ioData)
     return StatusDefs::Success;
 }
 
-FS_NAMESPACE_END
+Int32 FS_Iocp::WaitForMessage(ULong millisec)
+{
+    return StatusDefs::Success;
+}
 
+Int32 FS_Iocp::_FS_GetQueuedCompletionStatus()
+{
+    // 获取完成端口状态
+//     DWORD bytesTrans = 0;
+//     SOCKET sock = INVALID_SOCKET;
+//     IO_DATA_BASE *ioDataPtr = NULL;
+//     // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
+//     // 以及重叠结构ioDataPtr 用于获取数据
+//     if(FALSE == GetQueuedCompletionStatus(_completionPort, &bytesTrans, (PULONG_PTR)&sock, (LPOVERLAPPED *)&ioDataPtr, millisec))
+//     {
+//         const Int32 error = GetLastError();
+//         if(WAIT_TIMEOUT == error)
+//         {
+//             g_Log->net("WaitForMessage time out error<%d> status[%d]"
+//                        , error, StatusDefs::IOCP_WaitTimeOut);
+//             return StatusDefs::IOCP_WaitTimeOut;
+//         }
+// 
+//         printf("GetQueuedCompletionStatus failed with error %d\n", error);
+//         if(ERROR_NETNAME_DELETED == error)
+//         {
+//             g_Log->net("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
+//                        , ioDataPtr->_sock, error, StatusDefs::IOCP_IODisconnect);
+//             closesocket(ioDataPtr->_sock);
+//             return StatusDefs::IOCP_IODisconnect;
+//         }
+// 
+//         g_Log->e<FS_Iocp>(_LOGFMT_("WaitForMessage other error error<%d> status[%d]")
+//                           , error, StatusDefs::IOCP_PostSendFail);
+//         return StatusDefs::IOCP_WaitOtherError;
+//     }
+
+    return StatusDefs::Success;
+}
+
+FS_NAMESPACE_END
 
