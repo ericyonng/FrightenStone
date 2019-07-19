@@ -55,9 +55,6 @@ IMemoryAlloctor::~IMemoryAlloctor()
 
 void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const Byte8 *objName)
 {
-//     if(UNLIKELY(!_buf))
-//         _InitMemory();
-
     // 内存不足则使用系统内存分配方案
     MemoryBlock *newBlock = NULL;
     if(_usableBlockHeader == 0)
@@ -91,6 +88,7 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const Byte8 *objName)
         ASSERT(newBlock->_ref == 0);
         newBlock->_ref = 1;
     }
+
     if(newBlock)
     {
         newBlock->_objSize = static_cast<Int64>(bytesCnt);
@@ -123,6 +121,8 @@ void IMemoryAlloctor::FreeMemory(void *ptr)
     blockHeader->_objName[0] = 0;
     blockHeader->_nextBlock = _usableBlockHeader;
     _usableBlockHeader = blockHeader;
+    
+    // 释放后从正在使用中移除
     _usingBlocks.erase(blockHeader);
 }
 

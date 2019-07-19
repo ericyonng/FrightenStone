@@ -40,6 +40,7 @@
 FS_NAMESPACE_BEGIN
 
 struct IO_DATA_BASE;
+struct IO_EVENT;
 
 class BASE_EXPORT FS_Iocp
 {
@@ -58,10 +59,9 @@ public:
     Int32 PostRecv(IO_DATA_BASE *ioData);
     Int32 PostSend(IO_DATA_BASE *ioData);
 
-    Int32 WaitForMessage(ULong millisec = INFINITE);
+    Int32 WaitForComplete(IO_EVENT &ioEvent, ULong millisec = INFINITE);
 
 private:
-    Int32 _FS_GetQueuedCompletionStatus();
 
 private:
     HANDLE _completionPort = NULL;

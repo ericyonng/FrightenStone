@@ -33,6 +33,8 @@
 #include "base/common/net/Impl/Iocp/Example.h"
 #include "base/common/net/Impl/Iocp/FS_Iocp.h"
 #include "base/common/status/status.h"
+#include "base/common/log/Log.h"
+#include "base/common/net/Defs/IocpDefs.h"
 
 #include <windows.h>
 #include <WinSock2.h>
@@ -44,110 +46,111 @@ FS_NAMESPACE_BEGIN
 #define IO_DATA_BUFF_SIZE 1024
 #define CLIENT_QUANTITY 10
 
-LPFN_ACCEPTEX __g_fnAccept = NULL;
-
-class IO_Defs
-{
-public:
-    enum IO_TYPE
-    {
-        IO_ACCEPT = 10,
-        IO_RECV,
-        IO_SEND,
-    };
-};
-
-struct IO_DATA_BASE
-{
-    // 重叠体
-    OVERLAPPED _overlapped;    // 使用重叠体可以关联到iodatabase
-    SOCKET _sock;
-    char _buff[IO_DATA_BUFF_SIZE];
-    Int32 _length;
-    IO_Defs::IO_TYPE _ioType;
-};
-
-void LoadAcceptEx(SOCKET listenSocket)
-{
-    DWORD dwBytes = 0;
-    GUID guidAcceptEx = WSAID_ACCEPTEX;
-    if(WSAIoctl(listenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
-             &guidAcceptEx, sizeof(guidAcceptEx),
-             &__g_fnAccept, sizeof(__g_fnAccept),
-             &dwBytes, NULL, NULL)!=0)
-    {
-        auto error = WSAGetLastError();
-        printf("load acceptex fail error[%d]", error);
-    }
-}
-
-void PostAccept(SOCKET sockServer, IO_DATA_BASE *ioData)
-{
-    ioData->_ioType = IO_Defs::IO_ACCEPT;
-    ioData->_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if(!__g_fnAccept(sockServer
-                 , ioData->_sock
-                 , ioData->_buff
-                 , 0
-                 , sizeof(sockaddr_in) + 16
-                 , sizeof(sockaddr_in) + 16
-                 , NULL
-                 , &ioData->_overlapped)) // 可以是自定义的结构体
-    {
-        auto error = WSAGetLastError();
-        if(error != ERROR_IO_PENDING)
-        {
-            printf("AcceptEx failed error[%d]", error);
-            return;
-        }
-    }
-}
-
-// 投递接收数据
-bool PostRecv(IO_DATA_BASE *ioData)
-{
-    ioData->_ioType = IO_Defs::IO_RECV;
-    WSABUF wsBuff = {};
-    wsBuff.buf = ioData->_buff;
-    wsBuff.len = sizeof(ioData->_buff);
-    DWORD flags = 0;
-    memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
-    if(SOCKET_ERROR == WSARecv(ioData->_sock, &wsBuff, 1, NULL, &flags, &ioData->_overlapped, NULL))
-    {
-        auto error = WSAGetLastError();
-        if(error != ERROR_IO_PENDING)
-        {
-            printf("WSARecv failed error[%d]", error);
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool PostSend(IO_DATA_BASE *ioData)
-{
-    ioData->_ioType = IO_Defs::IO_SEND;
-    WSABUF wsBuff = {};
-    wsBuff.buf = ioData->_buff;
-    wsBuff.len = ioData->_length;
-    DWORD flags = 0;
-    memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
-    if(SOCKET_ERROR == WSASend(ioData->_sock, &wsBuff, 1, NULL, flags, &ioData->_overlapped, NULL))
-    {
-        auto error = WSAGetLastError();
-        if(error != ERROR_IO_PENDING)
-        {
-            printf("WSASend failed error[%d]", error);
-            return false;
-        }
-    }
-
-    return true;
-}
+// LPFN_ACCEPTEX __g_fnAccept = NULL;
+// 
+// class IO_Defs
+// {
+// public:
+//     enum IO_TYPE
+//     {
+//         IO_ACCEPT = 10,
+//         IO_RECV,
+//         IO_SEND,
+//     };
+// };
+// 
+// struct IO_DATA_BASE
+// {
+//     // 重叠体
+//     OVERLAPPED _overlapped;    // 使用重叠体可以关联到iodatabase
+//     SOCKET _sock;
+//     char _buff[IO_DATA_BUFF_SIZE];
+//     Int32 _length;
+//     IO_Defs::IO_TYPE _ioType;
+// };
+// 
+// void LoadAcceptEx(SOCKET listenSocket)
+// {
+//     DWORD dwBytes = 0;
+//     GUID guidAcceptEx = WSAID_ACCEPTEX;
+//     if(WSAIoctl(listenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
+//              &guidAcceptEx, sizeof(guidAcceptEx),
+//              &__g_fnAccept, sizeof(__g_fnAccept),
+//              &dwBytes, NULL, NULL)!=0)
+//     {
+//         auto error = WSAGetLastError();
+//         printf("load acceptex fail error[%d]", error);
+//     }
+// }
+// 
+// void PostAccept(SOCKET sockServer, IO_DATA_BASE *ioData)
+// {
+//     ioData->_ioType = IO_Defs::IO_ACCEPT;
+//     ioData->_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+//     if(!__g_fnAccept(sockServer
+//                  , ioData->_sock
+//                  , ioData->_buff
+//                  , 0
+//                  , sizeof(sockaddr_in) + 16
+//                  , sizeof(sockaddr_in) + 16
+//                  , NULL
+//                  , &ioData->_overlapped)) // 可以是自定义的结构体
+//     {
+//         auto error = WSAGetLastError();
+//         if(error != ERROR_IO_PENDING)
+//         {
+//             printf("AcceptEx failed error[%d]", error);
+//             return;
+//         }
+//     }
+// }
+// 
+// // 投递接收数据
+// bool PostRecv(IO_DATA_BASE *ioData)
+// {
+//     ioData->_ioType = IO_Defs::IO_RECV;
+//     WSABUF wsBuff = {};
+//     wsBuff.buf = ioData->_buff;
+//     wsBuff.len = sizeof(ioData->_buff);
+//     DWORD flags = 0;
+//     memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
+//     if(SOCKET_ERROR == WSARecv(ioData->_sock, &wsBuff, 1, NULL, &flags, &ioData->_overlapped, NULL))
+//     {
+//         auto error = WSAGetLastError();
+//         if(error != ERROR_IO_PENDING)
+//         {
+//             printf("WSARecv failed error[%d]", error);
+//             return false;
+//         }
+//     }
+// 
+//     return true;
+// }
+// 
+// bool PostSend(IO_DATA_BASE *ioData)
+// {
+//     ioData->_ioType = IO_Defs::IO_SEND;
+//     WSABUF wsBuff = {};
+//     wsBuff.buf = ioData->_buff;
+//     wsBuff.len = ioData->_length;
+//     DWORD flags = 0;
+//     memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
+//     if(SOCKET_ERROR == WSASend(ioData->_sock, &wsBuff, 1, NULL, flags, &ioData->_overlapped, NULL))
+//     {
+//         auto error = WSAGetLastError();
+//         if(error != ERROR_IO_PENDING)
+//         {
+//             printf("WSASend failed error[%d]", error);
+//             return false;
+//         }
+//     }
+// 
+//     return true;
+// }
 
 int Example::Run()
 {
+    g_Log->InitModule("IOCP_TEST");
     WORD ver = MAKEWORD(2, 2);
     WSADATA dat;
     WSAStartup(ver, &dat);
@@ -211,124 +214,95 @@ int Example::Run()
     // LoadAcceptEx(sockServer);
     IO_DATA_BASE ioData[CLIENT_QUANTITY] = {};
     for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
-        //PostAccept(sockServer, &ioData[i]);
         iocp.PostAccept(sockServer, &ioData[i]);
 
-//     Int32 msgCount = 0;
-//     while(true)
-//     {
-//         // 获取完成端口状态
-//         DWORD bytesTrans = 0;
-//         SOCKET sock = INVALID_SOCKET;
-//         IO_DATA_BASE *ioDataPtr = NULL;
-//         // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
-//         // 以及重叠结构ioDataPtr 用于获取数据
-//         if(FALSE == GetQueuedCompletionStatus(_completionPort, &bytesTrans, (PULONG_PTR)&sock, (LPOVERLAPPED *)&ioDataPtr, INFINITE))
-//         {
-//             const Int32 error = GetLastError();
-//             printf("GetQueuedCompletionStatus failed with error %d\n", error);
-//             if(ERROR_NETNAME_DELETED == error)
-//             {
-//                 printf("客户端断开，关闭 sockfd=%d\n", static_cast<Int32>(ioDataPtr->_sock));
-//                 closesocket(ioDataPtr->_sock);
-//                 continue;
-//             }
-//             break;
-//         }
-// 
-//         const Int32 st = iocp.WaitForMessage();
-//         if(st != StatusDefs::Success)
-//             continue;
-// 
-//         // 有连接连入
-//         if(ioDataPtr->_ioType == IO_Defs::IO_ACCEPT)
-//         {
-//             printf("新客户端连入 sockfd=%d\n", static_cast<Int32>(ioDataPtr->_sock));
-// 
-//             // clientsocket关联完成端口
-//             auto associateRet = CreateIoCompletionPort(reinterpret_cast<HANDLE>(ioDataPtr->_sock), _completionPort, (ULONG_PTR)(ioDataPtr->_sock), 0);
-//             if(!associateRet)
-//             {
-//                 auto err = GetLastError();
-//                 printf("CreateIoCompletionPort associated clientsock[%d] failure error code<%d>", static_cast<Int32>(ioDataPtr->_sock), err);
-//                 closesocket(ioDataPtr->_sock);
-//                 continue;
-//             }
-// 
-//             // 投递接收数据
-//             if(!PostRecv(ioDataPtr))
-//             {
-//                 printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
-//                 closesocket(ioDataPtr->_sock);
-//                 continue;
-//             }
-// 
-//             // 投递接收数据
-// //             for(Int32 i=0;i<10;++i)
-// //                 if(!PostRecv(ioDataPtr))
-// //                 {
-// //                     printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
-// //                     closesocket(ioDataPtr->_sock);
-// //                     continue;
-// //                 }
-//         }
-//         else if(ioDataPtr->_ioType == IO_Defs::IO_RECV)
-//         {
-//             if(bytesTrans <= 0)
-//             {
-//                 printf("recv error socket[%d], bytesTrans[%d]\n"
-//                        , static_cast<Int32>(ioDataPtr->_sock), bytesTrans);
-//                 closesocket(ioDataPtr->_sock);
-//                 continue;
-//             }
-// 
-//             // 打印接收到的数据
-//             printf("recv data :socket[%d], bytesTrans[%d] msgCount[%d]\n"
-//                    , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, ++msgCount);
-// 
-//             // 不停的接收数据
-//             ioDataPtr->_length = bytesTrans;
-//             PostSend(ioDataPtr);
-//         }
-//         else if(ioDataPtr->_ioType == IO_Defs::IO_SEND)
-//         {
-//             // 客户端断开处理
-//             if(bytesTrans <= 0)
-//             {
-//                 printf("send error socket[%d], bytesTrans[%d]\n"
-//                        , static_cast<Int32>(ioDataPtr->_sock), bytesTrans);
-//                 closesocket(ioDataPtr->_sock);
-//                 continue;
-//             }
-// 
-//             // 打印发送的数据
-//             printf("send data :socket[%d], bytesTrans[%d] msgCount[%d]\n"
-//                    , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, msgCount);
-// 
-//             PostRecv(ioDataPtr);
-//         }
-//         else
-//         {
-//             printf("未定义行为 sockefd=%d", static_cast<Int32>(sock));
-//         }
-//         // 检查是否有事件发生，和selet,epoll_wait类似
-//         // 接受连接 完成
-//         // 接受数据 完成 completion
-//         // 发送数据 完成
-//         // 向IOCP 投递接收数据任务
-//     }
-// 
-//     // ------------ IOCP end ------------ //
-//     // 关闭clientsocket
-//     for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
-//         closesocket(ioData[i]._sock);
-//     // 关闭serversocket
-//     closesocket(sockServer);
-//     // 关闭完成端口
-//     CloseHandle(_completionPort);
-// 
-//     // 清除windows socket环境
-//     WSACleanup();
+    Int32 msgCount = 0;
+    while(true)
+    {
+        // 等待io完成
+        IO_EVENT ioEvent = {};
+        const Int32 st = iocp.WaitForComplete(ioEvent);
+        if(st != StatusDefs::Success)
+        {
+            if(st== StatusDefs::IOCP_IODisconnect)
+                g_Log->sys(_LOGFMT_("客户端断开链接 sockfd=%llu"), ioEvent._ioData->_sock);
+            continue;
+        }
+
+        // 有连接连入
+        if(ioEvent._ioData->_ioType == IocpDefs::IO_ACCEPT)
+        {
+            g_Log->sys(_LOGFMT_("新客户端连入 sockfd=%llu"), ioEvent._ioData->_sock);
+
+            // 新客户端关联完成端口
+            if(StatusDefs::Success != iocp.Reg(ioEvent._ioData->_sock))
+                continue;
+
+            // 投递接收数据
+            if(StatusDefs::Success != iocp.PostRecv(ioEvent._ioData))
+            {
+                g_Log->e<Example>(_LOGFMT_("post recv fail sock[%llu]"), ioEvent._ioData->_sock);
+                closesocket(ioEvent._ioData->_sock);
+                continue;
+            }
+        }
+        else if(ioEvent._ioData->_ioType == IocpDefs::IO_RECV)
+        {
+            if(ioEvent._bytesTrans <= 0)
+            {
+                g_Log->e<Example>(_LOGFMT_("recv error socket[%llu], bytesTrans[%d]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                closesocket(ioEvent._ioData->_sock);
+                continue;
+            }
+
+            // 打印接收到的数据
+            g_Log->sys(_LOGFMT_("recv data :socket[%llu], bytesTrans[%d] msgCount[%d]")
+                       , ioEvent._ioData->_sock, ioEvent._bytesTrans, ++msgCount);
+
+            // 不停的接收数据
+            ioEvent._ioData->_length = ioEvent._bytesTrans;
+            iocp.PostSend(ioEvent._ioData);
+        }
+        else if(ioEvent._ioData->_ioType == IocpDefs::IO_SEND)
+        {
+            // 客户端断开处理
+            if(ioEvent._bytesTrans <= 0)
+            {
+                g_Log->e<Example>(_LOGFMT_("send error socket[%llu], bytesTrans[%d]")
+                                  , ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                closesocket(ioEvent._ioData->_sock);
+                continue;
+            }
+
+            // 打印发送的数据
+            g_Log->sys(_LOGFMT_("send data :socket[%llu], bytesTrans[%d] msgCount[%d]")
+                       , ioEvent._ioData->_sock, ioEvent._bytesTrans, msgCount);
+
+            iocp.PostRecv(ioEvent._ioData);
+        }
+        else
+        {
+            g_Log->e<Example>(_LOGFMT_("未定义行为 sockefd=%llu"), ioEvent._socket);
+        }
+        // 检查是否有事件发生，和selet,epoll_wait类似
+        // 接受连接 完成
+        // 接受数据 完成 completion
+        // 发送数据 完成
+        // 向IOCP 投递接收数据任务
+    }
+
+    // ------------ IOCP end ------------ //
+    // 关闭clientsocket
+    for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
+        closesocket(ioData[i]._sock);
+    // 关闭serversocket
+    closesocket(sockServer);
+    // 关闭完成端口
+    iocp.Destroy();
+    // CloseHandle(_completionPort);
+
+    // 清除windows socket环境
+    WSACleanup();
     return 0;
 }
 

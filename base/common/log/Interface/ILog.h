@@ -79,7 +79,7 @@ public:
     template<typename... Args>
     void crash(const char *fmt, const Args&... args);
     // 网络日志
-    // 请使用便利宏_LOGFMT_
+    // 请使用便利宏_LOGFMT_ 不支持控制台输出
     template<typename... Args>
     void net(const char *fmt, const Args&... args);
     // 内存泄漏日志
