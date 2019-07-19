@@ -31,6 +31,8 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Impl/Iocp/Example.h"
+#include "base/common/net/Impl/Iocp/FS_Iocp.h"
+#include "base/common/status/status.h"
 
 #include <windows.h>
 #include <WinSock2.h>
@@ -180,144 +182,153 @@ int Example::Run()
     }
 
     // 创建完成端口IOCP NumberOfConcurrentThreads=0表示默认cpu核数
-    auto _completionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
-    if(!_completionPort)
-    {
-        auto err = GetLastError();
-        printf("CreateIoCompletionPort failed error code<%d>", err);
-        return err;
-    }
+    FS_Iocp iocp;
+    iocp.Create();
+//     auto _completionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+//     if(!_completionPort)
+//     {
+//         auto err = GetLastError();
+//         printf("CreateIoCompletionPort failed error code<%d>", err);
+//         return err;
+//     }
 
     // 关联IOCP 与 ServerSocket
     // completionKey传入的一个数值，完成时会原样传回来; NumberOfConcurrentThreads这个参数在关联完成端口时被忽略
-    auto ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockServer), _completionPort, (ULONG_PTR)(sockServer), 0); // completekey可以是自定义的结构体指针或者其他数据的指针，便于获取完成状态时候识别
-    if(!ret)
-    {
-        auto err = GetLastError();
-        printf("CreateIoCompletionPort associated failure error code<%d>", err);
-        return err;
-    }
+    iocp.Reg(sockServer);
+//     auto ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockServer), _completionPort, (ULONG_PTR)(sockServer), 0); // completekey可以是自定义的结构体指针或者其他数据的指针，便于获取完成状态时候识别
+//     if(!ret)
+//     {
+//         auto err = GetLastError();
+//         printf("CreateIoCompletionPort associated failure error code<%d>", err);
+//         return err;
+//     }
 
     // 向IOCP投递接受客户端连接的任务
     // sAcceptSocket预先创建的socket，创建socket会消耗系统资源，socket资源有限固需要创建一个socket池，避免资源过度消耗
     // dwReceiveDataLength 有效接受数据长度，若为0表示连接时不必等待客户端发送数据acceptex即完成，若有值表示需要等待客户端发送数据才完成
     // lpdwBytesReceived返回接受数据长度，若不想等待客户端发送数据，这个地方可以填0
-    LoadAcceptEx(sockServer);
+    iocp.LoadAcceptEx(sockServer);
+    // LoadAcceptEx(sockServer);
     IO_DATA_BASE ioData[CLIENT_QUANTITY] = {};
     for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
-        PostAccept(sockServer, &ioData[i]);
+        //PostAccept(sockServer, &ioData[i]);
+        iocp.PostAccept(sockServer, &ioData[i]);
 
-    Int32 msgCount = 0;
-    while(true)
-    {
-        // 获取完成端口状态
-        DWORD bytesTrans = 0;
-        SOCKET sock = INVALID_SOCKET;
-        IO_DATA_BASE *ioDataPtr = NULL;
-        // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
-        // 以及重叠结构ioDataPtr 用于获取数据
-        if(FALSE == GetQueuedCompletionStatus(_completionPort, &bytesTrans, (PULONG_PTR)&sock, (LPOVERLAPPED *)&ioDataPtr, INFINITE))
-        {
-            const Int32 error = GetLastError();
-            printf("GetQueuedCompletionStatus failed with error %d\n", error);
-            if(ERROR_NETNAME_DELETED == error)
-            {
-                printf("客户端断开，关闭 sockfd=%d\n", static_cast<Int32>(ioDataPtr->_sock));
-                closesocket(ioDataPtr->_sock);
-                continue;
-            }
-            break;
-        }
-
-        // 有连接连入
-        if(ioDataPtr->_ioType == IO_Defs::IO_ACCEPT)
-        {
-            printf("新客户端连入 sockfd=%d\n", static_cast<Int32>(ioDataPtr->_sock));
-
-            // clientsocket关联完成端口
-            auto associateRet = CreateIoCompletionPort(reinterpret_cast<HANDLE>(ioDataPtr->_sock), _completionPort, (ULONG_PTR)(ioDataPtr->_sock), 0);
-            if(!associateRet)
-            {
-                auto err = GetLastError();
-                printf("CreateIoCompletionPort associated clientsock[%d] failure error code<%d>", static_cast<Int32>(ioDataPtr->_sock), err);
-                closesocket(ioDataPtr->_sock);
-                continue;
-            }
-
-            // 投递接收数据
-            if(!PostRecv(ioDataPtr))
-            {
-                printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
-                closesocket(ioDataPtr->_sock);
-                continue;
-            }
-
-            // 投递接收数据
-//             for(Int32 i=0;i<10;++i)
-//                 if(!PostRecv(ioDataPtr))
-//                 {
-//                     printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
-//                     closesocket(ioDataPtr->_sock);
-//                     continue;
-//                 }
-        }
-        else if(ioDataPtr->_ioType == IO_Defs::IO_RECV)
-        {
-            if(bytesTrans <= 0)
-            {
-                printf("recv error socket[%d], bytesTrans[%d]\n"
-                       , static_cast<Int32>(ioDataPtr->_sock), bytesTrans);
-                closesocket(ioDataPtr->_sock);
-                continue;
-            }
-
-            // 打印接收到的数据
-            printf("recv data :socket[%d], bytesTrans[%d] msgCount[%d]\n"
-                   , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, ++msgCount);
-
-            // 不停的接收数据
-            ioDataPtr->_length = bytesTrans;
-            PostSend(ioDataPtr);
-        }
-        else if(ioDataPtr->_ioType == IO_Defs::IO_SEND)
-        {
-            // 客户端断开处理
-            if(bytesTrans <= 0)
-            {
-                printf("send error socket[%d], bytesTrans[%d]\n"
-                       , static_cast<Int32>(ioDataPtr->_sock), bytesTrans);
-                closesocket(ioDataPtr->_sock);
-                continue;
-            }
-
-            // 打印发送的数据
-            printf("send data :socket[%d], bytesTrans[%d] msgCount[%d]\n"
-                   , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, msgCount);
-
-            PostRecv(ioDataPtr);
-        }
-        else
-        {
-            printf("未定义行为 sockefd=%d", static_cast<Int32>(sock));
-        }
-        // 检查是否有事件发生，和selet,epoll_wait类似
-        // 接受连接 完成
-        // 接受数据 完成 completion
-        // 发送数据 完成
-        // 向IOCP 投递接收数据任务
-    }
-
-    // ------------ IOCP end ------------ //
-    // 关闭clientsocket
-    for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
-        closesocket(ioData[i]._sock);
-    // 关闭serversocket
-    closesocket(sockServer);
-    // 关闭完成端口
-    CloseHandle(_completionPort);
-
-    // 清除windows socket环境
-    WSACleanup();
+//     Int32 msgCount = 0;
+//     while(true)
+//     {
+//         // 获取完成端口状态
+//         DWORD bytesTrans = 0;
+//         SOCKET sock = INVALID_SOCKET;
+//         IO_DATA_BASE *ioDataPtr = NULL;
+//         // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
+//         // 以及重叠结构ioDataPtr 用于获取数据
+//         if(FALSE == GetQueuedCompletionStatus(_completionPort, &bytesTrans, (PULONG_PTR)&sock, (LPOVERLAPPED *)&ioDataPtr, INFINITE))
+//         {
+//             const Int32 error = GetLastError();
+//             printf("GetQueuedCompletionStatus failed with error %d\n", error);
+//             if(ERROR_NETNAME_DELETED == error)
+//             {
+//                 printf("客户端断开，关闭 sockfd=%d\n", static_cast<Int32>(ioDataPtr->_sock));
+//                 closesocket(ioDataPtr->_sock);
+//                 continue;
+//             }
+//             break;
+//         }
+// 
+//         const Int32 st = iocp.WaitForMessage();
+//         if(st != StatusDefs::Success)
+//             continue;
+// 
+//         // 有连接连入
+//         if(ioDataPtr->_ioType == IO_Defs::IO_ACCEPT)
+//         {
+//             printf("新客户端连入 sockfd=%d\n", static_cast<Int32>(ioDataPtr->_sock));
+// 
+//             // clientsocket关联完成端口
+//             auto associateRet = CreateIoCompletionPort(reinterpret_cast<HANDLE>(ioDataPtr->_sock), _completionPort, (ULONG_PTR)(ioDataPtr->_sock), 0);
+//             if(!associateRet)
+//             {
+//                 auto err = GetLastError();
+//                 printf("CreateIoCompletionPort associated clientsock[%d] failure error code<%d>", static_cast<Int32>(ioDataPtr->_sock), err);
+//                 closesocket(ioDataPtr->_sock);
+//                 continue;
+//             }
+// 
+//             // 投递接收数据
+//             if(!PostRecv(ioDataPtr))
+//             {
+//                 printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
+//                 closesocket(ioDataPtr->_sock);
+//                 continue;
+//             }
+// 
+//             // 投递接收数据
+// //             for(Int32 i=0;i<10;++i)
+// //                 if(!PostRecv(ioDataPtr))
+// //                 {
+// //                     printf("post recv fail sock[%d]\n", static_cast<Int32>(ioDataPtr->_sock));
+// //                     closesocket(ioDataPtr->_sock);
+// //                     continue;
+// //                 }
+//         }
+//         else if(ioDataPtr->_ioType == IO_Defs::IO_RECV)
+//         {
+//             if(bytesTrans <= 0)
+//             {
+//                 printf("recv error socket[%d], bytesTrans[%d]\n"
+//                        , static_cast<Int32>(ioDataPtr->_sock), bytesTrans);
+//                 closesocket(ioDataPtr->_sock);
+//                 continue;
+//             }
+// 
+//             // 打印接收到的数据
+//             printf("recv data :socket[%d], bytesTrans[%d] msgCount[%d]\n"
+//                    , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, ++msgCount);
+// 
+//             // 不停的接收数据
+//             ioDataPtr->_length = bytesTrans;
+//             PostSend(ioDataPtr);
+//         }
+//         else if(ioDataPtr->_ioType == IO_Defs::IO_SEND)
+//         {
+//             // 客户端断开处理
+//             if(bytesTrans <= 0)
+//             {
+//                 printf("send error socket[%d], bytesTrans[%d]\n"
+//                        , static_cast<Int32>(ioDataPtr->_sock), bytesTrans);
+//                 closesocket(ioDataPtr->_sock);
+//                 continue;
+//             }
+// 
+//             // 打印发送的数据
+//             printf("send data :socket[%d], bytesTrans[%d] msgCount[%d]\n"
+//                    , static_cast<Int32>(ioDataPtr->_sock), bytesTrans, msgCount);
+// 
+//             PostRecv(ioDataPtr);
+//         }
+//         else
+//         {
+//             printf("未定义行为 sockefd=%d", static_cast<Int32>(sock));
+//         }
+//         // 检查是否有事件发生，和selet,epoll_wait类似
+//         // 接受连接 完成
+//         // 接受数据 完成 completion
+//         // 发送数据 完成
+//         // 向IOCP 投递接收数据任务
+//     }
+// 
+//     // ------------ IOCP end ------------ //
+//     // 关闭clientsocket
+//     for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
+//         closesocket(ioData[i]._sock);
+//     // 关闭serversocket
+//     closesocket(sockServer);
+//     // 关闭完成端口
+//     CloseHandle(_completionPort);
+// 
+//     // 清除windows socket环境
+//     WSACleanup();
     return 0;
 }
 
