@@ -58,11 +58,18 @@ public:
 struct BASE_EXPORT IO_DATA_BASE
 {
     // 重叠体
-    OVERLAPPED _overlapped;    // 使用重叠体可以关联到iodatabase
-    SOCKET _sock;
-    char _buff[IO_DATA_BUFF_SIZE];
-    Int32 _length;
-    Int32 _ioType;
+    OVERLAPPED _overlapped{0};    // 使用重叠体可以关联到iodatabase
+    SOCKET _sock = INVALID_SOCKET;
+    char _buff[IO_DATA_BUFF_SIZE]{0};
+    Int32 _length = 0;
+    Int32 _ioType = 0;
+};
+
+struct BASE_EXPORT IO_EVENT
+{
+    IO_DATA_BASE *_ioData = NULL;
+    SOCKET _socket = INVALID_SOCKET;
+    ULong _bytesTrans = 0;
 };
 
 FS_NAMESPACE_END

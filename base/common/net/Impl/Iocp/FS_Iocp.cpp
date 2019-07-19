@@ -59,7 +59,7 @@ Int32 FS_Iocp::Create()
         return StatusDefs::Success;
 
     // 创建完成端口IOCP NumberOfConcurrentThreads=0表示默认cpu核数
-    auto _completionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+    _completionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
     if(!_completionPort)
     {
         auto err = GetLastError();
@@ -186,45 +186,41 @@ Int32 FS_Iocp::PostSend(IO_DATA_BASE *ioData)
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::WaitForMessage(ULong millisec)
-{
-    return StatusDefs::Success;
-}
-
-Int32 FS_Iocp::_FS_GetQueuedCompletionStatus()
+Int32 FS_Iocp::WaitForComplete(IO_EVENT &ioEvent, ULong millisec)
 {
     // 获取完成端口状态
-//     DWORD bytesTrans = 0;
-//     SOCKET sock = INVALID_SOCKET;
-//     IO_DATA_BASE *ioDataPtr = NULL;
-//     // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
-//     // 以及重叠结构ioDataPtr 用于获取数据
-//     if(FALSE == GetQueuedCompletionStatus(_completionPort, &bytesTrans, (PULONG_PTR)&sock, (LPOVERLAPPED *)&ioDataPtr, millisec))
-//     {
-//         const Int32 error = GetLastError();
-//         if(WAIT_TIMEOUT == error)
-//         {
-//             g_Log->net("WaitForMessage time out error<%d> status[%d]"
-//                        , error, StatusDefs::IOCP_WaitTimeOut);
-//             return StatusDefs::IOCP_WaitTimeOut;
-//         }
-// 
-//         printf("GetQueuedCompletionStatus failed with error %d\n", error);
-//         if(ERROR_NETNAME_DELETED == error)
-//         {
-//             g_Log->net("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
-//                        , ioDataPtr->_sock, error, StatusDefs::IOCP_IODisconnect);
-//             closesocket(ioDataPtr->_sock);
-//             return StatusDefs::IOCP_IODisconnect;
-//         }
-// 
-//         g_Log->e<FS_Iocp>(_LOGFMT_("WaitForMessage other error error<%d> status[%d]")
-//                           , error, StatusDefs::IOCP_PostSendFail);
-//         return StatusDefs::IOCP_WaitOtherError;
-//     }
+    // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
+    // 以及重叠结构ioDataPtr 用于获取数据
+    if(FALSE == GetQueuedCompletionStatus(_completionPort
+                                          , &ioEvent._bytesTrans
+                                          , reinterpret_cast<PULONG_PTR>(&ioEvent._socket)
+                                          , reinterpret_cast<LPOVERLAPPED *>(&ioEvent._ioData)
+                                          , millisec))
+    {
+        const Int32 error = GetLastError();
+        if(WAIT_TIMEOUT == error)
+        {
+            g_Log->net("WaitForMessage time out error<%d> status[%d]"
+                       , error, StatusDefs::IOCP_WaitTimeOut);
+            return StatusDefs::IOCP_WaitTimeOut;
+        }
+
+        if(ERROR_NETNAME_DELETED == error)
+        {
+            g_Log->net("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
+                       , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
+            closesocket(ioEvent._ioData->_sock);
+            return StatusDefs::IOCP_IODisconnect;
+        }
+
+        g_Log->e<FS_Iocp>(_LOGFMT_("WaitForMessage other error error<%d> status[%d]")
+                          , error, StatusDefs::IOCP_PostSendFail);
+        return StatusDefs::IOCP_WaitOtherError;
+    }
 
     return StatusDefs::Success;
 }
+
 
 FS_NAMESPACE_END
 
