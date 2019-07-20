@@ -84,7 +84,7 @@ Int32 FS_Iocp::Reg(SOCKET sockfd)
     // 关联IOCP 与 sockfd
     // completionKey传入的一个数值，完成时会原样传回来; NumberOfConcurrentThreads这个参数在关联完成端口时被忽略
     // completekey可以是自定义的结构体指针或者其他数据的指针，便于获取完成状态时候识别 当处于关联时numofthread会被忽略
-    HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, reinterpret_cast<ULONG_PTR>(sockfd), 0); 
+    HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, ULONG_PTR(sockfd), 0); 
     if(!ret)
     {
         auto err = GetLastError();
