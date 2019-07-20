@@ -59,7 +59,7 @@ public:
     Int32 PostRecv(IO_DATA_BASE *ioData);
     Int32 PostSend(IO_DATA_BASE *ioData);
 
-    Int32 WaitForComplete(IO_EVENT &ioEvent, ULong millisec = INFINITE);
+    Int32 WaitForCompletion(IO_EVENT &ioEvent, ULong millisec = INFINITE);
 
 private:
 

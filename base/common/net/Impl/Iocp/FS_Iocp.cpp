@@ -84,7 +84,7 @@ Int32 FS_Iocp::Reg(SOCKET sockfd)
     // 关联IOCP 与 sockfd
     // completionKey传入的一个数值，完成时会原样传回来; NumberOfConcurrentThreads这个参数在关联完成端口时被忽略
     // completekey可以是自定义的结构体指针或者其他数据的指针，便于获取完成状态时候识别 当处于关联时numofthread会被忽略
-    HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, (ULONG_PTR)(sockfd), 0); 
+    HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, reinterpret_cast<ULONG_PTR>(sockfd), 0); 
     if(!ret)
     {
         auto err = GetLastError();
@@ -186,11 +186,14 @@ Int32 FS_Iocp::PostSend(IO_DATA_BASE *ioData)
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::WaitForComplete(IO_EVENT &ioEvent, ULong millisec)
+Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
 {
     // 获取完成端口状态
     // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
     // 以及重叠结构ioDataPtr 用于获取数据
+    ioEvent._bytesTrans = 0;
+    ioEvent._ioData = NULL;
+    ioEvent._socket = INVALID_SOCKET;
     if(FALSE == GetQueuedCompletionStatus(_completionPort
                                           , &ioEvent._bytesTrans
                                           , reinterpret_cast<PULONG_PTR>(&ioEvent._socket)
@@ -209,8 +212,10 @@ Int32 FS_Iocp::WaitForComplete(IO_EVENT &ioEvent, ULong millisec)
         {
             g_Log->net("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
                        , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
-            closesocket(ioEvent._ioData->_sock);
-            return StatusDefs::IOCP_IODisconnect;
+            // 此时ioevent的数据被正确的填充，只是ioEvent._bytesTrans<=0这个事件可以在recv事件做处理
+            // closesocket(ioEvent._ioData->_sock);
+            // return StatusDefs::IOCP_IODisconnect;
+            return StatusDefs::Success;
         }
 
         g_Log->e<FS_Iocp>(_LOGFMT_("WaitForMessage other error error<%d> status[%d]")

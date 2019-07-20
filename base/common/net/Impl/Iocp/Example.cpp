@@ -217,11 +217,11 @@ int Example::Run()
         iocp.PostAccept(sockServer, &ioData[i]);
 
     Int32 msgCount = 0;
+    IO_EVENT ioEvent = {};
     while(true)
     {
         // 等待io完成
-        IO_EVENT ioEvent = {};
-        const Int32 st = iocp.WaitForComplete(ioEvent);
+        const Int32 st = iocp.WaitForCompletion(ioEvent);
         if(st != StatusDefs::Success)
         {
             if(st== StatusDefs::IOCP_IODisconnect)
@@ -250,7 +250,9 @@ int Example::Run()
         {
             if(ioEvent._bytesTrans <= 0)
             {
-                g_Log->e<Example>(_LOGFMT_("recv error socket[%llu], bytesTrans[%d]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                // 客户端断开
+                // g_Log->e<Example>(_LOGFMT_("recv error socket[%llu], bytesTrans[%d]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                g_Log->sys(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
                 closesocket(ioEvent._ioData->_sock);
                 continue;
             }
@@ -268,8 +270,7 @@ int Example::Run()
             // 客户端断开处理
             if(ioEvent._bytesTrans <= 0)
             {
-                g_Log->e<Example>(_LOGFMT_("send error socket[%llu], bytesTrans[%d]")
-                                  , ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                g_Log->sys(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
                 closesocket(ioEvent._ioData->_sock);
                 continue;
             }
