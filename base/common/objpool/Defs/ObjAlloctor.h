@@ -21,49 +21,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryBlock.h
+ * @file  : ObjAlloctor.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/5
+ * @date  : 2019/7/24
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_MemoryPool_Defs_MemoryBlock_H__
-#define __Base_Common_MemoryPool_Defs_MemoryBlock_H__
-
+#ifndef __Base_Common_ObjPool_Defs_ObjAlloctor_H__
+#define __Base_Common_ObjPool_Defs_ObjAlloctor_H__
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_String.h"
+#include <set>
+#include "base/common/objpool/Defs/ObjBlock.h"
 
 FS_NAMESPACE_BEGIN
 
-class IMemoryAlloctor;
-
 template<typename ObjType>
-class BASE_EXPORT MemoryBlock
+class ObjBlock;
+class FS_String;
+
+// 内存分配器基类
+template<typename ObjType>
+class BASE_EXPORT IObjAlloctor
 {
+    friend class ObjPool;
 public:
-    MemoryBlock(IMemoryAlloctor *alloctor);
-    virtual ~MemoryBlock();
+    IObjAlloctor(size_t blockAmount);
+    virtual ~IObjAlloctor();
 
 public:
-    const char *OBJBlock<ObjType>::GetObjName();
+    void *Alloc();
+    void  Free(void *ptr);
 
-    Int64           _ref;
-    Int64           _objSize;
-    IMemoryAlloctor  *_alloctor;
-    MemoryBlock     *_nextBlock;
-    bool            _isInPool;
-//     char            _reserver1;     // 保留位，用于内存对齐
-//     char            _reserver2;     // 保留位，用于内存对齐
-//     char            _reserver3;     // 保留位，用于内存对齐
+public:
+    void  InitMemory();
+    void FinishMemory();
+
+protected:
+    bool                _isInit;
+    char                *_buf;                  // 整个已申请的内存地址
+    ObjBlock<ObjType>   *_usableBlockHeader;    // 结点 next方向是可用的未分配的内存块，分配时候给_usableBlockHeader节点，释放时候要释放的节点插在_usableBlockHeader之前当作可用节点头
+    size_t          _blockAmount;           // 内存块总数量
+    size_t          _blockSize;             // 内存块大小
+    std::set<ObjBlock<ObjType> *> _inUsings;   // 正在使用的内存块
 };
 
 FS_NAMESPACE_END
 
-#include "base/common/memorypool/Defs/MemoryBlockImpl.h"
+#include "base/common/objpool/Defs/ObjAlloctorImpl.h"
 
 #endif

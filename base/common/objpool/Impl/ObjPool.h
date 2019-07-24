@@ -53,7 +53,7 @@ public:
 
     virtual Int32 InitPool();
     virtual void FinishPool();
-    virtual void *Alloc(size_t bytes, const Byte8 *objName);
+    virtual void *Alloc(const Byte8 *objName);
     virtual void  Free(void *ptr);
     virtual void  AddRef(void *ptr);
     virtual void Lock();

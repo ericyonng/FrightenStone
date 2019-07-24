@@ -36,27 +36,38 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/objpool/Interface/IObjPool.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
-class IObjPool;
-
-class BASE_EXPORT ObjPoolHelper
+template<typename ObjType>
+class ObjPoolHelper
 {
 public:
-    ObjPoolHelper(size_t objSize, size_t objAmount, const Byte8 *objName);
+    ObjPoolHelper(size_t objAmount);
     virtual ~ObjPoolHelper();
 
 public:
-    void *Alloc(size_t bytes);
-    void Free(void *ptr);
-    void AddRef(void *ptr);
+    void *Alloc();
+    void  Free(void *ptr);
+    void  AddRef(void *ptr);
 
-    BUFFER256 _objName;
-    IObjPool *_objPool;
+private:
+    Int32 _Init();
+    void _Finish();
+    void _Lock();
+    void _Unlock();
+
+    Locker _locker;
+    size_t _objSize;
+    size_t _objAmount;
+    MemoryAlloctor *_objAlloctor;
 };
 
 FS_NAMESPACE_END
+
+#include "base/common/objpool/Defs/ObjPoolHelperImpl.h"
 
 /// 内存池创建对象便利宏
 // 声明中需要添加
@@ -68,11 +79,11 @@ public:                                                                         
         void  *operator new[](size_t bytes)     { return _objpool_helper.Alloc(bytes);}         \
         void   operator delete[] (void *ptr)    { _objpool_helper.Free(ptr);}                   \
 protected:                                                                                      \
-static fs::ObjPoolHelper _objpool_helper;
+static fs::ObjPoolHelper<Int32> _objpool_helper;
 
 // 在实现文件中需要添加
 #undef OBJ_POOL_CREATE_IMPL
 #define OBJ_POOL_CREATE_IMPL(objType, _objpool_helper, objAmount)                                \
-fs::ObjPoolHelper objType::_objpool_helper(sizeof(objType), objAmount, #objType);
+fs::ObjPoolHelper<Int32> objType::_objpool_helper(sizeof(objType), objAmount, #objType);
 
 #endif

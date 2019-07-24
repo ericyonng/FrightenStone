@@ -47,11 +47,13 @@ class FS_String;
 class BASE_EXPORT IMemoryAlloctor
 {
     friend class MemoryPoolMgr;
+    friend class ObjPool;
 public:
     IMemoryAlloctor();
     virtual ~IMemoryAlloctor();
 
 public:
+    template<typename ObjType>
     void *AllocMemory(size_t bytesCnt, const Byte8 *objName);
     void  FreeMemory(void *ptr);
     size_t GetBlockSize() const;

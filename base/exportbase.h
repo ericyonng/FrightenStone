@@ -34,6 +34,10 @@
 
 #pragma once
 
+#ifndef __FS_THREAD_SAFE__
+#define __FS_THREAD_SAFE__ 0
+#endif
+
 //导出定义
 #ifndef BASE_EXPORT
     #ifdef  FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL

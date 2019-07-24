@@ -21,76 +21,104 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPool.cpp
+ * @file  : ObjPoolHelperImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/9
+ * @date  : 2019/7/22
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/objpool/Impl/ObjPool.h"
-#include "base/common/memorypool/Defs/MemoryBlock.h"
-
+#ifdef __Base_Common_ObjPool_Defs_ObjPoolHelper_H__
+#pragma once
 
 FS_NAMESPACE_BEGIN
 
-ObjPool::ObjPool(size_t objSize, size_t objAmount)
-    : _objSize(objSize)
+template<typename ObjType>
+inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
+    :_objSize(sizeof(ObjType))
     , _objAmount(objAmount)
-    , _objAlloctor(NULL)
-
+    ,_objAlloctor(NULL)
 {
 
 }
 
-ObjPool::~ObjPool()
+template<typename ObjType>
+inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
 {
-    _locker.Lock();
-    Fs_SafeFree(_objAlloctor);
-    _locker.Unlock();
+
+    if(_objAlloctor)
+    {
+#if __FS_THREAD_SAFE__
+        _Lock();
+#endif
+
+        _objAlloctor->FinishMemory();
+        Fs_SafeFree(_objAlloctor);
+
+#if __FS_THREAD_SAFE__
+        _Unlock();
+#endif
+    }
 }
 
-void *ObjPool::Alloc(const Byte8 *objName)
+template<typename T>
+inline void *ObjPoolHelper<T>::Alloc()
 {
+#if __FS_THREAD_SAFE__
+    _Lock();
+#endif
+
     // 判断是否内存池可分配
     if(_objAlloctor->_usableBlockHeader)
-        return  _objAlloctor->AllocMemory(_objSize, objName);
+    {
+        auto ptr = _objAlloctor->AllocMemory(_objSize);
+#if __FS_THREAD_SAFE__
+        _Unlock();
+#endif
+        return ptr;
+    }
 
-    char *cache = reinterpret_cast<char *>(::malloc(_objSize + sizeof(MemoryBlock)));
-    MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
+    char *cache = reinterpret_cast<char *>(::malloc(_objSize + sizeof(OBJBlock)));
+    OBJBlock *block = reinterpret_cast<OBJBlock*>(cache);
     block->_isInPool = false;
     block->_ref = 1;
     block->_alloctor = 0;
     block->_nextBlock = 0;
-    auto len = sprintf(block->_objName, "%s", objName);
-    if(len > 0)
-        block->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
-    else
-        block->_objName[0] = 0;
 
-    return  cache + sizeof(MemoryBlock);
+#if __FS_THREAD_SAFE__
+    _Unlock();
+#endif
+    return  cache + sizeof(OBJBlock);
 }
 
-void ObjPool::Free(void *ptr)
+template<typename T>
+inline void ObjPoolHelper<T>::Free(void *ptr)
 {
-    char *mem = reinterpret_cast<char*>(ptr);
-    MemoryBlock *block = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(mem - sizeof(MemoryBlock)));
-    if(block->_isInPool)
-    {
-        block->_alloctor->FreeMemory(ptr);
-    }
-    else if(--block->_ref == 0)
-    {
-        ::free(ptr);
-    }
+#if __FS_THREAD_SAFE__
+     _Lock();
+#endif
+
+    _objAlloctor->Free(ptr);
+
+#if __FS_THREAD_SAFE__
+    _Unlock();
+#endif
 }
 
-void ObjPool::AddRef(void *ptr)
+template<typename T>
+inline void ObjPoolHelper<T>::AddRef(void *ptr)
 {
-    MemoryBlock *block = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptr) - sizeof(MemoryBlock));
-    ++block->_ref;
+#if __FS_THREAD_SAFE__
+    _Lock();
+#endif
+    _objAlloctor->AddRef(ptr);
+
+#if __FS_THREAD_SAFE__
+    _Unlock();
+#endif
 }
 
 FS_NAMESPACE_END
+
+#endif

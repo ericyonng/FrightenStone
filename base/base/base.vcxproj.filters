@@ -714,6 +714,27 @@
     <ClInclude Include="..\common\net\Defs\IocpDefs.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjPoolHelperImpl.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\MemoryBlockImpl.h">
+      <Filter>common\memorypool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\memorypool\Defs\MemoryBlockImpl.h">
+      <Filter>common\memorypool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjBlock.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjBlockImpl.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjAlloctor.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjAlloctorImpl.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -892,9 +913,6 @@
     </ClCompile>
     <ClCompile Include="..\common\objpool\Impl\ObjPool.cpp">
       <Filter>common\objpool\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\objpool\Defs\ObjPoolHelper.cpp">
-      <Filter>common\objpool\Defs</Filter>
     </ClCompile>
     <ClCompile Include="..\common\Application\Interface\IApplication.cpp">
       <Filter>common\Application\Interface</Filter>
