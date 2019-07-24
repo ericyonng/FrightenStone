@@ -31,27 +31,3 @@
  */
 #include "stdafx.h"
 #include "base/common/memorypool/Defs/MemoryBlock.h"
-
-FS_NAMESPACE_BEGIN
-
-MemoryBlock::MemoryBlock(IMemoryAlloctor *alloctor, const Byte8 *objName)
-    :_ref(0)
-    ,_objSize(0)
-    ,_alloctor(alloctor)
-    ,_nextBlock(NULL)
-    ,_isInPool(false)
-    ,_objName{0}
-//     ,_reserver1(0)
-//     ,_reserver2(0)
-//     ,_reserver3(0)
-{
-    auto len = sprintf(_objName, "%s", objName);
-    if(len < 0)
-        _objName[0] = 0;
-    else
-    {
-        _objName[len >= BUFFER_LEN256 ? (BUFFER_LEN256 - 1) : len] = 0;
-    }
-}
-
-FS_NAMESPACE_END

@@ -21,49 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryBlock.h
+ * @file  : MemoryBlockImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/5
+ * @date  : 2019/7/24
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_MemoryPool_Defs_MemoryBlock_H__
-#define __Base_Common_MemoryPool_Defs_MemoryBlock_H__
-
+#ifdef __Base_Common_MemoryPool_Defs_MemoryBlock_H__
 #pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 
-class IMemoryAlloctor;
+template<typename ObjType>
+inline MemoryBlock<ObjType>::MemoryBlock(IMemoryAlloctor *alloctor)
+    :_ref(0)
+    , _objSize(0)
+    , _alloctor(alloctor)
+    , _nextBlock(NULL)
+    , _isInPool(false)
+{
+
+}
 
 template<typename ObjType>
-class BASE_EXPORT MemoryBlock
+inline MemoryBlock<ObjType>::~MemoryBlock()
 {
-public:
-    MemoryBlock(IMemoryAlloctor *alloctor);
-    virtual ~MemoryBlock();
 
-public:
-    const char *OBJBlock<ObjType>::GetObjName();
+}
 
-    Int64           _ref;
-    Int64           _objSize;
-    IMemoryAlloctor  *_alloctor;
-    MemoryBlock     *_nextBlock;
-    bool            _isInPool;
-//     char            _reserver1;     // 保留位，用于内存对齐
-//     char            _reserver2;     // 保留位，用于内存对齐
-//     char            _reserver3;     // 保留位，用于内存对齐
-};
+template<typename ObjType>
+const char *MemoryBlock<ObjType>::GetObjName()
+{
+    return typeid(ObjType).name();
+}
 
 FS_NAMESPACE_END
-
-#include "base/common/memorypool/Defs/MemoryBlockImpl.h"
 
 #endif

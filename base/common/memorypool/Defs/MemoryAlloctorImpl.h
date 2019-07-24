@@ -39,6 +39,47 @@ inline size_t IMemoryAlloctor::GetBlockSize() const
     return _blockSize;
 }
 
+template<typename ObjType>
+inline void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const Byte8 *objName)
+{
+    // 内存不足则使用系统内存分配方案
+    MemoryBlock<ObjType> *newBlock = NULL;
+    if(_usableBlockHeader == 0)
+    {
+        newBlock = reinterpret_cast<MemoryBlock<ObjType> *>(::malloc(bytesCnt + sizeof(MemoryBlock<ObjType>)));
+        newBlock->_isInPool = false;    // 不在内存池内
+        newBlock->_ref = 1;             // 记1次引用
+        newBlock->_alloctor = this;     // 分配器
+        newBlock->_nextBlock = 0;
+    }
+    else
+    {
+        /**
+        *   get one node from free list
+        */
+        newBlock = _usableBlockHeader;
+        _usableBlockHeader = _usableBlockHeader->_nextBlock;
+        newBlock->_alloctor =   this;
+        newBlock->_isInPool = true;
+        auto len = sprintf(newBlock->_objName, "%s", objName);
+        if(len > 0)
+            newBlock->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
+        else
+            newBlock->_objName[0] = 0;
+
+        ASSERT(newBlock->_ref == 0);
+        newBlock->_ref = 1;
+    }
+
+    if(newBlock)
+    {
+        newBlock->_objSize = static_cast<Int64>(bytesCnt);
+        _usingBlocks.insert(newBlock);
+    }
+
+    return ((char*)newBlock) + sizeof(MemoryBlock);   // 从block的下一个地址开始才是真正的申请到的内存
+}
+
 FS_NAMESPACE_END
 
 #endif

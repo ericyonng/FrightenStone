@@ -279,6 +279,7 @@
     <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctor.h" />
     <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctorImpl.h" />
     <ClInclude Include="..\common\memorypool\Defs\MemoryBlock.h" />
+    <ClInclude Include="..\common\memorypool\Defs\MemoryBlockImpl.h" />
     <ClInclude Include="..\common\memorypool\Defs\MemoryPoolCreateDefs.h" />
     <ClInclude Include="..\common\memorypool\Impl\MemoryPoolMgr.h" />
     <ClInclude Include="..\common\memorypool\Interface\IMemoryPoolMgr.h" />
@@ -289,7 +290,13 @@
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
     <ClInclude Include="..\common\net\protocol\protocol.h" />
+    <ClInclude Include="..\common\objpool\Defs\MemoryBlockImpl.h" />
+    <ClInclude Include="..\common\objpool\Defs\ObjAlloctor.h" />
+    <ClInclude Include="..\common\objpool\Defs\ObjAlloctorImpl.h" />
+    <ClInclude Include="..\common\objpool\Defs\ObjBlock.h" />
+    <ClInclude Include="..\common\objpool\Defs\ObjBlockImpl.h" />
     <ClInclude Include="..\common\objpool\Defs\ObjPoolHelper.h" />
+    <ClInclude Include="..\common\objpool\Defs\ObjPoolHelperImpl.h" />
     <ClInclude Include="..\common\objpool\Impl\ObjPool.h" />
     <ClInclude Include="..\common\objpool\Impl\ObjPoolImpl.h" />
     <ClInclude Include="..\common\objpool\Interface\IObjPool.h" />
@@ -362,7 +369,6 @@
     <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp" />
     <ClCompile Include="..\common\net\Impl\Iocp\FS_Iocp.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
-    <ClCompile Include="..\common\objpool\Defs\ObjPoolHelper.cpp" />
     <ClCompile Include="..\common\objpool\Impl\ObjPool.cpp" />
     <ClCompile Include="..\common\objpool\Interface\IObjPool.cpp" />
     <ClCompile Include="..\common\socket\Impl\SocketUtil.cpp" />
