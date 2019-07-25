@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPool.h
+ * @file  : ObjPoolHelper.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/7/9
  * @brief :
@@ -29,45 +29,58 @@
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Impl_ObjPool_H__
-#define __Base_Common_ObjPool_Impl_ObjPool_H__
+#ifndef __Base_Common_ObjPool_Impl_ObjPoolHelper_H__
+#define __Base_Common_ObjPool_Impl_ObjPoolHelper_H__
 
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/Interface/IObjPool.h"
-#include "base/common/memorypool/Defs/MemoryAlloctor.h"
 #include "base/common/asyn/asyn.h"
-#include "base/common/status/status.h"
+#include "base/common/objpool/Defs/ObjAlloctor.h"
 
 FS_NAMESPACE_BEGIN
 
-class MemoryAlloctor;
-
-class BASE_EXPORT ObjPool : public IObjPool
+template<typename ObjType>
+class ObjPoolHelper
 {
 public:
-    ObjPool(size_t objSize, size_t objAmount);
-    virtual ~ObjPool();
+    ObjPoolHelper(size_t objAmount);
+    virtual ~ObjPoolHelper();
 
-    virtual Int32 InitPool();
-    virtual void FinishPool();
-    virtual void *Alloc(const Byte8 *objName);
-    virtual void  Free(void *ptr);
-    virtual void  AddRef(void *ptr);
-    virtual void Lock();
-    virtual void Unlock();
+public:
+    void *Alloc();
+    void  Free(void *ptr);
+    void  AddRef(void *ptr);
 
 private:
+    void _Init();
+    void _Finish();
+    void _Lock();
+    void _Unlock();
+
     Locker _locker;
-    size_t _objSize;
     size_t _objAmount;
-    MemoryAlloctor *_objAlloctor;
+    IObjAlloctor<ObjType> *_objAlloctor;
 };
 
 FS_NAMESPACE_END
 
-#include "base/common/objpool/Impl/ObjPoolImpl.h"
+#include "base/common/objpool/Impl/ObjPoolHelperImpl.h"
+
+/// 内存池创建对象便利宏
+// 声明中需要添加
+#undef  OBJ_POOL_CREATE
+#define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                               \
+public:                                                                                         \
+        void  *operator new(size_t bytes)       { return _objpool_helper.Alloc();}              \
+        void   operator delete(void *ptr)       { _objpool_helper.Free(ptr);}                   \
+                                                                                                \
+static fs::ObjPoolHelper<ObjType> _objpool_helper;
+
+// 在实现文件中需要添加
+#undef OBJ_POOL_CREATE_IMPL
+#define OBJ_POOL_CREATE_IMPL(objType, _objpool_helper, objAmount)                                \
+fs::ObjPoolHelper<objType> objType::_objpool_helper(objAmount);
 
 #endif

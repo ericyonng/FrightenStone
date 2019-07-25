@@ -9,7 +9,7 @@
 
 class TestObjPoolObj
 {
-   OBJ_POOL_CREATE(_objPoolHelper)
+   OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper)
 public:
     TestObjPoolObj() {}
     virtual ~TestObjPoolObj() {}

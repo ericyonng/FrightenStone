@@ -235,18 +235,6 @@
     <Filter Include="common\crashhandle\Interface">
       <UniqueIdentifier>{7cd21d8c-8b96-4933-8bfc-d8d2dc29ae24}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\memorypool">
-      <UniqueIdentifier>{c1fc02ff-94e4-48fd-bafe-c23aeefd1ed6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\memorypool\Defs">
-      <UniqueIdentifier>{66ec1004-a762-47f3-a10a-3f56d5d0025d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\memorypool\Impl">
-      <UniqueIdentifier>{c16a3017-6e61-4316-8bc2-47af4e77537f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\memorypool\Interface">
-      <UniqueIdentifier>{c6f99dbd-1143-4c4a-872c-2611a998d984}</UniqueIdentifier>
-    </Filter>
     <Filter Include="common\objpool">
       <UniqueIdentifier>{a32b33ae-4c3e-4dc8-ac40-05435e742312}</UniqueIdentifier>
     </Filter>
@@ -660,41 +648,8 @@
     <ClInclude Include="..\common\crashhandle\Impl\CrashHandleUtil.h">
       <Filter>common\crashhandle\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctor.h">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctorImpl.h">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\memorypool\Defs\MemoryBlock.h">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\memorypool\Impl\MemoryPoolMgr.h">
-      <Filter>common\memorypool\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\memorypool\Interface\IMemoryPoolMgr.h">
-      <Filter>common\memorypool\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\memorypool\Defs\MemoryPoolCreateDefs.h">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\memorypool\memorypool.h">
-      <Filter>common\memorypool</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\objpool\objpool.h">
       <Filter>common\objpool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\objpool\Interface\IObjPool.h">
-      <Filter>common\objpool\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\objpool\Impl\ObjPool.h">
-      <Filter>common\objpool\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\objpool\Impl\ObjPoolImpl.h">
-      <Filter>common\objpool\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\objpool\Defs\ObjPoolHelper.h">
-      <Filter>common\objpool\Defs</Filter>
     </ClInclude>
     <ClInclude Include="..\common\Application\Application.h">
       <Filter>common\Application</Filter>
@@ -714,15 +669,6 @@
     <ClInclude Include="..\common\net\Defs\IocpDefs.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\objpool\Defs\ObjPoolHelperImpl.h">
-      <Filter>common\objpool\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\objpool\Defs\MemoryBlockImpl.h">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\memorypool\Defs\MemoryBlockImpl.h">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\objpool\Defs\ObjBlock.h">
       <Filter>common\objpool\Defs</Filter>
     </ClInclude>
@@ -733,6 +679,15 @@
       <Filter>common\objpool\Defs</Filter>
     </ClInclude>
     <ClInclude Include="..\common\objpool\Defs\ObjAlloctorImpl.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Impl\ObjPoolHelper.h">
+      <Filter>common\objpool\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Impl\ObjPoolHelperImpl.h">
+      <Filter>common\objpool\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjPoolDefs.h">
       <Filter>common\objpool\Defs</Filter>
     </ClInclude>
   </ItemGroup>
@@ -893,27 +848,6 @@
     <ClCompile Include="..\common\crashhandle\Impl\IEasyGlobal.cpp">
       <Filter>common\Global\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\memorypool\Defs\MemoryAlloctor.cpp">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\memorypool\Defs\MemoryBlock.cpp">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\memorypool\Impl\MemoryPoolMgr.cpp">
-      <Filter>common\memorypool\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\memorypool\Interface\IMemoryPoolMgr.cpp">
-      <Filter>common\memorypool\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\memorypool\Defs\MemoryPoolCreateDefs.cpp">
-      <Filter>common\memorypool\Defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\objpool\Interface\IObjPool.cpp">
-      <Filter>common\objpool\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\objpool\Impl\ObjPool.cpp">
-      <Filter>common\objpool\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\Application\Interface\IApplication.cpp">
       <Filter>common\Application\Interface</Filter>
     </ClCompile>
@@ -928,6 +862,12 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Defs\IocpDefs.cpp">
       <Filter>common\net\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\objpool\Impl\ObjPoolHelper.cpp">
+      <Filter>common\objpool\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\objpool\Defs\ObjPoolDefs.cpp">
+      <Filter>common\objpool\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

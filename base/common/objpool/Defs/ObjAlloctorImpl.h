@@ -39,10 +39,11 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
-inline IObjAlloctor<ObjType>::IObjAlloctor()
+inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     :_isInit(false)
     ,_buf(NULL)
-    ,_blockAmount(BLOCK_AMOUNT_DEF)
+    ,_blockAmount(blockAmount)
+    ,_freeBlockLeft(blockAmount)
     ,_usableBlockHeader(NULL)
     ,_blockSize(sizeof(ObjType))
 {
@@ -79,13 +80,14 @@ inline void *IObjAlloctor<ObjType>::Alloc()
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
         newBlock->_alloctor =   this;
         newBlock->_isInPool = true;
+        --_freeBlockLeft;
 
         ASSERT(newBlock->_ref == 0);
         newBlock->_ref = 1;
     }
 
-    if(newBlock)
-        _usingBlocks.insert(newBlock);
+//     if(newBlock)
+//         _inUsings.insert(newBlock);
 
     return ((char*)newBlock) + sizeof(ObjBlock<ObjType>);   // 从block的下一个地址开始才是真正的申请到的内存
 }
@@ -105,20 +107,33 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
     if (!blockHeader->_isInPool)
     {
         ::free(blockHeader);
-        _usingBlocks.erase(blockHeader);
+        // _inUsings.erase(blockHeader);
         return;
     }
 
     // 被释放的节点插到可用头节点之前
     blockHeader->_nextBlock = _usableBlockHeader;
     _usableBlockHeader = blockHeader;
-    
+    ++_freeBlockLeft;
+
     // 释放后从正在使用中移除
-    _usingBlocks.erase(blockHeader);
+    // _inUsings.erase(blockHeader);
 }
 
 template<typename ObjType>
-void IObjAlloctor<ObjType>::InitMemory()
+inline bool IObjAlloctor<ObjType>::NotBusy()
+{
+    return (_freeBlockLeft * 100 / _blockAmount) <= ObjPoolDefs::__g_BusyThresholdValue;
+}
+
+template<typename ObjType>
+bool IObjAlloctor<ObjType>::IsEmpty()
+{
+    return _usableBlockHeader == NULL;
+}
+
+template<typename ObjType>
+inline void IObjAlloctor<ObjType>::InitMemory()
 {
     if(_isInit)
         return;
@@ -147,7 +162,7 @@ void IObjAlloctor<ObjType>::InitMemory()
     _usableBlockHeader->_nextBlock = 0;
     _usableBlockHeader->_isInPool = true;
     _usableBlockHeader->_objSize = sizeof(ObjType);
-    MemoryBlock *temp = _usableBlockHeader;
+    ObjBlock<ObjType> *temp = _usableBlockHeader;
 
     // 构建内存块链表
     for(size_t i = 1; i < _blockAmount; ++i)
@@ -167,7 +182,7 @@ void IObjAlloctor<ObjType>::InitMemory()
 }
 
 template<typename ObjType>
-void IObjAlloctor<ObjType>::FinishMemory()
+inline void IObjAlloctor<ObjType>::FinishMemory()
 {
     if(!_isInit)
         return;
@@ -175,22 +190,17 @@ void IObjAlloctor<ObjType>::FinishMemory()
     _isInit = false;
 
     // 收集并释放泄漏的内存
-    std::map<FS_String, std::pair<Int64, Int64>> objNameRefAmountSizePair;
-    FS_String objName;
-    for(auto &block : _inUsings)
-    {
-        if(block->_ref)
-        {
-            objName = block->GetObjName();
-            auto iterAmount = objNameRefAmountSizePair.find(objName);
-            if(iterAmount == objNameRefAmountSizePair.end())
-                iterAmount = objNameRefAmountSizePair.insert(std::make_pair(objName, std::pair<Int64, Int64>())).first;
-            iterAmount->second.first += 1;
-            iterAmount->second.second = block->_objSize;
-            if(!block->_isInPool)
-                ::free(block);
-        }
-    }
+    std::pair<Int64, Int64> amountRefSizePair;
+//     for(auto &block : _inUsings)
+//     {
+//         if(block->_ref)
+//         {
+//             amountRefSizePair.second += 1;
+//             amountRefSizePair.first += _blockSize;
+//             if(!block->_isInPool)
+//                 ::free(block);
+//         }
+//     }
 
     // 使用系统的内存分配释放掉
     while(_usableBlockHeader != 0)
@@ -211,8 +221,11 @@ void IObjAlloctor<ObjType>::FinishMemory()
     }
 
     // 内存泄漏打印
-    for(auto &memleakObj : objNameRefAmountSizePair)
-        g_Log->memleak("objName[%s], amount[%lld]*size[%lld];", memleakObj.first.c_str(), memleakObj.second.first, memleakObj.second.second);
+//     if(amountRefSizePair.first)
+//     {
+//         g_Log->memleak("objName[%s], amount[%lld]*size[%lld];"
+//                        , typeid(ObjType).name(), amountRefSizePair.first, amountRefSizePair.second);
+//     }
 }
 
 FS_NAMESPACE_END

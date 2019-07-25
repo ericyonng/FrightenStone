@@ -29,18 +29,17 @@
  *
  * 
  */
-#ifdef __Base_Common_ObjPool_Defs_ObjPoolHelper_H__
+#ifdef __Base_Common_ObjPool_Impl_ObjPoolHelper_H__
 #pragma once
 
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
 inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
-    :_objSize(sizeof(ObjType))
-    , _objAmount(objAmount)
+    : _objAmount(objAmount)
     ,_objAlloctor(NULL)
 {
-
+    _Init();
 }
 
 template<typename ObjType>
@@ -70,26 +69,12 @@ inline void *ObjPoolHelper<T>::Alloc()
 #endif
 
     // 判断是否内存池可分配
-    if(_objAlloctor->_usableBlockHeader)
-    {
-        auto ptr = _objAlloctor->AllocMemory(_objSize);
-#if __FS_THREAD_SAFE__
-        _Unlock();
-#endif
-        return ptr;
-    }
-
-    char *cache = reinterpret_cast<char *>(::malloc(_objSize + sizeof(OBJBlock)));
-    OBJBlock *block = reinterpret_cast<OBJBlock*>(cache);
-    block->_isInPool = false;
-    block->_ref = 1;
-    block->_alloctor = 0;
-    block->_nextBlock = 0;
+    auto ptr = _objAlloctor->Alloc();
 
 #if __FS_THREAD_SAFE__
     _Unlock();
 #endif
-    return  cache + sizeof(OBJBlock);
+    return  ptr;
 }
 
 template<typename T>
@@ -117,6 +102,33 @@ inline void ObjPoolHelper<T>::AddRef(void *ptr)
 #if __FS_THREAD_SAFE__
     _Unlock();
 #endif
+}
+
+template<typename ObjType>
+inline void ObjPoolHelper<ObjType>::_Init()
+{
+    _objAlloctor = new IObjAlloctor<ObjType>(_objAmount);
+    _objAlloctor->InitMemory();
+}
+
+template<typename ObjType>
+inline void ObjPoolHelper<ObjType>::_Finish()
+{
+    if(_objAlloctor)
+        _objAlloctor->FinishMemory();
+    Fs_SafeFree(_objAlloctor);
+}
+
+template<typename ObjType>
+inline void ObjPoolHelper<ObjType>::_Lock()
+{
+    _locker.Lock();
+}
+
+template<typename ObjType>
+inline void ObjPoolHelper<ObjType>::_Unlock()
+{
+    _locker.Lock();
 }
 
 FS_NAMESPACE_END

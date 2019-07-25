@@ -21,49 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryBlock.h
+ * @file  : ObjPoolDefs.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/5
+ * @date  : 2019/7/25
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_MemoryPool_Defs_MemoryBlock_H__
-#define __Base_Common_MemoryPool_Defs_MemoryBlock_H__
-
+#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
+#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 
-class IMemoryAlloctor;
-
-template<typename ObjType>
-class BASE_EXPORT MemoryBlock
+class BASE_EXPORT ObjPoolDefs
 {
 public:
-    MemoryBlock(IMemoryAlloctor *alloctor);
-    virtual ~MemoryBlock();
-
-public:
-    const char *OBJBlock<ObjType>::GetObjName();
-
-    Int64           _ref;
-    Int64           _objSize;
-    IMemoryAlloctor  *_alloctor;
-    MemoryBlock     *_nextBlock;
-    bool            _isInPool;
-//     char            _reserver1;     // 保留位，用于内存对齐
-//     char            _reserver2;     // 保留位，用于内存对齐
-//     char            _reserver3;     // 保留位，用于内存对齐
+    static const Int32 __g_BusyThresholdValue;      // 对象池忙阈值
 };
 
-FS_NAMESPACE_END
 
-#include "base/common/memorypool/Defs/MemoryBlockImpl.h"
+FS_NAMESPACE_END
 
 #endif
