@@ -42,13 +42,11 @@ FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
 class ObjBlock;
-class FS_String;
 
 // 内存分配器基类
 template<typename ObjType>
-class BASE_EXPORT IObjAlloctor
+class IObjAlloctor
 {
-    friend class ObjPool;
 public:
     IObjAlloctor(size_t blockAmount);
     virtual ~IObjAlloctor();
@@ -56,6 +54,8 @@ public:
 public:
     void *Alloc();
     void  Free(void *ptr);
+    bool NotBusy();    // free时候判断
+    bool IsEmpty();
 
 public:
     void  InitMemory();
@@ -67,7 +67,8 @@ protected:
     ObjBlock<ObjType>   *_usableBlockHeader;    // 结点 next方向是可用的未分配的内存块，分配时候给_usableBlockHeader节点，释放时候要释放的节点插在_usableBlockHeader之前当作可用节点头
     size_t          _blockAmount;           // 内存块总数量
     size_t          _blockSize;             // 内存块大小
-    std::set<ObjBlock<ObjType> *> _inUsings;   // 正在使用的内存块
+    size_t          _freeBlockLeft;         // 剩余空闲内存块
+    // std::set<ObjBlock<ObjType> *> _inUsings;   // 正在使用的内存块
 };
 
 FS_NAMESPACE_END

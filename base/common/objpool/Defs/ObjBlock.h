@@ -42,7 +42,7 @@ template<typename ObjType>
 class IObjAlloctor;
 
 template<typename ObjType>
-class BASE_EXPORT ObjBlock
+class ObjBlock
 {
 public:
     ObjBlock();
@@ -61,5 +61,9 @@ public:
 FS_NAMESPACE_END
 
 #include "base/common/objpool/Defs/ObjBlockImpl.h"
+
+
+// block链表:每次new的时候从链表头取内存块，每次释放内存时总是将内存块加到内存头
+// free时候需要找到内存块（使用对象内存与block内存对称方式）并加到内存block头
 
 #endif

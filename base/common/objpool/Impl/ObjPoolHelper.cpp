@@ -21,59 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IMemoryPool.cpp
+ * @file  : ObjPoolHelper.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/5
+ * @date  : 2019/7/9
  * @brief :
  * 
  *
  * 
  */
 #include "stdafx.h"
-#include "base/common/memorypool/Interface/IMemoryPool.h"
-#include "base/common/memorypool/Impl/MemoryPoolMgr.h"
-
-// void *operator new(size_t bytes)
-// {
-//     g_MemoryPoolMgr->Lock();
-//     auto ptr = g_MemoryPoolMgr->Alloc(bytes);
-//     g_MemoryPoolMgr->Unlock();
-//     return ptr;
-// }
-// 
-// void operator delete(void *ptr)
-// {
-//     g_MemoryPoolMgr->Lock();
-//     g_MemoryPoolMgr->Free(ptr);
-//     g_MemoryPoolMgr->Unlock();
-// }
-// 
-// void *operator new[](size_t bytes)
-// {
-//     g_MemoryPoolMgr->Lock();
-//     auto ptr = g_MemoryPoolMgr->Alloc(bytes);
-//     g_MemoryPoolMgr->Unlock();
-//     return ptr;
-// }
-// 
-// void operator delete[](void *ptr)
-// {
-//     g_MemoryPoolMgr->Lock();
-//     g_MemoryPoolMgr->Free(ptr);
-//     g_MemoryPoolMgr->Unlock();
-// }
-// 
-// void *mem_alloc(size_t bytes)
-// {
-//     g_MemoryPoolMgr->Lock();
-//     auto ptr = g_MemoryPoolMgr->Alloc(bytes);
-//     g_MemoryPoolMgr->Unlock();
-//     return ptr;
-// }
-// 
-// void mem_free(void *ptr)
-// {
-//     g_MemoryPoolMgr->Lock();
-//     g_MemoryPoolMgr->Free(ptr);
-//     g_MemoryPoolMgr->Unlock();
-// }
+#include "base/common/objpool/Impl/ObjPoolHelper.h"

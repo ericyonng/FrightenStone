@@ -231,7 +231,7 @@ private:\
 #if defined(_WIN32) && defined(_DEBUG)
 #define ASSERT(x)   assert(x)
 #else
-#define ASSERT(x)   x
+#define ASSERT(x)   
 #endif
 
 #undef ARRAY_ELEM_COUNT

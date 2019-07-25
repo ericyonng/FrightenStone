@@ -48,7 +48,7 @@ class BASE_EXPORT ITask;
 
 class BASE_EXPORT FS_ThreadPool
 {
-    OBJ_POOL_CREATE(_objPoolHelper)
+    OBJ_POOL_CREATE(fs::FS_ThreadPool, _objPoolHelper)
 public:
     explicit FS_ThreadPool();
     explicit FS_ThreadPool(Int32 minNum, Int32 maxNum);    // 

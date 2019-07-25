@@ -33,7 +33,6 @@
 #define __Base_Common_ObjPool_ObjPool_H__
 #pragma once
 
-#include "base/common/objpool/Interface/IObjPool.h"
-#include "base/common/objpool/Defs/ObjPoolHelper.h"
+#include "base/common/objpool/Impl/ObjPoolHelper.h"
 
 #endif
