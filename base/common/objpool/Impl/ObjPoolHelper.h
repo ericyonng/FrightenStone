@@ -53,6 +53,7 @@ public:
     void *Alloc();
     void  Free(void *ptr);
     void  AddRef(void *ptr);
+    size_t GetMemleakObjNum() const;
 
 private:
     void _Init();
@@ -83,12 +84,17 @@ FS_NAMESPACE_END
 public:                                                                                         \
         void  *operator new(size_t bytes)       { return _objpool_helper.Alloc();}              \
         void   operator delete(void *ptr)       { _objpool_helper.Free(ptr);}                   \
+        static size_t GetMemleakNum();                                                          \
                                                                                                 \
 static fs::ObjPoolHelper<ObjType> _objpool_helper;
 
 // 在实现文件中需要添加
 #undef OBJ_POOL_CREATE_IMPL
-#define OBJ_POOL_CREATE_IMPL(objType, _objpool_helper, objAmount)                                \
-fs::ObjPoolHelper<objType> objType::_objpool_helper(objAmount);
+#define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                \
+fs::ObjPoolHelper<ObjType> ObjType::_objpool_helper(objAmount);                                  \
+size_t ObjType::GetMemleakNum()                                                                  \
+{                                                                                                \
+    return _objpool_helper.GetMemleakObjNum();                                                   \
+}
 
 #endif

@@ -47,6 +47,7 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(AlloctorNode<ObjType> *curNode, size_
     ,_freeBlockLeft(blockAmount)
     ,_usableBlockHeader(NULL)
     ,_blockSize(sizeof(ObjType))
+    ,_objInUse(0)
 {
     _blockSize =_blockSize / sizeof(void *) * sizeof(void *) + (_blockSize % sizeof(void *) ? sizeof(void *) : 0);
     _blockSize = _blockSize + sizeof(ObjBlock<ObjType>);
@@ -87,6 +88,7 @@ inline void *IObjAlloctor<ObjType>::Alloc()
         newBlock->_ref = 1;
     }
 
+    ++_objInUse;
 //     if(newBlock)
 //         _inUsings.insert(newBlock);
 
@@ -108,6 +110,7 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
     if (!blockHeader->_isInPool)
     {
         ::free(blockHeader);
+        --_objInUse;
         // _inUsings.erase(blockHeader);
         return;
     }
@@ -116,6 +119,7 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
     blockHeader->_nextBlock = _usableBlockHeader;
     _usableBlockHeader = blockHeader;
     ++_freeBlockLeft;
+    --_objInUse;
 
     // 释放后从正在使用中移除
     // _inUsings.erase(blockHeader);
@@ -131,6 +135,12 @@ template<typename ObjType>
 inline bool IObjAlloctor<ObjType>::IsEmpty() const
 {
     return !_usableBlockHeader;
+}
+
+template<typename ObjType>
+inline size_t IObjAlloctor<ObjType>::GetObjInUse() const
+{
+    return _objInUse;
 }
 
 template<typename ObjType>

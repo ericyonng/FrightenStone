@@ -231,7 +231,7 @@ private:\
 #if defined(_WIN32) && defined(_DEBUG)
 #define ASSERT(x)   assert(x)
 #else
-#define ASSERT(x)   
+#define ASSERT(x)   x
 #endif
 
 #undef ARRAY_ELEM_COUNT
@@ -241,5 +241,8 @@ private:\
 #define FS_INFINITE INFINITE
 #else
 #endif
+
+#undef __DEF_OBJ_POOL_OBJ_NUM__
+#define __DEF_OBJ_POOL_OBJ_NUM__        10240
 
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__

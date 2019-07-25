@@ -104,6 +104,7 @@ void FS_Log::UnInstallBeforeLogHookFunc(Int32 level, const IDelegatePlus<void, L
 
 Int32 FS_Log::InitModule(const Byte8 *rootDirName)
 {
+    _locker.Lock();
     if(_isInit)
         return StatusDefs::Success;
 
@@ -124,6 +125,7 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     ASSERT(_threadPool->AddTask(*logTask));
 
     _isInit = true;
+    _locker.Unlock();
     return StatusDefs::Success;
 }
 

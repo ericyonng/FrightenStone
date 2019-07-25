@@ -40,7 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_IMPL(TimeWheel, _objPoolHelper, 10240)
+OBJ_POOL_CREATE_IMPL(TimeWheel, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 
 TimeWheel::TimeWheel(const TimeSlice &resolutionSlice)
     :_resolutionSlice(resolutionSlice)
