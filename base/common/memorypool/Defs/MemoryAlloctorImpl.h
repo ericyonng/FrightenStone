@@ -21,29 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : MemoryAlloctorImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
+ * @date  : 2019/7/5
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
+#ifdef __Base_Common_MemoryPool_Defs_MemoryAlloctor_H__
 #pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ObjPoolDefs
+inline size_t IMemoryAlloctor::GetBlockSize() const
 {
-public:
-    static const Int32 __g_FreeRate;      // ¶ÔÏó³Ø¿ÕÏÐÂÊ
-};
-
+    return _blockSize;
+}
 
 FS_NAMESPACE_END
 

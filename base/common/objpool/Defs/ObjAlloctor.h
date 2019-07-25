@@ -37,25 +37,32 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include <set>
 #include "base/common/objpool/Defs/ObjBlock.h"
+#include "base/common/objpool/Defs/ObjPoolDefs.h"
 
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
 class ObjBlock;
 
+template<typename ObjType>
+class AlloctorNode;
+
 // 内存分配器基类
 template<typename ObjType>
 class IObjAlloctor
 {
+    template<typename ObjType>
+    friend class ObjPoolHelper;
 public:
-    IObjAlloctor(size_t blockAmount);
+    IObjAlloctor(AlloctorNode<ObjType> *curNode, size_t blockAmount);
     virtual ~IObjAlloctor();
 
 public:
     void *Alloc();
     void  Free(void *ptr);
     bool NotBusy();    // free时候判断
-    bool IsEmpty();
+    bool IsEmpty() const;
+    AlloctorNode<ObjType> *GetNode();
 
 public:
     void  InitMemory();
@@ -64,6 +71,7 @@ public:
 protected:
     bool                _isInit;
     char                *_buf;                  // 整个已申请的内存地址
+    AlloctorNode<ObjType> *_curNode;            // 分配节点
     ObjBlock<ObjType>   *_usableBlockHeader;    // 结点 next方向是可用的未分配的内存块，分配时候给_usableBlockHeader节点，释放时候要释放的节点插在_usableBlockHeader之前当作可用节点头
     size_t          _blockAmount;           // 内存块总数量
     size_t          _blockSize;             // 内存块大小

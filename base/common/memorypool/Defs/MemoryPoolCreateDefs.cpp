@@ -21,30 +21,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : MemoryPoolCreateDefs.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
+ * @date  : 2019/7/7
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
+#include "stdafx.h"
+#include "base/common/memorypool/Defs/MemoryPoolCreateDefs.h"
+#include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ObjPoolDefs
+MemoryPoolHelper::MemoryPoolHelper(const Byte8 *objName)
+    :_objName{0}
 {
-public:
-    static const Int32 __g_FreeRate;      // ¶ÔÏó³Ø¿ÕÏÐÂÊ
-};
+    auto len = sprintf(_objName, "%s", objName);
+    if(len < 0)
+        _objName[0] = 0;
+    else
+    {
+        _objName[len >= BUFFER_LEN256 ? (BUFFER_LEN256 - 1) : len] = 0;
+    }
+}
 
+MemoryPoolHelper::~MemoryPoolHelper()
+{
+
+}
+
+void *MemoryPoolHelper::Alloc(size_t bytes)
+{
+    g_MemoryPool->Lock();
+    auto ptr = g_MemoryPool->Alloc(bytes, _objName);
+    g_MemoryPool->Unlock();
+    return ptr;
+}
+
+void MemoryPoolHelper::Free(void *ptr)
+{
+    g_MemoryPool->Lock();
+    g_MemoryPool->Free(ptr);
+    g_MemoryPool->Unlock();
+}
+
+void MemoryPoolHelper::AddRef(void *ptr)
+{
+    g_MemoryPool->Lock();
+    g_MemoryPool->AddRef(ptr);
+    g_MemoryPool->Unlock();
+}
 
 FS_NAMESPACE_END
-
-#endif

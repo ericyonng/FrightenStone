@@ -21,30 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : MemoryBlock.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
+ * @date  : 2019/7/5
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
+#include "stdafx.h"
+#include "base/common/memorypool/Defs/MemoryBlock.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ObjPoolDefs
+MemoryBlock::MemoryBlock(IMemoryAlloctor *alloctor, const Byte8 *objName)
+    :_ref(0)
+    ,_objSize(0)
+    ,_alloctor(alloctor)
+    ,_nextBlock(NULL)
+    ,_isInPool(false)
+    ,_objName{0}
+//     ,_reserver1(0)
+//     ,_reserver2(0)
+//     ,_reserver3(0)
 {
-public:
-    static const Int32 __g_FreeRate;      // ¶ÔÏó³Ø¿ÕÏÐÂÊ
-};
-
+    auto len = sprintf(_objName, "%s", objName);
+    if(len < 0)
+        _objName[0] = 0;
+    else
+    {
+        _objName[len >= BUFFER_LEN256 ? (BUFFER_LEN256 - 1) : len] = 0;
+    }
+}
 
 FS_NAMESPACE_END
-
-#endif

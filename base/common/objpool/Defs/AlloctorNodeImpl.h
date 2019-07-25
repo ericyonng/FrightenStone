@@ -21,30 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : AlloctorListImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
+ * @date  : 2019/07/25
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
+#ifdef __Base_Common_ObjPool_Defs_AlloctorNode_H__
 #pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ObjPoolDefs
+template<typename ObjType>
+inline AlloctorNode<ObjType>::AlloctorNode()
+    :_preNode(NULL)
+    ,_nextNode(NULL)
+    ,_curAlloctor(NULL)
 {
-public:
-    static const Int32 __g_FreeRate;      // ¶ÔÏó³Ø¿ÕÏÐÂÊ
-};
 
+}
+
+template<typename ObjType>
+inline AlloctorNode<ObjType>::~AlloctorNode()
+{
+
+}
 
 FS_NAMESPACE_END
 
 #endif
+

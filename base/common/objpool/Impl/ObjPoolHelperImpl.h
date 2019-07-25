@@ -37,7 +37,7 @@ FS_NAMESPACE_BEGIN
 template<typename ObjType>
 inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
     : _objAmount(objAmount)
-    ,_objAlloctor(NULL)
+    ,_objAlloctorHeader(NULL)
 {
     _Init();
 }
@@ -45,15 +45,13 @@ inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
 template<typename ObjType>
 inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
 {
-
-    if(_objAlloctor)
+    if(_objAlloctorHeader)
     {
 #if __FS_THREAD_SAFE__
         _Lock();
 #endif
 
-        _objAlloctor->FinishMemory();
-        Fs_SafeFree(_objAlloctor);
+        _Finish();
 
 #if __FS_THREAD_SAFE__
         _Unlock();
@@ -61,15 +59,19 @@ inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
     }
 }
 
-template<typename T>
-inline void *ObjPoolHelper<T>::Alloc()
+template<typename ObjType>
+inline void *ObjPoolHelper<ObjType>::Alloc()
 {
 #if __FS_THREAD_SAFE__
     _Lock();
 #endif
 
-    // 判断是否内存池可分配
-    auto ptr = _objAlloctor->Alloc();
+    // 从头节点分配内存
+    auto ptr = _objAlloctorHeader->_curAlloctor->Alloc();
+
+    // 头结点若内存满则创建新分配器并插入节点头部
+    if(_objAlloctorHeader->_curAlloctor->IsEmpty())
+        _SwitchToHeader(_NewAlloctorNode());
 
 #if __FS_THREAD_SAFE__
     _Unlock();
@@ -77,14 +79,22 @@ inline void *ObjPoolHelper<T>::Alloc()
     return  ptr;
 }
 
-template<typename T>
-inline void ObjPoolHelper<T>::Free(void *ptr)
+template<typename ObjType>
+inline void ObjPoolHelper<ObjType>::Free(void *ptr)
 {
 #if __FS_THREAD_SAFE__
      _Lock();
 #endif
 
-    _objAlloctor->Free(ptr);
+     // 通过地址找到所在节点
+     auto node = _PtrToAlloctorNode(ptr);
+
+     // 通过节点的分配器释放内存
+     node->_curAlloctor->Free(ptr);
+
+     // 内存分配器内存充裕就直接放到头节点
+     if(node->_curAlloctor->NotBusy())
+         _SwitchToHeader(node);
 
 #if __FS_THREAD_SAFE__
     _Unlock();
@@ -97,7 +107,9 @@ inline void ObjPoolHelper<T>::AddRef(void *ptr)
 #if __FS_THREAD_SAFE__
     _Lock();
 #endif
-    _objAlloctor->AddRef(ptr);
+
+    // 通过地址找到所在节点
+    _PtrToAlloctorNode(ptr)->_curAlloctor->AddRef(ptr);
 
 #if __FS_THREAD_SAFE__
     _Unlock();
@@ -107,16 +119,31 @@ inline void ObjPoolHelper<T>::AddRef(void *ptr)
 template<typename ObjType>
 inline void ObjPoolHelper<ObjType>::_Init()
 {
-    _objAlloctor = new IObjAlloctor<ObjType>(_objAmount);
-    _objAlloctor->InitMemory();
+    if(_objAlloctorHeader)
+        return;
+
+    _objAlloctorHeader = _NewAlloctorNode();
 }
 
 template<typename ObjType>
 inline void ObjPoolHelper<ObjType>::_Finish()
 {
-    if(_objAlloctor)
-        _objAlloctor->FinishMemory();
-    Fs_SafeFree(_objAlloctor);
+    while(_objAlloctorHeader)
+    {
+        _objAlloctorHeader->_curAlloctor->FinishMemory();
+        Fs_SafeFree(_objAlloctorHeader->_curAlloctor);
+        auto curNode = _objAlloctorHeader;
+
+        if(curNode->_preNode)
+            curNode->_preNode->_nextNode = curNode->_nextNode;
+
+        if(curNode->_nextNode)
+            curNode->_nextNode->_preNode = curNode->_preNode;
+
+        _objAlloctorHeader = curNode->_nextNode;
+        Fs_SafeFree(curNode);
+    }
+    _objAlloctorHeader = NULL;
 }
 
 template<typename ObjType>
@@ -129,6 +156,51 @@ template<typename ObjType>
 inline void ObjPoolHelper<ObjType>::_Unlock()
 {
     _locker.Lock();
+}
+
+template<typename ObjType>
+inline AlloctorNode<ObjType> *ObjPoolHelper<ObjType>::_NewAlloctorNode()
+{
+    // 初始化新的分配器
+    auto newAlloctor = new IObjAlloctor<ObjType>(new AlloctorNode<ObjType>, _objAmount);
+    newAlloctor->_curNode->_curAlloctor = newAlloctor;
+    newAlloctor->InitMemory();
+    return newAlloctor->_curNode;
+}
+
+template<typename ObjType>
+inline void ObjPoolHelper<ObjType>::_SwitchToHeader(AlloctorNode<ObjType> *node)
+{
+    // 已经是第一个节点
+    if(_objAlloctorHeader == node)
+        return;
+
+    // 从前后节点中间脱离（判断前后节点是否为空，都为空即本节点为头节点）
+    if(node->_preNode)
+        node->_preNode->_nextNode = node->_nextNode;
+
+    if(node->_nextNode)
+        node->_nextNode->_preNode = node->_preNode;
+
+    // 与头结点对接
+    _ReplaceHeader(node);
+}
+
+template<typename ObjType>
+inline void ObjPoolHelper<ObjType>::_ReplaceHeader(AlloctorNode<ObjType> *node)
+{
+    _objAlloctorHeader->_preNode = node;
+    node->_nextNode = _objAlloctorHeader;
+    _objAlloctorHeader = node;
+}
+
+template<typename ObjType>
+inline AlloctorNode<ObjType> *ObjPoolHelper<ObjType>::_PtrToAlloctorNode(void *ptr)
+{
+    // 内存块头
+    char *ptrToFree = reinterpret_cast<char *>(ptr);
+    ObjBlock<ObjType> *blockHeader = reinterpret_cast<ObjBlock<ObjType> *>(reinterpret_cast<char*>(ptrToFree - sizeof(ObjBlock<ObjType>)));
+    return blockHeader->_alloctor->GetNode();
 }
 
 FS_NAMESPACE_END

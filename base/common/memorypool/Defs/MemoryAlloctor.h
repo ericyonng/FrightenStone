@@ -21,30 +21,68 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : MemoryAlloctor.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
- * @brief :
+ * @date  : 2019/7/5
+ * @brief : 需要导出内存泄漏日志
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
+#ifndef __Base_Common_MemoryPool_Defs_MemoryAlloctor_H__
+#define __Base_Common_MemoryPool_Defs_MemoryAlloctor_H__
+
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include <set>
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ObjPoolDefs
+class MemoryBlock;
+class FS_String;
+
+// 内存分配器基类
+class BASE_EXPORT IMemoryAlloctor
 {
+    friend class MemoryPoolMgr;
 public:
-    static const Int32 __g_FreeRate;      // 对象池空闲率
+    IMemoryAlloctor();
+    virtual ~IMemoryAlloctor();
+
+public:
+    void *AllocMemory(size_t bytesCnt, const Byte8 *objName);
+    void  FreeMemory(void *ptr);
+    size_t GetBlockSize() const;
+
+public:
+    void  InitMemory();
+    void FinishMemory();
+
+    /**
+    *   得到当前池中可用的对象数
+    */
+    size_t  _GetFreeBlock();
+
+protected:
+    bool            _isInit;
+    char            *_buf;                  // 整个已申请的内存地址
+    MemoryBlock     *_usableBlockHeader;    // 结点 next方向是可用的未分配的内存块，分配时候给_usableBlockHeader节点，释放时候要释放的节点插在_usableBlockHeader之前当作可用节点头
+    size_t          _blockAmount;           // 内存块总数量
+    size_t          _blockSize;             // 内存块大小
+    std::set<MemoryBlock *> _usingBlocks;   // 正在使用的内存块
 };
 
+class MemoryAlloctor : public IMemoryAlloctor
+{
+public:
+    MemoryAlloctor(size_t blockSize, size_t blockAmount);
+    virtual ~MemoryAlloctor();
+};
 
 FS_NAMESPACE_END
+
+#include "base/common/memorypool/Defs/MemoryAlloctorImpl.h"
 
 #endif

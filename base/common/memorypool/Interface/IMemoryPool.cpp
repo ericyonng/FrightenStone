@@ -21,30 +21,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : IMemoryPool.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
+ * @date  : 2019/7/5
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#pragma once
+#include "stdafx.h"
+#include "base/common/memorypool/Interface/IMemoryPool.h"
+#include "base/common/memorypool/Impl/MemoryPoolMgr.h"
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-
-FS_NAMESPACE_BEGIN
-
-class BASE_EXPORT ObjPoolDefs
-{
-public:
-    static const Int32 __g_FreeRate;      // ¶ÔÏó³Ø¿ÕÏÐÂÊ
-};
-
-
-FS_NAMESPACE_END
-
-#endif
+// void *operator new(size_t bytes)
+// {
+//     g_MemoryPoolMgr->Lock();
+//     auto ptr = g_MemoryPoolMgr->Alloc(bytes);
+//     g_MemoryPoolMgr->Unlock();
+//     return ptr;
+// }
+// 
+// void operator delete(void *ptr)
+// {
+//     g_MemoryPoolMgr->Lock();
+//     g_MemoryPoolMgr->Free(ptr);
+//     g_MemoryPoolMgr->Unlock();
+// }
+// 
+// void *operator new[](size_t bytes)
+// {
+//     g_MemoryPoolMgr->Lock();
+//     auto ptr = g_MemoryPoolMgr->Alloc(bytes);
+//     g_MemoryPoolMgr->Unlock();
+//     return ptr;
+// }
+// 
+// void operator delete[](void *ptr)
+// {
+//     g_MemoryPoolMgr->Lock();
+//     g_MemoryPoolMgr->Free(ptr);
+//     g_MemoryPoolMgr->Unlock();
+// }
+// 
+// void *mem_alloc(size_t bytes)
+// {
+//     g_MemoryPoolMgr->Lock();
+//     auto ptr = g_MemoryPoolMgr->Alloc(bytes);
+//     g_MemoryPoolMgr->Unlock();
+//     return ptr;
+// }
+// 
+// void mem_free(void *ptr)
+// {
+//     g_MemoryPoolMgr->Lock();
+//     g_MemoryPoolMgr->Free(ptr);
+//     g_MemoryPoolMgr->Unlock();
+// }
