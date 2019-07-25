@@ -57,12 +57,12 @@ void cmdThread()
     }
 }
 
-class TestServerPool
-{
-    MEM_POOL_CREATE(_memHelper)
-};
-
-MEMPOOL_CREATE_IMPL(TestServerPool, _memHelper)
+// class TestServerPool
+// {
+//     MEM_POOL_CREATE(_memHelper)
+// };
+// 
+// MEMPOOL_CREATE_IMPL(TestServerPool, _memHelper)
 
 int main()
 {
@@ -79,11 +79,11 @@ int main()
 //         server.OnRun();
 //     }
 //     server.Close();
-    g_Log->InitModule("server");
-    g_MemoryPool->InitPool();
-    printf("mem:[%p]log[%p]", g_MemoryPool, g_Log);
-    TestServerPool *newObj = new TestServerPool;
-    g_MemoryPool->FinishPool();
+//     g_Log->InitModule("server");
+//     g_MemoryPool->InitPool();
+//     printf("mem:[%p]log[%p]", g_MemoryPool, g_Log);
+//     TestServerPool *newObj = new TestServerPool;
+//     g_MemoryPool->FinishPool();
     printf("exit。\n");
     getchar();
     return 0;
