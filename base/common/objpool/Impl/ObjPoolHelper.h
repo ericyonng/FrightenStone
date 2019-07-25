@@ -38,6 +38,7 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/asyn/asyn.h"
 #include "base/common/objpool/Defs/ObjAlloctor.h"
+#include "base/common/objpool/Defs/AlloctorNode.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -59,9 +60,16 @@ private:
     void _Lock();
     void _Unlock();
 
+    AlloctorNode<ObjType> *_NewAlloctorNode();
+    void _SwitchToHeader(AlloctorNode<ObjType> *node);
+    void _ReplaceHeader(AlloctorNode<ObjType> *node);
+    AlloctorNode<ObjType> *_PtrToAlloctorNode(void *ptr);
+
     Locker _locker;
     size_t _objAmount;
-    IObjAlloctor<ObjType> *_objAlloctor;
+
+    /* Ë«ÏòÁ´±í */
+    AlloctorNode<ObjType> *_objAlloctorHeader;
 };
 
 FS_NAMESPACE_END

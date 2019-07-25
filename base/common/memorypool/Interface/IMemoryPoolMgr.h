@@ -21,16 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : IMemoryPoolMgr.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
+ * @date  : 2019/7/6
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
+#ifndef __Base_Common_MemoryPool_Interface_IMemoryPoolMgr_H__
+#define __Base_Common_MemoryPool_Interface_IMemoryPoolMgr_H__
 #pragma once
 
 #include "base/exportbase.h"
@@ -38,13 +38,27 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ObjPoolDefs
+class FS_String;
+
+class BASE_EXPORT IMemoryPoolMgr
 {
 public:
-    static const Int32 __g_FreeRate;      // ¶ÔÏó³Ø¿ÕÏÐÂÊ
+    IMemoryPoolMgr();
+    virtual ~IMemoryPoolMgr();
+
+public:
+    static IMemoryPoolMgr *GetInstance();
+    virtual Int32 InitPool() = 0;
+    virtual void FinishPool() = 0;
+    virtual void *Alloc(size_t bytes, const Byte8 *objName) = 0;
+    virtual void  Free(void *ptr) = 0;
+    virtual void  AddRef(void *ptr) = 0;
+    virtual void Lock() = 0;
+    virtual void Unlock() = 0;
 };
 
-
 FS_NAMESPACE_END
+
+#define g_MemoryPool fs::IMemoryPoolMgr::GetInstance()
 
 #endif

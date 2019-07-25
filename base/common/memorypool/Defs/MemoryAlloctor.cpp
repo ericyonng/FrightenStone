@@ -21,56 +21,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjAlloctorImpl.h
+ * @file  : MemoryAlloctor.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/24
+ * @date  : 2019/7/5
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Base_Common_ObjPool_Defs_ObjAlloctor_H__
-#pragma once
+#include "stdafx.h"
+#include "base/common/memorypool/Defs/MemoryAlloctor.h"
+#include "base/common/memorypool/Defs/MemoryBlock.h"
+#include "base/common/log/Log.h"
 
 #ifndef BLOCK_AMOUNT_DEF
-#define BLOCK_AMOUNT_DEF    10240    // 默认内存块数量
+#define BLOCK_AMOUNT_DEF    1024    // 默认内存块数量
 #endif
 
 FS_NAMESPACE_BEGIN
 
-template<typename ObjType>
-inline IObjAlloctor<ObjType>::IObjAlloctor(AlloctorNode<ObjType> *curNode, size_t blockAmount)
+IMemoryAlloctor::IMemoryAlloctor()
     :_isInit(false)
     ,_buf(NULL)
-    ,_curNode(curNode)
-    ,_blockAmount(blockAmount)
-    ,_freeBlockLeft(blockAmount)
+    ,_blockAmount(BLOCK_AMOUNT_DEF)
     ,_usableBlockHeader(NULL)
-    ,_blockSize(sizeof(ObjType))
+    ,_blockSize(0)
 {
-    _blockSize =_blockSize / sizeof(void *) * sizeof(void *) + (_blockSize % sizeof(void *) ? sizeof(void *) : 0);
-    _blockSize = _blockSize + sizeof(ObjBlock<ObjType>);
+    
 }
 
-template<typename ObjType>
-inline IObjAlloctor<ObjType>::~IObjAlloctor()
+IMemoryAlloctor::~IMemoryAlloctor()
 {
     FinishMemory();
 }
 
-template<typename ObjType>
-inline void *IObjAlloctor<ObjType>::Alloc()
+void *IMemoryAlloctor::AllocMemory(size_t bytesCnt, const Byte8 *objName)
 {
     // 内存不足则使用系统内存分配方案
-    ObjBlock<ObjType> *newBlock = NULL;
+    MemoryBlock *newBlock = NULL;
     if(_usableBlockHeader == 0)
     {
-        newBlock = reinterpret_cast<ObjBlock<ObjType> *>(::malloc(_blockSize));
+        newBlock = reinterpret_cast<MemoryBlock *>(::malloc(bytesCnt + sizeof(MemoryBlock)));
         newBlock->_isInPool = false;    // 不在内存池内
         newBlock->_ref = 1;             // 记1次引用
         newBlock->_alloctor = this;     // 分配器
         newBlock->_nextBlock = 0;
-        newBlock->_objSize = sizeof(ObjType);
+        auto len = sprintf(newBlock->_objName, "%s", objName);
+        if(len > 0)
+            newBlock->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
+        else
+            newBlock->_objName[0] = 0;
     }
     else
     {
@@ -81,24 +81,30 @@ inline void *IObjAlloctor<ObjType>::Alloc()
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
         newBlock->_alloctor =   this;
         newBlock->_isInPool = true;
-        --_freeBlockLeft;
+        auto len = sprintf(newBlock->_objName, "%s", objName);
+        if(len > 0)
+            newBlock->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
+        else
+            newBlock->_objName[0] = 0;
 
         ASSERT(newBlock->_ref == 0);
         newBlock->_ref = 1;
     }
 
-//     if(newBlock)
-//         _inUsings.insert(newBlock);
+    if(newBlock)
+    {
+        newBlock->_objSize = static_cast<Int64>(bytesCnt);
+        _usingBlocks.insert(newBlock);
+    }
 
-    return ((char*)newBlock) + sizeof(ObjBlock<ObjType>);   // 从block的下一个地址开始才是真正的申请到的内存
+    return ((char*)newBlock) + sizeof(MemoryBlock);   // 从block的下一个地址开始才是真正的申请到的内存
 }
 
-template<typename ObjType>
-inline void IObjAlloctor<ObjType>::Free(void *ptr)
+void IMemoryAlloctor::FreeMemory(void *ptr)
 {
     // 内存块头
-    char *ptrToFree = reinterpret_cast<char *>(ptr);
-    ObjBlock<ObjType> *blockHeader = reinterpret_cast<ObjBlock<ObjType> *>(reinterpret_cast<char*>(ptrToFree - sizeof(ObjBlock<ObjType>)));
+    char *ptrToFree = reinterpret_cast<char*>(ptr);
+    MemoryBlock *blockHeader = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptrToFree - sizeof(MemoryBlock)));
 
     // 引用计数
     if(--blockHeader->_ref != 0)
@@ -108,39 +114,21 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
     if (!blockHeader->_isInPool)
     {
         ::free(blockHeader);
-        // _inUsings.erase(blockHeader);
+        blockHeader->_objName[0] = 0;
+        _usingBlocks.erase(blockHeader);
         return;
     }
 
     // 被释放的节点插到可用头节点之前
+    blockHeader->_objName[0] = 0;
     blockHeader->_nextBlock = _usableBlockHeader;
     _usableBlockHeader = blockHeader;
-    ++_freeBlockLeft;
-
+    
     // 释放后从正在使用中移除
-    // _inUsings.erase(blockHeader);
+    _usingBlocks.erase(blockHeader);
 }
 
-template<typename ObjType>
-inline bool IObjAlloctor<ObjType>::NotBusy()
-{
-    return (_freeBlockLeft * 100 / _blockAmount) >= ObjPoolDefs::__g_FreeRate;
-}
-
-template<typename ObjType>
-inline bool IObjAlloctor<ObjType>::IsEmpty() const
-{
-    return !_usableBlockHeader;
-}
-
-template<typename ObjType>
-inline AlloctorNode<ObjType> *IObjAlloctor<ObjType>::GetNode()
-{
-    return _curNode;
-}
-
-template<typename ObjType>
-inline void IObjAlloctor<ObjType>::InitMemory()
+void IMemoryAlloctor::InitMemory()
 {
     if(_isInit)
         return;
@@ -163,24 +151,24 @@ inline void IObjAlloctor<ObjType>::InitMemory()
     /**
     *   链表头和尾部指向同一位置
     */
-    _usableBlockHeader = reinterpret_cast<ObjBlock<ObjType> *>(_buf);
+    _usableBlockHeader = reinterpret_cast<MemoryBlock*>(_buf);
     _usableBlockHeader->_ref = 0;
     _usableBlockHeader->_alloctor = this;
     _usableBlockHeader->_nextBlock = 0;
     _usableBlockHeader->_isInPool = true;
-    _usableBlockHeader->_objSize = sizeof(ObjType);
-    ObjBlock<ObjType> *temp = _usableBlockHeader;
+    _usableBlockHeader->_objName[0] = 0;
+    MemoryBlock *temp = _usableBlockHeader;
 
     // 构建内存块链表
     for(size_t i = 1; i < _blockAmount; ++i)
     {
         char *cache = (_buf + _blockSize * i);
-        ObjBlock<ObjType> *block = reinterpret_cast<ObjBlock<ObjType> *>(cache);
+        MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
         block->_ref = 0;
         block->_isInPool = true;
         block->_alloctor = this;
         block->_nextBlock = 0;
-        block->_objSize = sizeof(ObjType);
+        block->_objName[0] = 0;
         temp->_nextBlock = block;
         temp = block;
     }
@@ -188,8 +176,7 @@ inline void IObjAlloctor<ObjType>::InitMemory()
     _isInit = true;
 }
 
-template<typename ObjType>
-inline void IObjAlloctor<ObjType>::FinishMemory()
+void IMemoryAlloctor::FinishMemory()
 {
     if(!_isInit)
         return;
@@ -197,22 +184,27 @@ inline void IObjAlloctor<ObjType>::FinishMemory()
     _isInit = false;
 
     // 收集并释放泄漏的内存
-    std::pair<Int64, Int64> amountRefSizePair;
-//     for(auto &block : _inUsings)
-//     {
-//         if(block->_ref)
-//         {
-//             amountRefSizePair.second += 1;
-//             amountRefSizePair.first += _blockSize;
-//             if(!block->_isInPool)
-//                 ::free(block);
-//         }
-//     }
+    std::map<FS_String, std::pair<Int64, Int64>> objNameRefAmountSizePair;
+    FS_String objName;
+    for(auto &block : _usingBlocks)
+    {
+        if(block->_ref)
+        {
+            objName = block->_objName;
+            auto iterAmount = objNameRefAmountSizePair.find(objName);
+            if(iterAmount == objNameRefAmountSizePair.end())
+                iterAmount = objNameRefAmountSizePair.insert(std::make_pair(objName, std::pair<Int64, Int64>())).first;
+            iterAmount->second.first += 1;
+            iterAmount->second.second = block->_objSize;
+            if(!block->_isInPool)
+                ::free(block);
+        }
+    }
 
     // 使用系统的内存分配释放掉
     while(_usableBlockHeader != 0)
     {
-        auto *header = _usableBlockHeader;
+        MemoryBlock *header = _usableBlockHeader;
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
 
         if(!header->_isInPool)
@@ -228,13 +220,33 @@ inline void IObjAlloctor<ObjType>::FinishMemory()
     }
 
     // 内存泄漏打印
-//     if(amountRefSizePair.first)
-//     {
-//         g_Log->memleak("objName[%s], amount[%lld]*size[%lld];"
-//                        , typeid(ObjType).name(), amountRefSizePair.first, amountRefSizePair.second);
-//     }
+    for(auto &memleakObj : objNameRefAmountSizePair)
+        g_Log->memleak("objName[%s], amount[%lld]*size[%lld];", memleakObj.first.c_str(), memleakObj.second.first, memleakObj.second.second);
+}
+
+size_t IMemoryAlloctor::_GetFreeBlock()
+{
+    MemoryBlock *temp = _usableBlockHeader;
+    size_t cnt = 0;
+    while(temp != 0)
+    {
+        ++cnt;
+        temp = temp->_nextBlock;
+    }
+    return  cnt;
+}
+
+MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount)
+{
+    _blockAmount = blockAmount;
+    _blockSize = blockSize / sizeof(void *) * sizeof(void *) + (blockSize % sizeof(void *) ? sizeof(void *) : 0);
+    _blockSize = _blockSize + sizeof(MemoryBlock);
+}
+
+MemoryAlloctor::~MemoryAlloctor()
+{
 }
 
 FS_NAMESPACE_END
 
-#endif
+
