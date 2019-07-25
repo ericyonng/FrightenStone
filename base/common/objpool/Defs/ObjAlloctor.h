@@ -62,6 +62,7 @@ public:
     void  Free(void *ptr);
     bool NotBusy();    // free时候判断
     bool IsEmpty() const;
+    size_t GetObjInUse() const;
     AlloctorNode<ObjType> *GetNode();
 
 public:
@@ -76,6 +77,7 @@ protected:
     size_t          _blockAmount;           // 内存块总数量
     size_t          _blockSize;             // 内存块大小
     size_t          _freeBlockLeft;         // 剩余空闲内存块
+    size_t          _objInUse;              // 正在使用的对象
     // std::set<ObjBlock<ObjType> *> _inUsings;   // 正在使用的内存块
 };
 

@@ -117,6 +117,20 @@ inline void ObjPoolHelper<T>::AddRef(void *ptr)
 }
 
 template<typename ObjType>
+inline size_t ObjPoolHelper<ObjType>::GetMemleakObjNum() const
+{
+    auto header = _objAlloctorHeader;
+    size_t cnt = 0;
+    do 
+    {
+        cnt += header->_curAlloctor->GetObjInUse();
+        header = header->_nextNode;
+    } while (header);
+
+    return cnt;
+}
+
+template<typename ObjType>
 inline void ObjPoolHelper<ObjType>::_Init()
 {
     if(_objAlloctorHeader)

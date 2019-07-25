@@ -18,7 +18,7 @@ private:
     char _cnt;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 5000)
+OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 
 class TestObjPoolObj2
 {
@@ -38,7 +38,7 @@ public:
         g_Log->InitModule("TestObjPool");
         fs::Time timeNow1, timeNow2;
         timeNow1.FlushTime();
-        for(Int32 i = 0; i < 50000000; ++i)
+        for(Int32 i = 0; i < 50000; ++i)
         {
              delete new TestObjPoolObj2;
         }
@@ -46,13 +46,15 @@ public:
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 
         timeNow1.FlushTime();
-        for(Int32 i = 0; i < 50000000; ++i)
+        for(Int32 i = 0; i < 5000; ++i)
         {
-            delete new TestObjPoolObj;
+            new TestObjPoolObj;
         }
         timeNow2.FlushTime();
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
-
+        std::cout << "memleak:" << TestObjPoolObj::GetMemleakNum() << std::endl;
+//         g_Log->w<TestObjPool>(_LOGFMT_("HELLO"));
+//         g_Log->FinishModule();
 //         timeNow1.FlushTime();
 //         for(Int32 i = 0; i < 100000; ++i)
 //         {
