@@ -41,6 +41,7 @@
 #include <atomic>
 #include <list>
 #include "base/common/objpool/objpool.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -55,29 +56,38 @@ public:
     virtual ~FS_ThreadPool();
 
 public:
-    void Clear();
+    // 添加任务 请确保同一个任务只投递一次，避免多线程处理同一任务的情况出现（除非线程池只有一个线程）
     bool AddTask(ITask &task, bool forceNewThread = false, Int32 numOfThreadToCreateIfNeed = 1);
-    void StopAdd();
-    void EnableAdd();
-    void SetThreadLimit(Int32 minNum, Int32 maxNum);
+    // 添加delegate任务 请确保同一个任务只投递一次，避免多线程处理同一任务的情况出现（除非线程池只有一个线程）
+    bool AddTask(IDelegatePlus<void, const FS_ThreadPool *> *callback, bool forceNewThread = false, Int32 numOfThreadToCreateIfNeed = 1);
+    // 线程任务执行
     static unsigned __stdcall ThreadHandler(void *param);
 
-    // ״̬
+    // 清理线程池
+    void Clear();
+    // 停止添加任务
+    void StopAdd();
+    // 开启添加任务
+    void EnableAdd();
+    // 设置最小最大线程数
+    void SetThreadLimit(Int32 minNum, Int32 maxNum);
+    // 是否正在清理线程池
     bool IsClearingPool() const;
 
 private:
-    bool _CreateThread(Int32 numToCreate);    // 
+    // 创建线程
+    bool _CreateThread(Int32 numToCreate);
 
 private:
-    std::atomic<Int32> _minNum{0};                      // 
-    std::atomic<Int32> _maxNum{0};                      // 
-    std::atomic<Int32> _curTotalNum{0};                 // 
-    std::atomic<Int32> _waitNum{0};                     // 
-    std::atomic<bool> _isDestroy{false};                // 
-    std::atomic<bool> _isStopAddingTask{false};         // 
-    std::atomic<bool> _isClearPool{false};              // 
-    ConditionLocker _locker;                            // 
-    std::list<ITask *> _tasks;                          // 
+    std::atomic<Int32> _minNum{0};                      // 最小线程数
+    std::atomic<Int32> _maxNum{0};                      // 最大线程数
+    std::atomic<Int32> _curTotalNum{0};                 // 当前线程数
+    std::atomic<Int32> _waitNum{0};                     // 正在挂起的线程数
+    std::atomic<bool> _isDestroy{false};                // 是否销毁线程池
+    std::atomic<bool> _isStopAddingTask{false};         // 是否停止添加任务
+    std::atomic<bool> _isClearPool{false};              // 是否正在清理线程池
+    ConditionLocker _locker;                            // 线程安全对象
+    std::list<ITask *> _tasks;                          // 任务队列
 };
 
 #pragma region inline
@@ -99,6 +109,7 @@ inline bool FS_ThreadPool::IsClearingPool() const
 
 FS_NAMESPACE_END
 
+// 消息队列（单线程的线程池可当作消息队列）
 #define FS_MessageQueue(x) fs::FS_ThreadPool x(1, 1)
 #define FS_MessageQueuePtr(x) fs::FS_ThreadPool *x = new fs::FS_ThreadPool(1, 1)
 #endif

@@ -36,6 +36,11 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 
+#pragma region macro
+#undef __DEF_OBJ_POOL_OBJ_NUM__
+#define __DEF_OBJ_POOL_OBJ_NUM__        10240
+#pragma endregion
+
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT ObjPoolDefs

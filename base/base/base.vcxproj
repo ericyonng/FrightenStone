@@ -243,12 +243,15 @@
     <ClInclude Include="..\common\component\Impl\FS_StringImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_ThreadPool.h" />
     <ClInclude Include="..\common\component\Impl\GlobalInitialize.h" />
-    <ClInclude Include="..\common\component\Impl\ITask.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVar.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmeticImpl.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarImpl.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarTraits.h" />
+    <ClInclude Include="..\common\component\Impl\Task\Impl\DelegateTask.h" />
+    <ClInclude Include="..\common\component\Impl\Task\Impl\DelegateTaskImpl.h" />
+    <ClInclude Include="..\common\component\Impl\Task\Interface\ITask.h" />
+    <ClInclude Include="..\common\component\Impl\Task\Task.h" />
     <ClInclude Include="..\common\component\Impl\Time.h" />
     <ClInclude Include="..\common\component\Impl\TimeSlice.h" />
     <ClInclude Include="..\common\component\Impl\TimeSliceImpl.h" />
@@ -345,6 +348,7 @@
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVar.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarTraits.cpp" />
+    <ClCompile Include="..\common\component\Impl\Task\Impl\DelegateTask.cpp" />
     <ClCompile Include="..\common\component\Impl\Time.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeSlice.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeWheel\Comp\TimeData.cpp" />

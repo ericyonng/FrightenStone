@@ -21,43 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ITask.h
+ * @file  : DelegateTask.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/7/26
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_ITask_H__
-#define __Base_Common_Component_Impl_ITask_H__
-
-
+#ifndef __Base_Common_Component_Impl_Task_Impl_DelegateTask_H__
+#define __Base_Common_Component_Impl_Task_Impl_DelegateTask_H__
 #pragma once
 
 #include "base/exportbase.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
-#include "base/common/basedefs/DataType/DataType.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/status/status.h"
+#include "base/common/component/Impl/Task/Interface/ITask.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ITask
+class FS_ThreadPool;
+
+class BASE_EXPORT DelegateTask : public ITask
 {
-    NO_COPY(ITask)
+    OBJ_POOL_CREATE(DelegateTask, _objPoolHelper)
 public:
-    virtual Int32 Run() = 0;
-    virtual Int32 Release() { delete this; return 0; }
-    virtual void SetArg(void *arg) { _arg = arg; }
-    virtual void *GetArg() { return _arg; }
+    DelegateTask(const FS_ThreadPool *pool, IDelegatePlus<void, const FS_ThreadPool *> *callback);
+    virtual ~DelegateTask();
 
-protected:
-    ITask() { _arg = NULL; }
-    virtual ~ITask() {}
+    virtual Int32 Run();
+    virtual Int32 Release();
 
-protected:
-    void *_arg = NULL;
+private:
+    const FS_ThreadPool *_pool;                             // 线程池对象
+    IDelegatePlus<void, const FS_ThreadPool *> *_callback;    // 需要释放
 };
 
 FS_NAMESPACE_END
+
+#include "base/common/component/Impl/Task/Impl/DelegateTaskImpl.h"
 
 #endif

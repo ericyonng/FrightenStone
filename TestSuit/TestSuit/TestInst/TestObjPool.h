@@ -12,7 +12,10 @@ class TestObjPoolObj
    OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper)
 public:
     TestObjPoolObj() {}
-    ~TestObjPoolObj() {}
+    ~TestObjPoolObj() 
+    {
+        std::cout << "Îö¹¹" << std::endl;
+    }
 
 private:
     Int64 _cnt;
@@ -53,7 +56,7 @@ public:
 
         timeNow1.FlushTime();
         for(Int32 i = 0; i < 50000000; ++i)
-        {
+        {            
             delete new TestObjPoolObj;
         }
         timeNow2.FlushTime();

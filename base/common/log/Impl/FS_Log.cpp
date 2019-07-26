@@ -310,7 +310,7 @@ void FS_Log::_OnThreadWriteLog()
     // 1.转移到缓冲区（只交换list指针）
     _locker.Lock();
     for(_logCaches->_increasePos = 0, _logCaches->_fileIndex = 0;
-        _logCaches->_fileIndex < fs::LogDefs::LOG_QUANTITY; 
+        _logCaches->_fileIndex < fs::LogDefs::LOG_QUANTITY;
         ++_logCaches->_fileIndex)
     {
         if(_logDatas[_logCaches->_fileIndex]->empty())

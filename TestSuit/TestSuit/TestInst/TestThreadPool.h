@@ -44,20 +44,32 @@ public:
     }
 };
 
+class MyObj
+{
+public:
+    void CallBack(const fs::FS_ThreadPool *pool)
+    {
+        std::cout << "this is my obj call back" << std::endl;
+    }
+};
+
 class TestThreadPool
 {
 public:
     static void Run()
     {
         FS_MessageQueuePtr(pool);
-        for(auto i = 0; i < 50; ++i)
-        {
-            Int32 *arg1 = new Int32;
-            *arg1 = i;
-            TestTask *task1 = new TestTask;
-            task1->SetArg(arg1);
-            pool->AddTask(*task1);
-        }
+        MyObj myObj;
+//         for(auto i = 0; i < 50; ++i)
+//         {
+//             Int32 *arg1 = new Int32;
+//             *arg1 = i;
+//             TestTask *task1 = new TestTask;
+//             task1->SetArg(arg1);
+//             pool->AddTask(*task1);
+//         }
+
+        pool->AddTask(fs::DelegatePlusFactory::Create(&myObj, &MyObj::CallBack));
         pool->Clear();
     }
 };
