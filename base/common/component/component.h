@@ -43,7 +43,7 @@
 #include "base/common/component/Impl/FS_ArgsExpander.h"
 #include "base/common/component/Impl/FS_ClassFactory.h"
 #include "base/common/component/Impl/FS_Delegate.h"
-#include "base/common/component/Impl/ITask.h"
+#include "base/common/component/Impl/Task/Task.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
 #include "base/common/component/Impl/File/FS_File.h"
 #include "base/common/component/Impl/File/LogFile.h"

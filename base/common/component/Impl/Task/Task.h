@@ -21,58 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IocpDefs.h
+ * @file  : Task.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/18
+ * @date  : 2019/7/26
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Defs_IocpDefs_H__
-#define __Base_Common_Net_Defs_IocpDefs_H__
+#ifndef __Base_Common_Component_Impl_Task_Task_H__
+#define __Base_Common_Component_Impl_Task_Task_H__
 #pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-
-#pragma region IOCP macro
-#define IO_DATA_BUFF_SIZE 1024          // io数据缓冲大小
-#pragma endregion
-
-FS_NAMESPACE_BEGIN
-
-/* iocp若干定义类型 */
-class BASE_EXPORT IocpDefs
-{
-public:
-    /* IO操作类型 */
-    enum IO_TYPE:Int32
-    {
-        IO_ACCEPT = 10,
-        IO_RECV,
-        IO_SEND,
-    };
-};
-
-struct BASE_EXPORT IO_DATA_BASE
-{
-    // 重叠体
-    OVERLAPPED _overlapped{0};    // 使用重叠体可以关联到iodatabase
-    SOCKET _sock = INVALID_SOCKET;
-    char _buff[IO_DATA_BUFF_SIZE]{0};
-    Int32 _length = 0;
-    Int32 _ioType = 0;
-};
-
-struct BASE_EXPORT IO_EVENT
-{
-    IO_DATA_BASE *_ioData = NULL;               // 重叠体自定义的数据
-    SOCKET _socket = INVALID_SOCKET;            // completionkey返回的socket socket在客户端断开后会被复用
-    ULong _bytesTrans = 0;                      // 传输的字节数
-};
-
-FS_NAMESPACE_END
-
+#include "base/common/component/Impl/Task/Interface/ITask.h"
+#include "base/common/component/Impl/Task/Impl/DelegateTask.h"
 #endif
 

@@ -21,58 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IocpDefs.h
+ * @file  : ITask.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/18
+ * @date  : 2019/5/24
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Defs_IocpDefs_H__
-#define __Base_Common_Net_Defs_IocpDefs_H__
+#ifndef __Base_Common_Component_Impl_Task_Interface_ITask_H__
+#define __Base_Common_Component_Impl_Task_Interface_ITask_H__
+
+
 #pragma once
 
 #include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-
-#pragma region IOCP macro
-#define IO_DATA_BUFF_SIZE 1024          // io数据缓冲大小
-#pragma endregion
+#include "base/common/basedefs/Macro/MacroDefs.h"
+#include "base/common/basedefs/DataType/DataType.h"
 
 FS_NAMESPACE_BEGIN
 
-/* iocp若干定义类型 */
-class BASE_EXPORT IocpDefs
+class BASE_EXPORT ITask
 {
+    NO_COPY(ITask)
 public:
-    /* IO操作类型 */
-    enum IO_TYPE:Int32
-    {
-        IO_ACCEPT = 10,
-        IO_RECV,
-        IO_SEND,
-    };
-};
+    virtual Int32 Run() = 0;
+    virtual Int32 Release() { delete this; return 0; }
+    virtual void SetArg(void *arg) { _arg = arg; }
+    virtual void *GetArg() { return _arg; }
 
-struct BASE_EXPORT IO_DATA_BASE
-{
-    // 重叠体
-    OVERLAPPED _overlapped{0};    // 使用重叠体可以关联到iodatabase
-    SOCKET _sock = INVALID_SOCKET;
-    char _buff[IO_DATA_BUFF_SIZE]{0};
-    Int32 _length = 0;
-    Int32 _ioType = 0;
-};
+protected:
+    ITask() { _arg = NULL; }
+    virtual ~ITask() {}
 
-struct BASE_EXPORT IO_EVENT
-{
-    IO_DATA_BASE *_ioData = NULL;               // 重叠体自定义的数据
-    SOCKET _socket = INVALID_SOCKET;            // completionkey返回的socket socket在客户端断开后会被复用
-    ULong _bytesTrans = 0;                      // 传输的字节数
+protected:
+    void *_arg = NULL;
 };
 
 FS_NAMESPACE_END
 
 #endif
-

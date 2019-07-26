@@ -31,7 +31,7 @@
  */
 #include "stdafx.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
-#include "base/common/component/Impl/ITask.h"
+#include "base/common/component/Impl/Task/Task.h"
 #include <iostream>
 
 #pragma region 
@@ -61,40 +61,6 @@ FS_ThreadPool::FS_ThreadPool(Int32 minNum, Int32 maxNum)
 FS_ThreadPool::~FS_ThreadPool()
 {
     Clear();
-}
-
-void FS_ThreadPool::Clear()
-{
-    _locker.Lock();
-    if(_isClearPool)
-    {
-        _locker.Unlock();
-        return;
-    }
-
-    _isClearPool = true;
-    _isStopAddingTask = true;
-    _isDestroy = true;
-    _locker.Unlock();
-
-    while(true)
-    {
-        _locker.Lock();
-        _locker.Sinal();
-        _locker.Unlock();
-        Sleep(THREAD_POOL_WAIT_FOR_COMPLETED_TIME);
-        _locker.Lock();
-        if(_tasks.empty() && _curTotalNum <= 0)
-        {
-            _locker.ResetSinal();
-            _locker.Unlock();
-            break;
-        }
-        _locker.Unlock();
-    }
-
-    // _locker.Broadcast();
-    std::cout << "clear end" << std::endl;
 }
 
 bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
@@ -130,20 +96,11 @@ bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 
     return true;
 }
 
-void FS_ThreadPool::SetThreadLimit(Int32 minNum, Int32 maxNum)
+bool FS_ThreadPool::AddTask(IDelegatePlus<void, const FS_ThreadPool *> *callback, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
 {
-    if(maxNum > _maxNum || _isDestroy || _isStopAddingTask || _isClearPool)
-        return;
-
-    Int32 maxNumTmp = _maxNum;
-    _maxNum = std::max<Int32>(maxNum, maxNumTmp);
-
-    Int32 diffMin = minNum - _minNum;
-    if(diffMin > 0)
-    {
-        _minNum = minNum;
-        _CreateThread(diffMin);
-    }
+    // 创建一个delegate task
+    DelegateTask *newTask = new DelegateTask(this, callback);
+    return AddTask(*newTask, forceNewThread, numOfThreadToCreateIfNeed);
 }
 
 unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
@@ -193,6 +150,57 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
     _endthreadex(0L);
 
     return 0L;
+}
+
+void FS_ThreadPool::Clear()
+{
+    _locker.Lock();
+    if(_isClearPool)
+    {
+        _locker.Unlock();
+        return;
+    }
+
+    _isClearPool = true;
+    _isStopAddingTask = true;
+    _isDestroy = true;
+    _locker.Unlock();
+
+    while(true)
+    {
+        _locker.Lock();
+        _locker.Sinal();
+        _locker.Unlock();
+        Sleep(THREAD_POOL_WAIT_FOR_COMPLETED_TIME);
+        _locker.Lock();
+        if(_tasks.empty() && _curTotalNum <= 0)
+        {
+            _locker.ResetSinal();
+            _locker.Unlock();
+            break;
+        }
+        _locker.Unlock();
+    }
+
+    // _locker.Broadcast();
+    std::cout << "clear end" << std::endl;
+}
+
+
+void FS_ThreadPool::SetThreadLimit(Int32 minNum, Int32 maxNum)
+{
+    if(maxNum > _maxNum || _isDestroy || _isStopAddingTask || _isClearPool)
+        return;
+
+    Int32 maxNumTmp = _maxNum;
+    _maxNum = std::max<Int32>(maxNum, maxNumTmp);
+
+    Int32 diffMin = minNum - _minNum;
+    if(diffMin > 0)
+    {
+        _minNum = minNum;
+        _CreateThread(diffMin);
+    }
 }
 
 bool FS_ThreadPool::_CreateThread(Int32 numToCreate)

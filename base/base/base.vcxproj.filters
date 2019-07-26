@@ -283,6 +283,15 @@
     <Filter Include="common\memorypool\Interface">
       <UniqueIdentifier>{8dc834d3-fa17-400a-b61c-17dce950e228}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\component\Impl\Task">
+      <UniqueIdentifier>{6c94f0d8-7a23-449b-a7b0-43197f14d70d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\Task\Impl">
+      <UniqueIdentifier>{9d673ff4-b9ea-4d05-9436-b2da2fc38316}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\Task\Interface">
+      <UniqueIdentifier>{4fd777a2-ff0f-45c1-848b-2b3a76c64ed0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -466,9 +475,6 @@
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
     <ClInclude Include="..\common\component\Impl\FS_ThreadPool.h">
-      <Filter>common\component\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\component\Impl\ITask.h">
       <Filter>common\component\Impl</Filter>
     </ClInclude>
     <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h">
@@ -732,6 +738,18 @@
     <ClInclude Include="..\common\objpool\Defs\AlloctorNodeImpl.h">
       <Filter>common\objpool\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\Task\Task.h">
+      <Filter>common\component\Impl\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\Task\Impl\DelegateTask.h">
+      <Filter>common\component\Impl\Task\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\Task\Interface\ITask.h">
+      <Filter>common\component\Impl\Task\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\Task\Impl\DelegateTaskImpl.h">
+      <Filter>common\component\Impl\Task\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -928,6 +946,9 @@
     </ClCompile>
     <ClCompile Include="..\common\memorypool\Interface\IMemoryPoolMgr.cpp">
       <Filter>common\memorypool\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\Task\Impl\DelegateTask.cpp">
+      <Filter>common\component\Impl\Task\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

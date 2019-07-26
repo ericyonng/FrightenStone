@@ -34,7 +34,7 @@
 #pragma once
 
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/ITask.h"
+#include "base/common/component/Impl/Task/Task.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 
 // 日志任务
