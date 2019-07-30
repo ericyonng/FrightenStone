@@ -133,6 +133,7 @@ inline size_t ObjPoolHelper<ObjType>::PrintMemleak(Int64 &poolOccupiedBytes)
     poolOccupiedBytes = _alloctor->GetBytesOccupied();
     ObjPoolMethods::PrintMemleakInfo(typeid(ObjType).name()
                                      , _alloctor->GetNodeCnt()
+                                     , _alloctor->GetTotalObjBlocks()
                                      , _alloctor->GetBytesOccupied()
                                      , _alloctor->GetObjInUse()
                                      , memleakBytes);

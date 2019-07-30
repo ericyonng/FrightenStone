@@ -123,6 +123,12 @@ inline size_t IObjAlloctor<ObjType>::GetObjInUse() const
 }
 
 template<typename ObjType>
+inline size_t IObjAlloctor<ObjType>::GetTotalObjBlocks() const
+{
+    return _nodeCnt * _nodeCapacity;
+}
+
+template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetNodeCnt() const
 {
     return _nodeCnt;
