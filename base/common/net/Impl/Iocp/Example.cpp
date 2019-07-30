@@ -248,7 +248,7 @@ int Example::Run()
             }
 
             // 继续接受下一个连接
-            iocp.PostAccept(sockServer, )
+            // iocp.PostAccept(sockServer, )
         }
         else if(ioEvent._ioData->_ioType == IocpDefs::IO_RECV)
         {

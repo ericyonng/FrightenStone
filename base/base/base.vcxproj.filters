@@ -687,12 +687,6 @@
     <ClInclude Include="..\common\net\Defs\IocpDefs.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\objpool\Defs\ObjBlock.h">
-      <Filter>common\objpool\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\objpool\Defs\ObjBlockImpl.h">
-      <Filter>common\objpool\Defs</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\objpool\Defs\ObjAlloctor.h">
       <Filter>common\objpool\Defs</Filter>
     </ClInclude>

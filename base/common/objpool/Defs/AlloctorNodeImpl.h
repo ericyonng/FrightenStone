@@ -35,18 +35,22 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
-inline AlloctorNode<ObjType>::AlloctorNode()
-    :_preNode(NULL)
-    ,_nextNode(NULL)
-    ,_curAlloctor(NULL)
-{
+const size_t AlloctorNode<ObjType>::_objBlockSize = sizeof(ObjType) / sizeof(void *) * sizeof(void *) +
+(sizeof(ObjType) % sizeof(void *) ? sizeof(void *) : 0);
 
+
+template<typename ObjType>
+inline AlloctorNode<ObjType>::AlloctorNode(size_t capacity)
+    : _objs(::malloc(capacity*_objBlockSize))
+    ,_nextNode(NULL)
+{
 }
 
 template<typename ObjType>
 inline AlloctorNode<ObjType>::~AlloctorNode()
 {
-
+    if(_objs)
+        ::free(_objs);
 }
 
 FS_NAMESPACE_END
