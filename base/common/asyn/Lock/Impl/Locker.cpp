@@ -91,6 +91,7 @@ void Locker::_Init()
 
     _metaLocker = new MetaLocker;
 
+    // 创建自旋锁，避免线程频繁挂起
     auto spinCnt = static_cast<DWORD>(1 << (WidthUtil::GetBinaryWidth<DWORD>() - 1)) | static_cast<DWORD>(SPINNING_COUNT);
     if(!InitializeCriticalSectionAndSpinCount(&(_metaLocker.load()->_handle), spinCnt))
         printf("MetaLocker create spinlock fail spinCnt[%lu]", spinCnt);

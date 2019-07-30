@@ -53,6 +53,12 @@ inline R FS_Delegate<T, R, Args...>::operator()(Args&&... args)
 }
 
 template <typename T, typename R, typename ... Args>
+inline void FS_Delegate<T, R, Args...>::Release()
+{
+    delete this;
+}
+
+template <typename T, typename R, typename ... Args>
 inline FS_Delegate<T, R, Args...>* DelegateFactory::Create(T *obj, R ( T::*f)(Args ...))
 {
     return new FS_Delegate<T, R, Args...>(obj, f);
@@ -66,6 +72,12 @@ inline IDelegatePlus<R, Args...>::IDelegatePlus()
 template <typename R, typename... Args>
 inline IDelegatePlus<R, Args...>::~IDelegatePlus()
 {
+}
+
+template <typename R, typename... Args>
+inline void IDelegatePlus<R, Args...>::Release()
+{
+    delete this;
 }
 
 template <typename T, class R, typename... Args>

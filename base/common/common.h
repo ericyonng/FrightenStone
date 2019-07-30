@@ -58,6 +58,7 @@
 #include "base/common/crashhandle/CrashHandle.h"
 #include "base/common/objpool/objpool.h"
 #include "base/common/Application/Application.h"
+#include "base/common/memleak/memleak.h"
 #endif
 #pragma endregion
 

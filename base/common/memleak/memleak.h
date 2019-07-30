@@ -21,27 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MetaLocker.cpp
+ * @file  : memleak.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/07/31
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/asyn/Lock/Defs/MetaLocker.h"
+#ifndef __Base_Common_Memleak_Memleak_H__
+#define __Base_Common_Memleak_Memleak_H__
+#pragma once
 
-FS_NAMESPACE_BEGIN
+#include "base/common/memleak/Impl/MemleakMonitor.h"
 
-MetaLocker::MetaLocker()
-{
-    memset(&_handle, 0, sizeof(_handle));
-}
-
-MetaLocker::~MetaLocker()
-{
-
-}
-
-FS_NAMESPACE_END
+#endif

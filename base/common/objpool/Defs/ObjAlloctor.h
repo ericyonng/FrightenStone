@@ -60,6 +60,8 @@ public:
     void *Alloc();
     void  Free(void *ptr);
     size_t GetObjInUse() const;
+    size_t GetNodeCnt() const;
+    size_t GetBytesOccupied() const;
 
 private:
     void _NewNode();

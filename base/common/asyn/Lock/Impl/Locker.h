@@ -36,14 +36,14 @@
 #pragma once
 
 #include<base/exportbase.h>
-#include <base/common/common.h>
 #include "base/common/assist/assistobjs/Defs/AssistObjsDefs.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
 #include "base/common/basedefs/Resource/Resource.h"
 
-class BASE_EXPORT MetaLocker;
 
 FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT MetaLocker;
 
 class BASE_EXPORT Locker
 {

@@ -292,6 +292,18 @@
     <Filter Include="common\component\Impl\Task\Interface">
       <UniqueIdentifier>{4fd777a2-ff0f-45c1-848b-2b3a76c64ed0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\memleak">
+      <UniqueIdentifier>{6cf1a0a7-c03e-4da9-9b13-3355a059f2f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\memleak\Defs">
+      <UniqueIdentifier>{d857dc45-2615-43ae-aa6e-cad5d8950230}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\memleak\Impl">
+      <UniqueIdentifier>{698348f4-d926-432f-bacb-1d61b48f6fe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\memleak\Interface">
+      <UniqueIdentifier>{15e19b17-69fe-48e7-91b7-298f73296584}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -744,6 +756,12 @@
     <ClInclude Include="..\common\component\Impl\Task\Impl\DelegateTaskImpl.h">
       <Filter>common\component\Impl\Task\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\memleak\memleak.h">
+      <Filter>common\memleak</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\memleak\Impl\MemleakMonitor.h">
+      <Filter>common\memleak\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -943,6 +961,9 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\Task\Impl\DelegateTask.cpp">
       <Filter>common\component\Impl\Task\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\memleak\Impl\MemleakMonitor.cpp">
+      <Filter>common\memleak\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

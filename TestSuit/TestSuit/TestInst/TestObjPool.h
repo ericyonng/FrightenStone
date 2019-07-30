@@ -8,7 +8,9 @@
 #define __FS_THREAD_SAFE__ 0
 
 #undef TEST_OBJ_NUM
-#define TEST_OBJ_NUM    1000
+#define TEST_OBJ_NUM    10000000
+
+fs::MemleakMonitor *_g_memMonitor = g_MemleakMonitor;
 
 class TestObjPoolObj
 {
@@ -21,10 +23,14 @@ public:
     }
 
 private:
-    char _char;
+    Int64 _char;
+    Int64 _char2;
+    Int64 _char3;
+    Int64 _char4;
+    Int64 _char5;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 5)
+OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, TEST_OBJ_NUM)
 
 class TestObjPoolObj2
 {
@@ -33,7 +39,11 @@ public:
     ~TestObjPoolObj2() {}
 
 private:
-    char _char;
+    Int64 _char;
+    Int64 _char2;
+    Int64 _char3;
+    Int64 _char4;
+    Int64 _char5;
 };
 
 class TestObjPool
@@ -41,7 +51,7 @@ class TestObjPool
 public:
     static void Run()
     {
-        // g_Log->InitModule("TestObjPool");
+        g_Log->InitModule("TestObjPool");
         fs::Time timeNow1, timeNow2;
         timeNow1.FlushTime();
         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
@@ -52,19 +62,15 @@ public:
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 
         timeNow1.FlushTime();
-        TestObjPoolObj *ptr[TEST_OBJ_NUM] = {};
         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
         {            
-            ptr[i] = new TestObjPoolObj;
+            new TestObjPoolObj;
         }
         timeNow2.FlushTime();
-        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-        {
-            delete  ptr[i];
-        }
 
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
         std::cout << "memleak:" << TestObjPoolObj::GetMemleakNum() << std::endl;
+        g_MemleakMonitor->PrintMemleakInfo();
 //         g_Log->w<TestObjPool>(_LOGFMT_("HELLO"));
 //         g_Log->FinishModule();
 //         timeNow1.FlushTime();
