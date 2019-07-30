@@ -36,7 +36,6 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include <set>
-#include "base/common/objpool/Defs/ObjBlock.h"
 #include "base/common/objpool/Defs/ObjPoolDefs.h"
 
 FS_NAMESPACE_BEGIN
@@ -54,31 +53,30 @@ class IObjAlloctor
     template<typename ObjType>
     friend class ObjPoolHelper;
 public:
-    IObjAlloctor(AlloctorNode<ObjType> *curNode, size_t blockAmount);
+    IObjAlloctor(size_t blockAmountPerNode);
     virtual ~IObjAlloctor();
 
 public:
     void *Alloc();
     void  Free(void *ptr);
-    bool NotBusy();    // free时候判断
-    bool IsEmpty() const;
     size_t GetObjInUse() const;
-    AlloctorNode<ObjType> *GetNode();
 
-public:
-    void  InitMemory();
-    void FinishMemory();
+private:
+    void _NewNode();
 
 protected:
-    bool                _isInit;
-    char                *_buf;                  // 整个已申请的内存地址
-    AlloctorNode<ObjType> *_curNode;            // 分配节点
-    ObjBlock<ObjType>   *_usableBlockHeader;    // 结点 next方向是可用的未分配的内存块，分配时候给_usableBlockHeader节点，释放时候要释放的节点插在_usableBlockHeader之前当作可用节点头
-    size_t          _blockAmount;           // 内存块总数量
-    size_t          _blockSize;             // 内存块大小
-    size_t          _freeBlockLeft;         // 剩余空闲内存块
+    void *_curNodeObjs;                     // 当前节点的对象池缓冲
+    ObjType *_lastDeleted;                  // free对象构成的链表指针指向的内存存储的是上一次释放的对象的地址
+    size_t _alloctedInCurNode;              // 当前节点已分配的对象个数
+    const size_t _nodeCapacity;             // 每个节点对象个数
+    AlloctorNode<ObjType> *_header;         // 头节点
+    AlloctorNode<ObjType> *_lastNode;       // 最新的节点
+    static const size_t _objBlockSize;      // 对象块大小
+
+    // 内存泄漏相关
+    size_t          _nodeCnt;               // 节点个数
+    size_t          _bytesOccupied;         // 对象池占用内存大小 = _objBlockSize * _nodeCnt * node._capacity
     size_t          _objInUse;              // 正在使用的对象
-    // std::set<ObjBlock<ObjType> *> _inUsings;   // 正在使用的内存块
 };
 
 FS_NAMESPACE_END

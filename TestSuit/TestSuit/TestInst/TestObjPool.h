@@ -7,6 +7,9 @@
 #undef __FS_THREAD_SAFE__
 #define __FS_THREAD_SAFE__ 0
 
+#undef TEST_OBJ_NUM
+#define TEST_OBJ_NUM    1000000
+
 class TestObjPoolObj
 {
    OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper)
@@ -18,13 +21,10 @@ public:
     }
 
 private:
-    Int64 _cnt;
-    Int64 _cnt2;
-    Int64 _cnt3;
-    Int64 _cnt4;
+    char _char;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, TEST_OBJ_NUM)
 
 class TestObjPoolObj2
 {
@@ -33,10 +33,7 @@ public:
     ~TestObjPoolObj2() {}
 
 private:
-    Int64 _cnt;
-    Int64 _cnt2;
-    Int64 _cnt3;
-    Int64 _cnt4;
+    char _char;
 };
 
 class TestObjPool
@@ -44,10 +41,10 @@ class TestObjPool
 public:
     static void Run()
     {
-        g_Log->InitModule("TestObjPool");
+        // g_Log->InitModule("TestObjPool");
         fs::Time timeNow1, timeNow2;
         timeNow1.FlushTime();
-        for(Int32 i = 0; i < 50000000; ++i)
+        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
         {
              new TestObjPoolObj2;
         }
@@ -55,9 +52,9 @@ public:
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 
         timeNow1.FlushTime();
-        for(Int32 i = 0; i < 50000000; ++i)
+        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
         {            
-            delete new TestObjPoolObj;
+            new TestObjPoolObj;
         }
         timeNow2.FlushTime();
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;

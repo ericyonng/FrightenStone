@@ -54,10 +54,17 @@
 #include "TestSuit/TestSuit/TestInst/TestMathUtil.h"
 #include "TestSuit/TestSuit/TestInst/TestIocpExample.h"
 
-int main()
+int _tmain(int argc, _TCHAR* argv[])
 {
-    TestThreadPool::Run();
-    std::cout << "main end" << std::endl;
+    TestObjPool::Run();
     getchar();
     return 0;
 }
+// 
+// int main()
+// {
+//     TestObjPool::Run();
+//     std::cout << "main end" << std::endl;
+//     getchar();
+//     return 0;
+// }

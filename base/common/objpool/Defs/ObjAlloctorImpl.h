@@ -38,103 +38,82 @@
 
 FS_NAMESPACE_BEGIN
 
+// objtype的blocksize必须是void *尺寸的整数倍
 template<typename ObjType>
-inline IObjAlloctor<ObjType>::IObjAlloctor(AlloctorNode<ObjType> *curNode, size_t blockAmount)
-    :_isInit(false)
-    ,_buf(NULL)
-    ,_curNode(curNode)
-    ,_blockAmount(blockAmount)
-    ,_freeBlockLeft(blockAmount)
-    ,_usableBlockHeader(NULL)
-    ,_blockSize(sizeof(ObjType))
+const size_t IObjAlloctor<ObjType>::_objBlockSize = sizeof(ObjType) / sizeof(void *) * sizeof(void *) + 
+(sizeof(ObjType) % sizeof(void *) ? sizeof(void *) : 0);
+
+template<typename ObjType>
+inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
+    :_curNodeObjs(NULL)
+    ,_lastDeleted(NULL)
+    ,_alloctedInCurNode(0)
+    ,_nodeCapacity(blockAmount)
+    ,_header(NULL)
+    ,_lastNode(NULL)
+    ,_nodeCnt(0)
+    ,_bytesOccupied(0)
     ,_objInUse(0)
 {
-    _blockSize =_blockSize / sizeof(void *) * sizeof(void *) + (_blockSize % sizeof(void *) ? sizeof(void *) : 0);
-    _blockSize = _blockSize + sizeof(ObjBlock<ObjType>);
+    // 初始化节点
+    _header = new AlloctorNode<ObjType>(_nodeCapacity);
+    _lastNode = _header;
+
+    // lastnode在构造中初始化
+    _curNodeObjs = _lastNode->_objs;
+    _alloctedInCurNode = 0;
+    ++_nodeCnt;
+    _bytesOccupied += _nodeCapacity * _objBlockSize;
 }
 
 template<typename ObjType>
 inline IObjAlloctor<ObjType>::~IObjAlloctor()
 {
-    FinishMemory();
+    if(_header)
+    {
+        auto *node = _header->_nextNode;
+        while(node)
+        {
+            auto *nextNode = node->_nextNode;
+            delete node;
+            node = nextNode;
+        }
+        Fs_SafeFree(_header);
+    }
 }
 
 template<typename ObjType>
 inline void *IObjAlloctor<ObjType>::Alloc()
 {
-    // 内存不足则使用系统内存分配方案
-    ObjBlock<ObjType> *newBlock = NULL;
-    if(_usableBlockHeader == 0)
+    if(_lastDeleted)
     {
-        newBlock = reinterpret_cast<ObjBlock<ObjType> *>(::malloc(_blockSize));
-        newBlock->_isInPool = false;    // 不在内存池内
-        newBlock->_ref = 1;             // 记1次引用
-        newBlock->_alloctor = this;     // 分配器
-        newBlock->_nextBlock = 0;
-        newBlock->_objSize = sizeof(ObjType);
-    }
-    else
-    {
-        /**
-        *   get one node from free list
-        */
-        newBlock = _usableBlockHeader;
-        _usableBlockHeader = _usableBlockHeader->_nextBlock;
-        newBlock->_alloctor =   this;
-        newBlock->_isInPool = true;
-        --_freeBlockLeft;
+        ObjType *ptr = _lastDeleted;
 
-        ASSERT(newBlock->_ref == 0);
-        newBlock->_ref = 1;
+        // 取得最后一个被释放对象的地址
+        _lastDeleted = *(reinterpret_cast<ObjType **>(_lastDeleted));
+        ++_objInUse;
+        return ptr;
     }
 
+    // 分配新节点
+    if(_alloctedInCurNode >= _nodeCapacity)
+        _NewNode();
+
+    // 内存池中分配对象
+    char *ptr = reinterpret_cast<char *>(_curNodeObjs);
+    ptr += _alloctedInCurNode * _objBlockSize;
+    ++_alloctedInCurNode;
     ++_objInUse;
-//     if(newBlock)
-//         _inUsings.insert(newBlock);
-
-    return ((char*)newBlock) + sizeof(ObjBlock<ObjType>);   // 从block的下一个地址开始才是真正的申请到的内存
+    return ptr;
 }
 
 template<typename ObjType>
 inline void IObjAlloctor<ObjType>::Free(void *ptr)
 {
-    // 内存块头
-    char *ptrToFree = reinterpret_cast<char *>(ptr);
-    ObjBlock<ObjType> *blockHeader = reinterpret_cast<ObjBlock<ObjType> *>(reinterpret_cast<char*>(ptrToFree - sizeof(ObjBlock<ObjType>)));
-
-    // 引用计数
-    if(--blockHeader->_ref != 0)
-        return;
-
-    // 不是内存池内且引用计数为0
-    if (!blockHeader->_isInPool)
-    {
-        ::free(blockHeader);
-        --_objInUse;
-        // _inUsings.erase(blockHeader);
-        return;
-    }
-
-    // 被释放的节点插到可用头节点之前
-    blockHeader->_nextBlock = _usableBlockHeader;
-    _usableBlockHeader = blockHeader;
-    ++_freeBlockLeft;
+    // free的对象构成链表用于下次分配
+    *((ObjType **)ptr) = _lastDeleted;
+    _lastDeleted = reinterpret_cast<ObjType *>(ptr);
     --_objInUse;
-
-    // 释放后从正在使用中移除
-    // _inUsings.erase(blockHeader);
-}
-
-template<typename ObjType>
-inline bool IObjAlloctor<ObjType>::NotBusy()
-{
-    return (_freeBlockLeft * 100 / _blockAmount) >= ObjPoolDefs::__g_FreeRate;
-}
-
-template<typename ObjType>
-inline bool IObjAlloctor<ObjType>::IsEmpty() const
-{
-    return !_usableBlockHeader;
 }
 
 template<typename ObjType>
@@ -144,105 +123,18 @@ inline size_t IObjAlloctor<ObjType>::GetObjInUse() const
 }
 
 template<typename ObjType>
-inline AlloctorNode<ObjType> *IObjAlloctor<ObjType>::GetNode()
+inline void IObjAlloctor<ObjType>::_NewNode()
 {
-    return _curNode;
-}
+    // 构成链表
+    auto *newNode = new AlloctorNode<ObjType>(_nodeCapacity);
 
-template<typename ObjType>
-inline void IObjAlloctor<ObjType>::InitMemory()
-{
-    if(_isInit)
-        return;
-
-    ASSERT(_buf == 0);
-    if(_buf)
-        return;
-
-    /**
-    *   计算需要申请的内存大小，其中包含内存头数据大小
-    */
-    size_t	bufSize = _blockSize * _blockAmount;
-
-    /**
-    *   申请内存
-    */
-    _buf = reinterpret_cast<char*>(::malloc(bufSize));
-    memset(_buf, 0, bufSize);
-
-    /**
-    *   链表头和尾部指向同一位置
-    */
-    _usableBlockHeader = reinterpret_cast<ObjBlock<ObjType> *>(_buf);
-    _usableBlockHeader->_ref = 0;
-    _usableBlockHeader->_alloctor = this;
-    _usableBlockHeader->_nextBlock = 0;
-    _usableBlockHeader->_isInPool = true;
-    _usableBlockHeader->_objSize = sizeof(ObjType);
-    ObjBlock<ObjType> *temp = _usableBlockHeader;
-
-    // 构建内存块链表
-    for(size_t i = 1; i < _blockAmount; ++i)
-    {
-        char *cache = (_buf + _blockSize * i);
-        ObjBlock<ObjType> *block = reinterpret_cast<ObjBlock<ObjType> *>(cache);
-        block->_ref = 0;
-        block->_isInPool = true;
-        block->_alloctor = this;
-        block->_nextBlock = 0;
-        block->_objSize = sizeof(ObjType);
-        temp->_nextBlock = block;
-        temp = block;
-    }
-
-    _isInit = true;
-}
-
-template<typename ObjType>
-inline void IObjAlloctor<ObjType>::FinishMemory()
-{
-    if(!_isInit)
-        return;
-
-    _isInit = false;
-
-    // 收集并释放泄漏的内存
-    std::pair<Int64, Int64> amountRefSizePair;
-//     for(auto &block : _inUsings)
-//     {
-//         if(block->_ref)
-//         {
-//             amountRefSizePair.second += 1;
-//             amountRefSizePair.first += _blockSize;
-//             if(!block->_isInPool)
-//                 ::free(block);
-//         }
-//     }
-
-    // 使用系统的内存分配释放掉
-    while(_usableBlockHeader != 0)
-    {
-        auto *header = _usableBlockHeader;
-        _usableBlockHeader = _usableBlockHeader->_nextBlock;
-
-        if(!header->_isInPool)
-            ::free(header);
-    }
-    _usableBlockHeader = 0;
-
-    // 释放本系统内存
-    if(_buf)
-    {
-        ::free(_buf);
-        _buf = NULL;
-    }
-
-    // 内存泄漏打印
-//     if(amountRefSizePair.first)
-//     {
-//         g_Log->memleak("objName[%s], amount[%lld]*size[%lld];"
-//                        , typeid(ObjType).name(), amountRefSizePair.first, amountRefSizePair.second);
-//     }
+    // lastnode在构造中初始化
+    _lastNode->_nextNode = newNode;
+    _lastNode = newNode;
+    _curNodeObjs = newNode->_objs;
+    _alloctedInCurNode = 0;
+    ++_nodeCnt;
+    _bytesOccupied += _nodeCapacity * _objBlockSize;
 }
 
 FS_NAMESPACE_END

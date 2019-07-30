@@ -52,25 +52,15 @@ public:
 public:
     void *Alloc();
     void  Free(void *ptr);
-    void  AddRef(void *ptr);
     size_t GetMemleakObjNum() const;
 
 private:
-    void _Init();
-    void _Finish();
     void _Lock();
     void _Unlock();
 
-    AlloctorNode<ObjType> *_NewAlloctorNode();
-    void _SwitchToHeader(AlloctorNode<ObjType> *node);
-    void _ReplaceHeader(AlloctorNode<ObjType> *node);
-    AlloctorNode<ObjType> *_PtrToAlloctorNode(void *ptr);
-
     Locker _locker;
     size_t _objAmount;
-
-    /* Ë«ÏòÁ´±í */
-    AlloctorNode<ObjType> *_objAlloctorHeader;
+    IObjAlloctor<ObjType> *_alloctor;
 };
 
 FS_NAMESPACE_END

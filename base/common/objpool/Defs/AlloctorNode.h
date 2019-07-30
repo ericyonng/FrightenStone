@@ -42,13 +42,13 @@ template<typename ObjType>
 class AlloctorNode
 {
 public:
-    AlloctorNode();
+    AlloctorNode(size_t capacity);
     ~AlloctorNode();
 
 public:
-    AlloctorNode<ObjType> *_preNode;
+    static const size_t _objBlockSize;
+    void *_objs;
     AlloctorNode<ObjType> *_nextNode;
-    IObjAlloctor<ObjType> *_curAlloctor;
 };
 
 FS_NAMESPACE_END
