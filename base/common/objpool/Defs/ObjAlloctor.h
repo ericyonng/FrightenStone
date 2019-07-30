@@ -60,6 +60,7 @@ public:
     void *Alloc();
     void  Free(void *ptr);
     size_t GetObjInUse() const;
+    size_t GetTotalObjBlocks() const;    // 当前全部的对象块个数
     size_t GetNodeCnt() const;
     size_t GetBytesOccupied() const;
 
