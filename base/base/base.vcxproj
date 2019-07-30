@@ -296,6 +296,8 @@
     <ClInclude Include="..\common\log\Interface\ILog.h" />
     <ClInclude Include="..\common\log\Interface\ILogImpl.h" />
     <ClInclude Include="..\common\log\Log.h" />
+    <ClInclude Include="..\common\memleak\Impl\MemleakMonitor.h" />
+    <ClInclude Include="..\common\memleak\memleak.h" />
     <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctor.h" />
     <ClInclude Include="..\common\memorypool\Defs\MemoryAlloctorImpl.h" />
     <ClInclude Include="..\common\memorypool\Defs\MemoryBlock.h" />
@@ -378,6 +380,7 @@
     <ClCompile Include="..\common\log\Defs\LogTask.cpp" />
     <ClCompile Include="..\common\log\Impl\FS_Log.cpp" />
     <ClCompile Include="..\common\log\Interface\ILog.cpp" />
+    <ClCompile Include="..\common\memleak\Impl\MemleakMonitor.cpp" />
     <ClCompile Include="..\common\memorypool\Defs\MemoryAlloctor.cpp" />
     <ClCompile Include="..\common\memorypool\Defs\MemoryBlock.cpp" />
     <ClCompile Include="..\common\memorypool\Defs\MemoryPoolCreateDefs.cpp" />

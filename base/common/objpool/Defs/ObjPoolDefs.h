@@ -35,6 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 #pragma region macro
 #undef __DEF_OBJ_POOL_OBJ_NUM__
@@ -47,6 +48,14 @@ class BASE_EXPORT ObjPoolDefs
 {
 public:
     static const Int32 __g_FreeRate;      // ¶ÔÏó³Ø¿ÕÏÐÂÊ
+};
+
+class BASE_EXPORT ObjPoolMethods
+{
+public:
+    static void PrintMemleakInfo(const char *objName, size_t nodeCnt, size_t bytesOccupied, size_t memleakObjCnt, size_t memleakBytes);
+    static void RegisterToMemleakMonitor(const char *objName, IDelegatePlus<size_t, Int64 &> *callback);
+    static void UnRegisterMemleakDelegate(const char *objName);
 };
 
 

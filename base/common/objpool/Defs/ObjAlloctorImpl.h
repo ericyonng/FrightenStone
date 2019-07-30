@@ -123,6 +123,18 @@ inline size_t IObjAlloctor<ObjType>::GetObjInUse() const
 }
 
 template<typename ObjType>
+inline size_t IObjAlloctor<ObjType>::GetNodeCnt() const
+{
+    return _nodeCnt;
+}
+
+template<typename ObjType>
+inline size_t IObjAlloctor<ObjType>::GetBytesOccupied() const
+{
+    return _bytesOccupied;
+}
+
+template<typename ObjType>
 inline void IObjAlloctor<ObjType>::_NewNode()
 {
     // ππ≥…¡¥±Ì

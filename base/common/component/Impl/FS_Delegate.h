@@ -47,6 +47,7 @@ class FS_Delegate
 public:
     FS_Delegate(T *t, R(T::*f)(Args...));
     R operator()(Args&&... args);
+    void Release();
 
 private:
     T *_obj;
@@ -68,6 +69,7 @@ public:
     IDelegatePlus();
     virtual ~IDelegatePlus();
     virtual R operator()(Args&&... args) = 0;
+    virtual void Release();
 };
 
 template <typename T, typename R, typename... Args>

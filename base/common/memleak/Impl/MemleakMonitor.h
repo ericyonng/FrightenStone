@@ -21,27 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MetaLocker.cpp
+ * @file  : MemleakMonitor.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
- * @brief :
+ * @date  : 2019/07/31
+ * @brief : 内存泄漏监视器，支持对象池中创建的对象
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/asyn/Lock/Defs/MetaLocker.h"
+#ifndef __Base_Common_Memleak_Impl_MemleakMonitor_H__
+#define __Base_Common_Memleak_Impl_MemleakMonitor_H__
+
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_String.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
-MetaLocker::MetaLocker()
+class BASE_EXPORT MemleakMonitor
 {
-    memset(&_handle, 0, sizeof(_handle));
-}
+public:
+    MemleakMonitor();
+    virtual ~MemleakMonitor();
 
-MetaLocker::~MetaLocker()
-{
+    static MemleakMonitor *GetInstance();
+    void RegisterCallback(const char *name, IDelegatePlus<size_t, Int64 &> *callback);
+    void UnRegister(const char *name);
 
-}
+    void PrintMemleakInfo();
+
+private:
+    static Locker _locker;
+    std::map<FS_String, std::vector<IDelegatePlus<size_t, Int64 &> *> *> _objNameRefPrintCallback;
+};
 
 FS_NAMESPACE_END
+
+extern BASE_EXPORT fs::MemleakMonitor *g_MemleakMonitor;
+
+#endif

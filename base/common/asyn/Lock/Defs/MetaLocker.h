@@ -33,10 +33,12 @@
 #define __Base_Common_Asyn_Lock_Defs_MetaLocker_H__
 
 #pragma once
-#include "base/common/common.h"
+#include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 
-class MetaLocker
+FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT MetaLocker
 {
 public:
     MetaLocker();
@@ -45,5 +47,7 @@ public:
 public:
     LockerHandle _handle;
 };
+
+FS_NAMESPACE_END
 
 #endif // !__Base_Common_Asyn_Lock_Defs_MetaLocker_H__

@@ -39,11 +39,18 @@ inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
     : _objAmount(objAmount)
     ,_alloctor(new IObjAlloctor<ObjType>(objAmount))
 {
+    // ´´½¨Î¯ÍÐ
+   ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
+                                            , DelegatePlusFactory::Create(this, &ObjPoolHelper<ObjType>::PrintMemleak));
+//     ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
+//                                              , DelegatePlusFactory::Create<size_t, size_t &>(obj, &fs::ObjPoolHelper<ObjType>::PrintMemleak));
 }
 
 template<typename ObjType>
 inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
 {
+    ObjPoolMethods::UnRegisterMemleakDelegate(typeid(ObjType).name());
+
 #if __FS_THREAD_SAFE__
     _Lock();
 #endif
@@ -99,6 +106,38 @@ inline size_t ObjPoolHelper<ObjType>::GetMemleakObjNum() const
 #endif
 
     return cnt;
+}
+
+template<typename ObjType>
+inline const char *ObjPoolHelper<ObjType>::GetObjName() const
+{
+    return typeid(ObjType).name();
+}
+
+template<typename ObjType>
+inline size_t ObjPoolHelper<ObjType>::GetMemleakBytes() const
+{
+    return _alloctor->GetObjInUse()*IObjAlloctor<ObjType>::_objBlockSize;
+}
+
+template<typename ObjType>
+inline size_t ObjPoolHelper<ObjType>::GetPoolBytesOccupied() const
+{
+    return _alloctor->GetBytesOccupied();
+}
+
+template<typename ObjType>
+inline size_t ObjPoolHelper<ObjType>::PrintMemleak(Int64 &poolOccupiedBytes)
+{
+    auto memleakBytes = _alloctor->GetObjInUse()*IObjAlloctor<ObjType>::_objBlockSize;
+    poolOccupiedBytes = _alloctor->GetBytesOccupied();
+    ObjPoolMethods::PrintMemleakInfo(typeid(ObjType).name()
+                                     , _alloctor->GetNodeCnt()
+                                     , _alloctor->GetBytesOccupied()
+                                     , _alloctor->GetObjInUse()
+                                     , memleakBytes);
+
+    return memleakBytes;
 }
 
 template<typename ObjType>

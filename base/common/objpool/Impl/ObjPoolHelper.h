@@ -53,6 +53,10 @@ public:
     void *Alloc();
     void  Free(void *ptr);
     size_t GetMemleakObjNum() const;
+    const char *GetObjName() const;
+    size_t GetMemleakBytes() const;
+    size_t GetPoolBytesOccupied() const;
+    size_t PrintMemleak(Int64 &poolOccupiedBytes);
 
 private:
     void _Lock();
@@ -70,21 +74,21 @@ FS_NAMESPACE_END
 /// 内存池创建对象便利宏
 // 声明中需要添加
 #undef  OBJ_POOL_CREATE
-#define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                               \
-public:                                                                                         \
-        void  *operator new(size_t bytes)       { return _objpool_helper.Alloc();}              \
-        void   operator delete(void *ptr)       { _objpool_helper.Free(ptr);}                   \
-        static size_t GetMemleakNum();                                                          \
-                                                                                                \
+#define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                                       \
+public:                                                                                                 \
+        void  *operator new(size_t bytes)       { return _objpool_helper.Alloc();}                      \
+        void   operator delete(void *ptr)       { _objpool_helper.Free(ptr);}                           \
+        static size_t GetMemleakNum();                                                                  \
+                                                                                                        \
 static fs::ObjPoolHelper<ObjType> _objpool_helper;
 
 // 在实现文件中需要添加
 #undef OBJ_POOL_CREATE_IMPL
-#define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                \
-fs::ObjPoolHelper<ObjType> ObjType::_objpool_helper(objAmount);                                  \
-size_t ObjType::GetMemleakNum()                                                                  \
-{                                                                                                \
-    return _objpool_helper.GetMemleakObjNum();                                                   \
+#define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                       \
+fs::ObjPoolHelper<ObjType> ObjType::_objpool_helper(objAmount);                                         \
+size_t ObjType::GetMemleakNum()                                                                         \
+{                                                                                                       \
+    return _objpool_helper.GetMemleakObjNum();                                                          \
 }
 
 #endif
