@@ -21,46 +21,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : common.h
+ * @file  : TestEvent.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/12
+ * @date  : 2019/7/31
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Common_H__
-#define __Base_Common_Common_H__
-/**
-* @file net.h
-* @auther Huiya Song <120453674@qq.com>
-* @date 2019/04/18
-* @brief
-*/
-
+#ifndef __Test_TestEvent_H__
+#define __Test_TestEvent_H__
 #pragma once
 
-// defs ...
-// Impl ...
-// Interface ...
-#include "base/common/basedefs/Resource/Resource.h"
-#pragma region base code
-#ifndef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-#include<base/common/socket/socket.h>
-#include <base/common/net/net.h>
-#include <base/common/status/status.h>
-#include "base/common/asyn/asyn.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/assist/assist.h"
-#include "base/common/component/component.h"
-#include "base/common/log/Log.h"
-#include "base/common/Global/EasyGlobal.h"
-#include "base/common/crashhandle/CrashHandle.h"
-#include "base/common/objpool/objpool.h"
-#include "base/common/Application/Application.h"
-#include "base/common/memleak/memleak.h"
-#include "base/common/event/event.h"
-#endif
-#pragma endregion
+#include "stdafx.h"
 
-#endif // !__Base_Common_Common_H__
+class EventTestTask
+{
+public:
+    EventTestTask() {}
+    ~EventTestTask() {}
+
+    void TestEvent(fs::FS_Event *ev)
+    {
+        std::cout << "TestEvent 1" << std::endl;
+        std::cout << ev->GetParam("token").AsStr() << std::endl;
+    }
+};
+
+void TestEventTask2(fs::FS_Event *ev)
+{
+    std::cout << "TestEventTask2" << std::endl;
+    std::cout << ev->GetParam("token").AsStr() << std::endl;
+}
+
+class TestEvent
+{
+public:
+    static void Run()
+    {
+        EventTestTask task1;
+        auto stub1 = g_FSEventMgr->AddListener(1, fs::DelegatePlusFactory::Create(&task1, &EventTestTask::TestEvent));
+        auto stub2 = g_FSEventMgr->AddListener(1, fs::DelegatePlusFactory::Create(&TestEventTask2));
+
+        fs::FS_Event *ev = new fs::FS_Event(1);
+        ev->SetParam("token", "hello world");
+        g_FSEventMgr->FireEvent(ev);
+
+        g_FSEventMgr->RemoveListenerX(stub1);
+        g_FSEventMgr->RemoveListenerX(stub2);
+    }
+};
+
+#endif

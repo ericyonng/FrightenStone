@@ -80,6 +80,9 @@ p = NULL;}
 #define Fs_Free(memblock)                 delete(memblock)
 #define Fs_SafeFree(memblock)        \
         (memblock?(Fs_Free(memblock), memblock = NULL):NULL)
+#define FS_Release(obj)                     \
+obj?obj->Release(),true:true;               \
+obj = NULL
 
 #ifndef INFINITE
 #define INFINITE    0xFFFFFFFF
@@ -231,7 +234,7 @@ private:\
 #if defined(_WIN32) && defined(_DEBUG)
 #define ASSERT(x)   assert(x)
 #else
-#define ASSERT(x)   x
+#define ASSERT(x)   x?true:false
 #endif
 
 #undef ARRAY_ELEM_COUNT

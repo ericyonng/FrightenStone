@@ -304,6 +304,18 @@
     <Filter Include="common\memleak\Interface">
       <UniqueIdentifier>{15e19b17-69fe-48e7-91b7-298f73296584}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\event">
+      <UniqueIdentifier>{74f554ec-c86d-444d-add9-a4da6f95a10c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\event\Defs">
+      <UniqueIdentifier>{1fa968f4-e4de-498c-9990-486c39b69e86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\event\Impl">
+      <UniqueIdentifier>{7eaf8e20-352d-4f80-90e0-f1440494d57c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\event\Interface">
+      <UniqueIdentifier>{ce9869ca-6893-46ae-82a2-6eb677118de6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -762,6 +774,30 @@
     <ClInclude Include="..\common\memleak\Impl\MemleakMonitor.h">
       <Filter>common\memleak\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_GuidUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\FS_GuidUtilDefs.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event\event.h">
+      <Filter>common\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event\Impl\EventManager.h">
+      <Filter>common\event\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event\Impl\EventManagerImpl.h">
+      <Filter>common\event\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event\Impl\FS_Event.h">
+      <Filter>common\event\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event\Impl\FS_EventImpl.h">
+      <Filter>common\event\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event\Defs\EventDefs.h">
+      <Filter>common\event\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -964,6 +1000,15 @@
     </ClCompile>
     <ClCompile Include="..\common\memleak\Impl\MemleakMonitor.cpp">
       <Filter>common\memleak\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\FS_GuidUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\event\Impl\EventManager.cpp">
+      <Filter>common\event\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\event\Impl\FS_Event.cpp">
+      <Filter>common\event\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

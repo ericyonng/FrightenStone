@@ -93,6 +93,7 @@ public:
 
     bool operator == (const FS_String &index) const;
     bool operator != (const char *str) const;
+    bool operator != (const FS_String &str) const;
     FS_String operator + (const FS_String &other) const; // 
     FS_String operator + (const char *other) const; // 
     FS_String operator + (const std::string &other) const; // 

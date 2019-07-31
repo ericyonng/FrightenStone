@@ -52,5 +52,6 @@
 #include "base/common/assist/utils/Defs/SystemUtilDefs.h"
 #include "base/common/assist/utils/Impl/KeyGeneratorUtil.h"
 #include "base/common/assist/utils/Impl/MathUtil.h"
+#include "base/common/assist/utils/Impl/FS_GuidUtil.h"
 
 #endif // !__Base_Common_Assist_Utils_Utils_H__
