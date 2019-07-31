@@ -85,6 +85,10 @@ inline IObjAlloctor<ObjType>::~IObjAlloctor()
 template<typename ObjType>
 inline void *IObjAlloctor<ObjType>::Alloc()
 {
+#if __FS_THREAD_SAFE__
+    _locker.Lock();
+#endif
+
     if(_lastDeleted)
     {
         ObjType *ptr = _lastDeleted;
@@ -92,6 +96,11 @@ inline void *IObjAlloctor<ObjType>::Alloc()
         // 取得最后一个被释放对象的地址
         _lastDeleted = *(reinterpret_cast<ObjType **>(_lastDeleted));
         ++_objInUse;
+
+#if __FS_THREAD_SAFE__
+        _locker.Unlock();
+#endif
+
         return ptr;
     }
 
@@ -104,11 +113,60 @@ inline void *IObjAlloctor<ObjType>::Alloc()
     ptr += _alloctedInCurNode * _objBlockSize;
     ++_alloctedInCurNode;
     ++_objInUse;
+
+#if __FS_THREAD_SAFE__
+    _locker.Unlock();
+#endif
+
     return ptr;
 }
 
 template<typename ObjType>
 inline void IObjAlloctor<ObjType>::Free(void *ptr)
+{
+#if __FS_THREAD_SAFE__
+    _locker.Lock();
+#endif
+
+    // free的对象构成链表用于下次分配
+    *((ObjType **)ptr) = _lastDeleted;
+    _lastDeleted = reinterpret_cast<ObjType *>(ptr);
+    --_objInUse;
+
+#if __FS_THREAD_SAFE__
+    _locker.Unlock();
+#endif
+}
+
+template<typename ObjType>
+inline void *IObjAlloctor<ObjType>::AllocNoLocker()
+{
+    if(_lastDeleted)
+    {
+        ObjType *ptr = _lastDeleted;
+
+        // 取得最后一个被释放对象的地址
+        _lastDeleted = *(reinterpret_cast<ObjType **>(_lastDeleted));
+        ++_objInUse;
+
+        return ptr;
+    }
+
+    // 分配新节点
+    if(_alloctedInCurNode >= _nodeCapacity)
+        _NewNode();
+
+    // 内存池中分配对象
+    char *ptr = reinterpret_cast<char *>(_curNodeObjs);
+    ptr += _alloctedInCurNode * _objBlockSize;
+    ++_alloctedInCurNode;
+    ++_objInUse;
+
+    return ptr;
+}
+
+template<typename ObjType>
+inline void IObjAlloctor<ObjType>::FreeNoLocker(void *ptr)
 {
     // free的对象构成链表用于下次分配
     *((ObjType **)ptr) = _lastDeleted;
@@ -117,27 +175,99 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
 }
 
 template<typename ObjType>
-inline size_t IObjAlloctor<ObjType>::GetObjInUse() const
+template<typename... Args>
+inline ObjType *IObjAlloctor<ObjType>::New(Args &&... args)
 {
+    return ::new(AllocNoLocker())ObjType(std::forward<Args>(args)...);
+}
+
+template<typename ObjType>
+template<typename... Args>
+inline ObjType *IObjAlloctor<ObjType>::NewByPtr(void *ptr, Args &&... args)
+{
+    return ::new(ptr)ObjType(std::forward<Args>(args)...);
+}
+
+template<typename ObjType>
+inline void IObjAlloctor<ObjType>::Delete(ObjType *ptr)
+{
+    // 先析构后释放
+    ptr->~ObjType();
+    FreeNoLocker(ptr);
+}
+
+template<typename ObjType>
+inline void IObjAlloctor<ObjType>::DeleteWithoutDestructor(ObjType *ptr)
+{
+    FreeNoLocker(ptr);
+}
+
+template<typename ObjType>
+inline size_t IObjAlloctor<ObjType>::GetObjInUse()
+{
+#if __FS_THREAD_SAFE__
+    _locker.Lock();
+    auto cnt = _objInUse;
+    _locker.Unlock();
+
+    return cnt;
+#else
     return _objInUse;
+#endif
 }
 
 template<typename ObjType>
-inline size_t IObjAlloctor<ObjType>::GetTotalObjBlocks() const
+inline size_t IObjAlloctor<ObjType>::GetTotalObjBlocks()
 {
+#if __FS_THREAD_SAFE__
+    _locker.Lock();
+    auto cnt = _nodeCnt * _nodeCapacity;
+    _locker.Unlock();
+
+    return cnt;
+#else
     return _nodeCnt * _nodeCapacity;
+#endif
 }
 
 template<typename ObjType>
-inline size_t IObjAlloctor<ObjType>::GetNodeCnt() const
+inline size_t IObjAlloctor<ObjType>::GetNodeCnt()
 {
+#if __FS_THREAD_SAFE__
+    _locker.Lock();
+    auto cnt = _nodeCnt;
+    _locker.Unlock();
+
+    return cnt;
+#else
     return _nodeCnt;
+#endif
 }
 
 template<typename ObjType>
-inline size_t IObjAlloctor<ObjType>::GetBytesOccupied() const
+inline size_t IObjAlloctor<ObjType>::GetBytesOccupied()
 {
+#if __FS_THREAD_SAFE__
+    _locker.Lock();
+    auto cnt = _bytesOccupied;
+    _locker.Unlock();
+
+    return cnt;
+#else
     return _bytesOccupied;
+#endif
+}
+
+template<typename ObjType>
+inline void IObjAlloctor<ObjType>::Lock()
+{
+    _locker.Lock();
+}
+
+template<typename ObjType>
+inline void IObjAlloctor<ObjType>::UnLock()
+{
+    _locker.Unlock();
 }
 
 template<typename ObjType>

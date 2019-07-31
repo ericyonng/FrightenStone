@@ -42,6 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
+// 支持线程安全 尽量设置线程不安全避免加锁开销
 template<typename ObjType>
 class ObjPoolHelper
 {
@@ -50,20 +51,18 @@ public:
     virtual ~ObjPoolHelper();
 
 public:
-    void *Alloc();
-    void  Free(void *ptr);
     size_t GetMemleakObjNum() const;
     const char *GetObjName() const;
     size_t GetMemleakBytes() const;
     size_t GetPoolBytesOccupied() const;
     size_t PrintMemleak(Int64 &poolOccupiedBytes);
 
-private:
-    void _Lock();
-    void _Unlock();
+    // 分配器行为接口
+    IObjAlloctor<ObjType> *operator->();
+    const IObjAlloctor<ObjType> *operator->() const;
 
+public:
     Locker _locker;
-    size_t _objAmount;
     IObjAlloctor<ObjType> *_alloctor;
 };
 
@@ -72,12 +71,12 @@ FS_NAMESPACE_END
 #include "base/common/objpool/Impl/ObjPoolHelperImpl.h"
 
 /// 内存池创建对象便利宏
-// 声明中需要添加
+// 声明中需要添加 便利宏不支持基本数据类型 基本数据类型请直接定义一个helper对象
 #undef  OBJ_POOL_CREATE
 #define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                                       \
 public:                                                                                                 \
-        void  *operator new(size_t bytes)       { return _objpool_helper.Alloc();}                      \
-        void   operator delete(void *ptr)       { _objpool_helper.Free(ptr);}                           \
+        void  *operator new(size_t bytes)       { return _objpool_helper._alloctor->Alloc();}           \
+        void   operator delete(void *ptr)       { _objpool_helper._alloctor->Free(ptr);}                \
         static size_t GetMemleakNum();                                                                  \
                                                                                                         \
 static fs::ObjPoolHelper<ObjType> _objpool_helper;
