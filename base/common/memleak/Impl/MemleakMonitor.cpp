@@ -111,4 +111,27 @@ void MemleakMonitor::PrintMemleakInfo()
                , totalMemleakBytes, totalOccupiedBytes);
 }
 
+void MemleakMonitor::PrintMemleakInfo(const char *objName)
+{
+    size_t totalMemleakBytes = 0;
+    Int64 totalOccupiedBytes = 0;
+    auto iterCallBacks = _objNameRefPrintCallback.find(objName);
+    if(iterCallBacks == _objNameRefPrintCallback.end())
+        return;
+
+    for(auto &callback : *iterCallBacks->second)
+    {
+        Int64 curOccupied = 0;
+        totalMemleakBytes += (*callback)(curOccupied);
+        totalOccupiedBytes += curOccupied;
+    }
+
+    // 打印内存泄漏
+    g_Log->memleak("memleak monitor[%s]: memleak bytes[%llu] pool occupied bytes[%lld]"
+                   ,objName, totalMemleakBytes, totalOccupiedBytes);
+
+    // 打印系统信息
+    g_Log->sys(_LOGFMT_("memleak monitor[%s]: memleak bytes[%llu] pool occupied bytes[%lld]")
+               ,objName, totalMemleakBytes, totalOccupiedBytes);
+}
 FS_NAMESPACE_END

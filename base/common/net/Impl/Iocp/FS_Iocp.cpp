@@ -155,6 +155,14 @@ Int32 FS_Iocp::PostRecv(IO_DATA_BASE *ioData)
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
         {
+            // 对端关闭
+            if(error == WSAECONNRESET)
+            {
+                g_Log->net("An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
+                                    , error, StatusDefs::IOCP_ClientForciblyClosed);
+                return StatusDefs::IOCP_ClientForciblyClosed;
+            }
+
             g_Log->e<FS_Iocp>(_LOGFMT_("PostRecv ioSocket[%llu] to completionport failed windows error<%d> status[%d]")
                               , ioData->_sock, error, StatusDefs::IOCP_PostRecvFail);
             return StatusDefs::IOCP_PostRecvFail;
@@ -177,6 +185,14 @@ Int32 FS_Iocp::PostSend(IO_DATA_BASE *ioData)
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
         {
+            // 对端关闭
+            if(error == WSAECONNRESET)
+            {
+                g_Log->net("An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
+                                    , error, StatusDefs::IOCP_ClientForciblyClosed);                
+                return StatusDefs::IOCP_ClientForciblyClosed;
+            }
+
             g_Log->e<FS_Iocp>(_LOGFMT_("PostSend ioSocket[%llu] to completionport failed windows error<%d> status[%d]")
                               , ioData->_sock, error, StatusDefs::IOCP_PostSendFail);
             return StatusDefs::IOCP_PostSendFail;

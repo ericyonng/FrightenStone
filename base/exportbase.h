@@ -34,9 +34,9 @@
 
 #pragma once
 
-#ifndef __FS_THREAD_SAFE__
-#define __FS_THREAD_SAFE__ 0
-#endif
+// 默认开启线程安全
+#undef __FS_THREAD_SAFE__
+#define __FS_THREAD_SAFE__ 1
 
 //导出定义
 #ifndef BASE_EXPORT

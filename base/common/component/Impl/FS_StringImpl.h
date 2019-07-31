@@ -40,40 +40,6 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_String::FS_String()
-{
-    _cache[0] = 0;
-}
-
-inline FS_String::~FS_String()
-{
-
-}
-
-inline FS_String::FS_String(char other)
-{
-    _buffer = other;
-    _cache[0] = 0;
-}
-
-inline FS_String::FS_String(const std::string &other)
-    :_buffer(other)
-{
-    _cache[0] = 0;
-}
-
-inline FS_String::FS_String(const char *other)
-{
-    _buffer = other;
-    _cache[0] = 0;
-}
-
-inline FS_String::FS_String(const FS_String &other)
-{
-    _buffer = other._buffer;
-    _cache[0] = 0;
-}
-
 #pragma region << 
 inline FS_String &FS_String::operator = (const Byte8 *str)
 {

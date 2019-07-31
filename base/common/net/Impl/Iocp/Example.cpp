@@ -150,7 +150,7 @@ FS_NAMESPACE_BEGIN
 
 int Example::Run()
 {
-    g_Log->InitModule("IOCP_TEST");
+    //g_Log->InitModule("IOCP_TEST");
     WORD ver = MAKEWORD(2, 2);
     WSADATA dat;
     WSAStartup(ver, &dat);
@@ -268,7 +268,12 @@ int Example::Run()
 
             // 不停的接收数据
             ioEvent._ioData->_length = ioEvent._bytesTrans;
-            iocp.PostSend(ioEvent._ioData);
+            auto st = iocp.PostSend(ioEvent._ioData);
+            if(st == StatusDefs::IOCP_ClientForciblyClosed)
+            {// 远端关闭
+                closesocket(ioEvent._ioData->_sock);
+                iocp.PostAccept(sockServer, ioEvent._ioData);
+            }
         }
         else if(ioEvent._ioData->_ioType == IocpDefs::IO_SEND)
         {
@@ -285,7 +290,12 @@ int Example::Run()
             g_Log->sys(_LOGFMT_("send data :socket[%llu], bytesTrans[%d] msgCount[%d]")
                        , ioEvent._ioData->_sock, ioEvent._bytesTrans, msgCount);
 
-            iocp.PostRecv(ioEvent._ioData);
+            auto st = iocp.PostRecv(ioEvent._ioData);
+            if(st == StatusDefs::IOCP_ClientForciblyClosed)
+            {// 远端关闭
+                closesocket(ioEvent._ioData->_sock);
+                iocp.PostAccept(sockServer, ioEvent._ioData);
+            }
         }
         else
         {

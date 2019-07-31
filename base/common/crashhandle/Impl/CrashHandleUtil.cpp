@@ -40,6 +40,7 @@
 #include "base/common/component/Impl/Time.h"
 #include "base/common/asyn/asyn.h"
 #include "iostream"
+#include "base/common/memleak/memleak.h"
 
 #define __USE_FS_DBGHELP__
 #include "3rd/3rd.h"
@@ -234,7 +235,7 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
 #endif // Release
     
     const Int32 initSymbolRet = InitSymbol();
-    ASSERT(initSymbolRet != StatusDefs::Success);
+    ASSERT(initSymbolRet == StatusDefs::Success);
     if(initSymbolRet != StatusDefs::Success)
         return initSymbolRet;
 
@@ -262,7 +263,7 @@ Int32 CrashHandleUtil::InitSymbol()
     if(::SymInitialize(::GetCurrentProcess(), NULL, TRUE) != TRUE)
     {
         const Int32 err = GetLastError();
-        printf("SymInitialize fail error[%d]\n", err);
+        g_Log->e<CrashHandleUtil>(_LOGFMT_("SymInitialize fail error[%d]"), err);
         return StatusDefs::CrashHandleUtil_SymInitializeFail;
     }
 
@@ -393,6 +394,7 @@ void CrashHandleUtil::_OnBeforeCrashLogHook(LogData *logData)
 
 void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 {
+    g_MemleakMonitor->PrintMemleakInfo();
 #ifdef _DEBUG
     // µØ¥∞∂—’ª–≈œ¢
     FS_String path;
