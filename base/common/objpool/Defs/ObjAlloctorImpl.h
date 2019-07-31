@@ -40,8 +40,8 @@ FS_NAMESPACE_BEGIN
 
 // objtype的blocksize必须是void *尺寸的整数倍
 template<typename ObjType>
-const size_t IObjAlloctor<ObjType>::_objBlockSize = sizeof(ObjType) / sizeof(void *) * sizeof(void *) + 
-(sizeof(ObjType) % sizeof(void *) ? sizeof(void *) : 0);
+const size_t IObjAlloctor<ObjType>::_objBlockSize = sizeof(ObjType) / __OBJPOOL_ALIGN_BYTES__ * __OBJPOOL_ALIGN_BYTES__ +
+(sizeof(ObjType) % (__OBJPOOL_ALIGN_BYTES__) ? (__OBJPOOL_ALIGN_BYTES__) : 0);
 
 template<typename ObjType>
 inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)

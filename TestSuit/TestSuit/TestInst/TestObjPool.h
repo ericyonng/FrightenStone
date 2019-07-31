@@ -2,7 +2,7 @@
 #define __Test_TestObjPool_H__
 #pragma once
 #undef __FS_THREAD_SAFE__
-#define __FS_THREAD_SAFE__ 0
+#define __FS_THREAD_SAFE__ 1
 #include "stdafx.h"
 
 #undef TEST_OBJ_NUM
@@ -21,11 +21,7 @@ public:
     }
 
 private:
-    Int64 _char;
-    Int64 _char2;
-    Int64 _char3;
-    Int64 _char4;
-    Int64 _char5;
+    fs::FS_String _str;
 };
 
 OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, TEST_OBJ_NUM)
@@ -37,11 +33,8 @@ public:
     ~TestObjPoolObj2() {}
 
 private:
-    Int64 _char;
-    Int64 _char2;
-    Int64 _char3;
-    Int64 _char4;
-    Int64 _char5;
+    fs::FS_String _str;
+
 };
 
 class TestObjPool
@@ -49,8 +42,20 @@ class TestObjPool
 public:
     static void Run()
     {
-        g_Log->InitModule("TestObjPool");
-        fs::Time timeNow1, timeNow2;
+        //g_Log->InitModule("TestObjPool");
+/*        Int32 i = 0;*/
+//         while(1)
+//         {
+//             auto ptr = new fs::FS_String;
+//             ++i;
+//             
+//             g_MemleakMonitor->PrintMemleakInfo(typeid(fs::FS_String).name());
+//         }
+//         auto newStr = new fs::FS_String;
+//         std::cout << "size of str:"<< sizeof(fs::FS_String) << std::endl;
+//         g_MemleakMonitor->PrintMemleakInfo();
+//         getchar();
+         fs::Time timeNow1, timeNow2;
 //         timeNow1.FlushTime();
 //         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
 //         {
@@ -59,24 +64,24 @@ public:
 //         timeNow2.FlushTime();
 //         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 // 
-//         timeNow1.FlushTime();
-//         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-//         {            
-//             new TestObjPoolObj;
-//         }
-//         timeNow2.FlushTime();
-//         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
-//         std::cout << "memleak:" << TestObjPoolObj::GetMemleakNum() << std::endl;
-
-        fs::ObjPoolHelper<char> charPool(TEST_OBJ_NUM);
         timeNow1.FlushTime();
-        auto alloctor = charPool._alloctor;
         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-            new TestObjPoolObj;
-         timeNow2.FlushTime();
-         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+        {            
+            new TestObjPoolObj2;
+        }
+        timeNow2.FlushTime();
+        std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+       // std::cout << "memleak:" << TestObjPoolObj::GetMemleakNum() << std::endl;
 
-        g_MemleakMonitor->PrintMemleakInfo();
+         fs::ObjPoolHelper<TestObjPoolObj> charPool(TEST_OBJ_NUM);
+         auto alloctor = charPool._alloctor;
+         timeNow1.FlushTime();
+         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
+             alloctor->New();
+          timeNow2.FlushTime();
+          std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+// 
+         //g_MemleakMonitor->PrintMemleakInfo(typeid(TestObjPoolObj).name());
 
 
 //         g_Log->w<TestObjPool>(_LOGFMT_("HELLO"));

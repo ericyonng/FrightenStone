@@ -53,6 +53,8 @@ public:
     void UnRegister(const char *name);
 
     void PrintMemleakInfo();
+    // 请使用typeid作为objName
+    void PrintMemleakInfo(const char *objName);
 
 private:
     static Locker _locker;

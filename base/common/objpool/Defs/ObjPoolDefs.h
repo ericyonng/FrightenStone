@@ -39,7 +39,9 @@
 
 #pragma region macro
 #undef __DEF_OBJ_POOL_OBJ_NUM__
-#define __DEF_OBJ_POOL_OBJ_NUM__        10240
+#define __DEF_OBJ_POOL_OBJ_NUM__        100
+#undef __OBJPOOL_ALIGN_BYTES__
+#define __OBJPOOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
 #pragma endregion
 
 FS_NAMESPACE_BEGIN

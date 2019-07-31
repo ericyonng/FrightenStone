@@ -51,6 +51,40 @@ const char *FS_String::endl = "\r\n";
 const char *FS_String::endl = "\n";
 #endif
 
+FS_String::FS_String()
+{
+    _cache[0] = 0;
+}
+
+FS_String::~FS_String()
+{
+
+}
+
+FS_String::FS_String(char other)
+{
+    _buffer = other;
+    _cache[0] = 0;
+}
+
+FS_String::FS_String(const std::string &other)
+    :_buffer(other)
+{
+    _cache[0] = 0;
+}
+
+FS_String::FS_String(const char *other)
+{
+    _buffer = other;
+    _cache[0] = 0;
+}
+
+FS_String::FS_String(const FS_String &other)
+{
+    _buffer = other._buffer;
+    _cache[0] = 0;
+}
+
 FS_String &FS_String::operator *=(size_t right)
 {
     if(this->empty() || right == 1)

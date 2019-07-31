@@ -133,6 +133,7 @@ public:
         IOCP_WaitTimeOut = 1506,                                // 超时等待
         IOCP_IODisconnect = 1507,                               // io连接断开
         IOCP_WaitOtherError = 1508,                             // 其他错误
+        IOCP_ClientForciblyClosed = 1509,                       // 远程客户端被强行关闭
         #pragma endregion
 
     };
