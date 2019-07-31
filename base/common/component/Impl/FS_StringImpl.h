@@ -222,6 +222,11 @@ inline bool FS_String::operator != (const char *str) const
     return _buffer != str;
 }
 
+inline bool FS_String::operator != (const FS_String &str) const
+{
+    return _buffer != str._buffer;
+}
+
 inline FS_String FS_String::operator + (const FS_String &other) const
 {
     return _buffer + other._buffer;

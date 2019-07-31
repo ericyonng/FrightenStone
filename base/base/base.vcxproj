@@ -187,12 +187,14 @@
     <ClInclude Include="..\common\assist\assistobjs\Impl\SingletonImpl.h" />
     <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtr.h" />
     <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtrImpl.h" />
+    <ClInclude Include="..\common\assist\utils\Defs\FS_GuidUtilDefs.h" />
     <ClInclude Include="..\common\assist\utils\Defs\FS_IPUtilDefs.h" />
     <ClInclude Include="..\common\assist\utils\Defs\SystemUtilDefs.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_FileUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\FS_GuidUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_IPUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\KeyGeneratorUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\MathUtil.h" />
@@ -282,6 +284,12 @@
     <ClInclude Include="..\common\component\Impl\XorEncrypt.h" />
     <ClInclude Include="..\common\crashhandle\CrashHandle.h" />
     <ClInclude Include="..\common\crashhandle\Impl\CrashHandleUtil.h" />
+    <ClInclude Include="..\common\event\Defs\EventDefs.h" />
+    <ClInclude Include="..\common\event\event.h" />
+    <ClInclude Include="..\common\event\Impl\EventManager.h" />
+    <ClInclude Include="..\common\event\Impl\EventManagerImpl.h" />
+    <ClInclude Include="..\common\event\Impl\FS_Event.h" />
+    <ClInclude Include="..\common\event\Impl\FS_EventImpl.h" />
     <ClInclude Include="..\common\Global\Defs\EasyGlobalMacros.h" />
     <ClInclude Include="..\common\Global\EasyGlobal.h" />
     <ClInclude Include="..\common\Global\Interface\IEasyGlobal.h" />
@@ -337,6 +345,7 @@
     <ClCompile Include="..\common\assist\utils\Impl\FS_BitUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_DirectoryUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\FS_GuidUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\KeyGeneratorUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\MathUtil.cpp" />
@@ -375,6 +384,8 @@
     <ClCompile Include="..\common\component\Impl\XorEncrypt.cpp" />
     <ClCompile Include="..\common\crashhandle\Impl\CrashHandleUtil.cpp" />
     <ClCompile Include="..\common\crashhandle\Impl\IEasyGlobal.cpp" />
+    <ClCompile Include="..\common\event\Impl\EventManager.cpp" />
+    <ClCompile Include="..\common\event\Impl\FS_Event.cpp" />
     <ClCompile Include="..\common\log\Defs\LogCaches.cpp" />
     <ClCompile Include="..\common\log\Defs\LogData.cpp" />
     <ClCompile Include="..\common\log\Defs\LogTask.cpp" />

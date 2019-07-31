@@ -97,6 +97,7 @@ public:
 
     static const FS_String &GetTypeName(unsigned int rttiType);
     static void InitRttiTypeNames();
+
 private:
     static std::map<unsigned int, FS_String> _rttiTypeRefString;   // ÀàÐÍ×Ö·û´®
     static const FS_String _nullString;
@@ -106,7 +107,7 @@ FS_NAMESPACE_END
 FS_NAMESPACE_BEGIN
 
 /**
- * Pre-declare LLBC_Variant class.
+ * Pre-declare SmartVar class.
  */
 class SmartVar;
 

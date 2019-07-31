@@ -21,46 +21,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : common.h
+ * @file  : FS_GuidUtil.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/12
+ * @date  : 2019/7/31
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Common_H__
-#define __Base_Common_Common_H__
-/**
-* @file net.h
-* @auther Huiya Song <120453674@qq.com>
-* @date 2019/04/18
-* @brief
-*/
+#include "stdafx.h"
+#include "base/common/assist/utils/Impl/FS_GuidUtil.h"
 
-#pragma once
+FS_NAMESPACE_BEGIN
 
-// defs ...
-// Impl ...
-// Interface ...
-#include "base/common/basedefs/Resource/Resource.h"
-#pragma region base code
-#ifndef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-#include<base/common/socket/socket.h>
-#include <base/common/net/net.h>
-#include <base/common/status/status.h>
-#include "base/common/asyn/asyn.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/assist/assist.h"
-#include "base/common/component/component.h"
-#include "base/common/log/Log.h"
-#include "base/common/Global/EasyGlobal.h"
-#include "base/common/crashhandle/CrashHandle.h"
-#include "base/common/objpool/objpool.h"
-#include "base/common/Application/Application.h"
-#include "base/common/memleak/memleak.h"
-#include "base/common/event/event.h"
+FS_GUID FS_GuidUtil::Gen()
+{
+    FS_GUID guid;
+    ::memset(&guid, 0, sizeof(FS_GUID));
+
+#ifndef _WIN32
+    uuid_generate(reinterpret_cast<unsigned char *>(&guid));
+#else
+    ::CoCreateGuid(&guid);
 #endif
-#pragma endregion
 
-#endif // !__Base_Common_Common_H__
+    return guid;
+}
+
+FS_String FS_GuidUtil::Format(const FS_GUID &guid)
+{
+    FS_String str;
+    str.Format("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+               guid.Data1,
+               guid.Data2,
+               guid.Data3,
+               guid.Data4[0],
+               guid.Data4[1],
+               guid.Data4[2],
+               guid.Data4[3],
+               guid.Data4[4],
+               guid.Data4[5],
+               guid.Data4[6],
+               guid.Data4[7]);
+
+    return str;
+}
+
+FS_String FS_GuidUtil::GenStr()
+{
+    return Format(Gen());
+}
+
+FS_NAMESPACE_END

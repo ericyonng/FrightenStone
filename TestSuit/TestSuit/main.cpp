@@ -53,10 +53,11 @@
 #include "TestSuit/TestSuit/TestInst/TestObjPool.h"
 #include "TestSuit/TestSuit/TestInst/TestMathUtil.h"
 #include "TestSuit/TestSuit/TestInst/TestIocpExample.h"
+#include "TestSuit/TestSuit/TestInst/TestEvent.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    TestObjPool::Run();
+    TestEvent::Run();
     getchar();
     return 0;
 }

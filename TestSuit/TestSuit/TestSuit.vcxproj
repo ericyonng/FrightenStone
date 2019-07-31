@@ -155,6 +155,7 @@
     <ClInclude Include="TestInst\TestCpuUtil.h" />
     <ClInclude Include="TestInst\TestCrashHandle.h" />
     <ClInclude Include="TestInst\TestDelegate.h" />
+    <ClInclude Include="TestInst\TestEvent.h" />
     <ClInclude Include="TestInst\TestFile.h" />
     <ClInclude Include="TestInst\TestFSDirectory.h" />
     <ClInclude Include="TestInst\TestFSFileUtil.h" />
