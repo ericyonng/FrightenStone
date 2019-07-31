@@ -1,14 +1,12 @@
 #ifndef __Test_TestObjPool_H__
 #define __Test_TestObjPool_H__
 #pragma once
-
-#include "stdafx.h"
-
 #undef __FS_THREAD_SAFE__
 #define __FS_THREAD_SAFE__ 0
+#include "stdafx.h"
 
 #undef TEST_OBJ_NUM
-#define TEST_OBJ_NUM    10000000
+#define TEST_OBJ_NUM    1000000
 
 fs::MemleakMonitor *_g_memMonitor = g_MemleakMonitor;
 
@@ -53,24 +51,34 @@ public:
     {
         g_Log->InitModule("TestObjPool");
         fs::Time timeNow1, timeNow2;
-        timeNow1.FlushTime();
-        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-        {
-             new TestObjPoolObj2;
-        }
-        timeNow2.FlushTime();
-        std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+//         timeNow1.FlushTime();
+//         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
+//         {
+//              new TestObjPoolObj2;
+//         }
+//         timeNow2.FlushTime();
+//         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+// 
+//         timeNow1.FlushTime();
+//         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
+//         {            
+//             new TestObjPoolObj;
+//         }
+//         timeNow2.FlushTime();
+//         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+//         std::cout << "memleak:" << TestObjPoolObj::GetMemleakNum() << std::endl;
 
+        fs::ObjPoolHelper<char> charPool(TEST_OBJ_NUM);
         timeNow1.FlushTime();
+        auto alloctor = charPool._alloctor;
         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-        {            
             new TestObjPoolObj;
-        }
-        timeNow2.FlushTime();
+         timeNow2.FlushTime();
+         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 
-        std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
-        std::cout << "memleak:" << TestObjPoolObj::GetMemleakNum() << std::endl;
         g_MemleakMonitor->PrintMemleakInfo();
+
+
 //         g_Log->w<TestObjPool>(_LOGFMT_("HELLO"));
 //         g_Log->FinishModule();
 //         timeNow1.FlushTime();

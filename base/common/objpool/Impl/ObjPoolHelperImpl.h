@@ -36,8 +36,7 @@ FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
 inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
-    : _objAmount(objAmount)
-    ,_alloctor(new IObjAlloctor<ObjType>(objAmount))
+    :_alloctor(new IObjAlloctor<ObjType>(objAmount))
 {
     // ´´½¨Î¯ÍÐ
    ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
@@ -52,60 +51,20 @@ inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
     ObjPoolMethods::UnRegisterMemleakDelegate(typeid(ObjType).name());
 
 #if __FS_THREAD_SAFE__
-    _Lock();
+    _locker.Lock();
 #endif
 
     Fs_SafeFree(_alloctor);
 
 #if __FS_THREAD_SAFE__
-    _Unlock();
-#endif
-}
-
-template<typename ObjType>
-inline void *ObjPoolHelper<ObjType>::Alloc()
-{
-#if __FS_THREAD_SAFE__
-    _Lock();
-#endif
-
-    auto ptr = _alloctor->Alloc();
-
-#if __FS_THREAD_SAFE__
-    _Unlock();
-#endif
-
-    return ptr;
-}
-
-template<typename ObjType>
-inline void ObjPoolHelper<ObjType>::Free(void *ptr)
-{
-#if __FS_THREAD_SAFE__
-     _Lock();
-#endif
-
-     _alloctor->Free(ptr);
-
-#if __FS_THREAD_SAFE__
-    _Unlock();
+    _locker.Unlock();
 #endif
 }
 
 template<typename ObjType>
 inline size_t ObjPoolHelper<ObjType>::GetMemleakObjNum() const
 {
-#if __FS_THREAD_SAFE__
-    _Lock();
-#endif
-
-    auto cnt = _alloctor->GetObjInUse();
-
-#if __FS_THREAD_SAFE__
-    _Unlock();
-#endif
-
-    return cnt;
+    return _alloctor->GetObjInUse();
 }
 
 template<typename ObjType>
@@ -142,15 +101,15 @@ inline size_t ObjPoolHelper<ObjType>::PrintMemleak(Int64 &poolOccupiedBytes)
 }
 
 template<typename ObjType>
-inline void ObjPoolHelper<ObjType>::_Lock()
+inline IObjAlloctor<ObjType> *ObjPoolHelper<ObjType>::operator->()
 {
-    _locker.Lock();
+    return _alloctor;
 }
 
 template<typename ObjType>
-inline void ObjPoolHelper<ObjType>::_Unlock()
+inline const IObjAlloctor<ObjType> *ObjPoolHelper<ObjType>::operator->() const
 {
-    _locker.Lock();
+    return _alloctor;
 }
 
 FS_NAMESPACE_END

@@ -37,6 +37,7 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include <set>
 #include "base/common/objpool/Defs/ObjPoolDefs.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -57,14 +58,31 @@ public:
     virtual ~IObjAlloctor();
 
 public:
+    // 依据__FS_THREAD_SAFE__开关开启线程安全
     void *Alloc();
     void  Free(void *ptr);
-    size_t GetObjInUse() const;
-    size_t GetTotalObjBlocks() const;    // 当前全部的对象块个数
-    size_t GetNodeCnt() const;
-    size_t GetBytesOccupied() const;
+
+    // 线程不安全
+    void *AllocNoLocker();
+    void FreeNoLocker(void *ptr);
+
+    // 带构造与析构操作 以下接口线程不安全
+    template<typename... Args>
+    ObjType *New(Args &&... args);
+    template<typename... Args>
+    ObjType *NewByPtr(void *ptr, Args &&... args);
+    void Delete(ObjType *ptr);
+    void DeleteWithoutDestructor(ObjType *ptr);
+
+    size_t GetObjInUse();
+    size_t GetTotalObjBlocks();    // 当前全部的对象块个数
+    size_t GetNodeCnt();
+    size_t GetBytesOccupied();
+    void Lock();
+    void UnLock();
 
 private:
+    
     void _NewNode();
 
 protected:
@@ -80,6 +98,7 @@ protected:
     size_t          _nodeCnt;               // 节点个数
     size_t          _bytesOccupied;         // 对象池占用内存大小 = _objBlockSize * _nodeCnt * node._capacity
     size_t          _objInUse;              // 正在使用的对象
+    Locker          _locker;                // 线程安全
 };
 
 FS_NAMESPACE_END
