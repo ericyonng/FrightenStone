@@ -230,7 +230,7 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
         ::SetUnhandledExceptionFilter(fs::__AppCrashHandler);
 
 #ifndef _DEBUG
-    if(!isUseSehExceptionHandler)
+//    if(!isUseSehExceptionHandler)
         __PreventSetUnhandledExceptionFilter();
 #endif // Release
     
