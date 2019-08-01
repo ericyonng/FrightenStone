@@ -35,6 +35,7 @@
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/component/Impl/File/LogFile.h"
 #include "base/common/assist/utils/Impl/FS_FileUtil.h"
+#include "base/common/assist/utils/Impl/SystemUtil.h"
 
 FS_NAMESPACE_BEGIN
 

@@ -247,7 +247,7 @@ int Example::Run()
                 continue;
             }
 
-            // 继续接受下一个连接
+            // 继续接受下一个连接 并判断已投递的连接不可大于限制
             // iocp.PostAccept(sockServer, )
         }
         else if(ioEvent._ioData->_ioType == IocpDefs::IO_RECV)

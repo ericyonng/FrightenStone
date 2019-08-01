@@ -37,6 +37,7 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/log/Defs/LogData.h"
+#include "base/common/assist/utils/Impl/SystemUtil.h"
 
  // 函数与行号便利宏
 #undef _FUNC_LINE_ARGS_

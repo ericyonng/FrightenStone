@@ -212,11 +212,15 @@ private:\
     x();
 
 #undef MAX_I64_NUM
-#define MAX_I64_NUM	0x7FFFFFFFFFFFFFFF
+#define MAX_I64_NUM 0x7FFFFFFFFFFFFFFF
 
 // 时间轮盘默认精度
 #undef TIME_WHEEL_RESOLUTION_DEF
 #define TIME_WHEEL_RESOLUTION_DEF 100LL    // 毫秒
+
+// 内存对齐
+#define MEM_ALIGN_BEGIN(n)  pack(push, n)
+#define MEM_ALIGN_END(n)    pack(pop)
 
 //参数的输入输出标识
 #undef  P_OUT
@@ -232,7 +236,7 @@ private:\
 #define P_INSIZE    /*输入目标尺寸*/
 
 #if defined(_WIN32) && defined(_DEBUG)
-#define ASSERT(x)   assert(x)
+#define ASSERT(x)   (x)?true:(::MessageBox(fs::SystemUtil::GetWindowHwndByPID(fs::SystemUtil::GetProcessId()), #x, fs::SystemUtil::GetCurProgramName().c_str(), MB_ABORTRETRYIGNORE))
 #else
 #define ASSERT(x)   x?true:false
 #endif

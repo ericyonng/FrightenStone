@@ -33,6 +33,7 @@
 #include "base/common/memorypool/Defs/MemoryAlloctor.h"
 #include "base/common/memorypool/Defs/MemoryBlock.h"
 #include "base/common/log/Log.h"
+#include "base/common/assist/utils/Impl/SystemUtil.h"
 
 #ifndef BLOCK_AMOUNT_DEF
 #define BLOCK_AMOUNT_DEF    1024    // 默认内存块数量

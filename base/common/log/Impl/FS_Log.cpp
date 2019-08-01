@@ -111,7 +111,7 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     // 根目录
     _rootDirName = rootDirName;
 
-    // 初始化log config options
+    // TODO:初始化log config options
     _ReadConfig();
 
     // 初始化日志文件
@@ -302,7 +302,7 @@ void FS_Log::_SetConsoleColor(Int32 level)
 
 void FS_Log::_ReadConfig()
 {
-
+    // 日志配置项
 }
 
 void FS_Log::_OnThreadWriteLog()
