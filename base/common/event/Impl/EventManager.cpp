@@ -129,7 +129,7 @@ void EventManager::FireEvent(FS_Event *event)
         {
             _Listener &listener = *lIt;
             if(listener._listenCallBack)
-                (*listener._listenCallBack)(std::move(event));
+                (*listener._listenCallBack)(std::forward<FS_Event *>(event));
         }
     }
 

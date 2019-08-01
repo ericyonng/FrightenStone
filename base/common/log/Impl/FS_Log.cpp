@@ -227,7 +227,7 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
             iterHook != _levelRefBeforeLogHook[level]->end();
             ++iterHook)
         {
-            (*(*iterHook))(std::move(logData));
+            (*(*iterHook))(std::forward<LogData *>(logData));
         }
     }
 

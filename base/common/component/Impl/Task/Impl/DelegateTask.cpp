@@ -38,7 +38,7 @@ FS_NAMESPACE_BEGIN
 
 Int32 DelegateTask::Run()
 {
-    (*_callback)(std::move(_pool));
+    (*_callback)(std::forward<const FS_ThreadPool *>(_pool));
     return StatusDefs::Success;
 }
 
