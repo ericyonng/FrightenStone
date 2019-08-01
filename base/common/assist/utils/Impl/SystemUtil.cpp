@@ -34,6 +34,7 @@
 #include "base/common/status/status.h"
 #include "base/common/component/Impl/FS_String.h"
 #include "base/common/assist/utils/Defs/SystemUtilDefs.h"
+#include "base/common/assist/utils/Impl/FS_DirectoryUtil.h"
 
 #pragma region windows
 #ifdef _WIN32
@@ -199,6 +200,13 @@ Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, 
         CloseHandle(hProc);
 
     return StatusDefs::Success;
+}
+
+FS_String SystemUtil::GetCurProgramName()
+{
+    FS_String path;
+    SystemUtil::GetProgramPath(true, path);
+    return FS_DirectoryUtil::GetFileNameInPath(path);
 }
 
 HANDLE SystemUtil::CreateProcessSnapshot()

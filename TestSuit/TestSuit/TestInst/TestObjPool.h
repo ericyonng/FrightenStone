@@ -12,7 +12,6 @@ fs::MemleakMonitor *_g_memMonitor = g_MemleakMonitor;
 
 class TestObjPoolObj
 {
-   OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper)
 public:
     TestObjPoolObj() {}
     ~TestObjPoolObj() 
@@ -28,7 +27,6 @@ private:
     fs::FS_ThreadPool _pool;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, TEST_OBJ_NUM)
 
 class TestObjPoolObj2
 {
@@ -50,6 +48,7 @@ public:
     static void Run()
     {
         g_Log->InitModule("TestObjPool");
+        ASSERT(1 == 0);
 /*        Int32 i = 0;*/
 //         while(1)
 //         {
@@ -88,7 +87,7 @@ public:
           timeNow2.FlushTime();
           std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 // 
-         //g_MemleakMonitor->PrintMemleakInfo(typeid(TestObjPoolObj).name());
+         g_MemleakMonitor->PrintMemleakInfo(typeid(TestObjPoolObj).name());
 
 
 //         g_Log->w<TestObjPool>(_LOGFMT_("HELLO"));
