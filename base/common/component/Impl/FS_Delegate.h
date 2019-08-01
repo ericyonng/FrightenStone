@@ -68,6 +68,8 @@ class IDelegatePlus
 public:
     IDelegatePlus();
     virtual ~IDelegatePlus();
+    // 左值会绑定成左值引用，右值会绑定成右值引用
+    // 请注意引用折叠适当使用std::forward可以完美的将参数传入，原来什么类型传入后绑定的就是什么类型
     virtual R operator()(Args&&... args) = 0;
     virtual void Release();
 };
