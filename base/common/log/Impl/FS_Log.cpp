@@ -63,7 +63,7 @@ FS_Log::FS_Log()
 
 FS_Log::~FS_Log()
 {
-    FinishModule();
+    // FinishModule();
 }
 
 void FS_Log::UnInstallLogHookFunc(Int32 level, const IDelegatePlus<void, const LogData *> *delegate)

@@ -22,6 +22,10 @@ public:
 
 private:
     fs::FS_String _str;
+    fs::FS_Timer _timer;
+    fs::SmartVar _var;
+    fs::FS_File _file;
+    fs::FS_ThreadPool _pool;
 };
 
 OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, TEST_OBJ_NUM)
@@ -34,7 +38,10 @@ public:
 
 private:
     fs::FS_String _str;
-
+    fs::FS_Timer _timer;
+    fs::SmartVar _var;
+    fs::FS_File _file;
+    fs::FS_ThreadPool _pool;
 };
 
 class TestObjPool
@@ -42,7 +49,7 @@ class TestObjPool
 public:
     static void Run()
     {
-        //g_Log->InitModule("TestObjPool");
+        g_Log->InitModule("TestObjPool");
 /*        Int32 i = 0;*/
 //         while(1)
 //         {
@@ -77,7 +84,7 @@ public:
          auto alloctor = charPool._alloctor;
          timeNow1.FlushTime();
          for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-             alloctor->New();
+             alloctor->NewWithoutConstruct();
           timeNow2.FlushTime();
           std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 // 

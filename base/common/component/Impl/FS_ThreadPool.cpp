@@ -60,7 +60,7 @@ FS_ThreadPool::FS_ThreadPool(Int32 minNum, Int32 maxNum)
 
 FS_ThreadPool::~FS_ThreadPool()
 {
-    Clear();
+    // Clear();
 }
 
 bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
@@ -183,7 +183,7 @@ void FS_ThreadPool::Clear()
     }
 
     // _locker.Broadcast();
-    std::cout << "clear end" << std::endl;
+    //std::cout << "clear end" << std::endl;
 }
 
 

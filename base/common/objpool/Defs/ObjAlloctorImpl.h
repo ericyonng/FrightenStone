@@ -54,6 +54,9 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     ,_nodeCnt(0)
     ,_bytesOccupied(0)
     ,_objInUse(0)
+    ,_ptrWillGiving(NULL)
+    ,_ptrWillGivingInChar(NULL)
+    ,_ptrWillGivingInVoid(NULL)
 {
     // 初始化节点
     _header = new AlloctorNode<ObjType>(_nodeCapacity);
@@ -87,38 +90,12 @@ inline void *IObjAlloctor<ObjType>::Alloc()
 {
 #if __FS_THREAD_SAFE__
     _locker.Lock();
-#endif
-
-    if(_lastDeleted)
-    {
-        ObjType *ptr = _lastDeleted;
-
-        // 取得最后一个被释放对象的地址
-        _lastDeleted = *(reinterpret_cast<ObjType **>(_lastDeleted));
-        ++_objInUse;
-
-#if __FS_THREAD_SAFE__
-        _locker.Unlock();
-#endif
-
-        return ptr;
-    }
-
-    // 分配新节点
-    if(_alloctedInCurNode >= _nodeCapacity)
-        _NewNode();
-
-    // 内存池中分配对象
-    char *ptr = reinterpret_cast<char *>(_curNodeObjs);
-    ptr += _alloctedInCurNode * _objBlockSize;
-    ++_alloctedInCurNode;
-    ++_objInUse;
-
-#if __FS_THREAD_SAFE__
+    _ptrWillGivingInVoid = AllocNoLocker();
     _locker.Unlock();
+    return _ptrWillGivingInVoid;
+#else
+    return AllocNoLocker();
 #endif
-
-    return ptr;
 }
 
 template<typename ObjType>
@@ -143,13 +120,13 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
 {
     if(_lastDeleted)
     {
-        ObjType *ptr = _lastDeleted;
+        _ptrWillGiving = _lastDeleted;
 
         // 取得最后一个被释放对象的地址
-        _lastDeleted = *(reinterpret_cast<ObjType **>(_lastDeleted));
+        _lastDeleted = *((ObjType **)(_lastDeleted));
         ++_objInUse;
 
-        return ptr;
+        return _ptrWillGiving;
     }
 
     // 分配新节点
@@ -157,12 +134,12 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
         _NewNode();
 
     // 内存池中分配对象
-    char *ptr = reinterpret_cast<char *>(_curNodeObjs);
-    ptr += _alloctedInCurNode * _objBlockSize;
+    _ptrWillGivingInChar = reinterpret_cast<char *>(_curNodeObjs);
+    _ptrWillGivingInChar += _alloctedInCurNode * _objBlockSize;
     ++_alloctedInCurNode;
     ++_objInUse;
 
-    return ptr;
+    return _ptrWillGivingInChar;
 }
 
 template<typename ObjType>
@@ -179,6 +156,12 @@ template<typename... Args>
 inline ObjType *IObjAlloctor<ObjType>::New(Args &&... args)
 {
     return ::new(AllocNoLocker())ObjType(std::forward<Args>(args)...);
+}
+
+template<typename ObjType>
+inline ObjType *IObjAlloctor<ObjType>::NewWithoutConstruct()
+{
+    return (ObjType *)AllocNoLocker();
 }
 
 template<typename ObjType>
