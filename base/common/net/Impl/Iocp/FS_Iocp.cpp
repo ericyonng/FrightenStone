@@ -96,6 +96,23 @@ Int32 FS_Iocp::Reg(SOCKET sockfd)
     return StatusDefs::Success;
 }
 
+Int32 FS_Iocp::Reg(SOCKET sockfd, void *ptr)
+{
+    // 关联IOCP 与 sockfd
+    // completionKey传入的一个数值，完成时会原样传回来; NumberOfConcurrentThreads这个参数在关联完成端口时被忽略
+    // completekey可以是自定义的结构体指针或者其他数据的指针，便于获取完成状态时候识别 当处于关联时numofthread会被忽略
+    HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, ULONG_PTR(ptr), 0);
+    if(!ret)
+    {
+        auto err = GetLastError();
+        g_Log->e<FS_Iocp>(_LOGFMT_("Reg sockfd[%llu] ptr[%p] to completionport failed windows error<%d> status[%d]")
+                          , sockfd, ptr, err, StatusDefs::IOCP_RegSocketToCompletionPortFail);
+        return StatusDefs::IOCP_RegSocketToCompletionPortFail;
+    }
+
+    return StatusDefs::Success;
+}
+
 Int32 FS_Iocp::LoadAcceptEx(SOCKET listenSocket)
 {
     if(_fnAcceptEx)
@@ -231,6 +248,19 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
             // 此时ioevent的数据被正确的填充，只是ioEvent._bytesTrans<=0这个事件可以在recv事件做处理
             // closesocket(ioEvent._ioData->_sock);
             // return StatusDefs::IOCP_IODisconnect;
+            return StatusDefs::Success;
+        }
+
+        if(ERROR_CONNECTION_ABORTED == error)
+        {// TODO:这个错误码要不要处理
+            g_Log->w<FS_Iocp>(_LOGFMT_("WaitForMessage error<%d> status<%d>")
+                              , error, StatusDefs::Unknown);
+            return StatusDefs::Success;
+        }
+        if(ERROR_SEM_TIMEOUT == error)
+        {// TODO:这个错误码要不要处理
+            g_Log->w<FS_Iocp>(_LOGFMT_("WaitForMessage error<%d> status<%d>")
+                              , error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
 

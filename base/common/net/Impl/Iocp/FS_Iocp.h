@@ -51,10 +51,17 @@ public:
     /* 初始化与注册 */
     Int32 Create();
     void Destroy();
+    // reg时候会把自定义的地址数据ulong_ptr传入在wait时候传回，便于确认wait传回的是哪一个绑定在完成端口的数据
     Int32 Reg(SOCKET sockfd);
+    // reg时候关联自定义数据
+    Int32 Reg(SOCKET sockfd, void *ptr);
     Int32 LoadAcceptEx(SOCKET listenSocket);
 
     /* Post Request */
+    // accept时候会把重叠体传入，在wait时候传回
+    // 传入重叠体结构便于区分绑定在完成端口上的socket中的子操作，
+    // 比如绑定的是监听socket但是可能被多个客户端连接，
+    // 为了区分是哪个客户端需要多传入一个重叠体结构以便区分
     Int32 PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData);
     Int32 PostRecv(IO_DATA_BASE *ioData);
     Int32 PostSend(IO_DATA_BASE *ioData);

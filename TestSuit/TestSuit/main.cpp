@@ -57,7 +57,7 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    TestIocpExample::Run();
+    TestDelegate::Run();
     getchar();
     return 0;
 }

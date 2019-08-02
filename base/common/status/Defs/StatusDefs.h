@@ -50,6 +50,7 @@ public:
         ParamError = 4,                                         // 参数错误
         Failed = 5,                                             // 失败
         AppInitFail = 6,                                        // 初始化失败
+        Unknown = 7,                                            // 未知错误
         #pragma endregion
 
         #pragma region SOCKET[500, 599]

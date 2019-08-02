@@ -47,6 +47,10 @@ public:
     {
         std::cout << "print2" << std::endl;
     }
+    static void print32()
+    {
+        std::cout << "print32" << std::endl;
+    }
 };
 
 static void print3()
@@ -77,6 +81,20 @@ public:
 
         auto delegate6 = fs::DelegatePlusFactory::Create(&print4);
         (*delegate6)(1, 10);
+
+        auto __lambda = [](int i)->void
+        {
+            std::cout << "this is lambda" << std::endl;
+        };
+
+        std::function<void()> func = Test1::print32;
+
+        //check(FakeLambda());
+        auto delegate7 = fs::DelegatePlusFactory::Create<decltype(func), void>(func);
+        (*delegate7)();
+
+        auto delegate8 = fs::DelegatePlusFactory::Create<decltype(__lambda), void, int>(__lambda);
+        (*delegate8)(1);
     }
 };
 
