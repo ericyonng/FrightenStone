@@ -106,7 +106,8 @@ template <typename CustomFuncType, typename Rtn, typename... Args>
 class DelegateCustomFuncPlus : public IDelegatePlus<Rtn, Args...>
 {
 public:
-    DelegateCustomFuncPlus(CustomFuncType const &customFunc);
+    DelegateCustomFuncPlus(CustomFuncType &&customFunc);
+    DelegateCustomFuncPlus(CustomFuncType const&customFunc);
     virtual ~DelegateCustomFuncPlus();
 
     virtual Rtn operator()(Args&&...);
@@ -126,7 +127,11 @@ public:
 
     // 绑定lambda,std::function,如：DelegatePlusFactory::Create<decltype(func), void, int>(func);
     template <typename CustomFuncType /* = decltype(func) */, typename Rtn, typename... Args>
-    static IDelegatePlus<Rtn, Args...> *Create(CustomFuncType const &func);
+    static IDelegatePlus<Rtn, Args...> *Create(CustomFuncType &&func);
+
+    // 绑定lambda,std::function,如：DelegatePlusFactory::Create<decltype(func), void, int>(func);
+    template <typename CustomFuncType /* = decltype(func) */, typename Rtn, typename... Args>
+    static IDelegatePlus<Rtn, Args...> *Create(CustomFuncType const&func);
 };
 
 FS_NAMESPACE_END

@@ -94,7 +94,7 @@ public:
         auto delegate7 = fs::DelegatePlusFactory::Create<decltype(func), void>(func);
         (*delegate7)();
 
-        auto delegate8 = fs::DelegatePlusFactory::Create<decltype(__lambda), void, int>(__lambda);
+        auto delegate8 = fs::DelegatePlusFactory::Create<decltype(__lambda), void, int>(std::forward<decltype(__lambda)>(__lambda));
         (*delegate8)(1);
     }
 };
