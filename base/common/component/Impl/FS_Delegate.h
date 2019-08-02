@@ -124,6 +124,7 @@ public:
     template <typename R, typename... Args>
     static IDelegatePlus<R, Args...> *Create(R(*f)(Args...));
 
+    // °ó¶¨lambda,std::function,Èç£ºDelegatePlusFactory::Create<decltype(func), void, int>(func);
     template <typename CustomFuncType /* = decltype(func) */, typename Rtn, typename... Args>
     static IDelegatePlus<Rtn, Args...> *Create(CustomFuncType const &func);
 };

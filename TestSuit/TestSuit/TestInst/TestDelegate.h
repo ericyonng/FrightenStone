@@ -84,10 +84,10 @@ public:
 
         std::function<void()> func = Test1::print32;
 
-        auto __lambda = [func](int i)->void
+        auto __lambda = [&test1](int i)->void
         {
             std::cout << "this is lambda" << std::endl;
-            return func();
+            return test1.print();
         };
 
 
