@@ -151,6 +151,7 @@ inline IDelegatePlus<Rtn, Args...> *DelegatePlusFactory::Create(CustomFuncType c
 {
     return new DelegateCustomFuncPlus<CustomFuncType, Rtn, Args...>(func);
 }
+
 FS_NAMESPACE_END
 
 #endif
