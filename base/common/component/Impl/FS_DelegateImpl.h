@@ -116,6 +116,24 @@ inline R DelegateFunctionPlus<R, Args...>::operator()(Args&&... args)
     return (*_f)(std::forward<Args>(args)...);
 }
 
+template <typename CustomFuncType, typename Rtn, typename... Args>
+inline DelegateCustomFuncPlus<CustomFuncType, Rtn, Args...>::DelegateCustomFuncPlus(CustomFuncType const &customFunc)
+    :_customFun(customFunc)
+{
+
+}
+
+template <typename CustomFuncType, typename Rtn, typename... Args>
+inline DelegateCustomFuncPlus<CustomFuncType, Rtn, Args...>::~DelegateCustomFuncPlus()
+{
+}
+
+template <typename CustomFuncType, typename Rtn, typename... Args>
+inline Rtn DelegateCustomFuncPlus<CustomFuncType, Rtn, Args...>::operator()(Args&&... args)
+{
+    return _customFun(std::forward<Args>(args)...);
+}
+
 template <typename T, typename R, typename... Args>
 inline IDelegatePlus<R, Args...> *DelegatePlusFactory::Create(T *obj, R(T::*f)(Args...))
 {
@@ -128,6 +146,11 @@ inline IDelegatePlus<R, Args...> *DelegatePlusFactory::Create(R(*f)(Args...))
     return new DelegateFunctionPlus<R, Args...>(f);
 }
 
+template <typename CustomFuncType, typename Rtn, typename... Args>
+inline IDelegatePlus<Rtn, Args...> *DelegatePlusFactory::Create(CustomFuncType const &func)
+{
+    return new DelegateCustomFuncPlus<CustomFuncType, Rtn, Args...>(func);
+}
 FS_NAMESPACE_END
 
 #endif

@@ -101,6 +101,20 @@ private:
     R(*_f)(Args...);
 };
 
+// 支持lambda表达式,std::function等闭包
+template <typename CustomFuncType, typename Rtn, typename... Args>
+class DelegateCustomFuncPlus : public IDelegatePlus<Rtn, Args...>
+{
+public:
+    DelegateCustomFuncPlus(CustomFuncType const &customFunc);
+    virtual ~DelegateCustomFuncPlus();
+
+    virtual Rtn operator()(Args&&...);
+
+private:
+    CustomFuncType _customFun;
+};
+
 class BASE_EXPORT DelegatePlusFactory
 {
 public:
@@ -109,6 +123,9 @@ public:
 
     template <typename R, typename... Args>
     static IDelegatePlus<R, Args...> *Create(R(*f)(Args...));
+
+    template <typename CustomFuncType /* = decltype(func) */, typename Rtn, typename... Args>
+    static IDelegatePlus<Rtn, Args...> *Create(CustomFuncType const &func);
 };
 
 FS_NAMESPACE_END
