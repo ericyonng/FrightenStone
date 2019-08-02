@@ -47,7 +47,7 @@ class FS_Delegate
 public:
     FS_Delegate(T *t, R(T::*f)(Args...));
     R operator()(Args&&... args);
-    void Release();
+    virtual void Release();
 
 private:
     T *_obj;

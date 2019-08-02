@@ -82,14 +82,15 @@ public:
         auto delegate6 = fs::DelegatePlusFactory::Create(&print4);
         (*delegate6)(1, 10);
 
-        auto __lambda = [](int i)->void
-        {
-            std::cout << "this is lambda" << std::endl;
-        };
-
         std::function<void()> func = Test1::print32;
 
-        //check(FakeLambda());
+        auto __lambda = [func](int i)->void
+        {
+            std::cout << "this is lambda" << std::endl;
+            return func();
+        };
+
+
         auto delegate7 = fs::DelegatePlusFactory::Create<decltype(func), void>(func);
         (*delegate7)();
 
