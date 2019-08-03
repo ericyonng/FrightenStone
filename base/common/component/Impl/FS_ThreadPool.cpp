@@ -63,6 +63,11 @@ FS_ThreadPool::~FS_ThreadPool()
     // Clear();
 }
 
+void FS_ThreadPool::Release()
+{
+    delete this;
+}
+
 bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
 {
     _locker.Lock();

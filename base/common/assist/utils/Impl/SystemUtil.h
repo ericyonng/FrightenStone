@@ -77,6 +77,8 @@ public:
     static void OutputToConsole(const FS_String &outStr);
     // ½áÊø½ø³Ì
     static Int32 CloseProcess(ULong processId, ULong *lastError = NULL);
+    // µ¯´°
+    static void MessageBoxPopup(const FS_String &title, const FS_String &content);
 };
 
 FS_NAMESPACE_END

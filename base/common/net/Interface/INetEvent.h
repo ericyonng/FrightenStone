@@ -21,52 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : CrashHandleUtil.h
+ * @file  : INetEvent.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/2
+ * @date  : 2019/08/02
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_CrashHandle_Impl_CrashHandleUtil_H__
-#define __Base_Common_CrashHandle_Impl_CrashHandleUtil_H__
+#ifndef __Base_Common_Net_Interface_InetEvent_H__
+#define __Base_Common_Net_Interface_InetEvent_H__
 
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 
-typedef struct _EXCEPTION_POINTERS EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
-typedef struct _EXCEPTION_RECORD EXCEPTION_RECORD, *PEXCEPTION_RECORD;
-typedef struct _CONTEXT CONTEXT, *PCONTEXT;
-
-#define GET_EXCEPTION_INFO() ((PEXCEPTION_POINTERS)(GetExceptionInformation()))
-
 FS_NAMESPACE_BEGIN
 
-class FS_String;
-struct LogData;
+class BASE_EXPORT FS_Client;
+class BASE_EXPORT FS_Server;
+class BASE_EXPORT NetMsg_DataHeader;
 
-class BASE_EXPORT CrashHandleUtil
+// 所有网络事件入口
+// 网络事件接口
+// TODO:后期支持protobuf协议
+class BASE_EXPORT INetEvent
 {
 public:
-    // 初始化crashdump信息 isUseSehExceptionHandler是外部手动加了__try __except的seh
-    static int InitCrashHandleParams(bool isUseSehExceptionHandler = false);
+    // 纯虚函数
+    // 客户端加入事件
+    virtual void OnNetJoin(FS_Client *client) = 0;
+    // 客户端离开事件
+    virtual void OnNetLeave(FS_Client *client) = 0;
+    // 客户端消息事件
+    virtual void OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header) = 0;
+    // recv事件
+    virtual void OnNetRecv(FS_Client *client) = 0;
+    // 释放接口
+    virtual void Release() = 0;
+private:
 
-    #ifdef _WIN32
-    // 配合__except见范例
-    static Int32 RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo);
-    #endif
-
-    // 初始化pdb等符号信息 用于打印堆栈信息
-    static Int32 InitSymbol();
-    // 抓取堆栈快照 主动打印堆栈信息
-    static FS_String FS_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = FS_INFINITE);
-
-protected:
-    static void _OnBeforeCrashLogHook(LogData *logData);
-    static void _OnAfterCrashLogHook(const LogData *logData);
 };
 
 FS_NAMESPACE_END

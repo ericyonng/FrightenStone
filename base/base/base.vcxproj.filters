@@ -316,6 +316,9 @@
     <Filter Include="common\event\Interface">
       <UniqueIdentifier>{ce9869ca-6893-46ae-82a2-6eb677118de6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\net\Interface\Iocp">
+      <UniqueIdentifier>{05600363-b9c3-4b63-a42f-e552cf6dad90}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -798,6 +801,18 @@
     <ClInclude Include="..\common\event\Defs\EventDefs.h">
       <Filter>common\event\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Interface\INetEvent.h">
+      <Filter>common\net\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_TcpServer.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Defs\FS_NetDefs.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_TcpServerImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1009,6 +1024,9 @@
     </ClCompile>
     <ClCompile Include="..\common\event\Impl\FS_Event.cpp">
       <Filter>common\event\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_TcpServer.cpp">
+      <Filter>common\net\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

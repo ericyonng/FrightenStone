@@ -68,6 +68,8 @@ class TestDelegate
 public:
     static void Run()
     {
+        g_Log->InitModule("testdelegate");
+        fs::CrashHandleUtil::InitCrashHandleParams();
         Test1 test1;
         fs::IDelegatePlus<void> *delegate = fs::DelegatePlusFactory::Create(&test1, &Test1::print);
         (*delegate)();
@@ -95,6 +97,8 @@ public:
         (*delegate7)();
 
         auto delegate8 = fs::DelegatePlusFactory::Create<decltype(__lambda), void, int>(std::forward<decltype(__lambda)>(__lambda));
+        (*delegate8)(1);
+        delegate8 = NULL;
         (*delegate8)(1);
     }
 };
