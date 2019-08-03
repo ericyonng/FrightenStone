@@ -47,7 +47,7 @@ class TimeSlice;
 
 class BASE_EXPORT Time 
 {
-    OBJ_POOL_CREATE(fs::Time, _objPoolHelper)
+    OBJ_POOL_CREATE(fs::Time, _objPoolHelper);
     #pragma region 
 public:
     static const Int64 _hourPerDay;

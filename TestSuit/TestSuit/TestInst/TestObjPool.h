@@ -12,6 +12,7 @@ fs::MemleakMonitor *_g_memMonitor = g_MemleakMonitor;
 
 class TestObjPoolObj
 {
+    OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper)
 public:
     TestObjPoolObj() {}
     ~TestObjPoolObj() 
@@ -26,6 +27,8 @@ private:
     fs::FS_File _file;
     fs::FS_ThreadPool _pool;
 };
+
+OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 1024)
 
 
 class TestObjPoolObj2
@@ -79,11 +82,11 @@ public:
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
        // std::cout << "memleak:" << TestObjPoolObj::GetMemleakNum() << std::endl;
 
-         fs::ObjPoolHelper<TestObjPoolObj> charPool(TEST_OBJ_NUM);
-         auto alloctor = charPool._alloctor;
+        // fs::ObjPoolHelper<TestObjPoolObj> charPool(TEST_OBJ_NUM);
+         //auto alloctor = charPool._alloctor;
          timeNow1.FlushTime();
          for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-             alloctor->NewWithoutConstruct();
+             TestObjPoolObj::NewWithoutConstruct();
           timeNow2.FlushTime();
           std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 // 

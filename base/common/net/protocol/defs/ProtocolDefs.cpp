@@ -32,12 +32,16 @@
 #include "stdafx.h"
 #include "base/common/net/protocol/defs/ProtocolDefs.h"
 
-PacketHeader::PacketHeader()
+FS_NAMESPACE_BEGIN
+
+OBJ_POOL_CREATE_IMPL(NetMsg_DataHeader, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+NetMsg_DataHeader::NetMsg_DataHeader()
 {
     _packetLength = 0;
     _cmd = ProtocolCmd::CMD_Begin;
 }
 
+OBJ_POOL_CREATE_IMPL(LoginReq, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 LoginReq::LoginReq()
 {
     _packetLength = sizeof(LoginReq);
@@ -46,6 +50,7 @@ LoginReq::LoginReq()
     memset(_pwd, 0, sizeof(_pwd));
 }
 
+OBJ_POOL_CREATE_IMPL(LoginRes, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 LoginRes::LoginRes()
 {
     _packetLength = sizeof(LoginRes);
@@ -55,6 +60,7 @@ LoginRes::LoginRes()
     _status = StatusDefs::Success;
 }
 
+OBJ_POOL_CREATE_IMPL(LoginNty, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 LoginNty::LoginNty()
 {
     _packetLength = sizeof(LoginNty);
@@ -64,9 +70,26 @@ LoginNty::LoginNty()
     memset(_pwd, 0, sizeof(_pwd));
 }
 
+OBJ_POOL_CREATE_IMPL(CreatePlayerNty, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 CreatePlayerNty::CreatePlayerNty()
 {
     _packetLength = sizeof(CreatePlayerNty);
     _cmd = ProtocolCmd::CreatePlayerNty;
     _socket = 0;
 }
+
+OBJ_POOL_CREATE_IMPL(CheckHeartReq, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+CheckHeartReq::CheckHeartReq()
+{
+    _packetLength = sizeof(CheckHeartReq);
+    _cmd = ProtocolCmd::CheckHeartReq;
+}
+
+OBJ_POOL_CREATE_IMPL(CheckHeartRes, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+CheckHeartRes::CheckHeartRes()
+{
+    _packetLength = sizeof(CheckHeartRes);
+    _cmd = ProtocolCmd::CheckHeartRes;
+}
+
+FS_NAMESPACE_END

@@ -45,7 +45,7 @@ class FS_String;
 
 class BASE_EXPORT TimeSlice
 {
-    OBJ_POOL_CREATE(fs::TimeSlice, _objPoolHelper)
+    OBJ_POOL_CREATE(fs::TimeSlice, _objPoolHelper);
 public:
     /**
 

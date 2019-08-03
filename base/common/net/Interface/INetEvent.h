@@ -41,7 +41,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Client;
 class BASE_EXPORT FS_Server;
-class BASE_EXPORT NetMsg_DataHeader;
+struct BASE_EXPORT NetMsg_DataHeader;
 
 // 所有网络事件入口
 // 网络事件接口
