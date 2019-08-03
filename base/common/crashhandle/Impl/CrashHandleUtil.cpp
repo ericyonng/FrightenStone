@@ -45,6 +45,16 @@
 #define __USE_FS_DBGHELP__
 #include "3rd/3rd.h"
 
+#if _WIN32
+#define FS_CFG_APP_DUMPFILE_DUMPTYPES               (MiniDumpWithFullMemory | \
+                                                     MiniDumpWithFullMemoryInfo | \
+                                                     MiniDumpIgnoreInaccessibleMemory | \
+                                                     MiniDumpWithFullAuxiliaryState | \
+                                                     MiniDumpWithHandleData | \
+                                                     MiniDumpWithThreadInfo)
+#endif
+
+
 FS_NAMESPACE_BEGIN
 
 static FS_String __dumpFileName;
@@ -144,7 +154,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
     ::MiniDumpWriteDump(::GetCurrentProcess(),
                         ::GetCurrentProcessId(),
                         dmpFile,
-                        MiniDumpNormal,
+                        (MINIDUMP_TYPE)FS_CFG_APP_DUMPFILE_DUMPTYPES,
                         &dmpInfo,
                         NULL,
                         NULL);
