@@ -40,11 +40,11 @@
 #include "base/common/component/Impl/Time.h"
 #include "base/common/net/Defs/FS_NetDefs.h"
 #include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Client;
-class BASE_EXPORT FS_ThreadPool;
 
 class BASE_EXPORT FS_TcpServer : public INetEvent
 {

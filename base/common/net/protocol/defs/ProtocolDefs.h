@@ -37,6 +37,7 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/status/status.h"
+#include "base/common/objpool/objpool.h"
 
 #pragma region 
 #ifndef SOCKET_CACHE_SIZE
@@ -47,10 +48,11 @@
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR            (-1)
 #endif
-
 #pragma endregion
 
 #pragma region 
+
+FS_NAMESPACE_BEGIN
 
 // 协议号
 class BASE_EXPORT ProtocolCmd
@@ -68,45 +70,67 @@ public:
         CreatePlayerReq = 7,        // 
         CreatePlayerRes = 8,        // 
         CreatePlayerNty = 9,        // 
+        CheckHeartReq = 10,         // 客户端心跳包
+        CheckHeartRes = 11,         // 心跳包反馈，按理不用反馈给客户端减少服务端压力
     };
 };
 
-struct BASE_EXPORT PacketHeader
+struct BASE_EXPORT NetMsg_DataHeader
 {
-    PacketHeader();
-    UInt16 _packetLength;           // 
-    UInt16 _cmd;                    // 
+    OBJ_POOL_CREATE(NetMsg_DataHeader, _objPoolHelper);
+
+    NetMsg_DataHeader();
+    UInt16 _packetLength;           // 包长度
+    UInt16 _cmd;                    // 命令
 };
 
-struct BASE_EXPORT LoginReq : public PacketHeader
+struct BASE_EXPORT LoginReq : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE(LoginReq, _objPoolHelper);
     LoginReq();
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
 };
 
-struct BASE_EXPORT LoginRes : public PacketHeader
+struct BASE_EXPORT LoginRes : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE(LoginRes, _objPoolHelper);
     LoginRes();
-
     char _userName[MAX_NAME_LEN];
     Int32 _status;
 };
 
-struct BASE_EXPORT LoginNty : public PacketHeader
+struct BASE_EXPORT LoginNty : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE(LoginNty, _objPoolHelper);
     LoginNty();
     
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
 };
 
-struct BASE_EXPORT CreatePlayerNty : public PacketHeader
+struct BASE_EXPORT CreatePlayerNty : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE(CreatePlayerNty, _objPoolHelper);
     CreatePlayerNty();
-
     Int32 _socket;
 };
+
+struct BASE_EXPORT CheckHeartReq : public NetMsg_DataHeader
+{
+    OBJ_POOL_CREATE(CheckHeartReq, _objPoolHelper);
+
+    CheckHeartReq();
+};
+
+struct BASE_EXPORT CheckHeartRes : public NetMsg_DataHeader
+{
+    OBJ_POOL_CREATE(CheckHeartRes, _objPoolHelper);
+
+    CheckHeartRes();
+};
+
+FS_NAMESPACE_END
 
 #pragma endregion
 

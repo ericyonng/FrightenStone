@@ -79,7 +79,34 @@ public:                                                                         
         void   operator delete(void *ptr)       { _objpool_helper._alloctor->Free(ptr);}                \
         static size_t GetMemleakNum();                                                                  \
                                                                                                         \
-static fs::ObjPoolHelper<ObjType> _objpool_helper;
+        template<typename... Args>                                                                      \
+        static ObjType *New(Args &&... args)                                                            \
+        {                                                                                               \
+            return _objpool_helper->New(std::forward<Args>(args)...);                                   \
+        }                                                                                               \
+                                                                                                        \
+        static ObjType *NewWithoutConstruct()                                                           \
+        {                                                                                               \
+            return _objpool_helper->NewWithoutConstruct();                                              \
+        }                                                                                               \
+                                                                                                        \
+        template<typename... Args>                                                                      \
+        static ObjType *NewByPtr(void *ptr, Args &&... args)                                            \
+        {                                                                                               \
+            return _objpool_helper->NewByPtr(ptr, std::forward<Args>(args)...);                         \
+        }                                                                                               \
+                                                                                                        \
+        static void Delete(ObjType *ptr)                                                                \
+        {                                                                                               \
+            _objpool_helper->Delete(ptr);                                                               \
+        }                                                                                               \
+                                                                                                        \
+        static void DeleteWithoutDestructor(ObjType *ptr)                                               \
+        {                                                                                               \
+            _objpool_helper->DeleteWithoutDestructor(ptr);                                              \
+        }                                                                                               \
+                                                                                                        \
+        static fs::ObjPoolHelper<ObjType> _objpool_helper
 
 // 在实现文件中需要添加
 #undef OBJ_POOL_CREATE_IMPL
