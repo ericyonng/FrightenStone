@@ -230,7 +230,7 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
         ::SetUnhandledExceptionFilter(fs::__AppCrashHandler);
 
 #ifndef _DEBUG
-//    if(!isUseSehExceptionHandler)
+    if(!isUseSehExceptionHandler)
         __PreventSetUnhandledExceptionFilter();
 #endif // Release
     
@@ -394,7 +394,15 @@ void CrashHandleUtil::_OnBeforeCrashLogHook(LogData *logData)
 
 void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 {
+    // 内存泄漏信息
     g_MemleakMonitor->PrintMemleakInfo();
+
+    // 弹窗堆栈信息
+    FS_String path;
+    SystemUtil::GetProgramPath(true, path);
+    auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);
+    SystemUtil::MessageBoxPopup(fileName, logData->_logToWrite);
+
 #ifdef _DEBUG
     // 弹窗堆栈信息
     FS_String path;

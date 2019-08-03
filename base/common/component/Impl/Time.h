@@ -130,7 +130,7 @@ public:
      * @param[in] from        - from time.
      * @return TimeSlice - timeslice value.
      */
-    TimeSlice GetIntervalTo(const TimeSlice &slice) const;    // 
+    TimeSlice GetIntervalTo(const TimeSlice &slice) const;    // slice是当天的时刻如：10:10:10.100000的微妙数
     TimeSlice GetIntervalTo(int hour, int minute, int second, int milliSecond = 0, int microSecond = 0) const;
     static TimeSlice GetIntervalTo(const Time &from, const TimeSlice &slice);
     static TimeSlice GetIntervalTo(const Time &from, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);

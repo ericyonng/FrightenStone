@@ -54,6 +54,7 @@ public:
     explicit FS_ThreadPool();
     explicit FS_ThreadPool(Int32 minNum, Int32 maxNum);    // 
     virtual ~FS_ThreadPool();
+    virtual void Release();
 
 public:
     // 添加任务 请确保同一个任务只投递一次，避免多线程处理同一任务的情况出现（除非线程池只有一个线程）

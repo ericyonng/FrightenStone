@@ -21,53 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : CrashHandleUtil.h
+ * @file  : FS_TcpServerImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/2
+ * @date  : 2019/08/03
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_CrashHandle_Impl_CrashHandleUtil_H__
-#define __Base_Common_CrashHandle_Impl_CrashHandleUtil_H__
-
+#ifdef __Base_Common_Net_Impl_FS_TcpServer_H__
 #pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-
-typedef struct _EXCEPTION_POINTERS EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
-typedef struct _EXCEPTION_RECORD EXCEPTION_RECORD, *PEXCEPTION_RECORD;
-typedef struct _CONTEXT CONTEXT, *PCONTEXT;
-
-#define GET_EXCEPTION_INFO() ((PEXCEPTION_POINTERS)(GetExceptionInformation()))
 
 FS_NAMESPACE_BEGIN
 
-class FS_String;
-struct LogData;
-
-class BASE_EXPORT CrashHandleUtil
+template<class ServerT>
+void FS_TcpServer::Start(Int32 svrQuantity)
 {
-public:
-    // 初始化crashdump信息 isUseSehExceptionHandler是外部手动加了__try __except的seh
-    static int InitCrashHandleParams(bool isUseSehExceptionHandler = false);
+    // 启动多个服务器（每个服务器一个线程）
+    for(int n = 0; n < svrQuantity; ++n)
+    {
+        auto ser = new ServerT();
+        ser->SetId(n + 1);
+        ser->SetClientNum((_maxClient / svrQuantity) + 1);
+        _fsServers.push_back(ser);
+        // 注册网络事件接受对象
+        ser->SetEventObj(this);
+        // 启动消息处理线程
+        ser->Start();
+    }
 
-    #ifdef _WIN32
-    // 配合__except见范例
-    static Int32 RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo);
-    #endif
+    // 启动监控网络任务
+    auto monitorDelegate = DelegatePlusFactory::Create(this, &FS_TcpServer::OnNetMonitorTask);
+    _threadPool->AddTask(monitorDelegate);
+}
 
-    // 初始化pdb等符号信息 用于打印堆栈信息
-    static Int32 InitSymbol();
-    // 抓取堆栈快照 主动打印堆栈信息
-    static FS_String FS_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = FS_INFINITE);
-
-protected:
-    static void _OnBeforeCrashLogHook(LogData *logData);
-    static void _OnAfterCrashLogHook(const LogData *logData);
-};
+#pragma region misc
+inline SOCKET FS_TcpServer::_GetSocket()
+{
+    return _sock;
+}
+#pragma  endregion
 
 FS_NAMESPACE_END
 

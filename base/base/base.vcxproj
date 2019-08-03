@@ -314,9 +314,13 @@
     <ClInclude Include="..\common\memorypool\Interface\IMemoryPool.h" />
     <ClInclude Include="..\common\memorypool\Interface\IMemoryPoolMgr.h" />
     <ClInclude Include="..\common\memorypool\memorypool.h" />
+    <ClInclude Include="..\common\net\Defs\FS_NetDefs.h" />
     <ClInclude Include="..\common\net\Defs\IocpDefs.h" />
+    <ClInclude Include="..\common\net\Impl\FS_TcpServer.h" />
+    <ClInclude Include="..\common\net\Impl\FS_TcpServerImpl.h" />
     <ClInclude Include="..\common\net\Impl\Iocp\Example.h" />
     <ClInclude Include="..\common\net\Impl\Iocp\FS_Iocp.h" />
+    <ClInclude Include="..\common\net\Interface\INetEvent.h" />
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
     <ClInclude Include="..\common\net\protocol\protocol.h" />
@@ -399,6 +403,7 @@
     <ClCompile Include="..\common\memorypool\Interface\IMemoryPool.cpp" />
     <ClCompile Include="..\common\memorypool\Interface\IMemoryPoolMgr.cpp" />
     <ClCompile Include="..\common\net\Defs\IocpDefs.cpp" />
+    <ClCompile Include="..\common\net\Impl\FS_TcpServer.cpp" />
     <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp" />
     <ClCompile Include="..\common\net\Impl\Iocp\FS_Iocp.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />

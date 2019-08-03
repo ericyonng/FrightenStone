@@ -350,6 +350,15 @@ Int32 SystemUtil::CloseProcess(ULong processId, ULong *lastError)
     return StatusDefs::Success;
 }
 
+// µ¯´°
+void SystemUtil::MessageBoxPopup(const FS_String &title, const FS_String &content)
+{
+#ifdef _WIN32
+    auto hwnd = GetWindowHwndByPID(GetProcessId());
+    ::MessageBoxA(hwnd, content.c_str(), title.c_str(), MB_ABORTRETRYIGNORE);
+#endif
+}
+
 ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
 {
     PROCESSENTRY32 pe = {0};

@@ -40,6 +40,11 @@
 #pragma comment(lib,"ws2_32.lib")
 #pragma endregion
 
+#ifndef _WIN32
+#include<fcntl.h>
+#include<stdlib.h>
+#endif // !_WIN32
+
 #include <memory.h>
 
 FS_NAMESPACE_BEGIN
@@ -51,6 +56,7 @@ int SocketUtil::InitSocketEnv()
     if(_isInitEnv)
         return StatusDefs::Success;
 
+#ifdef _WIN32
     WSADATA wsaData;
     memset(&wsaData, 0, sizeof(WSADATA));
     auto result = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -62,6 +68,14 @@ int SocketUtil::InitSocketEnv()
 
     if(result != NO_ERROR)
         return StatusDefs::Error;
+#endif
+
+#ifndef _WIN32
+    // if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+    //  return (1);
+    // 忽略异常信号，默认情况会导致进程终止
+    signal(SIGPIPE, SIG_IGN);
+#endif
 
     _isInitEnv = true;
     return StatusDefs::Success;
@@ -69,10 +83,11 @@ int SocketUtil::InitSocketEnv()
 
 int SocketUtil::ClearSocketEnv()
 {
-    int result = NO_ERROR;
     if(!_isInitEnv)
         return StatusDefs::Success;
 
+#ifdef _WIN32
+    int result = NO_ERROR;
     result = WSACleanup();
 //     if(result == SOCKET_ERROR) 
 //     {
@@ -82,21 +97,37 @@ int SocketUtil::ClearSocketEnv()
 
     if(result != NO_ERROR)
         return StatusDefs::Error;
+#endif
 
     _isInitEnv = false;
     return StatusDefs::Success;
 }
 
-bool SocketUtil::SetNoBlock(MYSOCKET socket)
+Int32 SocketUtil::SetNoBlock(MYSOCKET socket)
 {
+#ifdef _WIN32
     ULong ul = 1;
-    if(0 != ioctlsocket(socket, FIONBIO, &ul))
-        return false;
+    if(SOCKET_ERROR == ioctlsocket(socket, FIONBIO, &ul))
+        return StatusDefs::Socket_SetBlockParamError;
+#else
+    int flags;
+    if((flags = fcntl(fd, F_GETFL, NULL)) < 0) {
+        // CELLLog_Warring("fcntl(%d, F_GETFL)", fd);
+        return StatusDefs::Socket_SetBlockParamError;
+    }
 
-    return true;
+    if(!(flags & O_NONBLOCK)) {
+        if(fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+            // CELLLog_Warring("fcntl(%d, F_SETFL)", fd);
+            return StatusDefs::Socket_SetBlockParamError;
+        }
+    }
+#endif
+
+    return StatusDefs::Success;
 }
 
-bool SocketUtil::SetBlock(MYSOCKET socket)
+Int32 SocketUtil::SetBlock(MYSOCKET socket)
 {
     ULong ul = 0;
     if(0 != ioctlsocket(socket, FIONBIO, &ul))
@@ -105,6 +136,40 @@ bool SocketUtil::SetBlock(MYSOCKET socket)
     return true;
 }
 
+
+Int32 SocketUtil::MakeReUseAddr(MYSOCKET socket)
+{
+    int flag = 1;
+    if(SOCKET_ERROR == setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&flag, sizeof(flag))) {
+        // CELLLog_Warring("setsockopt socket<%d> SO_REUSEADDR failed", (int)fd);
+        return StatusDefs::Socket_Error;
+    }
+
+    return StatusDefs::Success;
+}
+
+Int32 SocketUtil::MakeNoDelay(MYSOCKET socket)
+{
+    int flag = 1;
+    if(SOCKET_ERROR == setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, (const char *)&flag, sizeof(flag))) {
+        // CELLLog_Warring("setsockopt socket<%d> IPPROTO_TCP TCP_NODELAY failed", (int)fd);
+        return StatusDefs::Socket_Error;
+    }
+
+    return StatusDefs::Success;
+}
+
+Int32 SocketUtil::DestroySocket(MYSOCKET socket)
+{
+#ifdef _WIN32
+    int ret = closesocket(socket);
+#else
+    int ret = close(socket);
+#endif
+    // if(ret < 0)
+        // CELLLog_PError("destory sockfd<%d>", (int)sockfd);
+    return ret == 0 ? StatusDefs::Success : StatusDefs::Socket_Error;
+}
 
 Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError)
 {

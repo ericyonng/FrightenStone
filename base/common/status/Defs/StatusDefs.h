@@ -61,6 +61,8 @@ public:
         Socket_SetSockOptFailed = 504,                          // 设置套接字参数失败
         Socket_GetsockoptFailed = 505,                          // 获取套接字参数时出错
         Socket_Unknown = 506,                                   // 未知
+        Socket_SetBlockParamError = 507,                        // 设置套接字阻塞参数失败
+        Socket_Error = 508,                                     // 套接字操作错误
         #pragma endregion
 
         #pragma region Trigger[600, 699]

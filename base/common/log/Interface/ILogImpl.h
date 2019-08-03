@@ -122,7 +122,6 @@ inline void ILog::crash(const char *fmt, const Args&... args)
                             .Format(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Crash, LogDefs::_SYSLOG_crash_, newLogData);
-    ASSERT(!"crash");
 }
 
 template<typename... Args>
