@@ -813,6 +813,12 @@
     <ClInclude Include="..\common\net\Impl\FS_TcpServerImpl.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_Server.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_ServerImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1026,6 +1032,9 @@
       <Filter>common\event\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\net\Impl\FS_TcpServer.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_Server.cpp">
       <Filter>common\net\Impl</Filter>
     </ClCompile>
   </ItemGroup>
