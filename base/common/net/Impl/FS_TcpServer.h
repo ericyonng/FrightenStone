@@ -86,7 +86,7 @@ public:
     virtual void OnNetLeave(FS_Client *client);
     virtual void OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header);
     virtual void OnNetRecv(FS_Client *client);
-    virtual void OnNetMonitorTask(FS_ThreadPool *threadPool) = 0;
+    virtual void OnNetMonitorTask(const FS_ThreadPool *threadPool) = 0;
     #pragma endregion
 
     /* тсоН */
