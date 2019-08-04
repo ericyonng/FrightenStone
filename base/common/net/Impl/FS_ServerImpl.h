@@ -45,7 +45,7 @@ inline void FS_Server::SetClientNum(Int32 socketNum)
 
 inline void FS_Server::SetEventHandleObj(INetEvent *handleObj)
 {
-    _pEventHandleObj = handleObj;
+    _eventHandleObj = handleObj;
 }
 FS_NAMESPACE_END
 

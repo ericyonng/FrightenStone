@@ -38,6 +38,7 @@
 #include "base/common/asyn/asyn.h"
 #include "base/common/net/Interface/INetEvent.h"
 #include "base/common/component/Impl/Time.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -52,53 +53,13 @@ public:
     virtual void SetClientNum(Int32 socketNum);
     void SetEventHandleObj(INetEvent *handleObj);
 
-    //关闭Socket
+    // 关闭Socket
     void Close();
+
+    // 处理网络消息
+    void NetMsgHandler(const FS_ThreadPool *pool);
     {
-        CELLLog_Info("CELLServer%d.Close begin", _id);
-        _taskServer.Close();
-        _thread.Close();
-        CELLLog_Info("CELLServer%d.Close end", _id);
-    }
 
-    //处理网络消息
-    void OnRun(CELLThread* pThread)
-    {
-        while(pThread->isRun())
-        {
-            if(!_clientsBuff.empty())
-            {//从缓冲队列里取出客户数据
-                std::lock_guard<std::mutex> lock(_mutex);
-                for(auto pClient : _clientsBuff)
-                {
-                    _clients[pClient->sockfd()] = pClient;
-                    pClient->serverId = _id;
-                    if(_pEventHandleObj)
-                        _pEventHandleObj->OnNetJoin(pClient);
-                    OnClientJoin(pClient);
-                }
-                _clientsBuff.clear();
-                _clients_change = true;
-            }
-
-            //如果没有需要处理的客户端，就跳过
-            if(_clients.empty())
-            {
-                CELLThread::Sleep(1);
-                //旧的时间戳
-                _oldTime = CELLTime::getNowInMilliSec();
-                continue;
-            }
-
-            CheckTime();
-            if(!DoNetEvents())
-            {
-                pThread->Exit();
-                break;
-            }
-            DoMsg();
-        }
-        CELLLog_Info("CELLServer%d.OnRun exit", _id);
     }
 
     virtual bool DoNetEvents() = 0;
@@ -138,9 +99,9 @@ public:
 
     void OnClientLeave(CELLClient* pClient)
     {
-        if(_pEventHandleObj)
-            _pEventHandleObj->OnNetLeave(pClient);
-        _clients_change = true;
+        if(_eventHandleObj)
+            _eventHandleObj->OnNetLeave(pClient);
+        _clientsChange = true;
         delete pClient;
     }
 
@@ -151,8 +112,8 @@ public:
 
     void OnNetRecv(CELLClient* pClient)
     {
-        if(_pEventHandleObj)
-            _pEventHandleObj->OnNetRecv(pClient);
+        if(_eventHandleObj)
+            _eventHandleObj->OnNetRecv(pClient);
     }
 
     void DoMsg()
@@ -178,16 +139,16 @@ public:
         //接收客户端数据
         int nLen = pClient->RecvData();
         //触发<接收到网络数据>事件
-        if(_pEventHandleObj)
-            _pEventHandleObj->OnNetRecv(pClient);
+        if(_eventHandleObj)
+            _eventHandleObj->OnNetRecv(pClient);
         return nLen;
     }
 
     //响应网络消息
     virtual void OnNetMsg(CELLClient* pClient, netmsg_DataHeader* header)
     {
-        if(_pEventHandleObj)
-            _pEventHandleObj->OnNetMsg(this, pClient, header);
+        if(_eventHandleObj)
+            _eventHandleObj->OnNetMsg(this, pClient, header);
     }
 
     void addClient(CELLClient* pClient)
@@ -246,22 +207,23 @@ private:
 protected:
     // 正式客户队列
     std::map<SOCKET, FS_Client *> _clients;
+
 private:
     // 缓冲客户队列
     std::vector<FS_Client *> _clientsBuff;
     // 缓冲队列的锁
     Locker _locker;
     // 网络事件处理对象
-    INetEvent* _pEventHandleObj = nullptr;
+    INetEvent* _eventHandleObj = nullptr;
     // 旧的时间戳
     Time _oldTime = Time::Now();
     //
-    CELLThread _thread;
+    FS_ThreadPool *_threadPool;
 protected:
-    //
+    // 服务id
     Int32 _id = -1;
-    //客户列表是否有变化
-    bool _clients_change = true;
+    // 客户列表是否有变化
+    bool _clientsChange = true;
 };
 
 FS_NAMESPACE_END

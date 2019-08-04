@@ -44,4 +44,54 @@ FS_Server::~FS_Server()
     g_Log->sys(_LOGFMT_("FS_Server%d.~FS_Server exit begin"), _id);
 }
 
+// 关闭Socket
+void FS_Server::Close()
+{
+    g_Log->net("FS_Server%d.Close begin", _id);
+    g_Log->sys(_LOGFMT_("FS_Server%d.Close begin"), _id);
+    _threadPool->Clear();
+    g_Log->net("FS_Server%d.Close end", _id);
+    g_Log->sys(_LOGFMT_("FS_Server%d.Close end"), _id);
+}
+
+void FS_Server::NetMsgHandler(const FS_ThreadPool *pool)
+{
+    while(pool->IsClearingPool())
+    {
+        if(!_clientsBuff.empty())
+        {// 从缓冲队列里取出客户数据
+            _locker.Lock();
+            for(auto client : _clientsBuff)
+            {
+                _clients[client->sockfd()] = client;
+                client->serverId = _id;
+                if(_eventHandleObj)
+                    _eventHandleObj->OnNetJoin(client);
+                OnClientJoin(client);
+            }
+            _clientsBuff.clear();
+            _clientsChange = true;
+            _locker.Unlock();
+        }
+
+        // 如果没有需要处理的客户端，就跳过
+        if(_clients.empty())
+        {
+            CELLThread::Sleep(1);
+            //旧的时间戳
+            _oldTime = CELLTime::getNowInMilliSec();
+            continue;
+        }
+
+        CheckTime();
+        if(!DoNetEvents())
+        {
+            pThread->Exit();
+            break;
+        }
+        DoMsg();
+    }
+    CELLLog_Info("CELLServer%d.OnRun exit", _id);
+}
+
 FS_NAMESPACE_END
