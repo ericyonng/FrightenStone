@@ -34,5 +34,6 @@
 #pragma once
 
 #include "base/common/objpool/Impl/ObjPoolHelper.h"
+#include "base/common/objpool/Defs/FS_ObjPoolDefs.h"
 
 #endif

@@ -32,8 +32,15 @@
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_Server.h"
 #include "base/common/log/Log.h"
+#include "base/common/socket/socket.h"
+#include "base/common/component/Impl/TimeSlice.h"
 
 FS_NAMESPACE_BEGIN
+
+FS_Server::FS_Server()
+    :_threadPool(new FS_ThreadPool(0, 1))
+{
+}
 
 FS_Server::~FS_Server()
 {
@@ -42,6 +49,21 @@ FS_Server::~FS_Server()
     Close();
     g_Log->net("FS_Server%d.~FS_Server exit begin", _id);
     g_Log->sys(_LOGFMT_("FS_Server%d.~FS_Server exit begin"), _id);
+}
+
+Int32 FS_Server::RecvData(FS_Client *client)
+{
+    //接收客户端数据
+    int len = client->RecvData();
+    // 触发<接收到网络数据>事件
+    _eventHandleObj->OnNetRecv(client);
+    return len;
+}
+
+void FS_Server::Start()
+{
+    auto clientMsgTrasfer = DelegatePlusFactory::Create(this, &FS_Server::_ClientMsgTransfer);
+    _threadPool->AddTask(clientMsgTrasfer);
 }
 
 // 关闭Socket
@@ -54,44 +76,134 @@ void FS_Server::Close()
     g_Log->sys(_LOGFMT_("FS_Server%d.Close end"), _id);
 }
 
-void FS_Server::NetMsgHandler(const FS_ThreadPool *pool)
+void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 {
     while(pool->IsClearingPool())
     {
-        if(!_clientsBuff.empty())
+        if(!_clientsCache.empty())
         {// 从缓冲队列里取出客户数据
             _locker.Lock();
-            for(auto client : _clientsBuff)
+            for(auto client : _clientsCache)
             {
-                _clients[client->sockfd()] = client;
+                _socketRefClients[client->GetSocket()] = client;
+                _clients.push_back(client);
                 client->serverId = _id;
-                if(_eventHandleObj)
-                    _eventHandleObj->OnNetJoin(client);
-                OnClientJoin(client);
+                _eventHandleObj->OnNetJoin(client);
+                _OnClientJoin(client);
             }
-            _clientsBuff.clear();
+            _clientsCache.clear();
             _clientsChange = true;
             _locker.Unlock();
         }
 
         // 如果没有需要处理的客户端，就跳过
-        if(_clients.empty())
+        if(_socketRefClients.empty())
         {
-            CELLThread::Sleep(1);
-            //旧的时间戳
-            _oldTime = CELLTime::getNowInMilliSec();
+            SocketUtil::Sleep(1);
+
+            // 旧的时间戳
+            _oldTime.FlushTime();
             continue;
         }
 
-        CheckTime();
-        if(!DoNetEvents())
-        {
-            pThread->Exit();
+        _DetectClientHeartTime();
+        if(!_OnClientStatusDirtied())
             break;
-        }
-        DoMsg();
+
+        _OnClientMsgTransfer();
     }
-    CELLLog_Info("CELLServer%d.OnRun exit", _id);
+
+    // 退出则清理客户端
+    _ClearClients();
+
+    g_Log->net("FS_Server%d.OnRun exit", _id);
+    g_Log->sys(_LOGFMT_("FS_Server%d.OnRun exit"), _id);
+}
+
+void FS_Server::_DetectClientHeartTime()
+{
+    //当前时间戳
+    const auto &nowTime = Time::Now();
+    auto dt = nowTime - _oldTime;
+    _oldTime.FlushTime();
+
+    FS_Client *client = NULL;
+    for(auto iter = _socketRefClients.begin(); iter != _socketRefClients.end(); )
+    {
+        client = iter->second;
+
+        // 心跳检测
+        if(client->CheckHeart(dt))
+        {
+#ifdef FS_USE_IOCP
+            if(client->IsPostIoChange())
+                client->Destroy();
+            else
+                _OnClientLeave(client);
+#else
+            _OnClientLeave(client);
+#endif // CELL_USE_IOCP
+            iter = _socketRefClients.erase(iter);
+            continue;
+        }
+
+        //// 定时发送检测
+        // pClient->checkSend(dt);
+
+        ++iter;
+    }
+}
+
+void FS_Server::_OnClientLeave(FS_Client *client)
+{
+    _eventHandleObj->OnNetLeave(client);
+    _clientsChange = true;
+    delete client;
+}
+
+void FS_Server::_OnClientJoin(FS_Client *client)
+{
+    // ...
+}
+
+void FS_Server::_OnNetRecv(FS_Client *client)
+{
+     _eventHandleObj->OnNetRecv(client);
+}
+
+void FS_Server::_OnClientMsgTransfer()
+{
+    FS_Client *client = NULL;
+    for(auto itr : _clients)
+    {
+        client = itr;
+        // 循环 判断是否有消息需要处理
+        while(client->HasMsg())
+        {
+            // 处理网络消息
+            _HandleNetMsg(client, client->FrontMsg());
+            // 移除消息队列（缓冲区）最前的一条数据
+            client->PopFrontMsg();
+        }
+    }
+}
+
+void FS_Server::_ClearClients()
+{
+    _locker.Lock();
+    for(auto iter : _clients)
+        delete iter;
+
+    _socketRefClients.clear();
+    _clients.clear();
+
+    for(auto iter : _clientsCache)
+        delete iter;
+
+    _clientsCache.clear();
+    _locker.Unlock();
 }
 
 FS_NAMESPACE_END
+
+

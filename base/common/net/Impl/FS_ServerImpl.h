@@ -33,10 +33,9 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
-
-inline void FS_Server::SetId(Int32 id)
+inline size_t FS_Server::GetClientCount() const
 {
-    _id = id;
+    return _socketRefClients.size() + _clientsCache.size();
 }
 
 inline void FS_Server::SetClientNum(Int32 socketNum)
@@ -47,6 +46,24 @@ inline void FS_Server::SetEventHandleObj(INetEvent *handleObj)
 {
     _eventHandleObj = handleObj;
 }
+
+inline void FS_Server::SetId(Int32 id)
+{
+    _id = id;
+}
+
+inline void FS_Server::AddClient(FS_Client *client)
+{
+    _locker.Lock();
+    _clientsCache.push_back(client);
+    _locker.Unlock();
+}
+
+inline void FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
+{
+    _eventHandleObj->OnNetMsg(this, client, header);
+}
+
 FS_NAMESPACE_END
 
 #endif

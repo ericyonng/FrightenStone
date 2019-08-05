@@ -55,6 +55,26 @@ inline T *Singleton<T>::GetInstance()
 
     return pObj;
 }
+
+template<typename T>
+template<typename... Args>
+inline T *Singleton<T>::GetInstance(Args &&... args)
+{
+    _locker.Lock();
+    T *pObj = _pObj;
+    if(NULL != pObj)
+    {
+        _locker.Unlock();
+        return pObj;
+    }
+
+    _pObj = new T(std::forward<Args>(args)...);
+    pObj = _pObj;
+    _locker.Unlock();
+
+    return pObj;
+}
+
 FS_NAMESPACE_END
 
 #endif // !__Base_Common_Assist_AssistObjs_Impl_Singleton_H__

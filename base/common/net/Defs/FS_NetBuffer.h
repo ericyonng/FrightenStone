@@ -21,45 +21,72 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : FS_NetBuffer.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
+ * @date  : 2019/8/5
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
+#ifndef __Base_Common_Net_Defs_FS_NetBuffer_H__
+#define __Base_Common_Net_Defs_FS_NetBuffer_H__
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_Delegate.h"
-
-#pragma region macro
-#undef __DEF_OBJ_POOL_OBJ_NUM__
-#define __DEF_OBJ_POOL_OBJ_NUM__        1024
-#undef __OBJPOOL_ALIGN_BYTES__
-#define __OBJPOOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
-#pragma endregion
+#include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ObjPoolDefs
-{
-public:
-    static const Int32 __g_FreeRate;      // 对象池空闲率
-};
+struct BASE_EXPORT IO_DATA_BASE;
 
-class BASE_EXPORT ObjPoolMethods
+class BASE_EXPORT FS_NetBuffer
 {
 public:
-    static void PrintMemleakInfo(const char *objName, size_t nodeCnt, size_t totalObjBlocks, size_t bytesOccupied, size_t memleakObjCnt, size_t memleakBytes);
-    static void RegisterToMemleakMonitor(const char *objName, IDelegatePlus<size_t, Int64 &> *callback);
-    static void UnRegisterMemleakDelegate(const char *objName);
+    FS_NetBuffer(Int32 sizeBuffer = 8192);
+    ~FS_NetBuffer();
+
+    char *GetData();
+    bool Push(const char *data, Int32 len);
+    void Pop(Int32 len);
+
+    Int32 Write2socket(SOCKET sockfd);
+    Int32 ReadFromSocket(SOCKET sockfd);
+
+    bool HasMsg() const;
+    bool NeedWrite() const;
+
+#pragma region iocp
+public:
+#ifdef FS_USE_IOCP
+    IO_DATA_BASE *MakeRecvIoData(SOCKET sockfd);
+    IO_DATA_BASE *MakeSendIoData(SOCKET sockfd);
+
+    // 从iocp读入或写入iocp时 buffer相应调整
+    bool OnReadFromIocp(int recvBytes);
+    bool OnWrite2Iocp(int sendBytes);
+#endif
+#pragma endregion
+
+private:
+    // 第二缓冲区 发送缓冲区
+    char *_buff = NULL;
+    // 可以用链表或队列来管理缓冲数据块
+    // list<char*> _buffList;
+    // 缓冲区的数据尾部位置，已有数据长度
+    Int32 _lastPos = 0;
+    // 缓冲区总的空间大小，字节长度
+    Int32 _buffSize = 0;
+    // 缓冲区写满次数计数
+    int _fullCount = 0;
+#ifdef FS_USE_IOCP
+    IO_DATA_BASE _ioData = {};
+#endif // CELL_USE_IOCP
 };
 
 FS_NAMESPACE_END
+
+#include "base/common/net/Defs/FS_NetBufferImpl.h"
 
 #endif
