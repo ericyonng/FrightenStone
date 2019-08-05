@@ -32,6 +32,7 @@
 #include "stdafx.h"
 #include "base/common/socket/Impl/SocketUtil.h"
 #include <base/common/status/status.h>
+#include "base/common/component/Impl/Time.h"
 
 #pragma region windows
 #include<WinSock2.h>
@@ -282,6 +283,12 @@ bool SocketUtil::IsDetectTimeOut(
     }
 
     return isTimeOut;
+}
+
+void SocketUtil::Sleep(UInt64 milliSec, UInt64 microSec)
+{
+    std::chrono::microseconds t(milliSec*Time::_microSecondPerMilliSecond + microSec);
+    std::this_thread::sleep_for(t);
 }
 
 Int32 SocketUtil::SetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 cacheSize)

@@ -21,45 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ObjPoolDefs.h
+ * @file  : FS_IocpServer.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/25
+ * @date  : 2019/8/5
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
-#define __Base_Common_ObjPool_Defs_ObjPoolDefs_H__
+#ifndef __Base_Common_Net_Impl_FS_IocpServer_H__
+#define __Base_Common_Net_Impl_FS_IocpServer_H__
 #pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_Delegate.h"
-
-#pragma region macro
-#undef __DEF_OBJ_POOL_OBJ_NUM__
-#define __DEF_OBJ_POOL_OBJ_NUM__        1024
-#undef __OBJPOOL_ALIGN_BYTES__
-#define __OBJPOOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
-#pragma endregion
-
-FS_NAMESPACE_BEGIN
-
-class BASE_EXPORT ObjPoolDefs
-{
-public:
-    static const Int32 __g_FreeRate;      // 对象池空闲率
-};
-
-class BASE_EXPORT ObjPoolMethods
-{
-public:
-    static void PrintMemleakInfo(const char *objName, size_t nodeCnt, size_t totalObjBlocks, size_t bytesOccupied, size_t memleakObjCnt, size_t memleakBytes);
-    static void RegisterToMemleakMonitor(const char *objName, IDelegatePlus<size_t, Int64 &> *callback);
-    static void UnRegisterMemleakDelegate(const char *objName);
-};
-
-FS_NAMESPACE_END
-
 #endif
+

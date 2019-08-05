@@ -249,4 +249,6 @@ private:\
 #else
 #endif
 
+#define FS_USE_IOCP
+
 #endif // !__Base_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__

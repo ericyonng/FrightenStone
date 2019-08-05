@@ -74,6 +74,8 @@ public:
         , bool setOneAtLeast = false
         , bool isInfiniteWaiting = false);
 
+    static void Sleep(UInt64 milliSec, UInt64 microSec = 0);
+
     // 设置socket缓冲区大小
     static Int32 SetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 cacheSize);
 
