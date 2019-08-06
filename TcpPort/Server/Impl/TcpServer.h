@@ -51,14 +51,14 @@ public:
     void Close();
     void CloseClients();
     Int32 RecvData(ClientSocket *client);
-    Int32 SendData(MYSOCKET socket, PacketHeader *header);
-    void SendToAll(PacketHeader* header);
+    Int32 SendData(MYSOCKET socket, fs::NetMsg_DataHeader *header);
+    void SendToAll(fs::NetMsg_DataHeader* header);
     #pragma endregion
 
     #pragma region 
     bool OnRun();
     bool IsRun() const;
-    virtual void OnNetMsg(MYSOCKET socket, PacketHeader *header);
+    virtual void OnNetMsg(MYSOCKET socket, fs::NetMsg_DataHeader *header);
     #pragma endregion
 
 private:

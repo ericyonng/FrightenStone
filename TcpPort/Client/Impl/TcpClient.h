@@ -44,14 +44,14 @@ public:
     Int32 InitSocket(bool blockSocket = false);
     Int32 Connect(const char *ip, UInt16 port) const;
     Int32 RecvData();
-    Int32 SendData(PacketHeader* header) const;
+    Int32 SendData(fs::NetMsg_DataHeader* header) const;
     void Close();
     #pragma endregion
 
     #pragma region 
     bool OnRun();
     bool IsRun() const;
-    virtual void OnNetMsg(PacketHeader *header);
+    virtual void OnNetMsg(fs::NetMsg_DataHeader *header);
     #pragma endregion
 
 private:

@@ -60,6 +60,7 @@
 #include "base/common/Application/Application.h"
 #include "base/common/memleak/memleak.h"
 #include "base/common/event/event.h"
+#include "base/common/memorypool/memorypool.h"
 #endif
 #pragma endregion
 

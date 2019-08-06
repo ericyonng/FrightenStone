@@ -116,9 +116,9 @@ Int32 TcpClient::RecvData()
 
     _lastPos += nLen;
 
-    while(_lastPos >= sizeof(PacketHeader))
+    while(_lastPos >= sizeof(fs::NetMsg_DataHeader))
     {
-        auto *header = reinterpret_cast<PacketHeader *>(_msgBuf);
+        auto *header = reinterpret_cast<fs::NetMsg_DataHeader *>(_msgBuf);
 
         if(_lastPos >= header->_packetLength)    // TODO
         {
@@ -138,7 +138,7 @@ Int32 TcpClient::RecvData()
     return StatusDefs::Success;
 }
 
-Int32 TcpClient::SendData(PacketHeader* header) const
+Int32 TcpClient::SendData(fs::NetMsg_DataHeader* header) const
 {
     if(IsRun() && header)
     {
@@ -200,21 +200,21 @@ bool TcpClient::IsRun() const
     return _sock != MYINVALID_SOCKET;
 }
 
-void TcpClient::OnNetMsg(PacketHeader *header)
+void TcpClient::OnNetMsg(fs::NetMsg_DataHeader *header)
 {
     switch(header->_cmd)
     {
-        case ProtocolCmd::LoginRes:
+        case fs::ProtocolCmd::LoginRes:
         {
 
-            auto *res = static_cast<LoginRes *>(header);
+            auto *res = static_cast<fs::LoginRes *>(header);
             printf("<socket=%llu>recv£ºLoginRes,len£º%d\n userName[%s] status[%d]"
                    , _sock, res->_packetLength, res->_userName, res->_status);
         }
         break;
-        case ProtocolCmd::LoginNty:
+        case fs::ProtocolCmd::LoginNty:
         {
-            auto *loginNty = static_cast<LoginNty *>(header);
+            auto *loginNty = static_cast<fs::LoginNty *>(header);
             printf("<socket=%llu>recv£ºLoginNty,len£º%d name[%s] pwd[%s]\n", _sock, loginNty->_packetLength, loginNty->_userName, loginNty->_pwd);
         }
         break;
