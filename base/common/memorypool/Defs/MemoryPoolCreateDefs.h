@@ -42,15 +42,13 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT MemoryPoolHelper
 {
 public:
-    MemoryPoolHelper(const Byte8 *objName);
+    MemoryPoolHelper();
     virtual ~MemoryPoolHelper();
 
 public:
     void *Alloc(size_t bytes);
     void Free(void *ptr);
     void AddRef(void *ptr);
-
-    BUFFER256 _objName;
 };
 
 FS_NAMESPACE_END
@@ -70,6 +68,6 @@ static fs::MemoryPoolHelper _mempool_helper;
 // 在实现文件中需要添加
 #undef MEMPOOL_CREATE_IMPL
 #define MEMPOOL_CREATE_IMPL(objType, _mempool_helper)                                           \
-fs::MemoryPoolHelper objType::_mempool_helper(#objType);
+fs::MemoryPoolHelper objType::_mempool_helper;
 
 #endif

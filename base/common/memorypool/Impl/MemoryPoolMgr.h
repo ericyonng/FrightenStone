@@ -40,6 +40,7 @@
 #include "base/common/asyn/asyn.h"
 #include "base/common/assist/assistobjs/Impl/Singleton.h"
 #include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
+#include "base/common/memorypool/Defs/MemoryPoolDefs.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -55,7 +56,7 @@ public:
 public:
     virtual Int32 InitPool();
     virtual void FinishPool();
-    virtual void *Alloc(size_t bytes, const Byte8 *objName);
+    virtual void *Alloc(size_t bytes);
     virtual void  Free(void *ptr);
     virtual void  AddRef(void *ptr);
     virtual void Lock();
@@ -65,20 +66,9 @@ private:
     void  _Init(size_t begin, size_t end, IMemoryAlloctor *alloctor);
 
 private:
-    // MemoryAlloctor<64, 10240>       _mem64;        // 64字节分配器
-    MemoryAlloctor * _mem64;                         // 64字节分配器
-    MemoryAlloctor *_mem128;                         // 64字节分配器
-    MemoryAlloctor *_mem256;                         // 64字节分配器
-    MemoryAlloctor *_mem512;                         // 64字节分配器
-    MemoryAlloctor *_mem1024;                         // 64字节分配器
-    MemoryAlloctor *_mem2048;                         // 64字节分配器
-    MemoryAlloctor *_mem4096;                         // 64字节分配器
-    MemoryAlloctor *_mem8192;                         // 64字节分配器
-    MemoryAlloctor *_mem16K;                         // 64字节分配器
-    MemoryAlloctor *_mem32K;                         // 64字节分配器
-    MemoryAlloctor *_mem64K;                         // 64字节分配器
-    IMemoryAlloctor                 *_alloctors[65536];  // 所有内存分配器
-
+    IMemoryAlloctor *_alloctors[__MEMORY_POOL_MAXBLOCK_LIMIT__];  // 内存分配器O(1)复杂度，最大支持__MEMORY_POOL_MAXBLOCK_LIMIT__的内存分配其他内存由系统分配
+    std::vector<IMemoryAlloctor *> _allAlloctors;                   // 用于释放
+    bool _isInit;
     Locker _locker;
 };
 

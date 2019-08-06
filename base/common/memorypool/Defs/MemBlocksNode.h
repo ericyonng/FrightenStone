@@ -21,29 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryBlock.cpp
+ * @file  : MemBlocksNode.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/5
+ * @date  : 2019/8/6
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/memorypool/Defs/MemoryBlock.h"
+#ifndef __Base_Common_MemoryPool_Defs_MemBlocksNode_H__
+#define __Base_Common_MemoryPool_Defs_MemBlocksNode_H__
+
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-MemoryBlock::MemoryBlock(IMemoryAlloctor *alloctor)
-    :_objSize(0)
-    ,_alloctor(alloctor)
-    ,_nextBlock(NULL)
-    ,_ref(0)
-    ,_isInPool(false)
-    ,_reserver1(0)
-    ,_reserver2(0)
-    ,_reserver3(0)
+struct BASE_EXPORT MemBlocksNode
 {
-}
+    MemBlocksNode(size_t nodeSize);
+    ~MemBlocksNode();
+
+    void *_memBuff;
+    size_t _nodeSize;
+    MemBlocksNode *_next;
+};
 
 FS_NAMESPACE_END
+
+#include "base/common/memorypool/Defs/MemBlocksNodeImpl.h"
+
+#endif

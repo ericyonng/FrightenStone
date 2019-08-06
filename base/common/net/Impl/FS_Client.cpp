@@ -32,17 +32,94 @@
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_Client.h"
 #include "base/common/socket/socket.h"
+#include "base/common/net/Defs/FS_NetBuffer.h"
+#include "base/common/log/Log.h"
+#include "base/common/net/Defs/FS_NetDefs.h"
 
 FS_NAMESPACE_BEGIN
-
-
-void FS_Client::Init()
+FS_Client::FS_Client(Int64 clientId
+                            , SOCKET sockfd
+                            , Int32 sendSize
+                            , Int32 recvSize)
+    : _id(clientId)
+    , _sockfd(sockfd)
+    , _sendBuff(new  FS_NetBuffer(sendSize))
+    , _recvBuff(new  FS_NetBuffer(recvSize))
 {
     ResetDTHeart();
     ResetDTSend();
 }
 
-void FS_Client::Destory()
+void FS_Client::Send2iocp(Int32 snd)
+{
+    if(!_isPostSend)
+        g_Log->e<FS_Client>(_LOGFMT_("send2iocp _isPostSend is false"));
+
+    _isPostSend = false;
+    _sendBuff->OnWrite2Iocp(snd);
+}
+
+bool FS_Client::CheckHeart(const TimeSlice &slice)
+{
+    _heartDeadSlice += slice;
+    if(_heartDeadSlice >= TimeSlice(0, CLIENT_HREAT_DEAD_TIME))
+    {
+        g_Log->i<FS_Client>(_LOGFMT_("checkHeart dead:sock=%lld,time=%lld")
+                            , _sockfd, _heartDeadSlice.GetTotalMilliSeconds());
+        return true;
+    }
+
+    return false;
+}
+
+// 定时发送消息检测
+bool FS_Client::CheckSend(const TimeSlice &dt)
+{
+    _lastSendSlice += dt;
+    if(_lastSendSlice >= TimeSlice(0, CLIENT_SEND_BUFF_TIME))
+    {
+        // CELLLog_Info("checkSend:s=%d,time=%d", _sockfd, _dtSend);
+        // 立即将发送缓冲区的数据发送出去
+        SendDataReal();
+        // 重置发送计时
+        ResetDTSend();
+        return true;
+    }
+
+    return false;
+}
+
+#ifdef FS_USE_IOCP
+IO_DATA_BASE *FS_Client::MakeRecvIoData()
+{
+    if(_isPostRecv)
+        return NULL;
+
+    _isPostRecv = true;
+    return _recvBuff->MakeRecvIoData(_sockfd);
+}
+
+void FS_Client::RecvFrom(Int32 rcvBytes)
+{
+    if(!_isPostRecv)
+        g_Log->w<FS_Client>(_LOGFMT_("recv from _isPostRecv is false"));
+
+    _isPostRecv = false;
+    _recvBuff->OnReadFromIocp(rcvBytes);
+}
+
+IO_DATA_BASE *FS_Client::MakeSendIoData()
+{
+    if(_isPostSend)
+        return NULL;
+
+    _isPostSend = true;
+    return _sendBuff->MakeSendIoData(_sockfd);
+}
+
+#endif
+
+void FS_Client::Destroy()
 {
     if(INVALID_SOCKET != _sockfd)
     {

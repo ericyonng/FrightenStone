@@ -35,8 +35,26 @@
 #include "base/common/log/Log.h"
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/net/Defs/IocpDefs.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
+
+OBJ_POOL_CREATE_IMPL(FS_NetBuffer, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+
+FS_NetBuffer::FS_NetBuffer(Int32 sizeBuffer)
+{
+    g_MemoryPool->Lock();
+    _buff = reinterpret_cast<char *>(g_MemoryPool->Alloc(sizeBuffer));
+    g_MemoryPool->Unlock();
+    _buffSize = sizeBuffer;
+}
+
+FS_NetBuffer::~FS_NetBuffer()
+{
+    g_MemoryPool->Lock();
+    g_MemoryPool->Free(_buff);
+    g_MemoryPool->Unlock();
+}
 
 bool FS_NetBuffer::Push(const char *data, Int32 len)
 {
@@ -182,7 +200,7 @@ IO_DATA_BASE *FS_NetBuffer::MakeSendIoData(SOCKET sockfd)
     {
         _ioData._wsaBuff.buf = _buff;
         _ioData._wsaBuff.len = _lastPos;
-        _ioData.sockfd = sockfd;
+        _ioData._sock = sockfd;
         return &_ioData;
     }
 

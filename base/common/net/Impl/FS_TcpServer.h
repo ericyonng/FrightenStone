@@ -41,6 +41,7 @@
 #include "base/common/net/Defs/FS_NetDefs.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -129,6 +130,9 @@ protected:
     std::atomic<Int32> _clientAcceptCnt;
     // 已分配客户端计数
     std::atomic<Int32> _clientJoinedCnt;
+
+    Locker _locker;
+    std::atomic<Int64> _clientMaxId;
     #pragma endregion
 };
 

@@ -21,29 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryBlock.cpp
+ * @file  : MemoryPoolDefs.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/5
+ * @date  : 2019/8/6
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/memorypool/Defs/MemoryBlock.h"
+#ifndef __Base_Common_MemoryPool_Defs_MemoryPoolDefs_H__
+#define __Base_Common_MemoryPool_Defs_MemoryPoolDefs_H__
+#pragma once
 
-FS_NAMESPACE_BEGIN
+#undef __MEMORY_POOL_ALIGN_BYTES__
+#define __MEMORY_POOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
 
-MemoryBlock::MemoryBlock(IMemoryAlloctor *alloctor)
-    :_objSize(0)
-    ,_alloctor(alloctor)
-    ,_nextBlock(NULL)
-    ,_ref(0)
-    ,_isInPool(false)
-    ,_reserver1(0)
-    ,_reserver2(0)
-    ,_reserver3(0)
-{
-}
+#undef __MEMORY_POOL_MINIMUM_BLOCK__
+#define __MEMORY_POOL_MINIMUM_BLOCK__        64          // 最小内存块64字节
 
-FS_NAMESPACE_END
+#undef __MEMORY_POOL_MAXIMUM_BLOCK__
+#define __MEMORY_POOL_MAXIMUM_BLOCK__        65536       // 最大内存块64K 只支持64的倍数
+
+#define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // 能够支持的最大内存块范围
+
+#endif
