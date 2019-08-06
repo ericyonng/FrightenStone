@@ -57,7 +57,7 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    TestDelegate::Run();
+    TestMemoryPool::Run();
     getchar();
     return 0;
 }
