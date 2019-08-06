@@ -267,7 +267,7 @@ int Example::Run()
                        , ioEvent._ioData->_sock, ioEvent._bytesTrans, ++msgCount);
 
             // 不停的接收数据
-            ioEvent._ioData->_length = ioEvent._bytesTrans;
+            ioEvent._ioData->_wsaBuff.len = ioEvent._bytesTrans;
             auto st = iocp.PostSend(ioEvent._ioData);
             if(st == StatusDefs::IOCP_ClientForciblyClosed)
             {// 远端关闭
@@ -290,6 +290,7 @@ int Example::Run()
             g_Log->sys(_LOGFMT_("send data :socket[%llu], bytesTrans[%d] msgCount[%d]")
                        , ioEvent._ioData->_sock, ioEvent._bytesTrans, msgCount);
 
+            // ioEvent._ioData->_wsaBuff.len = 
             auto st = iocp.PostRecv(ioEvent._ioData);
             if(st == StatusDefs::IOCP_ClientForciblyClosed)
             {// 远端关闭
@@ -299,7 +300,7 @@ int Example::Run()
         }
         else
         {
-            g_Log->e<Example>(_LOGFMT_("未定义行为 sockefd=%llu"), ioEvent._socket);
+            g_Log->e<Example>(_LOGFMT_("未定义行为 sockefd=%llu"), ioEvent.data._socket);
         }
         // 检查是否有事件发生，和selet,epoll_wait类似
         // 接受连接 完成

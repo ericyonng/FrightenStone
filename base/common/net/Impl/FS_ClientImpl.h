@@ -33,25 +33,77 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
-inline FS_Client::FS_Client(Int64 clientId
-                     , SOCKET sockfd
-                     , int sendSize
-                     , int recvSize)
-    : _id(clientId)
-    , _sockfd(sockfd)
-    , _sendBuff(sendSize)
-    , _recvBuff(recvSize)
-{
-}
 
 inline FS_Client::~FS_Client()
 {
-    Destory();
+    Destroy();
+    FS_Release(_recvBuff);
+    FS_Release(_sendBuff);
 }
 
-inline SOCKET FS_Client::GetSocket()
+inline Int32 FS_Client::RecvData()
+{
+    return _recvBuff->ReadFromSocket(_sockfd);
+}
+
+inline Int32 FS_Client::SendDataReal()
+{
+    ResetDTSend();
+    return _sendBuff->Write2socket(_sockfd);
+}
+
+inline Int32 FS_Client::SendData(NetMsg_DataHeader *header)
+{
+    return SendData((const char *)header, header->_packetLength);
+}
+
+inline Int32 FS_Client::SendData(const char *data, Int32 len)
+{
+    if(_sendBuff->Push(data, len))
+        return len;
+
+    return SOCKET_ERROR;
+}
+
+inline NetMsg_DataHeader *FS_Client::FrontMsg()
+{
+    return (NetMsg_DataHeader *)_recvBuff->GetData();
+}
+
+inline void FS_Client::PopFrontMsg()
+{
+    if(HasMsg())
+        _recvBuff->Pop(FrontMsg()->_packetLength);
+}
+
+inline void FS_Client::ResetDTHeart()
+{
+    _heartDeadSlice = 0;
+}
+
+inline void FS_Client::ResetDTSend()
+{
+    _lastSendSlice = 0;
+}
+
+inline bool FS_Client::IsPostIoChange() const
+{
+    return _isPostRecv || _isPostSend;
+}
+
+inline SOCKET FS_Client::GetSocket() const
 {
     return _sockfd;
+}
+
+inline bool FS_Client::HasMsg() const
+{
+    return _recvBuff->HasMsg();
+}
+
+inline bool FS_Client::NeedWrite() const
+{
+    return _sendBuff->NeedWrite();
 }
 
 FS_NAMESPACE_END

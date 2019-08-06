@@ -61,6 +61,20 @@
 #ifndef RECV_BUFF_SZIE
 #define RECV_BUFF_SZIE 8192
 #define SEND_BUFF_SZIE 10240
+#define FS_BUFF_SIZE_DEF 8192
 #endif // !RECV_BUFF_SZIE
+
+
+// 客户端心跳检测死亡计时时间(单位ms)
+#define CLIENT_HREAT_DEAD_TIME 120000
+// 在间隔指定时间后才允许发送(单位ms)
+#define CLIENT_SEND_BUFF_TIME 200
+
+// 心跳队列排序
+// class FS_ClientComp
+// {
+// public:
+//     bool operator(const FS_Client *l, const FS_Client *r) const;
+// };
 
 #endif

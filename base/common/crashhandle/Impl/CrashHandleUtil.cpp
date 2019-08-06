@@ -413,15 +413,15 @@ void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
     auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);
     SystemUtil::MessageBoxPopup(fileName, logData->_logToWrite);
 
-#ifdef _DEBUG
-    // µ¯´°¶ÑÕ»ÐÅÏ¢
-    FS_String path;
-    SystemUtil::GetProgramPath(true, path);
-    auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);
-    ::MessageBoxA(NULL, logData->_logToWrite.c_str(), fileName.c_str(), MB_ICONERROR | MB_OK);
-#else
-    Sleep(1000);
-#endif
+// #ifdef _DEBUG
+//     // µ¯´°¶ÑÕ»ÐÅÏ¢
+//     FS_String path;
+//     SystemUtil::GetProgramPath(true, path);
+//     auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);
+//     ::MessageBoxA(NULL, logData->_logToWrite.c_str(), fileName.c_str(), MB_ICONERROR | MB_OK);
+// #else
+//     Sleep(1000);
+// #endif
 }
 
 FS_NAMESPACE_END

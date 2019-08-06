@@ -37,8 +37,14 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/net/Defs/FS_NetDefs.h"
+#include "base/common/component/Impl/Time.h"
+#include "base/common/net/Defs/FS_NetBuffer.h"
+#include "base/common/net/protocol/protocol.h"
+#include "base/common/component/Impl/TimeSlice.h"
 
 FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT FS_NetBuffer;
 
 class BASE_EXPORT FS_Client
 {
@@ -49,137 +55,45 @@ public:
               , int recvSize = RECV_BUFF_SZIE);
     ~FS_Client();
 
-    void Init();
-    void Destory();
-    SOCKET GetSocket();
-    int RecvData()
-    {
-        return _recvBuff.Read4socket(_sockfd);
-    }
+public:
+    Int32 RecvData();
+    // 立即将发送缓冲区的数据发送给客户端
+    Int32 SendDataReal();
+    // 发送数据 缓冲区的控制根据业务需求的差异而调整
+    Int32 SendData(NetMsg_DataHeader *header);
+    // 返回值 len 或 SOCKET_ERROR
+    Int32 SendData(const char *data, Int32 len);
+    void Send2iocp(Int32 snd);
+    NetMsg_DataHeader *FrontMsg();
+    void PopFrontMsg();
 
-    bool hasMsg()
-    {
-        return _recvBuff.hasMsg();
-    }
+    void ResetDTHeart();
+    void ResetDTSend();
+    // 心跳检测 心跳检测需要一个set序列
+    bool CheckHeart(const TimeSlice &slice);
+    // 定时发送消息检测
+    bool CheckSend(const TimeSlice &dt);
 
-    netmsg_DataHeader* front_msg()
-    {
-        return (netmsg_DataHeader*)_recvBuff.data();
-    }
+    #ifdef FS_USE_IOCP
+    IO_DATA_BASE *MakeRecvIoData();
+    void RecvFrom(Int32 rcvBytes);
 
-    void pop_front_msg()
-    {
-        if(hasMsg())
-            _recvBuff.pop(front_msg()->dataLength);
-    }
+    IO_DATA_BASE *MakeSendIoData();
+    bool IsPostIoChange() const;
+    #endif // FS_USE_IOCP
 
-    bool needWrite()
-    {
-        return _sendBuff.needWrite();
-    }
-
-    //立即将发送缓冲区的数据发送给客户端
-    int SendDataReal()
-    {
-        resetDTSend();
-        return _sendBuff.write2socket(_sockfd);
-    }
-
-    //缓冲区的控制根据业务需求的差异而调整
-    //发送数据
-    int SendData(netmsg_DataHeader* header)
-    {
-        return SendData((const char*)header, header->dataLength);
-    }
-
-    int SendData(const char* pData, int len)
-    {
-        if(_sendBuff.push(pData, len))
-        {
-            return len;
-        }
-        return SOCKET_ERROR;
-    }
-
-    void ResetDTHeart()
-    {
-        _heartDeadTime = 0;
-    }
-
-    void ResetDTSend()
-    {
-        _lastSendTime = 0;
-    }
-
-    //心跳检测
-    bool checkHeart(time_t dt)
-    {
-        _dtHeart += dt;
-        if(_dtHeart >= CLIENT_HREAT_DEAD_TIME)
-        {
-            CELLLog_Info("checkHeart dead:s=%d,time=%ld", _sockfd, _dtHeart);
-            return true;
-        }
-        return false;
-    }
-
-    //定时发送消息检测
-    bool checkSend(time_t dt)
-    {
-        _dtSend += dt;
-        if(_dtSend >= CLIENT_SEND_BUFF_TIME)
-        {
-            //CELLLog_Info("checkSend:s=%d,time=%d", _sockfd, _dtSend);
-            //立即将发送缓冲区的数据发送出去
-            SendDataReal();
-            //重置发送计时
-            resetDTSend();
-            return true;
-        }
-        return false;
-    }
-
-#ifdef FS_USE_IOCP
-    IO_DATA_BASE* makeRecvIoData()
-    {
-        if(_isPostRecv)
-            return nullptr;
-        _isPostRecv = true;
-        return _recvBuff.makeRecvIoData(_sockfd);
-    }
-    void recv4iocp(int nRecv)
-    {
-        if(!_isPostRecv)
-            CELLLog_Error("recv4iocp _isPostRecv is false");
-        _isPostRecv = false;
-        _recvBuff.read4iocp(nRecv);
-    }
-
-    IO_DATA_BASE* makeSendIoData()
-    {
-        if(_isPostSend)
-            return nullptr;
-        _isPostSend = true;
-        return _sendBuff.makeSendIoData(_sockfd);
-    }
-
-    void send2iocp(int nSend)
-    {
-        if(!_isPostSend)
-            CELLLog_Error("send2iocp _isPostSend is false");
-        _isPostSend = false;
-        _sendBuff.write2iocp(nSend);
-    }
-
-    bool isPostIoAction()
-    {
-        return _isPostRecv || _isPostSend;
-    }
-#endif // FS_USE_IOCP
+    /* 杂项 */
+    #pragma region misc
+public:
+    void Destroy();
+    SOCKET GetSocket() const;
+    bool HasMsg() const;
+    bool NeedWrite() const;
+    #pragma endregion
 
     //////////用于调试的成员变量
 public:
-    Int64 _id = -1;
+    Int64 _id;
     // 所属serverid
     int _serverId = -1;
     // 测试接收发逻辑用
@@ -198,9 +112,9 @@ private:
     // 发送缓冲区
     FS_NetBuffer *_sendBuff;
     // 心跳死亡计时
-    Time _heartDeadTime;
+    TimeSlice _heartDeadSlice; // 心跳序列优化使用时间戳TODO
     // 上次发送消息数据的时间 
-    Time _lastSendTime;
+    TimeSlice _lastSendSlice;
 #ifdef FS_USE_IOCP
     bool _isPostRecv = false;
     bool _isPostSend = false;

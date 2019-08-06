@@ -34,6 +34,7 @@
 #include "base/common/log/Log.h"
 #include "base/common/socket/socket.h"
 #include "base/common/component/Impl/TimeSlice.h"
+#include "base/common/net/Impl/FS_Client.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -87,7 +88,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             {
                 _socketRefClients[client->GetSocket()] = client;
                 _clients.push_back(client);
-                client->serverId = _id;
+                client->_serverId = _id;
                 _eventHandleObj->OnNetJoin(client);
                 _OnClientJoin(client);
             }
@@ -97,7 +98,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         }
 
         // 如果没有需要处理的客户端，就跳过
-        if(_socketRefClients.empty())
+        if(_clients.empty())
         {
             SocketUtil::Sleep(1);
 
@@ -127,6 +128,7 @@ void FS_Server::_DetectClientHeartTime()
     auto dt = nowTime - _oldTime;
     _oldTime.FlushTime();
 
+    // 心跳序列优化TODO:使用排序
     FS_Client *client = NULL;
     for(auto iter = _socketRefClients.begin(); iter != _socketRefClients.end(); )
     {

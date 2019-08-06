@@ -43,7 +43,9 @@ FS_NAMESPACE_BEGIN
 
 MemoryPoolMgr::MemoryPoolMgr()
     :_alloctors{NULL}
+    ,_isInit(false)
 {
+    InitPool();
 }
 
 MemoryPoolMgr::~MemoryPoolMgr()
@@ -54,17 +56,21 @@ MemoryPoolMgr::~MemoryPoolMgr()
 Int32 MemoryPoolMgr::InitPool()
 {
     _locker.Lock();
-    _Init(0, 64,        _mem64 = new MemoryAlloctor(64, BLOCK_AMOUNT_DEF));
-    _Init(64, 128,      _mem128 = new MemoryAlloctor(64, BLOCK_AMOUNT_DEF));
-    _Init(128, 256,     _mem256 = new MemoryAlloctor(256, BLOCK_AMOUNT_DEF));
-    _Init(256, 512,     _mem512 = new MemoryAlloctor(512, BLOCK_AMOUNT_DEF));
-    _Init(512, 1024,    _mem1024 = new MemoryAlloctor(1024, BLOCK_AMOUNT_DEF));
-    _Init(1024, 2048,   _mem2048 = new MemoryAlloctor(2048, BLOCK_AMOUNT_DEF));
-    _Init(2048, 4096,   _mem4096 = new MemoryAlloctor(4096, BLOCK_AMOUNT_DEF));
-    _Init(4096, 8192,   _mem8192 = new MemoryAlloctor(8192, BLOCK_AMOUNT_DEF));
-    _Init(8192, 16384,  _mem16K = new MemoryAlloctor(16384, BLOCK_AMOUNT_DEF));
-    _Init(16384, 32768, _mem32K = new MemoryAlloctor(32768, BLOCK_AMOUNT_DEF));
-    _Init(32768, 65536, _mem64K = new MemoryAlloctor(65536, BLOCK_AMOUNT_DEF));
+    if(_isInit)
+    {
+        _locker.Unlock();
+        return StatusDefs::Success;
+    }
+    Int32 multi = __MEMORY_POOL_MINIMUM_BLOCK__;
+    for(Int32 i = 0; i < __MEMORY_POOL_MAXBLOCK_LIMIT__; )
+    {
+        _Init(i, i + multi, new MemoryAlloctor(i + multi, BLOCK_AMOUNT_DEF));
+
+        // 下一次分配的是原来的2倍的内存 64-128-256-512-...
+        i += multi;
+        multi = i;
+    }
+    _isInit = true;
     _locker.Unlock();
 
     return StatusDefs::Success;
@@ -73,51 +79,31 @@ Int32 MemoryPoolMgr::InitPool()
 void MemoryPoolMgr::FinishPool()
 {
     _locker.Lock();
-    _mem64->FinishMemory();
-    _mem128->FinishMemory();
-    _mem256->FinishMemory();
-    _mem512->FinishMemory();
-    _mem1024->FinishMemory();
-    _mem2048->FinishMemory();
-    _mem4096->FinishMemory();
-    _mem8192->FinishMemory();
-    _mem16K->FinishMemory();
-    _mem32K->FinishMemory();
-    _mem64K->FinishMemory();
-    Fs_SafeFree(_mem64);
-    Fs_SafeFree(_mem128);
-    Fs_SafeFree(_mem256);
-    Fs_SafeFree(_mem512);
-    Fs_SafeFree(_mem1024);
-    Fs_SafeFree(_mem2048);
-    Fs_SafeFree(_mem4096);
-    Fs_SafeFree(_mem8192);
-    Fs_SafeFree(_mem16K);
-    Fs_SafeFree(_mem32K);
-    Fs_SafeFree(_mem64K);
+    _isInit = false;
+    for(auto iter : _allAlloctors)
+        Fs_SafeFree(iter);
+    _allAlloctors.clear();
     _locker.Unlock();
 }
 
-void *MemoryPoolMgr::Alloc(size_t bytes, const Byte8 *objName)
+void *MemoryPoolMgr::Alloc(size_t bytes)
 {
     // 判断是否内存池可分配
     if(bytes < sizeof(_alloctors) / sizeof(IMemoryAlloctor *))
     {
-        return  _alloctors[bytes]->AllocMemory(bytes, objName);
+        return  _alloctors[bytes]->AllocMemory(bytes);
     }
     else
     {
-        char *cache = reinterpret_cast<char *>(::malloc(bytes + sizeof(MemoryBlock)));
+        auto alignBytes = bytes / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (bytes%__MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
+        alignBytes = bytes + sizeof(MemoryBlock);
+
+        char *cache = reinterpret_cast<char *>(::malloc(alignBytes));
         MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
         block->_isInPool = false;
         block->_ref = 1;
         block->_alloctor = 0;
         block->_nextBlock = 0;
-        auto len = sprintf(block->_objName, "%s", objName);
-        if(len > 0)
-            block->_objName[BUFFER_LEN256 > len ? len : BUFFER_LEN256 - 1] = 0;
-        else
-            block->_objName[0] = 0;
         return  cache + sizeof(MemoryBlock);
     }
 }
@@ -125,14 +111,14 @@ void *MemoryPoolMgr::Alloc(size_t bytes, const Byte8 *objName)
 void MemoryPoolMgr::Free(void *ptr)
 {
     char *mem = reinterpret_cast<char*>(ptr);
-    MemoryBlock *block = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(mem - sizeof(MemoryBlock)));
+    MemoryBlock *block = reinterpret_cast<MemoryBlock *>(reinterpret_cast<char*>(mem - sizeof(MemoryBlock)));
     if(block->_isInPool)
     {
         block->_alloctor->FreeMemory(ptr);
     }
     else if(--block->_ref == 0)
     {
-        ::free(ptr);
+        ::free(block);
     }
 }
 
@@ -147,6 +133,8 @@ void MemoryPoolMgr::_Init(size_t begin, size_t end, IMemoryAlloctor *alloctor)
     alloctor->InitMemory();
     for(size_t i = begin; i < end; ++i)
         _alloctors[i] = alloctor;
+
+    _allAlloctors.push_back(alloctor);
 }
 
 FS_NAMESPACE_END

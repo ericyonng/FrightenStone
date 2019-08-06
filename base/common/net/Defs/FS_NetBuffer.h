@@ -36,16 +36,18 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/objpool/objpool.h"
+#include "base/common/net/Defs/FS_NetDefs.h"
+#include "base/common/net/Defs/IocpDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-struct BASE_EXPORT IO_DATA_BASE;
-
 class BASE_EXPORT FS_NetBuffer
 {
+    OBJ_POOL_CREATE(FS_NetBuffer, _objPoolHelper);
 public:
-    FS_NetBuffer(Int32 sizeBuffer = 8192);
+    FS_NetBuffer(Int32 sizeBuffer = FS_BUFF_SIZE_DEF);
     ~FS_NetBuffer();
+    void Release();
 
     char *GetData();
     bool Push(const char *data, Int32 len);

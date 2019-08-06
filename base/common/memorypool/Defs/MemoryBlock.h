@@ -45,17 +45,16 @@ class IMemoryAlloctor;
 class BASE_EXPORT MemoryBlock
 {
 public:
-    MemoryBlock(IMemoryAlloctor *alloctor, const Byte8 *objName);
+    MemoryBlock(IMemoryAlloctor *alloctor);
 
-    Int64           _ref;
     Int64           _objSize;
     IMemoryAlloctor  *_alloctor;
     MemoryBlock     *_nextBlock;
+    Int32           _ref;           // 引用计数
     bool            _isInPool;
-    BUFFER256       _objName;
-//     char            _reserver1;     // 保留位，用于内存对齐
-//     char            _reserver2;     // 保留位，用于内存对齐
-//     char            _reserver3;     // 保留位，用于内存对齐
+    char            _reserver1;     // 保留位，用于内存对齐
+    char            _reserver2;     // 保留位，用于内存对齐
+    char            _reserver3;     // 保留位，用于内存对齐
 };
 
 FS_NAMESPACE_END

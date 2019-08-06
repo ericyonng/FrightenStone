@@ -3,6 +3,6 @@
 #pragma once
 #include "base/common/assist/assistobjs/Impl/Singleton.h"
 
-#define g_CharPool fs::Singleton<fs::ObjPoolHelper<char>>::GetInstance(__DEF_OBJ_POOL_OBJ_NUM__)
+// #define g_CharPool fs::Singleton<fs::ObjPoolHelper<char>>::GetInstance(__DEF_OBJ_POOL_OBJ_NUM__)
 
 #endif

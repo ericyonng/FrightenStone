@@ -42,7 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class FS_Client;
+class BASE_EXPORT FS_Client;
 
 class BASE_EXPORT FS_Server
 {
@@ -68,6 +68,7 @@ private:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
     // 客户端状态变化（连入/有待发送数据/有待接收数据）
     virtual bool _OnClientStatusDirtied() = 0;
+    // TODO:心跳优化
     void _DetectClientHeartTime();
     void _OnClientLeave(FS_Client *client);
     virtual void _OnClientJoin(FS_Client *client);
@@ -80,7 +81,7 @@ private:
 protected:
     // 正式客户队列 隐患：不严格按照包到达时序处理，若两个包有先后依赖会出问题
     std::map<SOCKET, FS_Client *> _socketRefClients;
-    std::set<FS_Client *> _clients;      // 严格时序 使用set兼顾时间排序与移除是O(Log n),消息变化时候先移除后插入以便重新排序
+    std::vector<FS_Client *> _clients;      // 严格时序 使用set兼顾时间排序与移除是O(Log n),消息变化时候先移除后插入以便重新排序
 
 private:
     // 缓冲客户队列
@@ -101,5 +102,6 @@ protected:
 };
 
 FS_NAMESPACE_END
+#include "base/common/net/Impl/FS_ServerImpl.h"
 
 #endif

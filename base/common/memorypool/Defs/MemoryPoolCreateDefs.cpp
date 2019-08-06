@@ -35,16 +35,8 @@
 
 FS_NAMESPACE_BEGIN
 
-MemoryPoolHelper::MemoryPoolHelper(const Byte8 *objName)
-    :_objName{0}
+MemoryPoolHelper::MemoryPoolHelper()
 {
-    auto len = sprintf(_objName, "%s", objName);
-    if(len < 0)
-        _objName[0] = 0;
-    else
-    {
-        _objName[len >= BUFFER_LEN256 ? (BUFFER_LEN256 - 1) : len] = 0;
-    }
 }
 
 MemoryPoolHelper::~MemoryPoolHelper()
@@ -55,7 +47,7 @@ MemoryPoolHelper::~MemoryPoolHelper()
 void *MemoryPoolHelper::Alloc(size_t bytes)
 {
     g_MemoryPool->Lock();
-    auto ptr = g_MemoryPool->Alloc(bytes, _objName);
+    auto ptr = g_MemoryPool->Alloc(bytes);
     g_MemoryPool->Unlock();
     return ptr;
 }

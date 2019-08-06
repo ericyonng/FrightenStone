@@ -33,16 +33,6 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
-inline FS_NetBuffer::FS_NetBuffer(Int32 sizeBuffer)
-{
-    _buff = new char[sizeBuffer];
-    _buffSize = sizeBuffer;
-}
-
-inline FS_NetBuffer::~FS_NetBuffer()
-{
-    Fs_SafeFree(_buff);
-}
 
 inline char *FS_NetBuffer::GetData()
 {
@@ -52,6 +42,11 @@ inline char *FS_NetBuffer::GetData()
 inline bool FS_NetBuffer::NeedWrite() const
 {
     return _lastPos > 0;
+}
+
+inline void FS_NetBuffer::Release()
+{
+    FsDelete(this);
 }
 
 FS_NAMESPACE_END

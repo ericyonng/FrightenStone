@@ -140,7 +140,7 @@ Int32 FS_Iocp::PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData)
     ioData->_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(!_fnAcceptEx(listenSocket
                      , ioData->_sock
-                     , ioData->_buff
+                     , ioData->_wsaBuff.buf
                      , 0
                      , sizeof(sockaddr_in) + 16     // msdn指定参数
                      , sizeof(sockaddr_in) + 16     // msdn指定参数
@@ -162,12 +162,9 @@ Int32 FS_Iocp::PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData)
 Int32 FS_Iocp::PostRecv(IO_DATA_BASE *ioData)
 {
     ioData->_ioType = IocpDefs::IO_RECV;
-    WSABUF wsBuff = {};
-    wsBuff.buf = ioData->_buff;
-    wsBuff.len = sizeof(ioData->_buff);
     DWORD flags = 0;
     memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
-    if(SOCKET_ERROR == WSARecv(ioData->_sock, &wsBuff, 1, NULL, &flags, &ioData->_overlapped, NULL))
+    if(SOCKET_ERROR == WSARecv(ioData->_sock, &ioData->_wsaBuff, 1, NULL, &flags, &ioData->_overlapped, NULL))
     {
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
@@ -192,12 +189,9 @@ Int32 FS_Iocp::PostRecv(IO_DATA_BASE *ioData)
 Int32 FS_Iocp::PostSend(IO_DATA_BASE *ioData)
 {
     ioData->_ioType = IocpDefs::IO_SEND;
-    WSABUF wsBuff = {};
-    wsBuff.buf = ioData->_buff;
-    wsBuff.len = ioData->_length;
     DWORD flags = 0;
     memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
-    if(SOCKET_ERROR == WSASend(ioData->_sock, &wsBuff, 1, NULL, flags, &ioData->_overlapped, NULL))
+    if(SOCKET_ERROR == WSASend(ioData->_sock, &ioData->_wsaBuff, 1, NULL, flags, &ioData->_overlapped, NULL))
     {
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
@@ -226,10 +220,10 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
     // 以及重叠结构ioDataPtr 用于获取数据
     ioEvent._bytesTrans = 0;
     ioEvent._ioData = NULL;
-    ioEvent._socket = INVALID_SOCKET;
+    ioEvent.data._socket = INVALID_SOCKET;
     if(FALSE == GetQueuedCompletionStatus(_completionPort
                                           , &ioEvent._bytesTrans
-                                          , reinterpret_cast<PULONG_PTR>(&ioEvent._socket)
+                                          , reinterpret_cast<PULONG_PTR>(&ioEvent.data._socket)
                                           , reinterpret_cast<LPOVERLAPPED *>(&ioEvent._ioData)
                                           , millisec))
     {

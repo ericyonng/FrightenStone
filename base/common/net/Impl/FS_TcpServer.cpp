@@ -35,6 +35,8 @@
 #include "base/common/socket/socket.h"
 #include "base/common/log/Log.h"
 #include "base/common/component/Impl/TimeSlice.h"
+#include "base/common/net/Impl/FS_Client.h"
+#include "base/common/net/Impl/FS_Server.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -188,7 +190,10 @@ SOCKET FS_TcpServer::Accept()
     ++_clientAcceptCnt;
     SocketUtil::MakeReUseAddr(sock);
     // 将新客户端分配给客户数量最少的cellServer
-    _AddClientToFSServer(new FS_Client(sock, _sendBuffSize, _recvBuffSize));
+    _locker.Lock();
+    Int64 clientId = ++_clientMaxId;
+    _locker.Unlock();
+    _AddClientToFSServer(new FS_Client(clientId, sock, _sendBuffSize, _recvBuffSize));
     // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
 
     return sock;
@@ -252,7 +257,6 @@ void FS_TcpServer::_AddClientToFSServer(FS_Client *client)
     {
         if(minServer->GetClientCount() > svr->GetClientCount())
             minServer = svr;
-
     }
     minServer->AddClient(client);
 }

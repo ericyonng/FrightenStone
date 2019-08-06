@@ -70,13 +70,13 @@ struct BASE_EXPORT IO_DATA_BASE
 
 struct BASE_EXPORT IO_EVENT
 {
-//     union
-//     {
-//         void *_ptr;                             // 传入自定义数据,绑定完成端口时
-//         SOCKET _socket;                         // 传入socket
-//     }data;
+    union
+    {
+        void *_ptr;                             // 传入自定义数据,绑定完成端口时
+        SOCKET _socket;                         // 传入socket
+    }data;
     IO_DATA_BASE *_ioData = NULL;               // 重叠体自定义的数据
-    SOCKET _socket = INVALID_SOCKET;            // completionkey返回的socket socket在客户端断开后会被复用
+    //SOCKET _socket = INVALID_SOCKET;            // completionkey返回的socket socket在客户端断开后会被复用
     ULong _bytesTrans = 0;                      // 传输的字节数
 };
 
