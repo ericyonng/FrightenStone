@@ -12,7 +12,7 @@ fs::MemleakMonitor *_g_memMonitor = g_MemleakMonitor;
 
 class TestObjPoolObj
 {
-    OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper)
+    OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper);
 public:
     TestObjPoolObj() {}
     ~TestObjPoolObj() 

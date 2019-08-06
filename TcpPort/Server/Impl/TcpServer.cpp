@@ -141,7 +141,7 @@ MYSOCKET TcpServer::Accept()
     }
     else
     {
-        CreatePlayerNty userJoin;
+        fs::CreatePlayerNty userJoin;
         SendToAll(&userJoin);
         _clients.push_back(new ClientSocket(socket));
         printf("socket=<%llu>new client join£ºsocket = %llu,IP = %s \n", _socket, socket, inet_ntoa(clientAddr.sin_addr));
@@ -205,9 +205,9 @@ Int32 TcpServer::RecvData(ClientSocket *client)
     memcpy(client->GetMsgBuf() + client->GetLastPos(), _recv, nLen);
     client->SetLastPos(client->GetLastPos() + nLen);
 
-    while(client->GetLastPos() >= sizeof(PacketHeader))
+    while(client->GetLastPos() >= sizeof(fs::NetMsg_DataHeader))
     {
-        auto *header = reinterpret_cast<PacketHeader *>(client->GetMsgBuf());
+        auto *header = reinterpret_cast<fs::NetMsg_DataHeader *>(client->GetMsgBuf());
         if(client->GetLastPos() >= header->_packetLength)
         {
             Int32 nSize = client->GetLastPos() - header->_packetLength;
@@ -222,7 +222,7 @@ Int32 TcpServer::RecvData(ClientSocket *client)
     return 0;
 }
 
-Int32 TcpServer::SendData(MYSOCKET socket, PacketHeader *header)
+Int32 TcpServer::SendData(MYSOCKET socket, fs::NetMsg_DataHeader *header)
 {
     if(UNLIKELY(!IsRun() || !header))
         return SOCKET_ERROR;
@@ -230,7 +230,7 @@ Int32 TcpServer::SendData(MYSOCKET socket, PacketHeader *header)
     return send(socket, reinterpret_cast<const char *>(header), header->_packetLength, 0);
 }
 
-void TcpServer::SendToAll(PacketHeader* header)
+void TcpServer::SendToAll(fs::NetMsg_DataHeader* header)
 {
     for(Int32 n = static_cast<Int32>(_clients.size() - 1); n >= 0; --n)
         SendData(_clients[n]->GetSocket(), header);
@@ -299,23 +299,23 @@ bool TcpServer::IsRun() const
     return _socket != MYINVALID_SOCKET;
 }
 
-void TcpServer::OnNetMsg(MYSOCKET socket, PacketHeader *header)
+void TcpServer::OnNetMsg(MYSOCKET socket, fs::NetMsg_DataHeader *header)
 {
     switch(header->_cmd)
     {
-        case ProtocolCmd::LoginReq:
+        case fs::ProtocolCmd::LoginReq:
         {
 
-            LoginReq *login = static_cast<LoginReq *>(header);
+            fs::LoginReq *login = static_cast<fs::LoginReq *>(header);
             printf("recv<Socket=%llu>request£ºLoginReq, len£º%d,userName=%s PassWord=%s\n", socket, login->_packetLength, login->_userName, login->_pwd);
 
-            LoginNty nty;
+            fs::LoginNty nty;
             memcpy(nty._userName, login->_userName, sizeof(login->_userName));
             memcpy(nty._pwd, login->_pwd, sizeof(login->_pwd));
             SendData(socket, &nty);
 
             // res
-            LoginRes res;
+            fs::LoginRes res;
             memcpy(res._userName, login->_userName, sizeof(login->_userName));
             SendData(socket, &res);
         }

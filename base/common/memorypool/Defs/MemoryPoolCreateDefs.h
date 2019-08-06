@@ -63,7 +63,7 @@ public:                                                                         
         void  *operator new[](size_t bytes)     { return _mempool_helper.Alloc(bytes);}         \
         void   operator delete[] (void *ptr)    { _mempool_helper.Free(ptr);}                   \
 protected:                                                                                      \
-static fs::MemoryPoolHelper _mempool_helper;
+static fs::MemoryPoolHelper _mempool_helper
 
 // 在实现文件中需要添加
 #undef MEMPOOL_CREATE_IMPL
