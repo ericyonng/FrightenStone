@@ -43,10 +43,16 @@ public:
     TestMemPoolObj()
     {
         std::cout << "¹¹Ôì" << std::endl;
+        _int = 11;
     }
     ~TestMemPoolObj()
     {
         std::cout << "Îö¹¹" << std::endl;
+    }
+
+    void Print()
+    {
+        std::cout << "int"<<_int << std::endl;
     }
 
 public:
@@ -62,10 +68,13 @@ public:
     static void Run()
     {
         g_Log->InitModule("main");
-        g_MemoryPool->InitPool();
+        //g_MemoryPool->InitPool();
         printf("mem:[%p]log[%p]", g_MemoryPool, g_Log);
 
         TestMemPoolObj *newObj = new TestMemPoolObj;
+        newObj->Print();
+        delete newObj;
+        newObj = new TestMemPoolObj;
         //g_MemoryPool->FinishPool();
         //g_Log->FinishModule();
     }

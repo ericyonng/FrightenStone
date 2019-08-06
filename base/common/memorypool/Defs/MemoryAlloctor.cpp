@@ -49,6 +49,11 @@ IMemoryAlloctor::IMemoryAlloctor()
     ,_blockAmount(BLOCK_AMOUNT_DEF)
     ,_usableBlockHeader(NULL)
     ,_blockSize(0)
+    ,_lastDeleted(NULL)
+    ,_memBlockInUse(0)
+    ,_header(NULL)
+    ,_lastNode(NULL)
+    ,_curNodeCnt(0)
 {
     
 }
@@ -62,7 +67,7 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
 {
     // ÅÐ¶ÏfreeÁ´±í
     MemoryBlock *newBlock = NULL;
-    if(_lastNode)
+    if(_lastDeleted)
     {
         newBlock = _lastDeleted;
         _lastDeleted = _lastDeleted->_nextBlock;
