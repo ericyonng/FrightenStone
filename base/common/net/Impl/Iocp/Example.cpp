@@ -31,7 +31,7 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Impl/Iocp/Example.h"
-#include "base/common/net/Impl/Iocp/FS_Iocp.h"
+#include "base/common/net/Impl/FS_Iocp.h"
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
 #include "base/common/net/Defs/IocpDefs.h"
@@ -227,6 +227,13 @@ int Example::Run()
 //             if(st== StatusDefs::IOCP_IODisconnect)
 //                 g_Log->sys(_LOGFMT_("客户端断开链接 sockfd=%llu"), ioEvent._ioData->_sock);
             continue;
+        }
+
+        // 处理iocp退出
+        if(ioEvent.data._code == IocpDefs::IO_QUIT)
+        {
+            g_Log->sys(_LOGFMT_("iocp退出 code=%lld"), ioEvent.data._code);
+            break;
         }
 
         // 有连接连入

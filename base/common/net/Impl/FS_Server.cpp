@@ -52,9 +52,28 @@ FS_Server::~FS_Server()
     g_Log->sys(_LOGFMT_("FS_Server%d.~FS_Server exit begin"), _id);
 }
 
+#pragma region misc
+void FS_Server::_ClearClients()
+{
+    _locker.Lock();
+    for(auto iter : _clients)
+        delete iter;
+
+    _socketRefClients.clear();
+    _clients.clear();
+
+    for(auto iter : _clientsCache)
+        delete iter;
+
+    _clientsCache.clear();
+    _locker.Unlock();
+}
+#pragma endregion
+
+#pragma region recv/addclient/start/close
 Int32 FS_Server::RecvData(FS_Client *client)
 {
-    //接收客户端数据
+    // 接收客户端数据
     int len = client->RecvData();
     // 触发<接收到网络数据>事件
     _eventHandleObj->OnNetRecv(client);
@@ -76,7 +95,9 @@ void FS_Server::Close()
     g_Log->net("FS_Server%d.Close end", _id);
     g_Log->sys(_LOGFMT_("FS_Server%d.Close end"), _id);
 }
+#pragma endregion
 
+#pragma region net message handle
 void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 {
     while(pool->IsClearingPool())
@@ -107,6 +128,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             continue;
         }
 
+        // TODO:心跳检测优化
         _DetectClientHeartTime();
         if(!_OnClientStatusDirtied())
             break;
@@ -189,22 +211,7 @@ void FS_Server::_OnClientMsgTransfer()
         }
     }
 }
-
-void FS_Server::_ClearClients()
-{
-    _locker.Lock();
-    for(auto iter : _clients)
-        delete iter;
-
-    _socketRefClients.clear();
-    _clients.clear();
-
-    for(auto iter : _clientsCache)
-        delete iter;
-
-    _clientsCache.clear();
-    _locker.Unlock();
-}
+#pragma endregion
 
 FS_NAMESPACE_END
 

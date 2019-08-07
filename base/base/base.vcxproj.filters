@@ -849,6 +849,12 @@
     <ClInclude Include="..\common\memorypool\Defs\MemBlocksNodeImpl.h">
       <Filter>common\memorypool\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_Iocp.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1075,6 +1081,9 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Defs\FS_NetBuffer.cpp">
       <Filter>common\net\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_Iocp.cpp">
+      <Filter>common\net\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

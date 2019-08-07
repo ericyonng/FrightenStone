@@ -50,23 +50,50 @@ public:
     FS_Server();
     virtual ~FS_Server();
 
-#pragma region 
+    /* 杂项 */
+    #pragma region misc
+    /*
+    *   brief:
+    *       1. - GetClientCount 客户端数量
+    *       2. - SetClientNum 设置最大服务的客户端数量
+    *       3. - SetEventHandleObj 设置网络消息处理对象
+    *       4. - SetId 设置服务id
+    *       5. - _ClearClients 清理客户端
+    */
 public:
     size_t GetClientCount() const;
     virtual void SetClientNum(Int32 socketNum);
     void SetEventHandleObj(INetEvent *handleObj);
     void SetId(Int32 id);
+private:
+    void _ClearClients();
+    #pragma endregion
 
+    /* 接受数据/添加客户端/启动服务/停止服务 */
+    #pragma region recv/addclient/start/close
+public:
     // 接收数据 处理粘包 拆分包
     Int32 RecvData(FS_Client *client);
     void AddClient(FS_Client *client);
     void Start();
     void Close();
+    #pragma endregion
 
-private:
-    // 收发客户端消息中转
+    /* 网络消息处理 */
+    #pragma region net message handle
+    /*
+    *   brief:
+    *       1. - _ClientMsgTransfer 收发客户端消息中转
+    *       2. - _OnClientStatusDirtied 客户端状态变化（连入/有待发送数据/有待接收数据）
+    *       3. - _DetectClientHeartTime 客户端心跳检测，TODO:需要优化
+    *       4. - _OnClientLeave 客户端断开
+    *       5. - _OnClientJoin 客户端连入
+    *       6. - _OnNetRecv 接收网络消息
+    *       7. - _OnClientMsgTransfer 网络消息再次中转
+    *       8. - _HandleNetMsg 网络消息处理
+    */
+protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
-    // 客户端状态变化（连入/有待发送数据/有待接收数据）
     virtual bool _OnClientStatusDirtied() = 0;
     // TODO:心跳优化
     void _DetectClientHeartTime();
@@ -75,9 +102,10 @@ private:
     void _OnNetRecv(FS_Client *client);
     void _OnClientMsgTransfer();
     virtual void _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
+    #pragma endregion
 
-    void _ClearClients();
-
+    /* 数据成员 */
+    #pragma region data member
 protected:
     // 正式客户队列 隐患：不严格按照包到达时序处理，若两个包有先后依赖会出问题
     std::map<SOCKET, FS_Client *> _socketRefClients;
@@ -99,6 +127,7 @@ protected:
     Int32 _id = -1;
     // 客户列表是否有变化
     bool _clientsChange = true;
+    #pragma endregion
 };
 
 FS_NAMESPACE_END
