@@ -31,3 +31,20 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_IocpServer.h"
+#include "base/common/net/Impl/FS_Iocp.h"
+
+FS_NAMESPACE_BEGIN
+
+FS_IocpServer::FS_IocpServer()
+    :_iocp(new FS_Iocp)
+    ,_ioEvent(new IO_EVENT)
+{
+    _iocp->Create();
+}
+
+FS_IocpServer::~FS_IocpServer()
+{
+    Close();
+}
+
+FS_NAMESPACE_END

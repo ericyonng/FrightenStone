@@ -21,28 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_Iocp.h
+ * @file  : FS_IocpImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/17
+ * @date  : 2019/8/7
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_Iocp_FS_Iocp_H__
-#define __Base_Common_Net_Impl_Iocp_FS_Iocp_H__
+#ifdef __Base_Common_Net_Impl_FS_Iocp_H__
 #pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include<MSWSock.h>
 
 FS_NAMESPACE_BEGIN
 
-struct IO_DATA_BASE;
-struct IO_EVENT;
-
 FS_NAMESPACE_END
 
-
 #endif
+

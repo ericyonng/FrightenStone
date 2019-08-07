@@ -33,6 +33,7 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
+#pragma region misc
 inline size_t FS_Server::GetClientCount() const
 {
     return _socketRefClients.size() + _clientsCache.size();
@@ -51,18 +52,23 @@ inline void FS_Server::SetId(Int32 id)
 {
     _id = id;
 }
+#pragma endregion
 
+#pragma region recv/addclient/start/close
 inline void FS_Server::AddClient(FS_Client *client)
 {
     _locker.Lock();
     _clientsCache.push_back(client);
     _locker.Unlock();
 }
+#pragma endregion
 
+#pragma region net message handle
 inline void FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
 {
     _eventHandleObj->OnNetMsg(this, client, header);
 }
+#pragma endregion
 
 FS_NAMESPACE_END
 
