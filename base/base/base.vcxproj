@@ -332,7 +332,6 @@
     <ClInclude Include="..\common\net\Impl\FS_TcpServer.h" />
     <ClInclude Include="..\common\net\Impl\FS_TcpServerImpl.h" />
     <ClInclude Include="..\common\net\Impl\Iocp\Example.h" />
-    <ClInclude Include="..\common\net\Impl\Iocp\FS_Iocp.h" />
     <ClInclude Include="..\common\net\Interface\INetEvent.h" />
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
@@ -424,7 +423,6 @@
     <ClCompile Include="..\common\net\Impl\FS_Server.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_TcpServer.cpp" />
     <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp" />
-    <ClCompile Include="..\common\net\Impl\Iocp\FS_Iocp.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
     <ClCompile Include="..\common\objpool\Defs\ObjPoolDefs.cpp" />
     <ClCompile Include="..\common\objpool\Impl\ObjPoolHelper.cpp" />
