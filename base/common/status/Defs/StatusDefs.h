@@ -138,7 +138,7 @@ public:
         IOCP_WaitOtherError = 1508,                             // 其他错误
         IOCP_ClientForciblyClosed = 1509,                       // 远程客户端被强行关闭
         IOCP_PostQuitFail = 1510,                               // 向完成端口投递quit失败
-
+        IOCP_Quit = 1511,                                       // iocp退出
         #pragma endregion
 
     };

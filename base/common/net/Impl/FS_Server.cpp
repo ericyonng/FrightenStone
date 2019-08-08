@@ -56,12 +56,10 @@ FS_Server::~FS_Server()
 void FS_Server::_ClearClients()
 {
     _locker.Lock();
-    for(auto iter : _clients)
-        delete iter;
+    for(auto iter : _socketRefClients)
+        delete iter.second;
 
     _socketRefClients.clear();
-    _clients.clear();
-
     for(auto iter : _clientsCache)
         delete iter;
 
@@ -108,7 +106,6 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             for(auto client : _clientsCache)
             {
                 _socketRefClients[client->GetSocket()] = client;
-                _clients.push_back(client);
                 client->_serverId = _id;
                 _eventHandleObj->OnNetJoin(client);
                 _OnClientJoin(client);
@@ -119,7 +116,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         }
 
         // 如果没有需要处理的客户端，就跳过
-        if(_clients.empty())
+        if(_socketRefClients.empty())
         {
             SocketUtil::Sleep(1);
 
@@ -130,10 +127,15 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
         // TODO:心跳检测优化
         _DetectClientHeartTime();
-        if(!_OnClientStatusDirtied())
+        auto st = _BeforeClientMsgTransfer();
+        if(st != StatusDefs::Success)
+        {
+            g_Log->net("FS_Server_OnClientStatusDirtied: st[%d] ", st);
             break;
+        }
 
-        _OnClientMsgTransfer();
+        // 客户端消息到达
+        _OnClientMsgArrived();
     }
 
     // 退出则清理客户端
@@ -195,14 +197,14 @@ void FS_Server::_OnNetRecv(FS_Client *client)
      _eventHandleObj->OnNetRecv(client);
 }
 
-void FS_Server::_OnClientMsgTransfer()
+void FS_Server::_OnClientMsgArrived()
 {
     FS_Client *client = NULL;
-    for(auto itr : _clients)
+    for(auto itr : _socketRefClients)
     {
-        client = itr;
+        client = itr.second;
         // 循环 判断是否有消息需要处理
-        while(client->HasMsg())
+        while(client->HasRecvMsg())
         {
             // 处理网络消息
             _HandleNetMsg(client, client->FrontMsg());

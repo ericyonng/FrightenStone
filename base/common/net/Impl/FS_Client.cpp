@@ -50,15 +50,6 @@ FS_Client::FS_Client(Int64 clientId
     ResetDTSend();
 }
 
-void FS_Client::Send2iocp(Int32 snd)
-{
-    if(!_isPostSend)
-        g_Log->e<FS_Client>(_LOGFMT_("send2iocp _isPostSend is false"));
-
-    _isPostSend = false;
-    _sendBuff->OnWrite2Iocp(snd);
-}
-
 bool FS_Client::CheckHeart(const TimeSlice &slice)
 {
     _heartDeadSlice += slice;
@@ -99,7 +90,7 @@ IO_DATA_BASE *FS_Client::MakeRecvIoData()
     return _recvBuff->MakeRecvIoData(_sockfd);
 }
 
-void FS_Client::RecvFrom(Int32 rcvBytes)
+void FS_Client::OnRecvFromIocp(Int32 rcvBytes)
 {
     if(!_isPostRecv)
         g_Log->w<FS_Client>(_LOGFMT_("recv from _isPostRecv is false"));
@@ -117,6 +108,14 @@ IO_DATA_BASE *FS_Client::MakeSendIoData()
     return _sendBuff->MakeSendIoData(_sockfd);
 }
 
+void FS_Client::OnSend2iocp(Int32 snd)
+{
+    if(!_isPostSend)
+        g_Log->e<FS_Client>(_LOGFMT_("send2iocp _isPostSend is false"));
+
+    _isPostSend = false;
+    _sendBuff->OnWrite2Iocp(snd);
+}
 #endif
 
 void FS_Client::Destroy()

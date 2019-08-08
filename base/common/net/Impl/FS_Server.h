@@ -94,13 +94,13 @@ public:
     */
 protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
-    virtual bool _OnClientStatusDirtied() = 0;
+    virtual Int32 _BeforeClientMsgTransfer() = 0;
     // TODO:心跳优化
     void _DetectClientHeartTime();
     void _OnClientLeave(FS_Client *client);
     virtual void _OnClientJoin(FS_Client *client);
     void _OnNetRecv(FS_Client *client);
-    void _OnClientMsgTransfer();
+    void _OnClientMsgArrived();
     virtual void _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
     #pragma endregion
 
@@ -109,7 +109,8 @@ protected:
 protected:
     // 正式客户队列 隐患：不严格按照包到达时序处理，若两个包有先后依赖会出问题
     std::map<SOCKET, FS_Client *> _socketRefClients;
-    std::vector<FS_Client *> _clients;      // 严格时序 使用set兼顾时间排序与移除是O(Log n),消息变化时候先移除后插入以便重新排序
+//     std::vector<FS_Client *> _clients;      // 严格时序 使用set兼顾时间排序与移除是O(Log n),消息变化时候先移除后插入以便重新排序
+//     std::vector<FS_Client *> _clientsBack;     // 双缓冲策略便于vector移除元素 以及回收构成环 严格时序 使用set兼顾时间排序与移除是O(Log n),消息变化时候先移除后插入以便重新排序
 
 private:
     // 缓冲客户队列

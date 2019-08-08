@@ -81,14 +81,14 @@ struct BASE_EXPORT IO_EVENT
         void *_ptr;                             // 传入自定义数据,绑定完成端口时
         SOCKET _socket;                         // 传入socket
         Int64 _code;                            // 状态码
-    }data;
+    }_data;
     IO_DATA_BASE *_ioData = NULL;               // 重叠体自定义的数据
     // SOCKET _socket = INVALID_SOCKET;            // completionkey返回的socket socket在客户端断开后会被复用
     ULong _bytesTrans = 0;                      // 传输的字节数
 };
 
 inline IO_EVENT::IO_EVENT()
-    :data{NULL}
+    :_data{NULL}
     ,_ioData(NULL)
     ,_bytesTrans(0)
 {

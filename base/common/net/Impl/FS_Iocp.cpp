@@ -237,10 +237,10 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
     // 以及重叠结构ioDataPtr 用于获取数据
     ioEvent._bytesTrans = 0;
     ioEvent._ioData = NULL;
-    ioEvent.data._ptr = NULL;
+    ioEvent._data._ptr = NULL;
     if(FALSE == GetQueuedCompletionStatus(_completionPort
                                           , &ioEvent._bytesTrans
-                                          , reinterpret_cast<PULONG_PTR>(&ioEvent.data)
+                                          , reinterpret_cast<PULONG_PTR>(&ioEvent._data)
                                           , reinterpret_cast<LPOVERLAPPED *>(&ioEvent._ioData)
                                           , millisec))
     {
