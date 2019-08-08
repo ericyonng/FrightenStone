@@ -38,6 +38,7 @@
  // Interface ...
 #include <base\common\net\protocol\protocol.h>
 #include "base\common\net\Impl\Iocp\Example.h"
+#include "base\common\net\Impl\FS_MainIocpServer.h"
 
 #endif
 
