@@ -72,7 +72,7 @@ inline NetMsg_DataHeader *FS_Client::FrontMsg()
 
 inline void FS_Client::PopFrontMsg()
 {
-    if(HasMsg())
+    if(HasRecvMsg())
         _recvBuff->Pop(FrontMsg()->_packetLength);
 }
 
@@ -96,7 +96,7 @@ inline SOCKET FS_Client::GetSocket() const
     return _sockfd;
 }
 
-inline bool FS_Client::HasMsg() const
+inline bool FS_Client::HasRecvMsg() const
 {
     return _recvBuff->HasMsg();
 }

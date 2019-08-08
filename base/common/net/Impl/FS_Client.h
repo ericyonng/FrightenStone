@@ -63,7 +63,6 @@ public:
     Int32 SendData(NetMsg_DataHeader *header);
     // ·µ»ØÖµ len »ò SOCKET_ERROR
     Int32 SendData(const char *data, Int32 len);
-    void Send2iocp(Int32 snd);
     NetMsg_DataHeader *FrontMsg();
     void PopFrontMsg();
 
@@ -76,9 +75,11 @@ public:
 
     #ifdef FS_USE_IOCP
     IO_DATA_BASE *MakeRecvIoData();
-    void RecvFrom(Int32 rcvBytes);
+    void OnRecvFromIocp(Int32 rcvBytes);
 
     IO_DATA_BASE *MakeSendIoData();
+    void OnSend2iocp(Int32 snd);
+
     bool IsPostIoChange() const;
     #endif // FS_USE_IOCP
 
@@ -87,7 +88,7 @@ public:
 public:
     void Destroy();
     SOCKET GetSocket() const;
-    bool HasMsg() const;
+    bool HasRecvMsg() const;
     bool NeedWrite() const;
     #pragma endregion
 

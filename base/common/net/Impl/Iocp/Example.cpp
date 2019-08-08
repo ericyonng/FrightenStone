@@ -230,9 +230,9 @@ int Example::Run()
         }
 
         // 处理iocp退出
-        if(ioEvent.data._code == IocpDefs::IO_QUIT)
+        if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys(_LOGFMT_("iocp退出 code=%lld"), ioEvent.data._code);
+            g_Log->sys(_LOGFMT_("iocp退出 code=%lld"), ioEvent._data._code);
             break;
         }
 
@@ -307,7 +307,7 @@ int Example::Run()
         }
         else
         {
-            g_Log->e<Example>(_LOGFMT_("未定义行为 sockefd=%llu"), ioEvent.data._socket);
+            g_Log->e<Example>(_LOGFMT_("未定义行为 sockefd=%llu"), ioEvent._data._socket);
         }
         // 检查是否有事件发生，和selet,epoll_wait类似
         // 接受连接 完成
