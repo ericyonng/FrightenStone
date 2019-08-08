@@ -44,6 +44,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Client;
 
+// 服务类
 class BASE_EXPORT FS_Server
 {
 public:
@@ -76,6 +77,7 @@ public:
     Int32 RecvData(FS_Client *client);
     void AddClient(FS_Client *client);
     void Start();
+    virtual void BeforeClose();
     void Close();
     #pragma endregion
 
@@ -87,10 +89,10 @@ public:
     *       2. - _OnClientStatusDirtied 客户端状态变化（连入/有待发送数据/有待接收数据）
     *       3. - _DetectClientHeartTime 客户端心跳检测，TODO:需要优化
     *       4. - _OnClientLeave 客户端断开
-    *       5. - _OnClientJoin 客户端连入
+    *       5. - _OnClientJoin 客户端连入 iocp与epoll有不同的重写方法
     *       6. - _OnNetRecv 接收网络消息
     *       7. - _OnClientMsgTransfer 网络消息再次中转
-    *       8. - _HandleNetMsg 网络消息处理
+    *       8. - _HandleNetMsg 网络消息处理 <真正的消息入口>
     */
 protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
@@ -99,7 +101,7 @@ protected:
     void _DetectClientHeartTime();
     void _OnClientLeave(FS_Client *client);
     virtual void _OnClientJoin(FS_Client *client);
-    void _OnNetRecv(FS_Client *client);
+    void _OnPrepareNetRecv(FS_Client *client);
     void _OnClientMsgArrived();
     virtual void _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
     #pragma endregion
@@ -109,8 +111,6 @@ protected:
 protected:
     // 正式客户队列 隐患：不严格按照包到达时序处理，若两个包有先后依赖会出问题
     std::map<SOCKET, FS_Client *> _socketRefClients;
-//     std::vector<FS_Client *> _clients;      // 严格时序 使用set兼顾时间排序与移除是O(Log n),消息变化时候先移除后插入以便重新排序
-//     std::vector<FS_Client *> _clientsBack;     // 双缓冲策略便于vector移除元素 以及回收构成环 严格时序 使用set兼顾时间排序与移除是O(Log n),消息变化时候先移除后插入以便重新排序
 
 private:
     // 缓冲客户队列
@@ -118,9 +118,9 @@ private:
     // 缓冲队列的锁
     Locker _locker;
     // 网络事件处理对象
-    INetEvent *_eventHandleObj = nullptr;
+    INetEvent *_eventHandleObj = NULL;    // 内部不释放
     // 旧的时间戳
-    Time _oldTime = Time::Now();
+    Time _lastHeartDetectTime = Time::Now();
     //
     FS_ThreadPool *_threadPool;
 protected:

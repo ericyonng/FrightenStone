@@ -47,6 +47,7 @@ inline void STLUtil::DelMapContainer(_Type &container)
     AutoDelHelper<DelType> delObj;
     for(auto iterElement = container.begin(); iterElement != container.end(); ++iterElement)
         delObj.Release(iterElement->second);
+    container.clear();
 }
 
 template<typename _Type, AssistObjsDefs::DelMethods DelType>
@@ -58,6 +59,7 @@ inline void STLUtil::DelSetContainer(_Type &container)
         auto element = *iterElement;
         delObj.Release(element);
     }
+    container.clear();
 }
 
 template<typename _Type, AssistObjsDefs::DelMethods DelType>
@@ -69,7 +71,21 @@ inline void STLUtil::DelListContainer(_Type &container)
         auto element = *iterElement;
         delObj.Release(element);
     }
+    container.clear();
 }
+
+template<typename _Type, AssistObjsDefs::DelMethods DelType>
+inline void STLUtil::DelVectorContainer(_Type &container)
+{
+    AutoDelHelper<DelType> delObj;
+    for(auto iterElement = container.begin(); iterElement != container.end(); ++iterElement)
+    {
+        auto element = *iterElement;
+        delObj.Release(element);
+    }
+    container.clear();
+}
+
 
 template<typename _Type, AssistObjsDefs::DelMethods DelType>
 inline void STLUtil::DelArray(_Type &container)

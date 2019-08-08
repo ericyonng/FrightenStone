@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpServer.cpp
+ * @file  : FS_IocpMsgTransferServer.cpp
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/8/5
  * @brief :
@@ -30,7 +30,7 @@
  * 
  */
 #include "stdafx.h"
-#include "base/common/net/Impl/FS_IocpServer.h"
+#include "base/common/net/Impl/FS_IocpMsgTransferServer.h"
 #include "base/common/net/Impl/FS_Iocp.h"
 #include "base/common/net/Impl/FS_Client.h"
 #include "base/common/net/Defs/IocpDefs.h"
@@ -42,19 +42,28 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_IocpServer::FS_IocpServer()
-    :_iocp(new FS_Iocp)
+FS_IocpMsgTransferServer::FS_IocpMsgTransferServer()
+    :_iocpClientMsgTransfer(new FS_Iocp)
     ,_ioEvent(new IO_EVENT)
 {
-    _iocp->Create();
+    _iocpClientMsgTransfer->Create();
 }
 
-FS_IocpServer::~FS_IocpServer()
+FS_IocpMsgTransferServer::~FS_IocpMsgTransferServer()
 {
     Close();
+    Fs_SafeFree(_iocpClientMsgTransfer);
+    Fs_SafeFree(_ioEvent);
 }
 
-Int32 FS_IocpServer::_BeforeClientMsgTransfer()
+void FS_IocpMsgTransferServer::BeforeClose()
+{
+    g_Log->net("FS_IocpMsgTransferServer%d.BeforeClose begin quit iocp", _id);
+    // 退出iocp
+    _iocpClientMsgTransfer->PostQuit();
+}
+
+Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer()
 {
     // 1.遍历post 客户端请求
     FS_Client *client = NULL;
@@ -68,7 +77,7 @@ Int32 FS_IocpServer::_BeforeClientMsgTransfer()
             auto ioData = client->MakeSendIoData();
             if(ioData)
             {
-                if(!_iocp->PostSend(ioData))
+                if(!_iocpClientMsgTransfer->PostSend(ioData))
                 {
                     _OnClientLeave(client);
                     iter = _socketRefClients.erase(iter);
@@ -79,7 +88,7 @@ Int32 FS_IocpServer::_BeforeClientMsgTransfer()
             ioData = client->MakeRecvIoData();
             if(ioData)
             {
-                if(!_iocp->PostRecv(ioData))
+                if(!_iocpClientMsgTransfer->PostRecv(ioData))
                 {
                     _OnClientLeave(client);
                     iter = _socketRefClients.erase(iter);
@@ -91,7 +100,7 @@ Int32 FS_IocpServer::_BeforeClientMsgTransfer()
             auto ioData = client->MakeRecvIoData();
             if(ioData)
             {
-                if(!_iocp->PostRecv(ioData))
+                if(!_iocpClientMsgTransfer->PostRecv(ioData))
                 {
                     _OnClientLeave(client);
                     iter = _socketRefClients.erase(iter);
@@ -116,21 +125,20 @@ Int32 FS_IocpServer::_BeforeClientMsgTransfer()
     return StatusDefs::Success;
 }
 
-Int32 FS_IocpServer::_ListenIocpNetEvents()
+Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
 {
-    auto ret = _iocp->WaitForCompletion(*_ioEvent, 1);
+    auto ret = _iocpClientMsgTransfer->WaitForCompletion(*_ioEvent, 1);
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->net("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
+        return ret;
+    }
 
     // 处理iocp退出
     if(_ioEvent->_data._code == IocpDefs::IO_QUIT)
     {
         g_Log->sys(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
         return StatusDefs::IOCP_Quit;
-    }
-
-    if(ret != StatusDefs::Success)
-    {
-        g_Log->net("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
-        return ret;
     }
 
     if(IocpDefs::IO_RECV == _ioEvent->_ioData->_ioType)
@@ -149,7 +157,7 @@ Int32 FS_IocpServer::_ListenIocpNetEvents()
         {// 客户端接收数据
 
             client->OnRecvFromIocp(_ioEvent->_bytesTrans);
-            _OnNetRecv(client);
+            _OnPrepareNetRecv(client);
         }
     }
     else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
@@ -167,13 +175,13 @@ Int32 FS_IocpServer::_ListenIocpNetEvents()
     }
     else 
     {
-        g_Log->e<FS_IocpServer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
+        g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
     }
 
     return ret;
 }
 
-void FS_IocpServer::_RmClient(FS_Client *client)
+void FS_IocpMsgTransferServer::_RmClient(FS_Client *client)
 {
     auto iter = _socketRefClients.find(client->GetSocket());
     if(iter != _socketRefClients.end())
@@ -183,19 +191,20 @@ void FS_IocpServer::_RmClient(FS_Client *client)
     _OnClientLeave(client);
 }
 
-void FS_IocpServer::_RmClient(IO_EVENT &ioEvent)
+void FS_IocpMsgTransferServer::_RmClient(IO_EVENT &ioEvent)
 {
     FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
     if(client)
         _RmClient(client);
 }
 
-void FS_IocpServer::_OnClientJoin(FS_Client *client)
+void FS_IocpMsgTransferServer::_OnClientJoin(FS_Client *client)
 {
-    _iocp->Reg(client->GetSocket(), client);
+    // 玩家连入时监听玩家数据
+    _iocpClientMsgTransfer->Reg(client->GetSocket(), client);
     auto ioData = client->MakeRecvIoData();
     if(ioData)
-        _iocp->PostRecv(ioData);
+        _iocpClientMsgTransfer->PostRecv(ioData);
 }
 
 FS_NAMESPACE_END

@@ -21,14 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpServerImpl.h
+ * @file  : FS_MainIocpServerImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/5
+ * @date  : 2019/8/8
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Base_Common_Net_Impl_FS_IocpServer_H__
+#ifdef __Base_Common_Net_Impl_FS_MainIocpServer_H__
 #pragma once
+
+FS_NAMESPACE_BEGIN
+
+#pragma region start close
+inline void FS_MainIocpServer::BeforeClose()
+{
+    _mainLocker.Lock();
+    if(_closeIocpDelegate)
+        (*_closeIocpDelegate)();
+    _mainLocker.Unlock();
+}
+#pragma endregion
+
+FS_NAMESPACE_END
+
 #endif

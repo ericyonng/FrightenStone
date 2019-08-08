@@ -21,49 +21,61 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : INetEvent.h
+ * @file  : FS_MainIocpServer.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/08/02
+ * @date  : 2019/8/8
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Interface_InetEvent_H__
-#define __Base_Common_Net_Interface_InetEvent_H__
-
+#ifndef __Base_Common_Net_Impl_FS_MainIocpServer_H__
+#define __Base_Common_Net_Impl_FS_MainIocpServer_H__
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/net/Impl/FS_TcpServer.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/asyn/asyn.h"
 
+// 主服务器单线程监听，多线程收发
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Client;
-class BASE_EXPORT FS_Server;
-struct BASE_EXPORT NetMsg_DataHeader;
+class BASE_EXPORT FS_ThreadPool;
 
-// 所有网络事件入口
-// 网络事件接口
-// TODO:后期支持protobuf协议
-class BASE_EXPORT INetEvent
+class BASE_EXPORT FS_MainIocpServer : public FS_TcpServer
 {
 public:
-    // 纯虚函数
-    // 客户端加入事件
-    virtual void OnNetJoin(FS_Client *client) = 0;
-    // 客户端离开事件
-    virtual void OnNetLeave(FS_Client *client) = 0;
-    // 客户端消息事件
-    virtual void OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header) = 0;
-    // recv事件
-    virtual void OnPrepareNetRecv(FS_Client *client) = 0;
-    // 释放接口
-    virtual void Release() = 0;
-private:
+    FS_MainIocpServer();
+    virtual ~FS_MainIocpServer();
 
+    /* 启动与关闭服务器 */
+    #pragma region start close
+public:
+    void Start(Int32 msgTransferServerCnt);
+    virtual void BeforeClose();
+    #pragma endregion
+
+    /* 监听客户端连入 */
+    #pragma region listen net handle
+    /*
+    *   brief:
+    *       1. - _OnNetMonitorTask 监听客户端连入线程处理
+    *       2. - _IocpAccept - 接受客户端连入
+    */
+protected:
+    virtual void _OnNetMonitorTask(const FS_ThreadPool *pool);
+    SOCKET _IocpAccept(SOCKET sock);
+    #pragma endregion
+
+private:
+    Locker _mainLocker;
+    IDelegatePlus<void> *_closeIocpDelegate;    // 委托执行关服时退出iocp
 };
 
 FS_NAMESPACE_END
+
+#include "base/common/net/Impl/FS_MainIocpServerImpl.h"
 
 #endif
