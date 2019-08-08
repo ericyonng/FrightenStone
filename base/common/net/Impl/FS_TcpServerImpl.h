@@ -45,13 +45,13 @@ void FS_TcpServer::Start(Int32 svrQuantity)
         ser->SetClientNum((_maxClient / svrQuantity) + 1);
         _fsServers.push_back(ser);
         // 注册网络事件接受对象
-        ser->SetEventObj(this);
+        ser->SetEventHandleObj(this);
         // 启动消息处理线程
         ser->Start();
     }
 
     // 启动监控网络任务
-    auto monitorDelegate = DelegatePlusFactory::Create(this, &FS_TcpServer::OnNetMonitorTask);
+    auto monitorDelegate = DelegatePlusFactory::Create(this, &FS_TcpServer::_OnNetMonitorTask);
     _threadPool->AddTask(monitorDelegate);
 }
 

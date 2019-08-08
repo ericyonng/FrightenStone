@@ -325,8 +325,10 @@
     <ClInclude Include="..\common\net\Impl\FS_ClientImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_Iocp.h" />
     <ClInclude Include="..\common\net\Impl\FS_IocpImpl.h" />
-    <ClInclude Include="..\common\net\Impl\FS_IocpServer.h" />
-    <ClInclude Include="..\common\net\Impl\FS_IocpServerImpl.h" />
+    <ClInclude Include="..\common\net\Impl\FS_IocpMsgTransferServer.h" />
+    <ClInclude Include="..\common\net\Impl\FS_IocpMsgTransferServerImpl.h" />
+    <ClInclude Include="..\common\net\Impl\FS_MainIocpServer.h" />
+    <ClInclude Include="..\common\net\Impl\FS_MainIocpServerImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_Server.h" />
     <ClInclude Include="..\common\net\Impl\FS_ServerImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_TcpServer.h" />
@@ -419,7 +421,8 @@
     <ClCompile Include="..\common\net\Defs\IocpDefs.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Client.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Iocp.cpp" />
-    <ClCompile Include="..\common\net\Impl\FS_IocpServer.cpp" />
+    <ClCompile Include="..\common\net\Impl\FS_IocpMsgTransferServer.cpp" />
+    <ClCompile Include="..\common\net\Impl\FS_MainIocpServer.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Server.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_TcpServer.cpp" />
     <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp" />

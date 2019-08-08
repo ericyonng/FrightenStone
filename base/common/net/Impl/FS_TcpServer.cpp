@@ -37,11 +37,12 @@
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/net/Impl/FS_Client.h"
 #include "base/common/net/Impl/FS_Server.h"
+#include "base/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
 
 FS_TcpServer::FS_TcpServer()
-    :_threadPool(new FS_ThreadPool)
+    :_threadPool(new FS_ThreadPool(0, 1))
     ,_sock(INVALID_SOCKET)
     ,_sendBuffSize(0)
     ,_recvBuffSize(0)
@@ -119,7 +120,7 @@ Int32 FS_TcpServer::Bind(const Byte8 *ip, UInt16 port)
 
 #ifdef _WIN32
     if(ip) {
-        sin.sin_addr.S_un.S_addr = inet_addr(ip);
+        inet_pton(sin.sin_family, ip, &(sin.sin_addr));// 比较新的函数对比inet_addr
     }
     else {
         sin.sin_addr.S_un.S_addr = INADDR_ANY;
@@ -133,7 +134,7 @@ Int32 FS_TcpServer::Bind(const Byte8 *ip, UInt16 port)
     }
 #endif
 
-    int ret = bind(_sock, (sockaddr*)&sin, sizeof(sin));
+    int ret = bind(_sock, (sockaddr *)&sin, sizeof(sin));
     if(SOCKET_ERROR == ret)
     {
         g_Log->e<FS_TcpServer>(_LOGFMT_("bind port<%hu> failed..."), port);
@@ -199,6 +200,11 @@ SOCKET FS_TcpServer::Accept()
     return sock;
 }
 
+void FS_TcpServer::BeforeClose()
+{
+
+}
+
 void FS_TcpServer::Close()
 {
     g_Log->net("FS_TcpServer.Close begin");
@@ -207,10 +213,8 @@ void FS_TcpServer::Close()
     _threadPool->Clear();
     if(_sock != INVALID_SOCKET)
     {
-        for(auto s : _fsServers)
-            delete s;
+        STLUtil::DelVectorContainer(_fsServers);
 
-        _fsServers.clear();
         // 关闭套节字socket
         SocketUtil::DestroySocket(_sock);
         _sock = INVALID_SOCKET;
@@ -242,7 +246,7 @@ void FS_TcpServer::OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHea
     ++_recvMsgCount;
 }
 
-void FS_TcpServer::OnNetRecv(FS_Client *client)
+void FS_TcpServer::OnPrepareNetRecv(FS_Client *client)
 {
     ++_recvCount;
 }

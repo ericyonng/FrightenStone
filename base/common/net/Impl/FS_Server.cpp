@@ -35,6 +35,7 @@
 #include "base/common/socket/socket.h"
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/net/Impl/FS_Client.h"
+#include "base/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -48,22 +49,21 @@ FS_Server::~FS_Server()
     g_Log->net("FS_Server%d.~FS_Server exit begin", _id);
     g_Log->sys(_LOGFMT_( "FS_Server%d.~FS_Server exit begin"), _id);
     Close();
+    _locker.Lock();
+    STLUtil::DelMapContainer(_socketRefClients);
+    STLUtil::DelVectorContainer(_clientsCache);
+    _locker.Unlock();
     g_Log->net("FS_Server%d.~FS_Server exit begin", _id);
     g_Log->sys(_LOGFMT_("FS_Server%d.~FS_Server exit begin"), _id);
+    Fs_SafeFree(_threadPool);
 }
 
 #pragma region misc
 void FS_Server::_ClearClients()
 {
     _locker.Lock();
-    for(auto iter : _socketRefClients)
-        delete iter.second;
-
-    _socketRefClients.clear();
-    for(auto iter : _clientsCache)
-        delete iter;
-
-    _clientsCache.clear();
+    STLUtil::DelMapContainer(_socketRefClients);
+    STLUtil::DelVectorContainer(_clientsCache);
     _locker.Unlock();
 }
 #pragma endregion
@@ -74,7 +74,7 @@ Int32 FS_Server::RecvData(FS_Client *client)
     // 接收客户端数据
     int len = client->RecvData();
     // 触发<接收到网络数据>事件
-    _eventHandleObj->OnNetRecv(client);
+    _eventHandleObj->OnPrepareNetRecv(client);
     return len;
 }
 
@@ -84,9 +84,14 @@ void FS_Server::Start()
     _threadPool->AddTask(clientMsgTrasfer);
 }
 
+void FS_Server::BeforeClose()
+{
+}
+
 // 关闭Socket
 void FS_Server::Close()
 {
+    BeforeClose();
     g_Log->net("FS_Server%d.Close begin", _id);
     g_Log->sys(_LOGFMT_("FS_Server%d.Close begin"), _id);
     _threadPool->Clear();
@@ -98,7 +103,7 @@ void FS_Server::Close()
 #pragma region net message handle
 void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 {
-    while(pool->IsClearingPool())
+    while(!pool->IsClearingPool())
     {
         if(!_clientsCache.empty())
         {// 从缓冲队列里取出客户数据
@@ -121,7 +126,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             SocketUtil::Sleep(1);
 
             // 旧的时间戳
-            _oldTime.FlushTime();
+            _lastHeartDetectTime.FlushTime();
             continue;
         }
 
@@ -147,10 +152,10 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
 void FS_Server::_DetectClientHeartTime()
 {
-    //当前时间戳
+    // 当前时间戳
     const auto &nowTime = Time::Now();
-    auto dt = nowTime - _oldTime;
-    _oldTime.FlushTime();
+    auto dt = nowTime - _lastHeartDetectTime;
+    _lastHeartDetectTime.FlushTime();
 
     // 心跳序列优化TODO:使用排序
     FS_Client *client = NULL;
@@ -192,9 +197,9 @@ void FS_Server::_OnClientJoin(FS_Client *client)
     // ...
 }
 
-void FS_Server::_OnNetRecv(FS_Client *client)
+void FS_Server::_OnPrepareNetRecv(FS_Client *client)
 {
-     _eventHandleObj->OnNetRecv(client);
+     _eventHandleObj->OnPrepareNetRecv(client);
 }
 
 void FS_Server::_OnClientMsgArrived()

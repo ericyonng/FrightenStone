@@ -55,6 +55,9 @@ public:
     static void DelListContainer(_Type &container);
 
     template<typename _Type, AssistObjsDefs::DelMethods DelType = AssistObjsDefs::Delete>
+    static void DelVectorContainer(_Type &container);
+
+    template<typename _Type, AssistObjsDefs::DelMethods DelType = AssistObjsDefs::Delete>
     static void DelArray(_Type &container);
 };
 

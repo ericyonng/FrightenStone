@@ -72,6 +72,7 @@ public:
     SOCKET Accept();
     template<class ServerT>
     void Start(Int32 svrQuantity);
+    virtual void BeforeClose();
     void Close();
     #pragma endregion
 
@@ -80,14 +81,19 @@ public:
     /*
     * brief: 
     *       1. FS_Server 4 多个线程触发 不安全 如果只开启1个FS_Server就是安全的
-    *       2. OnNetMonitorTask 监听网络任务 OnRun(旧版) 建议多条线程去做monitor而不是单条线程，完成端口的get是线程安全的
+    *       2. _OnNetMonitorTask 监听网络任务 OnRun(旧版) 建议多条线程去做monitor而不是单条线程，完成端口的get是线程安全的
+    *       3. OnNetJoin 玩家加入
+    *       4. OnNetLeave 玩家掉线
+    *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）
+    *       6. OnNetRecv 接收到数据
     */
 public:
     virtual void OnNetJoin(FS_Client *client);
     virtual void OnNetLeave(FS_Client *client);
     virtual void OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header);
-    virtual void OnNetRecv(FS_Client *client);
-    virtual void OnNetMonitorTask(const FS_ThreadPool *threadPool) = 0;
+    virtual void OnPrepareNetRecv(FS_Client *client);
+protected:
+    virtual void _OnNetMonitorTask(const FS_ThreadPool *threadPool) = 0;
     #pragma endregion
 
     /* 杂项 */
