@@ -45,7 +45,7 @@
 #define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // 能够支持的最大内存块范围
 
 #ifndef BLOCK_AMOUNT_DEF
-#define BLOCK_AMOUNT_DEF    10240    // 默认内存块数量
+#define BLOCK_AMOUNT_DEF    128    // 默认内存块数量
 #endif
 
 #endif

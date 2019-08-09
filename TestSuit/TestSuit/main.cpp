@@ -29,43 +29,32 @@
  *
  * 
  */
-#include "TestSuit/TestSuit/TestInst/TestDelegate.h"
-#include "TestSuit/TestSuit/TestInst/TestString.h"
-#include "TestSuit/TestSuit/TestInst/TestTime.h"
-#include "TestSuit/TestSuit/TestInst/TestTrigger.h"
-#include "TestSuit/TestSuit/TestInst/TestThreadPool.h"
-#include "TestSuit/TestSuit/TestInst/TestFSDirectory.h"
-#include "TestSuit/TestSuit/TestInst/TestFSFileUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestCpuUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestFile.h"
-#include "TestSuit/TestSuit/TestInst/TestJson.h"
-#include "TestSuit/TestSuit/TestInst/TestLogFile.h"
-#include "TestSuit/TestSuit/TestInst/TestRandom.h"
-#include "TestSuit/TestSuit/TestInst/TestAes.h"
-#include "TestSuit/TestSuit/TestInst/TestUtf8.h"
-#include "TestSuit/TestSuit/TestInst/TerstSmartVar.h"
-#include "TestSuit/TestSuit/TestInst/TestTimeWheel.h"
-#include "TestSuit/TestSuit/TestInst/TestSystemUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestLogModule.h"
-#include "TestSuit/TestSuit/TestInst/TestXor.h"
-#include "TestSuit/TestSuit/TestInst/TestCrashHandle.h"
-#include "TestSuit/TestSuit/TestInst/TestMemoryPool.h"
-#include "TestSuit/TestSuit/TestInst/TestObjPool.h"
-#include "TestSuit/TestSuit/TestInst/TestMathUtil.h"
-#include "TestSuit/TestSuit/TestInst/TestIocpExample.h"
-#include "TestSuit/TestSuit/TestInst/TestEvent.h"
+#include "TestSuit/TestSuit/TestInsts.h"
+#include "stdio.h"
+#include "iostream"
 
-int _tmain(int argc, _TCHAR* argv[])
-{
-    TestMemoryPool::Run();
-    getchar();
-    return 0;
-}
-// 
-// int main()
+// int _tmain(int argc, _TCHAR* argv[])
 // {
-//     TestObjPool::Run();
-//     std::cout << "main end" << std::endl;
+//     TestCrashHandle::Run();
 //     getchar();
 //     return 0;
 // }
+// 
+
+class base
+{
+public:
+    static void Run()
+    {
+        int *obj = NULL;
+        *obj = 55;
+    }
+};
+int main()
+{
+    TestInsts inst;
+    inst.Run();
+    std::cout << "main end" << std::endl;
+    getchar();
+    return 0;
+}

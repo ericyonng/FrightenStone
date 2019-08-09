@@ -78,7 +78,13 @@ public:
 //         g_EasyGlobal = new TestCrashEasyGloal;
 //         g_EasyGlobal->Init();
         g_Global.Init();
+        Int32 i = 100;
+        while(i-- > 0)
+        {
+            Sleep(1);
+        }
         fs::CrashHandleUtil::InitCrashHandleParams();
+/*        std::cout << fs::CrashHandleUtil::FS_CaptureStackBackTrace() << std::endl;*/
         Int32 *intPtr = NULL;
         *intPtr = 89;
 //         __try
