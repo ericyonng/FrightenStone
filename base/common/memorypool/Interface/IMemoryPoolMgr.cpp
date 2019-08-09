@@ -33,6 +33,8 @@
 #include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 #include "base/common/memorypool/Impl/MemoryPoolMgr.h"
 
+fs::IMemoryPoolMgr *g_MemoryPool = fs::Singleton<fs::MemoryPoolMgr>::GetInstance();
+
 FS_NAMESPACE_BEGIN
 
 IMemoryPoolMgr::IMemoryPoolMgr()

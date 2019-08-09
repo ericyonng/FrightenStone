@@ -39,6 +39,11 @@ inline size_t IMemoryAlloctor::GetBlockSize() const
     return _blockSize;
 }
 
+inline size_t IMemoryAlloctor::GetEffectiveBlockSize() const
+{
+    return _effectiveBlockSize;
+}
+
 FS_NAMESPACE_END
 
 #endif

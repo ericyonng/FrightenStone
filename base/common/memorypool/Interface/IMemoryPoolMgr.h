@@ -35,6 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/SingletonAgency.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -51,6 +52,7 @@ public:
     virtual Int32 InitPool() = 0;
     virtual void FinishPool() = 0;
     virtual void *Alloc(size_t bytes) = 0;
+    virtual void *Realloc(void *ptr, size_t bytes) = 0;
     virtual void  Free(void *ptr) = 0;
     virtual void  AddRef(void *ptr) = 0;
     virtual void Lock() = 0;
@@ -59,6 +61,5 @@ public:
 
 FS_NAMESPACE_END
 
-#define g_MemoryPool fs::IMemoryPoolMgr::GetInstance()
-
+extern BASE_EXPORT fs::IMemoryPoolMgr *g_MemoryPool;
 #endif

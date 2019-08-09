@@ -84,6 +84,10 @@ int main()
 //     printf("mem:[%p]log[%p]", g_MemoryPool, g_Log);
 //     TestServerPool *newObj = new TestServerPool;
 //     g_MemoryPool->FinishPool();
+
+    printf("g_Log %p\n", g_Log);
+    printf("g_MemoryPool %p\n", g_MemoryPool);
+    g_Log->InitModule("server");
     printf("exit。\n");
     getchar();
     return 0;

@@ -119,6 +119,7 @@ FS_NAMESPACE_END
 #include "base/common/log/Interface/ILogImpl.h"
 
 // 需要验证多进程下是否公用一个对象
-#define g_Log fs::ILog::GetInstance()
+extern BASE_EXPORT fs::ILog *g_Log;
+//#define g_Log fs::ILog::GetInstance()
 
 #endif

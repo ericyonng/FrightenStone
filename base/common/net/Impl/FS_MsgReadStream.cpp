@@ -21,31 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryPoolDefs.h
+ * @file  : FS_MsgReadStream.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/6
+ * @date  : 2019/08/10
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_MemoryPool_Defs_MemoryPoolDefs_H__
-#define __Base_Common_MemoryPool_Defs_MemoryPoolDefs_H__
-#pragma once
+#include "stdafx.h"
+#include "base/common/net/Impl/FS_MsgReadStream.h"
 
-#undef __MEMORY_POOL_ALIGN_BYTES__
-#define __MEMORY_POOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
-
-#undef __MEMORY_POOL_MINIMUM_BLOCK__
-#define __MEMORY_POOL_MINIMUM_BLOCK__        64          // 最小内存块64字节
-
-#undef __MEMORY_POOL_MAXIMUM_BLOCK__
-#define __MEMORY_POOL_MAXIMUM_BLOCK__        65536       // 最大内存块64K 只支持64的倍数
-
-#define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // 能够支持的最大内存块范围
-
-#ifndef BLOCK_AMOUNT_DEF
-#define BLOCK_AMOUNT_DEF    10240    // 默认内存块数量
-#endif
-
-#endif
+FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_IMPL(FS_MsgReadStream, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
+FS_NAMESPACE_END

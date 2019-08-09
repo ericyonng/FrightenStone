@@ -34,9 +34,12 @@
 #include "base/common/memorypool/Defs/MemoryBlock.h"
 #include "base/common/component/Impl/FS_String.h"
 #include "base/common/status/status.h"
+#include "iostream"
 
 #pragma region macro
-#define BLOCK_AMOUNT_DEF 10240      // 默认内存块数量
+// #ifndef BLOCK_AMOUNT_DEF
+// #define BLOCK_AMOUNT_DEF 128       // 默认内存块数量
+// #endif
 #pragma endregion
 
 FS_NAMESPACE_BEGIN
@@ -89,7 +92,7 @@ void MemoryPoolMgr::FinishPool()
 void *MemoryPoolMgr::Alloc(size_t bytes)
 {
     // 判断是否内存池可分配
-    if(bytes < sizeof(_alloctors) / sizeof(IMemoryAlloctor *))
+    if(bytes < __MEMORY_POOL_MAXBLOCK_LIMIT__ / sizeof(IMemoryAlloctor *))
     {
         return  _alloctors[bytes]->AllocMemory(bytes);
     }
@@ -106,6 +109,35 @@ void *MemoryPoolMgr::Alloc(size_t bytes)
         block->_nextBlock = 0;
         return  cache + sizeof(MemoryBlock);
     }
+}
+
+void *MemoryPoolMgr::Realloc(void *ptr, size_t bytes)
+{
+    // 1.判断是否在内存池中
+    MemoryBlock *block = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptr) - sizeof(MemoryBlock));
+    if(!block->_isInPool)
+    {
+        auto alignBytes = bytes / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (bytes%__MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
+        alignBytes = bytes + sizeof(MemoryBlock);
+
+        char *newCache = reinterpret_cast<char *>(::realloc(block, alignBytes));
+        block = reinterpret_cast<MemoryBlock *>(newCache);
+        block->_isInPool = false;
+        block->_ref = 1;
+        block->_alloctor = 0;
+        block->_nextBlock = 0;
+        return  newCache + sizeof(MemoryBlock);
+    }
+
+    // 2.原来内存块够用则重复利用
+    if(block->_alloctor->GetEffectiveBlockSize() >= bytes)
+        return ptr;
+
+    // 3.不够用则先分配合适的内存块大小 再将数据拷贝到新的，然后释放原来的
+    auto newCache = Alloc(bytes);
+    ::memcpy(newCache, ptr, block->_alloctor->GetEffectiveBlockSize());
+    Free(ptr);
+    return newCache;
 }
 
 void MemoryPoolMgr::Free(void *ptr)

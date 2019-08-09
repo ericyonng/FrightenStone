@@ -21,31 +21,63 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryPoolDefs.h
+ * @file  : FS_MsgWriteStreamImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/6
+ * @date  : 2019/08/10
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_MemoryPool_Defs_MemoryPoolDefs_H__
-#define __Base_Common_MemoryPool_Defs_MemoryPoolDefs_H__
+#ifdef __Base_Common_Net_Impl_FS_MsgWriteStream_H__
 #pragma once
 
-#undef __MEMORY_POOL_ALIGN_BYTES__
-#define __MEMORY_POOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
+FS_NAMESPACE_BEGIN
+inline FS_MsgWriteStream::FS_MsgWriteStream(char *data, int size, bool isDelete)
+    :FS_Stream(data, size, isDelete)
+{
+    // 预先占领消息长度所需空间 避免写入字节流时覆盖了长度位置
+    Write<UInt16>(0);
+}
 
-#undef __MEMORY_POOL_MINIMUM_BLOCK__
-#define __MEMORY_POOL_MINIMUM_BLOCK__        64          // 最小内存块64字节
+inline FS_MsgWriteStream::FS_MsgWriteStream(int size)
+    :FS_Stream(size)
+{
+    // 预先占领消息长度所需空间 避免写入字节流时覆盖了长度位置
+    Write<UInt16>(0);
+}
 
-#undef __MEMORY_POOL_MAXIMUM_BLOCK__
-#define __MEMORY_POOL_MAXIMUM_BLOCK__        65536       // 最大内存块64K 只支持64的倍数
+#pragma region write bytes
+inline void FS_MsgWriteStream::SetNetMsgCmd(UInt16 cmd)
+{
+    Write<UInt16>(cmd);
+}
 
-#define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // 能够支持的最大内存块范围
+inline bool FS_MsgWriteStream::WriteString(const char *str, Int32 len)
+{
+    return WriteArray(str, len);
+}
 
-#ifndef BLOCK_AMOUNT_DEF
-#define BLOCK_AMOUNT_DEF    10240    // 默认内存块数量
-#endif
+inline bool FS_MsgWriteStream::WriteString(const char *str)
+{
+    return WriteArray(str, static_cast<UInt32>(strlen(str)));
+}
+
+inline void FS_MsgWriteStream::Finish()
+{// 字节流结束后，要刷新在开头的字节流长度
+
+    // 定位到字节流头部
+    Int32 pos = GetWrLength();
+    SetWritePos(0);
+
+    // 写入字节流长度
+    Write<UInt16>(pos);
+
+    // 重新还原当前写入位置
+    SetWritePos(pos);
+}
+#pragma endregion
+
+FS_NAMESPACE_END
 
 #endif
