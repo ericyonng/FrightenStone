@@ -264,6 +264,8 @@
     <ClInclude Include="..\common\component\Impl\FS_StringImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_ThreadPool.h" />
     <ClInclude Include="..\common\component\Impl\GlobalInitialize.h" />
+    <ClInclude Include="..\common\component\Impl\SingletonAgency.h" />
+    <ClInclude Include="..\common\component\Impl\SingletonAgencyImpl.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVar.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.h" />
     <ClInclude Include="..\common\component\Impl\SmartVar\SmartVarArithmeticImpl.h" />
@@ -331,6 +333,10 @@
     <ClInclude Include="..\common\net\Impl\FS_IocpMsgTransferServerImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_MainIocpServer.h" />
     <ClInclude Include="..\common\net\Impl\FS_MainIocpServerImpl.h" />
+    <ClInclude Include="..\common\net\Impl\FS_MsgReadStream.h" />
+    <ClInclude Include="..\common\net\Impl\FS_MsgReadStreamImpl.h" />
+    <ClInclude Include="..\common\net\Impl\FS_MsgWriteStream.h" />
+    <ClInclude Include="..\common\net\Impl\FS_MsgWriteStreamImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_Server.h" />
     <ClInclude Include="..\common\net\Impl\FS_ServerImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_TcpServer.h" />
@@ -426,6 +432,8 @@
     <ClCompile Include="..\common\net\Impl\FS_Iocp.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_IocpMsgTransferServer.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_MainIocpServer.cpp" />
+    <ClCompile Include="..\common\net\Impl\FS_MsgReadStream.cpp" />
+    <ClCompile Include="..\common\net\Impl\FS_MsgWriteStream.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Server.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_TcpServer.cpp" />
     <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp" />

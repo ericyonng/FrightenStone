@@ -58,5 +58,7 @@
 #include "base/common/component/Impl/FS_List.h"
 #include "base/common/component/Impl/FS_CpuInfo.h"
 #include "base/common/component/Impl/XorEncrypt.h"
+#include "base/common/component/Impl/FS_Stream.h"
+#include "base/common/component/Impl/SingletonAgency.h"
 
 #endif

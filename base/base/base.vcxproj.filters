@@ -864,6 +864,24 @@
     <ClInclude Include="..\common\component\Impl\FS_StreamImpl.h">
       <Filter>common\component\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_MsgReadStream.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_MsgReadStreamImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_MsgWriteStream.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_MsgWriteStreamImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SingletonAgency.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\SingletonAgencyImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1096,6 +1114,12 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\FS_Stream.cpp">
       <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_MsgReadStream.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_MsgWriteStream.cpp">
+      <Filter>common\net\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

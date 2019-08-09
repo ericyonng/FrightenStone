@@ -36,6 +36,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -58,7 +59,11 @@ FS_NAMESPACE_END
 #undef  MEM_POOL_CREATE
 #define MEM_POOL_CREATE(_mempool_helper)                                                        \
 public:                                                                                         \
-        void  *operator new(size_t bytes)       { return _mempool_helper.Alloc(bytes);}         \
+        void  *operator new(size_t bytes)                                                       \
+        {                                                                                       \
+            auto ptr = g_MemoryPool->Alloc(bytes);                                              \
+            return ptr;                                                                         \
+        }                                                                                       \
         void   operator delete(void *ptr)       { _mempool_helper.Free(ptr);}                   \
         void  *operator new[](size_t bytes)     { return _mempool_helper.Alloc(bytes);}         \
         void   operator delete[] (void *ptr)    { _mempool_helper.Free(ptr);}                   \

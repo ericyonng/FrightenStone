@@ -32,10 +32,6 @@
 #ifdef __Base_Common_ObjPool_Defs_ObjAlloctor_H__
 #pragma once
 
-#ifndef BLOCK_AMOUNT_DEF
-#define BLOCK_AMOUNT_DEF    10240    // 默认内存块数量
-#endif
-
 FS_NAMESPACE_BEGIN
 
 // objtype的blocksize必须是void *尺寸的整数倍

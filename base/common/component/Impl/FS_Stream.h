@@ -38,11 +38,13 @@
 #include "base/common/objpool/objpool.h"
 #include "base/common/component/Impl/FS_String.h"
 #include "base/common/log/Log.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
 // 字节流写入规则：先写入uint32的数据长度，再写入数据
 // 字节流读取规则：先读取uint32的数据长度，再读取数据
+// 若是由内存池创建的缓冲区，在写入时支持缓冲区自增长
 class BASE_EXPORT FS_Stream
 {
     OBJ_POOL_CREATE(FS_Stream, _objPoolHelper);
@@ -55,16 +57,16 @@ public:
     #pragma region assist
     /*
     *   brief:
-    *       1. - GetData 获取数据缓冲区
+    *       1. - GetDataAddr 获取数据缓冲区变量的地址（由于数据缓冲区会自动扩展空间所以需要取得空间所在地址）
     *       2. - GetWrLength 已写入数据缓冲区的长度
-    *       1. - CanRead 还能读出len字节的数据吗?
-    *       2. - CanWrite 还能写入len字节的数据吗?
-    *       3. - OffsetWrLenOnWrChange 已写入位置，写入位置_writePos 偏移len字节长度
-    *       4. - OffsetOnReadChange 已读取位置，读取位置 _readPos 偏移len字节长度
-    *       5. - SetWritePos 设置写入位置_writePos
+    *       3. - CanRead 还能读出len字节的数据吗?
+    *       4. - CanWrite 还能写入len字节的数据吗?
+    *       5. - OffsetWrLenOnWrChange 已写入位置，写入位置_writePos 偏移len字节长度
+    *       6. - OffsetOnReadChange 已读取位置，读取位置 _readPos 偏移len字节长度
+    *       7. - SetWritePos 设置写入位置_writePos
     */
 public:
-    char *GetData();
+    char **GetDataAddr();
     Int32 GetWrLength() const;
     bool CanRead(Int32 len) const;
     bool CanWrite(Int32 len) const;
@@ -104,6 +106,8 @@ public:
     bool Write(const T &n);
     template<typename T>
     bool WriteArray(T *data, UInt32 len);
+    bool Write(const FS_String &str);
+    bool Write(const std::string &str);
     bool WriteInt8(Byte8 n);
     bool WriteInt16(Int16 n);
     bool WriteInt32(Int32 n);

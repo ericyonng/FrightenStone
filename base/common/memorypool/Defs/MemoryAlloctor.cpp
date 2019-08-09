@@ -37,10 +37,6 @@
 #include "base/common/memorypool/Defs/MemoryPoolDefs.h"
 #include "base/common/memorypool/Defs/MemBlocksNode.h"
 
-#ifndef BLOCK_AMOUNT_DEF
-#define BLOCK_AMOUNT_DEF    1024    // 默认内存块数量
-#endif
-
 FS_NAMESPACE_BEGIN
 
 IMemoryAlloctor::IMemoryAlloctor()
@@ -49,6 +45,7 @@ IMemoryAlloctor::IMemoryAlloctor()
     ,_blockAmount(BLOCK_AMOUNT_DEF)
     ,_usableBlockHeader(NULL)
     ,_blockSize(0)
+    ,_effectiveBlockSize(0)
     ,_lastDeleted(NULL)
     ,_memBlockInUse(0)
     ,_header(NULL)
@@ -85,14 +82,13 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
         newBlock->_alloctor = this;
         newBlock->_isInPool = true;
-        ASSERT(newBlock->_ref == 0);
+        // ASSERT(newBlock->_ref == 0);
         newBlock->_ref = 1;
     }
-
-    if(newBlock)
-        newBlock->_objSize = static_cast<Int64>(bytesCnt);
-
+    
+    newBlock->_objSize = static_cast<Int64>(bytesCnt);
     ++_memBlockInUse;
+
     return ((char*)newBlock) + sizeof(MemoryBlock);   // 从block的下一个地址开始才是真正的申请到的内存
 }
 
@@ -214,6 +210,7 @@ MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount)
     _blockAmount = blockAmount;
     _blockSize = blockSize / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (blockSize % __MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
     _blockSize = _blockSize + sizeof(MemoryBlock);
+    _effectiveBlockSize = _blockSize - sizeof(MemoryBlock);
 }
 
 MemoryAlloctor::~MemoryAlloctor()

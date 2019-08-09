@@ -42,12 +42,10 @@ class TestMemPoolObj
 public:
     TestMemPoolObj()
     {
-        std::cout << "¹¹Ôì" << std::endl;
-        _int = 11;
+
     }
     ~TestMemPoolObj()
     {
-        std::cout << "Îö¹¹" << std::endl;
     }
 
     void Print()
@@ -62,21 +60,60 @@ public:
 
 MEMPOOL_CREATE_IMPL(TestMemPoolObj, _memHelper)
 
+
+class TestMemPoolObj2
+{
+public:
+    TestMemPoolObj2()
+    {
+
+    }
+    ~TestMemPoolObj2()
+    {
+    }
+
+    void Print()
+    {
+        std::cout << "int" << _int << std::endl;
+    }
+
+public:
+    Int64 _int;
+
+};
+
 class TestMemoryPool
 {
 public:
     static void Run()
     {
-        g_Log->InitModule("main");
         //g_MemoryPool->InitPool();
-        printf("mem:[%p]log[%p]", g_MemoryPool, g_Log);
+        //printf("mem:[%p]log[%p]", g_MemoryPool, g_Log);
 
-        TestMemPoolObj *newObj = new TestMemPoolObj;
-        newObj->Print();
-        delete newObj;
-        newObj = new TestMemPoolObj;
-        //g_MemoryPool->FinishPool();
-        //g_Log->FinishModule();
+        printf("g_Log %p\n", g_Log);
+        printf("g_MemoryPool %p\n", g_MemoryPool);
+        g_Log->InitModule("main");
+
+        fs::Time _time1, _time2;
+        const size_t sizeOfObj = sizeof(TestMemPoolObj2);
+       // auto pool = g_MemoryPool;
+        _time1.FlushTime();
+        for(auto i = 0; i < 1000000; ++i)
+        {
+            g_MemoryPool->Lock();
+            g_MemoryPool->Alloc(sizeOfObj);
+            g_MemoryPool->Unlock();
+        }
+        _time2.FlushTime();
+        std::cout << "slice:" << (_time2 - _time1).GetTotalMicroSeconds() << std::endl;
+
+        _time1.FlushTime();
+        for(auto i = 0; i < 1000000; ++i)
+        {
+            new TestMemPoolObj2;
+        }
+        _time2.FlushTime();
+        std::cout << "slice:" << (_time2 - _time1).GetTotalMicroSeconds() << std::endl;
     }
 };
 

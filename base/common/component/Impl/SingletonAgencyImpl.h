@@ -21,31 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryPoolDefs.h
+ * @file  : SingletonAgencyImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/6
+ * @date  : 2019/08/10
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_MemoryPool_Defs_MemoryPoolDefs_H__
-#define __Base_Common_MemoryPool_Defs_MemoryPoolDefs_H__
+#ifdef __Base_Common_Component_Impl_SingletonAgency_H__
 #pragma once
 
-#undef __MEMORY_POOL_ALIGN_BYTES__
-#define __MEMORY_POOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
+FS_NAMESPACE_BEGIN
 
-#undef __MEMORY_POOL_MINIMUM_BLOCK__
-#define __MEMORY_POOL_MINIMUM_BLOCK__        64          // 最小内存块64字节
+template<typename ObjType>
+inline SingletonAgency<ObjType>::SingletonAgency()
+{
+}
 
-#undef __MEMORY_POOL_MAXIMUM_BLOCK__
-#define __MEMORY_POOL_MAXIMUM_BLOCK__        65536       // 最大内存块64K 只支持64的倍数
+template<typename ObjType>
+inline SingletonAgency<ObjType>::~SingletonAgency()
+{
+}
 
-#define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // 能够支持的最大内存块范围
+template<typename ObjType>
+inline ObjType *SingletonAgency<ObjType>::operator->()
+{
+    static ObjType *obj = Singleton<ObjType>::GetInstance();
+    return obj;
+}
 
-#ifndef BLOCK_AMOUNT_DEF
-#define BLOCK_AMOUNT_DEF    10240    // 默认内存块数量
-#endif
+template<typename ObjType>
+inline const ObjType *SingletonAgency<ObjType>::operator->() const
+{
+    static ObjType *obj = Singleton<ObjType>::GetInstance();
+    return obj;
+}
+
+FS_NAMESPACE_END
 
 #endif

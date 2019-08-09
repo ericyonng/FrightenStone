@@ -25,15 +25,16 @@ s/*!
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/06/24
  * @brief :
- * 
  *
- * 
+ *
+ *
  */
 #include "stdafx.h"
 #include "base/common/log/Interface/ILog.h"
 #include "base/common/log/Impl/FS_Log.h"
 #include "base/common/status/status.h"
 
+fs::ILog *g_Log = fs::Singleton<fs::FS_Log>::GetInstance();
 FS_NAMESPACE_BEGIN
 
 ILog *ILog::GetInstance()

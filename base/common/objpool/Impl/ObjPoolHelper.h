@@ -118,4 +118,12 @@ size_t ObjType::GetMemleakNum()                                                 
     return _objpool_helper.GetMemleakObjNum();                                                          \
 }
 
+// 默认以_objPoolHelper命名对象池变量名
+#undef OBJ_POOL_CREATE_DEF
+#define OBJ_POOL_CREATE_DEF(ObjType)    OBJ_POOL_CREATE(ObjType, _objPoolHelper)
+
+// 默认以_objPoolHelper命名对象池变量名
+#undef OBJ_POOL_CREATE_DEF_IMPL
+#define OBJ_POOL_CREATE_DEF_IMPL(ObjType, objAmount) OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)
+
 #endif

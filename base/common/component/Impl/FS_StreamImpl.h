@@ -42,12 +42,12 @@ inline FS_Stream::FS_Stream(Byte8 *data, Int32 size, bool needDelete)
 }
 
 #pragma region assist
-inline char *FS_Stream::GetData()
+inline char ** FS_Stream::GetDataAddr()
 {
-    return _buff;
+    return &_buff;
 }
 
-Int32 FS_Stream::GetWrLength() const
+inline Int32 FS_Stream::GetWrLength() const
 {
     return _writePos;
 }
@@ -227,19 +227,26 @@ inline bool FS_Stream::Write(const T &n)
     // 计算要写入数据的字节长度
     Int32 len = static_cast<Int32>(sizeof(T));
 
-    // 判断能不能写入
-    if(CanWrite(len))
-    {
-        // 将要写入的数据 拷贝到缓冲区尾部
-        memcpy(_buff + _writePos, &n, static_cast<size_t>(len));
-
-        // 计算已写入数据尾部位置
-        OffsetWrLenOnWrChange(len);
-        return true;
+    bool canWrite = CanWrite(len);
+    if(!canWrite && !_isPoolCreate)
+    {// 不能写入且不是内存池创建的缓冲区
+        g_Log->e<FS_Stream>(_LOGFMT_("Write failed. obj name[%s]"), typeid(T).name());
+        return false;
+    }
+    else if(!canWrite)
+    {// 不能写且是由内存池创建的缓冲区则自增长为2倍
+        g_MemoryPool->Lock();
+        _buff = reinterpret_cast<char *>(g_MemoryPool->Realloc(_buff, 2 * _size));
+        g_MemoryPool->Unlock();
+        _size *= 2;
     }
 
-    g_Log->e<FS_Stream>(_LOGFMT_("Write failed. obj name[%s]"), typeid(T).name());
-    return false;
+    // 将要写入的数据 拷贝到缓冲区尾部
+    memcpy(_buff + _writePos, &n, static_cast<size_t>(len));
+
+    // 计算已写入数据尾部位置
+    OffsetWrLenOnWrChange(len);
+    return true;
 }
 
 template<typename T>
@@ -249,21 +256,39 @@ inline bool FS_Stream::WriteArray(T *data, UInt32 len)
     auto bytes = sizeof(T)*len;
 
     // 判断能不能写入
-    if(CanWrite(bytes + sizeof(UInt32)))
-    {
-        // 先写入数组的元素长度
-        Write(len);
-
-        // 将要写入的数据 拷贝到缓冲区尾部
-        memcpy(_buff + _writePos, data, bytes);
-
-        // 计算数据尾部位置
-        OffsetWrLenOnWrChange(bytes);
-        return true;
+    bool canWrite = CanWrite(static_cast<Int32>(bytes + sizeof(UInt32)));
+    if(!canWrite && !_isPoolCreate)
+    {// 不能写入且不是内存池创建的缓冲区
+        g_Log->e<FS_Stream>(_LOGFMT_("WriteArray failed. obj name[%s]"), typeid(T).name());
+        return false;
+    }
+    else if(!canWrite)
+    {// 不能写且是由内存池创建的缓冲区则自增长为2倍
+        g_MemoryPool->Lock();
+        _buff = reinterpret_cast<char *>(g_MemoryPool->Realloc(_buff, 2 * _size));
+        g_MemoryPool->Unlock();
+        _size *= 2;
     }
 
-    g_Log->e<FS_Stream>(_LOGFMT_("WriteArray failed. obj name[%s]"), typeid(T).name());
-    return false;
+    // 先写入数组的元素长度
+    Write(len);
+
+    // 将要写入的数据 拷贝到缓冲区尾部
+    memcpy(_buff + _writePos, data, bytes);
+
+    // 计算数据尾部位置
+    OffsetWrLenOnWrChange(static_cast<Int32>(bytes));
+    return true;
+}
+
+inline bool FS_Stream::Write(const FS_String &str)
+{
+    return Write(str.GetRaw());
+}
+
+inline bool FS_Stream::Write(const std::string &str)
+{
+    return WriteArray(str.c_str(), static_cast<UInt32>(str.size()));
 }
 
 inline bool FS_Stream::WriteInt8(Byte8 n)

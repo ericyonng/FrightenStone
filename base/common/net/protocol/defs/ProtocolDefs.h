@@ -72,6 +72,7 @@ public:
         CreatePlayerNty = 9,        // 
         CheckHeartReq = 10,         // 客户端心跳包
         CheckHeartRes = 11,         // 心跳包反馈，按理不用反馈给客户端减少服务端压力
+        CMD_End,
     };
 };
 

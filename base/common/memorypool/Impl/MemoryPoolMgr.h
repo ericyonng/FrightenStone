@@ -57,6 +57,7 @@ public:
     virtual Int32 InitPool();
     virtual void FinishPool();
     virtual void *Alloc(size_t bytes);
+    virtual void *Realloc(void *ptr, size_t bytes);
     virtual void  Free(void *ptr);
     virtual void  AddRef(void *ptr);
     virtual void Lock();
@@ -85,5 +86,9 @@ inline void MemoryPoolMgr::Unlock()
 FS_NAMESPACE_END
 
 // #define g_MemoryPoolMgr fs::Singleton<fs::MemoryPoolMgr>::GetInstance()
+// 强烈建银get出pool的真实指针避免直接使用本宏，消耗很大
+// extern BASE_EXPORT fs::SingletonAgency<fs::MemoryPoolMgr> g_MemoryPoolAgency;
+
+// #define g_MemoryPool g_MemoryPoolAgency
 
 #endif

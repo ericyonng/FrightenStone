@@ -67,6 +67,7 @@ public:
     void *AllocMemory(size_t bytesCnt);
     void  FreeMemory(void *ptr);
     size_t GetBlockSize() const;
+    size_t GetEffectiveBlockSize() const;
 
 public:
     void InitMemory();
@@ -91,6 +92,7 @@ protected:
     // 最新的节点
     size_t          _blockAmount;           // 内存块总数量
     size_t          _blockSize;             // 内存块大小
+    size_t          _effectiveBlockSize;    // 有效内存块大小（扣除MemoryBlock的内存大小）
 };
 
 class MemoryAlloctor : public IMemoryAlloctor
