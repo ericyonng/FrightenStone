@@ -35,6 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/objpool/objpool.h"
 
 #pragma region IOCP macro
 #define IO_DATA_BUFF_SIZE 1024          // io数据缓冲大小
@@ -62,6 +63,8 @@ public:
 
 struct BASE_EXPORT IO_DATA_BASE
 {
+    OBJ_POOL_CREATE(IO_DATA_BASE, _objPoolHelper);
+
     // 重叠体
     OVERLAPPED _overlapped{0};          // 使用重叠体可以关联到iodatabase,在投递accept时候传入
     SOCKET _sock = INVALID_SOCKET;
@@ -75,6 +78,8 @@ struct BASE_EXPORT IO_DATA_BASE
 
 struct BASE_EXPORT IO_EVENT
 {
+    OBJ_POOL_CREATE(IO_EVENT, _objPoolHelper);
+
     IO_EVENT();
     union
     {

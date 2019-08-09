@@ -37,6 +37,7 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/asyn/asyn.h"
+#include "base/common/objpool/Defs/ObjPoolDefs.h"
 #include "base/common/objpool/Defs/ObjAlloctor.h"
 #include "base/common/objpool/Defs/AlloctorNode.h"
 

@@ -38,7 +38,7 @@
 #undef __FS_THREAD_SAFE__
 #define __FS_THREAD_SAFE__ 1
 
-//导出定义
+// 导出定义
 #ifndef BASE_EXPORT
     #ifdef  FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
         #define BASE_EXPORT _declspec(dllexport)
@@ -47,7 +47,7 @@
     #endif
 #endif
 
-//定义文件名
+// 定义文件名
 #ifdef _DEBUG
     #define FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL_NAME                "baseD.dll"    //
 #else
@@ -55,7 +55,10 @@
 #endif
 
 #pragma region Warning Disable
-#pragma warning(disable:4251)               // 
+#pragma warning(disable:4251)               // 模版类造成的警告
+#ifdef _WIN32
+#pragma warning (disable:4819)              // 屏蔽文件中存在汉字时的编码警告
+#endif
 #define D_SCL_SECURE_NO_WARNINGS            // disable warning C4996
 #pragma endregion
 

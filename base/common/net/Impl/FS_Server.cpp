@@ -39,6 +39,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(FS_Server, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+
 FS_Server::FS_Server()
     :_threadPool(new FS_ThreadPool(0, 1))
 {
@@ -178,7 +180,7 @@ void FS_Server::_DetectClientHeartTime()
             continue;
         }
 
-        //// 定时发送检测
+        //// 定时发送检测 iocp有定时的发送机制
         // pClient->checkSend(dt);
 
         ++iter;
@@ -217,6 +219,15 @@ void FS_Server::_OnClientMsgArrived()
             client->PopFrontMsg();
         }
     }
+}
+
+Int32 FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
+{
+    auto st = _eventHandleObj->OnNetMsg(this, client, header);
+    if(st == StatusDefs::Success)
+        client->ResetDTHeart();
+
+    return st;
 }
 #pragma endregion
 

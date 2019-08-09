@@ -64,10 +64,7 @@ inline void FS_Server::AddClient(FS_Client *client)
 #pragma endregion
 
 #pragma region net message handle
-inline void FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
-{
-    _eventHandleObj->OnNetMsg(this, client, header);
-}
+
 #pragma endregion
 
 FS_NAMESPACE_END

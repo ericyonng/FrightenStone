@@ -858,6 +858,12 @@
     <ClInclude Include="..\common\net\Impl\FS_MainIocpServerImpl.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_Stream.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_StreamImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1087,6 +1093,9 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Impl\FS_MainIocpServer.cpp">
       <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\FS_Stream.cpp">
+      <Filter>common\component\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

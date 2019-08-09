@@ -38,6 +38,7 @@
 #include "base/common/net/Impl/FS_TcpServer.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/asyn/asyn.h"
+#include "base/common/objpool/objpool.h"
 
 // 主服务器单线程监听，多线程收发
 FS_NAMESPACE_BEGIN
@@ -46,12 +47,16 @@ class BASE_EXPORT FS_ThreadPool;
 
 class BASE_EXPORT FS_MainIocpServer : public FS_TcpServer
 {
+    OBJ_POOL_CREATE(FS_MainIocpServer, _objPoolHelper);
 public:
     FS_MainIocpServer();
     virtual ~FS_MainIocpServer();
 
     /* 启动与关闭服务器 */
     #pragma region start close
+    /*
+    *   起服关服步骤：InitSocket->Bind->Listen->Start->Close
+    */
 public:
     void Start(Int32 msgTransferServerCnt);
     virtual void BeforeClose();
@@ -66,7 +71,7 @@ public:
     */
 protected:
     virtual void _OnNetMonitorTask(const FS_ThreadPool *pool);
-    SOCKET _IocpAccept(SOCKET sock);
+    SOCKET _OnIocpAccept(SOCKET sock);
     #pragma endregion
 
 private:
