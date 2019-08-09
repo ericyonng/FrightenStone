@@ -55,7 +55,7 @@ public:
     // 客户端离开事件
     virtual void OnNetLeave(FS_Client *client) = 0;
     // 客户端消息事件
-    virtual void OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header) = 0;
+    virtual Int32 OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header) = 0;
     // recv事件
     virtual void OnPrepareNetRecv(FS_Client *client) = 0;
     // 释放接口

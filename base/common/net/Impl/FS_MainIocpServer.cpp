@@ -42,6 +42,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(FS_MainIocpServer, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+
 FS_MainIocpServer::FS_MainIocpServer()
     :_closeIocpDelegate(NULL)
 {
@@ -117,7 +119,7 @@ void FS_MainIocpServer::_OnNetMonitorTask(const FS_ThreadPool *pool)
         if(IocpDefs::IO_ACCEPT == ioEvent._ioData->_ioType)
         {
             // CELLLog_Info("新客户端加入 sockfd=%d", ioEvent.pIoData->sockfd);
-            _IocpAccept(ioEvent._ioData->_sock);
+            _OnIocpAccept(ioEvent._ioData->_sock);
 
             // 继续向IOCP投递接受连接任务
             listenIocp->PostAccept(listenSock, &ioData);
@@ -129,7 +131,7 @@ void FS_MainIocpServer::_OnNetMonitorTask(const FS_ThreadPool *pool)
     _mainLocker.Unlock();
 }
 
-SOCKET FS_MainIocpServer::_IocpAccept(SOCKET sock)
+SOCKET FS_MainIocpServer::_OnIocpAccept(SOCKET sock)
 {
     // 4 accept 等待接受客户端连接
     // sockaddr_in clientAddr = {};

@@ -35,6 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/net/Impl/FS_Server.h"
+#include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -44,11 +45,13 @@ struct BASE_EXPORT IO_EVENT;
  // 网络消息转发处理服务类
 class BASE_EXPORT FS_IocpMsgTransferServer :public FS_Server
 {
+    OBJ_POOL_CREATE(FS_IocpMsgTransferServer, _objPoolHelper);
 public:
     FS_IocpMsgTransferServer();
     virtual ~FS_IocpMsgTransferServer() noexcept;
 
 public:
+    // 在关闭服务前做些处理比如退出iocp
     virtual void BeforeClose();
 
     /* 网络消息处理 */

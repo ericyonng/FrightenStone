@@ -49,6 +49,7 @@ class BASE_EXPORT FS_Client;
 
 class BASE_EXPORT FS_TcpServer : public INetEvent
 {
+    OBJ_POOL_CREATE(FS_TcpServer, _objPoolHelper);
 public:
     FS_TcpServer();
     virtual ~FS_TcpServer();
@@ -63,15 +64,16 @@ public:
     *       3. - Listen 监听端口号
     *       4. - Accept 接受客户端连接
     *       5. - Start 根据跨平台的不同会有不同的server实例 这也是设计成使用泛型的一个原因
-    *       6. - Close 关闭服务器
+    *       6. - BeforeClose 在关服前做些处理比如退出iocp
+    *       7. - Close 关闭服务器
     */
 public:
     SOCKET InitSocket();
     Int32 Bind(const Byte8 *ip, UInt16 port);
-    Int32 Listen(Int32 n);
+    Int32 Listen(Int32 unconnectQueueLen = SOMAXCONN);
     SOCKET Accept();
     template<class ServerT>
-    void Start(Int32 svrQuantity);
+    void Start(Int32 msgTransferSvrQuantity);
     virtual void BeforeClose();
     void Close();
     #pragma endregion
@@ -82,15 +84,15 @@ public:
     * brief: 
     *       1. FS_Server 4 多个线程触发 不安全 如果只开启1个FS_Server就是安全的
     *       2. _OnNetMonitorTask 监听网络任务 OnRun(旧版) 建议多条线程去做monitor而不是单条线程，完成端口的get是线程安全的
-    *       3. OnNetJoin 玩家加入
-    *       4. OnNetLeave 玩家掉线
-    *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）
-    *       6. OnNetRecv 接收到数据
+    *       3. OnNetJoin 玩家加入 线程不安全
+    *       4. OnNetLeave 玩家掉线 线程不安全
+    *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）线程不安全 NetMsg_DataHeader 转发到其他线程需要拷贝避免消息被覆盖
+    *       6. OnNetRecv 接收到数据 线程不安全
     */
 public:
     virtual void OnNetJoin(FS_Client *client);
     virtual void OnNetLeave(FS_Client *client);
-    virtual void OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header);
+    virtual Int32 OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header);
     virtual void OnPrepareNetRecv(FS_Client *client);
 protected:
     virtual void _OnNetMonitorTask(const FS_ThreadPool *threadPool) = 0;
@@ -118,7 +120,7 @@ private:
     // 消息处理对象，内部会创建线程
     std::vector<FS_Server *> _fsServers;
     // 每秒消息计时
-    Time _time;
+    Time _msgCountTime;
     SOCKET _sock;
 
 protected:

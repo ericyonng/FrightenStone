@@ -48,6 +48,7 @@ class BASE_EXPORT FS_NetBuffer;
 
 class BASE_EXPORT FS_Client
 {
+    OBJ_POOL_CREATE(FS_Client, _objPoolHelper);
 public:
     FS_Client(Int64 clientId
               , SOCKET sockfd = INVALID_SOCKET
@@ -115,7 +116,7 @@ private:
     // 心跳死亡计时
     TimeSlice _heartDeadSlice; // 心跳序列优化使用时间戳TODO
     // 上次发送消息数据的时间 
-    TimeSlice _lastSendSlice;
+    TimeSlice _lastSendSlice; // 用于定时发送
 #ifdef FS_USE_IOCP
     bool _isPostRecv = false;
     bool _isPostSend = false;

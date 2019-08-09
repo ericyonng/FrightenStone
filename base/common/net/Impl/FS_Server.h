@@ -47,6 +47,7 @@ class BASE_EXPORT FS_Client;
 // 服务类
 class BASE_EXPORT FS_Server
 {
+    OBJ_POOL_CREATE(FS_Server, _objPoolHelper);
 public:
     FS_Server();
     virtual ~FS_Server();
@@ -92,7 +93,9 @@ public:
     *       5. - _OnClientJoin 客户端连入 iocp与epoll有不同的重写方法
     *       6. - _OnNetRecv 接收网络消息
     *       7. - _OnClientMsgTransfer 网络消息再次中转
-    *       8. - _HandleNetMsg 网络消息处理 <真正的消息入口>
+    *       8. - _HandleNetMsg 网络消息处理 <真正的消息入口> 
+    *               NetMsg_DataHeader 是缓冲区中的数据，
+    *               若要转发到其他地方需要进行拷贝否则会被覆盖数据
     */
 protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
@@ -103,7 +106,7 @@ protected:
     virtual void _OnClientJoin(FS_Client *client);
     void _OnPrepareNetRecv(FS_Client *client);
     void _OnClientMsgArrived();
-    virtual void _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
+    virtual Int32 _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
     #pragma endregion
 
     /* 数据成员 */

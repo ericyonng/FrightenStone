@@ -41,6 +41,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_IMPL(FS_TcpServer, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+
 FS_TcpServer::FS_TcpServer()
     :_threadPool(new FS_ThreadPool(0, 1))
     ,_sock(INVALID_SOCKET)
@@ -51,6 +53,7 @@ FS_TcpServer::FS_TcpServer()
     ,_recvMsgCount{0}
     ,_clientAcceptCnt{0}
     ,_clientJoinedCnt{0}
+    ,_clientMaxId{0}
 {
     // TODO:¶ÁÈ¡ÅäÖÃ
     _sendBuffSize = SEND_BUFF_SZIE;
@@ -146,10 +149,10 @@ Int32 FS_TcpServer::Bind(const Byte8 *ip, UInt16 port)
     return StatusDefs::Success;
 }
 
-Int32 FS_TcpServer::Listen(Int32 n)
+Int32 FS_TcpServer::Listen(Int32 unconnectQueueLen)
 {
     // 3 listen ¼àÌýÍøÂç¶Ë¿Ú
-    int ret = listen(_sock, n);
+    int ret = listen(_sock, unconnectQueueLen);
     if(SOCKET_ERROR == ret)
     {
         g_Log->e<FS_TcpServer>(_LOGFMT_("listen socket<%d> failed..."), static_cast<Int32>(_sock));
@@ -207,6 +210,11 @@ void FS_TcpServer::BeforeClose()
 
 void FS_TcpServer::Close()
 {
+    g_Log->net("FS_TcpServer.BeforeClose begin");
+    g_Log->sys(_LOGFMT_("FS_TcpServer.BeforeClose begin"));
+
+    BeforeClose();
+
     g_Log->net("FS_TcpServer.Close begin");
     g_Log->sys(_LOGFMT_("FS_TcpServer.Close begin"));
 
@@ -241,9 +249,10 @@ void FS_TcpServer::OnNetLeave(FS_Client *client)
     g_Log->sys(_LOGFMT_("client<%d> leave"), static_cast<Int32>(client->GetSocket()));
 }
 
-void FS_TcpServer::OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header)
+Int32 FS_TcpServer::OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header)
 {
     ++_recvMsgCount;
+    return StatusDefs::Success;
 }
 
 void FS_TcpServer::OnPrepareNetRecv(FS_Client *client)
@@ -268,7 +277,7 @@ void FS_TcpServer::_AddClientToFSServer(FS_Client *client)
 void FS_TcpServer::_StatisticsMsgPerSecond()
 {
     const auto &nowTime = Time::Now();
-    const auto slice = nowTime - _time;
+    const auto slice = nowTime - _msgCountTime;
     if(slice.GetTotalSeconds() >= 1)
     {
         g_Log->net("thread<%d>,timeSlice<%d>,socket<%d>,Accept<%d>,Join<%d>,recv<%d>,msg<%d>"
@@ -282,7 +291,7 @@ void FS_TcpServer::_StatisticsMsgPerSecond()
 
         _recvCount = 0;
         _recvMsgCount = 0;
-        _time.FlushTime();
+        _msgCountTime.FlushTime();
     }
 }
 #pragma endregion
