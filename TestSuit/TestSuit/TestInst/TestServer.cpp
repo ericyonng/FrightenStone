@@ -49,23 +49,28 @@ public:
     {
         fs::FS_TcpServer::OnNetJoin(client);
         Int32 joinedCnt = _clientJoinedCnt;
-        g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> joined, client joined cnt<%d>")
-                               , static_cast<Int32>(client->GetSocket()), joinedCnt);
+        // g_Log->any("client<%d> joined curJoinedCnt[%d]", (Int32)(client->GetSocket()), joinedCnt);
+//         g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> joined, client joined cnt<%d>")
+//                                , static_cast<Int32>(client->GetSocket()), joinedCnt);
     }
     //cellServer 4 多个线程触发 不安全
     //如果只开启1个cellServer就是安全的
     virtual void OnNetLeave(fs::FS_Client *client)
     {
         fs::FS_TcpServer::OnNetLeave(client);
-        Int32 joinedCnt = _clientJoinedCnt;
-        g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> leave, client joined cnt<%d>")
-                               , static_cast<Int32>(client->GetSocket()), joinedCnt);
+        // Int32 joinedCnt = _clientJoinedCnt;
+        // g_Log->any("client<%d> leave curJoinedCnt[%d]", (Int32)(client->GetSocket()), joinedCnt);
+
+//         g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> leave, client joined cnt<%d>")
+//                                , static_cast<Int32>(client->GetSocket()), joinedCnt);
     }
     //cellServer 4 多个线程触发 不安全
     //如果只开启1个cellServer就是安全的
     virtual Int32 OnNetMsg(fs::FS_Server *server, fs::FS_Client *client, fs::NetMsg_DataHeader *header)
     {
         fs::FS_TcpServer::OnNetMsg(server, client, header);
+        // Int32 recvMsgCnt = _recvMsgCount;
+        // g_Log->any("curRecv[%d]", recvMsgCnt);
         switch(header->_cmd)
         {
             case fs::ProtocolCmd::LoginReq:
@@ -85,8 +90,8 @@ public:
                     ++client->_recvMsgId;
                 }
 
-                g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> loginReq, userName[%s] pwd[%s] ")
-                                       , static_cast<Int32>(client->GetSocket()), login->_userName, login->_pwd);
+//                 g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> loginReq, userName[%s] pwd[%s] ")
+//                                        , static_cast<Int32>(client->GetSocket()), login->_userName, login->_pwd);
                 // 登录逻辑
                 // ......
                 // 回应消息
@@ -144,8 +149,8 @@ public:
                 s.WriteArray(ata, n8);
                 s.Finish();
                 client->SendData(*s.GetDataAddr(), s.GetWrLength());
-                g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> logout")
-                                       , static_cast<Int32>(client->GetSocket()));
+//                 g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> logout")
+//                                        , static_cast<Int32>(client->GetSocket()));
                 return StatusDefs::Success;
             }
             break;
@@ -153,8 +158,7 @@ public:
             {
                 fs::CheckHeartRes ret;
                 client->SendData(&ret);
-                g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> CheckHeartReq")
-                                       , static_cast<Int32>(client->GetSocket()));
+                //g_Log->any("socket<%d> CheckHeartReq", static_cast<Int32>(client->GetSocket()));
                 return StatusDefs::Success;
             }
             default:
@@ -187,7 +191,7 @@ void TestServer::Run()
     fs::CrashHandleUtil::InitCrashHandleParams();
     fs::EasyFSServer easyServer;
     easyServer.InitSocket();
-    easyServer.Bind("127.0.0.1", 4567);
+    easyServer.Bind(NULL, 4567);
     easyServer.Listen();
     easyServer.Start(4);
     while(1)

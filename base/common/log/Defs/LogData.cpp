@@ -43,6 +43,7 @@ static const char *__g_LogLevelDescription[LogLevel::End + 1] =
     "Net",
     "Memleak",
     "Sys",
+    "Any",
 
     "Unknown"
 };
