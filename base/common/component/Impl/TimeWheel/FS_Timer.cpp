@@ -104,7 +104,7 @@ void FS_Timer::OnTimeOut(const Time &curWheelTIme)
 FS_String FS_Timer::ToString() const
 {
     FS_String info;
-    info.Format("Timer:[_lastTimeOutTime:%lld fmt:%s\n|_timeOutDelegate:0x%p|_cancelTimerDelegate:0x%p\n%s]\n"
+    info.AppendFormat("Timer:[_lastTimeOutTime:%lld fmt:%s\n|_timeOutDelegate:0x%p|_cancelTimerDelegate:0x%p\n%s]\n"
                 , _lastTimeOutTime.GetMicroTimestamp(),_lastTimeOutTime.ToString().c_str()
                 ,_timeOutDelegate, _cancelTimerDelegate
                 , _timeData->ToString().c_str());

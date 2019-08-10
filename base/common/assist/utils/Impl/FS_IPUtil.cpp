@@ -115,7 +115,7 @@ Int32 FS_IPUtil::GetIPByDomain(
             continue;
         }
 
-        ipAddrString.Format("%d.%d.%d.%d"
+        ipAddrString.AppendFormat("%d.%d.%d.%d"
                 , (*addr).sin_addr.S_un.S_un_b.s_b1
                 , (*addr).sin_addr.S_un.S_un_b.s_b2
                 , (*addr).sin_addr.S_un.S_un_b.s_b3

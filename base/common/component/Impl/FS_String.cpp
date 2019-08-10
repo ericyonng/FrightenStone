@@ -630,7 +630,7 @@ std::string::size_type FS_String::_next_utf8_char_pos(std::string::size_type &be
     return endPos;
 }
 
-FS_String &FS_String::FormatCStyle(const char *fmt, ...)
+FS_String &FS_String::AppendFormatCStyle(const char *fmt, ...)
 {
     char *buf; int len;
     __FS_BuildFormatStr_(fmt, buf, len);
