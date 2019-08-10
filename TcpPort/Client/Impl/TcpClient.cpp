@@ -208,8 +208,8 @@ void TcpClient::OnNetMsg(fs::NetMsg_DataHeader *header)
         {
 
             auto *res = static_cast<fs::LoginRes *>(header);
-            printf("<socket=%llu>recv£ºLoginRes,len£º%d\n userName[%s] status[%d]"
-                   , _sock, res->_packetLength, res->_userName, res->_status);
+//             printf("<socket=%llu>recv£ºLoginRes,len£º%d\n userName[%s] status[%d]"
+//                    , _sock, res->_packetLength, res->_userName, res->_status);
         }
         break;
         case fs::ProtocolCmd::LoginNty:
