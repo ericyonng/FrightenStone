@@ -196,10 +196,10 @@ inline FS_String TimeSlice::ToString() const
 {
     int days = GetDays();
     if(days != 0)
-        return FS_String().Format("%d %02d:%02d:%02d.%06d",
+        return FS_String().AppendFormat("%d %02d:%02d:%02d.%06d",
                                     days, GetHours(), GetMinutes(), GetSeconds(), GetMilliSeconds() * 1000 + GetMicroSeconds());
     else
-        return FS_String().Format("%02d:%02d:%02d.%06d",
+        return FS_String().AppendFormat("%02d:%02d:%02d.%06d",
                                     GetHours(), GetMinutes(), GetSeconds(), GetMilliSeconds() * 1000 + GetMicroSeconds());
 }
 

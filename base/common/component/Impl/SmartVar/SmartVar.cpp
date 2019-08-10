@@ -682,7 +682,7 @@ FS_String SmartVar::ValueToString() const
             return StringUtil::Num2Str(_raw._briefData._uint64Data);
 
         case SmartVarRtti::SV_BRIEF_PTR:
-            return FS_String().Format("0x%p", _raw._briefData._uint64Data);
+            return FS_String().AppendFormat("0x%p", _raw._briefData._uint64Data);
 
         case SmartVarRtti::SV_BRIEF_FLOAT:
         case SmartVarRtti::SV_BRIEF_DOUBLE:

@@ -51,7 +51,7 @@ FS_GUID FS_GuidUtil::Gen()
 FS_String FS_GuidUtil::Format(const FS_GUID &guid)
 {
     FS_String str;
-    str.Format("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+    str.AppendFormat("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
                guid.Data1,
                guid.Data2,
                guid.Data3,

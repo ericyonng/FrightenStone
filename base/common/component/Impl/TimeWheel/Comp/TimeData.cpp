@@ -64,7 +64,7 @@ TimeData::~TimeData()
 FS_String TimeData::ToString() const
 {
     FS_String info;
-    info.Format("timeData: _expiredTime:%lld fmt:%s\n|_isCancel:%d|_timeWheelUniqueId:%lld|"
+    info.AppendFormat("timeData: _expiredTime:%lld fmt:%s\n|_isCancel:%d|_timeWheelUniqueId:%lld|"
                 "_period:%lld"
                 , _expiredTime.GetMicroTimestamp()
                 , _expiredTime.ToString().c_str()

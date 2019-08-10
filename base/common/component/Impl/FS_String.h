@@ -181,10 +181,10 @@ private:
     #pragma region format
 public:
     template<typename... Args>
-    FS_String &Format(const char *fmt, Args&&... rest);
+    FS_String &AppendFormat(const char *fmt, Args&&... rest);
     template< typename... Args>
     FS_String &Append(Args&&... rest);
-    FS_String &FormatCStyle(const char *fmt, ...);
+    FS_String &AppendFormatCStyle(const char *fmt, ...);
 
     // 兼容格式字符串中没有占位符情况
     template<typename... Args>

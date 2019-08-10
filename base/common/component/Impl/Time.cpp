@@ -405,7 +405,7 @@ const FS_String &Time::ToString() const
 
     auto &repr = *_GetCache(true);
     auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);    
-    return repr.Format("%s.%06d", cache2->c_str(), localTime%_microSecondPerSecond);
+    return repr.AppendFormat("%s.%06d", cache2->c_str(), localTime%_microSecondPerSecond);
 }
 
 const FS_String &Time::ToStringOfMillSecondPrecision() const
@@ -418,7 +418,7 @@ const FS_String &Time::ToStringOfMillSecondPrecision() const
 
     auto &repr = *_GetCache(true);
     auto localTime = _rawTime - static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
-    return repr.Format("%s.%03d", cache2->c_str(), localTime%_microSecondPerSecond / _microSecondPerMilliSecond);
+    return repr.AppendFormat("%s.%03d", cache2->c_str(), localTime%_microSecondPerSecond / _microSecondPerMilliSecond);
 }
 
 Time::Time(Int64 microSecTimestamp)

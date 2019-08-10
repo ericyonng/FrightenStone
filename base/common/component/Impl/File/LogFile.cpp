@@ -62,11 +62,11 @@ void LogFile::PartitionFile(bool isSysFirstCreate)
 
     // 查找不存在的文件名
     FS_String wholeName;
-    wholeName.Format("%sOld%d", fileNameCache.c_str(), ++_partNo);
+    wholeName.AppendFormat("%sOld%d", fileNameCache.c_str(), ++_partNo);
     while(FS_FileUtil::IsFileExist(wholeName.c_str()))
     {
         wholeName.Clear();
-        wholeName.Format("%sOld%d", fileNameCache.c_str(), ++_partNo);
+        wholeName.AppendFormat("%sOld%d", fileNameCache.c_str(), ++_partNo);
     }
 
     // 转储文件

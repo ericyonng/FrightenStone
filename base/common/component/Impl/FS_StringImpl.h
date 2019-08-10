@@ -367,9 +367,9 @@ void FS_String::_append_fmt_str(const Byte8 *fmtstr, Int16 bufferSize, const T &
 }
 
 template<typename... Args>
-inline FS_String &FS_String::Format(const char *fmt, Args&&... rest)
+inline FS_String &FS_String::AppendFormat(const char *fmt, Args&&... rest)
 {
-    return FormatCStyle(fmt, std::forward<Args>(rest)...);
+    return AppendFormatCStyle(fmt, std::forward<Args>(rest)...);
 
 //     UInt64 firstIndex = 0, nextIndex = 0;
 //     AppendFirstValidPlaceHolderString(fmt, firstIndex, _buffer);

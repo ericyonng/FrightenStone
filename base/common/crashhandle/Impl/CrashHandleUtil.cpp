@@ -119,18 +119,18 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, FS_String &backTrace)
         IMAGEHLP_LINE64 lineInfo = {sizeof(IMAGEHLP_LINE64)};
         if(::SymGetLineFromAddr64(curProc, stackFrame64.AddrPC.Offset, &symDisplacement, &lineInfo))
         {
-            backTraces.push_back(FS_String().Format("0x%x in %s at %s:%d",
+            backTraces.push_back(FS_String().AppendFormat("0x%x in %s at %s:%d",
                 (void *)symbol->Address, symbol->Name, lineInfo.FileName, lineInfo.LineNumber));
         }
         else
         {
-            backTraces.push_back(FS_String().Format("0x%x in %s at %s:%d",
+            backTraces.push_back(FS_String().AppendFormat("0x%x in %s at %s:%d",
                 (void *)symbol->Address, symbol->Name, "", 0));
         }
     }
 
     for(size_t i = 0; i < backTraces.size(); i++)
-        backTrace.Format("#%d %s\n", backTraces.size() - i - 1, backTraces[i].c_str());
+        backTrace.AppendFormat("#%d %s\n", backTraces.size() - i - 1, backTraces[i].c_str());
 }
 
 static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
@@ -163,11 +163,11 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
 
     FS_String errMsg;
     errMsg << "Unhandled exception!\n";
-    errMsg.Format("Mini dump file path:%s\n", __dumpFileName.c_str());
+    errMsg.AppendFormat("Mini dump file path:%s\n", __dumpFileName.c_str());
 
     FS_String backTrace;
     __GetExceptionBackTrace(cache.ContextRecord, backTrace);
-    errMsg.Format("\nStack BackTrace:\n%s", backTrace.c_str());
+    errMsg.AppendFormat("\nStack BackTrace:\n%s", backTrace.c_str());
     g_Log->crash("\n[ ******** crash info ******** ]%s\n[ ******** End ******** ]\n", errMsg.c_str());
 
     return EXCEPTION_EXECUTE_HANDLER;
@@ -221,7 +221,7 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
     Time nowTime;
     nowTime.FlushTime();
     fileName = fileNameExt[0];
-    fileName.Format("_%d%02d%02d_%02d%02d%02d_%06d_%s"
+    fileName.AppendFormat("_%d%02d%02d_%02d%02d%02d_%06d_%s"
                     , nowTime.GetLocalYear()
                     , nowTime.GetLocalMonth()
                     , nowTime.GetLocalDay()
@@ -321,12 +321,12 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
         IMAGEHLP_LINE64 &imgHelpLine64 = win32ImgHelpLine64;
         if(::SymGetLineFromAddr64(curProc, symbol->Address, &displacement, &imgHelpLine64) == TRUE)
         {
-            backTrace.Format("#%d 0x%x in %s at %s:%d", frames - frame - 1, (void *)symbol->Address,
+            backTrace.AppendFormat("#%d 0x%x in %s at %s:%d", frames - frame - 1, (void *)symbol->Address,
                                     symbol->Name, imgHelpLine64.FileName, imgHelpLine64.LineNumber);
         }
         else
         {
-            backTrace.Format("#%d 0x%x in %s at %s:%d", frames - frame - 1,
+            backTrace.AppendFormat("#%d 0x%x in %s at %s:%d", frames - frame - 1,
                 (void *)symbol->Address, symbol->Name, "", 0);
         }
 
@@ -340,7 +340,7 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
     {
         for(int i = skipFrames; i < frames; i++)
         {
-            backTrace.Format("#%d ", frames - i - 1);
+            backTrace.AppendFormat("#%d ", frames - i - 1);
 
             char *parenthesisEnd = NULL;
             char *parenthesisBeg = strchr(strs[i], '(');
@@ -372,12 +372,12 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
                 }
                 else
                 {
-                    backTrace.Format("%s", strs[i]);
+                    backTrace.AppendFormat("%s", strs[i]);
                 }
             }
             else
             {
-                backTrace.Format("%s", strs[i]);
+                backTrace.AppendFormat("%s", strs[i]);
             }
 
             if(i != frames - 1)
