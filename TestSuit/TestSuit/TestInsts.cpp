@@ -57,8 +57,9 @@
 #include "TestSuit/TestSuit/TestInst/TestMathUtil.h"
 #include "TestSuit/TestSuit/TestInst/TestIocpExample.h"
 #include "TestSuit/TestSuit/TestInst/TestEvent.h"
+#include "TestSuit/TestSuit/TestInst/TestServer.h"
 
 void TestInsts::Run()
 {
-    TestCrashHandle::Run();
+    TestServer::Run();
 }

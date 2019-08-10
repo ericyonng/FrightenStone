@@ -96,12 +96,18 @@
     <ClInclude Include="TestInsts.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TestInst\TestServer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TestInsts.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TestInst\TestServer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

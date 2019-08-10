@@ -91,6 +91,7 @@ public:
     SOCKET GetSocket() const;
     bool HasRecvMsg() const;
     bool NeedWrite() const;
+    bool IsDestroy() const;
     #pragma endregion
 
     //////////用于调试的成员变量
@@ -99,10 +100,10 @@ public:
     // 所属serverid
     int _serverId = -1;
     // 测试接收发逻辑用
-    // 用于server检测接收到的消息ID是否连续
+    // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
     int _recvMsgId = 1;
     // 测试接收发逻辑用
-    // 用于client检测接收到的消息ID是否连续
+    // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
     int _sendMsgId = 1;
     ///////////////////////////////////
 

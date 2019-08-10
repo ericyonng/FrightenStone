@@ -223,9 +223,11 @@ void FS_Server::_OnClientMsgArrived()
 
 Int32 FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
 {
+    _eventHandleObj->Lock();
     auto st = _eventHandleObj->OnNetMsg(this, client, header);
     if(st == StatusDefs::Success)
         client->ResetDTHeart();
+    _eventHandleObj->Unlock();
 
     return st;
 }

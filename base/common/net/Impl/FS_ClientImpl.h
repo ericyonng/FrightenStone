@@ -106,5 +106,10 @@ inline bool FS_Client::NeedWrite() const
     return _sendBuff->NeedWrite();
 }
 
+inline bool FS_Client::IsDestroy() const
+{
+    return _sockfd == INVALID_SOCKET;
+}
+
 FS_NAMESPACE_END
 #endif

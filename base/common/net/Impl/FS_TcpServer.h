@@ -76,6 +76,8 @@ public:
     void Start(Int32 msgTransferSvrQuantity);
     virtual void BeforeClose();
     void Close();
+    void Lock();
+    void Unlock();
     #pragma endregion
 
     /* 网络事件 */
@@ -134,9 +136,9 @@ protected:
     std::atomic<Int32> _recvCount;
     // 收到消息计数
     std::atomic<Int32> _recvMsgCount;
-    // 客户端计数
+    // 客户端总共连入计数
     std::atomic<Int32> _clientAcceptCnt;
-    // 已分配客户端计数
+    // 当前保持连接已分配客户端计数
     std::atomic<Int32> _clientJoinedCnt;
 
     Locker _locker;

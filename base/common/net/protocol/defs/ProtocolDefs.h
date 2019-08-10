@@ -61,17 +61,17 @@ public:
     enum
     {
         CMD_Begin = 0,              // 
-        LoginReq = 1,               // 
+        LoginReq = 10,               // 
         LoginNty = 2,               // 
-        LoginRes = 3,               // 
-        LogoutReq = 4,              // 
-        LogoutNty = 5,              // 
+        LoginRes = 11,               // 
+        LogoutReq = 12,              // 
+        LogoutNty = 13,              // 
         LogoutRes = 6,              // 
         CreatePlayerReq = 7,        // 
         CreatePlayerRes = 8,        // 
         CreatePlayerNty = 9,        // 
-        CheckHeartReq = 10,         // 客户端心跳包
-        CheckHeartRes = 11,         // 心跳包反馈，按理不用反馈给客户端减少服务端压力
+        CheckHeartReq = 15,         // 客户端心跳包
+        CheckHeartRes = 16,         // 心跳包反馈，按理不用反馈给客户端减少服务端压力
         CMD_End,
     };
 };
@@ -91,14 +91,18 @@ struct BASE_EXPORT LoginReq : public NetMsg_DataHeader
     LoginReq();
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
+    char _data[28];
+    Int32 _msgId;
 };
 
 struct BASE_EXPORT LoginRes : public NetMsg_DataHeader
 {
     OBJ_POOL_CREATE(LoginRes, _objPoolHelper);
     LoginRes();
-    char _userName[MAX_NAME_LEN];
-    Int32 _status;
+
+    Int32 result;
+    char data[88];
+    Int32 _msgId;
 };
 
 struct BASE_EXPORT LoginNty : public NetMsg_DataHeader

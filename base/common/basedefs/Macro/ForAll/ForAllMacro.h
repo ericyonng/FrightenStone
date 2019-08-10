@@ -92,10 +92,10 @@ obj = NULL
 #define NULL nullptr
 
 #undef MAX_NAME_LEN
-#define MAX_NAME_LEN 64
+#define MAX_NAME_LEN 32
 
 #undef MAX_PWD_LEN
-#define MAX_PWD_LEN 128
+#define MAX_PWD_LEN 32
 
 #undef MAX_CEIL_WIDE
 #define MAX_CEIL_WIDE 16
