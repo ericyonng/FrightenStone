@@ -55,9 +55,6 @@ LoginRes::LoginRes()
 {
     _packetLength = sizeof(LoginRes);
     _cmd = ProtocolCmd::LoginRes;
-
-    memset(_userName, 0, sizeof(_userName));
-    _status = StatusDefs::Success;
 }
 
 OBJ_POOL_CREATE_IMPL(LoginNty, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)

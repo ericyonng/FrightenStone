@@ -41,6 +41,7 @@
 #include "base\common\net\Impl\FS_MainIocpServer.h"
 #include "base\common\net\Impl\FS_MsgReadStream.h"
 #include "base\common\net\Impl\FS_MsgWriteStream.h"
+#include "base\common\net\Impl\FS_Client.h"
 
 #endif
 

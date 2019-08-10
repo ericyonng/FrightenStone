@@ -55,6 +55,16 @@ void FS_TcpServer::Start(Int32 msgTransferSvrQuantity)
     _threadPool->AddTask(monitorDelegate);
 }
 
+inline void FS_TcpServer::Lock()
+{
+    _locker.Lock();
+}
+
+inline void FS_TcpServer::Unlock()
+{
+    _locker.Unlock();
+}
+
 #pragma region misc
 inline SOCKET FS_TcpServer::_GetSocket()
 {

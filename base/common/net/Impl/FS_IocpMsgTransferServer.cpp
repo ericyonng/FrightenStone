@@ -79,7 +79,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer()
             auto ioData = client->MakeSendIoData();
             if(ioData)
             {
-                if(!_iocpClientMsgTransfer->PostSend(ioData))
+                if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
                 {
                     _OnClientLeave(client);
                     iter = _socketRefClients.erase(iter);
@@ -90,7 +90,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer()
             ioData = client->MakeRecvIoData();
             if(ioData)
             {
-                if(!_iocpClientMsgTransfer->PostRecv(ioData))
+                if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
                     _OnClientLeave(client);
                     iter = _socketRefClients.erase(iter);
@@ -102,7 +102,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer()
             auto ioData = client->MakeRecvIoData();
             if(ioData)
             {
-                if(!_iocpClientMsgTransfer->PostRecv(ioData))
+                if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
                     _OnClientLeave(client);
                     iter = _socketRefClients.erase(iter);
@@ -118,7 +118,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer()
     while(true)
     {
         int ret = _ListenIocpNetEvents();
-        if(ret == StatusDefs::WaitEventTimeOut)
+        if(ret == StatusDefs::IOCP_WaitTimeOut)
             return StatusDefs::Success;
         else if(ret != StatusDefs::Success)
             return ret;
@@ -173,7 +173,13 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
 
         FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
         if(client)
+        {
+            // ÅÐ¶ÏÊÇ·ñ¶Ï¿ª
+            if(client->IsDestroy())
+                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("client is destroy"));
+
             client->OnSend2iocp(_ioEvent->_bytesTrans);
+        }
     }
     else 
     {

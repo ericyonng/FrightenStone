@@ -97,7 +97,7 @@ void FS_NetBuffer::Pop(Int32 len)
     Int32 n = _lastPos - len;
     if(n > 0)
         memcpy(_buff, _buff + len, n);
-    else
+    else if(n < 0)
     {
         n = 0;
         g_Log->e<FS_NetBuffer>(_LOGFMT_("n is negative lastPos[%d] len[%d]"),

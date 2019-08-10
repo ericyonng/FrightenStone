@@ -21,43 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_MsgReadStream.h
+ * @file  : TestServer.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/08/10
+ * @date  : 2019/8/10
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_MsgReadStream_H__
-#define __Base_Common_Net_Impl_FS_MsgReadStream_H__
-
+#ifndef __Test_TestServer_H__
+#define __Test_TestServer_H__
 #pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_Stream.h"
-#include "base/common/net/protocol/protocol.h"
-#include "base/common/objpool/objpool.h"
+#include "stdafx.h"
 
-FS_NAMESPACE_BEGIN
-
-// 消息数据字节流
-class BASE_EXPORT FS_MsgReadStream :public FS_Stream
+class TestServer
 {
-    OBJ_POOL_CREATE(FS_MsgReadStream, _objPoolHelper);
 public:
-    FS_MsgReadStream(NetMsg_DataHeader *header);
-    FS_MsgReadStream(char *data, Int32 size, bool isDelete = false);
-    virtual ~FS_MsgReadStream();
-
-public:
-    UInt16 GetNetMsgCmd();
+    static void Run();
 };
-
-
-FS_NAMESPACE_END
-
-#include "base/common/net/Impl/FS_MsgReadStreamImpl.h"
 
 #endif

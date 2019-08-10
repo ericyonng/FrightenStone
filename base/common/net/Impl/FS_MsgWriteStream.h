@@ -43,7 +43,7 @@
 FS_NAMESPACE_BEGIN
 
 // 消息数据字节流 字节流结构：buff = [长度] + [字节流区]
-class FS_MsgWriteStream :public FS_Stream
+class BASE_EXPORT FS_MsgWriteStream :public FS_Stream
 {
     OBJ_POOL_CREATE_DEF(FS_MsgWriteStream);
 public:

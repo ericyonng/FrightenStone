@@ -60,6 +60,9 @@ public:
     virtual void OnPrepareNetRecv(FS_Client *client) = 0;
     // 释放接口
     virtual void Release() = 0;
+    // 线程安全
+    virtual void Lock() = 0;
+    virtual void Unlock() = 0;
 private:
 
 };

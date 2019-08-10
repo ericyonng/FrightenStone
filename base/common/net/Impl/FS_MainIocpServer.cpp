@@ -98,7 +98,7 @@ void FS_MainIocpServer::_OnNetMonitorTask(const FS_ThreadPool *pool)
 
         // ¼àÌýiocp
         auto ret = listenIocp->WaitForCompletion(ioEvent, 1);
-        if(ret == StatusDefs::WaitEventTimeOut)
+        if(ret == StatusDefs::IOCP_WaitTimeOut)
             continue;
 
         // ³ö´í
