@@ -316,7 +316,7 @@ void TcpServer::OnNetMsg(MYSOCKET socket, fs::NetMsg_DataHeader *header)
 
             // res
             fs::LoginRes res;
-            memcpy(res._userName, login->_userName, sizeof(login->_userName));
+            //memcpy(res._userName, login->_userName, sizeof(login->_userName));
             SendData(socket, &res);
         }
         break;
