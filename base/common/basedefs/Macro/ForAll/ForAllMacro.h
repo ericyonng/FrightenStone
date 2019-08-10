@@ -77,7 +77,7 @@ p = NULL;}
 #define Fs_Malloc(type, size)             (reinterpret_cast<type *>(malloc(size)))
 #define Fs_Calloc(type, size)             (reinterpret_cast<type *>(calloc(size, 1)))
 #define Fs_Realloc(type, memblock, size)  (reinterpret_cast<type *>(realloc((memblock), (size))))
-#define Fs_Free(memblock)                 delete(memblock)
+#define Fs_Free(memblock)                 delete memblock
 #define Fs_SafeFree(memblock)        \
         (memblock?(Fs_Free(memblock), memblock = NULL):NULL)
 #define FS_Release(obj)                     \

@@ -37,7 +37,7 @@
  //SOCKET
 #ifdef _WIN32
 #undef FD_SETSIZE
-#define FD_SETSIZE      65535
+#define FD_SETSIZE      100000
 #define WIN32_LEAN_AND_MEAN
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
@@ -66,7 +66,7 @@
 
 
 // 客户端心跳检测死亡计时时间(单位ms)
-#define CLIENT_HREAT_DEAD_TIME 120000
+#define CLIENT_HREAT_DEAD_TIME 120000000
 // 在间隔指定时间后才允许发送(单位ms)
 #define CLIENT_SEND_BUFF_TIME 200
 

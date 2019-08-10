@@ -238,16 +238,16 @@ void FS_TcpServer::Close()
 void FS_TcpServer::OnNetJoin(FS_Client *client)
 {
     ++_clientJoinedCnt;
-    g_Log->net("client<%d> join", client->GetSocket());
-    g_Log->sys(_LOGFMT_("client<%d> join"), client->GetSocket());
+//     g_Log->net("client<%d> join", client->GetSocket());
+//     g_Log->sys(_LOGFMT_("client<%d> join"), client->GetSocket());
 }
 
 void FS_TcpServer::OnNetLeave(FS_Client *client)
 {
     --_clientAcceptCnt;
     --_clientJoinedCnt;
-    g_Log->net("client<%d> leave", static_cast<Int32>(client->GetSocket()));
-    g_Log->sys(_LOGFMT_("client<%d> leave"), static_cast<Int32>(client->GetSocket()));
+//     g_Log->net("client<%d> leave", static_cast<Int32>(client->GetSocket()));
+//     g_Log->sys(_LOGFMT_("client<%d> leave"), static_cast<Int32>(client->GetSocket()));
 }
 
 Int32 FS_TcpServer::OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header)
@@ -281,7 +281,7 @@ void FS_TcpServer::_StatisticsMsgPerSecond()
     const auto slice = nowTime - _msgCountTime;
     if(slice.GetTotalSeconds() >= 1)
     {
-        g_Log->net("thread<%d>,timeSlice<%d>,socket<%d>,Accept<%d>,Join<%d>,recv<%d>,msg<%d>"
+        g_Log->any("thread<%d>,timeSlice<%d>,socket<%d>,Accept<%d>,Join<%d>,recv<%d>,msg<%d>"
                    , static_cast<Int32>(_fsServers.size())
                    , slice.GetTotalSeconds()
                    , static_cast<Int32>(_sock)
