@@ -134,15 +134,25 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
         // TODO:心跳检测优化
         _DetectClientHeartTime();
-        auto st = _BeforeClientMsgTransfer();
+        auto st = _BeforeClientMsgTransfer(_delayRemoveClients);
         if(st != StatusDefs::Success)
         {
-            g_Log->net("FS_Server_OnClientStatusDirtied: st[%d] ", st);
+            g_Log->net("FS_Server _BeforeClientMsgTransfer: st[%d] ", st);
+
+            // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
+            for(auto &client : _delayRemoveClients)
+                _OnClientLeave(client);
+            _delayRemoveClients.clear();
             break;
         }
 
         // 客户端消息到达
         _OnClientMsgArrived();
+
+        // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
+        for(auto &client : _delayRemoveClients)
+            _OnClientLeave(client);
+        _delayRemoveClients.clear();
     }
 
     // 退出则清理客户端
@@ -172,9 +182,11 @@ void FS_Server::_DetectClientHeartTime()
             if(client->IsPostIoChange())
                 client->Destroy();
             else
-                _OnClientLeave(client);
+                _delayRemoveClients.insert(client);
+                // _OnClientLeave(client);
 #else
-            _OnClientLeave(client);
+            // _OnClientLeave(client);
+            _delayRemoveClients.insert(client);
 #endif // CELL_USE_IOCP
             iter = _socketRefClients.erase(iter);
             continue;

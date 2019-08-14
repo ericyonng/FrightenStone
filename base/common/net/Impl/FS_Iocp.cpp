@@ -267,13 +267,13 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
 
         if(ERROR_CONNECTION_ABORTED == error)
         {// TODO:这个错误码要不要处理
-            g_Log->w<FS_Iocp>(_LOGFMT_("WaitForMessage error<%d> status<%d>")
+            g_Log->w<FS_Iocp>(_LOGFMT_("WaitForMessage invalid client socket error<%d> status<%d>")
                               , error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
         if(ERROR_SEM_TIMEOUT == error)
-        {// TODO:这个错误码要不要处理
-            g_Log->w<FS_Iocp>(_LOGFMT_("WaitForMessage error<%d> status<%d>")
+        {// TODO:这个错误码要不要处理 压力过大可以重新投递相应的数据
+            g_Log->w<FS_Iocp>(_LOGFMT_("pressure is too large for this machine. please improve machine performance or expand net card bandwidth error<%d> status<%d>")
                               , error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
