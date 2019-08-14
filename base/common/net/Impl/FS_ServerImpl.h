@@ -64,7 +64,10 @@ inline void FS_Server::AddClient(FS_Client *client)
 #pragma endregion
 
 #pragma region net message handle
-
+inline void FS_Server::_RmClient(FS_Client *client)
+{
+    _delayRemoveClients.insert(client);
+}
 #pragma endregion
 
 FS_NAMESPACE_END

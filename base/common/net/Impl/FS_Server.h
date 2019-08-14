@@ -99,9 +99,10 @@ public:
     */
 protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
-    virtual Int32 _BeforeClientMsgTransfer() = 0;
+    virtual Int32 _BeforeClientMsgTransfer(std::set<FS_Client *> &delayDestroyClients) = 0;
     // TODO:心跳优化
     void _DetectClientHeartTime();
+    void _RmClient(FS_Client *client);
     void _OnClientLeave(FS_Client *client);
     virtual void _OnClientJoin(FS_Client *client);
     void _OnPrepareNetRecv(FS_Client *client);
@@ -124,8 +125,9 @@ private:
     INetEvent *_eventHandleObj = NULL;    // 内部不释放
     // 旧的时间戳
     Time _lastHeartDetectTime = Time::Now();
-    //
+    // 线程
     FS_ThreadPool *_threadPool;
+    std::set<FS_Client *> _delayRemoveClients;
 protected:
     // 服务id
     Int32 _id = -1;
