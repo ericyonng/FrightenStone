@@ -54,6 +54,8 @@ FS_TcpServer::FS_TcpServer()
     ,_clientAcceptCnt{0}
     ,_clientJoinedCnt{0}
     ,_clientMaxId{0}
+    ,_leaveClientCnt(0)
+    ,_joinClientCnt(0)
 {
     // TODO:¶ÁÈ¡ÅäÖÃ
     _sendBuffSize = SEND_BUFF_SZIE;
@@ -238,7 +240,11 @@ void FS_TcpServer::Close()
 void FS_TcpServer::OnNetJoin(FS_Client *client)
 {
     ++_clientJoinedCnt;
-//     g_Log->net("client<%d> join", client->GetSocket());
+    _locker.Lock();
+    ++_joinClientCnt;
+    Int64 joinClientCnt = _joinClientCnt;
+    _locker.Unlock();
+    g_Log->net("client _joinClientCnt<%lld>", joinClientCnt);
 //     g_Log->sys(_LOGFMT_("client<%d> join"), client->GetSocket());
 }
 
@@ -246,6 +252,11 @@ void FS_TcpServer::OnNetLeave(FS_Client *client)
 {
     --_clientAcceptCnt;
     --_clientJoinedCnt;
+    _locker.Lock();
+    ++_leaveClientCnt;
+    Int64 leaveClientCnt = _leaveClientCnt;
+    _locker.Unlock();
+    g_Log->net("client _leaveClientCnt<%lld>", leaveClientCnt);
 //     g_Log->net("client<%d> leave", static_cast<Int32>(client->GetSocket()));
 //     g_Log->sys(_LOGFMT_("client<%d> leave"), static_cast<Int32>(client->GetSocket()));
 }

@@ -180,7 +180,10 @@ void FS_Server::_DetectClientHeartTime()
         {
 #ifdef FS_USE_IOCP
             if(client->IsPostIoChange())
+            {
                 client->Destroy();
+                _delayRemoveClients.insert(client);
+            }
             else
                 _delayRemoveClients.insert(client);
                 // _OnClientLeave(client);

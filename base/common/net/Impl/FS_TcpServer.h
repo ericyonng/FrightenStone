@@ -143,6 +143,8 @@ protected:
 
     Locker _locker;
     std::atomic<Int64> _clientMaxId;
+    Int64 _leaveClientCnt;
+    Int64 _joinClientCnt;
     #pragma endregion
 };
 
