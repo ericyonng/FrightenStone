@@ -407,6 +407,10 @@ void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
     // 内存泄漏信息
     g_MemleakMonitor->PrintMemleakInfo();
 
+    // 系统内存情况
+    g_Log->sys(_LOGFMT_("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]")
+               , SystemUtil::GetTotalPhysMemSize(), SystemUtil::GetAvailPhysMemSize(), SystemUtil::GetMemoryLoad());
+
     // 弹窗堆栈信息
     FS_String path;
     SystemUtil::GetProgramPath(true, path);

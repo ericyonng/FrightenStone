@@ -114,7 +114,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<FS_Client *> &
             }
         }
 
-        iter++;
+        ++iter;
     }
 
     // 2.iocp等待消息完成直到timeout或error为止
@@ -123,15 +123,12 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<FS_Client *> &
     {
         ret = _ListenIocpNetEvents();
         if(ret == StatusDefs::IOCP_WaitTimeOut)
-        {
-            ret = StatusDefs::Success;
-            break;
-        }
+            return StatusDefs::Success;
         else if(ret != StatusDefs::Success)
-            break;
+            return ret;
     }
 
-    return ret;
+    return StatusDefs::Success;
 }
 
 Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
