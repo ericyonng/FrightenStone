@@ -125,6 +125,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         // 如果没有需要处理的客户端，就跳过
         if(_socketRefClients.empty())
         {
+            // 使用wait
             SocketUtil::Sleep(1);
 
             // 旧的时间戳
