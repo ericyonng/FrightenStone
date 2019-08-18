@@ -48,15 +48,15 @@ FS_Server::FS_Server()
 
 FS_Server::~FS_Server()
 {
-    g_Log->net("FS_Server%d.~FS_Server exit begin", _id);
-    g_Log->sys(_LOGFMT_( "FS_Server%d.~FS_Server exit begin"), _id);
+    g_Log->net<FS_Server>("FS_Server%d.~FS_Server exit begin", _id);
+    g_Log->sys<FS_Server>(_LOGFMT_( "FS_Server%d.~FS_Server exit begin"), _id);
     Close();
     _locker.Lock();
     STLUtil::DelMapContainer(_socketRefClients);
     STLUtil::DelVectorContainer(_clientsCache);
     _locker.Unlock();
-    g_Log->net("FS_Server%d.~FS_Server exit begin", _id);
-    g_Log->sys(_LOGFMT_("FS_Server%d.~FS_Server exit begin"), _id);
+    g_Log->net<FS_Server>("FS_Server%d.~FS_Server exit begin", _id);
+    g_Log->sys<FS_Server>(_LOGFMT_("FS_Server%d.~FS_Server exit begin"), _id);
     Fs_SafeFree(_threadPool);
 }
 
@@ -94,11 +94,11 @@ void FS_Server::BeforeClose()
 void FS_Server::Close()
 {
     BeforeClose();
-    g_Log->net("FS_Server%d.Close begin", _id);
-    g_Log->sys(_LOGFMT_("FS_Server%d.Close begin"), _id);
+    g_Log->net<FS_Server>("FS_Server%d.Close begin", _id);
+    g_Log->sys<FS_Server>(_LOGFMT_("FS_Server%d.Close begin"), _id);
     _threadPool->Clear();
-    g_Log->net("FS_Server%d.Close end", _id);
-    g_Log->sys(_LOGFMT_("FS_Server%d.Close end"), _id);
+    g_Log->net<FS_Server>("FS_Server%d.Close end", _id);
+    g_Log->sys<FS_Server>(_LOGFMT_("FS_Server%d.Close end"), _id);
 }
 #pragma endregion
 
@@ -138,7 +138,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         auto st = _BeforeClientMsgTransfer(_delayRemoveClients);
         if(st != StatusDefs::Success)
         {
-            g_Log->net("FS_Server _BeforeClientMsgTransfer: st[%d] ", st);
+            g_Log->net<FS_Server>("FS_Server _BeforeClientMsgTransfer: st[%d] ", st);
 
             // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
             for(auto &client : _delayRemoveClients)
@@ -167,8 +167,8 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
     // 退出则清理客户端
     _ClearClients();
 
-    g_Log->net("FS_Server%d.OnRun exit", _id);
-    g_Log->sys(_LOGFMT_("FS_Server%d.OnRun exit"), _id);
+    g_Log->net<FS_Server>("FS_Server%d.OnRun exit", _id);
+    g_Log->sys<FS_Server>(_LOGFMT_("FS_Server%d.OnRun exit"), _id);
 }
 
 void FS_Server::_DetectClientHeartTime()
@@ -191,7 +191,7 @@ void FS_Server::_DetectClientHeartTime()
         if(client->IsPostIoChange())
             client->Close();
 
-        g_Log->any("heart beat expired sock[%llu]", client->GetSocket());
+        g_Log->any<FS_Server>("heart beat expired sock[%llu]", client->GetSocket());
         // _OnClientLeave(client);
 #else
         // _OnClientLeave(client);
@@ -199,6 +199,8 @@ void FS_Server::_DetectClientHeartTime()
 #endif // CELL_USE_IOCP
         iterClient = _clientHeartBeatQueue.erase(iterClient);
     }
+
+    g_Log->net<FS_Server>("_AddToHeartBeatQueue heart beat queue cnt[%llu]", _clientHeartBeatQueue.size());
 }
 
 void FS_Server::_OnClientLeave(FS_Client *client)
@@ -207,7 +209,7 @@ void FS_Server::_OnClientLeave(FS_Client *client)
     _clientsChange = true;
     _clientHeartBeatQueue.erase(client);
     // _socketRefClients.erase(client->GetSocket());
-    g_Log->any("_OnClientLeave sock[%llu]", client->GetSocket());
+    g_Log->any<FS_Server>("_OnClientLeave sock[%llu]", client->GetSocket());
     delete client;
 }
 

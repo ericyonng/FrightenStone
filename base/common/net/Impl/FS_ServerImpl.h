@@ -68,9 +68,10 @@ inline void FS_Server::_AddToHeartBeatQueue(FS_Client *client)
 {
     _clientHeartBeatQueue.erase(client);
     _clientHeartBeatQueue.insert(client);
+    g_Log->net<FS_Server>("_AddToHeartBeatQueue heart beat queue cnt[%llu]", _clientHeartBeatQueue.size());
 }
 
-inline void FS_Server::_RmClient(FS_Client *client)
+inline void FS_Server::_DelayRmClient(FS_Client *client)
 {
     if(!client->IsDestroy())
         _delayRemoveClients.insert(client->GetSocket());

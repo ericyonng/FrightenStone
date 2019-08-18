@@ -22,7 +22,7 @@ void ObjPoolMethods::PrintMemleakInfo(const char *objName, size_t nodeCnt, size_
     }
     
     // 打印内存占用信息
-    g_Log->sys(_LOGFMT_("[objpool memory info]: obj name[%s], pool node cnt[%llu] totalObjBlocks[%llu] pool memory bytes occupied[%llu]")
+    g_Log->sys<ObjPoolMethods>(_LOGFMT_("[objpool memory info]: obj name[%s], pool node cnt[%llu] totalObjBlocks[%llu] pool memory bytes occupied[%llu]")
                , objName
                , nodeCnt
                , totalObjBlocks

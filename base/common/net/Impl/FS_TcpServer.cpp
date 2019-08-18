@@ -110,8 +110,8 @@ SOCKET FS_TcpServer::InitSocket()
         g_Log->w<FS_TcpServer>(_LOGFMT_("make reuse of socket failed sock[%d]"), static_cast<Int32>(_sock));
     }
 
-    g_Log->net("create socket<%d> success...", static_cast<Int32>(_sock));
-    g_Log->sys(_LOGFMT_("create socket<%d> success..."), static_cast<Int32>(_sock));
+    g_Log->net<FS_TcpServer>("create socket<%d> success...", static_cast<Int32>(_sock));
+    g_Log->sys<FS_TcpServer>(_LOGFMT_("create socket<%d> success..."), static_cast<Int32>(_sock));
     return _sock;
 }
 
@@ -146,8 +146,8 @@ Int32 FS_TcpServer::Bind(const Byte8 *ip, UInt16 port)
         return StatusDefs::Socket_Error;
     }
 
-    g_Log->net("bind port<%hu> success...", port);
-    g_Log->sys(_LOGFMT_("bind port<%hu> success..."), port);
+    g_Log->net<FS_TcpServer>("bind port<%hu> success...", port);
+    g_Log->sys<FS_TcpServer>(_LOGFMT_("bind port<%hu> success..."), port);
     return StatusDefs::Success;
 }
 
@@ -161,8 +161,8 @@ Int32 FS_TcpServer::Listen(Int32 unconnectQueueLen)
         return StatusDefs::Socket_Error;
     }
 
-    g_Log->net("listen port socket<%d> success...", static_cast<Int32>(_sock));
-    g_Log->sys(_LOGFMT_("listen port socket<%d> success..."), static_cast<Int32>(_sock));
+    g_Log->net<FS_TcpServer>("listen port socket<%d> success...", static_cast<Int32>(_sock));
+    g_Log->sys<FS_TcpServer>(_LOGFMT_("listen port socket<%d> success..."), static_cast<Int32>(_sock));
     return StatusDefs::Success;
 }
 
@@ -212,13 +212,13 @@ void FS_TcpServer::BeforeClose()
 
 void FS_TcpServer::Close()
 {
-    g_Log->net("FS_TcpServer.BeforeClose begin");
-    g_Log->sys(_LOGFMT_("FS_TcpServer.BeforeClose begin"));
+    g_Log->net<FS_TcpServer>("FS_TcpServer.BeforeClose begin");
+    g_Log->sys<FS_TcpServer>(_LOGFMT_("FS_TcpServer.BeforeClose begin"));
 
     BeforeClose();
 
-    g_Log->net("FS_TcpServer.Close begin");
-    g_Log->sys(_LOGFMT_("FS_TcpServer.Close begin"));
+    g_Log->net<FS_TcpServer>("FS_TcpServer.Close begin");
+    g_Log->sys<FS_TcpServer>(_LOGFMT_("FS_TcpServer.Close begin"));
 
     _threadPool->Clear();
     if(_sock != INVALID_SOCKET)
@@ -230,8 +230,8 @@ void FS_TcpServer::Close()
         _sock = INVALID_SOCKET;
     }
 
-    g_Log->net("FS_TcpServer.Close end");
-    g_Log->sys(_LOGFMT_("FS_TcpServer.Close end"));
+    g_Log->net<FS_TcpServer>("FS_TcpServer.Close end");
+    g_Log->sys<FS_TcpServer>(_LOGFMT_("FS_TcpServer.Close end"));
 }
 
 #pragma endregion
@@ -244,7 +244,7 @@ void FS_TcpServer::OnNetJoin(FS_Client *client)
     ++_joinClientCnt;
     Int64 joinClientCnt = _joinClientCnt;
     _locker.Unlock();
-    g_Log->net("client _joinClientCnt<%lld>", joinClientCnt);
+    g_Log->net<FS_TcpServer>("client _joinClientCnt<%lld>", joinClientCnt);
 //     g_Log->sys(_LOGFMT_("client<%d> join"), client->GetSocket());
 }
 
@@ -256,7 +256,7 @@ void FS_TcpServer::OnNetLeave(FS_Client *client)
     ++_leaveClientCnt;
     Int64 leaveClientCnt = _leaveClientCnt;
     _locker.Unlock();
-    g_Log->net("client _leaveClientCnt<%lld>", leaveClientCnt);
+    g_Log->net<FS_TcpServer>("client _leaveClientCnt<%lld>", leaveClientCnt);
 //     g_Log->net("client<%d> leave", static_cast<Int32>(client->GetSocket()));
 //     g_Log->sys(_LOGFMT_("client<%d> leave"), static_cast<Int32>(client->GetSocket()));
 }
@@ -292,7 +292,7 @@ void FS_TcpServer::_StatisticsMsgPerSecond()
     const auto slice = nowTime - _msgCountTime;
     if(slice.GetTotalSeconds() >= 1)
     {
-        g_Log->any("thread<%d>,timeSlice<%d>,socket<%d>,Accept<%d>,Join<%d>,recv<%d>,msg<%d>"
+        g_Log->any<FS_TcpServer>("thread<%d>,timeSlice<%d>,socket<%d>,Accept<%d>,Join<%d>,recv<%d>,msg<%d>"
                    , static_cast<Int32>(_fsServers.size())
                    , slice.GetTotalSeconds()
                    , static_cast<Int32>(_sock)

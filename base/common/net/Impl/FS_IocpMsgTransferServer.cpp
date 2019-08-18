@@ -60,7 +60,7 @@ FS_IocpMsgTransferServer::~FS_IocpMsgTransferServer()
 
 void FS_IocpMsgTransferServer::BeforeClose()
 {
-    g_Log->net("FS_IocpMsgTransferServer%d.BeforeClose begin quit iocp", _id);
+    g_Log->net<FS_IocpMsgTransferServer>("FS_IocpMsgTransferServer%d.BeforeClose begin quit iocp", _id);
     // 退出iocp
     _iocpClientMsgTransfer->PostQuit();
 }
@@ -137,14 +137,14 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
     auto ret = _iocpClientMsgTransfer->WaitForCompletion(*_ioEvent, 1);
     if(ret != StatusDefs::Success)
     {
-        g_Log->net("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
+        g_Log->net<FS_IocpMsgTransferServer>("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
         return ret;
     }
 
     // 处理iocp退出
     if(_ioEvent->_data._code == IocpDefs::IO_QUIT)
     {
-        g_Log->sys(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
+        g_Log->sys<FS_IocpMsgTransferServer>(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
         return StatusDefs::IOCP_Quit;
     }
 

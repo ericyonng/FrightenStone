@@ -179,7 +179,7 @@ Int32 FS_Iocp::PostRecv(IO_DATA_BASE *ioData)
             // 对端关闭
             if(error == WSAECONNRESET)
             {
-                g_Log->net("An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
+                g_Log->net<FS_Iocp>("An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
                            , error, StatusDefs::IOCP_ClientForciblyClosed);
                 return StatusDefs::IOCP_ClientForciblyClosed;
             }
@@ -206,7 +206,7 @@ Int32 FS_Iocp::PostSend(IO_DATA_BASE *ioData)
             // 对端关闭
             if(error == WSAECONNRESET)
             {
-                g_Log->net("An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
+                g_Log->net<FS_Iocp>("An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
                            , error, StatusDefs::IOCP_ClientForciblyClosed);
                 return StatusDefs::IOCP_ClientForciblyClosed;
             }
@@ -250,14 +250,14 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
         const Int32 error = GetLastError();
         if(WAIT_TIMEOUT == error)
         {
-            g_Log->net("WaitForMessage time out error<%d> status[%d]"
+            g_Log->net<FS_Iocp>("WaitForMessage time out error<%d> status[%d]"
                        , error, StatusDefs::IOCP_WaitTimeOut);
             return StatusDefs::IOCP_WaitTimeOut;
         }
 
         if(ERROR_NETNAME_DELETED == error)
         {
-            g_Log->net("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
+            g_Log->net<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
                        , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
             // 此时ioevent的数据被正确的填充，只是ioEvent._bytesTrans<=0这个事件可以在recv事件做处理
             // closesocket(ioEvent._ioData->_sock);

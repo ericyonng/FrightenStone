@@ -40,6 +40,7 @@
 #include "base/common/component/Impl/Time.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
 #include "base/common/net/Defs/HeartBeatComp.h"
+#include "base/common/log/Log.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -103,9 +104,8 @@ protected:
     // TODO:ÐÄÌøÓÅ»¯
     void _DetectClientHeartTime();
     void _AddToHeartBeatQueue(FS_Client *client);
-    void _OnClientHeartBeatUpdate(FS_Client *client);
 
-    void _RmClient(FS_Client *client);
+    void _DelayRmClient(FS_Client *client);
     void _OnClientLeave(FS_Client *client);
     virtual void _OnClientJoin(FS_Client *client);
     void _OnPrepareNetRecv(FS_Client *client);

@@ -232,14 +232,14 @@ int Example::Run()
         // 处理iocp退出
         if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys(_LOGFMT_("iocp退出 code=%lld"), ioEvent._data._code);
+            g_Log->sys<Example>(_LOGFMT_("iocp退出 code=%lld"), ioEvent._data._code);
             break;
         }
 
         // 有连接连入
         if(ioEvent._ioData->_ioType == IocpDefs::IO_ACCEPT)
         {
-            g_Log->sys(_LOGFMT_("新客户端连入 sockfd=%llu"), ioEvent._ioData->_sock);
+            g_Log->sys<Example>(_LOGFMT_("新客户端连入 sockfd=%llu"), ioEvent._ioData->_sock);
 
             // 新客户端关联完成端口
             if(StatusDefs::Success != iocp.Reg(ioEvent._ioData->_sock))
@@ -263,14 +263,14 @@ int Example::Run()
             {
                 // 客户端断开
                 // g_Log->e<Example>(_LOGFMT_("recv error socket[%llu], bytesTrans[%d]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
-                g_Log->sys(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                g_Log->sys<Example>(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
                 closesocket(ioEvent._ioData->_sock);
                 iocp.PostAccept(sockServer, ioEvent._ioData);
                 continue;
             }
 
             // 打印接收到的数据
-            g_Log->sys(_LOGFMT_("recv data :socket[%llu], bytesTrans[%d] msgCount[%d]")
+            g_Log->sys<Example>(_LOGFMT_("recv data :socket[%llu], bytesTrans[%d] msgCount[%d]")
                        , ioEvent._ioData->_sock, ioEvent._bytesTrans, ++msgCount);
 
             // 不停的接收数据
@@ -287,14 +287,14 @@ int Example::Run()
             // 客户端断开处理
             if(ioEvent._bytesTrans <= 0)
             {
-                g_Log->sys(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                g_Log->sys<Example>(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
                 closesocket(ioEvent._ioData->_sock);
                 iocp.PostAccept(sockServer, ioEvent._ioData);
                 continue;
             }
 
             // 打印发送的数据
-            g_Log->sys(_LOGFMT_("send data :socket[%llu], bytesTrans[%d] msgCount[%d]")
+            g_Log->sys<Example>(_LOGFMT_("send data :socket[%llu], bytesTrans[%d] msgCount[%d]")
                        , ioEvent._ioData->_sock, ioEvent._bytesTrans, msgCount);
 
             // ioEvent._ioData->_wsaBuff.len = 

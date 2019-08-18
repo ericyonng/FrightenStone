@@ -81,7 +81,7 @@ public:
     void crash(const char *fmt, const Args&... args);
     // 网络日志
     // 请使用便利宏_LOGFMT_ 不支持控制台输出
-    template<typename... Args>
+    template<typename ObjType, typename... Args>
     void net(const char *fmt, const Args&... args);
     // 内存泄漏日志
     // 请使用便利宏_LOGFMT_
@@ -89,9 +89,9 @@ public:
     void memleak(const char *fmt, const Args&... args);
     // 系统分析日志
     // 请使用便利宏_LOGFMT_
-    template<typename... Args>
+    template<typename ObjType, typename... Args>
     void sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename... Args>
+    template<typename ObjType, typename... Args>
     void any(const char *fmt, const Args&... args);
 
     /* 功能函数 */
