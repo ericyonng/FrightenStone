@@ -65,10 +65,9 @@ public:
     *       5. _OnClientJoin - 客户端连入处理
     */
 protected:
-    virtual Int32 _BeforeClientMsgTransfer(std::set<FS_Client *> &delayDestroyClients);
-    Int32 _ListenIocpNetEvents();
-    void _RmClient(FS_Client *client);
-    void _RmClient(IO_EVENT &ioEvent);
+    virtual Int32 _BeforeClientMsgTransfer(std::set<SOCKET> &delayDestroyClients);
+    Int32 _ListenIocpNetEvents(std::set<SOCKET> &delayDestroyClients);
+    void _DelayRmClient(IO_EVENT *ioEvent, std::set<SOCKET> &delayRemoveClients);
     virtual void _OnClientJoin(FS_Client *client);
     #pragma endregion
 

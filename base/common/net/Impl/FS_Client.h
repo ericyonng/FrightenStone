@@ -68,6 +68,7 @@ public:
     void PopFrontMsg();
 
     void ResetDTHeart();
+    void UpdateHeartBeatExpiredTime();
     void ResetDTSend();
     // 心跳检测 心跳检测需要一个set序列
     bool CheckHeart(const TimeSlice &slice);
@@ -87,11 +88,12 @@ public:
     /* 杂项 */
     #pragma region misc
 public:
-    void Destroy();
     SOCKET GetSocket() const;
     bool HasRecvMsg() const;
     bool NeedWrite() const;
     bool IsDestroy() const;
+    const Time &GetHeartBeatExpiredTime() const;
+    void Close();
     #pragma endregion
 
     //////////用于调试的成员变量
@@ -118,6 +120,8 @@ private:
     TimeSlice _heartDeadSlice; // 心跳序列优化使用时间戳TODO
     // 上次发送消息数据的时间 
     TimeSlice _lastSendSlice; // 用于定时发送
+    // 心跳过期时间
+    Time _heartBeatExpiredTime; // 心跳过期时间
 #ifdef FS_USE_IOCP
     bool _isPostRecv = false;
     bool _isPostSend = false;

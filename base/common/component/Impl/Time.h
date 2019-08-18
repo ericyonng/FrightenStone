@@ -101,6 +101,8 @@ public:
     #pragma region 
     const Time &FlushTime();
     const Time &FlushTime(Int64 microSecTime);
+    const Time &FlushAppendTime(const TimeSlice &addSliceBaseOnNowTime);
+    const Time &FlushAppendTime(Int64 addMicroSecBaseOnNowTime);
 
     bool operator ==(const Time &time) const;
     bool operator ==(const Int64 &microSecondTimestamp) const;

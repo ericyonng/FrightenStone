@@ -49,7 +49,8 @@ FS_Client::FS_Client(Int64 clientId
     , _sendBuff(new  FS_NetBuffer(sendSize))
     , _recvBuff(new  FS_NetBuffer(recvSize))
 {
-    ResetDTHeart();
+    UpdateHeartBeatExpiredTime();
+    // ResetDTHeart();
     ResetDTSend();
 }
 
@@ -121,7 +122,7 @@ void FS_Client::OnSend2iocp(Int32 snd)
 }
 #endif
 
-void FS_Client::Destroy()
+void FS_Client::Close()
 {
     if(INVALID_SOCKET != _sockfd)
     {

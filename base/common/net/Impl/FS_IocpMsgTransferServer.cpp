@@ -65,7 +65,7 @@ void FS_IocpMsgTransferServer::BeforeClose()
     _iocpClientMsgTransfer->PostQuit();
 }
 
-Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<FS_Client *> &delayDestroyClients)
+Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delayDestroyClients)
 {
     // 1.遍历post 客户端请求
     FS_Client *client = NULL;
@@ -82,7 +82,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<FS_Client *> &
                 if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
                 {
                     // _OnClientLeave(client);
-                    delayDestroyClients.insert(client);
+                    delayDestroyClients.insert(client->GetSocket());
                     iter = _socketRefClients.erase(iter);
                     continue;
                 }
@@ -94,7 +94,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<FS_Client *> &
                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
                     // _OnClientLeave(client);
-                    delayDestroyClients.insert(client);
+                    delayDestroyClients.insert(client->GetSocket());
                     iter = _socketRefClients.erase(iter);
                     continue;
                 }
@@ -107,7 +107,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<FS_Client *> &
                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
                     // _OnClientLeave(client);
-                    delayDestroyClients.insert(client);
+                    delayDestroyClients.insert(client->GetSocket());
                     iter = _socketRefClients.erase(iter);
                     continue;
                 }
@@ -121,7 +121,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<FS_Client *> &
     Int32 ret = StatusDefs::Success;
     while(true)
     {
-        ret = _ListenIocpNetEvents();
+        ret = _ListenIocpNetEvents(delayDestroyClients);
         if(ret == StatusDefs::IOCP_WaitTimeOut)
             return StatusDefs::Success;
         else if(ret != StatusDefs::Success)
@@ -131,7 +131,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<FS_Client *> &
     return StatusDefs::Success;
 }
 
-Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
+Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDestroyClients)
 {
     auto ret = _iocpClientMsgTransfer->WaitForCompletion(*_ioEvent, 1);
     if(ret != StatusDefs::Success)
@@ -154,7 +154,9 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
         {// 客户端断开处理
             
             //CELLLog_Info("rmClient sockfd=%d, IO_TYPE::RECV bytesTrans=%d", _ioEvent.pIoData->sockfd, _ioEvent.bytesTrans);
-            _RmClient(*_ioEvent);
+            // _RmClient(*_ioEvent);
+            _DelayRmClient(_ioEvent, delayDestroyClients);
+
             return ret;
         }
 
@@ -171,7 +173,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
 
         if(_ioEvent->_bytesTrans <= 0)
         {// 客户端断开处理
-            _RmClient(*_ioEvent);
+            _DelayRmClient(_ioEvent, delayDestroyClients);
             return ret;
         }
 
@@ -193,23 +195,6 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
     return ret;
 }
 
-void FS_IocpMsgTransferServer::_RmClient(FS_Client *client)
-{
-    auto iter = _socketRefClients.find(client->GetSocket());
-    if(iter != _socketRefClients.end())
-        _socketRefClients.erase(iter);
-
-    // 掉线处理
-    // FS_Server::_RmClient(client);
-    _OnClientLeave(client);
-}
-
-void FS_IocpMsgTransferServer::_RmClient(IO_EVENT &ioEvent)
-{
-    FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
-    if(client)
-        _RmClient(client);
-}
 
 void FS_IocpMsgTransferServer::_OnClientJoin(FS_Client *client)
 {

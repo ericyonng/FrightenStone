@@ -882,6 +882,12 @@
     <ClInclude Include="..\common\component\Impl\SingletonAgencyImpl.h">
       <Filter>common\component\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Defs\HeartBeatComp.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Defs\HeartBeatCompImpl.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

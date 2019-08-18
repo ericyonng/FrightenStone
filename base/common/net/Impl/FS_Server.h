@@ -39,10 +39,9 @@
 #include "base/common/net/Interface/INetEvent.h"
 #include "base/common/component/Impl/Time.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
+#include "base/common/net/Defs/HeartBeatComp.h"
 
 FS_NAMESPACE_BEGIN
-
-class BASE_EXPORT FS_Client;
 
 // 服务类
 class BASE_EXPORT FS_Server
@@ -99,13 +98,18 @@ public:
     */
 protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
-    virtual Int32 _BeforeClientMsgTransfer(std::set<FS_Client *> &delayDestroyClients) = 0;
+    virtual Int32 _BeforeClientMsgTransfer(std::set<SOCKET> &delayDestroyClients) = 0;
+    
     // TODO:心跳优化
     void _DetectClientHeartTime();
+    void _AddToHeartBeatQueue(FS_Client *client);
+    void _OnClientHeartBeatUpdate(FS_Client *client);
+
     void _RmClient(FS_Client *client);
     void _OnClientLeave(FS_Client *client);
     virtual void _OnClientJoin(FS_Client *client);
     void _OnPrepareNetRecv(FS_Client *client);
+
     void _OnClientMsgArrived();
     virtual Int32 _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
     #pragma endregion
@@ -115,6 +119,7 @@ protected:
 protected:
     // 正式客户队列 隐患：不严格按照包到达时序处理，若两个包有先后依赖会出问题
     std::map<SOCKET, FS_Client *> _socketRefClients;
+    std::set<FS_Client *, HeartBeatComp> _clientHeartBeatQueue;
 
 private:
     // 缓冲客户队列
@@ -127,7 +132,7 @@ private:
     Time _lastHeartDetectTime = Time::Now();
     // 线程
     FS_ThreadPool *_threadPool;
-    std::set<FS_Client *> _delayRemoveClients;
+    std::set<SOCKET> _delayRemoveClients;
 protected:
     // 服务id
     Int32 _id = -1;
