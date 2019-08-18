@@ -324,6 +324,8 @@
     <ClInclude Include="..\common\net\Defs\FS_NetBuffer.h" />
     <ClInclude Include="..\common\net\Defs\FS_NetBufferImpl.h" />
     <ClInclude Include="..\common\net\Defs\FS_NetDefs.h" />
+    <ClInclude Include="..\common\net\Defs\HeartBeatComp.h" />
+    <ClInclude Include="..\common\net\Defs\HeartBeatCompImpl.h" />
     <ClInclude Include="..\common\net\Defs\IocpDefs.h" />
     <ClInclude Include="..\common\net\Impl\FS_Client.h" />
     <ClInclude Include="..\common\net\Impl\FS_ClientImpl.h" />

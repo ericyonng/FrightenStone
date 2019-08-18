@@ -31,4 +31,20 @@
  */
 #ifdef __Base_Common_Net_Impl_FS_IocpMsgTransferServer_H__
 #pragma once
+
+FS_NAMESPACE_BEGIN
+
+inline void FS_IocpMsgTransferServer::_DelayRmClient(IO_EVENT *ioEvent, std::set<SOCKET> &delayRemoveClients)
+{
+    FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
+    if(!client)
+        return;
+
+    // µôÏß´¦Àí
+    if(!client->IsDestroy())
+        delayRemoveClients.insert(client->GetSocket());
+}
+
+FS_NAMESPACE_END
+
 #endif

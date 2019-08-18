@@ -114,6 +114,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             {
                 _socketRefClients[client->GetSocket()] = client;
                 client->_serverId = _id;
+                _AddToHeartBeatQueue(client);
                 _eventHandleObj->OnNetJoin(client);
                 _OnClientJoin(client);
             }
@@ -122,19 +123,17 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             _locker.Unlock();
         }
 
+        // TODO:心跳检测优化
+        _DetectClientHeartTime();
+
         // 如果没有需要处理的客户端，就跳过
         if(_socketRefClients.empty())
         {
             // 使用wait
             SocketUtil::Sleep(1);
-
-            // 旧的时间戳
-            _lastHeartDetectTime.FlushTime();
             continue;
         }
 
-        // TODO:心跳检测优化
-        _DetectClientHeartTime();
         auto st = _BeforeClientMsgTransfer(_delayRemoveClients);
         if(st != StatusDefs::Success)
         {
@@ -142,7 +141,11 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
             // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
             for(auto &client : _delayRemoveClients)
-                _OnClientLeave(client);
+            {
+                auto iterClient = _socketRefClients.find(client);
+                _OnClientLeave(iterClient->second);
+                _socketRefClients.erase(iterClient);
+            }
             _delayRemoveClients.clear();
             break;
         }
@@ -152,7 +155,11 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
         // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
         for(auto &client : _delayRemoveClients)
-            _OnClientLeave(client);
+        {
+            auto iterClient = _socketRefClients.find(client);
+            _OnClientLeave(iterClient->second);
+            _socketRefClients.erase(iterClient);
+        }
         _delayRemoveClients.clear();
     }
 
@@ -165,41 +172,31 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
 void FS_Server::_DetectClientHeartTime()
 {
-    // 当前时间戳
-    const auto &nowTime = Time::Now();
-    auto dt = nowTime - _lastHeartDetectTime;
+    // 更新当前心跳检测时间戳
     _lastHeartDetectTime.FlushTime();
 
-    // 心跳序列优化TODO:使用排序
+    // 遍历心跳过期的客户端
     FS_Client *client = NULL;
-    for(auto iter = _socketRefClients.begin(); iter != _socketRefClients.end(); )
+    for(auto iterClient=_clientHeartBeatQueue.begin();iterClient!=_clientHeartBeatQueue.end();)
     {
-        client = iter->second;
+        client = *iterClient;
+        if(client->GetHeartBeatExpiredTime() > _lastHeartDetectTime)
+            break;
 
-        // 心跳检测
-        if(client->CheckHeart(dt))
-        {
 #ifdef FS_USE_IOCP
-            if(client->IsPostIoChange())
-            {
-                client->Destroy();
-                _delayRemoveClients.insert(client);
-            }
-            else
-                _delayRemoveClients.insert(client);
-                // _OnClientLeave(client);
+        _delayRemoveClients.insert(client->GetSocket());
+
+        // 若有post消息，则先关闭socket，其他情况不用
+        if(client->IsPostIoChange())
+            client->Close();
+
+        g_Log->any("heart beat expired sock[%llu]", client->GetSocket());
+        // _OnClientLeave(client);
 #else
-            // _OnClientLeave(client);
-            _delayRemoveClients.insert(client);
+        // _OnClientLeave(client);
+        _delayRemoveClients.insert(client);
 #endif // CELL_USE_IOCP
-            iter = _socketRefClients.erase(iter);
-            continue;
-        }
-
-        //// 定时发送检测 iocp有定时的发送机制
-        // pClient->checkSend(dt);
-
-        ++iter;
+        iterClient = _clientHeartBeatQueue.erase(iterClient);
     }
 }
 
@@ -207,6 +204,9 @@ void FS_Server::_OnClientLeave(FS_Client *client)
 {
     _eventHandleObj->OnNetLeave(client);
     _clientsChange = true;
+    _clientHeartBeatQueue.erase(client);
+    // _socketRefClients.erase(client->GetSocket());
+    g_Log->any("_OnClientLeave sock[%llu]", client->GetSocket());
     delete client;
 }
 
@@ -242,7 +242,11 @@ Int32 FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
     _eventHandleObj->Lock();
     auto st = _eventHandleObj->OnNetMsg(this, client, header);
     if(st == StatusDefs::Success)
-        client->ResetDTHeart();
+    {
+        client->UpdateHeartBeatExpiredTime();
+        _OnClientHeartBeatUpdate(client);
+    }
+        //client->ResetDTHeart();
     _eventHandleObj->Unlock();
 
     return st;

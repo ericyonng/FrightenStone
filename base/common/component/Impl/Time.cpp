@@ -202,6 +202,22 @@ Time Time::FromTimeStruct(const tm &timeStruct, int milliSecond, int microSecond
                 milliSecond * _microSecondPerMilliSecond + microSecond);
 }
 
+const Time &Time::FlushAppendTime(const TimeSlice &addSliceBaseOnNowTime)
+{
+    _rawTime = std::chrono::system_clock::now().time_since_epoch().count() / _resolutionPerMicroSecond \
+        + addSliceBaseOnNowTime.GetTotalMicroSeconds();
+    _UpdateTimeStructs();
+    return *this;
+}
+
+const Time &Time::FlushAppendTime(Int64 addMicroSecBaseOnNowTime)
+{
+    _rawTime = std::chrono::system_clock::now().time_since_epoch().count() / _resolutionPerMicroSecond \
+        + addMicroSecBaseOnNowTime;
+    _UpdateTimeStructs();
+    return *this;
+}
+
 Time &Time::operator =(const Time &other)
 {
     if(this == &other)

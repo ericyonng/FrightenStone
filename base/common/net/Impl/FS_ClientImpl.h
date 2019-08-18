@@ -36,7 +36,7 @@ FS_NAMESPACE_BEGIN
 
 inline FS_Client::~FS_Client()
 {
-    Destroy();
+    Close();
     FS_Release(_recvBuff);
     FS_Release(_sendBuff);
 }
@@ -81,6 +81,11 @@ inline void FS_Client::ResetDTHeart()
     _heartDeadSlice = 0;
 }
 
+inline void FS_Client::UpdateHeartBeatExpiredTime()
+{
+    _heartBeatExpiredTime.FlushAppendTime(CLIENT_HREAT_DEAD_TIME*Time::_microSecondPerMilliSecond);
+}
+
 inline void FS_Client::ResetDTSend()
 {
     _lastSendSlice = 0;
@@ -109,6 +114,11 @@ inline bool FS_Client::NeedWrite() const
 inline bool FS_Client::IsDestroy() const
 {
     return _sockfd == INVALID_SOCKET;
+}
+
+inline  const Time &FS_Client::GetHeartBeatExpiredTime() const
+{
+    return _heartBeatExpiredTime;
 }
 
 FS_NAMESPACE_END
