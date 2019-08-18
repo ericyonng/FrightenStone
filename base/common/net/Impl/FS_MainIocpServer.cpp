@@ -104,14 +104,14 @@ void FS_MainIocpServer::_OnNetMonitorTask(const FS_ThreadPool *pool)
         // 出错
         if(ret != StatusDefs::Success)
         {
-            g_Log->net("OnNetMonitorTask.WaitForCompletion error ret[%d]", ret);
+            g_Log->net<FS_MainIocpServer>("OnNetMonitorTask.WaitForCompletion error ret[%d]", ret);
             break;
         }
 
         // 处理iocp退出
         if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys(_LOGFMT_("iocp退出 code=%lld"), ioEvent._data._code);
+            g_Log->sys<FS_MainIocpServer>(_LOGFMT_("iocp退出 code=%lld"), ioEvent._data._code);
             break;
         }
 
@@ -160,7 +160,7 @@ SOCKET FS_MainIocpServer::_OnIocpAccept(SOCKET sock)
             // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
             SocketUtil::DestroySocket(sock);
             g_Log->w<FS_MainIocpServer>(_LOGFMT_("Accept to MaxClient[%d]"), _maxClient);
-            g_Log->net("Accept to MaxClient[%d]", _maxClient);
+            g_Log->net<FS_MainIocpServer>("Accept to MaxClient[%d]", _maxClient);
         }
     }
 

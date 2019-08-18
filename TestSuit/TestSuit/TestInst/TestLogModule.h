@@ -57,7 +57,7 @@ public:
 //         logMgr->net<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
 
             g_Log->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
-            g_Log->sys(_LOGFMT_("time:%lld"), nowTime.GetMicroTimestamp());
+            g_Log->sys<TestLogModule>(_LOGFMT_("time:%lld"), nowTime.GetMicroTimestamp());
         nowTime2.FlushTime();
         std::cout << (nowTime2 - nowTime).GetTotalMilliSeconds() << std::endl;
         g_EasyGlobal2->Finish();

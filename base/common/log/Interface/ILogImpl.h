@@ -124,15 +124,16 @@ inline void ILog::crash(const char *fmt, const Args&... args)
     _WriteLog(LogLevel::Crash, LogDefs::_SYSLOG_crash_, newLogData);
 }
 
-template<typename... Args>
+template<typename ObjType, typename... Args>
 inline void ILog::net(const char *fmt, const Args&... args)
 {
     // 构建日志数据
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
-    newLogData->_logToWrite.AppendFormat("%s<%s>: "
+    newLogData->_logToWrite.AppendFormat("%s<%s>[%s]: "
                                    , newLogData->_logTime.ToString().c_str()
-                                   , LogLevel::GetDescription(LogLevel::Net))
+                                   , LogLevel::GetDescription(LogLevel::Net)
+                                   , typeid(ObjType).name())
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Net, LogDefs::_SYSLOG_net_, newLogData);
@@ -152,15 +153,16 @@ inline void ILog::memleak(const char *fmt, const Args&... args)
     _WriteLog(LogLevel::Memleak, LogDefs::_SYSLOG_memleak_, newLogData);
 }
 
-template<typename... Args>
+template<typename ObjType, typename... Args>
 inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
     // 构建日志数据
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
-    newLogData->_logToWrite.AppendFormat("%s<%s>[%s][line:%d]: "
+    newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
                                    , newLogData->_logTime.ToString().c_str()
                                    , LogLevel::GetDescription(LogLevel::Sys)
+                                   , typeid(ObjType).name()
                                    , funcName
                                    , codeLine)
         .AppendFormat(fmt, args...) << FS_String::endl;
@@ -168,15 +170,16 @@ inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, con
     _WriteLog(LogLevel::Sys, LogDefs::_SYSLOG_sys_, newLogData);
 }
 
-template<typename... Args>
+template<typename ObjType, typename... Args>
 inline void ILog::any(const char *fmt, const Args&... args)
 {
     // 构建日志数据
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
-    newLogData->_logToWrite.AppendFormat("%s<%s>: "
+    newLogData->_logToWrite.AppendFormat("%s<%s>[%s]: "
                                          , newLogData->_logTime.ToString().c_str()
-                                         , LogLevel::GetDescription(LogLevel::Any))
+                                         , LogLevel::GetDescription(LogLevel::Any)
+                                         , typeid(ObjType).name())
         .AppendFormat(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Any, LogDefs::_SYSLOG_Any_, newLogData);

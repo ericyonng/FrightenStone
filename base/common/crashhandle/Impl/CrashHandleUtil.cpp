@@ -408,7 +408,7 @@ void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
     g_MemleakMonitor->PrintMemleakInfo();
 
     // 系统内存情况
-    g_Log->sys(_LOGFMT_("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]")
+    g_Log->sys<CrashHandleUtil>(_LOGFMT_("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]")
                , SystemUtil::GetTotalPhysMemSize(), SystemUtil::GetAvailPhysMemSize(), SystemUtil::GetMemoryLoad());
 
     // 弹窗堆栈信息

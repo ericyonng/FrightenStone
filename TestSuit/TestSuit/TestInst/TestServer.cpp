@@ -49,6 +49,7 @@ public:
     {
         fs::FS_TcpServer::OnNetJoin(client);
         Int32 joinedCnt = _clientJoinedCnt;
+        g_Log->net<EasyFSServer>("OnNetJoin joinedcnt[%d]", joinedCnt);
         // g_Log->any("client<%d> joined curJoinedCnt[%d]", (Int32)(client->GetSocket()), joinedCnt);
 //         g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> joined, client joined cnt<%d>")
 //                                , static_cast<Int32>(client->GetSocket()), joinedCnt);

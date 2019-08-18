@@ -107,7 +107,7 @@ void MemleakMonitor::PrintMemleakInfo()
                    , totalMemleakBytes, totalOccupiedBytes);
 
     // 打印系统信息
-    g_Log->sys(_LOGFMT_("memleak monitor: total memleak bytes[%llu] total pool occupied bytes[%lld]")
+    g_Log->sys<MemleakMonitor>(_LOGFMT_("memleak monitor: total memleak bytes[%llu] total pool occupied bytes[%lld]")
                , totalMemleakBytes, totalOccupiedBytes);
 }
 
@@ -131,7 +131,7 @@ void MemleakMonitor::PrintMemleakInfo(const char *objName)
                    ,objName, totalMemleakBytes, totalOccupiedBytes);
 
     // 打印系统信息
-    g_Log->sys(_LOGFMT_("memleak monitor[%s]: memleak bytes[%llu] pool occupied bytes[%lld]")
+    g_Log->sys<MemleakMonitor>(_LOGFMT_("memleak monitor[%s]: memleak bytes[%llu] pool occupied bytes[%lld]")
                ,objName, totalMemleakBytes, totalOccupiedBytes);
 }
 FS_NAMESPACE_END
