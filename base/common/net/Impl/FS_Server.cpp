@@ -114,6 +114,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             {
                 _socketRefClients[client->GetSocket()] = client;
                 client->_serverId = _id;
+                ++_clientJoin;
                 _AddToHeartBeatQueue(client);
                 _eventHandleObj->OnNetJoin(client);
                 _OnClientJoin(client);
@@ -243,8 +244,10 @@ Int32 FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
     auto st = _eventHandleObj->OnNetMsg(this, client, header);
     if(st == StatusDefs::Success)
     {
+        _clientHeartBeatQueue.erase(client);
         client->UpdateHeartBeatExpiredTime();
-        _OnClientHeartBeatUpdate(client);
+        if(!client->IsDestroy())
+            _clientHeartBeatQueue.insert(client);
     }
         //client->ResetDTHeart();
     _eventHandleObj->Unlock();

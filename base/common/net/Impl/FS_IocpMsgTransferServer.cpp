@@ -69,7 +69,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
 {
     // 1.遍历post 客户端请求
     FS_Client *client = NULL;
-    for(auto iter = _socketRefClients.begin(); iter != _socketRefClients.end(); )
+    for(auto iter = _socketRefClients.begin(); iter != _socketRefClients.end(); ++iter)
     {
         client = iter->second;
 
@@ -82,8 +82,9 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
                 if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
                 {
                     // _OnClientLeave(client);
-                    delayDestroyClients.insert(client->GetSocket());
-                    iter = _socketRefClients.erase(iter);
+                    if(!client->IsDestroy())
+                        delayDestroyClients.insert(client->GetSocket());
+                    //iter = _socketRefClients.erase(iter);
                     continue;
                 }
             }
@@ -94,8 +95,9 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
                     // _OnClientLeave(client);
-                    delayDestroyClients.insert(client->GetSocket());
-                    iter = _socketRefClients.erase(iter);
+                    if(!client->IsDestroy())
+                        delayDestroyClients.insert(client->GetSocket());
+                    //iter = _socketRefClients.erase(iter);
                     continue;
                 }
             }
@@ -107,14 +109,13 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
                     // _OnClientLeave(client);
-                    delayDestroyClients.insert(client->GetSocket());
-                    iter = _socketRefClients.erase(iter);
+                    if(!client->IsDestroy())
+                        delayDestroyClients.insert(client->GetSocket());
+                    //iter = _socketRefClients.erase(iter);
                     continue;
                 }
             }
         }
-
-        ++iter;
     }
 
     // 2.iocp等待消息完成直到timeout或error为止

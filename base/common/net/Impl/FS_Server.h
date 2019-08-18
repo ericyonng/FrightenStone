@@ -138,6 +138,7 @@ protected:
     Int32 _id = -1;
     // 客户列表是否有变化
     bool _clientsChange = true;
+    Int32 _clientJoin = 0;
     #pragma endregion
 };
 

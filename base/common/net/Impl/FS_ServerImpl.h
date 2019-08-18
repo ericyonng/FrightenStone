@@ -70,15 +70,10 @@ inline void FS_Server::_AddToHeartBeatQueue(FS_Client *client)
     _clientHeartBeatQueue.insert(client);
 }
 
-inline void FS_Server::_OnClientHeartBeatUpdate(FS_Client *client)
-{
-    _clientHeartBeatQueue.erase(client);
-    _clientHeartBeatQueue.insert(client);
-}
-
 inline void FS_Server::_RmClient(FS_Client *client)
 {
-    _delayRemoveClients.insert(client->GetSocket());
+    if(!client->IsDestroy())
+        _delayRemoveClients.insert(client->GetSocket());
 }
 #pragma endregion
 
