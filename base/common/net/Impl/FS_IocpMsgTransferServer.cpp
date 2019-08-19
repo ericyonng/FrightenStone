@@ -138,6 +138,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
     if(ret != StatusDefs::Success)
     {
         g_Log->net<FS_IocpMsgTransferServer>("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
+        g_Log->any<FS_IocpMsgTransferServer>("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
         return ret;
     }
 
@@ -157,6 +158,8 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
             //CELLLog_Info("rmClient sockfd=%d, IO_TYPE::RECV bytesTrans=%d", _ioEvent.pIoData->sockfd, _ioEvent.bytesTrans);
             // _RmClient(*_ioEvent);
             _DelayRmClient(_ioEvent, delayDestroyClients);
+            FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
+            g_Log->any<FS_IocpMsgTransferServer>("client[%llu] IO_TYPE::RECV bytesTrans[%d]",client?client->GetSocket():0, _ioEvent->_bytesTrans);
 
             return ret;
         }
@@ -175,6 +178,10 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
         if(_ioEvent->_bytesTrans <= 0)
         {// 客户端断开处理
             _DelayRmClient(_ioEvent, delayDestroyClients);
+
+            FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
+            g_Log->any<FS_IocpMsgTransferServer>("client[%llu] IO_TYPE::IO_SEND bytesTrans[%d]", client ? client->GetSocket() : 0, _ioEvent->_bytesTrans);
+
             return ret;
         }
 

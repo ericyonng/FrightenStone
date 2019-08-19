@@ -41,7 +41,7 @@
 
 #pragma region log config options
 #define LOG_THREAD_INTERVAL_MS_TIME 1000        // 日志线程写日志间隔时间
-#define LOG_SIZE_LIMIT  10240000                // 日志尺寸限制10MB
+#define LOG_SIZE_LIMIT  268435456               // 日志尺寸限制256MB
 // #define LOG_SIZE_LIMIT  -1                   // 无限制
 #define ENABLE_OUTPUT_CONSOLE 1                 // 开启控制台打印
 #pragma endregion

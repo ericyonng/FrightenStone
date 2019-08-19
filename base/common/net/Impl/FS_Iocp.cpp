@@ -252,6 +252,8 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
         {
             g_Log->net<FS_Iocp>("WaitForMessage time out error<%d> status[%d]"
                        , error, StatusDefs::IOCP_WaitTimeOut);
+//             g_Log->any<FS_Iocp>("WaitForMessage time out error<%d> status[%d]"
+//                                 , error, StatusDefs::IOCP_WaitTimeOut);
             return StatusDefs::IOCP_WaitTimeOut;
         }
 
@@ -259,6 +261,8 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
         {
             g_Log->net<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
                        , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
+//             g_Log->any<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
+//                                 , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
             // 此时ioevent的数据被正确的填充，只是ioEvent._bytesTrans<=0这个事件可以在recv事件做处理
             // closesocket(ioEvent._ioData->_sock);
             // return StatusDefs::IOCP_IODisconnect;

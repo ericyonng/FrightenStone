@@ -115,6 +115,8 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
                 _socketRefClients[client->GetSocket()] = client;
                 client->_serverId = _id;
                 ++_clientJoin;
+                ++_joinClientCnt;
+                client->UpdateHeartBeatExpiredTime();
                 _AddToHeartBeatQueue(client);
                 _eventHandleObj->OnNetJoin(client);
                 _OnClientJoin(client);
@@ -125,7 +127,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         }
 
         // TODO:心跳检测优化
-        _DetectClientHeartTime();
+        // _DetectClientHeartTime();
 
         // 如果没有需要处理的客户端，就跳过
         if(_socketRefClients.empty())
@@ -135,7 +137,13 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             continue;
         }
 
+        // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
+        Time ts, ts2;
+        ts.FlushTime();
         auto st = _BeforeClientMsgTransfer(_delayRemoveClients);
+        ts2.FlushTime();
+        g_Log->any<FS_Server>("ts before _BeforeClientMsgTransfer[%lld] ts after _BeforeClientMsgTransfer[%lld]"
+                              , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
         if(st != StatusDefs::Success)
         {
             g_Log->net<FS_Server>("FS_Server _BeforeClientMsgTransfer: st[%d] ", st);
@@ -146,13 +154,18 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
                 auto iterClient = _socketRefClients.find(client);
                 _OnClientLeave(iterClient->second);
                 _socketRefClients.erase(iterClient);
+                ++_leaveClientCnt;
             }
             _delayRemoveClients.clear();
             break;
         }
 
         // 客户端消息到达
+        ts.FlushTime();
         _OnClientMsgArrived();
+        ts2.FlushTime();
+        g_Log->any<FS_Server>("ts before _OnClientMsgArrived [%lld] ts after _OnClientMsgArrived[%lld]"
+                   , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
 
         // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
         for(auto &client : _delayRemoveClients)
@@ -160,9 +173,18 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             auto iterClient = _socketRefClients.find(client);
             _OnClientLeave(iterClient->second);
             _socketRefClients.erase(iterClient);
+            ++_leaveClientCnt;
         }
         _delayRemoveClients.clear();
+
+        // 打印当前join的数目以及leave的数目
+        g_Log->any<FS_Server>("joined cnt[%lld] leaved cnt[%lld]"
+                              , _joinClientCnt, _leaveClientCnt);
     }
+
+    // 打印当前join的数目以及leave的数目
+    g_Log->any<FS_Server>("joined cnt[%lld] leaved cnt[%lld]"
+                          , _joinClientCnt, _leaveClientCnt);
 
     // 退出则清理客户端
     _ClearClients();
@@ -185,13 +207,16 @@ void FS_Server::_DetectClientHeartTime()
             break;
 
 #ifdef FS_USE_IOCP
-        _delayRemoveClients.insert(client->GetSocket());
+        auto sock = client->GetSocket();
+        _delayRemoveClients.insert(sock);
 
         // 若有post消息，则先关闭socket，其他情况不用
         if(client->IsPostIoChange())
             client->Close();
 
-        g_Log->any<FS_Server>("heart beat expired sock[%llu]", client->GetSocket());
+        g_Log->any<FS_Server>("heart beat expired sock[%llu] expiredtime[%lld] nowtime[%lld]"
+                              , sock, client->GetHeartBeatExpiredTime().GetMicroTimestamp()
+                              ,_lastHeartDetectTime.GetMicroTimestamp());
         // _OnClientLeave(client);
 #else
         // _OnClientLeave(client);
@@ -200,7 +225,7 @@ void FS_Server::_DetectClientHeartTime()
         iterClient = _clientHeartBeatQueue.erase(iterClient);
     }
 
-    g_Log->net<FS_Server>("_AddToHeartBeatQueue heart beat queue cnt[%llu]", _clientHeartBeatQueue.size());
+    g_Log->net<FS_Server>("_DetectClientHeartTime heart beat queue cnt[%llu]", _clientHeartBeatQueue.size());
 }
 
 void FS_Server::_OnClientLeave(FS_Client *client)
@@ -250,6 +275,11 @@ Int32 FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
         client->UpdateHeartBeatExpiredTime();
         if(!client->IsDestroy())
             _clientHeartBeatQueue.insert(client);
+    }
+    else
+    {
+        g_Log->any<FS_Server>("client sock[%llu] heart beat expired time[%lld] error msg st[%d]"
+                              , client->GetSocket(), client->GetHeartBeatExpiredTime().GetMicroTimestamp(), st);
     }
         //client->ResetDTHeart();
     _eventHandleObj->Unlock();
