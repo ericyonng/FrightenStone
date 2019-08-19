@@ -120,6 +120,7 @@ protected:
     // 正式客户队列 隐患：不严格按照包到达时序处理，若两个包有先后依赖会出问题
     std::map<SOCKET, FS_Client *> _socketRefClients;
     std::set<FS_Client *, HeartBeatComp> _clientHeartBeatQueue;
+    std::set<FS_Client *> _needWriteClients;  // 需要投递消息的客户端 TODO:
 
 private:
     // 缓冲客户队列
@@ -139,6 +140,8 @@ protected:
     // 客户列表是否有变化
     bool _clientsChange = true;
     Int32 _clientJoin = 0;
+    Int64 _leaveClientCnt = 0;
+    Int64 _joinClientCnt = 0;
     #pragma endregion
 };
 
