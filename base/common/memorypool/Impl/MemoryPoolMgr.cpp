@@ -101,10 +101,7 @@ void *MemoryPoolMgr::Alloc(size_t bytes)
     // 判断是否内存池可分配
     if(bytes < __MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_POOL_ALIGN_BYTES__*__MEMORY_POOL_ALIGN_BYTES__)
     {
-        _locker.Lock();
-        auto ptr = _alloctors[bytes]->AllocMemory(bytes);
-        _locker.Unlock();
-        return  ptr;
+        return  _alloctors[bytes]->AllocMemory(bytes);
     }
     else
     {
