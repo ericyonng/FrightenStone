@@ -194,7 +194,7 @@ void TestServer::Run()
     easyServer.InitSocket();
     easyServer.Bind(NULL, 4567);
     easyServer.Listen();
-    easyServer.Start(8);
+    easyServer.Start(1);
     while(1)
     {
         Sleep(1000);
