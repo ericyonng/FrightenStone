@@ -126,9 +126,6 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             _locker.Unlock();
         }
 
-        // TODO:心跳检测优化
-        // _DetectClientHeartTime();
-
         // 如果没有需要处理的客户端，就跳过
         if(_socketRefClients.empty())
         {
@@ -137,11 +134,18 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             continue;
         }
 
+        // TODO:心跳检测优化
+        _DetectClientHeartTime();
+
         // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
         Time ts, ts2;
         ts.FlushTime();
-        auto st = _BeforeClientMsgTransfer(_delayRemoveClients);
+        auto st = _BeforeClientMsgTransfer(_delayRemoveClients);    // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
         ts2.FlushTime();
+        auto sliceofTransfer = ts2 - ts;
+        if(sliceofTransfer.GetTotalMicroSeconds() >= 2 * 1000 * 1000)
+            g_Log->w<FS_Server>(_LOGFMT_("_BeforeClientMsgTransfer tims slice too long[%lld]"), sliceofTransfer.GetTotalMicroSeconds());
+
         g_Log->any<FS_Server>("ts before _BeforeClientMsgTransfer[%lld] ts after _BeforeClientMsgTransfer[%lld]"
                               , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
         if(st != StatusDefs::Success)
@@ -162,8 +166,13 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
         // 客户端消息到达
         ts.FlushTime();
-        _OnClientMsgArrived();
+        _OnClientMsgArrived();    // TODO关于超级流量导致msgarrive执行过长判定为攻击行为，由外部运维处理攻击
         ts2.FlushTime();
+
+        auto sliceofMsgArrived = ts2 - ts;
+        if(sliceofMsgArrived.GetTotalMicroSeconds() >= 2 * 1000 * 1000)
+            g_Log->w<FS_Server>(_LOGFMT_("_OnClientMsgArrived tims slice too long[%lld]"), sliceofMsgArrived.GetTotalMicroSeconds());
+
         g_Log->any<FS_Server>("ts before _OnClientMsgArrived [%lld] ts after _OnClientMsgArrived[%lld]"
                    , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
 
@@ -171,6 +180,12 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         for(auto &client : _delayRemoveClients)
         {
             auto iterClient = _socketRefClients.find(client);
+//             if(iterClient == _socketRefClients.end())
+//             {
+//                 g_Log->w<FS_Server>(_LOGFMT_("client[%llu] is not in _socketRefClients or is removed"), client);
+//                 continue;
+//             }
+
             _OnClientLeave(iterClient->second);
             _socketRefClients.erase(iterClient);
             ++_leaveClientCnt;
@@ -213,7 +228,6 @@ void FS_Server::_DetectClientHeartTime()
         // 若有post消息，则先关闭socket，其他情况不用
         if(client->IsPostIoChange())
             client->Close();
-
         g_Log->any<FS_Server>("heart beat expired sock[%llu] expiredtime[%lld] nowtime[%lld]"
                               , sock, client->GetHeartBeatExpiredTime().GetMicroTimestamp()
                               ,_lastHeartDetectTime.GetMicroTimestamp());
@@ -254,6 +268,9 @@ void FS_Server::_OnClientMsgArrived()
     for(auto itr : _socketRefClients)
     {
         client = itr.second;
+        if(client->IsDestroy())
+            continue;
+
         // 循环 判断是否有消息需要处理
         while(client->HasRecvMsg())
         {
