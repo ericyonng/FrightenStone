@@ -41,6 +41,7 @@
 #include "base/common/assist/assistobjs/Impl/Singleton.h"
 #include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 #include "base/common/memorypool/Defs/MemoryPoolDefs.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -62,15 +63,19 @@ public:
     virtual void  AddRef(void *ptr);
     virtual void Lock();
     virtual void Unlock();
+    virtual void PrintMemPoolInfo() const;
 
 private:
     void  _Init(size_t begin, size_t end, IMemoryAlloctor *alloctor);
+    void _RegisterPrintCallback();
+    void _UnRegisterPrintCallback();
 
 private:
     IMemoryAlloctor *_alloctors[__MEMORY_POOL_MAXBLOCK_LIMIT__];  // 内存分配器O(1)复杂度，最大支持__MEMORY_POOL_MAXBLOCK_LIMIT__的内存分配其他内存由系统分配
     std::vector<IMemoryAlloctor *> _allAlloctors;                   // 用于释放
     bool _isInit;
     Locker _locker;
+    IDelegatePlus<void> *_printCallback;
 };
 
 inline void MemoryPoolMgr::Lock()

@@ -66,6 +66,8 @@ public:
     GENERAL_ADDLOG(SYSLOG, crash)           // 崩溃
     GENERAL_ADDLOG(SYSLOG, details)         // 具体日志
     GENERAL_ADDLOG(SYSLOG, memleak)         // 内存泄露
+    GENERAL_ADDLOG(SYSLOG, mempool)         // 内存池情况日志
+    GENERAL_ADDLOG(SYSLOG, objpool)         // 对象池情况日志
     GENERAL_ADDLOG(SYSLOG, net)             // 网络层
     GENERAL_ADDLOG(SYSLOG, sys)             // 系统信息（用于分析）
     GENERAL_ADDLOG(SYSLOG, Any)             // 任意内容

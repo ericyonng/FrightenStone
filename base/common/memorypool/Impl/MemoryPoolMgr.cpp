@@ -34,6 +34,8 @@
 #include "base/common/memorypool/Defs/MemoryBlock.h"
 #include "base/common/component/Impl/FS_String.h"
 #include "base/common/status/status.h"
+#include "base/common/memleak/memleak.h"
+#include "base/common/log/Log.h"
 #include "iostream"
 
 #pragma region macro
@@ -47,6 +49,7 @@ FS_NAMESPACE_BEGIN
 MemoryPoolMgr::MemoryPoolMgr()
     :_alloctors{NULL}
     ,_isInit(false)
+    ,_printCallback(NULL)
 {
     InitPool();
 }
@@ -76,11 +79,15 @@ Int32 MemoryPoolMgr::InitPool()
     _isInit = true;
     _locker.Unlock();
 
+    _RegisterPrintCallback();
+
     return StatusDefs::Success;
 }
 
 void MemoryPoolMgr::FinishPool()
 {
+    _UnRegisterPrintCallback();
+
     _locker.Lock();
     _isInit = false;
     for(auto iter : _allAlloctors)
@@ -92,9 +99,12 @@ void MemoryPoolMgr::FinishPool()
 void *MemoryPoolMgr::Alloc(size_t bytes)
 {
     // 判断是否内存池可分配
-    if(bytes < __MEMORY_POOL_MAXBLOCK_LIMIT__ / sizeof(IMemoryAlloctor *))
+    if(bytes < __MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_POOL_ALIGN_BYTES__*__MEMORY_POOL_ALIGN_BYTES__)
     {
-        return  _alloctors[bytes]->AllocMemory(bytes);
+        _locker.Lock();
+        auto ptr = _alloctors[bytes]->AllocMemory(bytes);
+        _locker.Unlock();
+        return  ptr;
     }
     else
     {
@@ -160,6 +170,20 @@ void MemoryPoolMgr::AddRef(void *ptr)
     ++block->_ref;
 }
 
+void MemoryPoolMgr::PrintMemPoolInfo() const
+{
+    size_t totalOccupiedBytes = 0;
+    size_t bytesInUsed = 0;
+    for(auto &alloctor : _allAlloctors)
+    {
+        alloctor->PrintMemInfo();
+        totalOccupiedBytes += alloctor->GetOccupiedBytes();
+        bytesInUsed += alloctor->GetInUsedBytes();
+    }
+    g_Log->mempool("mem pool total occupied bytes[%llu],in used bytes[%llu]", totalOccupiedBytes, bytesInUsed);
+    g_Log->mempool("=========================================================");
+}
+
 void MemoryPoolMgr::_Init(size_t begin, size_t end, IMemoryAlloctor *alloctor)
 {
     alloctor->InitMemory();
@@ -169,4 +193,19 @@ void MemoryPoolMgr::_Init(size_t begin, size_t end, IMemoryAlloctor *alloctor)
     _allAlloctors.push_back(alloctor);
 }
 
+void MemoryPoolMgr::_RegisterPrintCallback()
+{
+    _printCallback = const_cast<IDelegatePlus<void> *>(DelegatePlusFactory::Create(this, &MemoryPoolMgr::PrintMemPoolInfo));
+    if(!g_MemleakMonitor)
+        g_MemleakMonitor = MemleakMonitor::GetInstance();
+    g_MemleakMonitor->RegisterMemPoolPrintCallback(_printCallback);
+}
+
+void MemoryPoolMgr::_UnRegisterPrintCallback()
+{
+    FS_Release(_printCallback);
+    g_MemleakMonitor->UnRegisterMemPoolPrintCallback();
+}
 FS_NAMESPACE_END
+
+

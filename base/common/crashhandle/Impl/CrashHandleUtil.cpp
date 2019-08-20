@@ -405,7 +405,7 @@ void CrashHandleUtil::_OnBeforeCrashLogHook(LogData *logData)
 void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 {
     // 内存泄漏信息
-    g_MemleakMonitor->PrintMemleakInfo();
+    g_MemleakMonitor->PrintObjPoolInfo();
 
     // 系统内存情况
     g_Log->sys<CrashHandleUtil>(_LOGFMT_("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]")

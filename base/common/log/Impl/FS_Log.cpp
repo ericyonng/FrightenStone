@@ -258,7 +258,7 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
 
 void FS_Log::_OutputToConsole(Int32 level,const FS_String &logStr)
 {
-    if(level != LogLevel::Net)
+    if(_IsAllowToConsole(level))
     {
         SystemUtil::LockConsole();
         const Int32 oldColor = SystemUtil::GetConsoleColor();

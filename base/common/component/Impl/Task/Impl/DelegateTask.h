@@ -46,7 +46,7 @@ class FS_ThreadPool;
 
 class BASE_EXPORT DelegateTask : public ITask
 {
-    OBJ_POOL_CREATE(DelegateTask, _objPoolHelper);
+    // OBJ_POOL_CREATE(DelegateTask, _objPoolHelper);
 public:
     DelegateTask(const FS_ThreadPool *pool, IDelegatePlus<void, const FS_ThreadPool *> *callback);
     virtual ~DelegateTask();

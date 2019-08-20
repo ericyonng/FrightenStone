@@ -84,6 +84,7 @@ protected:
 
     // 控制台相关
     void _OutputToConsole(Int32 level, const FS_String &logStr);
+    bool _IsAllowToConsole(Int32 level) const;
     void _SetConsoleColor(Int32 level);
 
     // 杂项

@@ -144,7 +144,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
     if(ret != StatusDefs::Success)
     {
         g_Log->net<FS_IocpMsgTransferServer>("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
-        g_Log->any<FS_IocpMsgTransferServer>("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
+        // g_Log->any<FS_IocpMsgTransferServer>("FS_IOCPServer%d.DoIocpNetEvents.wait nothing but ret[%d]", _id, ret);
         return ret;
     }
 

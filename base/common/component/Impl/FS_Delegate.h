@@ -71,6 +71,7 @@ public:
     // 左值会绑定成左值引用，右值会绑定成右值引用
     // 请注意引用折叠适当使用std::forward可以完美的将参数传入，原来什么类型传入后绑定的就是什么类型
     virtual R operator()(Args&&... args) = 0;
+    virtual R operator()(Args&&... args) const = 0;
     virtual void Release();
 };
 
@@ -79,13 +80,16 @@ class DelegateClassPlus : public IDelegatePlus<R, Args...>
 {
 public:
     DelegateClassPlus(T *t, R(T::*f)(Args...));
+    DelegateClassPlus(T *t, R(T::*f)(Args...) const);
     virtual ~DelegateClassPlus();
 
     virtual R operator()(Args&&... args);
+    virtual R operator()(Args&&... args) const;
 
 private:
     T *_obj;
     R(T::*_f)(Args...);
+    // mutable R(T::*_fconst)(Args...) const;
 };
 
 template <typename R, typename... Args>
@@ -96,6 +100,7 @@ public:
     virtual ~DelegateFunctionPlus();
 
     virtual R operator()(Args&&... args);
+    virtual R operator()(Args&&... args) const;
 
 private:
     R(*_f)(Args...);
@@ -111,6 +116,7 @@ public:
     virtual ~DelegateCustomFuncPlus();
 
     virtual Rtn operator()(Args&&...);
+    virtual Rtn operator()(Args&&... args) const;
 
 private:
     CustomFuncType _customFun;
@@ -121,6 +127,8 @@ class BASE_EXPORT DelegatePlusFactory
 public:
     template <typename T, typename R, typename... Args>
     static IDelegatePlus<R, Args...> *Create(T *obj, R(T::*f)(Args...));
+    template <typename T, typename R, typename... Args>
+    static const IDelegatePlus<R, Args...> *Create(T *obj, R(T::*f)(Args...) const);
 
     template <typename R, typename... Args>
     static IDelegatePlus<R, Args...> *Create(R(*f)(Args...));

@@ -87,6 +87,14 @@ inline DelegateClassPlus<T, R, Args...>::DelegateClassPlus(T *t, R(T::*f)(Args..
 {
 }
 
+template <typename T, class R, typename... Args>
+inline DelegateClassPlus<T, R, Args...>::DelegateClassPlus(T *t, R(T::*f)(Args...) const)
+    :_obj(t)
+    , _f(decltype(_f)(f))
+{
+}
+
+
 template <typename T, typename R, typename... Args>
 inline DelegateClassPlus<T, R, Args...>::~DelegateClassPlus()
 {
@@ -95,6 +103,12 @@ inline DelegateClassPlus<T, R, Args...>::~DelegateClassPlus()
 
 template <typename T, typename R, typename... Args>
 inline R DelegateClassPlus<T, R, Args...>::operator()(Args&&... args)
+{
+    return (_obj->*_f)(std::forward<Args>(args)...);
+}
+
+template <typename T, typename R, typename... Args>
+inline R DelegateClassPlus<T, R, Args...>::operator()(Args&&... args) const
 {
     return (_obj->*_f)(std::forward<Args>(args)...);
 }
@@ -112,6 +126,12 @@ inline DelegateFunctionPlus<R, Args...>::~DelegateFunctionPlus()
 
 template <typename R, typename... Args>
 inline R DelegateFunctionPlus<R, Args...>::operator()(Args&&... args)
+{
+    return (*_f)(std::forward<Args>(args)...);
+}
+
+template <typename R, typename... Args>
+inline R DelegateFunctionPlus<R, Args...>::operator()(Args&&... args) const
 {
     return (*_f)(std::forward<Args>(args)...);
 }
@@ -141,8 +161,20 @@ inline Rtn DelegateCustomFuncPlus<CustomFuncType, Rtn, Args...>::operator()(Args
     return _customFun(std::forward<Args>(args)...);
 }
 
+template <typename CustomFuncType, typename Rtn, typename... Args>
+inline Rtn DelegateCustomFuncPlus<CustomFuncType, Rtn, Args...>::operator()(Args&&... args) const
+{
+    return _customFun(std::forward<Args>(args)...);
+}
+
 template <typename T, typename R, typename... Args>
 inline IDelegatePlus<R, Args...> *DelegatePlusFactory::Create(T *obj, R(T::*f)(Args...))
+{
+    return new DelegateClassPlus<T, R, Args...>(obj, f);
+}
+
+template <typename T, typename R, typename... Args>
+inline const IDelegatePlus<R, Args...> *DelegatePlusFactory::Create(T *obj, R(T::*f)(Args...) const)
 {
     return new DelegateClassPlus<T, R, Args...>(obj, f);
 }

@@ -32,6 +32,7 @@
 #include "stdafx.h"
 #include "base/common/memleak/Impl/MemleakMonitor.h"
 #include "base/common/log/Log.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
 
 fs::MemleakMonitor *g_MemleakMonitor = NULL;
 
@@ -40,13 +41,16 @@ FS_NAMESPACE_BEGIN
 
 Locker MemleakMonitor::_locker;
 MemleakMonitor::MemleakMonitor()
+    :_memPoolPrintCallback(NULL)
+    ,_printInfoPool(new FS_ThreadPool(0, 1))
 {
-
+    _printInfoPool->AddTask(DelegatePlusFactory::Create(this, &MemleakMonitor::_PrintInfoPerSeconds));
 }
 
 MemleakMonitor::~MemleakMonitor()
 {
-
+    _printInfoPool->Clear();
+    Fs_SafeFree(_printInfoPool);
 }
 
 MemleakMonitor *MemleakMonitor::GetInstance()
@@ -60,7 +64,7 @@ MemleakMonitor *MemleakMonitor::GetInstance()
     return g_MemleakMonitor;
 }
 
-void MemleakMonitor::RegisterCallback(const char *name, IDelegatePlus<size_t, Int64 &> *callback)
+void MemleakMonitor::RegisterObjPoolCallback(const char *name, IDelegatePlus<size_t, Int64 &> *callback)
 {
     _locker.Lock();
     auto iterCallbacks = _objNameRefPrintCallback.find(name);
@@ -70,7 +74,7 @@ void MemleakMonitor::RegisterCallback(const char *name, IDelegatePlus<size_t, In
     _locker.Unlock();
 }
 
-void MemleakMonitor::UnRegister(const char *name)
+void MemleakMonitor::UnRegisterObjPool(const char *name)
 {
     _locker.Lock();
     auto iterCallbacks = _objNameRefPrintCallback.find(name);
@@ -88,32 +92,47 @@ void MemleakMonitor::UnRegister(const char *name)
     _locker.Unlock();
 }
 
-void MemleakMonitor::PrintMemleakInfo()
+void MemleakMonitor::RegisterMemPoolPrintCallback(const IDelegatePlus<void> *callback)
 {
-    size_t totalMemleakBytes = 0;
+    _locker.Lock();
+    _memPoolPrintCallback = callback;
+    _locker.Unlock();
+}
+
+void MemleakMonitor::UnRegisterMemPoolPrintCallback()
+{
+    _locker.Lock();
+    _memPoolPrintCallback = NULL;
+    _locker.Unlock();
+}
+
+void MemleakMonitor::PrintObjPoolInfo() const
+{
+    size_t totalPoolInUsedBytes = 0;
     Int64 totalOccupiedBytes = 0;
     for(auto &iterCallbacks : _objNameRefPrintCallback)
     {
         for(auto &callback : *iterCallbacks.second)
         {
             Int64 curOccupied = 0;
-            totalMemleakBytes += (*callback)(curOccupied);
+            totalPoolInUsedBytes += (*callback)(curOccupied);
             totalOccupiedBytes += curOccupied;
         }
     }
 
     // 打印内存泄漏
-    g_Log->memleak("memleak monitor: total memleak bytes[%llu] total pool occupied bytes[%lld]"
-                   , totalMemleakBytes, totalOccupiedBytes);
+    g_Log->objpool("objpool: total total pool in used bytes[%llu] total pool occupied bytes[%lld]"
+                   , totalPoolInUsedBytes, totalOccupiedBytes);
+    g_Log->objpool("=========================================================");
 
     // 打印系统信息
-    g_Log->sys<MemleakMonitor>(_LOGFMT_("memleak monitor: total memleak bytes[%llu] total pool occupied bytes[%lld]")
-               , totalMemleakBytes, totalOccupiedBytes);
+//     g_Log->sys<MemleakMonitor>(_LOGFMT_("objpool: total total pool in used bytes[%llu] total pool occupied bytes[%lld]")
+//                , totalPoolInUsedBytes, totalOccupiedBytes);
 }
 
-void MemleakMonitor::PrintMemleakInfo(const char *objName)
+void MemleakMonitor::PrintObjPoolInfo(const char *objName) const
 {
-    size_t totalMemleakBytes = 0;
+    size_t totalPoolInUsedBytes = 0;
     Int64 totalOccupiedBytes = 0;
     auto iterCallBacks = _objNameRefPrintCallback.find(objName);
     if(iterCallBacks == _objNameRefPrintCallback.end())
@@ -122,16 +141,37 @@ void MemleakMonitor::PrintMemleakInfo(const char *objName)
     for(auto &callback : *iterCallBacks->second)
     {
         Int64 curOccupied = 0;
-        totalMemleakBytes += (*callback)(curOccupied);
+        totalPoolInUsedBytes += (*callback)(curOccupied);
         totalOccupiedBytes += curOccupied;
     }
 
     // 打印内存泄漏
-    g_Log->memleak("memleak monitor[%s]: memleak bytes[%llu] pool occupied bytes[%lld]"
-                   ,objName, totalMemleakBytes, totalOccupiedBytes);
+    g_Log->objpool("objpool objname[%s]:  total total pool in used bytes[%llu] total pool occupied bytes[%lld]"
+                   ,objName, totalPoolInUsedBytes, totalOccupiedBytes);
 
     // 打印系统信息
-    g_Log->sys<MemleakMonitor>(_LOGFMT_("memleak monitor[%s]: memleak bytes[%llu] pool occupied bytes[%lld]")
-               ,objName, totalMemleakBytes, totalOccupiedBytes);
+//     g_Log->sys<MemleakMonitor>(_LOGFMT_("objpool objname[%s]:  total total pool in used bytes[%llu] total pool occupied bytes[%lld]")
+//                ,objName, totalPoolInUsedBytes, totalOccupiedBytes);
 }
+
+
+void MemleakMonitor::PrintPoolAll() const
+{
+    // 打印对象池
+    PrintObjPoolInfo();
+    if(_memPoolPrintCallback)
+        (*_memPoolPrintCallback)();
+}
+
+void MemleakMonitor::_PrintInfoPerSeconds(const FS_ThreadPool *pool)
+{
+    while(!pool->IsClearingPool())
+    {
+        Sleep(1000);
+        _locker.Lock();
+        PrintPoolAll();
+        _locker.Unlock();
+    }
+}
+
 FS_NAMESPACE_END

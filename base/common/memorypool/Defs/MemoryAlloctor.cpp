@@ -147,6 +147,13 @@ void IMemoryAlloctor::_InitNode(MemBlocksNode *newNode)
     }
 }
 
+void IMemoryAlloctor::PrintMemInfo() const
+{
+    // 单独的内存池日志 [当前内存池占用内存情况,内存池使用情况]
+    g_Log->mempool("blockSize[%llu] nodecnt[%lld],total bytes occupied[%lld],memblock in used bytes[%lld]"
+                   ,_blockSize, _curNodeCnt, _curNodeCnt*_blockAmount*_blockSize, _memBlockInUse*_blockSize);
+}
+
 void IMemoryAlloctor::InitMemory()
 {
     // 初始化头节点

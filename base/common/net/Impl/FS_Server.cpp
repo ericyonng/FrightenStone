@@ -146,8 +146,8 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         if(sliceofTransfer.GetTotalMicroSeconds() >= 2 * 1000 * 1000)
             g_Log->w<FS_Server>(_LOGFMT_("_BeforeClientMsgTransfer tims slice too long[%lld]"), sliceofTransfer.GetTotalMicroSeconds());
 
-        g_Log->any<FS_Server>("ts before _BeforeClientMsgTransfer[%lld] ts after _BeforeClientMsgTransfer[%lld]"
-                              , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
+//         g_Log->any<FS_Server>("ts before _BeforeClientMsgTransfer[%lld] ts after _BeforeClientMsgTransfer[%lld]"
+//                               , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
         if(st != StatusDefs::Success)
         {
             g_Log->net<FS_Server>("FS_Server _BeforeClientMsgTransfer: st[%d] ", st);
@@ -173,8 +173,8 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         if(sliceofMsgArrived.GetTotalMicroSeconds() >= 2 * 1000 * 1000)
             g_Log->w<FS_Server>(_LOGFMT_("_OnClientMsgArrived tims slice too long[%lld]"), sliceofMsgArrived.GetTotalMicroSeconds());
 
-        g_Log->any<FS_Server>("ts before _OnClientMsgArrived [%lld] ts after _OnClientMsgArrived[%lld]"
-                   , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
+//         g_Log->any<FS_Server>("ts before _OnClientMsgArrived [%lld] ts after _OnClientMsgArrived[%lld]"
+//                    , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
 
         // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
         for(auto &client : _delayRemoveClients)
@@ -193,8 +193,8 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         _delayRemoveClients.clear();
 
         // 打印当前join的数目以及leave的数目
-        g_Log->any<FS_Server>("joined cnt[%lld] leaved cnt[%lld]"
-                              , _joinClientCnt, _leaveClientCnt);
+//         g_Log->any<FS_Server>("joined cnt[%lld] leaved cnt[%lld]"
+//                               , _joinClientCnt, _leaveClientCnt);
     }
 
     // 打印当前join的数目以及leave的数目
@@ -248,7 +248,7 @@ void FS_Server::_OnClientLeave(FS_Client *client)
     _clientsChange = true;
     _clientHeartBeatQueue.erase(client);
     // _socketRefClients.erase(client->GetSocket());
-    g_Log->any<FS_Server>("_OnClientLeave sock[%llu]", client->GetSocket());
+    g_Log->net<FS_Server>("_OnClientLeave sock[%llu]", client->GetSocket());
     delete client;
 }
 
