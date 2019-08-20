@@ -83,10 +83,18 @@ public:
     // 请使用便利宏_LOGFMT_ 不支持控制台输出
     template<typename ObjType, typename... Args>
     void net(const char *fmt, const Args&... args);
+
     // 内存泄漏日志
     // 请使用便利宏_LOGFMT_
     template<typename... Args>
     void memleak(const char *fmt, const Args&... args);
+    // 请使用便利宏_LOGFMT_
+    template<typename... Args>
+    void mempool(const char *fmt, const Args&... args);
+    // 请使用便利宏_LOGFMT_
+    template<typename... Args>
+    void objpool(const char *fmt, const Args&... args);
+
     // 系统分析日志
     // 请使用便利宏_LOGFMT_
     template<typename ObjType, typename... Args>

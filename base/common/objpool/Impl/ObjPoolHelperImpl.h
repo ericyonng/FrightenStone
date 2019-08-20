@@ -40,7 +40,7 @@ inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
 {
     // ´´½¨Î¯ÍÐ
    ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
-                                            , DelegatePlusFactory::Create(this, &ObjPoolHelper<ObjType>::PrintMemleak));
+                                            , DelegatePlusFactory::Create(this, &ObjPoolHelper<ObjType>::PrintObjPool));
 //     ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
 //                                              , DelegatePlusFactory::Create<size_t, size_t &>(obj, &fs::ObjPoolHelper<ObjType>::PrintMemleak));
 }
@@ -86,11 +86,11 @@ inline size_t ObjPoolHelper<ObjType>::GetPoolBytesOccupied() const
 }
 
 template<typename ObjType>
-inline size_t ObjPoolHelper<ObjType>::PrintMemleak(Int64 &poolOccupiedBytes)
+inline size_t ObjPoolHelper<ObjType>::PrintObjPool(Int64 &poolOccupiedBytes)
 {
     auto memleakBytes = _alloctor->GetObjInUse()*IObjAlloctor<ObjType>::_objBlockSize;
     poolOccupiedBytes = _alloctor->GetBytesOccupied();
-    ObjPoolMethods::PrintMemleakInfo(typeid(ObjType).name()
+    ObjPoolMethods::PrintObjPoolInfo(typeid(ObjType).name()
                                      , _alloctor->GetNodeCnt()
                                      , _alloctor->GetTotalObjBlocks()
                                      , _alloctor->GetBytesOccupied()

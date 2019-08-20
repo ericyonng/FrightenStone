@@ -42,6 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT MemleakMonitor
 {
 public:
@@ -49,16 +50,27 @@ public:
     virtual ~MemleakMonitor();
 
     static MemleakMonitor *GetInstance();
-    void RegisterCallback(const char *name, IDelegatePlus<size_t, Int64 &> *callback);
-    void UnRegister(const char *name);
+    void RegisterObjPoolCallback(const char *name, IDelegatePlus<size_t, Int64 &> *callback);
+    void UnRegisterObjPool(const char *name);
+    void RegisterMemPoolPrintCallback(const IDelegatePlus<void> *callback);
+    void UnRegisterMemPoolPrintCallback();
 
-    void PrintMemleakInfo();
+    void PrintObjPoolInfo() const;
     // 请使用typeid作为objName
-    void PrintMemleakInfo(const char *objName);
+    void PrintObjPoolInfo(const char *objName) const;
+
+    // print objpool/mempool
+    void PrintPoolAll() const;
+
+private:
+    void _PrintInfoPerSeconds(const FS_ThreadPool *pool);
 
 private:
     static Locker _locker;
     std::map<FS_String, std::vector<IDelegatePlus<size_t, Int64 &> *> *> _objNameRefPrintCallback;
+    const IDelegatePlus<void> *_memPoolPrintCallback;
+
+    FS_ThreadPool *_printInfoPool;
 };
 
 FS_NAMESPACE_END

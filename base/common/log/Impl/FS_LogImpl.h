@@ -52,6 +52,16 @@ inline const IDelegatePlus<void, LogData *> *FS_Log::_InstallBeforeLogHookFunc(I
     return delegate;
 }
 
+inline bool FS_Log::_IsAllowToConsole(Int32 level) const
+{
+    if(level == LogLevel::Net ||
+       level == LogLevel::MemPool ||
+       level == LogLevel::ObjPool)
+        return false;
+
+    return true;
+}
+
 FS_NAMESPACE_END
 
 #endif

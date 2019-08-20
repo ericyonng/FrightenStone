@@ -56,7 +56,7 @@ public:
     const char *GetObjName() const;
     size_t GetMemleakBytes() const;
     size_t GetPoolBytesOccupied() const;
-    size_t PrintMemleak(Int64 &poolOccupiedBytes);
+    size_t PrintObjPool(Int64 &poolOccupiedBytes);
 
     // 分配器行为接口
     IObjAlloctor<ObjType> *operator->();

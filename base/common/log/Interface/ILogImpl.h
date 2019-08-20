@@ -153,6 +153,33 @@ inline void ILog::memleak(const char *fmt, const Args&... args)
     _WriteLog(LogLevel::Memleak, LogDefs::_SYSLOG_memleak_, newLogData);
 }
 
+template<typename... Args>
+inline void ILog::mempool(const char *fmt, const Args&... args)
+{
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.AppendFormat("%s<%s>: "
+                                         , newLogData->_logTime.ToString().c_str()
+                                         , LogLevel::GetDescription(LogLevel::MemPool))
+        .AppendFormat(fmt, args...) << FS_String::endl;
+
+    _WriteLog(LogLevel::MemPool, LogDefs::_SYSLOG_mempool_, newLogData);
+}
+
+template<typename... Args>
+inline void ILog::objpool(const char *fmt, const Args&... args)
+{
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.AppendFormat("%s<%s>: "
+                                         , newLogData->_logTime.ToString().c_str()
+                                         , LogLevel::GetDescription(LogLevel::ObjPool))
+        .AppendFormat(fmt, args...) << FS_String::endl;
+
+    _WriteLog(LogLevel::ObjPool, LogDefs::_SYSLOG_objpool_, newLogData);
+}
 template<typename ObjType, typename... Args>
 inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {

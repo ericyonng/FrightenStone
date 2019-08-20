@@ -66,7 +66,7 @@
 
 
 // 客户端心跳检测死亡计时时间(单位ms)
-#define CLIENT_HREAT_DEAD_TIME 12000
+#define CLIENT_HREAT_DEAD_TIME 120000
 // 在间隔指定时间后才允许发送(单位ms)
 #define CLIENT_SEND_BUFF_TIME 200
 

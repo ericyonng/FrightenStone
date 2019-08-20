@@ -292,12 +292,14 @@ void FS_TcpServer::_StatisticsMsgPerSecond()
     const auto slice = nowTime - _msgCountTime;
     if(slice.GetTotalSeconds() >= 1)
     {
-        g_Log->any<FS_TcpServer>("thread<%d>,timeSlice<%d>,socket<%d>,Accept<%d>,Join<%d>,recv<%d>,msg<%d>"
+        g_Log->any<FS_TcpServer>("thread<%d>,timeSlice<%d>,socket<%d>,Accept<%d>,Join<%d>, totalJoinedCnt[%lld], totalLeaveCnt[%lld], recv<%d>,msg<%d>"
                    , static_cast<Int32>(_fsServers.size())
                    , slice.GetTotalSeconds()
                    , static_cast<Int32>(_sock)
                    , (Int32)_clientAcceptCnt
                    , (Int32)_clientJoinedCnt
+                   , _joinClientCnt
+                   ,_leaveClientCnt
                    , (Int32)_recvCount
                    , (Int32)_recvMsgCount);
 

@@ -57,6 +57,7 @@ public:
     virtual void  AddRef(void *ptr) = 0;
     virtual void Lock() = 0;
     virtual void Unlock() = 0;
+    virtual void PrintMemPoolInfo() const = 0;
 };
 
 FS_NAMESPACE_END

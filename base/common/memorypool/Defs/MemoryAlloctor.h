@@ -68,6 +68,9 @@ public:
     void  FreeMemory(void *ptr);
     size_t GetBlockSize() const;
     size_t GetEffectiveBlockSize() const;
+    size_t GetOccupiedBytes() const;
+    size_t GetInUsedBytes() const;
+    void PrintMemInfo() const;
 
 public:
     void InitMemory();

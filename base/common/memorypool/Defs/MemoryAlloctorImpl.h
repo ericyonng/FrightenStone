@@ -44,6 +44,16 @@ inline size_t IMemoryAlloctor::GetEffectiveBlockSize() const
     return _effectiveBlockSize;
 }
 
+inline size_t IMemoryAlloctor::GetOccupiedBytes() const
+{
+    return _blockSize * _blockAmount*_curNodeCnt;
+}
+
+inline size_t IMemoryAlloctor::GetInUsedBytes() const
+{
+    return _memBlockInUse * _blockSize;
+}
+
 FS_NAMESPACE_END
 
 #endif
