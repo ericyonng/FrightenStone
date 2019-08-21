@@ -41,6 +41,8 @@ public:
     EasyFSServer()
     {
         _isCheckMsgID = true;
+        _bSendBack = true;
+        _bSendFull = true;
     }
 
     // FS_Server 4 多个线程触发 不安全
@@ -49,7 +51,7 @@ public:
     {
         fs::FS_TcpServer::OnNetJoin(client);
         Int32 joinedCnt = _clientJoinedCnt;
-        g_Log->net<EasyFSServer>("OnNetJoin joinedcnt[%d]", joinedCnt);
+       // g_Log->net<EasyFSServer>("OnNetJoin joinedcnt[%d]", joinedCnt);
         // g_Log->any("client<%d> joined curJoinedCnt[%d]", (Int32)(client->GetSocket()), joinedCnt);
 //         g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> joined, client joined cnt<%d>")
 //                                , static_cast<Int32>(client->GetSocket()), joinedCnt);
@@ -106,11 +108,13 @@ public:
                         // 客户端消息太多，需要考虑应对策略
                         // 正常连接，业务客户端不会有这么多消息
                         // 模拟并发测试时是否发送频率过高
-                        g_Log->w<EasyFSServer>(_LOGFMT_("<Socket=%d> Send Full"), client->GetSocket());
+                        if(_bSendFull)
+                            g_Log->w<EasyFSServer>(_LOGFMT_("<Socket=%d> Send Full"), client->GetSocket());
                     }
                     else {
                         ++client->_sendMsgId;
                     }
+                    // g_Log->net<EasyFSServer>("<Socket=%d> send login res", client->GetSocket());
                 }
 
                 return StatusDefs::Success;
@@ -194,7 +198,7 @@ void TestServer::Run()
     easyServer.InitSocket();
     easyServer.Bind(NULL, 4567);
     easyServer.Listen();
-    easyServer.Start(1);
+    easyServer.Start(8);
     while(1)
     {
         Sleep(1000);

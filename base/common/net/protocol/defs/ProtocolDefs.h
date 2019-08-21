@@ -100,7 +100,7 @@ struct BASE_EXPORT LoginRes : public NetMsg_DataHeader
     OBJ_POOL_CREATE(LoginRes, _objPoolHelper);
     LoginRes();
 
-    Int32 result;
+    Int32 _result;
     char data[88];
     Int32 _msgId;
 };
