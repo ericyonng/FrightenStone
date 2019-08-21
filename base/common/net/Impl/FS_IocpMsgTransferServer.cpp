@@ -73,9 +73,10 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
     {
         client = iter->second;
 
-        if(client->IsDestroy() || delayDestroyClients.find(iter->first) != delayDestroyClients.end())
+        if(client->IsDestroy())
         {
             g_Log->w<FS_IocpMsgTransferServer>(_LOGFMT_("client sock[%llu] is destroyed"), iter->first);
+            delayDestroyClients.insert(client->GetSocket());
             continue;
         }
 
@@ -175,7 +176,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
         {// 客户端接收数据
          
             // 判断是否断开 已断开的有可能是上次postsend只后1ms内系统没有完成send，同时客户端被移除导致
-            if(client->IsDestroy()||delayDestroyClients.find(client->GetSocket())!=delayDestroyClients.end())
+            if(client->IsDestroy())
             {
                 g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("client is destroy"));
                 return ret;
@@ -202,7 +203,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
         if(client)
         {
             // 判断是否断开 已断开的有可能是上次postsend只后1ms内系统没有完成send，同时客户端被移除导致
-            if(client->IsDestroy()||delayDestroyClients.find(client->GetSocket())!=delayDestroyClients.end())
+            if(client->IsDestroy())
             {
                 g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("client is destroy"));
                 return ret;

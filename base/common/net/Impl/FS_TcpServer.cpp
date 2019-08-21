@@ -244,7 +244,7 @@ void FS_TcpServer::OnNetJoin(FS_Client *client)
     ++_joinClientCnt;
     Int64 joinClientCnt = _joinClientCnt;
     _locker.Unlock();
-    g_Log->net<FS_TcpServer>("client _joinClientCnt<%lld>", joinClientCnt);
+    // g_Log->net<FS_TcpServer>("client _joinClientCnt<%lld>", joinClientCnt);
 //     g_Log->sys(_LOGFMT_("client<%d> join"), client->GetSocket());
 }
 
@@ -256,7 +256,7 @@ void FS_TcpServer::OnNetLeave(FS_Client *client)
     ++_leaveClientCnt;
     Int64 leaveClientCnt = _leaveClientCnt;
     _locker.Unlock();
-    g_Log->net<FS_TcpServer>("client _leaveClientCnt<%lld>", leaveClientCnt);
+    // g_Log->net<FS_TcpServer>("client _leaveClientCnt<%lld>", leaveClientCnt);
 //     g_Log->net("client<%d> leave", static_cast<Int32>(client->GetSocket()));
 //     g_Log->sys(_LOGFMT_("client<%d> leave"), static_cast<Int32>(client->GetSocket()));
 }

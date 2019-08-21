@@ -55,6 +55,7 @@ LoginRes::LoginRes()
 {
     _packetLength = sizeof(LoginRes);
     _cmd = ProtocolCmd::LoginRes;
+    _result = 0;
 }
 
 OBJ_POOL_CREATE_IMPL(LoginNty, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)

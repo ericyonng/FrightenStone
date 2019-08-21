@@ -138,13 +138,9 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         _DetectClientHeartTime();
 
         // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
-        Time ts, ts2;
-        ts.FlushTime();
+        g_Log->net<FS_Server>("before _BeforeClientMsgTransfer");
         auto st = _BeforeClientMsgTransfer(_delayRemoveClients);    // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
-        ts2.FlushTime();
-        auto sliceofTransfer = ts2 - ts;
-        if(sliceofTransfer.GetTotalMicroSeconds() >= 2 * 1000 * 1000)
-            g_Log->w<FS_Server>(_LOGFMT_("_BeforeClientMsgTransfer tims slice too long[%lld]"), sliceofTransfer.GetTotalMicroSeconds());
+        g_Log->net<FS_Server>("after _BeforeClientMsgTransfer");
 
 //         g_Log->any<FS_Server>("ts before _BeforeClientMsgTransfer[%lld] ts after _BeforeClientMsgTransfer[%lld]"
 //                               , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
@@ -165,13 +161,10 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         }
 
         // 客户端消息到达
-        ts.FlushTime();
-        _OnClientMsgArrived();    // TODO关于超级流量导致msgarrive执行过长判定为攻击行为，由外部运维处理攻击
-        ts2.FlushTime();
+        g_Log->net<FS_Server>("before _OnClientMsgArrived");
 
-        auto sliceofMsgArrived = ts2 - ts;
-        if(sliceofMsgArrived.GetTotalMicroSeconds() >= 2 * 1000 * 1000)
-            g_Log->w<FS_Server>(_LOGFMT_("_OnClientMsgArrived tims slice too long[%lld]"), sliceofMsgArrived.GetTotalMicroSeconds());
+        _OnClientMsgArrived();    // TODO关于超级流量导致msgarrive执行过长判定为攻击行为，由外部运维处理攻击
+        g_Log->net<FS_Server>("after _OnClientMsgArrived");
 
 //         g_Log->any<FS_Server>("ts before _OnClientMsgArrived [%lld] ts after _OnClientMsgArrived[%lld]"
 //                    , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
@@ -284,22 +277,21 @@ void FS_Server::_OnClientMsgArrived()
 
 Int32 FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
 {
-    _eventHandleObj->Lock();
     auto st = _eventHandleObj->OnNetMsg(this, client, header);
     if(st == StatusDefs::Success)
     {
-        _clientHeartBeatQueue.erase(client);
-        client->UpdateHeartBeatExpiredTime();
         if(!client->IsDestroy())
+        {
+            _clientHeartBeatQueue.erase(client);
+            client->UpdateHeartBeatExpiredTime();
             _clientHeartBeatQueue.insert(client);
+        }
     }
     else
     {
         g_Log->any<FS_Server>("client sock[%llu] heart beat expired time[%lld] error msg st[%d]"
                               , client->GetSocket(), client->GetHeartBeatExpiredTime().GetMicroTimestamp(), st);
     }
-        //client->ResetDTHeart();
-    _eventHandleObj->Unlock();
 
     return st;
 }
