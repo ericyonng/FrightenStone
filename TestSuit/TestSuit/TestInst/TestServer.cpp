@@ -193,7 +193,13 @@ FS_NAMESPACE_END
 void TestServer::Run()
 {
     g_Log->InitModule("TestServer");
-    fs::CrashHandleUtil::InitCrashHandleParams();
+    auto initret = fs::CrashHandleUtil::InitCrashHandleParams();
+    if(initret != StatusDefs::Success)
+    {
+        g_Log->e<TestServer>(_LOGFMT_("InitCrashHandleParams fail initret[%d]"), initret);
+        return;
+    }
+
     fs::EasyFSServer easyServer;
     easyServer.InitSocket();
     easyServer.Bind(NULL, 4567);

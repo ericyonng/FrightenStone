@@ -58,6 +58,8 @@ public:
     void PrintObjPoolInfo() const;
     // 请使用typeid作为objName
     void PrintObjPoolInfo(const char *objName) const;
+    // 打印系统占用内存信息
+    void PrintSysMemoryInfo() const;
 
     // print objpool/mempool
     void PrintPoolAll() const;
