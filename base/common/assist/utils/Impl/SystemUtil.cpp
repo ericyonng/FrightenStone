@@ -369,4 +369,18 @@ ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
     return pe.th32ProcessID;
 }
 
+ULong SystemUtil::GetCurrentThreadId()
+{
+    return ::GetCurrentThreadId();
+}
+
+void SystemUtil::GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber)
+{
+    PROCESSOR_NUMBER processorInfo = {};
+    GetCurrentProcessorNumberEx(&processorInfo);
+    cpuGroup = processorInfo.Group;
+    cpuNumber = processorInfo.Number;
+}
 FS_NAMESPACE_END
+
+
