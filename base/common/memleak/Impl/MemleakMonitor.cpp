@@ -155,10 +155,22 @@ void MemleakMonitor::PrintObjPoolInfo(const char *objName) const
 }
 
 
+void MemleakMonitor::PrintSysMemoryInfo() const
+{
+    // 系统内存情况
+    g_Log->mempool("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]"
+                   , SystemUtil::GetTotalPhysMemSize()
+                   , SystemUtil::GetAvailPhysMemSize()
+                   , SystemUtil::GetMemoryLoad());
+}
+
 void MemleakMonitor::PrintPoolAll() const
 {
+    // 系统内存信息
+    PrintSysMemoryInfo();
     // 打印对象池
     PrintObjPoolInfo();
+    // 内存池信息
     if(_memPoolPrintCallback)
         (*_memPoolPrintCallback)();
 }
