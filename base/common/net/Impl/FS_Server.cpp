@@ -203,8 +203,12 @@ void FS_Server::_DetectClientHeartTime()
 #endif // CELL_USE_IOCP
         iterClient = _clientHeartBeatQueue.erase(iterClient);
     }
-
-    g_Log->net<FS_Server>("fs_server id[%d] _DetectClientHeartTime heart beat queue cnt[%llu]",_id, _clientHeartBeatQueue.size());
+    UInt16 cpuGroup = 0;
+    Byte8 cpuNum = 0;
+    ULong threadId = SystemUtil::GetCurrentThreadId();
+    SystemUtil::GetCallingThreadCpuInfo(cpuGroup, cpuNum);
+    g_Log->net<FS_Server>("cpuGroup[%hu],cpuNumber[%d],threadId[%lu],fs_server id[%d] _DetectClientHeartTime heart beat queue cnt[%llu]"
+                          , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
 }
 
 void FS_Server::_OnClientLeave(FS_Client *client)

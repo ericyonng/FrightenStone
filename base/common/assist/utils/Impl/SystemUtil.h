@@ -57,6 +57,10 @@ public:
     static ULong GetFirstProcessPid(HANDLE &hSnapshot);
     // 获取下一个进程id
     static ULong GetNextProcessPid(HANDLE &hSnapshot);
+    // 获取线程id
+    static ULong GetCurrentThreadId();
+    // 获取当前调用线程所在的cpu编号信息
+    static void GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber);
 //     // 枚举窗口回调函数
 //     static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
     // 通过进程ID获取窗口句柄
