@@ -138,56 +138,28 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         _DetectClientHeartTime();
 
         // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
-        g_Log->net<FS_Server>("before _BeforeClientMsgTransfer");
-        auto st = _BeforeClientMsgTransfer(_delayRemoveClients);    // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
-        g_Log->net<FS_Server>("after _BeforeClientMsgTransfer");
-
-//         g_Log->any<FS_Server>("ts before _BeforeClientMsgTransfer[%lld] ts after _BeforeClientMsgTransfer[%lld]"
-//                               , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
+        // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
+        auto st = _BeforeClientMsgTransfer(_delayRemoveClients);
         if(st != StatusDefs::Success)
         {
-            g_Log->net<FS_Server>("FS_Server _BeforeClientMsgTransfer: st[%d] ", st);
+            g_Log->net<FS_Server>("FS_Server id[%d] _BeforeClientMsgTransfer: st[%d] ", _id, st);
 
             // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
             for(auto &client : _delayRemoveClients)
-            {
-                auto iterClient = _socketRefClients.find(client);
-                _OnClientLeave(iterClient->second);
-                _socketRefClients.erase(iterClient);
-                ++_leaveClientCnt;
-            }
+                _OnClientLeave(client);
+
             _delayRemoveClients.clear();
             break;
         }
 
         // 客户端消息到达
-        g_Log->net<FS_Server>("before _OnClientMsgArrived");
-
         _OnClientMsgArrived();    // TODO关于超级流量导致msgarrive执行过长判定为攻击行为，由外部运维处理攻击
-        g_Log->net<FS_Server>("after _OnClientMsgArrived");
 
-//         g_Log->any<FS_Server>("ts before _OnClientMsgArrived [%lld] ts after _OnClientMsgArrived[%lld]"
-//                    , ts.GetMicroTimestamp(), ts2.GetMicroTimestamp());
-
-        // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
+        // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，
+        // 需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
         for(auto &client : _delayRemoveClients)
-        {
-            auto iterClient = _socketRefClients.find(client);
-//             if(iterClient == _socketRefClients.end())
-//             {
-//                 g_Log->w<FS_Server>(_LOGFMT_("client[%llu] is not in _socketRefClients or is removed"), client);
-//                 continue;
-//             }
-
-            _OnClientLeave(iterClient->second);
-            _socketRefClients.erase(iterClient);
-            ++_leaveClientCnt;
-        }
+            _OnClientLeave(client);
         _delayRemoveClients.clear();
-
-        // 打印当前join的数目以及leave的数目
-//         g_Log->any<FS_Server>("joined cnt[%lld] leaved cnt[%lld]"
-//                               , _joinClientCnt, _leaveClientCnt);
     }
 
     // 打印当前join的数目以及leave的数目
@@ -232,7 +204,7 @@ void FS_Server::_DetectClientHeartTime()
         iterClient = _clientHeartBeatQueue.erase(iterClient);
     }
 
-    g_Log->net<FS_Server>("_DetectClientHeartTime heart beat queue cnt[%llu]", _clientHeartBeatQueue.size());
+    g_Log->net<FS_Server>("fs_server id[%d] _DetectClientHeartTime heart beat queue cnt[%llu]",_id, _clientHeartBeatQueue.size());
 }
 
 void FS_Server::_OnClientLeave(FS_Client *client)
@@ -243,6 +215,14 @@ void FS_Server::_OnClientLeave(FS_Client *client)
     // _socketRefClients.erase(client->GetSocket());
     g_Log->net<FS_Server>("_OnClientLeave sock[%llu]", client->GetSocket());
     delete client;
+}
+
+void FS_Server::_OnClientLeave(SOCKET clientSock)
+{
+    auto iterClient = _socketRefClients.find(clientSock);
+    _OnClientLeave(iterClient->second);
+    _socketRefClients.erase(iterClient);
+    ++_leaveClientCnt;
 }
 
 void FS_Server::_OnClientJoin(FS_Client *client)
@@ -261,8 +241,8 @@ void FS_Server::_OnClientMsgArrived()
     for(auto itr : _socketRefClients)
     {
         client = itr.second;
-        if(client->IsDestroy())
-            continue;
+//         if(client->IsDestroy())// 要不要销毁不在客户端消息到达的处理范畴
+//             continue;
 
         // 循环 判断是否有消息需要处理
         while(client->HasRecvMsg())
