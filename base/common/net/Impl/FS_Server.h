@@ -107,6 +107,7 @@ protected:
 
     void _DelayRmClient(FS_Client *client);
     void _OnClientLeave(FS_Client *client);
+    void _OnClientLeave(SOCKET clientSock);
     virtual void _OnClientJoin(FS_Client *client);
     void _OnPrepareNetRecv(FS_Client *client);
 

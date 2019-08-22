@@ -109,7 +109,8 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
                 }
             }
         }
-        else {
+        else if(!client->IsPostIoChange()){
+            // TODO:需要考虑在1ms内客户端是否需要多次recv，只有没投递过recv的客户端才可以投递recv，避免多次投递，当客户端销毁后有可能recv才完成
             auto ioData = client->MakeRecvIoData();
             if(ioData)
             {
@@ -128,7 +129,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
     // 2.iocp等待消息完成直到timeout或error为止
     Int32 ret = StatusDefs::Success;
     while(true)
-    {
+    {// 只处理到wait超时（意味着这超时后若客户端有数据到来只能等到下次投递完recv）
         ret = _ListenIocpNetEvents(delayDestroyClients);
         if(ret == StatusDefs::IOCP_WaitTimeOut)
             return StatusDefs::Success;
