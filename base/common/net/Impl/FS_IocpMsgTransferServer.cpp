@@ -183,7 +183,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
                 return ret;
             }
 
-            client->OnRecvFromIocp(_ioEvent->_bytesTrans);
+            client->OnRecvFromIocp(_ioEvent->_ioData->_owner->GetNode(), _ioEvent->_bytesTrans);
             _OnPrepareNetRecv(client);
         }
     }
@@ -210,7 +210,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
                 return ret;
             }
 
-            client->OnSend2iocp(_ioEvent->_bytesTrans);
+            client->OnSend2iocp(_ioEvent->_ioData->_owner->GetNode(), _ioEvent->_bytesTrans);
         }
     }
     else 

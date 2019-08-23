@@ -51,9 +51,12 @@ public:
     void Release();
 
     char *GetData();
+    std::list<FS_NetBuffer *>::iterator &GetNode();
+    FS_NetBufferArray *GetOwner();
+    void SetNode(const std::list<FS_NetBuffer *>::iterator &iterNode);
+
     bool Push(const char *data, Int32 len);
     void Pop(Int32 len);
-
     Int32 Write2socket(SOCKET sockfd);
     Int32 ReadFromSocket(SOCKET sockfd);
 
@@ -86,6 +89,7 @@ private:
     // 缓冲区写满次数计数
     int _fullCount = 0;
     FS_NetBufferArray *_owner = NULL;
+    std::list<FS_NetBuffer *>::iterator _arrayNode;
 #ifdef FS_USE_IOCP
     IO_DATA_BASE _ioData = {};
 #endif // CELL_USE_IOCP
