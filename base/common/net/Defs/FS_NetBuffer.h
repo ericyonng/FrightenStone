@@ -41,11 +41,12 @@
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT FS_NetBufferArray;
 class BASE_EXPORT FS_NetBuffer
 {
     OBJ_POOL_CREATE(FS_NetBuffer, _objPoolHelper);
 public:
-    FS_NetBuffer(Int32 sizeBuffer = FS_BUFF_SIZE_DEF);
+    FS_NetBuffer(FS_NetBufferArray *owner, Int32 sizeBuffer = FS_BUFF_SIZE_DEF);
     ~FS_NetBuffer();
     void Release();
 
@@ -59,6 +60,7 @@ public:
     bool HasMsg() const;
     bool NeedWrite() const;
     bool IsFull() const;
+    bool IsEmpty() const;
 
 #pragma region iocp
 public:
@@ -83,6 +85,7 @@ private:
     Int32 _buffSize = 0;
     // 缓冲区写满次数计数
     int _fullCount = 0;
+    FS_NetBufferArray *_owner = NULL;
 #ifdef FS_USE_IOCP
     IO_DATA_BASE _ioData = {};
 #endif // CELL_USE_IOCP

@@ -31,3 +31,8 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Defs/FS_NetBufferArray.h"
+
+FS_NAMESPACE_BEGIN
+
+
+FS_NAMESPACE_END

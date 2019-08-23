@@ -25,7 +25,8 @@
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/08/23
  * @brief :
- * 
+ *          FS_NetBufferArray是有序的buffer队列，写入数据空间不足时会自动扩展，
+ *          当弹出数据时也是有序的从头节点弹出，
  *
  * 
  */
@@ -50,7 +51,7 @@ public:
 public:
     char *GetData();
     bool Push(const char *data, Int32 len);
-    void Pop(Int32 len);
+    void Pop(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 len);
 
     Int32 Write2socket(SOCKET sockfd);
     Int32 ReadFromSocket(SOCKET sockfd);

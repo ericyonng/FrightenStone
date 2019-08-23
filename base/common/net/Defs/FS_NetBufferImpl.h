@@ -48,6 +48,10 @@ inline bool FS_NetBuffer::IsFull() const
 {
 }
 
+inline bool FS_NetBuffer::IsEmpty() const
+{
+}
+
 inline void FS_NetBuffer::Release()
 {
     FsDelete(this);
