@@ -36,13 +36,15 @@
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/memorypool/memorypool.h"
+#include "base/common/net/Defs/FS_NetBufferArray.h"
 
 FS_NAMESPACE_BEGIN
 
 OBJ_POOL_CREATE_IMPL(FS_NetBuffer, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 
-FS_NetBuffer::FS_NetBuffer(Int32 sizeBuffer)
+FS_NetBuffer::FS_NetBuffer(FS_NetBufferArray *owner, Int32 sizeBuffer)
 {
+    _owner = owner;
     g_MemoryPool->Lock();
     _buff = reinterpret_cast<char *>(g_MemoryPool->Alloc(sizeBuffer));
     g_MemoryPool->Unlock();
@@ -112,7 +114,7 @@ void FS_NetBuffer::Pop(Int32 len)
 Int32 FS_NetBuffer::Write2socket(SOCKET sockfd)
 {
     Int32 ret = 0;
-    //缓冲区有数据
+    // 缓冲区有数据
     if(_lastPos > 0 && INVALID_SOCKET != sockfd)
     {
         //发送数据
