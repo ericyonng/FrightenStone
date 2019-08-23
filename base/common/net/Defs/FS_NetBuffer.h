@@ -58,6 +58,7 @@ public:
 
     bool HasMsg() const;
     bool NeedWrite() const;
+    bool IsFull() const;
 
 #pragma region iocp
 public:

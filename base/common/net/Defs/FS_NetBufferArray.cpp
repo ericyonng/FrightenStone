@@ -21,38 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_NetBufferImpl.h
+ * @file  : FS_NetBufferArray.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/5
+ * @date  : 2019/08/23
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Base_Common_Net_Defs_FS_NetBuffer_H__
-#pragma once
-
-FS_NAMESPACE_BEGIN
-
-inline char *FS_NetBuffer::GetData()
-{
-    return _buff;
-}
-
-inline bool FS_NetBuffer::NeedWrite() const
-{
-    return _lastPos > 0;
-}
-
-inline bool FS_NetBuffer::IsFull() const
-{
-}
-
-inline void FS_NetBuffer::Release()
-{
-    FsDelete(this);
-}
-
-FS_NAMESPACE_END
-
-#endif
+#include "stdafx.h"
+#include "base/common/net/Defs/FS_NetBufferArray.h"

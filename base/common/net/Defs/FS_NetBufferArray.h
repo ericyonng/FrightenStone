@@ -21,38 +21,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_NetBufferImpl.h
+ * @file  : FS_NetBufferArray.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/5
+ * @date  : 2019/08/23
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Base_Common_Net_Defs_FS_NetBuffer_H__
+#ifndef __Base_Common_Net_Defs_FS_NetBufferArray_H__
+#define __Base_Common_Net_Defs_FS_NetBufferArray_H__
 #pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/assist/utils/Impl/STLUtil.h"
+#include "base/common/net/Defs/FS_NetBuffer.h"
 
 FS_NAMESPACE_BEGIN
 
-inline char *FS_NetBuffer::GetData()
+class BASE_EXPORT FS_NetBufferArray
 {
-    return _buff;
-}
+    OBJ_POOL_CREATE_DEF(FS_NetBufferArray);
+public:
+    FS_NetBufferArray(Int32 sizeBuffer = FS_BUFF_SIZE_DEF);
+    ~FS_NetBufferArray();
+    
+public:
+    char *GetData();
+    bool Push(const char *data, Int32 len);
+    void Pop(Int32 len);
 
-inline bool FS_NetBuffer::NeedWrite() const
-{
-    return _lastPos > 0;
-}
+    Int32 Write2socket(SOCKET sockfd);
+    Int32 ReadFromSocket(SOCKET sockfd);
 
-inline bool FS_NetBuffer::IsFull() const
-{
-}
+    bool HasMsg() const;
+    bool NeedWrite() const;
 
-inline void FS_NetBuffer::Release()
-{
-    FsDelete(this);
-}
+#pragma region iocp
+public:
+#ifdef FS_USE_IOCP
+    IO_DATA_BASE *MakeRecvIoData(SOCKET sockfd);
+    IO_DATA_BASE *MakeSendIoData(SOCKET sockfd);
+
+    // 从iocp读入或写入iocp时 buffer相应调整
+    bool OnReadFromIocp(int recvBytes);
+    bool OnWrite2Iocp(int sendBytes);
+#endif
+#pragma endregion
+
+private:
+    Int32 _bufferSize;
+    std::list<FS_NetBuffer *> _buffers;
+};
 
 FS_NAMESPACE_END
+
+#include "base/common/net/Defs/FS_NetBufferArrayImpl.h"
 
 #endif
