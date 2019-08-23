@@ -41,10 +41,9 @@
 #include "base/common/net/Defs/FS_NetBuffer.h"
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/component/Impl/TimeSlice.h"
+#include "base/common/net/Defs/FS_NetBufferArray.h"
 
 FS_NAMESPACE_BEGIN
-
-class BASE_EXPORT FS_NetBuffer;
 
 class BASE_EXPORT FS_Client
 {
@@ -64,8 +63,9 @@ public:
     Int32 SendData(NetMsg_DataHeader *header);
     // 返回值 len 或 SOCKET_ERROR
     Int32 SendData(const char *data, Int32 len);
-    NetMsg_DataHeader *FrontMsg();
-    void PopFrontMsg();
+    std::list<FS_NetBuffer *>::iterator FrontMsgNode();
+    NetMsg_DataHeader *FrontMsg(std::list<FS_NetBuffer *>::iterator &iterNode);
+    void PopFrontMsg(std::list<FS_NetBuffer *>::iterator &iterNode);
 
     void ResetDTHeart();
     void UpdateHeartBeatExpiredTime();
@@ -77,10 +77,10 @@ public:
 
     #ifdef FS_USE_IOCP
     IO_DATA_BASE *MakeRecvIoData();
-    void OnRecvFromIocp(Int32 rcvBytes);
+    void OnRecvFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 rcvBytes);
 
     IO_DATA_BASE *MakeSendIoData();
-    void OnSend2iocp(Int32 snd);
+    void OnSend2iocp(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 snd);
 
     bool IsPostIoChange() const;
     #endif // FS_USE_IOCP
@@ -113,9 +113,9 @@ private:
     // socket fd_set  file desc set
     SOCKET _sockfd;
     // 第二缓冲区 接收消息缓冲区
-    FS_NetBuffer *_recvBuff;
+    FS_NetBufferArray *_recvBuff;
     // 发送缓冲区
-    FS_NetBuffer *_sendBuff;
+    FS_NetBufferArray *_sendBuff;
     // 心跳死亡计时
     TimeSlice _heartDeadSlice; // 心跳序列优化使用时间戳TODO
     // 上次发送消息数据的时间 

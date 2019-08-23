@@ -65,15 +65,20 @@ inline Int32 FS_Client::SendData(const char *data, Int32 len)
     return SOCKET_ERROR;
 }
 
-inline NetMsg_DataHeader *FS_Client::FrontMsg()
+inline NetMsg_DataHeader *FS_Client::FrontMsg(std::list<FS_NetBuffer *>::iterator &iterNode)
 {
-    return (NetMsg_DataHeader *)_recvBuff->GetData();
+    return (NetMsg_DataHeader *)(*iterNode)->GetData();
 }
 
-inline void FS_Client::PopFrontMsg()
+inline std::list<FS_NetBuffer *>::iterator FS_Client::FrontMsgNode()
+{
+    return _recvBuff->GetFrontNode();
+}
+
+inline void FS_Client::PopFrontMsg(std::list<FS_NetBuffer *>::iterator &iterNode)
 {
     if(HasRecvMsg())
-        _recvBuff->Pop(FrontMsg()->_packetLength);
+        _recvBuff->Pop(iterNode, FrontMsg(iterNode)->_packetLength);
 }
 
 inline void FS_Client::ResetDTHeart()

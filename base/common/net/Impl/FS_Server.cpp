@@ -252,9 +252,10 @@ void FS_Server::_OnClientMsgArrived()
         while(client->HasRecvMsg())
         {
             // 处理网络消息
-            _HandleNetMsg(client, client->FrontMsg());
+            auto iterNode = client->FrontMsgNode();
+            _HandleNetMsg(client, client->FrontMsg(iterNode));
             // 移除消息队列（缓冲区）最前的一条数据
-            client->PopFrontMsg();
+            client->PopFrontMsg(iterNode);
         }
     }
 }

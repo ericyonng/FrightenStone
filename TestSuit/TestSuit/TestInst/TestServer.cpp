@@ -93,15 +93,18 @@ public:
                     ++client->_recvMsgId;
                 }
 
-//                 g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> loginReq, userName[%s] pwd[%s] ")
-//                                        , static_cast<Int32>(client->GetSocket()), login->_userName, login->_pwd);
+                g_Log->net<EasyFSServer>("<Recv>socket<%d> loginReq, userName[%s] pwd[%s] msgId[%d] "
+                                        , static_cast<Int32>(client->GetSocket()), login->_userName, login->_pwd, login->_msgId);
                 // 登录逻辑
+
                 // ......
                 // 回应消息
                 if(_bSendBack)
                 {
                     fs::LoginRes ret;
                     ret._msgId = client->_sendMsgId;
+                    g_Log->net<EasyFSServer>("<Send>socket<%d> LoginRes, _result[%d] msgId[%d] "
+                                             , static_cast<Int32>(client->GetSocket()), ret._result, ret._msgId);
                     if(SOCKET_ERROR == client->SendData(&ret))
                     {
                         // 发送缓冲区满了，消息没发出去,目前直接抛弃了
@@ -114,6 +117,7 @@ public:
                     else {
                         ++client->_sendMsgId;
                     }
+
                     // g_Log->net<EasyFSServer>("<Socket=%d> send login res", client->GetSocket());
                 }
 

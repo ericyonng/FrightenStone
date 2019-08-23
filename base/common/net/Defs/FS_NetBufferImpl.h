@@ -39,6 +39,21 @@ inline char *FS_NetBuffer::GetData()
     return _buff;
 }
 
+inline std::list<FS_NetBuffer *>::iterator &FS_NetBuffer::GetNode()
+{
+    return _arrayNode;
+}
+
+inline FS_NetBufferArray *FS_NetBuffer::GetOwner()
+{
+    return _owner;
+}
+
+inline void FS_NetBuffer::SetNode(const std::list<FS_NetBuffer *>::iterator &iterNode)
+{
+    _arrayNode = iterNode;
+}
+
 inline bool FS_NetBuffer::NeedWrite() const
 {
     return _lastPos > 0;
@@ -46,10 +61,12 @@ inline bool FS_NetBuffer::NeedWrite() const
 
 inline bool FS_NetBuffer::IsFull() const
 {
+    return _lastPos >= _buffSize;
 }
 
 inline bool FS_NetBuffer::IsEmpty() const
 {
+    return _lastPos <= 0;
 }
 
 inline void FS_NetBuffer::Release()

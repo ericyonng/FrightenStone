@@ -236,8 +236,8 @@ Int32 FS_Iocp::PostQuit()
 Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
 {
     // 获取完成端口状态
-    // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)
-    // 以及重叠结构ioDataPtr 用于获取数据
+    // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)会原样返回
+    // 以及重叠结构ioDataPtr 用于获取数据重叠结构会原样返回
     ioEvent._bytesTrans = 0;
     ioEvent._ioData = NULL;
     ioEvent._data._ptr = NULL;

@@ -43,6 +43,8 @@
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT FS_NetBuffer;
+
 /* iocp若干定义类型 */
 class BASE_EXPORT IocpDefs
 {
@@ -69,8 +71,11 @@ struct BASE_EXPORT IO_DATA_BASE
     OVERLAPPED _overlapped{0};          // 使用重叠体可以关联到iodatabase,在投递accept时候传入
     SOCKET _sock = INVALID_SOCKET;
     Int32 _ioType = 0;
+    FS_NetBuffer *_owner;               // 所属的缓冲
 
-    // 没必要每个客户端指定一个缓冲，太大了，因为iocp取数据 时候数据是从队列中先进先出的方式被拷贝出来，每个iocp中的线程是互斥的执行的
+    // 没必要每个客户端指定一个缓冲，太大了，
+    // 因为iocp取数据 时候数据是从队列中先进先出的方式被拷贝出来，
+    // 每个iocp中的线程是互斥的执行的
     WSABUF _wsaBuff{0};                 // 数据缓冲结构
     // char _buff[IO_DATA_BUFF_SIZE]{0};           
     // Int32 _length = 0;

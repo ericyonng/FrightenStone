@@ -41,15 +41,19 @@
 
 FS_NAMESPACE_BEGIN
 
+// 数据出去的方向从front开始
+// 数据进来的方向从back开始
 class BASE_EXPORT FS_NetBufferArray
 {
     OBJ_POOL_CREATE_DEF(FS_NetBufferArray);
 public:
     FS_NetBufferArray(Int32 sizeBuffer = FS_BUFF_SIZE_DEF);
     ~FS_NetBufferArray();
+    void Release();
     
 public:
     char *GetData();
+    std::list<FS_NetBuffer *>::iterator GetFrontNode();
     bool Push(const char *data, Int32 len);
     void Pop(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 len);
 
@@ -66,8 +70,8 @@ public:
     IO_DATA_BASE *MakeSendIoData(SOCKET sockfd);
 
     // 从iocp读入或写入iocp时 buffer相应调整
-    bool OnReadFromIocp(int recvBytes);
-    bool OnWrite2Iocp(int sendBytes);
+    bool OnReadFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, int recvBytes);
+    bool OnWrite2Iocp(std::list<FS_NetBuffer *>::iterator &iterNode, int sendBytes);
 #endif
 #pragma endregion
 
