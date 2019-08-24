@@ -33,6 +33,7 @@
 #include "base/common/memleak/Impl/MemleakMonitor.h"
 #include "base/common/log/Log.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
+#include "base/common/assist/utils/utils.h"
 
 fs::MemleakMonitor *g_MemleakMonitor = NULL;
 
@@ -162,17 +163,37 @@ void MemleakMonitor::PrintSysMemoryInfo() const
                    , SystemUtil::GetTotalPhysMemSize()
                    , SystemUtil::GetAvailPhysMemSize()
                    , SystemUtil::GetMemoryLoad());
+
+    ProcessMemInfo memInfo = {};
+    g_Log->mempool("process occupied memory info:");
+    if(SystemUtil::GetProcessMemInfo(SystemUtil::GetCurProcessHandle(), memInfo))
+    {
+        g_Log->mempool("max historysetsize in bytes[%llu], cur set size in bytes[%llu];\n"
+                       "\tmaxHistoryPagedPoolUsage in bytes[%llu],cur paged pool usage in bytes[%llu];\n"
+                       "\tmax history non paged pool usage in bytes[%llu], cur non paged pool usage in bytes[%llu];\n"
+                       "\tmax history page file usage in bytes[%llu], cur page file usage in bytes[%llu];\n"
+                       "\tcur process allocating memory usage in bytes[%llu];"
+                       , memInfo._maxHistorySetSize, memInfo._curSetSize
+                       , memInfo._maxHistoryPagedPoolUsage, memInfo._pagedPoolUsage
+                       , memInfo._maxHistoryNonPagedPoolUsage, memInfo._curNonPagedPoolUsage
+                       , memInfo._maxHistoryPageFileUsage, memInfo._curPageFileUsage
+                       , memInfo._processAllocMemoryUsage);
+    }
+    else
+    {
+        g_Log->mempool("fail get process mem info");
+    }
 }
 
 void MemleakMonitor::PrintPoolAll() const
 {
     // 系统内存信息
     PrintSysMemoryInfo();
-    // 打印对象池
-    PrintObjPoolInfo();
     // 内存池信息
     if(_memPoolPrintCallback)
         (*_memPoolPrintCallback)();
+    // 打印对象池
+    PrintObjPoolInfo();
 }
 
 void MemleakMonitor::_PrintInfoPerSeconds(const FS_ThreadPool *pool)
