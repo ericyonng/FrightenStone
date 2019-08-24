@@ -54,4 +54,6 @@ const char *LogLevel::GetDescription(Int32 level)
 {
     return __g_LogLevelDescription[level];
 }
+
+MEMPOOL_CREATE_IMPL(LogData, _memPoolHelper)
 FS_NAMESPACE_END

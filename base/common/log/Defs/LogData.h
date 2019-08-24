@@ -36,6 +36,7 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/component/Impl/FS_String.h"
 #include "base/common/component/Impl/Time.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 class FS_String;
@@ -68,6 +69,9 @@ public:
 
 struct BASE_EXPORT LogData
 {
+    MEM_POOL_CREATE(_memPoolHelper);
+
+public:
     Time _logTime;                  // 时间 generate inside
     FS_String _logToWrite;          // 格式化的日志字符串 %s<%s>[%s][%s]line:%d %s
 };
