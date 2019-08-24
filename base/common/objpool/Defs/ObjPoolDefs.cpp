@@ -7,18 +7,18 @@ FS_NAMESPACE_BEGIN
 
 const Int32 ObjPoolDefs::__g_FreeRate = 50;           // 释放内存时判断内存块利用率低于__g_BusyThresholdValue百分数时转为可用区内存
 
-void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_t totalObjBlocks, size_t bytesOccupied, size_t memleakObjCnt, size_t memleakBytes)
+void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_t totalObjBlocks, size_t bytesOccupied, size_t memObjInUsingCnt, size_t memInUsingBytes)
 {
-    if(memleakBytes)
+    if(memInUsingBytes)
     {// 内存泄漏打印内存泄漏
         g_Log->objpool("obj name[%s], pool node cnt[%llu] totalObjBlocks[%llu] pool memory bytes occupied[%llu]"
-                       " memleak obj cnt[%llu] memleak bytes[%llu]"
+                       " memObjInUsingCnt[%llu] memInUsingBytes[%llu]"
                        , objName
                        , nodeCnt
                        , totalObjBlocks
                        , bytesOccupied
-                       , memleakObjCnt
-                       , memleakBytes);
+                       , memObjInUsingCnt
+                       , memInUsingBytes);
     }
     
     // 打印内存占用信息
