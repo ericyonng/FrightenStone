@@ -88,16 +88,16 @@ inline size_t ObjPoolHelper<ObjType>::GetPoolBytesOccupied() const
 template<typename ObjType>
 inline size_t ObjPoolHelper<ObjType>::PrintObjPool(Int64 &poolOccupiedBytes)
 {
-    auto memleakBytes = _alloctor->GetObjInUse()*IObjAlloctor<ObjType>::_objBlockSize;
+    auto memInUsingBytes = _alloctor->GetObjInUse()*IObjAlloctor<ObjType>::_objBlockSize;
     poolOccupiedBytes = _alloctor->GetBytesOccupied();
     ObjPoolMethods::PrintObjPoolInfo(typeid(ObjType).name()
                                      , _alloctor->GetNodeCnt()
                                      , _alloctor->GetTotalObjBlocks()
                                      , _alloctor->GetBytesOccupied()
                                      , _alloctor->GetObjInUse()
-                                     , memleakBytes);
+                                     , memInUsingBytes);
 
-    return memleakBytes;
+    return memInUsingBytes;
 }
 
 template<typename ObjType>
