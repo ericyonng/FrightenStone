@@ -109,7 +109,6 @@ private:
     LogFile *_logFiles[LogDefs::LOG_QUANTITY];                              // 日志id日志文件 创建后文件只允许读不允许增删改
     std::list<LogData *> *_logDatas[LogDefs::LOG_QUANTITY];                 // 日志id日志内容
     IDelegatePlus<void> *_threadWriteLogDelegate;                           // 日志线程写日志委托
-
     LogCaches *_logCaches;                                                  // 缓冲变量，提高性能
 };
 
