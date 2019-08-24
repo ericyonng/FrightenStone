@@ -236,7 +236,7 @@ private:\
 #define P_INSIZE    /* ‰»Îƒø±Í≥ﬂ¥Á*/
 
 #if defined(_WIN32) && defined(_DEBUG)
-#define ASSERT(x)   (x)?true:(::MessageBox(fs::SystemUtil::GetWindowHwndByPID(fs::SystemUtil::GetProcessId()), #x, fs::SystemUtil::GetCurProgramName().c_str(), MB_ABORTRETRYIGNORE))
+#define ASSERT(x)   (x)?true:(::MessageBox(fs::SystemUtil::GetWindowHwndByPID(fs::SystemUtil::GetCurProcessId()), #x, fs::SystemUtil::GetCurProgramName().c_str(), MB_ABORTRETRYIGNORE))
 #else
 #define ASSERT(x)   x?true:false
 #endif

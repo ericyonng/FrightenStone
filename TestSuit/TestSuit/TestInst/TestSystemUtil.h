@@ -46,7 +46,7 @@ public:
         // 当前进程
         fs::FS_String path;
         fs::SystemUtil::GetProgramPath(true,path);
-        std::cout <<"current process id:"<<fs::SystemUtil::GetProcessId()<< " current process path:" << path << std::endl;
+        std::cout <<"current process id:"<<fs::SystemUtil::GetCurProcessId()<< " current process path:" << path << std::endl;
 
 //         // 遍历进程
 //         auto hProcModule = fs::SystemUtil::CreateProcessSnapshot();

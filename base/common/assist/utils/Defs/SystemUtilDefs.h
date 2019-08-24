@@ -95,6 +95,20 @@ public:
     };
 };
 
+// 进程占用的内存信息
+struct BASE_EXPORT ProcessMemInfo
+{
+    size_t _maxHistorySetSize;              // 使用过的最大工作集，峰值内存占用
+    size_t _curSetSize;                     // 当前工作集占用大小，当前进程占用的内存
+    size_t _maxHistoryPagedPoolUsage;       // 使用过的最大分页池大小
+    size_t _pagedPoolUsage;                 // 分页池大小
+    size_t _maxHistoryNonPagedPoolUsage;    // 使用过的最大非分页池大小
+    size_t _curNonPagedPoolUsage;           // 当前非分页池大小
+    size_t _curPageFileUsage;               // 当前页交换文件使用大小
+    size_t _maxHistoryPageFileUsage;        // 历史最大页交换文件使用大小
+    size_t _processAllocMemoryUsage;        // 进程运行过程中申请的内存大小
+};
+
 extern BASE_EXPORT Locker __g_consoleLock;
 FS_NAMESPACE_END
 

@@ -87,8 +87,8 @@ inline IO_DATA_BASE *FS_NetBufferArray::MakeRecvIoData(SOCKET sockfd)
 }
 
 inline IO_DATA_BASE *FS_NetBufferArray::MakeSendIoData(SOCKET sockfd)
-{
-    return _buffers.back()->MakeSendIoData(sockfd);
+{// 从最早的数据发送
+    return _buffers.front()->MakeSendIoData(sockfd);
 }
 
 inline bool FS_NetBufferArray::OnReadFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, int recvBytes)

@@ -116,6 +116,24 @@ ULong SystemUtil::GetMemoryLoad()
 
     return status.dwMemoryLoad;
 }
+// 进程占用内存信息
+bool SystemUtil::GetProcessMemInfo(HANDLE processHandle, ProcessMemInfo &info)
+{
+    PROCESS_MEMORY_COUNTERS_EX processInfo = {};
+    if(!GetProcessMemoryInfo(processHandle, (PROCESS_MEMORY_COUNTERS *)&processInfo, sizeof(PROCESS_MEMORY_COUNTERS_EX)))
+        return false;
+
+    info._maxHistorySetSize = processInfo.PeakWorkingSetSize;
+    info._curSetSize = processInfo.WorkingSetSize;
+    info._maxHistoryPagedPoolUsage = processInfo.QuotaPeakPagedPoolUsage;
+    info._pagedPoolUsage = processInfo.QuotaPagedPoolUsage;
+    info._maxHistoryNonPagedPoolUsage = processInfo.QuotaPeakNonPagedPoolUsage;
+    info._curNonPagedPoolUsage = processInfo.QuotaNonPagedPoolUsage;
+    info._curPageFileUsage = processInfo.PagefileUsage;
+    info._maxHistoryPageFileUsage = processInfo.PeakPagefileUsage;
+    info._processAllocMemoryUsage = processInfo.PrivateUsage;
+    return true;
+}
 
 Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, ULong pid)
 {
@@ -259,11 +277,6 @@ HWND SystemUtil::GetWindowHwndByPID(DWORD dwProcessID)
     return hwndRet;
 }
 
-Int32 SystemUtil::GetProcessId()
-{
-    return _getpid();
-}
-
 void SystemUtil::BringWindowsToTop(HWND curWin)
 {
     ::BringWindowToTop(curWin);
@@ -290,6 +303,15 @@ bool SystemUtil::IsProcessExist(const FS_String &processName)
     }
 
     return false;
+}
+
+// 弹窗
+void SystemUtil::MessageBoxPopup(const FS_String &title, const FS_String &content)
+{
+#ifdef _WIN32
+    auto hwnd = GetWindowHwndByPID(GetCurProcessId());
+    ::MessageBoxA(hwnd, content.c_str(), title.c_str(), MB_ABORTRETRYIGNORE);
+#endif
 }
 
 void SystemUtil::LockConsole()
@@ -334,6 +356,32 @@ void SystemUtil::OutputToConsole(const FS_String &outStr)
     printf("%s", outStr.c_str());
 }
 
+ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
+{
+    PROCESSENTRY32 pe = {0};
+    pe.dwSize = sizeof(pe);
+    if(!Process32Next(hSnapshot, &pe))
+        return 0;
+
+    return pe.th32ProcessID;
+}
+
+ULong SystemUtil::GetCurrentThreadId()
+{
+    return ::GetCurrentThreadId();
+}
+
+Int32 SystemUtil::GetCurProcessId()
+{
+    return _getpid();
+}
+
+// 获取进程句柄
+HANDLE SystemUtil::GetCurProcessHandle()
+{
+    return ::GetCurrentProcess();
+}
+
 Int32 SystemUtil::CloseProcess(ULong processId, ULong *lastError)
 {
 #ifdef _WIN32
@@ -348,30 +396,6 @@ Int32 SystemUtil::CloseProcess(ULong processId, ULong *lastError)
 #endif
 
     return StatusDefs::Success;
-}
-
-// 弹窗
-void SystemUtil::MessageBoxPopup(const FS_String &title, const FS_String &content)
-{
-#ifdef _WIN32
-    auto hwnd = GetWindowHwndByPID(GetProcessId());
-    ::MessageBoxA(hwnd, content.c_str(), title.c_str(), MB_ABORTRETRYIGNORE);
-#endif
-}
-
-ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
-{
-    PROCESSENTRY32 pe = {0};
-    pe.dwSize = sizeof(pe);
-    if(!Process32Next(hSnapshot, &pe))
-        return 0;
-
-    return pe.th32ProcessID;
-}
-
-ULong SystemUtil::GetCurrentThreadId()
-{
-    return ::GetCurrentThreadId();
 }
 
 void SystemUtil::GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber)
