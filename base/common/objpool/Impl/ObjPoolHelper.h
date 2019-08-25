@@ -43,7 +43,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// 支持线程安全 尽量设置线程不安全避免加锁开销
+// 支持线程安全 尽量设置线程不安全避免加锁开销,不支持stl容器等自带分配器的对象
 template<typename ObjType>
 class ObjPoolHelper
 {

@@ -47,7 +47,7 @@ FS_NAMESPACE_BEGIN
 
 class FS_String;
 
-// TODO 抽象一个IMemoryPoolMgr 提供给外部使用
+// TODO 抽象一个IMemoryPoolMgr 提供给外部使用 最大支持__MEMORY_POOL_MAX_EXPAND_BYTES__ 内存池大小
 class BASE_EXPORT MemoryPoolMgr : public IMemoryPoolMgr
 {
 public:
@@ -69,6 +69,7 @@ private:
     void  _Init(size_t begin, size_t end, IMemoryAlloctor *alloctor);
     void _RegisterPrintCallback();
     void _UnRegisterPrintCallback();
+    void _UpdateMemPoolOccupied(size_t newOccupiedBytes);
 
 private:
     IMemoryAlloctor *_alloctors[__MEMORY_POOL_MAXBLOCK_LIMIT__];  // 内存分配器O(1)复杂度，最大支持__MEMORY_POOL_MAXBLOCK_LIMIT__的内存分配其他内存由系统分配
@@ -76,6 +77,10 @@ private:
     bool _isInit;
     Locker _locker;
     IDelegatePlus<void> *_printCallback;
+    size_t _curTotalOccupiedBytes = 0;      // 当前内存池占用的总字节数
+    bool _canCreateNewNode = true;
+    const size_t _maxCanAllocMemLimit;
+    IDelegatePlus<void, size_t> *_updateMemPoolOccupied = NULL;
 };
 
 inline void MemoryPoolMgr::Lock()
@@ -86,6 +91,16 @@ inline void MemoryPoolMgr::Lock()
 inline void MemoryPoolMgr::Unlock()
 {
     _locker.Unlock();
+}
+
+inline void MemoryPoolMgr::_UpdateMemPoolOccupied(size_t newOccupiedBytes)
+{
+    _curTotalOccupiedBytes += newOccupiedBytes;
+    if(!_canCreateNewNode)
+        return;
+
+    if(_curTotalOccupiedBytes >= __MEMORY_POOL_MAX_EXPAND_BYTES__)
+        _canCreateNewNode = false;
 }
 
 FS_NAMESPACE_END

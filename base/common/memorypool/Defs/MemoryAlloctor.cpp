@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-IMemoryAlloctor::IMemoryAlloctor()
+IMemoryAlloctor::IMemoryAlloctor(const bool &canCreateNewNode)
     :_isFinish(false)
     ,_curBuf(NULL)
     ,_blockAmount(BLOCK_AMOUNT_DEF)
@@ -51,6 +51,7 @@ IMemoryAlloctor::IMemoryAlloctor()
     ,_header(NULL)
     ,_lastNode(NULL)
     ,_curNodeCnt(0)
+    ,_canCreateNewNode(canCreateNewNode)
 {
     
 }
@@ -76,7 +77,11 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
     {
         // 没有可用内存开辟新节点
         if(!_usableBlockHeader)
+        {
+            if(!_canCreateNewNode)
+                return NULL;
             _NewNode();
+        }
 
         newBlock = _usableBlockHeader;
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
@@ -210,14 +215,17 @@ void IMemoryAlloctor::_NewNode()
     ++_curNodeCnt;
 
     _InitNode(newNode);
+    (*_updateMemPoolOccupied)(std::forward<size_t>(newNode->_nodeSize));
 }
 
-MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount)
+MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegatePlus<void, size_t> *updateMemPoolOccupied, const bool &canCreateNewNode)
+    :IMemoryAlloctor(canCreateNewNode)
 {
     _blockAmount = blockAmount;
     _blockSize = blockSize / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (blockSize % __MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
     _blockSize = _blockSize + sizeof(MemoryBlock);
     _effectiveBlockSize = _blockSize - sizeof(MemoryBlock);
+    _updateMemPoolOccupied = updateMemPoolOccupied;
 }
 
 MemoryAlloctor::~MemoryAlloctor()
