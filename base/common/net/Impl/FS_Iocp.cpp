@@ -250,8 +250,8 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
         const Int32 error = GetLastError();
         if(WAIT_TIMEOUT == error)
         {
-            g_Log->net<FS_Iocp>("WaitForMessage time out error<%d> status[%d]"
-                       , error, StatusDefs::IOCP_WaitTimeOut);
+//             g_Log->net<FS_Iocp>("WaitForMessage time out error<%d> status[%d]"
+//                        , error, StatusDefs::IOCP_WaitTimeOut);
 //             g_Log->any<FS_Iocp>("WaitForMessage time out error<%d> status[%d]"
 //                                 , error, StatusDefs::IOCP_WaitTimeOut);
             return StatusDefs::IOCP_WaitTimeOut;
