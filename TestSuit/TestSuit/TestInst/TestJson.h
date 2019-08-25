@@ -42,11 +42,13 @@ class TestJson
 public:
     static void Run()
     {
+        g_Log->InitModule("test json");
         fs::json j;
         j["pi"] = 3.141;
         j["name"] = "Niels";
         fs::FS_String p;
-        std::cout << p << std::endl;
+        p = std::string(j.dump());
+        std::cout <<"p = "<< p << std::endl;
         std::cout << j << std::endl;
     }
 };
