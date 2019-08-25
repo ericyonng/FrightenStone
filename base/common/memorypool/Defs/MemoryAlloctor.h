@@ -48,6 +48,7 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include <set>
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -60,7 +61,7 @@ class BASE_EXPORT IMemoryAlloctor
 {
     friend class MemoryPoolMgr;
 public:
-    IMemoryAlloctor();
+    IMemoryAlloctor(const bool &canCreateNewNode);
     virtual ~IMemoryAlloctor();
 
 public:
@@ -96,12 +97,15 @@ protected:
     size_t          _blockAmount;           // 内存块总数量
     size_t          _blockSize;             // 内存块大小
     size_t          _effectiveBlockSize;    // 有效内存块大小（扣除MemoryBlock的内存大小）
+
+    IDelegatePlus<void, size_t> *_updateMemPoolOccupied = NULL;
+    const bool &_canCreateNewNode;
 };
 
 class MemoryAlloctor : public IMemoryAlloctor
 {
 public:
-    MemoryAlloctor(size_t blockSize, size_t blockAmount);
+    MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegatePlus<void, size_t> *updateMemPoolOccupied, const bool &canCreateNewNode);
     virtual ~MemoryAlloctor();
 };
 

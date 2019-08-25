@@ -50,6 +50,7 @@ MemoryPoolMgr::MemoryPoolMgr()
     :_alloctors{NULL}
     ,_isInit(false)
     ,_printCallback(NULL)
+    ,_maxCanAllocMemLimit(__MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_POOL_ALIGN_BYTES__*__MEMORY_POOL_ALIGN_BYTES__)
 {
     InitPool();
 }
@@ -67,10 +68,12 @@ Int32 MemoryPoolMgr::InitPool()
         _locker.Unlock();
         return StatusDefs::Success;
     }
+    _updateMemPoolOccupied = DelegatePlusFactory::Create(this, &MemoryPoolMgr::_UpdateMemPoolOccupied);
     Int32 multi = __MEMORY_POOL_MINIMUM_BLOCK__;
     for(Int32 i = 0; i < __MEMORY_POOL_MAXBLOCK_LIMIT__; )
     {
-        _Init(i, i + multi, new MemoryAlloctor(i + multi, BLOCK_AMOUNT_DEF));
+        _Init(i, i + multi, new MemoryAlloctor(i + multi, BLOCK_AMOUNT_DEF, _updateMemPoolOccupied, _canCreateNewNode));
+        _UpdateMemPoolOccupied(i + multi * BLOCK_AMOUNT_DEF);
 
         // 下一次分配的是原来的2倍的内存 64-128-256-512-...
         i += multi;
@@ -93,29 +96,31 @@ void MemoryPoolMgr::FinishPool()
     for(auto iter : _allAlloctors)
         Fs_SafeFree(iter);
     _allAlloctors.clear();
+    Fs_SafeFree(_updateMemPoolOccupied);
     _locker.Unlock();
 }
 
 void *MemoryPoolMgr::Alloc(size_t bytes)
 {
     // 判断是否内存池可分配
-    if(bytes < __MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_POOL_ALIGN_BYTES__*__MEMORY_POOL_ALIGN_BYTES__)
+    if(bytes < _maxCanAllocMemLimit)
     {
-        return  _alloctors[bytes]->AllocMemory(bytes);
+        auto ptr = _alloctors[bytes]->AllocMemory(bytes);
+        if(ptr)
+            return ptr;
     }
-    else
-    {
-        auto alignBytes = bytes / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (bytes%__MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
-        alignBytes = bytes + sizeof(MemoryBlock);
 
-        char *cache = reinterpret_cast<char *>(::malloc(alignBytes));
-        MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
-        block->_isInPool = false;
-        block->_ref = 1;
-        block->_alloctor = 0;
-        block->_nextBlock = 0;
-        return  cache + sizeof(MemoryBlock);
-    }
+    // 非内存池
+    auto alignBytes = bytes / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (bytes%__MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
+    alignBytes = bytes + sizeof(MemoryBlock);
+
+    char *cache = reinterpret_cast<char *>(::malloc(alignBytes));
+    MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
+    block->_isInPool = false;
+    block->_ref = 1;
+    block->_alloctor = 0;
+    block->_nextBlock = 0;
+    return  cache + sizeof(MemoryBlock);
 }
 
 void *MemoryPoolMgr::Realloc(void *ptr, size_t bytes)
@@ -203,6 +208,7 @@ void MemoryPoolMgr::_UnRegisterPrintCallback()
     FS_Release(_printCallback);
     g_MemleakMonitor->UnRegisterMemPoolPrintCallback();
 }
+
 FS_NAMESPACE_END
 
 
