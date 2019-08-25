@@ -68,12 +68,12 @@ inline void FS_Server::_AddToHeartBeatQueue(FS_Client *client)
 {
     _clientHeartBeatQueue.erase(client);
     _clientHeartBeatQueue.insert(client);
-    UInt16 cpuGroup = 0;
-    Byte8 cpuNum = 0;
-    ULong threadId = SystemUtil::GetCurrentThreadId();
-    SystemUtil::GetCallingThreadCpuInfo(cpuGroup, cpuNum);
-    g_Log->net<FS_Server>("_AddToHeartBeatQueue cpuGroup[%hu],cpuNumber[%d],threadId[%lu],fs_server id[%d] heart beat queue cnt[%llu]"
-                          , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
+//     UInt16 cpuGroup = 0;
+//     Byte8 cpuNum = 0;
+//     ULong threadId = SystemUtil::GetCurrentThreadId();
+//     SystemUtil::GetCallingThreadCpuInfo(cpuGroup, cpuNum);
+//     g_Log->net<FS_Server>("_AddToHeartBeatQueue cpuGroup[%hu],cpuNumber[%d],threadId[%lu],fs_server id[%d] heart beat queue cnt[%llu]"
+//                           , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
 }
 
 inline void FS_Server::_DelayRmClient(FS_Client *client)
