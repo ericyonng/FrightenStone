@@ -61,5 +61,6 @@
 
 void TestInsts::Run()
 {
-    TestServer::Run();
+    // TestServer::Run();
+    TestJson::Run();
 }
