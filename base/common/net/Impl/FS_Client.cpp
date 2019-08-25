@@ -98,7 +98,7 @@ IO_DATA_BASE *FS_Client::MakeRecvIoData()
 void FS_Client::OnRecvFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 rcvBytes)
 {
     if(!_isPostRecv)
-        g_Log->w<FS_Client>(_LOGFMT_("recv from _isPostRecv is false"));
+        g_Log->e<FS_Client>(_LOGFMT_("recv from _isPostRecv is false"));
 
     _isPostRecv = false;
     _recvBuff->OnReadFromIocp(iterNode, rcvBytes);

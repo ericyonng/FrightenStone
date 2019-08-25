@@ -104,7 +104,7 @@ void FS_MainIocpServer::_OnNetMonitorTask(const FS_ThreadPool *pool)
         // ³ö´í
         if(ret != StatusDefs::Success)
         {
-            g_Log->net<FS_MainIocpServer>("OnNetMonitorTask.WaitForCompletion error ret[%d]", ret);
+            g_Log->e<FS_MainIocpServer>(_LOGFMT_("OnNetMonitorTask.WaitForCompletion error ret[%d]"), ret);
             break;
         }
 

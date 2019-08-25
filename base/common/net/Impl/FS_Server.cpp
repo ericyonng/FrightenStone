@@ -142,7 +142,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         auto st = _BeforeClientMsgTransfer(_delayRemoveClients);
         if(st != StatusDefs::Success)
         {
-            g_Log->net<FS_Server>("FS_Server id[%d] _BeforeClientMsgTransfer: st[%d] ", _id, st);
+            g_Log->e<FS_Server>(_LOGFMT_("FS_Server id[%d] _BeforeClientMsgTransfer: st[%d] "), _id, st);
 
             // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
             for(auto &client : _delayRemoveClients)
@@ -193,7 +193,7 @@ void FS_Server::_DetectClientHeartTime()
         // 若有post消息，则先关闭socket，其他情况不用
         if(client->IsPostIoChange())
             client->Close();
-        g_Log->any<FS_Server>("heart beat expired sock[%llu] expiredtime[%lld] nowtime[%lld]"
+        g_Log->net<FS_Server>("heart beat expired sock[%llu] expiredtime[%lld] nowtime[%lld]"
                               , sock, client->GetHeartBeatExpiredTime().GetMicroTimestamp()
                               ,_lastHeartDetectTime.GetMicroTimestamp());
         // _OnClientLeave(client);
@@ -207,8 +207,8 @@ void FS_Server::_DetectClientHeartTime()
     Byte8 cpuNum = 0;
     ULong threadId = SystemUtil::GetCurrentThreadId();
     SystemUtil::GetCallingThreadCpuInfo(cpuGroup, cpuNum);
-    g_Log->net<FS_Server>("cpuGroup[%hu],cpuNumber[%d],threadId[%lu],fs_server id[%d] _DetectClientHeartTime heart beat queue cnt[%llu]"
-                          , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
+//     g_Log->net<FS_Server>("cpuGroup[%hu],cpuNumber[%d],threadId[%lu],fs_server id[%d] _DetectClientHeartTime heart beat queue cnt[%llu]"
+//                           , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
 }
 
 void FS_Server::_OnClientLeave(FS_Client *client)
@@ -274,8 +274,8 @@ Int32 FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)
     }
     else
     {
-        g_Log->any<FS_Server>("client sock[%llu] heart beat expired time[%lld] error msg st[%d]"
-                              , client->GetSocket(), client->GetHeartBeatExpiredTime().GetMicroTimestamp(), st);
+        g_Log->w<FS_Server>(_LOGFMT_("client sock[%llu] heart beat expired time[%lld] error msg st[%d]")
+                            , client->GetSocket(), client->GetHeartBeatExpiredTime().GetMicroTimestamp(), st);
     }
 
     return st;
