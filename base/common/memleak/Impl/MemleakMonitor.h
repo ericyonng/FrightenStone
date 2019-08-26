@@ -50,6 +50,8 @@ public:
     virtual ~MemleakMonitor();
 
     static MemleakMonitor *GetInstance();
+    void Start();
+
     void RegisterObjPoolCallback(const char *name, IDelegatePlus<size_t, Int64 &> *callback);
     void UnRegisterObjPool(const char *name);
     void RegisterMemPoolPrintCallback(const IDelegatePlus<void> *callback);

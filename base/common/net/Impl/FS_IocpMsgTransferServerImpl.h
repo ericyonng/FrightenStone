@@ -38,7 +38,10 @@ inline void FS_IocpMsgTransferServer::_DelayRmClient(IO_EVENT *ioEvent, std::set
 {
     FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
     if(!client)
+    {
+        g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("_ioEvent->_data._ptr is null"));
         return;
+    }
 
     // µôÏß´¦Àí
     if(!client->IsDestroy())

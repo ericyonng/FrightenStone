@@ -45,7 +45,7 @@ MemleakMonitor::MemleakMonitor()
     :_memPoolPrintCallback(NULL)
     ,_printInfoPool(new FS_ThreadPool(0, 1))
 {
-    _printInfoPool->AddTask(DelegatePlusFactory::Create(this, &MemleakMonitor::_PrintInfoPerSeconds));
+    
 }
 
 MemleakMonitor::~MemleakMonitor()
@@ -63,6 +63,11 @@ MemleakMonitor *MemleakMonitor::GetInstance()
     _locker.Unlock();
 
     return g_MemleakMonitor;
+}
+
+void MemleakMonitor::Start()
+{
+    _printInfoPool->AddTask(DelegatePlusFactory::Create(this, &MemleakMonitor::_PrintInfoPerSeconds));
 }
 
 void MemleakMonitor::RegisterObjPoolCallback(const char *name, IDelegatePlus<size_t, Int64 &> *callback)

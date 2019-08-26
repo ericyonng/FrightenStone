@@ -9,6 +9,11 @@ inline FS_NetBufferArray::FS_NetBufferArray(Int32 sizeBuffer)
     :_bufferSize(sizeBuffer)
 {
     auto newBuffer = new FS_NetBuffer(this, _bufferSize);
+    if(!newBuffer)
+    {
+        g_Log->e<FS_NetBufferArray>(_LOGFMT_("newBuffer is null cant new a obj from pool stack backtrace:\n %s")
+                                    , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+    }
     _buffers.push_back(newBuffer);
     newBuffer->SetNode(--_buffers.end());
 }
@@ -35,7 +40,22 @@ inline std::list<FS_NetBuffer *>::iterator FS_NetBufferArray::GetFrontNode()
 
 inline bool FS_NetBufferArray::Push(const char *data, Int32 len)
 {
-    if(!_buffers.back()->Push(data, len))
+    auto back = _buffers.back();
+    if(!back)
+    {
+        _buffers.pop_back();
+        auto newBuffer = new FS_NetBuffer(this, _bufferSize);
+        if(!newBuffer)
+        {
+            g_Log->e<FS_NetBufferArray>(_LOGFMT_("newBuffer is null cant new a obj from pool stack backtrace:\n %s")
+                                        , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+        }
+        _buffers.push_back(newBuffer);
+        newBuffer->SetNode(--_buffers.end());
+        back = newBuffer;
+    }
+
+    if(!back->Push(data, len))
     {
         auto newBuffer = new FS_NetBuffer(this, _bufferSize);
         _buffers.push_back(newBuffer);
@@ -73,22 +93,53 @@ inline Int32 FS_NetBufferArray::ReadFromSocket(SOCKET sockfd)
 
 inline bool FS_NetBufferArray::HasMsg() const
 {
-    return _buffers.front()->HasMsg();
+    auto front = _buffers.front();
+    return front ? front->HasMsg() : false;
 }
 
 inline bool FS_NetBufferArray::NeedWrite() const
 {
-    return _buffers.front()->NeedWrite();
+    auto buffer = _buffers.front();
+    return buffer ? buffer->NeedWrite() : false;
 }
 
 inline IO_DATA_BASE *FS_NetBufferArray::MakeRecvIoData(SOCKET sockfd)
 {
-    return _buffers.back()->MakeRecvIoData(sockfd);
+    auto back = _buffers.back();
+    if(!back)
+    {
+        _buffers.pop_back();
+        auto newBuffer = new FS_NetBuffer(this, _bufferSize);
+        if(!newBuffer)
+        {
+            g_Log->e<FS_NetBufferArray>(_LOGFMT_("newBuffer is null cant new a obj from pool stack backtrace:\n %s")
+                                        , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+        }
+        _buffers.push_back(newBuffer);
+        newBuffer->SetNode(--_buffers.end());
+        back = newBuffer;
+    }
+
+    return back->MakeRecvIoData(sockfd);
 }
 
 inline IO_DATA_BASE *FS_NetBufferArray::MakeSendIoData(SOCKET sockfd)
 {// 从最早的数据发送
-    return _buffers.front()->MakeSendIoData(sockfd);
+    auto front = _buffers.front();
+    if(!front)
+    {
+        _buffers.pop_front();
+        auto newBuffer = new FS_NetBuffer(this, _bufferSize);
+        if(!newBuffer)
+        {
+            g_Log->e<FS_NetBufferArray>(_LOGFMT_("newBuffer is null cant new a obj from pool stack backtrace:\n %s")
+                                        , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+        }
+        _buffers.push_front(newBuffer);
+        newBuffer->SetNode(_buffers.begin());
+        front = newBuffer;
+    }
+    return front->MakeSendIoData(sockfd);
 }
 
 inline bool FS_NetBufferArray::OnReadFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, int recvBytes)

@@ -106,7 +106,10 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
 {
     _locker.Lock();
     if(_isInit)
+    {
+        _locker.Unlock();
         return StatusDefs::Success;
+    }
 
     // 根目录
     _rootDirName = rootDirName;
@@ -321,6 +324,9 @@ void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
 {// TODO:测试
     // 1.转移到缓冲区（只交换list指针）
     _flielocker[logFileIndex]->Lock();
+//     FS_String str;
+//     str.AppendFormat("\nthreadid[%lu] logfileIndex[%d]\n", SystemUtil::GetCurrentThreadId(), logFileIndex);
+//     _OutputToConsole(LogLevel::Any, str);
     if(_logDatas[logFileIndex]->empty())
     {
         _flielocker[logFileIndex]->Unlock();

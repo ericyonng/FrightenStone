@@ -52,6 +52,17 @@ public:
         nowTime.FlushTime();
         for(auto i = 0; i < 1000000; ++i)
             g_Log->net<TestLogModule>("Welcome To Frighten Stone Frame!");
+        nowTime2.FlushTime();
+//         {
+//             g_Log->any<TestLogModule>("Welcome To Frighten Stone Frame!");
+//             g_Log->w<TestLogModule>(_LOGFMT_("Welcome To Frighten Stone Frame!"));
+//             g_Log->sys<TestLogModule>(_LOGFMT_("Welcome To Frighten Stone Frame!"));
+//             g_Log->mempool("Welcome To Frighten Stone Frame!");
+//             g_Log->memleak("Welcome To Frighten Stone Frame!");
+//             g_Log->objpool("Welcome To Frighten Stone Frame!");
+//         }
+        
+
 //         logMgr->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
 //         logMgr->e<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
 //         logMgr->crash<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
@@ -60,7 +71,6 @@ public:
 
 //             g_Log->w<TestLogModule>(_LOGFMT_("hello world%s"), "wocao");
 //             g_Log->sys<TestLogModule>(_LOGFMT_("time:%lld"), nowTime.GetMicroTimestamp());
-        nowTime2.FlushTime();
         std::cout <<"time used<us>= " << (nowTime2 - nowTime).GetTotalMicroSeconds() << std::endl;
         getchar();
         g_EasyGlobal2->Finish();
