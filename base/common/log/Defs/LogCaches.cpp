@@ -38,7 +38,6 @@
 FS_NAMESPACE_BEGIN
 LogDataCache::LogDataCache()
     :_cache{new std::list<LogData *>}
-    ,_fileIndex(0)
 {
 }
 
@@ -49,14 +48,12 @@ fs::LogDataCache::~LogDataCache()
 
 LogCaches::LogCaches()
     :_swapCache(NULL)
+    ,_cache4RealLog(NULL)
 {
-    for(Int32 i = 0; i < LogDefs::LOG_QUANTITY; ++i)
-        _logDataCache[i] = new LogDataCache;
 }
 
 LogCaches::~LogCaches()
 {
-    STLUtil::DelArray(_logDataCache);
 }
 
 FS_NAMESPACE_END

@@ -92,7 +92,7 @@ protected:
 
     // 线程操作
 private:
-    void _OnThreadWriteLog();
+    void _OnThreadWriteLog(Int32 logFileIndex);
 
 private:
     std::atomic_bool _isInit{false};
@@ -105,11 +105,13 @@ private:
     Int32 _threadWorkIntervalMsTime;                                            // 日志线程工作间隔时间
 
     /* 日志文件内容 */
-    ConditionLocker _locker;                                                // 锁
+    ConditionLocker *_flielocker[LogDefs::LOG_QUANTITY];                    // 日志文件锁
+    ConditionLocker _locker;                                                // 系统锁
+
     LogFile *_logFiles[LogDefs::LOG_QUANTITY];                              // 日志id日志文件 创建后文件只允许读不允许增删改
     std::list<LogData *> *_logDatas[LogDefs::LOG_QUANTITY];                 // 日志id日志内容
-    IDelegatePlus<void> *_threadWriteLogDelegate;                           // 日志线程写日志委托
-    LogCaches *_logCaches;                                                  // 缓冲变量，提高性能
+    IDelegatePlus<void, Int32> *_threadWriteLogDelegate;                    // 日志线程写日志委托
+    std::list<LogData *> *_logCaches[LogDefs::LOG_QUANTITY];                // 缓冲变量，提高性能
 };
 
 FS_NAMESPACE_END

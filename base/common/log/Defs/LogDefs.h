@@ -74,7 +74,7 @@ public:
     GENERAL_ADDLOG(TESTLOG, testcode)       // ¥˙¬Î≤‚ ‘
     DECLEAR_GENERAL_LOG_END()
 };
-
+ 
 
 FS_NAMESPACE_END
 
