@@ -203,6 +203,7 @@ void TestServer::Run()
         g_Log->e<TestServer>(_LOGFMT_("InitCrashHandleParams fail initret[%d]"), initret);
         return;
     }
+    g_MemleakMonitor->Start();
 
     fs::EasyFSServer easyServer;
     easyServer.InitSocket();

@@ -38,6 +38,10 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/assist/utils/Impl/STLUtil.h"
 #include "base/common/net/Defs/FS_NetBuffer.h"
+#include "base/common/assist/utils/Impl/SystemUtil.h"
+#include "base/common/component/Impl/FS_String.h"
+#include "base/common/crashhandle/CrashHandle.h"
+#include "base/common/log/Log.h"
 
 FS_NAMESPACE_BEGIN
 

@@ -42,7 +42,6 @@ const size_t IObjAlloctor<ObjType>::_objBlockSize = sizeof(ObjType) / __OBJPOOL_
 template<typename ObjType>
 inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     :_curNodeObjs(NULL)
-    ,_lastDeleted(NULL)
     ,_alloctedInCurNode(0)
     ,_nodeCapacity(blockAmount)
     ,_header(NULL)
@@ -102,8 +101,7 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
 #endif
 
     // free的对象构成链表用于下次分配
-    *((ObjType **)ptr) = _lastDeleted;
-    _lastDeleted = reinterpret_cast<ObjType *>(ptr);
+    _lastDeleted.push_back((ObjType *)ptr);
     --_objInUse;
 
 #if __FS_THREAD_SAFE__
@@ -114,12 +112,10 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
 template<typename ObjType>
 inline void *IObjAlloctor<ObjType>::AllocNoLocker()
 {
-    if(_lastDeleted)
+    if(!_lastDeleted.empty())
     {
-        _ptrWillGiving = _lastDeleted;
-
-        // 取得最后一个被释放对象的地址
-        _lastDeleted = *((ObjType **)(_lastDeleted));
+        _ptrWillGiving = _lastDeleted.front();
+        _lastDeleted.pop_front();
         ++_objInUse;
 
         return _ptrWillGiving;
@@ -142,8 +138,7 @@ template<typename ObjType>
 inline void IObjAlloctor<ObjType>::FreeNoLocker(void *ptr)
 {
     // free的对象构成链表用于下次分配
-    *((ObjType **)ptr) = _lastDeleted;
-    _lastDeleted = reinterpret_cast<ObjType *>(ptr);
+    _lastDeleted.push_back((ObjType *)ptr);
     --_objInUse;
 }
 

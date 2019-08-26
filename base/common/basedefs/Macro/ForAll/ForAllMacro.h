@@ -241,6 +241,9 @@ private:\
 #define ASSERT(x)   x?true:false
 #endif
 
+#undef ASSERTBOX
+#define ASSERTBOX(x)    (x)?true:(::MessageBox(fs::SystemUtil::GetWindowHwndByPID(fs::SystemUtil::GetCurProcessId()), #x, fs::SystemUtil::GetCurProgramName().c_str(), MB_ABORTRETRYIGNORE))
+
 #undef ARRAY_ELEM_COUNT
 #define ARRAY_ELEM_COUNT(x) sizeof(x)/sizeof(x[0])
 
