@@ -52,11 +52,11 @@ FS_Log::FS_Log()
     : _threadPool(NULL)
     , _threadWorkIntervalMsTime(LOG_THREAD_INTERVAL_MS_TIME)
     , _threadWriteLogDelegate(NULL)
-    , _logCaches(NULL)
     , _levelRefHook{NULL}
     , _levelRefBeforeLogHook{NULL}
     , _logFiles{NULL}
     , _logDatas{NULL}
+    ,_logCaches{NULL}
 {
 
 }
@@ -111,18 +111,29 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     // 根目录
     _rootDirName = rootDirName;
 
+    // 初始化文件锁
+    for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
+        _flielocker[i] = new ConditionLocker();
+
     // TODO:初始化log config options
     _ReadConfig();
 
     // 初始化日志文件
-    _logCaches = new LogCaches;
     LogDefs::LogInitHelper<LogDefs::LOG_NUM_MAX>::InitLog(this);
 
-    // 初始化线程池并添加写日志任务
-    _threadPool = new FS_ThreadPool(1, 1);
+    // 初始化缓冲
+    for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
+        _logCaches[i] = new std::list<LogData *>;
+
+    // 初始化线程池并添加写日志任务,每个日志文件一个独立的线程
+    _threadPool = new FS_ThreadPool(0, LogDefs::LOG_QUANTITY);
     _threadWriteLogDelegate = DelegatePlusFactory::Create(this, &FS_Log::_OnThreadWriteLog);
-    ITask *logTask = new LogTask(_threadPool, _threadWriteLogDelegate, _threadWorkIntervalMsTime);
-    ASSERT(_threadPool->AddTask(*logTask));
+    for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
+    {
+        ITask *logTask = new LogTask(_threadPool, _threadWriteLogDelegate, _threadWorkIntervalMsTime, i);
+        ASSERT(_threadPool->AddTask(*logTask, true));
+    }
+
 
     _isInit = true;
     _locker.Unlock();
@@ -167,8 +178,9 @@ void FS_Log::FinishModule()
 
         Fs_SafeFree(_levelRefBeforeLogHook[i]);
     }
-    Fs_SafeFree(_logCaches);
     Fs_SafeFree(_threadPool);
+    STLUtil::DelArray(_flielocker);
+    STLUtil::DelArray(_logCaches);
 }
 
 Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName)
@@ -235,9 +247,9 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
     LogData cache = *logData;
     
     // 3.将日志数据放入队列
-    _locker.Lock();
+    _flielocker[fileUniqueIndex]->Lock();
     _logDatas[fileUniqueIndex]->push_back(logData);
-    _locker.Unlock();
+    _flielocker[fileUniqueIndex]->Unlock();
 
     // 4.打印到控制台
 #if ENABLE_OUTPUT_CONSOLE
@@ -305,53 +317,42 @@ void FS_Log::_ReadConfig()
     // 日志配置项
 }
 
-void FS_Log::_OnThreadWriteLog()
-{
+void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
+{// TODO:测试
     // 1.转移到缓冲区（只交换list指针）
-    _locker.Lock();
-    for(_logCaches->_increasePos = 0, _logCaches->_fileIndex = 0;
-        _logCaches->_fileIndex < fs::LogDefs::LOG_QUANTITY;
-        ++_logCaches->_fileIndex)
+    _flielocker[logFileIndex]->Lock();
+    if(_logDatas[logFileIndex]->empty())
     {
-        if(_logDatas[_logCaches->_fileIndex]->empty())
-            continue;
-
-        // 只交换数据队列指针拷贝最少，最快，而且交换后_logDatas队列是空的相当于清空了数据 保证缓冲队列前几个都不为NULL, 碰到NULL表示结束
-        _logCaches->_swapCache = _logCaches->_logDataCache[_logCaches->_increasePos]->_cache;
-
-        _logCaches->_logDataCache[_logCaches->_increasePos]->_cache = _logDatas[_logCaches->_fileIndex];
-        _logCaches->_logDataCache[_logCaches->_increasePos]->_fileIndex = _logCaches->_fileIndex;
-
-        _logDatas[_logCaches->_fileIndex] = _logCaches->_swapCache;
-
-        ++_logCaches->_increasePos;
+        _flielocker[logFileIndex]->Unlock();
+        return;
     }
-    _locker.Unlock();
 
-    if(_logCaches->_logDataCache[0]->_cache->empty())
+    // 只交换数据队列指针拷贝最少，最快，而且交换后_logDatas队列是空的相当于清空了数据 保证缓冲队列前几个都不为NULL, 碰到NULL表示结束
+    std::list<LogData *> *&swapCache = _logCaches[logFileIndex];
+    std::list<LogData *> *cache4RealLog = NULL;
+    cache4RealLog = _logDatas[logFileIndex];
+    _logDatas[logFileIndex] = swapCache;
+    _flielocker[logFileIndex]->Unlock();
+    swapCache = cache4RealLog;
+
+    if(swapCache->empty())
         return;
 
     // 2.写日志
-    for(_logCaches->_pos = 0; _logCaches->_pos < fs::LogDefs::LOG_QUANTITY; ++_logCaches->_pos)
+    LogFile *logFile = _logFiles[logFileIndex];
+    for(auto &iterLog : *swapCache)
     {
-        if(_logCaches->_logDataCache[_logCaches->_pos]->_cache->empty())
-            break;
+        // 文件过大转储到分立文件
+        if(logFile->IsTooLarge(LOG_SIZE_LIMIT))
+            logFile->PartitionFile();
 
-        _logCaches->_logFile = _logFiles[_logCaches->_logDataCache[_logCaches->_pos]->_fileIndex];
-        for(auto &iterLog : *_logCaches->_logDataCache[_logCaches->_pos]->_cache)
-        {
-            // 文件过大转储到分立文件
-            if(_logCaches->_logFile->IsTooLarge(LOG_SIZE_LIMIT))
-                _logCaches->_logFile->PartitionFile();
-
-            // 写入文件
-            _logCaches->_logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
-            Fs_SafeFree(iterLog);
-        }
-
-        _logCaches->_logFile->Flush();
-        _logCaches->_logDataCache[_logCaches->_pos]->_cache->clear();
+        // 写入文件
+        logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
+        Fs_SafeFree(iterLog);
     }
+
+    logFile->Flush();
+    swapCache->clear();
 }
 FS_NAMESPACE_END
 

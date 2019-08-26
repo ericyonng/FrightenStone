@@ -44,16 +44,17 @@ class FS_ThreadPool;
 class LogTask :public ITask
 {
 public:
-    LogTask(FS_ThreadPool *pool, IDelegatePlus<void> *taskDelegate, Int32 workIntervalMsTime);
+    LogTask(FS_ThreadPool *pool, IDelegatePlus<void, Int32> *taskDelegate, Int32 workIntervalMsTime, Int32 logFileIndex);
     virtual ~LogTask();
 
     // 任务执行体
     virtual Int32 Run();
 
 protected:
-    IDelegatePlus<void> *_taskDelegate;
+    IDelegatePlus<void, Int32> *_taskDelegate;
     FS_ThreadPool *_pool;
     Int32 _workIntervalMsTime;    // 写日志时间间隔
+    Int32 _logFileIndex;
 };
 
 

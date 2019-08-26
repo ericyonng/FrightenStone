@@ -44,7 +44,6 @@ struct LogDataCache
     ~LogDataCache();
 
     std::list<LogData *> *_cache;    // 日志数据队列
-    Int32 _fileIndex;                      // 日志数据在原数据的位置
 };
 
 struct LogData;
@@ -57,11 +56,8 @@ public:
     virtual ~LogCaches();
 
 public:
-    LogDataCache *_logDataCache[fs::LogDefs::LOG_QUANTITY];     // 日志内容缓冲
-    Int32 _pos{0};
-    Int32 _fileIndex{0};
-    Int32 _increasePos{0};
     std::list<LogData *> *_swapCache;
+    std::list<LogData *> *_cache4RealLog;
 
     // logfile
     LogFile *_logFile{NULL};
