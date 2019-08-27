@@ -65,17 +65,16 @@ void FS_IocpMsgTransferServer::BeforeClose()
     _iocpClientMsgTransfer->PostQuit();
 }
 
-Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delayDestroyClients)
+Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<UInt64> &delayDestroyClients)
 {
     // 1.遍历post 客户端请求
     FS_Client *client = NULL;
-    for(auto iter = _socketRefClients.begin(); iter != _socketRefClients.end(); ++iter)
+    for(auto iter = _clientIdRefClients.begin(); iter != _clientIdRefClients.end(); ++iter)
     {
         client = iter->second;
-
         if(client->IsDestroy())
         {
-            g_Log->w<FS_IocpMsgTransferServer>(_LOGFMT_("client sock[%llu] is destroyed"), iter->first);
+            g_Log->w<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroyed"), iter->first);
             continue;
         }
 
@@ -87,10 +86,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
             {
                 if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
                 {
-                    // _OnClientLeave(client);
-                    if(!client->IsDestroy())
-                        delayDestroyClients.insert(client->GetSocket());
-                    //iter = _socketRefClients.erase(iter);
+                    delayDestroyClients.insert(client->GetId());
                     continue;
                 }
             }
@@ -100,10 +96,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
             {
                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
-                    // _OnClientLeave(client);
-                    if(!client->IsDestroy())
-                        delayDestroyClients.insert(client->GetSocket());
-                    //iter = _socketRefClients.erase(iter);
+                    delayDestroyClients.insert(client->GetId());
                     continue;
                 }
             }
@@ -115,10 +108,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
             {
                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
-                    // _OnClientLeave(client);
-                    if(!client->IsDestroy())
-                        delayDestroyClients.insert(client->GetSocket());
-                    //iter = _socketRefClients.erase(iter);
+                    delayDestroyClients.insert(client->GetId());
                     continue;
                 }
             }
@@ -139,7 +129,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<SOCKET> &delay
     return StatusDefs::Success;
 }
 
-Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDestroyClients)
+Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDestroyClients)
 {
     auto ret = _iocpClientMsgTransfer->WaitForCompletion(*_ioEvent, 1);
     if(ret != StatusDefs::Success)
@@ -168,7 +158,6 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
             _DelayRmClient(_ioEvent, delayDestroyClients);
             FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
             g_Log->any<FS_IocpMsgTransferServer>("client[%llu] IO_TYPE::RECV bytesTrans[%d]",client?client->GetSocket():0, _ioEvent->_bytesTrans);
-
             return ret;
         }
 
@@ -177,9 +166,10 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
         {// 客户端接收数据
          
             // 判断是否断开 已断开的有可能是上次postsend只后1ms内系统没有完成send，同时客户端被移除导致
-            if(client->IsDestroy() || _ioEvent->_ioData->_sock == INVALID_SOCKET)
+            if(client->IsDestroy() ||
+               _clientIdRefClients.find(client->GetId()) == _clientIdRefClients.end())
             {
-                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("client is destroy"));
+                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroy"), client->GetId());
                 return ret;
             }
 
@@ -205,9 +195,9 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<SOCKET> &delayDest
         {
             // 判断是否断开 已断开的有可能是上次postsend只后1ms内系统没有完成send，同时客户端被移除导致
             if(client->IsDestroy() || 
-               _socketRefClients.find(_ioEvent->_ioData->_sock) == _socketRefClients.end())
+               _clientIdRefClients.find(client->GetId()) == _clientIdRefClients.end())
             {
-                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("client is destroy"));
+                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroy"), client->GetId());
                 return ret;
             }
 

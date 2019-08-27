@@ -34,7 +34,7 @@
 
 FS_NAMESPACE_BEGIN
 
-inline void FS_IocpMsgTransferServer::_DelayRmClient(IO_EVENT *ioEvent, std::set<SOCKET> &delayRemoveClients)
+inline void FS_IocpMsgTransferServer::_DelayRmClient(IO_EVENT *ioEvent, std::set<UInt64> &delayRemoveClients)
 {
     FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
     if(!client)
@@ -44,8 +44,7 @@ inline void FS_IocpMsgTransferServer::_DelayRmClient(IO_EVENT *ioEvent, std::set
     }
 
     // µôÏß´¦Àí
-    if(!client->IsDestroy())
-        delayRemoveClients.insert(client->GetSocket());
+    delayRemoveClients.insert(client->GetId());
 }
 
 FS_NAMESPACE_END

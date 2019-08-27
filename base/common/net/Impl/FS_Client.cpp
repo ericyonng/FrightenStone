@@ -41,7 +41,7 @@ FS_NAMESPACE_BEGIN
 
 OBJ_POOL_CREATE_IMPL(FS_Client, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 
-FS_Client::FS_Client(Int64 clientId
+FS_Client::FS_Client(UInt64 clientId
                             , SOCKET sockfd
                             , Int32 sendSize
                             , Int32 recvSize)

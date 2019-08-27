@@ -52,7 +52,7 @@ FS_Server::~FS_Server()
     g_Log->sys<FS_Server>(_LOGFMT_( "FS_Server%d.~FS_Server exit begin"), _id);
     Close();
     _locker.Lock();
-    STLUtil::DelMapContainer(_socketRefClients);
+    STLUtil::DelMapContainer(_clientIdRefClients);
     STLUtil::DelVectorContainer(_clientsCache);
     _locker.Unlock();
     g_Log->net<FS_Server>("FS_Server%d.~FS_Server exit begin", _id);
@@ -64,7 +64,7 @@ FS_Server::~FS_Server()
 void FS_Server::_ClearClients()
 {
     _locker.Lock();
-    STLUtil::DelMapContainer(_socketRefClients);
+    STLUtil::DelMapContainer(_clientIdRefClients);
     STLUtil::DelVectorContainer(_clientsCache);
     _locker.Unlock();
 }
@@ -112,7 +112,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
             _locker.Lock();
             for(auto client : _clientsCache)
             {
-                _socketRefClients[client->GetSocket()] = client;
+                _clientIdRefClients[client->GetId()] = client;
                 client->_serverId = _id;
                 ++_clientJoin;
                 ++_joinClientCnt;
@@ -127,7 +127,7 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
         }
 
         // 如果没有需要处理的客户端，就跳过
-        if(_socketRefClients.empty())
+        if(_clientIdRefClients.empty())
         {
             // 使用wait
             SocketUtil::Sleep(1);
@@ -139,16 +139,16 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
         // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
         // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
-        auto st = _BeforeClientMsgTransfer(_delayRemoveClients);
+        auto st = _BeforeClientMsgTransfer(_delayRemoveClientIds);
         if(st != StatusDefs::Success)
         {
             g_Log->e<FS_Server>(_LOGFMT_("FS_Server id[%d] _BeforeClientMsgTransfer: st[%d] "), _id, st);
 
             // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
-            for(auto &client : _delayRemoveClients)
+            for(auto &client : _delayRemoveClientIds)
                 _OnClientLeave(client);
 
-            _delayRemoveClients.clear();
+            _delayRemoveClientIds.clear();
             break;
         }
 
@@ -157,9 +157,9 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
         // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，
         // 需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
-        for(auto &client : _delayRemoveClients)
+        for(auto &client : _delayRemoveClientIds)
             _OnClientLeave(client);
-        _delayRemoveClients.clear();
+        _delayRemoveClientIds.clear();
     }
 
     // 打印当前join的数目以及leave的数目
@@ -188,13 +188,13 @@ void FS_Server::_DetectClientHeartTime()
 
 #ifdef FS_USE_IOCP
         auto sock = client->GetSocket();
-        _delayRemoveClients.insert(sock);
+        _delayRemoveClientIds.insert(client->GetId());
 
         // 若有post消息，则先关闭socket，其他情况不用
         if(client->IsPostIoChange())
             client->Close();
-        g_Log->net<FS_Server>("heart beat expired sock[%llu] expiredtime[%lld] nowtime[%lld]"
-                              , sock, client->GetHeartBeatExpiredTime().GetMicroTimestamp()
+        g_Log->net<FS_Server>("heart beat expired sock[%llu] clientId[%llu] expiredtime[%lld] nowtime[%lld]"
+                              , sock, client->GetId(), client->GetHeartBeatExpiredTime().GetMicroTimestamp()
                               ,_lastHeartDetectTime.GetMicroTimestamp());
         // _OnClientLeave(client);
 #else
@@ -203,10 +203,10 @@ void FS_Server::_DetectClientHeartTime()
 #endif // CELL_USE_IOCP
         iterClient = _clientHeartBeatQueue.erase(iterClient);
     }
-    UInt16 cpuGroup = 0;
-    Byte8 cpuNum = 0;
-    ULong threadId = SystemUtil::GetCurrentThreadId();
-    SystemUtil::GetCallingThreadCpuInfo(cpuGroup, cpuNum);
+//     UInt16 cpuGroup = 0;
+//     Byte8 cpuNum = 0;
+//     ULong threadId = SystemUtil::GetCurrentThreadId();
+//     SystemUtil::GetCallingThreadCpuInfo(cpuGroup, cpuNum);
 //     g_Log->net<FS_Server>("cpuGroup[%hu],cpuNumber[%d],threadId[%lu],fs_server id[%d] _DetectClientHeartTime heart beat queue cnt[%llu]"
 //                           , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
 }
@@ -216,16 +216,15 @@ void FS_Server::_OnClientLeave(FS_Client *client)
     _eventHandleObj->OnNetLeave(client);
     _clientsChange = true;
     _clientHeartBeatQueue.erase(client);
-    // _socketRefClients.erase(client->GetSocket());
-    g_Log->net<FS_Server>("_OnClientLeave sock[%llu]", client->GetSocket());
+    g_Log->net<FS_Server>("_OnClientLeave sock[%llu] clientId[%llu]", client->GetSocket(), client->GetId());
     delete client;
 }
 
-void FS_Server::_OnClientLeave(SOCKET clientSock)
+void FS_Server::_OnClientLeave(UInt64 clientId)
 {
-    auto iterClient = _socketRefClients.find(clientSock);
+    auto iterClient = _clientIdRefClients.find(clientId);
     _OnClientLeave(iterClient->second);
-    _socketRefClients.erase(iterClient);
+    _clientIdRefClients.erase(iterClient);
     ++_leaveClientCnt;
 }
 
@@ -242,7 +241,7 @@ void FS_Server::_OnPrepareNetRecv(FS_Client *client)
 void FS_Server::_OnClientMsgArrived()
 {
     FS_Client *client = NULL;
-    for(auto itr : _socketRefClients)
+    for(auto itr : _clientIdRefClients)
     {
         client = itr.second;
 //         if(client->IsDestroy())// 要不要销毁不在客户端消息到达的处理范畴

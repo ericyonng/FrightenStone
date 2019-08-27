@@ -106,6 +106,11 @@ inline SOCKET FS_Client::GetSocket() const
     return _sockfd;
 }
 
+inline UInt64 FS_Client::GetId() const
+{
+    return _id;
+}
+
 inline bool FS_Client::HasRecvMsg() const
 {
     return _recvBuff->HasMsg();
