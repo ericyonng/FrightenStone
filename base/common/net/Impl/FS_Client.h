@@ -49,7 +49,7 @@ class BASE_EXPORT FS_Client
 {
     OBJ_POOL_CREATE(FS_Client, _objPoolHelper);
 public:
-    FS_Client(Int64 clientId
+    FS_Client(UInt64 clientId
               , SOCKET sockfd = INVALID_SOCKET
               , int sendSize = SEND_BUFF_SZIE
               , int recvSize = RECV_BUFF_SZIE);
@@ -89,6 +89,7 @@ public:
     #pragma region misc
 public:
     SOCKET GetSocket() const;
+    UInt64 GetId() const;
     bool HasRecvMsg() const;
     bool NeedWrite() const;
     bool IsDestroy() const;
@@ -98,7 +99,6 @@ public:
 
     //////////用于调试的成员变量
 public:
-    Int64 _id;
     // 所属serverid
     int _serverId = -1;
     // 测试接收发逻辑用
@@ -110,6 +110,8 @@ public:
     ///////////////////////////////////
 
 private:
+    // 每个FS_Server 唯一id
+    UInt64 _id;
     // socket fd_set  file desc set
     SOCKET _sockfd;
     // 第二缓冲区 接收消息缓冲区
@@ -122,6 +124,7 @@ private:
     TimeSlice _lastSendSlice; // 用于定时发送
     // 心跳过期时间
     Time _heartBeatExpiredTime; // 心跳过期时间
+
 #ifdef FS_USE_IOCP
     bool _isPostRecv = false;
     bool _isPostSend = false;

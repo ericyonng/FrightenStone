@@ -66,7 +66,7 @@ public:
     size_t GetClientCount() const;
     virtual void SetClientNum(Int32 socketNum);
     void SetEventHandleObj(INetEvent *handleObj);
-    void SetId(Int32 id);
+    void SetId(UInt32 id);
 private:
     void _ClearClients();
     #pragma endregion
@@ -99,7 +99,7 @@ public:
     */
 protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
-    virtual Int32 _BeforeClientMsgTransfer(std::set<SOCKET> &delayDestroyClients) = 0;
+    virtual Int32 _BeforeClientMsgTransfer(std::set<UInt64> &delayDestroyClients) = 0;
     
     // TODO:心跳优化
     void _DetectClientHeartTime();
@@ -107,7 +107,7 @@ protected:
 
     void _DelayRmClient(FS_Client *client);
     void _OnClientLeave(FS_Client *client);
-    void _OnClientLeave(SOCKET clientSock);
+    void _OnClientLeave(UInt64 clientId);
     virtual void _OnClientJoin(FS_Client *client);
     void _OnPrepareNetRecv(FS_Client *client);
 
@@ -119,9 +119,8 @@ protected:
     #pragma region data member
 protected:
     // 正式客户队列 隐患：不严格按照包到达时序处理，若两个包有先后依赖会出问题
-    std::map<SOCKET, FS_Client *> _socketRefClients;
+    std::map<UInt64, FS_Client *> _clientIdRefClients;
     std::set<FS_Client *, HeartBeatComp> _clientHeartBeatQueue;
-    std::set<FS_Client *> _needWriteClients;  // 需要投递消息的客户端 TODO:
 
 private:
     // 缓冲客户队列
@@ -134,10 +133,10 @@ private:
     Time _lastHeartDetectTime = Time::Now();
     // 线程
     FS_ThreadPool *_threadPool;
-    std::set<SOCKET> _delayRemoveClients;
+    std::set<UInt64> _delayRemoveClientIds;
 protected:
     // 服务id
-    Int32 _id = -1;
+    UInt32 _id = 0;
     // 客户列表是否有变化
     bool _clientsChange = true;
     Int32 _clientJoin = 0;

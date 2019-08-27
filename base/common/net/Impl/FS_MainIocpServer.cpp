@@ -148,7 +148,7 @@ SOCKET FS_MainIocpServer::_OnIocpAccept(SOCKET sock)
             SocketUtil::MakeReUseAddr(sock);
 
             _locker.Lock();
-            Int64 clientId = ++_clientMaxId;
+            UInt64 clientId = ++_clientMaxId;
             _locker.Unlock();
 
             // 将新客户端分配给客户数量最少的FS_Server

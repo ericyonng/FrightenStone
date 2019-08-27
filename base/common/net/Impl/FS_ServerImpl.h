@@ -36,7 +36,7 @@ FS_NAMESPACE_BEGIN
 #pragma region misc
 inline size_t FS_Server::GetClientCount() const
 {
-    return _socketRefClients.size() + _clientsCache.size();
+    return _clientIdRefClients.size() + _clientsCache.size();
 }
 
 inline void FS_Server::SetClientNum(Int32 socketNum)
@@ -48,7 +48,7 @@ inline void FS_Server::SetEventHandleObj(INetEvent *handleObj)
     _eventHandleObj = handleObj;
 }
 
-inline void FS_Server::SetId(Int32 id)
+inline void FS_Server::SetId(UInt32 id)
 {
     _id = id;
 }
@@ -79,7 +79,7 @@ inline void FS_Server::_AddToHeartBeatQueue(FS_Client *client)
 inline void FS_Server::_DelayRmClient(FS_Client *client)
 {
     if(!client->IsDestroy())
-        _delayRemoveClients.insert(client->GetSocket());
+        _delayRemoveClientIds.insert(client->GetId());
 }
 #pragma endregion
 

@@ -89,7 +89,8 @@ struct BASE_EXPORT IO_EVENT
     union
     {
         void *_ptr;                             // 传入自定义数据,绑定完成端口时
-        SOCKET _socket;                         // 传入socket
+        UInt64 _clientId;                       // 传入client唯一id
+        SOCKET _socket;                         // 套接字
         Int64 _code;                            // 状态码
     }_data;
     IO_DATA_BASE *_ioData = NULL;               // 重叠体自定义的数据
