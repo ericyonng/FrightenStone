@@ -37,6 +37,7 @@
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/memorypool/memorypool.h"
 #include "base/common/net/Defs/FS_NetBufferArray.h"
+#include "base/common/crashhandle/CrashHandle.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -54,6 +55,8 @@ FS_NetBuffer::FS_NetBuffer(FS_NetBufferArray *owner, Int32 sizeBuffer)
 FS_NetBuffer::~FS_NetBuffer()
 {
     g_MemoryPool->Lock();
+    // ´òÓ¡¶ÑÕ»
+    g_Log->net<FS_NetBuffer>("FS_NetBuffer will free stack trace back:\n%s", CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
     g_MemoryPool->Free(_buff);
     g_MemoryPool->Unlock();
 }
