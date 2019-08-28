@@ -86,7 +86,10 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<UInt64> &delay
             {
                 if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
                 {
+                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
+                                                         , client->GetId(), client->GetSocket());
                     delayDestroyClients.insert(client->GetId());
+                    client->Close();
                     continue;
                 }
             }
@@ -96,7 +99,10 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<UInt64> &delay
             {
                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
+                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
+                                                         , client->GetId(), client->GetSocket());
                     delayDestroyClients.insert(client->GetId());
+                    client->Close();
                     continue;
                 }
             }
@@ -108,7 +114,10 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<UInt64> &delay
             {
                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
                 {
+                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
+                                                         , client->GetId(), client->GetSocket());
                     delayDestroyClients.insert(client->GetId());
+                    client->Close();
                     continue;
                 }
             }
@@ -156,7 +165,10 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDest
             //CELLLog_Info("rmClient sockfd=%d, IO_TYPE::RECV bytesTrans=%d", _ioEvent.pIoData->sockfd, _ioEvent.bytesTrans);
             // _RmClient(*_ioEvent);
             _DelayRmClient(_ioEvent, delayDestroyClients);
+
             FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
+            if(client && !client->IsDestroy())
+                client->Close();
             g_Log->any<FS_IocpMsgTransferServer>("client[%llu] IO_TYPE::RECV bytesTrans[%d]",client?client->GetSocket():0, _ioEvent->_bytesTrans);
             return ret;
         }
@@ -169,6 +181,9 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDest
             if(client->IsDestroy() ||
                _clientIdRefClients.find(client->GetId()) == _clientIdRefClients.end())
             {
+                if(!client->IsDestroy())
+                    client->Close();
+
                 g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroy"), client->GetId());
                 return ret;
             }
@@ -185,6 +200,9 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDest
             _DelayRmClient(_ioEvent, delayDestroyClients);
 
             FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
+            if(client && !client->IsDestroy())
+                client->Close();
+
             g_Log->any<FS_IocpMsgTransferServer>("client[%llu] IO_TYPE::IO_SEND bytesTrans[%d]", client ? client->GetSocket() : 0, _ioEvent->_bytesTrans);
 
             return ret;
@@ -197,6 +215,9 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDest
             if(client->IsDestroy() || 
                _clientIdRefClients.find(client->GetId()) == _clientIdRefClients.end())
             {
+                if(!client->IsDestroy())
+                    client->Close();
+
                 g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroy"), client->GetId());
                 return ret;
             }
@@ -218,7 +239,14 @@ void FS_IocpMsgTransferServer::_OnClientJoin(FS_Client *client)
     _iocpClientMsgTransfer->Reg(client->GetSocket(), client);
     auto ioData = client->MakeRecvIoData();
     if(ioData)
-        _iocpClientMsgTransfer->PostRecv(ioData);
+    {
+        if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
+        {
+            g_Log->net<FS_IocpMsgTransferServer>("_OnClientJoin PostRecv fail clientid[%llu] sock[%llu]"
+                                                 , client->GetId(), client->GetSocket());
+            client->Close();
+        }
+    }
 }
 
 FS_NAMESPACE_END
