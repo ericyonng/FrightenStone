@@ -196,6 +196,9 @@ void FS_Server::_DetectClientHeartTime()
         g_Log->net<FS_Server>("heart beat expired sock[%llu] clientId[%llu] expiredtime[%lld] nowtime[%lld]"
                               , sock, client->GetId(), client->GetHeartBeatExpiredTime().GetMicroTimestamp()
                               ,_lastHeartDetectTime.GetMicroTimestamp());
+        g_Log->any<FS_Server>("heart beat expired sock[%llu] clientId[%llu] expiredtime[%lld] nowtime[%lld]"
+                              , sock, client->GetId(), client->GetHeartBeatExpiredTime().GetMicroTimestamp()
+                              , _lastHeartDetectTime.GetMicroTimestamp());
         // _OnClientLeave(client);
 #else
         // _OnClientLeave(client);
