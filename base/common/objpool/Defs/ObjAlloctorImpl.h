@@ -101,7 +101,7 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
 #endif
 
     // free的对象构成链表用于下次分配
-    _lastDeleted.push_back((ObjType *)ptr);
+    _lastDeleted.push_front((ObjType *)ptr);
     --_objInUse;
 
 #if __FS_THREAD_SAFE__
@@ -126,8 +126,7 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
         _NewNode();
 
     // 内存池中分配对象
-    _ptrWillGivingInChar = reinterpret_cast<char *>(_curNodeObjs);
-    _ptrWillGivingInChar += _alloctedInCurNode * _objBlockSize;
+    _ptrWillGivingInChar = reinterpret_cast<char *>(_curNodeObjs) + _alloctedInCurNode * _objBlockSize;
     ++_alloctedInCurNode;
     ++_objInUse;
 
@@ -138,7 +137,7 @@ template<typename ObjType>
 inline void IObjAlloctor<ObjType>::FreeNoLocker(void *ptr)
 {
     // free的对象构成链表用于下次分配
-    _lastDeleted.push_back((ObjType *)ptr);
+    _lastDeleted.push_front((ObjType *)ptr);
     --_objInUse;
 }
 
