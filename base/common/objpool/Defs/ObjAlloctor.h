@@ -83,7 +83,6 @@ public:
     void UnLock();
 
 private:
-    
     void _NewNode();
 
 protected:
