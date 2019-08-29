@@ -161,15 +161,18 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDest
 
         if(_ioEvent->_bytesTrans <= 0)
         {// 客户端断开处理
-            
+            FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
+            g_Log->any<FS_IocpMsgTransferServer>("client[%llu] clientId[%llu] IO_TYPE::RECV bytesTrans[%d]"
+                                                 , client ? client->GetSocket() : 0
+                                                 , client ? client->GetId() : 0,
+                                                 _ioEvent->_bytesTrans);
+
             //CELLLog_Info("rmClient sockfd=%d, IO_TYPE::RECV bytesTrans=%d", _ioEvent.pIoData->sockfd, _ioEvent.bytesTrans);
             // _RmClient(*_ioEvent);
             _DelayRmClient(_ioEvent, delayDestroyClients);
-
-            FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
             if(client && !client->IsDestroy())
                 client->Close();
-            g_Log->any<FS_IocpMsgTransferServer>("client[%llu] IO_TYPE::RECV bytesTrans[%d]",client?client->GetSocket():0, _ioEvent->_bytesTrans);
+
             return ret;
         }
 
@@ -184,7 +187,8 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDest
                 if(!client->IsDestroy())
                     client->Close();
 
-                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroy"), client->GetId());
+                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroy")
+                                                   , client->GetId());
                 return ret;
             }
 
@@ -197,13 +201,15 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDest
 
         if(_ioEvent->_bytesTrans <= 0)
         {// 客户端断开处理
-            _DelayRmClient(_ioEvent, delayDestroyClients);
-
             FS_Client *client = reinterpret_cast<FS_Client *>(_ioEvent->_data._ptr);
+            g_Log->any<FS_IocpMsgTransferServer>("client[%llu] clientId[%llu] IO_TYPE::IO_SEND bytesTrans[%d]"
+                                                 , client ? client->GetSocket() : 0
+                                                 , client ? client->GetId() : 0
+                                                 , _ioEvent->_bytesTrans);
+
+            _DelayRmClient(_ioEvent, delayDestroyClients);
             if(client && !client->IsDestroy())
                 client->Close();
-
-            g_Log->any<FS_IocpMsgTransferServer>("client[%llu] IO_TYPE::IO_SEND bytesTrans[%d]", client ? client->GetSocket() : 0, _ioEvent->_bytesTrans);
 
             return ret;
         }
@@ -218,7 +224,8 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents(std::set<UInt64> &delayDest
                 if(!client->IsDestroy())
                     client->Close();
 
-                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroy"), client->GetId());
+                g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroy")
+                                                   , client->GetId());
                 return ret;
             }
 

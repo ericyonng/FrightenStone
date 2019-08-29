@@ -6,7 +6,7 @@
 #include "stdafx.h"
 
 #undef TEST_OBJ_NUM
-#define TEST_OBJ_NUM    10000000
+#define TEST_OBJ_NUM    1000000
 
 fs::MemleakMonitor *_g_memMonitor = g_MemleakMonitor;
 
@@ -65,10 +65,10 @@ public:
 //         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 // 
         timeNow1.FlushTime();
-        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-        {            
-            new TestObjPoolObj2;
-        }
+//         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
+//         {            
+//             new TestObjPoolObj2;
+//         }
         timeNow2.FlushTime();
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
        // std::cout << "memleak:" << TestObjPoolObj::GetMemleakNum() << std::endl;
@@ -77,7 +77,10 @@ public:
          //auto alloctor = charPool._alloctor;
          timeNow1.FlushTime();
          for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-             new TestObjPoolObj;
+         {
+             g_Log->net<TestObjPool>("hello worldasdfasefalksdflas;kdflasdfjaksldjfalskdjflasdkjfalskdjflaskdjflasdkjflaksjflaskdfjkl");
+         }
+             // new TestObjPoolObj;
 
           timeNow2.FlushTime();
           std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
