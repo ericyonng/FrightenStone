@@ -61,35 +61,69 @@ public:
         std::cout << "size after erase:" << listmy.size() << std::endl;
         std::cout << "begin:" << listmy.begin()->_obj << std::endl;
         listmy.insert_before((char *)( "wocao"), listmy.end());
+        listmy.pop_back();
         auto curNode = listmy.begin();
-        while(curNode)
+        if(curNode)
         {
-            std::cout << "node:" << curNode->_obj << std::endl;
-            curNode = curNode->_nextNode;
+            for(auto i = 0; i < listmy.size(); ++i)
+            {
+                std::cout << "node:" << curNode->_obj << std::endl;
+                curNode = curNode->_nextNode;
+            }
         }
 
         listmy.erase(listmy.begin()->_nextNode);
         curNode = listmy.begin();
-        while(curNode)
+        if(curNode)
         {
-            std::cout <<"node:" << curNode->_obj << std::endl;
-            curNode = curNode->_nextNode;
+            for(auto i = 0; i < listmy.size(); ++i)
+            {
+                std::cout << "node:" << curNode->_obj << std::endl;
+                curNode = curNode->_nextNode;
+            }
         }
 
         listmy.pop_front();
         std::cout << "after pop front:" << std::endl;
 
         curNode = listmy.begin();
-        while(curNode)
+        if(curNode)
         {
-            std::cout << "node:" << curNode->_obj << std::endl;
-            curNode = curNode->_nextNode;
+            for(auto i = 0; i < listmy.size(); ++i)
+            {
+                std::cout << "node:" << curNode->_obj << std::endl;
+                curNode = curNode->_nextNode;
+            }
         }
 
         listmy.clear();
         std::cout << "size:" << listmy.size() << std::endl;
         std::cout << "empty:" << listmy.empty() << std::endl;
 
+//         fs::FS_List<Int32> *myList = new fs::FS_List<Int32>;
+//         std::list<Int32> *sysList = new std::list<Int32>;
+// 
+//         const Int32 loopCnt = 1000000;
+//         for(auto i = 0; i < loopCnt; ++i)
+//             sysList->push_front(i);
+//         for(auto i = 0; i < loopCnt; ++i)
+//             myList->push_front(i);
+// 
+//         fs::Time time1, time2;
+//         //sysList->push_back(0);
+//         time1.FlushTime();
+//         for(auto i = 0; i < loopCnt; ++i)
+//             sysList->push_front(i);
+//         time2.FlushTime();
+//         std::cout << "sys escape:" << (time1 - time2).GetTotalMicroSeconds() << std::endl;
+// 
+//         //myList->push_back(0);
+//         time1.FlushTime();
+//         for(auto i = 0; i < loopCnt; ++i)
+//             myList->push_front(i);
+//         time2.FlushTime();
+//         std::cout << "mylist escape:" << (time1 - time2).GetTotalMicroSeconds() << std::endl;
+//         getchar();
     }
 };
 

@@ -69,25 +69,36 @@ inline const ObjType &FS_List<ObjType>::front() const
 template<typename ObjType>
 inline ObjType &FS_List<ObjType>::back()
 {
-    return _end->_obj;
+    return _head->_preNode->_obj;
 }
 
 template<typename ObjType>
 inline const ObjType &FS_List<ObjType>::back() const
 {
-    return _end->_obj;
+    return _head->_preNode->_obj;
 }
 
 template<typename ObjType>
 inline void FS_List<ObjType>::push_front(ObjType obj)
 {
     auto newNode = _NewNode(obj);
-    newNode->_nextNode = _head;
     if(_head)
+    {
+        // 首节点换位
+        newNode->_nextNode = _head;
+        newNode->_preNode = _head->_preNode;
+
+        // 末节点指向首节点
+        _head->_preNode->_nextNode = newNode;
         _head->_preNode = newNode;
+    }
+    else
+    {
+        newNode->_preNode = newNode;
+        newNode->_nextNode = newNode;
+    }
+
     _head = newNode;
-    if(!_head->_nextNode)
-        _end = _head;
     ++_nodeCnt;
 }
 
@@ -95,12 +106,22 @@ template<typename ObjType>
 inline void FS_List<ObjType>::push_back(ObjType obj)
 {
     auto newNode = _NewNode(obj);
-    newNode->_preNode = _end;
-    if(_end)
-        _end->_nextNode = newNode;
-    _end = newNode;
-    if(!_end->_preNode)
-        _head = _end;
+    if(_head)
+    {
+        // 首节点换位
+        newNode->_nextNode = _head;
+        newNode->_preNode = _head->_preNode;
+
+        // 末节点指向首节点
+        _head->_preNode->_nextNode = newNode;
+        _head->_preNode = newNode;
+    }
+    else
+    {
+        newNode->_preNode = newNode;
+        newNode->_nextNode = newNode;
+        _head = newNode;
+    }
 
     ++_nodeCnt;
 }
@@ -108,31 +129,13 @@ inline void FS_List<ObjType>::push_back(ObjType obj)
 template<typename ObjType>
 inline void FS_List<ObjType>::pop_front()
 {
-    auto head = _head;
-    if(_head->_nextNode)
-        _head->_nextNode->_preNode = NULL;
-    else
-        _end = NULL;
-
-    _head = _head->_nextNode;
-    delete head;
-    --_nodeCnt;
+    erase(_head);
 }
 
 template<typename ObjType>
 inline void FS_List<ObjType>::pop_back()
 {
-    auto end = _end;
-    if(_end->_preNode)
-        _end->_preNode->_nextNode = NULL;
-    else
-    {
-        _head = NULL;
-    }
-
-    _end = _end->_preNode;
-    delete end;
-    --_nodeCnt;
+    erase(_head->_preNode);
 }
 
 template<typename ObjType>
@@ -150,28 +153,30 @@ inline const ListNode<ObjType> *FS_List<ObjType>::begin() const
 template<typename ObjType>
 inline ListNode<ObjType> *FS_List<ObjType>::end()
 {
-    return _end;
+    return _head->_preNode;
 }
 
 template<typename ObjType>
 inline const ListNode<ObjType> *FS_List<ObjType>::end() const
 {
-    return _end;
+    return _head->_preNode;
 }
 
 template<typename ObjType>
-void FS_List<ObjType>::erase(ListNode<ObjType> *node)
+inline void FS_List<ObjType>::erase(ListNode<ObjType> *node)
 {
-    if(node == _head)
+    // 前后节点对接
+    if(_nodeCnt == 1)
     {
-        pop_front();
+        _head = NULL;
+        delete node;
+        --_nodeCnt;
         return;
     }
-    else if(node == _end)
-    {
-        pop_back();
-        return;
-    }
+    
+    // 是否头
+    if(_head == node)
+        _head = node->_nextNode;
 
     node->_preNode->_nextNode = node->_nextNode;
     node->_nextNode->_preNode = node->_preNode;
@@ -185,14 +190,13 @@ inline void FS_List<ObjType>::insert_before(ObjType newObj, ListNode<ObjType> *s
     auto newNode = _NewNode(newObj);
     // 与旧的前节点对接
     newNode->_preNode = specifyPosNode->_preNode;
-    if(specifyPosNode->_preNode)
-        specifyPosNode->_preNode->_nextNode = newNode;
+    specifyPosNode->_preNode->_nextNode = newNode;
 
     // 与指定节点对接
     newNode->_nextNode = specifyPosNode;
     specifyPosNode->_preNode = newNode;
 
-    if(!newNode->_preNode)
+    if(specifyPosNode == _head)
         _head = newNode;
     ++_nodeCnt;
 }
@@ -212,13 +216,13 @@ inline size_t FS_List<ObjType>::size() const
 template<typename ObjType>
 inline void FS_List<ObjType>::clear()
 {
-    while(_head)
+    while(_nodeCnt > 0)
     {
+        --_nodeCnt;
         auto node = _head;
         _head = _head->_nextNode;
         delete node;
     }
-    _nodeCnt = 0;
 }
 
 template<typename ObjType>

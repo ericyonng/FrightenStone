@@ -79,7 +79,6 @@ private:
 
 private:
     ListNode<ObjType> *_head = NULL;
-    ListNode<ObjType> *_end = NULL;
     size_t _nodeCnt = 0;
 };
 
