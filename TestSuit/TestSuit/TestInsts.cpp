@@ -58,9 +58,10 @@
 #include "TestSuit/TestSuit/TestInst/TestIocpExample.h"
 #include "TestSuit/TestSuit/TestInst/TestEvent.h"
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
+#include "TestSuit/TestSuit/TestInst/TestFS_List.h"
 
 void TestInsts::Run()
 {
-    TestServer::Run();
+    TestFS_List::Run();
     // TestJson::Run();
 }

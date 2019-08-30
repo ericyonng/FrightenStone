@@ -1,4 +1,3 @@
-
 /*!
  * MIT License
  *
@@ -22,23 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_List.h
+ * @file  : ListNodeImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/12
+ * @date  : 2019/8/30
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_FS_List_H__
-#define __Base_Common_Component_Impl_FS_List_H__
-/**
-* @file FS_List.h
-* @auther Huiya Song <120453674@qq.com>
-* @date 2019/04/25
-* @brief
-*/
+#ifdef __Base_Common_Component_Impl_FS_List_Defs_ListNode_H__
 #pragma once
 
-/// TODO 泛型的优先级队列，时间序列，等
+template<typename ObjType>
+fs::ObjPoolHelper<fs::ListNode<ObjType>> fs::ListNode<ObjType>::_objPoolHelper(__DEF_OBJ_POOL_OBJ_NUM__);
+
+FS_NAMESPACE_BEGIN
+
+template<typename ObjType>
+inline size_t ListNode<ObjType>::GetMemleakNum()
+{
+    return _objPoolHelper.GetMemleakObjNum();
+}
+
+template<typename ObjType>
+inline ListNode<ObjType>::ListNode(ObjType obj)
+    :_obj(obj)
+{
+}
+
+FS_NAMESPACE_END
+
 #endif
