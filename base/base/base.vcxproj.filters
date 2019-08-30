@@ -319,6 +319,15 @@
     <Filter Include="common\net\Interface\Iocp">
       <UniqueIdentifier>{05600363-b9c3-4b63-a42f-e552cf6dad90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\component\Impl\FS_List">
+      <UniqueIdentifier>{42131043-0d13-41dd-9559-134a9b5144a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\FS_List\Defs">
+      <UniqueIdentifier>{2ea2288f-b612-45e5-9e14-941345c904e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\FS_List\Impl">
+      <UniqueIdentifier>{fadd69c1-087e-4a5d-a57b-2d34bb14ce58}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -624,12 +633,6 @@
     <ClInclude Include="..\common\basedefs\DataType\ForAll\Defs\NetDataType.h">
       <Filter>common\basedefs\DataType\ForAll\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\FS_List.h">
-      <Filter>common\component\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\component\Impl\FS_ListImpl.h">
-      <Filter>common\component\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\socket\Defs\SocketDefs.h">
       <Filter>common\socket\Defs</Filter>
     </ClInclude>
@@ -894,6 +897,21 @@
     <ClInclude Include="..\common\net\Defs\FS_NetBufferArrayImpl.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_List\FS_List.h">
+      <Filter>common\component\Impl\FS_List</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_List\Impl\FS_List.h">
+      <Filter>common\component\Impl\FS_List\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_List\Impl\FS_ListImpl.h">
+      <Filter>common\component\Impl\FS_List\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_List\Defs\ListNode.h">
+      <Filter>common\component\Impl\FS_List\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_List\Defs\ListNodeImpl.h">
+      <Filter>common\component\Impl\FS_List\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1016,9 +1034,6 @@
     <ClCompile Include="..\common\assist\utils\Impl\SystemUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\component\Impl\FS_List.cpp">
-      <Filter>common\component\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\log\Impl\FS_Log.cpp">
       <Filter>common\log\Impl</Filter>
     </ClCompile>
@@ -1135,6 +1150,9 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Defs\FS_NetBufferArray.cpp">
       <Filter>common\net\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\FS_List\Impl\FS_List.cpp">
+      <Filter>common\component\Impl\FS_List\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

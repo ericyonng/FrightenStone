@@ -21,13 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_List.cpp
+ * @file  : ListNode.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/12
+ * @date  : 2019/8/30
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/component/Impl/FS_List.h"
+#ifndef __Base_Common_Component_Impl_FS_List_Defs_ListNode_H__
+#define __Base_Common_Component_Impl_FS_List_Defs_ListNode_H__
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/objpool/objpool.h"
+
+FS_NAMESPACE_BEGIN
+
+template<typename ObjType>
+struct ListNode
+{
+    OBJ_POOL_CREATE(ListNode<ObjType>, _objPoolHelper);
+
+public:
+    ListNode(ObjType obj);
+
+public:
+    ObjType _obj = ObjType();
+    ListNode<ObjType> *_preNode = NULL;
+    ListNode<ObjType> *_nextNode = NULL;
+};
+
+FS_NAMESPACE_END
+
+#include "base/common/component/Impl/FS_List/Defs/ListNodeImpl.h"
+
+#endif

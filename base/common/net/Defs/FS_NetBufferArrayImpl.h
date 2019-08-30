@@ -70,15 +70,15 @@ inline void FS_NetBufferArray::Pop(std::list<FS_NetBuffer *>::iterator &iterNode
 {
     auto buffer = *iterNode;
     buffer->Pop(len);
-    if(_buffers.size() == 1)
-        return;
-
-    if(buffer->IsEmpty())
-    {
-        _buffers.erase(iterNode);
-        iterNode = _buffers.end();
-        FS_Release(buffer);
-    }
+//     if(_buffers.size() == 1)
+//         return;
+// 
+//     if(buffer->IsEmpty())
+//     {
+//         _buffers.erase(iterNode);
+//         iterNode = _buffers.end();
+//         FS_Release(buffer);
+//     }
 }
 
 inline Int32 FS_NetBufferArray::Write2socket(SOCKET sockfd)
@@ -153,15 +153,15 @@ inline bool FS_NetBufferArray::OnWrite2Iocp(std::list<FS_NetBuffer *>::iterator 
     bool isWrite2Iocp = buffer->OnWrite2Iocp(sendBytes);
     if(!isWrite2Iocp)
         return false;
-    if(_buffers.size() == 1)
-        return isWrite2Iocp;
-
-    if(buffer->IsEmpty())
-    {
-        _buffers.erase(iterNode);
-        iterNode = _buffers.end();
-        FS_Release(buffer);
-    }
+//     if(_buffers.size() == 1)
+//         return isWrite2Iocp;
+// 
+//     if(buffer->IsEmpty())
+//     {
+//         _buffers.erase(iterNode);
+//         iterNode = _buffers.end();
+//         FS_Release(buffer);
+//     }
 
     return isWrite2Iocp;
 }

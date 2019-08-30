@@ -254,8 +254,11 @@
     <ClInclude Include="..\common\component\Impl\FS_CpuInfo.h" />
     <ClInclude Include="..\common\component\Impl\FS_Delegate.h" />
     <ClInclude Include="..\common\component\Impl\FS_DelegateImpl.h" />
-    <ClInclude Include="..\common\component\Impl\FS_List.h" />
-    <ClInclude Include="..\common\component\Impl\FS_ListImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_List\Defs\ListNode.h" />
+    <ClInclude Include="..\common\component\Impl\FS_List\Defs\ListNodeImpl.h" />
+    <ClInclude Include="..\common\component\Impl\FS_List\FS_List.h" />
+    <ClInclude Include="..\common\component\Impl\FS_List\Impl\FS_List.h" />
+    <ClInclude Include="..\common\component\Impl\FS_List\Impl\FS_ListImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_Random.h" />
     <ClInclude Include="..\common\component\Impl\FS_RandomImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_Stream.h" />
@@ -397,7 +400,7 @@
     <ClCompile Include="..\common\component\Impl\File\FS_IniFile.cpp" />
     <ClCompile Include="..\common\component\Impl\File\LogFile.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_CpuInfo.cpp" />
-    <ClCompile Include="..\common\component\Impl\FS_List.cpp" />
+    <ClCompile Include="..\common\component\Impl\FS_List\Impl\FS_List.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_Random.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_Stream.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_String.cpp" />
