@@ -101,6 +101,16 @@ inline bool FS_Client::IsPostIoChange() const
     return _isPostRecv || _isPostSend;
 }
 
+inline bool FS_Client::IsPostSend() const
+{
+    return _isPostSend;
+}
+
+inline bool FS_Client::IsPostRecv() const
+{
+    return _isPostRecv;
+}
+
 inline SOCKET FS_Client::GetSocket() const
 {
     return _sockfd;

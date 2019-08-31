@@ -329,6 +329,8 @@
     <ClInclude Include="..\common\net\Defs\FS_NetBufferImpl.h" />
     <ClInclude Include="..\common\net\Defs\FS_NetBufferArray.h" />
     <ClInclude Include="..\common\net\Defs\FS_NetDefs.h" />
+    <ClInclude Include="..\common\net\Defs\FS_Packet.h" />
+    <ClInclude Include="..\common\net\Defs\FS_PacketImpl.h" />
     <ClInclude Include="..\common\net\Defs\HeartBeatComp.h" />
     <ClInclude Include="..\common\net\Defs\HeartBeatCompImpl.h" />
     <ClInclude Include="..\common\net\Defs\IocpDefs.h" />
@@ -435,6 +437,7 @@
     <ClCompile Include="..\common\memorypool\Interface\IMemoryPoolMgr.cpp" />
     <ClCompile Include="..\common\net\Defs\FS_NetBuffer.cpp" />
     <ClCompile Include="..\common\net\Defs\FS_NetBufferArray.cpp" />
+    <ClCompile Include="..\common\net\Defs\FS_Packet.cpp" />
     <ClCompile Include="..\common\net\Defs\IocpDefs.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Client.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Iocp.cpp" />

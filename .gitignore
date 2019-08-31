@@ -99,3 +99,4 @@ CTestTestfile.cmake
 *.logOld7
 *.logOld8
 *.logOld9
+*.ipch

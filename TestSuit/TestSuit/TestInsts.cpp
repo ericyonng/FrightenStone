@@ -62,6 +62,6 @@
 
 void TestInsts::Run()
 {
-    TestFS_List::Run();
+    TestServer::Run();
     // TestJson::Run();
 }

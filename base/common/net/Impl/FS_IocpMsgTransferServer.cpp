@@ -79,7 +79,7 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<UInt64> &delay
         }
 
         // 需要写数据的客户端,才postSend
-        if(client->NeedWrite())
+        if(!client->IsPostSend() && client->NeedWrite())
         {
             auto ioData = client->MakeSendIoData();
             if(ioData)
@@ -107,7 +107,8 @@ Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer(std::set<UInt64> &delay
                 }
             }
         }
-        else if(!client->IsPostIoChange()){
+        else if(!client->IsPostRecv())
+        {
             // TODO:需要考虑在1ms内客户端是否需要多次recv，只有没投递过recv的客户端才可以投递recv，避免多次投递，当客户端销毁后有可能recv才完成
             auto ioData = client->MakeRecvIoData();
             if(ioData)

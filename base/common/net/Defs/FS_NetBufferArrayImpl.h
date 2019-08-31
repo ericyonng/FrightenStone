@@ -3,8 +3,6 @@
 
 FS_NAMESPACE_BEGIN
 
-
-
 inline FS_NetBufferArray::FS_NetBufferArray(Int32 sizeBuffer)
     :_bufferSize(sizeBuffer)
 {
@@ -15,7 +13,7 @@ inline FS_NetBufferArray::FS_NetBufferArray(Int32 sizeBuffer)
                                     , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
     }
     _buffers.push_back(newBuffer);
-    newBuffer->SetNode(--_buffers.end());
+    newBuffer->SetNode(_buffers.begin());
 }
 
 inline FS_NetBufferArray::~FS_NetBufferArray()
@@ -40,22 +38,7 @@ inline std::list<FS_NetBuffer *>::iterator FS_NetBufferArray::GetFrontNode()
 
 inline bool FS_NetBufferArray::Push(const char *data, Int32 len)
 {
-    auto back = _buffers.back();
-    if(!back)
-    {
-        _buffers.pop_back();
-        auto newBuffer = new FS_NetBuffer(this, _bufferSize);
-        if(!newBuffer)
-        {
-            g_Log->e<FS_NetBufferArray>(_LOGFMT_("newBuffer is null cant new a obj from pool stack backtrace:\n %s")
-                                        , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
-        }
-        _buffers.push_back(newBuffer);
-        newBuffer->SetNode(--_buffers.end());
-        back = newBuffer;
-    }
-
-    if(!back->Push(data, len))
+    if(!_buffers.back()->Push(data, len))
     {
         auto newBuffer = new FS_NetBuffer(this, _bufferSize);
         _buffers.push_back(newBuffer);
@@ -70,15 +53,15 @@ inline void FS_NetBufferArray::Pop(std::list<FS_NetBuffer *>::iterator &iterNode
 {
     auto buffer = *iterNode;
     buffer->Pop(len);
-//     if(_buffers.size() == 1)
-//         return;
-// 
-//     if(buffer->IsEmpty())
-//     {
-//         _buffers.erase(iterNode);
-//         iterNode = _buffers.end();
-//         FS_Release(buffer);
-//     }
+    if(_buffers.size() == 1)
+        return;
+
+    if(buffer->IsEmpty())
+    {
+        _buffers.erase(iterNode);
+        iterNode = _buffers.end();
+        FS_Release(buffer);
+    }
 }
 
 inline Int32 FS_NetBufferArray::Write2socket(SOCKET sockfd)
@@ -99,47 +82,17 @@ inline bool FS_NetBufferArray::HasMsg() const
 
 inline bool FS_NetBufferArray::NeedWrite() const
 {
-    auto buffer = _buffers.front();
-    return buffer ? buffer->NeedWrite() : false;
+    return _buffers.front()->NeedWrite();
 }
 
 inline IO_DATA_BASE *FS_NetBufferArray::MakeRecvIoData(SOCKET sockfd)
 {
-    auto back = _buffers.back();
-    if(!back)
-    {
-        _buffers.pop_back();
-        auto newBuffer = new FS_NetBuffer(this, _bufferSize);
-        if(!newBuffer)
-        {
-            g_Log->e<FS_NetBufferArray>(_LOGFMT_("newBuffer is null cant new a obj from pool stack backtrace:\n %s")
-                                        , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
-        }
-        _buffers.push_back(newBuffer);
-        newBuffer->SetNode(--_buffers.end());
-        back = newBuffer;
-    }
-
-    return back->MakeRecvIoData(sockfd);
+    return _buffers.back()->MakeRecvIoData(sockfd);
 }
 
 inline IO_DATA_BASE *FS_NetBufferArray::MakeSendIoData(SOCKET sockfd)
 {// 从最早的数据发送
-    auto front = _buffers.front();
-    if(!front)
-    {
-        _buffers.pop_front();
-        auto newBuffer = new FS_NetBuffer(this, _bufferSize);
-        if(!newBuffer)
-        {
-            g_Log->e<FS_NetBufferArray>(_LOGFMT_("newBuffer is null cant new a obj from pool stack backtrace:\n %s")
-                                        , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
-        }
-        _buffers.push_front(newBuffer);
-        newBuffer->SetNode(_buffers.begin());
-        front = newBuffer;
-    }
-    return front->MakeSendIoData(sockfd);
+    return _buffers.front()->MakeSendIoData(sockfd);
 }
 
 inline bool FS_NetBufferArray::OnReadFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, int recvBytes)
@@ -153,15 +106,16 @@ inline bool FS_NetBufferArray::OnWrite2Iocp(std::list<FS_NetBuffer *>::iterator 
     bool isWrite2Iocp = buffer->OnWrite2Iocp(sendBytes);
     if(!isWrite2Iocp)
         return false;
-//     if(_buffers.size() == 1)
-//         return isWrite2Iocp;
-// 
-//     if(buffer->IsEmpty())
-//     {
-//         _buffers.erase(iterNode);
-//         iterNode = _buffers.end();
-//         FS_Release(buffer);
-//     }
+
+    if(_buffers.size() == 1)
+        return isWrite2Iocp;
+
+    if(buffer->IsEmpty())
+    {
+        _buffers.erase(iterNode);
+        iterNode = _buffers.end();
+        FS_Release(buffer);
+    }
 
     return isWrite2Iocp;
 }

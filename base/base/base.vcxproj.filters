@@ -912,6 +912,12 @@
     <ClInclude Include="..\common\component\Impl\FS_List\Defs\ListNodeImpl.h">
       <Filter>common\component\Impl\FS_List\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Defs\FS_Packet.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Defs\FS_PacketImpl.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1153,6 +1159,9 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\FS_List\Impl\FS_List.cpp">
       <Filter>common\component\Impl\FS_List\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Defs\FS_Packet.cpp">
+      <Filter>common\net\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

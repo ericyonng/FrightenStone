@@ -142,7 +142,8 @@ protected:
     std::atomic<Int32> _clientJoinedCnt;
 
     Locker _locker;
-    std::atomic<UInt64> _clientMaxId;
+    UInt64 _clientMaxId;
+    const UInt64 _maxClientIdLimit;
     Int64 _leaveClientCnt;
     Int64 _joinClientCnt;
     #pragma endregion
