@@ -69,6 +69,7 @@ struct BASE_EXPORT IO_DATA_BASE
 
     // 重叠体
     OVERLAPPED _overlapped{0};          // 使用重叠体可以关联到iodatabase,在投递accept时候传入
+    UInt64 _clientId;                   // 客户端唯一id
     SOCKET _sock = INVALID_SOCKET;
     Int32 _ioType = 0;
     FS_NetBuffer *_owner;               // 所属的缓冲

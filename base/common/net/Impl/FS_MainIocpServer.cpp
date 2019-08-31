@@ -142,25 +142,26 @@ SOCKET FS_MainIocpServer::_OnIocpAccept(SOCKET sock)
     }
     else
     {
-        if(_clientAcceptCnt < _maxClient)
+        _locker.Lock();
+        UInt64 curMaxId = _clientMaxId;
+        if(_clientAcceptCnt < _maxClient && curMaxId < _maxClientIdLimit)
         {
+            curMaxId = ++_clientMaxId;
+            _locker.Unlock();
             ++_clientAcceptCnt;
             SocketUtil::MakeReUseAddr(sock);
 
-            _locker.Lock();
-            UInt64 clientId = ++_clientMaxId;
-            _locker.Unlock();
-
             // 将新客户端分配给客户数量最少的FS_Server
-            _AddClientToFSServer(new FS_Client(clientId, sock, _sendBuffSize, _recvBuffSize));
+            _AddClientToFSServer(new FS_Client(curMaxId, sock, _sendBuffSize, _recvBuffSize));
 
             // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
         }
         else {
+            _locker.Unlock();
             // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
             SocketUtil::DestroySocket(sock);
-            g_Log->w<FS_MainIocpServer>(_LOGFMT_("Accept to MaxClient[%d]"), _maxClient);
-            g_Log->net<FS_MainIocpServer>("Accept to MaxClient[%d]", _maxClient);
+            g_Log->w<FS_MainIocpServer>(_LOGFMT_("Accept to MaxClient[%d] or curMaxId[%llu] too large"), _maxClient, curMaxId);
+            g_Log->net<FS_MainIocpServer>("Accept to MaxClient[%d]or curMaxId[%llu] too large", _maxClient, curMaxId);
         }
     }
 

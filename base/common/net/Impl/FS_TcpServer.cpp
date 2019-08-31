@@ -53,9 +53,10 @@ FS_TcpServer::FS_TcpServer()
     ,_recvMsgCount{0}
     ,_clientAcceptCnt{0}
     ,_clientJoinedCnt{0}
-    ,_clientMaxId{0}
+    ,_clientMaxId(0)
     ,_leaveClientCnt(0)
     ,_joinClientCnt(0)
+    ,_maxClientIdLimit((std::numeric_limits<UInt64>::max)())
 {
     // TODO:∂¡»°≈‰÷√
     _sendBuffSize = SEND_BUFF_SZIE;

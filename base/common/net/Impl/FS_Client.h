@@ -83,6 +83,8 @@ public:
     void OnSend2iocp(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 snd);
 
     bool IsPostIoChange() const;
+    bool IsPostSend() const;
+    bool IsPostRecv() const;
     #endif // FS_USE_IOCP
 
     /* тсоН */
