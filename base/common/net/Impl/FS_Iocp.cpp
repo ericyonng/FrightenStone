@@ -118,6 +118,23 @@ Int32 FS_Iocp::Reg(SOCKET sockfd, void *ptr)
     return StatusDefs::Success;
 }
 
+Int32 FS_Iocp::Reg(SOCKET sockfd, UInt64 clientId)
+{
+    // 关联IOCP 与 sockfd
+// completionKey传入的一个数值，完成时会原样传回来; NumberOfConcurrentThreads这个参数在关联完成端口时被忽略
+// completekey可以是自定义的结构体指针或者其他数据的指针，便于获取完成状态时候识别 当处于关联时numofthread会被忽略
+    HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, ULONG_PTR(clientId), 0);
+    if(!ret)
+    {
+        auto err = GetLastError();
+        g_Log->e<FS_Iocp>(_LOGFMT_("Reg sockfd[%llu] clientId[%llu] to completionport failed windows error<%d> status[%d]")
+                          , sockfd, clientId, err, StatusDefs::IOCP_RegSocketToCompletionPortFail);
+        return StatusDefs::IOCP_RegSocketToCompletionPortFail;
+    }
+
+    return StatusDefs::Success;
+}
+
 Int32 FS_Iocp::LoadAcceptEx(SOCKET listenSocket)
 {
     if(_fnAcceptEx)
@@ -240,7 +257,7 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
     // 以及重叠结构ioDataPtr 用于获取数据重叠结构会原样返回
     ioEvent._bytesTrans = 0;
     ioEvent._ioData = NULL;
-    ioEvent._data._ptr = NULL;
+    ioEvent._data._clientId = 0;
     if(FALSE == GetQueuedCompletionStatus(_completionPort
                                           , &ioEvent._bytesTrans
                                           , reinterpret_cast<PULONG_PTR>(&ioEvent._data)

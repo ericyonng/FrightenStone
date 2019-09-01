@@ -139,27 +139,15 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
         // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
         // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
-        auto st = _BeforeClientMsgTransfer(_delayRemoveClientIds);
+        auto st = _BeforeClientMsgTransfer();
         if(st != StatusDefs::Success)
         {
             g_Log->e<FS_Server>(_LOGFMT_("FS_Server id[%d] _BeforeClientMsgTransfer: st[%d] "), _id, st);
-
-            // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
-            for(auto &client : _delayRemoveClientIds)
-                _OnClientLeave(client);
-
-            _delayRemoveClientIds.clear();
             break;
         }
 
         // 客户端消息到达
         _OnClientMsgArrived();    // TODO关于超级流量导致msgarrive执行过长判定为攻击行为，由外部运维处理攻击
-
-        // 断开的客户端清理(提前清理，时有可能客户端还有数据在getqueue队列中，
-        // 需要等待iocp消息队列中所有数据都取出才可以清理离线客户端，以免导致崩溃)
-        for(auto &client : _delayRemoveClientIds)
-            _OnClientLeave(client);
-        _delayRemoveClientIds.clear();
     }
 
     // 打印当前join的数目以及leave的数目
@@ -187,22 +175,26 @@ void FS_Server::_DetectClientHeartTime()
             break;
 
 #ifdef FS_USE_IOCP
+        
         auto sock = client->GetSocket();
-        _delayRemoveClientIds.insert(client->GetId());
+        g_Log->net<FS_Server>("heart beat expired sock[%llu] clientId[%llu] expiredtime[%lld] nowtime[%lld]"
+                              , sock, client->GetId(), client->GetHeartBeatExpiredTime().GetMicroTimestamp()
+                              , _lastHeartDetectTime.GetMicroTimestamp());
+        g_Log->any<FS_Server>("heart beat expired sock[%llu] clientId[%llu] expiredtime[%lld] nowtime[%lld]"
+                              , sock, client->GetId(), client->GetHeartBeatExpiredTime().GetMicroTimestamp()
+                              , _lastHeartDetectTime.GetMicroTimestamp());
 
         // 若有post消息，则先关闭socket，其他情况不用
         if(client->IsPostIoChange())
             client->Close();
-        g_Log->net<FS_Server>("heart beat expired sock[%llu] clientId[%llu] expiredtime[%lld] nowtime[%lld]"
-                              , sock, client->GetId(), client->GetHeartBeatExpiredTime().GetMicroTimestamp()
-                              ,_lastHeartDetectTime.GetMicroTimestamp());
-        g_Log->any<FS_Server>("heart beat expired sock[%llu] clientId[%llu] expiredtime[%lld] nowtime[%lld]"
-                              , sock, client->GetId(), client->GetHeartBeatExpiredTime().GetMicroTimestamp()
-                              , _lastHeartDetectTime.GetMicroTimestamp());
+        else
+            _OnClientLeaveByHeartBeat(client);
+
+        
         // _OnClientLeave(client);
 #else
         // _OnClientLeave(client);
-        _delayRemoveClients.insert(client);
+         _OnClientLeaveByHeartBeat(client);
 #endif // CELL_USE_IOCP
         iterClient = _clientHeartBeatQueue.erase(iterClient);
     }
@@ -218,17 +210,39 @@ void FS_Server::_OnClientLeave(FS_Client *client)
 {
     _eventHandleObj->OnNetLeave(client);
     _clientsChange = true;
-    _clientHeartBeatQueue.erase(client);
     g_Log->net<FS_Server>("_OnClientLeave sock[%llu] clientId[%llu]", client->GetSocket(), client->GetId());
     delete client;
+    ++_leaveClientCnt;
 }
 
 void FS_Server::_OnClientLeave(UInt64 clientId)
 {
     auto iterClient = _clientIdRefClients.find(clientId);
+    _clientHeartBeatQueue.erase(iterClient->second);
     _OnClientLeave(iterClient->second);
     _clientIdRefClients.erase(iterClient);
-    ++_leaveClientCnt;
+}
+
+void FS_Server::_OnClientLeaveAndEraseFromQueue(FS_Client *client)
+{
+    _clientIdRefClients.erase(client->GetId());
+    _clientHeartBeatQueue.erase(client);
+    _OnClientLeave(client);
+}
+
+std::map<UInt64, FS_Client *>::iterator fs::FS_Server::_OnClientLeaveAndEraseFromQueue(std::map<UInt64, FS_Client *>::iterator iter)
+{
+    auto client = iter->second;
+    iter = _clientIdRefClients.erase(iter);
+    _clientHeartBeatQueue.erase(client);
+    _OnClientLeave(client);
+    return iter;
+}
+
+void FS_Server::_OnClientLeaveByHeartBeat(FS_Client *client)
+{
+    _clientIdRefClients.erase(client->GetId());
+    _OnClientLeave(client);
 }
 
 void FS_Server::_OnClientJoin(FS_Client *client)

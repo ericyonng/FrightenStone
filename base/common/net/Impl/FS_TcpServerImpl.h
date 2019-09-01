@@ -38,11 +38,12 @@ template<class ServerT>
 void FS_TcpServer::Start(Int32 msgTransferSvrQuantity)
 {
     // 启动多个服务器（每个服务器一个线程）
+    const Int32 numPerServer = _maxClient / msgTransferSvrQuantity + 1;
     for(int n = 0; n < msgTransferSvrQuantity; ++n)
     {
         auto ser = new ServerT();
         ser->SetId(n + 1);
-        ser->SetClientNum((_maxClient / msgTransferSvrQuantity) + 1);
+        ser->SetClientNum(numPerServer);
         _fsServers.push_back(ser);
         // 注册网络事件接受对象
         ser->SetEventHandleObj(this);

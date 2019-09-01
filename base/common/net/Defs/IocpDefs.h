@@ -93,7 +93,7 @@ struct BASE_EXPORT IO_EVENT
         UInt64 _clientId;                       // 传入client唯一id
         SOCKET _socket;                         // 套接字
         Int64 _code;                            // 状态码
-    }_data;
+    }_data;   // 绑定完成端口时，绑定的完成键，在完成时会回传，建议回传clientId,用于判断客户端是否存在
     IO_DATA_BASE *_ioData = NULL;               // 重叠体自定义的数据
     // SOCKET _socket = INVALID_SOCKET;            // completionkey返回的socket socket在客户端断开后会被复用
     ULong _bytesTrans = 0;                      // 传输的字节数

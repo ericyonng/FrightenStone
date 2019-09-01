@@ -36,6 +36,7 @@ FS_NAMESPACE_BEGIN
 
 inline FS_Client::~FS_Client()
 {
+    _id = 0;
     Close();
     FS_Release(_recvBuff);
     FS_Release(_sendBuff);
