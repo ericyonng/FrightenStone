@@ -139,15 +139,12 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
 
         // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
         // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
-        auto st = _BeforeClientMsgTransfer();
+        auto st = _OnClientNetEventHandle();
         if(st != StatusDefs::Success)
         {
             g_Log->e<FS_Server>(_LOGFMT_("FS_Server id[%d] _BeforeClientMsgTransfer: st[%d] "), _id, st);
             break;
         }
-
-        // 客户端消息到达
-        _OnClientMsgArrived();    // TODO关于超级流量导致msgarrive执行过长判定为攻击行为，由外部运维处理攻击
     }
 
     // 打印当前join的数目以及leave的数目
@@ -255,24 +252,16 @@ void FS_Server::_OnPrepareNetRecv(FS_Client *client)
      _eventHandleObj->OnPrepareNetRecv(client);
 }
 
-void FS_Server::_OnClientMsgArrived()
+void FS_Server::_OnClientMsgArrived(FS_Client *client)
 {
-    FS_Client *client = NULL;
-    for(auto itr : _clientIdRefClients)
+    // 循环 判断是否有消息需要处理
+    while(client->HasRecvMsg())
     {
-        client = itr.second;
-//         if(client->IsDestroy())// 要不要销毁不在客户端消息到达的处理范畴
-//             continue;
-
-        // 循环 判断是否有消息需要处理
-        while(client->HasRecvMsg())
-        {
-            // 处理网络消息
-            auto iterNode = client->FrontMsgNode();
-            _HandleNetMsg(client, client->FrontMsg(iterNode));
-            // 移除消息队列（缓冲区）最前的一条数据
-            client->PopFrontMsg(iterNode);
-        }
+        // 处理网络消息
+        auto iterNode = client->FrontMsgNode();
+        _HandleNetMsg(client, client->FrontMsg(iterNode));
+        // 移除消息队列（缓冲区）最前的一条数据
+        client->PopFrontMsg(iterNode);
     }
 }
 

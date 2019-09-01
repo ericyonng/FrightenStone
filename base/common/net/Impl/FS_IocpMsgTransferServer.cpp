@@ -65,69 +65,69 @@ void FS_IocpMsgTransferServer::BeforeClose()
     _iocpClientMsgTransfer->PostQuit();
 }
 
-Int32 FS_IocpMsgTransferServer::_BeforeClientMsgTransfer()
+Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
 {
     // 1.遍历post 客户端请求
     FS_Client *client = NULL;
-    for(auto iter = _clientIdRefClients.begin(); iter != _clientIdRefClients.end();)
-    {
-        client = iter->second;
-        if(client->IsDestroy())
-        {
-            g_Log->w<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroyed"), iter->first);
-            ++iter;
-            continue;
-        }
-
-        // 需要写数据的客户端,才postSend
-        if(!client->IsPostSend() && client->NeedWrite())
-        {
-            auto ioData = client->MakeSendIoData();
-            if(ioData)
-            {
-                if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
-                {
-                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
-                                                         , client->GetId(), client->GetSocket());
-
-                    iter = _OnClientLeaveAndEraseFromQueue(iter);
-                    continue;
-                }
-            }
-
-            ioData = client->MakeRecvIoData();
-            if(ioData)
-            {
-                if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
-                {
-                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
-                                                         , client->GetId(), client->GetSocket());
-                    iter = _OnClientLeaveAndEraseFromQueue(iter);
-                    continue;
-                }
-            }
-        }
-        else if(!client->IsPostRecv())
-        {
-            // TODO:需要考虑在1ms内客户端是否需要多次recv，只有没投递过recv的客户端才可以投递recv，避免多次投递，当客户端销毁后有可能recv才完成
-            auto ioData = client->MakeRecvIoData();
-            if(ioData)
-            {
-                if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
-                {
-                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
-                                                         , client->GetId(), client->GetSocket());
-                    iter = _OnClientLeaveAndEraseFromQueue(iter);
-                    continue;
-                }
-            }
-        }
-        ++iter;
-    }
+//     for(auto iter = _clientIdRefClients.begin(); iter != _clientIdRefClients.end();)
+//     {
+//         client = iter->second;
+//         if(client->IsDestroy())
+//         {
+//             g_Log->w<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroyed"), iter->first);
+//             ++iter;
+//             continue;
+//         }
+// 
+//         // 需要写数据的客户端,才postSend
+//         if(!client->IsPostSend() && client->NeedWrite())
+//         {
+//             auto ioData = client->MakeSendIoData();
+//             if(ioData)
+//             {
+//                 if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
+//                 {
+//                     g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
+//                                                          , client->GetId(), client->GetSocket());
+// 
+//                     iter = _OnClientLeaveAndEraseFromQueue(iter);
+//                     continue;
+//                 }
+//             }
+// 
+//             ioData = client->MakeRecvIoData();
+//             if(ioData)
+//             {
+//                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
+//                 {
+//                     g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
+//                                                          , client->GetId(), client->GetSocket());
+//                     iter = _OnClientLeaveAndEraseFromQueue(iter);
+//                     continue;
+//                 }
+//             }
+//         }
+//         else if(!client->IsPostRecv())
+//         {
+//             // TODO:需要考虑在1ms内客户端是否需要多次recv，只有没投递过recv的客户端才可以投递recv，避免多次投递，当客户端销毁后有可能recv才完成
+//             auto ioData = client->MakeRecvIoData();
+//             if(ioData)
+//             {
+//                 if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
+//                 {
+//                     g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
+//                                                          , client->GetId(), client->GetSocket());
+//                     iter = _OnClientLeaveAndEraseFromQueue(iter);
+//                     continue;
+//                 }
+//             }
+//         }
+//         ++iter;
+//     }
 
     // 2.iocp等待消息完成直到timeout或error为止
     Int32 ret = StatusDefs::Success;
-    while(true)
+    //while(true)
     {// 只处理到wait超时（意味着这超时后若客户端有数据到来只能等到下次投递完recv）
         ret = _ListenIocpNetEvents();
         if(ret == StatusDefs::IOCP_WaitTimeOut)
@@ -191,6 +191,40 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
 
         client->OnRecvFromIocp(_ioEvent->_ioData->_owner->GetNode(), _ioEvent->_bytesTrans);
         _OnPrepareNetRecv(client);
+
+        // 消息到达
+        _OnClientMsgArrived(client);
+
+        if(client->NeedWrite())
+        {
+            auto ioData = client->MakeSendIoData();
+            if(ioData)
+            {
+                if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
+                {
+                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
+                                                         , client->GetId(), client->GetSocket());
+
+                    _OnClientLeaveAndEraseFromQueue(client);
+                    return ret;
+                }
+            }
+        }
+        else
+        {
+            // 投递recv
+            auto ioData = client->MakeRecvIoData();
+            if(ioData)
+            {
+                if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
+                {
+                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
+                                                         , client->GetId(), client->GetSocket());
+                    _OnClientLeaveAndEraseFromQueue(client);
+                    return ret;
+                }
+            }
+        }
     }
     else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
     {// 发送数据 完成 Completion
@@ -214,6 +248,35 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
         }
 
         client->OnSend2iocp(_ioEvent->_ioData->_owner->GetNode(), _ioEvent->_bytesTrans);
+
+        // 继续投递send
+        if(client->NeedWrite())
+        {
+            auto ioData = client->MakeSendIoData();
+            if(ioData)
+            {
+                if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
+                {
+                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
+                                                         , client->GetId(), client->GetSocket());
+
+                    _OnClientLeaveAndEraseFromQueue(client);
+                    return ret;
+                }
+            }
+        }
+        
+        auto ioData = client->MakeRecvIoData();
+        if(ioData)
+        {
+            if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
+            {
+                g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
+                                                        , client->GetId(), client->GetSocket());
+                _OnClientLeaveAndEraseFromQueue(client);
+                return ret;
+            }
+        }
     }
     else 
     {
