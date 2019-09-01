@@ -97,6 +97,8 @@ public:
     bool IsDestroy() const;
     const Time &GetHeartBeatExpiredTime() const;
     void Close();
+    const FS_NetBufferArray *GetSendBufferArray() const;
+
     #pragma endregion
 
     //////////用于调试的成员变量
