@@ -77,10 +77,10 @@ public:
 
     #ifdef FS_USE_IOCP
     IO_DATA_BASE *MakeRecvIoData();
-    void OnRecvFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 rcvBytes);
+    void OnRecvFromIocp(std::list<FS_NetBuffer *>::iterator &&iterNode, Int32 rcvBytes);
 
     IO_DATA_BASE *MakeSendIoData();
-    void OnSend2iocp(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 snd);
+    void OnSend2iocp(std::list<FS_NetBuffer *>::iterator &&iterNode, Int32 snd);
 
     bool IsPostIoChange() const;
     bool IsPostSend() const;

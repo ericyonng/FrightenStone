@@ -65,7 +65,7 @@ public:
     *       5. _OnClientJoin - 客户端连入处理
     */
 protected:
-    virtual Int32 _BeforeClientMsgTransfer();
+    virtual Int32 _OnClientNetEventHandle();
     Int32 _ListenIocpNetEvents();
     virtual void _OnClientJoin(FS_Client *client);
     #pragma endregion

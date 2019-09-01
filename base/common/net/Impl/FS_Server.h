@@ -99,7 +99,7 @@ public:
     */
 protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
-    virtual Int32 _BeforeClientMsgTransfer() = 0;
+    virtual Int32 _OnClientNetEventHandle() = 0;
     
     // TODO:ÐÄÌøÓÅ»¯
     void _DetectClientHeartTime();
@@ -117,7 +117,7 @@ protected:
     bool _IsClientRemoved(UInt64 clientId);
     FS_Client *_GetClient(UInt64 clientId);
 
-    void _OnClientMsgArrived();
+    void _OnClientMsgArrived(FS_Client *client);
     virtual Int32 _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
     #pragma endregion
 

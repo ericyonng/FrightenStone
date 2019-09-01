@@ -95,7 +95,7 @@ IO_DATA_BASE *FS_Client::MakeRecvIoData()
     return _recvBuff->MakeRecvIoData(_sockfd);
 }
 
-void FS_Client::OnRecvFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 rcvBytes)
+void FS_Client::OnRecvFromIocp(std::list<FS_NetBuffer *>::iterator &&iterNode, Int32 rcvBytes)
 {
     if(!_isPostRecv)
         g_Log->e<FS_Client>(_LOGFMT_("recv from _isPostRecv is false"));
@@ -113,7 +113,7 @@ IO_DATA_BASE *FS_Client::MakeSendIoData()
     return _sendBuff->MakeSendIoData(_sockfd);
 }
 
-void FS_Client::OnSend2iocp(std::list<FS_NetBuffer *>::iterator &iterNode, Int32 snd)
+void FS_Client::OnSend2iocp(std::list<FS_NetBuffer *>::iterator &&iterNode, Int32 snd)
 {
     if(!_isPostSend)
         g_Log->e<FS_Client>(_LOGFMT_("send2iocp _isPostSend is false"));

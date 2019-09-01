@@ -113,7 +113,7 @@ inline bool FS_NetBufferArray::OnWrite2Iocp(std::list<FS_NetBuffer *>::iterator 
     if(buffer->IsEmpty())
     {
         _buffers.erase(iterNode);
-        iterNode = _buffers.end();
+        //iterNode = _buffers.end();
         FS_Release(buffer);
     }
 

@@ -39,7 +39,7 @@ inline char *FS_NetBuffer::GetData()
     return _buff;
 }
 
-inline std::list<FS_NetBuffer *>::iterator &FS_NetBuffer::GetNode()
+inline std::list<FS_NetBuffer *>::iterator FS_NetBuffer::GetNode()
 {
     return _arrayNode;
 }

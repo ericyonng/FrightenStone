@@ -51,7 +51,7 @@ public:
     void Release();
 
     char *GetData();
-    std::list<FS_NetBuffer *>::iterator &GetNode();
+    std::list<FS_NetBuffer *>::iterator GetNode();
     FS_NetBufferArray *GetOwner();
     void SetNode(const std::list<FS_NetBuffer *>::iterator &iterNode);
 
