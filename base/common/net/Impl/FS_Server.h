@@ -99,17 +99,23 @@ public:
     */
 protected:
     void _ClientMsgTransfer(const FS_ThreadPool *pool);
-    virtual Int32 _BeforeClientMsgTransfer(std::set<UInt64> &delayDestroyClients) = 0;
+    virtual Int32 _BeforeClientMsgTransfer() = 0;
     
     // TODO:心跳优化
     void _DetectClientHeartTime();
     void _AddToHeartBeatQueue(FS_Client *client);
 
-    void _DelayRmClient(FS_Client *client);
+    void _RmClient(FS_Client *client);
     void _OnClientLeave(FS_Client *client);
+    std::map<UInt64, FS_Client *>::iterator _OnClientLeaveAndEraseFromQueue(std::map<UInt64, FS_Client *>::iterator iter);
+    void _OnClientLeaveAndEraseFromQueue(FS_Client *client);
+    void _OnClientLeaveByHeartBeat(FS_Client *client);
     void _OnClientLeave(UInt64 clientId);
     virtual void _OnClientJoin(FS_Client *client);
     void _OnPrepareNetRecv(FS_Client *client);
+
+    bool _IsClientRemoved(UInt64 clientId);
+    FS_Client *_GetClient(UInt64 clientId);
 
     void _OnClientMsgArrived();
     virtual Int32 _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
@@ -133,7 +139,6 @@ private:
     Time _lastHeartDetectTime = Time::Now();
     // 线程
     FS_ThreadPool *_threadPool;
-    std::set<UInt64> _delayRemoveClientIds;
 protected:
     // 服务id
     UInt32 _id = 0;

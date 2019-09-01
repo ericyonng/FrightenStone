@@ -67,6 +67,7 @@ public:
     void Destroy();
     Int32 Reg(SOCKET sockfd);
     Int32 Reg(SOCKET sockfd, void *ptr);
+    Int32 Reg(SOCKET sockfd, UInt64 clientId);
     Int32 LoadAcceptEx(SOCKET listenSocket);
     #pragma endregion
 

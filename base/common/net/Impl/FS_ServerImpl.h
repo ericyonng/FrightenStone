@@ -76,11 +76,35 @@ inline void FS_Server::_AddToHeartBeatQueue(FS_Client *client)
 //                           , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
 }
 
-inline void FS_Server::_DelayRmClient(FS_Client *client)
+inline void FS_Server::_RmClient(FS_Client *client)
 {
-    if(!client->IsDestroy())
-        _delayRemoveClientIds.insert(client->GetId());
+    if(client)
+    {
+        auto iterClient = _clientIdRefClients.find(client->GetId());
+        if(iterClient == _clientIdRefClients.end())
+        {
+            g_Log->net<FS_Server>("_RmClient a not exist clientId[%llu]", client->GetId());
+            return;
+        }
+
+        _OnClientLeaveAndEraseFromQueue(iterClient);
+    }
 }
+
+inline bool FS_Server::_IsClientRemoved(UInt64 clientId)
+{
+    return _clientIdRefClients.find(clientId) == _clientIdRefClients.end();
+}
+
+inline FS_Client *FS_Server::_GetClient(UInt64 clientId)
+{
+    auto iterClient = _clientIdRefClients.find(clientId);
+    if(iterClient == _clientIdRefClients.end())
+        return NULL;
+
+    return iterClient->second;
+}
+
 #pragma endregion
 
 FS_NAMESPACE_END

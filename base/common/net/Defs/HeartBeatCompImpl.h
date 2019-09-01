@@ -41,6 +41,9 @@ inline bool HeartBeatComp::operator()(const FS_Client *l, const FS_Client *r) co
     if(l == r)
         return l < r;
 
+    if(l->GetHeartBeatExpiredTime() == r->GetHeartBeatExpiredTime())
+        return l < r;
+
     return l->GetHeartBeatExpiredTime() < r->GetHeartBeatExpiredTime();
 }
 
