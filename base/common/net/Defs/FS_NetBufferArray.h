@@ -66,6 +66,7 @@ public:
 
     bool HasMsg() const;
     bool NeedWrite() const;
+    bool IsFirstNodeNull() const;
 
 #pragma region iocp
 public:

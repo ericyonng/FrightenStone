@@ -171,11 +171,14 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
 
         if(_ioEvent->_bytesTrans <= 0)
         {// 客户端断开处理
-            g_Log->any<FS_IocpMsgTransferServer>("client sock[%llu] clientId[%llu] IO_TYPE::RECV bytesTrans[%d]"
+            g_Log->any<FS_IocpMsgTransferServer>("client sock[%llu] clientId[%llu] IO_TYPE::RECV bytesTrans[%lu]"
                                                  , client->GetSocket()
                                                  , clientId,
                                                  _ioEvent->_bytesTrans);
-
+            g_Log->net<FS_IocpMsgTransferServer>("client sock[%llu] clientId[%llu] will remove IO_TYPE::IO_RECV bytesTrans[%lu]"
+                                                 , client->GetSocket()
+                                                 , clientId
+                                                 , _ioEvent->_bytesTrans);
             //CELLLog_Info("rmClient sockfd=%d, IO_TYPE::RECV bytesTrans=%d", _ioEvent.pIoData->sockfd, _ioEvent.bytesTrans);
             // _RmClient(*_ioEvent);
             _RmClient(client);
@@ -231,11 +234,14 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
 
         if(_ioEvent->_bytesTrans <= 0)
         {// 客户端断开处理
-            g_Log->any<FS_IocpMsgTransferServer>("client sock[%llu] clientId[%llu] IO_TYPE::IO_SEND bytesTrans[%d]"
+            g_Log->any<FS_IocpMsgTransferServer>("client sock[%llu] clientId[%llu] IO_TYPE::IO_SEND bytesTrans[%lu]"
                                                  , client->GetSocket()
                                                  , clientId
                                                  , _ioEvent->_bytesTrans);
-
+            g_Log->net<FS_IocpMsgTransferServer>("client sock[%llu] clientId[%llu] will remove IO_TYPE::IO_SEND bytesTrans[%lu]"
+                                                 , client->GetSocket()
+                                                 , clientId
+                                                 , _ioEvent->_bytesTrans);
             _RmClient(client);
             return ret;
         }
@@ -247,8 +253,17 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
                                                 , client->GetId());
         }
 
+        g_Log->net<FS_IocpMsgTransferServer>("client id[%llu], socket id[%llu], send suc bytestrans[%lu]"
+                                             , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans);
+        
         client->OnSend2iocp(_ioEvent->_ioData->_owner->GetNode(), _ioEvent->_bytesTrans);
-
+        if(client->GetSendBufferArray()->IsFirstNodeNull())
+        {
+            g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("SEND BUFFER FIRST NODE IS NULL"
+                                                        "client id[%llu], socket id[%llu], bytesTrans[%lu]\nstack trace back:\n%s")
+                                               , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans
+                                               , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+        }
         // 继续投递send
         if(client->NeedWrite())
         {

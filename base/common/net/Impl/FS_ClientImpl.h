@@ -142,5 +142,10 @@ inline  const Time &FS_Client::GetHeartBeatExpiredTime() const
     return _heartBeatExpiredTime;
 }
 
+inline const FS_NetBufferArray *FS_Client::GetSendBufferArray() const
+{
+    return _sendBuff;
+}
+
 FS_NAMESPACE_END
 #endif

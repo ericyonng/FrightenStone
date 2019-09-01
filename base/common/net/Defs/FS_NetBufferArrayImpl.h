@@ -85,6 +85,11 @@ inline bool FS_NetBufferArray::NeedWrite() const
     return _buffers.front()->NeedWrite();
 }
 
+inline bool FS_NetBufferArray::IsFirstNodeNull() const
+{
+    return !_buffers.front();
+}
+
 inline IO_DATA_BASE *FS_NetBufferArray::MakeRecvIoData(SOCKET sockfd)
 {
     return _buffers.back()->MakeRecvIoData(sockfd);
@@ -115,6 +120,13 @@ inline bool FS_NetBufferArray::OnWrite2Iocp(std::list<FS_NetBuffer *>::iterator 
         _buffers.erase(iterNode);
         //iterNode = _buffers.end();
         FS_Release(buffer);
+    }
+
+    FS_NetBuffer *firstNode = *_buffers.begin();
+    if(!firstNode)
+    {
+        g_Log->e<FS_NetBufferArray>(_LOGFMT_("first buffer is null[%s]")
+                                    , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
     }
 
     return isWrite2Iocp;

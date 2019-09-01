@@ -294,8 +294,14 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
         }
         if(ERROR_SEM_TIMEOUT == error)
         {// TODO:这个错误码要不要处理 压力过大可以重新投递相应的数据
-            g_Log->w<FS_Iocp>(_LOGFMT_("pressure is too large for this machine. please improve machine performance or expand net card bandwidth error<%d> status<%d>")
-                              , error, StatusDefs::Unknown);
+            g_Log->w<FS_Iocp>(_LOGFMT_("pressure is too large for this machine."
+                                       " please improve machine performance or "
+                                       "expand net card bandwidth error<%d> status<%d>"
+                                       "clientId<%llu> bytesTrans<%lu>")
+                              , error
+                              , StatusDefs::Unknown
+                              , ioEvent._data._clientId
+                              , ioEvent._bytesTrans);
             return StatusDefs::Success;
         }
 
