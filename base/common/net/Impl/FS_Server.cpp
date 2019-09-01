@@ -53,7 +53,7 @@ FS_Server::~FS_Server()
     Close();
     _locker.Lock();
     STLUtil::DelMapContainer(_clientIdRefClients);
-    STLUtil::DelVectorContainer(_clientsCache);
+    STLUtil::DelVectorContainer(_waitToJoinClients);
     _locker.Unlock();
     g_Log->net<FS_Server>("FS_Server%d.~FS_Server exit begin", _id);
     g_Log->sys<FS_Server>(_LOGFMT_("FS_Server%d.~FS_Server exit begin"), _id);
@@ -65,24 +65,15 @@ void FS_Server::_ClearClients()
 {
     _locker.Lock();
     STLUtil::DelMapContainer(_clientIdRefClients);
-    STLUtil::DelVectorContainer(_clientsCache);
+    STLUtil::DelVectorContainer(_waitToJoinClients);
     _locker.Unlock();
 }
 #pragma endregion
 
 #pragma region recv/addclient/start/close
-Int32 FS_Server::RecvData(FS_Client *client)
-{
-    // 接收客户端数据
-    int len = client->RecvData();
-    // 触发<接收到网络数据>事件
-    _eventHandleObj->OnPrepareNetRecv(client);
-    return len;
-}
-
 void FS_Server::Start()
 {
-    auto clientMsgTrasfer = DelegatePlusFactory::Create(this, &FS_Server::_ClientMsgTransfer);
+    auto clientMsgTrasfer = DelegatePlusFactory::Create(this, &FS_Server::_OnWorking);
     _threadPool->AddTask(clientMsgTrasfer);
 }
 
@@ -103,14 +94,15 @@ void FS_Server::Close()
 #pragma endregion
 
 #pragma region net message handle
-void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
+void FS_Server::_OnWorking(const FS_ThreadPool *pool)
 {
     while(!pool->IsClearingPool())
     {
-        if(!_clientsCache.empty())
-        {// 从缓冲队列里取出客户数据
-            _locker.Lock();
-            for(auto client : _clientsCache)
+        // 1.从waitJoin队列中转移待连入的客户端
+        _locker.Lock();
+        if(!_waitToJoinClients.empty())
+        {
+            for(auto client : _waitToJoinClients)
             {
                 _clientIdRefClients[client->GetId()] = client;
                 client->_serverId = _id;
@@ -121,30 +113,33 @@ void FS_Server::_ClientMsgTransfer(const FS_ThreadPool *pool)
                 _eventHandleObj->OnNetJoin(client);
                 _OnClientJoin(client);
             }
-            _clientsCache.clear();
+            _waitToJoinClients.clear();
             _clientsChange = true;
-            _locker.Unlock();
         }
+        _locker.Unlock();
 
-        // 如果没有需要处理的客户端，就跳过
-        if(_clientIdRefClients.empty())
-        {
-            // 使用wait
+        // 2.判断有无客户端需要处理
+        if(_clientIdRefClients.empty()){
             SocketUtil::Sleep(1);
             continue;
         }
 
-        // TODO:心跳检测优化
+        // 3.判断心跳
         _DetectClientHeartTime();
 
-        // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
-        // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
+        // 4.处理网络事件
         auto st = _OnClientNetEventHandle();
         if(st != StatusDefs::Success)
         {
             g_Log->e<FS_Server>(_LOGFMT_("FS_Server id[%d] _BeforeClientMsgTransfer: st[%d] "), _id, st);
             break;
         }
+
+        // 5.处理客户端到达消息
+        _OnClientMsgArrived();
+
+        // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
+        // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
     }
 
     // 打印当前join的数目以及leave的数目
@@ -183,7 +178,10 @@ void FS_Server::_DetectClientHeartTime()
 
         // 若有post消息，则先关闭socket，其他情况不用
         if(client->IsPostIoChange())
+        {
             client->Close();
+            _needToPostClientIds.insert(client->GetId());
+        }
         else
             _OnClientLeaveByHeartBeat(client);
 
@@ -252,17 +250,28 @@ void FS_Server::_OnPrepareNetRecv(FS_Client *client)
      _eventHandleObj->OnPrepareNetRecv(client);
 }
 
-void FS_Server::_OnClientMsgArrived(FS_Client *client)
+void FS_Server::_OnClientMsgArrived()
 {
-    // 循环 判断是否有消息需要处理
-    while(client->HasRecvMsg())
+    FS_Client *client = NULL;
+    for(auto clientId : _msgArrivedClientIds)
     {
-        // 处理网络消息
-        auto iterNode = client->FrontMsgNode();
-        _HandleNetMsg(client, client->FrontMsg(iterNode));
-        // 移除消息队列（缓冲区）最前的一条数据
-        client->PopFrontMsg(iterNode);
+        auto iterClient = _clientIdRefClients.find(clientId);
+        if(iterClient == _clientIdRefClients.end())
+            continue;
+
+        client = iterClient->second;
+        // 循环 判断是否有消息需要处理
+        while(client->HasRecvMsg())
+        {
+            // 处理网络消息
+            auto iterNode = client->FrontMsgNode();
+            _HandleNetMsg(client, client->FrontMsg(iterNode));
+            // 移除消息队列（缓冲区）最前的一条数据
+            client->PopFrontMsg(iterNode);
+        }
     }
+
+    _msgArrivedClientIds.clear();
 }
 
 Int32 FS_Server::_HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header)

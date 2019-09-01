@@ -196,6 +196,7 @@ FS_NAMESPACE_END
 
 void TestServer::Run()
 {
+    fs::TimeUtil::SetTimeZone();
     g_Log->InitModule("TestServer");
     auto initret = fs::CrashHandleUtil::InitCrashHandleParams();
     if(initret != StatusDefs::Success)

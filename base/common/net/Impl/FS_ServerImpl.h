@@ -36,7 +36,7 @@ FS_NAMESPACE_BEGIN
 #pragma region misc
 inline size_t FS_Server::GetClientCount() const
 {
-    return _clientIdRefClients.size() + _clientsCache.size();
+    return _clientIdRefClients.size() + _waitToJoinClients.size();
 }
 
 inline void FS_Server::SetClientNum(Int32 socketNum)
@@ -55,10 +55,10 @@ inline void FS_Server::SetId(UInt32 id)
 #pragma endregion
 
 #pragma region recv/addclient/start/close
-inline void FS_Server::AddClient(FS_Client *client)
+inline void FS_Server::AddClientToWaitJoinQueue(FS_Client *client)
 {
     _locker.Lock();
-    _clientsCache.push_back(client);
+    _waitToJoinClients.push_back(client);
     _locker.Unlock();
 }
 #pragma endregion
