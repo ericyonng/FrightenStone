@@ -284,7 +284,7 @@ void FS_TcpServer::_AddClientToFSServer(FS_Client *client)
         if(minServer->GetClientCount() > svr->GetClientCount())
             minServer = svr;
     }
-    minServer->AddClient(client);
+    minServer->AddClientToWaitJoinQueue(client);
 }
 
 void FS_TcpServer::_StatisticsMsgPerSecond()

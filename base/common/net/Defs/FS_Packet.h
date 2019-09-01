@@ -36,17 +36,32 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/objpool/objpool.h"
+#include "base/common/net/protocol/protocol.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Packet
 {
     OBJ_POOL_CREATE_DEF(FS_Packet);
+
 public:
+    FS_Packet();
+    FS_Packet(char *buff, UInt16 bufferSize);
+    ~FS_Packet();
+
+public:
+    void FromMsg(NetMsg_DataHeader *header);
+    NetMsg_DataHeader *CastToMsg();
+    template<typename T>
+    T *CastToMsg();
+    char *GiveupBuffer(UInt16 &bufferSize);
+    void ClearBuffer();
 
 private:
+    UInt16 _cmd;
+    UInt16 _size;
     char *_buff;
-    size_t _size;
 };
 
 FS_NAMESPACE_END

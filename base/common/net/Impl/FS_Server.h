@@ -75,8 +75,7 @@ private:
     #pragma region recv/addclient/start/close
 public:
     // 接收数据 处理粘包 拆分包
-    Int32 RecvData(FS_Client *client);
-    void AddClient(FS_Client *client);
+    void AddClientToWaitJoinQueue(FS_Client *client);
     void Start();
     virtual void BeforeClose();
     void Close();
@@ -98,7 +97,7 @@ public:
     *               若要转发到其他地方需要进行拷贝否则会被覆盖数据
     */
 protected:
-    void _ClientMsgTransfer(const FS_ThreadPool *pool);
+    void _OnWorking(const FS_ThreadPool *pool);
     virtual Int32 _OnClientNetEventHandle() = 0;
     
     // TODO:心跳优化
@@ -117,7 +116,7 @@ protected:
     bool _IsClientRemoved(UInt64 clientId);
     FS_Client *_GetClient(UInt64 clientId);
 
-    void _OnClientMsgArrived(FS_Client *client);
+    void _OnClientMsgArrived();
     virtual Int32 _HandleNetMsg(FS_Client *client, NetMsg_DataHeader *header);
     #pragma endregion
 
@@ -127,10 +126,11 @@ protected:
     // 正式客户队列 隐患：不严格按照包到达时序处理，若两个包有先后依赖会出问题
     std::map<UInt64, FS_Client *> _clientIdRefClients;
     std::set<FS_Client *, HeartBeatComp> _clientHeartBeatQueue;
-
+    std::set<UInt64> _msgArrivedClientIds;
+    std::set<UInt64> _needToPostClientIds;
 private:
     // 缓冲客户队列
-    std::vector<FS_Client *> _clientsCache; // 待发送，接收,待连入缓冲
+    std::vector<FS_Client *> _waitToJoinClients; // 待发送，接收,待连入缓冲
     // 缓冲队列的锁
     Locker _locker;
     // 网络事件处理对象

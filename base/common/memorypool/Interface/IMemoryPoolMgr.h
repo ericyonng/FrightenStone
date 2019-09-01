@@ -51,7 +51,11 @@ public:
     static IMemoryPoolMgr *GetInstance();
     virtual Int32 InitPool() = 0;
     virtual void FinishPool() = 0;
+    template<typename T>
+    T *Alloc(size_t bytes);
     virtual void *Alloc(size_t bytes) = 0;
+    template<typename T>
+    T *Realloc(void *ptr, size_t bytes);
     virtual void *Realloc(void *ptr, size_t bytes) = 0;
     virtual void  Free(void *ptr) = 0;
     virtual void  AddRef(void *ptr) = 0;
@@ -60,6 +64,17 @@ public:
     virtual void PrintMemPoolInfo() const = 0;
 };
 
+template<typename T>
+inline T *IMemoryPoolMgr::Alloc(size_t bytes)
+{
+    return reinterpret_cast<T *>(Alloc(bytes));
+}
+
+template<typename T>
+inline T *IMemoryPoolMgr::Realloc(void *ptr, size_t bytes)
+{
+    return reinterpret_cast<T *>(Realloc(ptr, bytes));
+}
 FS_NAMESPACE_END
 
 extern BASE_EXPORT fs::IMemoryPoolMgr *g_MemoryPool;

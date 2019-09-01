@@ -34,6 +34,70 @@
 
 FS_NAMESPACE_BEGIN
 
+inline FS_Packet::FS_Packet()
+    :_cmd(0)
+    ,_size(0)
+    ,_buff(NULL)
+{
+}
+
+inline FS_Packet::FS_Packet(char *buff, UInt16 bufferSize)
+    :_cmd(0)
+    , _size(bufferSize)
+    , _buff(buff)
+{
+}
+
+inline FS_Packet::~FS_Packet()
+{
+    ClearBuffer();
+}
+
+inline void FS_Packet::FromMsg(NetMsg_DataHeader *header)
+{
+    ClearBuffer();
+    g_MemoryPool->Lock();
+    _buff = g_MemoryPool->Alloc<char>(header->_packetLength);
+    g_MemoryPool->Unlock();
+    _size = header->_packetLength;
+    _cmd = header->_cmd;
+}
+
+inline NetMsg_DataHeader *FS_Packet::CastToMsg()
+{
+    return reinterpret_cast<NetMsg_DataHeader *>(_buff);
+}
+
+template<typename T>
+inline T *FS_Packet::CastToMsg()
+{
+    return reinterpret_cast<T*>(_buff);
+}
+
+inline char *FS_Packet::GiveupBuffer(UInt16 &bufferSize)
+{
+    auto buff = _buff;
+    bufferSize = _size;
+
+    _cmd = 0;
+    _size = 0;
+    _buff = NULL;
+    return buff;
+}
+
+inline void FS_Packet::ClearBuffer()
+{
+    if(_buff)
+    {
+        g_MemoryPool->Lock();
+        g_MemoryPool->Free(_buff);
+        g_MemoryPool->Unlock();
+        _buff = NULL;
+        _size = 0;
+        _cmd = 0;
+    }
+}
+
 FS_NAMESPACE_END
 
 #endif

@@ -392,7 +392,13 @@ FS_String &Time::Format(const Byte8 *outFmt) const
     if(outFmt)
         strftime(buf, sizeof(buf), outFmt, &_localTimeStruct);
     else
-        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_localTimeStruct);
+        sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d"
+                , _localTimeStruct.tm_year + 1900
+                , _localTimeStruct.tm_mon + 1
+                , _localTimeStruct.tm_mday
+                , _localTimeStruct.tm_hour
+                , _localTimeStruct.tm_min
+                , _localTimeStruct.tm_sec);
 
     *_GetCache(true) = buf;
     return *_cache;
