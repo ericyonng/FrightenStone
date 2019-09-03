@@ -46,22 +46,26 @@ class BASE_EXPORT FS_Packet
     OBJ_POOL_CREATE_DEF(FS_Packet);
 
 public:
-    FS_Packet();
-    FS_Packet(char *buff, UInt16 bufferSize);
+    FS_Packet(UInt64 clientId);
+    FS_Packet(UInt64 clientId, char *buff, UInt16 bufferSize);
     ~FS_Packet();
 
 public:
-    void FromMsg(NetMsg_DataHeader *header);
+    void FromMsg(UInt64 clientId, NetMsg_DataHeader *header);
     NetMsg_DataHeader *CastToMsg();
     template<typename T>
     T *CastToMsg();
-    char *GiveupBuffer(UInt16 &bufferSize);
+
+    bool IsFullPacket();
+    char *GiveupBuffer(UInt16 &bufferSize, Int32 &lastPos);
     void ClearBuffer();
 
 private:
     UInt16 _cmd;
     UInt16 _size;
+    UInt64 _clientId;
     char *_buff;
+    Int32 _lastPos;
 };
 
 FS_NAMESPACE_END
