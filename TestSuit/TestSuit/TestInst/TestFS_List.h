@@ -186,7 +186,7 @@ public:
 
         std::cout << "testList1" << std::endl;
         auto beginTest = testList1.begin();
-        const Int32 sizeNode = testList1.size();
+        const Int32 sizeNode = static_cast<Int32>(testList1.size());
         while(beginTest)
         {
             std::cout << "num=" << beginTest->_obj->iterList1->_obj->_num << std::endl;

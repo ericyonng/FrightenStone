@@ -67,13 +67,19 @@ struct BASE_EXPORT IO_DATA_BASE
 {
     OBJ_POOL_CREATE(IO_DATA_BASE, _objPoolHelper);
 
+public:
+    IO_DATA_BASE() {}
+    ~IO_DATA_BASE()
+    {
+        Fs_SafeFree(_completedCallback);
+    }
+
     // 重叠体
     OVERLAPPED _overlapped{0};          // 使用重叠体可以关联到iodatabase,在投递accept时候传入
-    UInt64 _clientId;                   // 客户端唯一id
-    SOCKET _sock = INVALID_SOCKET;
     Int32 _ioType = 0;
-    FS_NetBuffer *_owner;               // 所属的缓冲
-    IDelegatePlus<void, Int32> *_completedCallback; // 完成时的回调
+    UInt64 _ownerId = 0;                   // 客户端唯一id
+    SOCKET _sock = INVALID_SOCKET;
+    IDelegatePlus<void, Int32> *_completedCallback = NULL; // 完成时的回调
 
     // 没必要每个客户端指定一个缓冲，太大了，
     // 因为iocp取数据 时候数据是从队列中先进先出的方式被拷贝出来，

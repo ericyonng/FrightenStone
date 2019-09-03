@@ -177,8 +177,7 @@ void FS_Server::_DetectClientHeartTime()
                               , _lastHeartDetectTime.GetMicroTimestamp());
 
         // 若有post消息，则先关闭socket，其他情况不用
-        if(client->IsPostIoChange())
-        {
+        if(client->IsPostIoChange()){
             client->Close();
             _needToPostClientIds.insert(client->GetId());
         }
@@ -264,11 +263,13 @@ void FS_Server::_OnClientMsgArrived()
         while(client->HasRecvMsg())
         {
             // 处理网络消息
-            auto iterNode = client->FrontMsgNode();
-            _HandleNetMsg(client, client->FrontMsg(iterNode));
+            _HandleNetMsg(client, client->FrontRecvMsg());
             // 移除消息队列（缓冲区）最前的一条数据
-            client->PopFrontMsg(iterNode);
+            client->PopRecvFrontMsg();
         }
+
+        if(client->NeedWrite())
+            _needToPostClientIds.insert(client->GetId());
     }
 
     _msgArrivedClientIds.clear();

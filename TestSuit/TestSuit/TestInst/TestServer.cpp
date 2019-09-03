@@ -105,18 +105,20 @@ public:
                     ret._msgId = client->_sendMsgId;
 //                     g_Log->net<EasyFSServer>("<Send>socket<%d> LoginRes, _result[%d] msgId[%d] "
 //                                              , static_cast<Int32>(client->GetSocket()), ret._result, ret._msgId);
-                    if(SOCKET_ERROR == client->SendData(&ret))
-                    {
-                        // 发送缓冲区满了，消息没发出去,目前直接抛弃了
-                        // 客户端消息太多，需要考虑应对策略
-                        // 正常连接，业务客户端不会有这么多消息
-                        // 模拟并发测试时是否发送频率过高
-                        if(_bSendFull)
-                            g_Log->w<EasyFSServer>(_LOGFMT_("<Socket=%d> Send Full"), client->GetSocket());
-                    }
-                    else {
-                        ++client->_sendMsgId;
-                    }
+                    client->SendData(&ret);
+                    ++client->_sendMsgId;
+
+//                     if(SOCKET_ERROR == client->SendData(&ret))
+//                     {
+//                         // 发送缓冲区满了，消息没发出去,目前直接抛弃了
+//                         // 客户端消息太多，需要考虑应对策略
+//                         // 正常连接，业务客户端不会有这么多消息
+//                         // 模拟并发测试时是否发送频率过高
+//                         if(_bSendFull)
+//                             g_Log->w<EasyFSServer>(_LOGFMT_("<Socket=%d> Send Full"), client->GetSocket());
+//                     }
+//                     else {
+//                     }
 
                     // g_Log->net<EasyFSServer>("<Socket=%d> send login res", client->GetSocket());
                 }
@@ -210,7 +212,7 @@ void TestServer::Run()
     easyServer.InitSocket();
     easyServer.Bind(NULL, 4567);
     easyServer.Listen();
-    easyServer.Start(8);
+    easyServer.Start(1);
     while(1)
     {
         Sleep(1000);

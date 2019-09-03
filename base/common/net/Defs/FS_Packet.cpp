@@ -31,9 +31,61 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Defs/FS_Packet.h"
+#include "base/common/log/Log.h"
 
 FS_NAMESPACE_BEGIN
 
 OBJ_POOL_CREATE_DEF_IMPL(FS_Packet, __DEF_OBJ_POOL_OBJ_NUM__)
 
+void FS_Packet::Pop(Int32 len)
+{
+    Int32 n = _lastPos - len;
+    if(n > 0)
+        memcpy(_buff, _buff + len, n);
+    else if(n < 0)
+    {
+        n = 0;
+        g_Log->e<FS_Packet>(_LOGFMT_("_ownerId[%llu] n is negative lastPos[%d] len[%d]"),
+                               _ownerId, _lastPos, len);
+    }
+
+    _lastPos = n;
+}
+
+void FS_Packet::_OnSendSucCallback(Int32 transferBytes)
+{
+    // 写入iocp完成多少字节则buffer响应减少多少字节
+    if(_lastPos < transferBytes)
+    {
+        g_Log->e<FS_Packet>(_LOGFMT_("_ownerId[%llu] packetsize<%d> _lastPos<%d> transferBytes<%d>")
+                               , _ioData._ownerId, _packetSize, _lastPos, transferBytes);
+        return;
+    }
+
+    if(_lastPos == transferBytes)
+    {// _lastPos=2000 实际发送sendBytes=2000
+     // 数据尾部位置清零
+        _lastPos = 0;
+    }
+    else {
+        // _lastPos=2000 实际发送ret=1000
+        _lastPos -= transferBytes;
+        memcpy(_buff, _buff + transferBytes, _lastPos);
+    }
+}
+
+void FS_Packet::_OnRecvSucCallback(Int32 transferBytes)
+{
+    // 从iocp读入buffer则buffer数据增加相应字节
+    if(transferBytes > 0 && _packetSize - _lastPos >= transferBytes)
+    {
+        _lastPos += transferBytes;
+        return;
+    }
+
+    g_Log->e<FS_Packet>(_LOGFMT_("_ownerId<%llu> _packetSize<%d> _lastPos<%d> transferBytes<%d>")
+                           , _ioData._ownerId, _packetSize, _lastPos, transferBytes);
+}
+
 FS_NAMESPACE_END
+

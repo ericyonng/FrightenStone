@@ -38,6 +38,8 @@
 #include "base/common/objpool/objpool.h"
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/memorypool/memorypool.h"
+#include "base/common/net/Defs/IocpDefs.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -46,26 +48,39 @@ class BASE_EXPORT FS_Packet
     OBJ_POOL_CREATE_DEF(FS_Packet);
 
 public:
-    FS_Packet(UInt64 clientId);
-    FS_Packet(UInt64 clientId, char *buff, UInt16 bufferSize);
+    FS_Packet(UInt64 ownerId);
+    FS_Packet(UInt64 ownerId, Int32 packetSize);
+    FS_Packet(UInt64 ownerId, char *buff, Int32 packetSize);
     ~FS_Packet();
 
 public:
-    void FromMsg(UInt64 clientId, NetMsg_DataHeader *header);
+    void Pop(Int32 len);
+    void FromMsg(UInt64 ownerId, NetMsg_DataHeader *header);
+    void FromMsg(UInt64 ownerId, const char *data, Int32 len);
     NetMsg_DataHeader *CastToMsg();
     template<typename T>
     T *CastToMsg();
-
-    bool IsFullPacket();
-    char *GiveupBuffer(UInt16 &bufferSize, Int32 &lastPos);
+    char *GiveupBuffer(Int32 &packetSize, Int32 &lastPos);
     void ClearBuffer();
 
+    IO_DATA_BASE *MakeRecvIoData();
+    IO_DATA_BASE *MakeSendIoData();
+
+    bool IsFullPacket();
+    bool IsEmpty();
+    bool HasMsg() const;
+    bool NeedWrite() const;
+
 private:
-    UInt16 _cmd;
-    UInt16 _size;
-    UInt64 _clientId;
+    void _OnSendSucCallback(Int32 transferBytes);
+    void _OnRecvSucCallback(Int32 transferBytes);
+
+private:
+    Int32 _packetSize;
+    UInt64 _ownerId;
     char *_buff;
     Int32 _lastPos;
+    IO_DATA_BASE _ioData = {};
 };
 
 FS_NAMESPACE_END

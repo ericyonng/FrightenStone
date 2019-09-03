@@ -34,21 +34,31 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_Packet::FS_Packet(UInt64 clientId)
-    :_cmd(0)
-    ,_size(0)
-    ,_buff(NULL)
-    ,_clientId(clientId)
-    ,_lastPos(0)
+inline FS_Packet::FS_Packet(UInt64 ownerId)
+    : _packetSize(0)
+    , _buff(NULL)
+    , _ownerId(ownerId)
+    , _lastPos(0)
 {
+
 }
 
-inline FS_Packet::FS_Packet(UInt64 clientId, char *buff, UInt16 bufferSize)
-    :_cmd(0)
-    , _size(bufferSize)
+inline FS_Packet::FS_Packet(UInt64 ownerId, Int32 packetSize)
+    :_packetSize(packetSize)
+    ,_buff(NULL)
+    ,_ownerId(ownerId)
+    ,_lastPos(0)
+{
+    g_MemoryPool->Lock();
+    _buff = g_MemoryPool->Alloc<char>(packetSize);
+    g_MemoryPool->Unlock();
+}
+
+inline FS_Packet::FS_Packet(UInt64 ownerId, char *buff, Int32 packetSize)
+    : _packetSize(packetSize)
     , _buff(buff)
-    ,_clientId(clientId)
-    ,_lastPos(bufferSize)
+    ,_ownerId(ownerId)
+    ,_lastPos(packetSize)
 {
 }
 
@@ -57,26 +67,33 @@ inline FS_Packet::~FS_Packet()
     ClearBuffer();
 }
 
-inline void FS_Packet::FromMsg(UInt64 clientId, NetMsg_DataHeader *header)
+inline void FS_Packet::FromMsg(UInt64 ownerId, NetMsg_DataHeader *header)
 {
     ClearBuffer();
     g_MemoryPool->Lock();
-    _buff = g_MemoryPool->Alloc<char>(header->_packetLength);
+    _buff = g_MemoryPool->Alloc<char>(static_cast<size_t>(header->_packetLength));
     g_MemoryPool->Unlock();
-    _size = header->_packetLength;
-    _cmd = header->_cmd;
-    _clientId = clientId;
+    _packetSize = header->_packetLength;
+    _ownerId = ownerId;
     _lastPos = header->_packetLength;
+}
+
+inline void FS_Packet::FromMsg(UInt64 ownerId, const char *data, Int32 len)
+{
+    ClearBuffer();
+    g_MemoryPool->Lock();
+    _buff = g_MemoryPool->Alloc<char>(static_cast<size_t>(len));
+    g_MemoryPool->Unlock();
+    _packetSize = len;
+    _ownerId = ownerId;
+    _lastPos = len;
+
+    ::memcpy(_buff, data, len);
 }
 
 inline NetMsg_DataHeader *FS_Packet::CastToMsg()
 {
     return reinterpret_cast<NetMsg_DataHeader *>(_buff);
-}
-
-inline bool FS_Packet::IsFullPacket()
-{
-    return _size!=0 && _size == _lastPos;
 }
 
 template<typename T>
@@ -85,15 +102,14 @@ inline T *FS_Packet::CastToMsg()
     return reinterpret_cast<T*>(_buff);
 }
 
-inline char *FS_Packet::GiveupBuffer(UInt16 &bufferSize, Int32 &lastPos)
+inline char *FS_Packet::GiveupBuffer(Int32 &packetSize, Int32 &lastPos)
 {
     auto buff = _buff;
-    bufferSize = _size;
+    packetSize = _packetSize;
 
-    _cmd = 0;
-    _size = 0;
+    _packetSize = 0;
     _buff = NULL;
-    _clientId = 0;
+    _ownerId = 0;
     _lastPos = 0;
     return buff;
 }
@@ -106,11 +122,71 @@ inline void FS_Packet::ClearBuffer()
         g_MemoryPool->Free(_buff);
         g_MemoryPool->Unlock();
         _buff = NULL;
-        _size = 0;
-        _cmd = 0;
-        _clientId = 0;
+        _packetSize = 0;
+        _ownerId = 0;
         _lastPos = 0;
+        Fs_SafeFree(_ioData._completedCallback);
     }
+}
+
+inline IO_DATA_BASE *FS_Packet::MakeRecvIoData()
+{
+    int len = _packetSize - _lastPos;
+    if(len > 0)
+    {
+        _ioData._wsaBuff.buf = _buff + _lastPos;
+        _ioData._wsaBuff.len = len;
+        _ioData._ownerId = _ownerId;
+        if(!_ioData._completedCallback)
+            _ioData._completedCallback = DelegatePlusFactory::Create(this, &FS_Packet::_OnRecvSucCallback);
+        return &_ioData;
+    }
+
+    return NULL;
+}
+
+inline IO_DATA_BASE *FS_Packet::MakeSendIoData()
+{
+    if(_lastPos > 0)
+    {
+        _ioData._wsaBuff.buf = _buff;
+        _ioData._wsaBuff.len = _lastPos;
+        _ioData._ownerId = _ownerId;
+        if(!_ioData._completedCallback)
+            _ioData._completedCallback = DelegatePlusFactory::Create(this, &FS_Packet::_OnSendSucCallback);
+        return &_ioData;
+    }
+
+    return NULL;
+}
+
+inline bool FS_Packet::IsFullPacket()
+{
+    return _packetSize!=0 && _packetSize == _lastPos;
+}
+
+inline bool FS_Packet::IsEmpty()
+{
+    return _lastPos == 0;
+}
+
+inline bool FS_Packet::HasMsg() const
+{
+    // 判断消息缓冲区的数据长度大于消息头NetMsg_DataHeader长度
+    if(_lastPos >= sizeof(NetMsg_DataHeader))
+    {
+        // 这时就可以知道当前消息的长度
+        NetMsg_DataHeader *header = (NetMsg_DataHeader*)_buff;
+        // 判断消息缓冲区的数据长度大于消息长度
+        return _lastPos >= header->_packetLength;
+    }
+
+    return false;
+}
+
+inline bool FS_Packet::NeedWrite() const
+{
+    return _lastPos > 0;
 }
 
 FS_NAMESPACE_END

@@ -88,8 +88,8 @@ public:
     */
 public:
     Int32 PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData);
-    Int32 PostRecv(IO_DATA_BASE *ioData);
-    Int32 PostSend(IO_DATA_BASE *ioData);
+    Int32 PostRecv(SOCKET targetSock, IO_DATA_BASE *ioData);
+    Int32 PostSend(SOCKET targetSock, IO_DATA_BASE *ioData);
     Int32 PostQuit();
     Int32 WaitForCompletion(IO_EVENT &ioEvent, ULong millisec = INFINITE);
     #pragma endregion

@@ -183,12 +183,12 @@ Int32 FS_Iocp::PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData)
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::PostRecv(IO_DATA_BASE *ioData)
+Int32 FS_Iocp::PostRecv(SOCKET targetSock, IO_DATA_BASE *ioData)
 {
     ioData->_ioType = IocpDefs::IO_RECV;
     DWORD flags = 0;
     memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
-    if(SOCKET_ERROR == WSARecv(ioData->_sock, &ioData->_wsaBuff, 1, NULL, &flags, &ioData->_overlapped, NULL))
+    if(SOCKET_ERROR == WSARecv(targetSock, &ioData->_wsaBuff, 1, NULL, &flags, &ioData->_overlapped, NULL))
     {
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
@@ -196,13 +196,13 @@ Int32 FS_Iocp::PostRecv(IO_DATA_BASE *ioData)
             // 对端关闭
             if(error == WSAECONNRESET)
             {
-                g_Log->net<FS_Iocp>("An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
-                           , error, StatusDefs::IOCP_ClientForciblyClosed);
+                g_Log->net<FS_Iocp>("targetSock[%llu]An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
+                           ,targetSock, error, StatusDefs::IOCP_ClientForciblyClosed);
                 return StatusDefs::IOCP_ClientForciblyClosed;
             }
 
             g_Log->e<FS_Iocp>(_LOGFMT_("PostRecv ioSocket[%llu] to completionport failed windows error<%d> status[%d]")
-                              , ioData->_sock, error, StatusDefs::IOCP_PostRecvFail);
+                              , targetSock, error, StatusDefs::IOCP_PostRecvFail);
             return StatusDefs::IOCP_PostRecvFail;
         }
     }
@@ -210,12 +210,12 @@ Int32 FS_Iocp::PostRecv(IO_DATA_BASE *ioData)
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::PostSend(IO_DATA_BASE *ioData)
+Int32 FS_Iocp::PostSend(SOCKET targetSock, IO_DATA_BASE *ioData)
 {
     ioData->_ioType = IocpDefs::IO_SEND;
     DWORD flags = 0;
     memset(&ioData->_overlapped, 0, sizeof(ioData->_overlapped));
-    if(SOCKET_ERROR == WSASend(ioData->_sock, &ioData->_wsaBuff, 1, NULL, flags, &ioData->_overlapped, NULL))
+    if(SOCKET_ERROR == WSASend(targetSock, &ioData->_wsaBuff, 1, NULL, flags, &ioData->_overlapped, NULL))
     {
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
@@ -223,13 +223,13 @@ Int32 FS_Iocp::PostSend(IO_DATA_BASE *ioData)
             // 对端关闭
             if(error == WSAECONNRESET)
             {
-                g_Log->net<FS_Iocp>("An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
-                           , error, StatusDefs::IOCP_ClientForciblyClosed);
+                g_Log->net<FS_Iocp>("targetSock[%llu] An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
+                           ,targetSock, error, StatusDefs::IOCP_ClientForciblyClosed);
                 return StatusDefs::IOCP_ClientForciblyClosed;
             }
 
             g_Log->e<FS_Iocp>(_LOGFMT_("PostSend ioSocket[%llu] to completionport failed windows error<%d> status[%d]")
-                              , ioData->_sock, error, StatusDefs::IOCP_PostSendFail);
+                              , targetSock, error, StatusDefs::IOCP_PostSendFail);
             return StatusDefs::IOCP_PostSendFail;
         }
     }
@@ -250,7 +250,7 @@ Int32 FS_Iocp::PostQuit()
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
+Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // clientId为完成键
 {
     // 获取完成端口状态
     // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)会原样返回
@@ -276,8 +276,8 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
 
         if(ERROR_NETNAME_DELETED == error)
         {
-            g_Log->net<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
-                       , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
+            g_Log->net<FS_Iocp>("WaitForMessage client closed clientId=%llu\n error<%d> status[%d]"
+                       , ioEvent._ioData->_ownerId, error, StatusDefs::IOCP_IODisconnect);
 //             g_Log->any<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
 //                                 , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
             // 此时ioevent的数据被正确的填充，只是ioEvent._bytesTrans<=0这个事件可以在recv事件做处理
@@ -288,8 +288,8 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
 
         if(ERROR_CONNECTION_ABORTED == error)
         {// TODO:这个错误码要不要处理
-            g_Log->w<FS_Iocp>(_LOGFMT_("WaitForMessage invalid client socket error<%d> status<%d>")
-                              , error, StatusDefs::Unknown);
+            g_Log->w<FS_Iocp>(_LOGFMT_("clientId[%llu] WaitForMessage invalid client socket error<%d> status<%d>")
+                              , ioEvent._data._clientId, error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
         if(ERROR_SEM_TIMEOUT == error)
@@ -305,8 +305,8 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)
             return StatusDefs::Success;
         }
 
-        g_Log->e<FS_Iocp>(_LOGFMT_("WaitForMessage other error error<%d> status[%d]")
-                          , error, StatusDefs::IOCP_PostSendFail);
+        g_Log->e<FS_Iocp>(_LOGFMT_("clientId[%llu] WaitForMessage other error error<%d> status[%d]")
+                          ,ioEvent._data._clientId, error, StatusDefs::IOCP_PostSendFail);
         return StatusDefs::IOCP_WaitOtherError;
     }
 
