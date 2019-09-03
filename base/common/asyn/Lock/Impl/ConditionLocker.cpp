@@ -117,7 +117,10 @@ void ConditionLocker::Broadcast()
     }
 
     if(LIKELY(isSinal))
+    {
+        _isSinal = false;
         ResetEvent(_event.load());
+    }
 }
 
 void ConditionLocker::ResetSinal()

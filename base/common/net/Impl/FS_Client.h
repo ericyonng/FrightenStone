@@ -42,6 +42,7 @@
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/net/Defs/FS_NetBufferArray.h"
+#include "base/common/net/Defs/FS_Packet.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -119,13 +120,9 @@ private:
     // socket fd_set  file desc set
     SOCKET _sockfd;
     // 第二缓冲区 接收消息缓冲区
-    FS_NetBufferArray *_recvBuff;
+    FS_NetBuffer *_recvBuff;
     // 发送缓冲区
-    FS_NetBufferArray *_sendBuff;
-    // 心跳死亡计时
-    TimeSlice _heartDeadSlice; // 心跳序列优化使用时间戳TODO
-    // 上次发送消息数据的时间 
-    TimeSlice _lastSendSlice; // 用于定时发送
+    std::list<FS_Packet *> _sendBuff;
     // 心跳过期时间
     Time _heartBeatExpiredTime; // 心跳过期时间
 
