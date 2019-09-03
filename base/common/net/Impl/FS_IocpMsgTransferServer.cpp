@@ -73,6 +73,12 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
         iterClientId!=_needToPostClientIds.end();)
     {
         auto iterClient = _clientIdRefClients.find(*iterClientId);
+        if(iterClient == _clientIdRefClients.end())
+        {
+            iterClientId = _needToPostClientIds.erase(iterClientId);
+            continue;
+        }
+
         client = iterClient->second;
         if(client->IsDestroy())
         {
@@ -87,7 +93,7 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
             auto ioData = client->MakeSendIoData();
             if(ioData)
             {
-                if(_iocpClientMsgTransfer->PostSend(ioData) != StatusDefs::Success)
+                if(_iocpClientMsgTransfer->PostSend(client->GetSocket(), ioData) != StatusDefs::Success)
                 {
                     g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
                                                          , client->GetId(), client->GetSocket());
@@ -105,7 +111,7 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
         auto ioData = client->MakeRecvIoData();
         if(ioData)
         {
-            if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
+            if(_iocpClientMsgTransfer->PostRecv(client->GetSocket(), ioData) != StatusDefs::Success)
             {
                 g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
                                                         , client->GetId(), client->GetSocket());
@@ -186,7 +192,9 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
                                                 , client->GetId());
         }
 
-        client->OnRecvFromIocp(_ioEvent->_ioData->_owner->GetNode(), _ioEvent->_bytesTrans);
+        // 完成回调
+        (*_ioEvent->_ioData->_completedCallback)(std::forward<Int32>(static_cast<Int32>(_ioEvent->_bytesTrans)));
+        client->ResetPostRecv();
         _OnPrepareNetRecv(client);
         _msgArrivedClientIds.insert(clientId);
         _needToPostClientIds.insert(clientId);
@@ -218,17 +226,21 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
         g_Log->net<FS_IocpMsgTransferServer>("client id[%llu], socket id[%llu], send suc bytestrans[%lu]"
                                              , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans);
         
-        client->OnSend2iocp(_ioEvent->_ioData->_owner->GetNode(), _ioEvent->_bytesTrans);
-        if(client->GetSendBufferArray()->IsFirstNodeNull())
+        // 完成回调
+        (*_ioEvent->_ioData->_completedCallback)(std::forward<Int32>(static_cast<Int32>(_ioEvent->_bytesTrans)));
+        client->ResetPostSend();
+        if(client->IsSendBufferFrontFinish())
+            client->PopSendBuffFront();
+
+        if(client->IsSendBufferFirstNull())
         {
             g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("SEND BUFFER FIRST NODE IS NULL"
                                                         "client id[%llu], socket id[%llu], bytesTrans[%lu]\nstack trace back:\n%s")
                                                , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans
                                                , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
         }
-
-        if(client->NeedWrite())
-            _needToPostClientIds.insert(clientId);
+        
+        _needToPostClientIds.insert(clientId);
     }
     else 
     {
@@ -245,7 +257,7 @@ void FS_IocpMsgTransferServer::_OnClientJoin(FS_Client *client)
     auto ioData = client->MakeRecvIoData();
     if(ioData)
     {
-        if(_iocpClientMsgTransfer->PostRecv(ioData) != StatusDefs::Success)
+        if(_iocpClientMsgTransfer->PostRecv(client->GetSocket(), ioData) != StatusDefs::Success)
         {
             g_Log->net<FS_IocpMsgTransferServer>("_OnClientJoin PostRecv fail clientid[%llu] sock[%llu]"
                                                  , client->GetId(), client->GetSocket());

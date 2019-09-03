@@ -38,63 +38,62 @@ inline FS_Client::~FS_Client()
 {
     _id = 0;
     Close();
-    FS_Release(_recvBuff);
-    FS_Release(_sendBuff);
+    Fs_SafeFree(_recvBuff);
+    STLUtil::DelListContainer(_sendBuff);
 }
 
-inline Int32 FS_Client::RecvData()
+inline void FS_Client::SendData(NetMsg_DataHeader *header)
 {
-    return _recvBuff->ReadFromSocket(_sockfd);
+    SendData((const char *)header, header->_packetLength);
 }
 
-inline Int32 FS_Client::SendDataReal()
+inline void FS_Client::SendData(const char *data, Int32 len)
 {
-    ResetDTSend();
-    return _sendBuff->Write2socket(_sockfd);
+    FS_Packet *newData = new FS_Packet(_id);
+    newData->FromMsg(_id, data, len);
+    _sendBuff.push_back(newData);
 }
 
-inline Int32 FS_Client::SendData(NetMsg_DataHeader *header)
+inline NetMsg_DataHeader *FS_Client::FrontRecvMsg()
 {
-    return SendData((const char *)header, header->_packetLength);
+    return _recvBuff->CastToMsg();
 }
 
-inline Int32 FS_Client::SendData(const char *data, Int32 len)
-{
-    if(_sendBuff->Push(data, len))
-        return len;
-
-    return SOCKET_ERROR;
-}
-
-inline NetMsg_DataHeader *FS_Client::FrontMsg(std::list<FS_NetBuffer *>::iterator &iterNode)
-{
-    return (NetMsg_DataHeader *)(*iterNode)->GetData();
-}
-
-inline std::list<FS_NetBuffer *>::iterator FS_Client::FrontMsgNode()
-{
-    return _recvBuff->GetFrontNode();
-}
-
-inline void FS_Client::PopFrontMsg(std::list<FS_NetBuffer *>::iterator &iterNode)
+inline void FS_Client::PopRecvFrontMsg()
 {
     if(HasRecvMsg())
-        _recvBuff->Pop(iterNode, FrontMsg(iterNode)->_packetLength);
+        _recvBuff->Pop(FrontRecvMsg()->_packetLength);
 }
 
-inline void FS_Client::ResetDTHeart()
+inline void FS_Client::PopSendBuffFront()
 {
-    _heartDeadSlice = 0;
+    if(!_sendBuff.empty())
+    {
+        auto front = _sendBuff.front();
+        Fs_SafeFree(front);
+        _sendBuff.pop_front();
+    }
+}
+
+inline bool FS_Client::IsSendBufferFrontFinish()
+{
+    if(!_sendBuff.empty())
+    {
+        auto front = _sendBuff.front();
+        return front->IsEmpty();
+    }
+
+    return true;
+}
+
+inline bool FS_Client::IsSendBufferFirstNull()
+{
+    return !_sendBuff.empty() && !_sendBuff.front();
 }
 
 inline void FS_Client::UpdateHeartBeatExpiredTime()
 {
     _heartBeatExpiredTime.FlushAppendTime(CLIENT_HREAT_DEAD_TIME*Time::_microSecondPerMilliSecond);
-}
-
-inline void FS_Client::ResetDTSend()
-{
-    _lastSendSlice = 0;
 }
 
 inline bool FS_Client::IsPostIoChange() const
@@ -129,7 +128,7 @@ inline bool FS_Client::HasRecvMsg() const
 
 inline bool FS_Client::NeedWrite() const
 {
-    return _sendBuff->NeedWrite();
+    return !_sendBuff.empty();
 }
 
 inline bool FS_Client::IsDestroy() const
@@ -140,11 +139,6 @@ inline bool FS_Client::IsDestroy() const
 inline  const Time &FS_Client::GetHeartBeatExpiredTime() const
 {
     return _heartBeatExpiredTime;
-}
-
-inline const FS_NetBufferArray *FS_Client::GetSendBufferArray() const
-{
-    return _sendBuff;
 }
 
 FS_NAMESPACE_END

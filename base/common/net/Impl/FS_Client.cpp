@@ -47,42 +47,9 @@ FS_Client::FS_Client(UInt64 clientId
                             , Int32 recvSize)
     : _id(clientId)
     , _sockfd(sockfd)
-    , _sendBuff(new  FS_NetBufferArray(sendSize))
-    , _recvBuff(new  FS_NetBufferArray(recvSize))
+    , _recvBuff(new  FS_Packet(clientId, recvSize))
 {
     UpdateHeartBeatExpiredTime();
-    // ResetDTHeart();
-    ResetDTSend();
-}
-
-bool FS_Client::CheckHeart(const TimeSlice &slice)
-{
-    _heartDeadSlice += slice;
-    if(_heartDeadSlice >= TimeSlice(0, CLIENT_HREAT_DEAD_TIME))
-    {
-        g_Log->i<FS_Client>(_LOGFMT_("checkHeart dead:sock=%lld,time=%lld")
-                            , _sockfd, _heartDeadSlice.GetTotalMilliSeconds());
-        return true;
-    }
-
-    return false;
-}
-
-// 定时发送消息检测
-bool FS_Client::CheckSend(const TimeSlice &dt)
-{
-    _lastSendSlice += dt;
-    if(_lastSendSlice >= TimeSlice(0, CLIENT_SEND_BUFF_TIME))
-    {
-        // CELLLog_Info("checkSend:s=%d,time=%d", _sockfd, _dtSend);
-        // 立即将发送缓冲区的数据发送出去
-        SendDataReal();
-        // 重置发送计时
-        ResetDTSend();
-        return true;
-    }
-
-    return false;
 }
 
 #ifdef FS_USE_IOCP
@@ -92,35 +59,34 @@ IO_DATA_BASE *FS_Client::MakeRecvIoData()
         return NULL;
 
     _isPostRecv = true;
-    return _recvBuff->MakeRecvIoData(_sockfd);
+    return _recvBuff->MakeRecvIoData();
 }
 
-void FS_Client::OnRecvFromIocp(std::list<FS_NetBuffer *>::iterator &&iterNode, Int32 rcvBytes)
+IO_DATA_BASE *FS_Client::MakeSendIoData()
+{
+    if(_isPostSend || _sendBuff.empty())
+        return NULL;
+
+    _isPostSend = true;
+    return _sendBuff.front()->MakeSendIoData();
+}
+
+void FS_Client::ResetPostRecv()
 {
     if(!_isPostRecv)
         g_Log->e<FS_Client>(_LOGFMT_("recv from _isPostRecv is false"));
 
     _isPostRecv = false;
-    _recvBuff->OnReadFromIocp(iterNode, rcvBytes);
 }
 
-IO_DATA_BASE *FS_Client::MakeSendIoData()
-{
-    if(_isPostSend)
-        return NULL;
-
-    _isPostSend = true;
-    return _sendBuff->MakeSendIoData(_sockfd);
-}
-
-void FS_Client::OnSend2iocp(std::list<FS_NetBuffer *>::iterator &&iterNode, Int32 snd)
+void FS_Client::ResetPostSend()
 {
     if(!_isPostSend)
         g_Log->e<FS_Client>(_LOGFMT_("send2iocp _isPostSend is false"));
 
     _isPostSend = false;
-    _sendBuff->OnWrite2Iocp(iterNode, snd);
 }
+
 #endif
 
 void FS_Client::Close()

@@ -193,7 +193,6 @@ IO_DATA_BASE *FS_NetBuffer::MakeRecvIoData(SOCKET sockfd)
         _ioData._wsaBuff.buf = _buff + _lastPos;
         _ioData._wsaBuff.len = len;
         _ioData._sock = sockfd;
-        _ioData._owner = this;
         return &_ioData;
     }
 
@@ -207,7 +206,6 @@ IO_DATA_BASE *FS_NetBuffer::MakeSendIoData(SOCKET sockfd)
         _ioData._wsaBuff.buf = _buff;
         _ioData._wsaBuff.len = _lastPos;
         _ioData._sock = sockfd;
-        _ioData._owner = this;
         return &_ioData;
     }
 

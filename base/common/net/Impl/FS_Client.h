@@ -43,6 +43,7 @@
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/net/Defs/FS_NetBufferArray.h"
 #include "base/common/net/Defs/FS_Packet.h"
+#include "base/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -57,35 +58,28 @@ public:
     ~FS_Client();
 
 public:
-    Int32 RecvData();
-    // 立即将发送缓冲区的数据发送给客户端
-    Int32 SendDataReal();
     // 发送数据 缓冲区的控制根据业务需求的差异而调整
-    Int32 SendData(NetMsg_DataHeader *header);
+    void SendData(NetMsg_DataHeader *header);
     // 返回值 len 或 SOCKET_ERROR
-    Int32 SendData(const char *data, Int32 len);
-    std::list<FS_NetBuffer *>::iterator FrontMsgNode();
-    NetMsg_DataHeader *FrontMsg(std::list<FS_NetBuffer *>::iterator &iterNode);
-    void PopFrontMsg(std::list<FS_NetBuffer *>::iterator &iterNode);
+    void SendData(const char *data, Int32 len);
 
-    void ResetDTHeart();
+    NetMsg_DataHeader *FrontRecvMsg();
+    void PopRecvFrontMsg();
+    void PopSendBuffFront();
+    bool IsSendBufferFrontFinish();
+    bool IsSendBufferFirstNull();
+
     void UpdateHeartBeatExpiredTime();
-    void ResetDTSend();
-    // 心跳检测 心跳检测需要一个set序列
-    bool CheckHeart(const TimeSlice &slice);
-    // 定时发送消息检测
-    bool CheckSend(const TimeSlice &dt);
 
     #ifdef FS_USE_IOCP
     IO_DATA_BASE *MakeRecvIoData();
-    void OnRecvFromIocp(std::list<FS_NetBuffer *>::iterator &&iterNode, Int32 rcvBytes);
-
     IO_DATA_BASE *MakeSendIoData();
-    void OnSend2iocp(std::list<FS_NetBuffer *>::iterator &&iterNode, Int32 snd);
 
     bool IsPostIoChange() const;
     bool IsPostSend() const;
     bool IsPostRecv() const;
+    void ResetPostSend();
+    void ResetPostRecv();
     #endif // FS_USE_IOCP
 
     /* 杂项 */
@@ -98,7 +92,6 @@ public:
     bool IsDestroy() const;
     const Time &GetHeartBeatExpiredTime() const;
     void Close();
-    const FS_NetBufferArray *GetSendBufferArray() const;
 
     #pragma endregion
 
@@ -120,7 +113,7 @@ private:
     // socket fd_set  file desc set
     SOCKET _sockfd;
     // 第二缓冲区 接收消息缓冲区
-    FS_NetBuffer *_recvBuff;
+    FS_Packet *_recvBuff;
     // 发送缓冲区
     std::list<FS_Packet *> _sendBuff;
     // 心跳过期时间

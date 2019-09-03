@@ -246,7 +246,7 @@ int Example::Run()
                 continue;
 
             // 投递接收数据
-            if(StatusDefs::Success != iocp.PostRecv(ioEvent._ioData))
+            if(StatusDefs::Success != iocp.PostRecv(ioEvent._ioData->_sock, ioEvent._ioData))
             {
                 g_Log->e<Example>(_LOGFMT_("post recv fail sock[%llu]"), ioEvent._ioData->_sock);
                 closesocket(ioEvent._ioData->_sock);
@@ -275,7 +275,7 @@ int Example::Run()
 
             // 不停的接收数据
             ioEvent._ioData->_wsaBuff.len = ioEvent._bytesTrans;
-            auto st = iocp.PostSend(ioEvent._ioData);
+            auto st = iocp.PostSend(ioEvent._ioData->_sock, ioEvent._ioData);
             if(st == StatusDefs::IOCP_ClientForciblyClosed)
             {// 远端关闭
                 closesocket(ioEvent._ioData->_sock);
@@ -298,7 +298,7 @@ int Example::Run()
                        , ioEvent._ioData->_sock, ioEvent._bytesTrans, msgCount);
 
             // ioEvent._ioData->_wsaBuff.len = 
-            auto st = iocp.PostRecv(ioEvent._ioData);
+            auto st = iocp.PostRecv(ioEvent._ioData->_sock, ioEvent._ioData);
             if(st == StatusDefs::IOCP_ClientForciblyClosed)
             {// 远端关闭
                 closesocket(ioEvent._ioData->_sock);
