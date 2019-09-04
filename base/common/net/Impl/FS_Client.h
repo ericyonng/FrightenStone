@@ -49,7 +49,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Client
 {
-    OBJ_POOL_CREATE(FS_Client, _objPoolHelper);
+    // OBJ_POOL_CREATE(FS_Client, _objPoolHelper);
 public:
     FS_Client(UInt64 clientId
               , SOCKET sockfd = INVALID_SOCKET

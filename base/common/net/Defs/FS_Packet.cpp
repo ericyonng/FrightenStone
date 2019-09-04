@@ -32,10 +32,11 @@
 #include "stdafx.h"
 #include "base/common/net/Defs/FS_Packet.h"
 #include "base/common/log/Log.h"
+#include "base/common/crashhandle/CrashHandle.h"
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_Packet, __DEF_OBJ_POOL_OBJ_NUM__)
+// OBJ_POOL_CREATE_DEF_IMPL(FS_Packet, __DEF_OBJ_POOL_OBJ_NUM__)
 
 void FS_Packet::Pop(Int32 len)
 {
@@ -50,6 +51,45 @@ void FS_Packet::Pop(Int32 len)
     }
 
     _lastPos = n;
+}
+
+IO_DATA_BASE *FS_Packet::MakeRecvIoData()
+{
+    int len = _packetSize - _lastPos;
+    if(len > 0)
+    {
+        _ioData._wsaBuff.buf = _buff + _lastPos;
+        _ioData._wsaBuff.len = len;
+        _ioData._ownerId = _ownerId;
+        if(!_ioData._completedCallback)
+            _ioData._completedCallback = DelegatePlusFactory::Create(this, &FS_Packet::_OnRecvSucCallback);
+
+        if(!_ioData._completedCallback)
+            g_Log->e<FS_Packet>(_LOGFMT_("memory cant create a delegate now stack trace back:\n%s")
+                                , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+        return &_ioData;
+    }
+
+    return NULL;
+}
+
+IO_DATA_BASE *FS_Packet::MakeSendIoData()
+{
+    if(_lastPos > 0)
+    {
+        _ioData._wsaBuff.buf = _buff;
+        _ioData._wsaBuff.len = _lastPos;
+        _ioData._ownerId = _ownerId;
+        if(!_ioData._completedCallback)
+            _ioData._completedCallback = DelegatePlusFactory::Create(this, &FS_Packet::_OnSendSucCallback);
+
+        if(!_ioData._completedCallback)
+            g_Log->e<FS_Packet>(_LOGFMT_("memory cant create a delegate now stack trace back:\n%s")
+                                , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+        return &_ioData;
+    }
+
+    return NULL;
 }
 
 void FS_Packet::_OnSendSucCallback(Int32 transferBytes)

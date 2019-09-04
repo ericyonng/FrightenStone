@@ -45,7 +45,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Packet
 {
-    OBJ_POOL_CREATE_DEF(FS_Packet);
+    // OBJ_POOL_CREATE_DEF(FS_Packet);
 
 public:
     FS_Packet(UInt64 ownerId);

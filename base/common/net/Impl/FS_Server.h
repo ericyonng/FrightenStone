@@ -47,7 +47,7 @@ FS_NAMESPACE_BEGIN
 // ·þÎñÀà
 class BASE_EXPORT FS_Server
 {
-    OBJ_POOL_CREATE(FS_Server, _objPoolHelper);
+    // OBJ_POOL_CREATE(FS_Server, _objPoolHelper);
 public:
     FS_Server();
     virtual ~FS_Server();

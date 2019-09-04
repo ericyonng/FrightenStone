@@ -129,37 +129,6 @@ inline void FS_Packet::ClearBuffer()
     }
 }
 
-inline IO_DATA_BASE *FS_Packet::MakeRecvIoData()
-{
-    int len = _packetSize - _lastPos;
-    if(len > 0)
-    {
-        _ioData._wsaBuff.buf = _buff + _lastPos;
-        _ioData._wsaBuff.len = len;
-        _ioData._ownerId = _ownerId;
-        if(!_ioData._completedCallback)
-            _ioData._completedCallback = DelegatePlusFactory::Create(this, &FS_Packet::_OnRecvSucCallback);
-        return &_ioData;
-    }
-
-    return NULL;
-}
-
-inline IO_DATA_BASE *FS_Packet::MakeSendIoData()
-{
-    if(_lastPos > 0)
-    {
-        _ioData._wsaBuff.buf = _buff;
-        _ioData._wsaBuff.len = _lastPos;
-        _ioData._ownerId = _ownerId;
-        if(!_ioData._completedCallback)
-            _ioData._completedCallback = DelegatePlusFactory::Create(this, &FS_Packet::_OnSendSucCallback);
-        return &_ioData;
-    }
-
-    return NULL;
-}
-
 inline bool FS_Packet::IsFullPacket()
 {
     return _packetSize!=0 && _packetSize == _lastPos;
