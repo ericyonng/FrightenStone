@@ -49,9 +49,6 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     ,_nodeCnt(0)
     ,_bytesOccupied(0)
     ,_objInUse(0)
-    ,_ptrWillGiving(NULL)
-    ,_ptrWillGivingInChar(NULL)
-    ,_ptrWillGivingInVoid(NULL)
 {
     // 初始化节点
     _header = new AlloctorNode<ObjType>(_nodeCapacity);
@@ -83,30 +80,20 @@ inline IObjAlloctor<ObjType>::~IObjAlloctor()
 template<typename ObjType>
 inline void *IObjAlloctor<ObjType>::Alloc()
 {
-#if __FS_THREAD_SAFE__
     _locker.Lock();
-    _ptrWillGivingInVoid = AllocNoLocker();
+    auto ptr = AllocNoLocker();
     _locker.Unlock();
-    return _ptrWillGivingInVoid;
-#else
-    return AllocNoLocker();
-#endif
+    return ptr;
 }
 
 template<typename ObjType>
 inline void IObjAlloctor<ObjType>::Free(void *ptr)
 {
-#if __FS_THREAD_SAFE__
     _locker.Lock();
-#endif
-
     // free的对象构成链表用于下次分配
     _lastDeleted.push_front((ObjType *)ptr);
     --_objInUse;
-
-#if __FS_THREAD_SAFE__
     _locker.Unlock();
-#endif
 }
 
 template<typename ObjType>
@@ -114,11 +101,11 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
 {
     if(!_lastDeleted.empty())
     {
-        _ptrWillGiving = _lastDeleted.front();
+        auto ptr = _lastDeleted.front();
         _lastDeleted.pop_front();
         ++_objInUse;
 
-        return _ptrWillGiving;
+        return ptr;
     }
 
     // 分配新节点
@@ -126,11 +113,11 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
         _NewNode();
 
     // 内存池中分配对象
-    _ptrWillGivingInChar = reinterpret_cast<char *>(_curNodeObjs) + _alloctedInCurNode * _objBlockSize;
+    auto ptr = reinterpret_cast<char *>(_curNodeObjs) + _alloctedInCurNode * _objBlockSize;
     ++_alloctedInCurNode;
     ++_objInUse;
 
-    return _ptrWillGivingInChar;
+    return ptr;
 }
 
 template<typename ObjType>

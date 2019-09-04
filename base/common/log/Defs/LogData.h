@@ -69,7 +69,7 @@ public:
 
 struct BASE_EXPORT LogData
 {
-    // OBJ_POOL_CREATE_DEF(LogData);
+    OBJ_POOL_CREATE_DEF(LogData);
 
 public:
     Time _logTime;                  // Ê±¼ä generate inside

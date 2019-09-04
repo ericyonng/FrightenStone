@@ -69,22 +69,14 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
 {
     // 1.遍历post 客户端请求
     FS_Client *client = NULL;
-    for(auto iterClientId = _needToPostClientIds.begin(); 
-        iterClientId!=_needToPostClientIds.end();)
+    for(auto iterClient = _clientIdRefClients.begin(); 
+        iterClient!=_clientIdRefClients.end();)
     {
-        auto iterClient = _clientIdRefClients.find(*iterClientId);
-        if(iterClient == _clientIdRefClients.end())
-        {
-            iterClientId = _needToPostClientIds.erase(iterClientId);
-            continue;
-        }
-
         client = iterClient->second;
         if(client->IsDestroy())
         {
-            g_Log->w<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroyed"), *iterClientId);
-            _OnClientLeaveAndEraseFromQueue(client);
-            ++iterClientId;
+            g_Log->w<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroyed"), iterClient->first);
+            iterClient = _OnClientLeaveAndEraseFromQueue(iterClient);
             continue;
         }
 
@@ -98,8 +90,7 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
                     g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
                                                          , client->GetId(), client->GetSocket());
 
-                    _OnClientLeaveAndEraseFromQueue(client);
-                    iterClientId = _needToPostClientIds.erase(iterClientId);
+                    iterClient = _OnClientLeaveAndEraseFromQueue(iterClient);
                     continue;
                 }
             }
@@ -115,15 +106,13 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
             {
                 g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
                                                         , client->GetId(), client->GetSocket());
-                _OnClientLeaveAndEraseFromQueue(client);
-                iterClientId = _needToPostClientIds.erase(iterClientId);
+                iterClient = _OnClientLeaveAndEraseFromQueue(iterClient);
                 continue;
             }
         }
 
-        ++iterClientId;
+        ++iterClient;
     }
-    _needToPostClientIds.clear();
 
     // 2.iocp等待消息完成直到timeout或error为止
     Int32 ret = StatusDefs::Success;
@@ -197,7 +186,6 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
         client->ResetPostRecv();
         _OnPrepareNetRecv(client);
         _msgArrivedClientIds.insert(clientId);
-        _needToPostClientIds.insert(clientId);
     }
     else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
     {// 发送数据 完成 Completion
@@ -223,8 +211,8 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
                                                 , client->GetId());
         }
 
-        g_Log->net<FS_IocpMsgTransferServer>("client id[%llu], socket id[%llu], send suc bytestrans[%lu]"
-                                             , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans);
+//         g_Log->net<FS_IocpMsgTransferServer>("client id[%llu], socket id[%llu], send suc bytestrans[%lu]"
+//                                              , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans);
         
         // 完成回调
         (*_ioEvent->_ioData->_completedCallback)(std::forward<Int32>(static_cast<Int32>(_ioEvent->_bytesTrans)));
@@ -240,7 +228,6 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
                                                , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
         }
         
-        _needToPostClientIds.insert(clientId);
     }
     else 
     {

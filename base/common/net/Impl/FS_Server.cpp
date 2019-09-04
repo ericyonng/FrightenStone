@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// OBJ_POOL_CREATE_IMPL(FS_Server, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+OBJ_POOL_CREATE_IMPL(FS_Server, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_Server::FS_Server()
     :_threadPool(new FS_ThreadPool(0, 1))
@@ -267,9 +267,6 @@ void FS_Server::_OnClientMsgArrived()
             // 移除消息队列（缓冲区）最前的一条数据
             client->PopRecvFrontMsg();
         }
-
-        if(client->NeedWrite())
-            _needToPostClientIds.insert(client->GetId());
     }
 
     _msgArrivedClientIds.clear();

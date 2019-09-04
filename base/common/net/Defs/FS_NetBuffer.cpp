@@ -56,7 +56,7 @@ FS_NetBuffer::~FS_NetBuffer()
 {
     g_MemoryPool->Lock();
     // ´òÓ¡¶ÑÕ»
-    g_Log->net<FS_NetBuffer>("FS_NetBuffer will free stack trace back:\n%s", CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+    //g_Log->net<FS_NetBuffer>("FS_NetBuffer will free stack trace back:\n%s", CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
     g_MemoryPool->Free(_buff);
     g_MemoryPool->Unlock();
 }
