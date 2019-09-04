@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_IMPL(FS_Server, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+// OBJ_POOL_CREATE_IMPL(FS_Server, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_Server::FS_Server()
     :_threadPool(new FS_ThreadPool(0, 1))
