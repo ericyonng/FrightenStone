@@ -50,7 +50,7 @@ class FS_String;
 
 class BASE_EXPORT FS_File
 {
-    // OBJ_POOL_CREATE(fs::FS_File, _objPoolHelper);
+    OBJ_POOL_CREATE(fs::FS_File, _objPoolHelper);
 public:
     FS_File();
     virtual ~FS_File();

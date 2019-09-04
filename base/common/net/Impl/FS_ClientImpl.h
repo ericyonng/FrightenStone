@@ -44,14 +44,12 @@ inline FS_Client::~FS_Client()
 
 inline void FS_Client::SendData(NetMsg_DataHeader *header)
 {
-    SendData((const char *)header, header->_packetLength);
+    _SendData((const char *)header, header->_packetLength);
 }
 
 inline void FS_Client::SendData(const char *data, Int32 len)
 {
-    FS_Packet *newData = new FS_Packet(_id);
-    newData->FromMsg(_id, data, len);
-    _sendBuff.push_back(newData);
+    _SendData(data, len);
 }
 
 inline NetMsg_DataHeader *FS_Client::FrontRecvMsg()
@@ -109,6 +107,13 @@ inline bool FS_Client::IsPostSend() const
 inline bool FS_Client::IsPostRecv() const
 {
     return _isPostRecv;
+}
+
+inline void FS_Client::_SendData(const char *data, Int32 len)
+{
+    FS_Packet *newData = new FS_Packet(_id);
+    newData->FromMsg(_id, data, len);
+    _sendBuff.push_back(newData);
 }
 
 inline SOCKET FS_Client::GetSocket() const
