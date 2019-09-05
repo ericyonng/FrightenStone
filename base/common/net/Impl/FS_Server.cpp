@@ -96,6 +96,7 @@ void FS_Server::Close()
 #pragma region net message handle
 void FS_Server::_OnWorking(const FS_ThreadPool *pool)
 {
+    Time beginTime, endTime;
     while(!pool->IsClearingPool())
     {
         // 1.从waitJoin队列中转移待连入的客户端
@@ -128,7 +129,10 @@ void FS_Server::_OnWorking(const FS_ThreadPool *pool)
         _DetectClientHeartTime();
 
         // 4.处理网络事件
+        beginTime.FlushTime();
         auto st = _OnClientNetEventHandle();
+        endTime.FlushTime();
+        g_Log->net<FS_Server>("_OnClientNetEventHandle escape[%lld]us", (endTime-beginTime).GetTotalMicroSeconds());
         if(st != StatusDefs::Success)
         {
             g_Log->e<FS_Server>(_LOGFMT_("FS_Server id[%d] _BeforeClientMsgTransfer: st[%d] "), _id, st);
@@ -136,8 +140,10 @@ void FS_Server::_OnWorking(const FS_ThreadPool *pool)
         }
 
         // 5.处理客户端到达消息
+         beginTime.FlushTime();
         _OnClientMsgArrived();
-
+        endTime.FlushTime();
+        g_Log->net<FS_Server>("_OnClientMsgArrived escape[%lld]us", (endTime-beginTime).GetTotalMicroSeconds());
         // before内部若有大量消息，则可能导致其他客户端心跳超时TODO:
         // TODO关于超级流量导致_BeforeClientMsgTransfer执行过长判定为攻击行为，由外部运维处理攻击
     }

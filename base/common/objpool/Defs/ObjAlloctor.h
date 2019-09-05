@@ -79,6 +79,7 @@ public:
     size_t GetTotalObjBlocks();    // 当前全部的对象块个数
     size_t GetNodeCnt();
     size_t GetBytesOccupied();
+    size_t GetObjBlockSize();
     void Lock();
     void UnLock();
 

@@ -69,14 +69,17 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
 {
     // 1.遍历post 客户端请求
     FS_Client *client = NULL;
-    for(auto iterClient = _clientIdRefClients.begin(); 
-        iterClient!=_clientIdRefClients.end();)
+    for(auto iterClientId = _needToPostClientIds.begin(); iterClientId!=_needToPostClientIds.end(); ++iterClientId)
     {
+        auto iterClient = _clientIdRefClients.find(*iterClientId);
+        if(iterClient == _clientIdRefClients.end())
+            continue;
+
         client = iterClient->second;
         if(client->IsDestroy())
         {
             g_Log->w<FS_IocpMsgTransferServer>(_LOGFMT_("clientId[%llu] is destroyed"), iterClient->first);
-            iterClient = _OnClientLeaveAndEraseFromQueue(iterClient);
+            _OnClientLeaveAndEraseFromQueue(iterClient);
             continue;
         }
 
@@ -90,7 +93,7 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
                     g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
                                                          , client->GetId(), client->GetSocket());
 
-                    iterClient = _OnClientLeaveAndEraseFromQueue(iterClient);
+                    _OnClientLeaveAndEraseFromQueue(iterClient);
                     continue;
                 }
             }
@@ -106,13 +109,12 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
             {
                 g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer PostRecv fail clientid[%llu] sock[%llu]"
                                                         , client->GetId(), client->GetSocket());
-                iterClient = _OnClientLeaveAndEraseFromQueue(iterClient);
+                _OnClientLeaveAndEraseFromQueue(iterClient);
                 continue;
             }
         }
-
-        ++iterClient;
     }
+    _needToPostClientIds.clear();
 
     // 2.iocp等待消息完成直到timeout或error为止
     Int32 ret = StatusDefs::Success;
@@ -186,6 +188,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
         client->ResetPostRecv();
         _OnPrepareNetRecv(client);
         _msgArrivedClientIds.insert(clientId);
+        _needToPostClientIds.insert(clientId);
     }
     else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
     {// 发送数据 完成 Completion
@@ -227,7 +230,9 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
                                                , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans
                                                , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
         }
-        
+
+        if(client->NeedWrite())
+            _needToPostClientIds.insert(clientId);
     }
     else 
     {

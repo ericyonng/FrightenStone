@@ -93,6 +93,7 @@ inline size_t ObjPoolHelper<ObjType>::PrintObjPool(Int64 &poolOccupiedBytes)
     ObjPoolMethods::PrintObjPoolInfo(typeid(ObjType).name()
                                      , _alloctor->GetNodeCnt()
                                      , _alloctor->GetTotalObjBlocks()
+                                     , _alloctor->GetObjBlockSize()
                                      , _alloctor->GetBytesOccupied()
                                      , _alloctor->GetObjInUse()
                                      , memInUsingBytes);
