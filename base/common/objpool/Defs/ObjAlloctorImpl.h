@@ -219,6 +219,12 @@ inline size_t IObjAlloctor<ObjType>::GetBytesOccupied()
 }
 
 template<typename ObjType>
+inline size_t IObjAlloctor<ObjType>::GetObjBlockSize()
+{
+    return _objBlockSize;
+}
+
+template<typename ObjType>
 inline void IObjAlloctor<ObjType>::Lock()
 {
     _locker.Lock();
