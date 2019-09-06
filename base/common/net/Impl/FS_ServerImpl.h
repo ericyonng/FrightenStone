@@ -55,12 +55,7 @@ inline void FS_Server::SetId(UInt32 id)
 #pragma endregion
 
 #pragma region recv/addclient/start/close
-inline void FS_Server::AddClientToWaitJoinQueue(FS_Client *client)
-{
-    _locker.Lock();
-    _waitToJoinClients.push_back(client);
-    _locker.Unlock();
-}
+
 #pragma endregion
 
 #pragma region net message handle
@@ -74,6 +69,13 @@ inline void FS_Server::_AddToHeartBeatQueue(FS_Client *client)
 //     SystemUtil::GetCallingThreadCpuInfo(cpuGroup, cpuNum);
 //     g_Log->net<FS_Server>("_AddToHeartBeatQueue cpuGroup[%hu],cpuNumber[%d],threadId[%lu],fs_server id[%d] heart beat queue cnt[%llu]"
 //                           , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
+}
+
+inline void FS_Server::WaitForJoining(FS_Client *client)
+{
+    _locker.Lock();
+    _waitToJoinClients.push_back(client);
+    _locker.Unlock();
 }
 
 inline void FS_Server::_RmClient(FS_Client *client)
