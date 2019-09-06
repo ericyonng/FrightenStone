@@ -21,19 +21,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IocpDefs.cpp
+ * @file  : Sender.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/18
+ * @date  : 2019/9/6
  * @brief :
  * 
  *
  * 
  */
+
 #include "stdafx.h"
-#include "base/common/net/Defs/IocpDefs.h"
+#include "base/common/net/Defs/Sender.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/log/Log.h"
+#include "base/common/net/Defs/FS_Packet.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_IMPL(IO_DATA_BASE, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-OBJ_POOL_CREATE_IMPL(IO_EVENT, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-OBJ_POOL_CREATE_DEF_IMPL(PacketQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
+
+void Sender::Start()
+{
+    _pool = new FS_ThreadPool(0, 1);
+    auto task = DelegatePlusFactory::Create(this, &Sender::_OnWork);
+    if(!_pool->AddTask(task))
+    {
+        g_Log->e<Sender>(_LOGFMT_("add task error"));
+    }
+}
+
+void Sender::SendPacket(FS_Packet *packet)
+{
+    // 添加到队列
+    // post
+    // 
+}
+
+void Sender::_OnWork(const FS_ThreadPool *pool)
+{
+    // 注册postquit事件
+    while(!pool->IsClearingPool())
+    {
+        // 监听发送成功
+        // 
+    }
+}
+
+void Sender::_OnSendSuc(PacketQueueNode *node, Int32 transferBytes)
+{
+}
+
 FS_NAMESPACE_END
