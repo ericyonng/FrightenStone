@@ -21,19 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IocpDefs.cpp
+ * @file  : PacketQueueNode.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/18
+ * @date  : 2019/9/6
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/net/Defs/IocpDefs.h"
+#ifndef __Base_Common_Net_Defs_PacketQueueNode_H__
+#define __Base_Common_Net_Defs_PacketQueueNode_H__
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_IMPL(IO_DATA_BASE, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-OBJ_POOL_CREATE_IMPL(IO_EVENT, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-OBJ_POOL_CREATE_DEF_IMPL(PacketQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
+
+
 FS_NAMESPACE_END
+
+#endif

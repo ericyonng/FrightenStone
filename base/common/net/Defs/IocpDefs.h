@@ -63,12 +63,35 @@ public:
     };
 };
 
+/* packet节点 */
+class BASE_EXPORT FS_Packet;
+struct BASE_EXPORT PacketQueueNode
+{
+    OBJ_POOL_CREATE_DEF(PacketQueueNode);
+    PacketQueueNode(const std::list<FS_Packet *>::iterator &iterNode, FS_Packet *packet);
+    ~PacketQueueNode();
+
+    std::list<FS_Packet *>::iterator _iterNode;
+    FS_Packet *_packet;
+};
+
+inline PacketQueueNode::PacketQueueNode(const std::list<FS_Packet *>::iterator &iterNode, FS_Packet *packet)
+    :_iterNode(iterNode)
+    , _packet(packet)
+{
+}
+
+inline PacketQueueNode::~PacketQueueNode()
+{
+    Fs_SafeFree(_packet);
+}
+
 struct BASE_EXPORT IO_DATA_BASE
 {
     OBJ_POOL_CREATE(IO_DATA_BASE, _objPoolHelper);
 
 public:
-    IO_DATA_BASE() {}
+    IO_DATA_BASE():_node(NULL), {}
     ~IO_DATA_BASE()
     {
         Fs_SafeFree(_completedCallback);
@@ -79,6 +102,10 @@ public:
     Int32 _ioType = 0;
     UInt64 _ownerId = 0;                   // 客户端唯一id
     SOCKET _sock = INVALID_SOCKET;
+    union
+    {
+        PacketQueueNode *_node;         // packet所在的队列节点
+    };
     IDelegatePlus<void, Int32> *_completedCallback = NULL; // 完成时的回调
 
     // 没必要每个客户端指定一个缓冲，太大了，
