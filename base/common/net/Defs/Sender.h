@@ -21,19 +21,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IocpDefs.cpp
+ * @file  : Sender.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/18
+ * @date  : 2019/9/6
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/net/Defs/IocpDefs.h"
+#ifndef __Base_Common_Net_Defs_Sender_H__
+#define __Base_Common_Net_Defs_Sender_H__
+
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_IMPL(IO_DATA_BASE, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-OBJ_POOL_CREATE_IMPL(IO_EVENT, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-OBJ_POOL_CREATE_DEF_IMPL(PacketQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
+
+class BASE_EXPORT FS_Packet;
+class BASE_EXPORT PacketQueueNode;
+class BASE_EXPORT FS_ThreadPool;
+class BASE_EXPORT FS_Iocp;
+
+class BASE_EXPORT Sender
+{
+    OBJ_POOL_CREATE_DEF(Sender);
+public:
+    Sender();
+    ~Sender();
+
+    void Start();
+    void SendPacket(FS_Packet *packet);
+
+private:
+    void _OnWork(const FS_ThreadPool *pool);
+    void _OnSendSuc(PacketQueueNode *node, Int32 transferBytes);
+
+public:
+    FS_ThreadPool *_pool;
+    FS_Iocp *_sender;
+    Locker _locker;
+    std::list<PacketQueueNode *> _queue;
+};
+
 FS_NAMESPACE_END
+
+#include "base/common/net/Defs/SenderImpl.h"
+
+#endif

@@ -52,6 +52,7 @@ MemleakMonitor::~MemleakMonitor()
 {
     _printInfoPool->Clear();
     Fs_SafeFree(_printInfoPool);
+    STLUtil::DelMapContainer(_objNameRefPrintCallback);
 }
 
 MemleakMonitor *MemleakMonitor::GetInstance()

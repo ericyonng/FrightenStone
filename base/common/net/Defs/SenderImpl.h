@@ -21,19 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IocpDefs.cpp
+ * @file  : SenderImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/18
+ * @date  : 2019/9/6
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/net/Defs/IocpDefs.h"
+#pragma once
+
+#ifdef __Base_Common_Net_Defs_Sender_H__
+
+#pragma once
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_IMPL(IO_DATA_BASE, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-OBJ_POOL_CREATE_IMPL(IO_EVENT, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-OBJ_POOL_CREATE_DEF_IMPL(PacketQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
+
+inline Sender::Sender()
+    :_pool(NULL)
+{
+}
+
+inline Sender::~Sender()
+{
+    STLUtil::DelListContainer(_queue);
+}
+
+
 FS_NAMESPACE_END
+
+#endif
