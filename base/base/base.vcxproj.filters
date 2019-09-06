@@ -918,6 +918,15 @@
     <ClInclude Include="..\common\net\Defs\FS_PacketImpl.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Defs\Sender.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Defs\SenderImpl.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Defs\PacketQueueNode.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1161,6 +1170,9 @@
       <Filter>common\component\Impl\FS_List\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\net\Defs\FS_Packet.cpp">
+      <Filter>common\net\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Defs\Sender.cpp">
       <Filter>common\net\Defs</Filter>
     </ClCompile>
   </ItemGroup>
