@@ -34,19 +34,21 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_Packet::FS_Packet(UInt64 ownerId)
+inline FS_Packet::FS_Packet(UInt64 ownerId, SOCKET sock)
     : _packetSize(0)
     , _buff(NULL)
     , _ownerId(ownerId)
+    ,_socket(sock)
     , _lastPos(0)
 {
 
 }
 
-inline FS_Packet::FS_Packet(UInt64 ownerId, Int32 packetSize)
+inline FS_Packet::FS_Packet(UInt64 ownerId, SOCKET sock, Int32 packetSize)
     :_packetSize(packetSize)
     ,_buff(NULL)
     ,_ownerId(ownerId)
+    ,_socket(sock)
     ,_lastPos(0)
 {
     g_MemoryPool->Lock();
@@ -54,33 +56,40 @@ inline FS_Packet::FS_Packet(UInt64 ownerId, Int32 packetSize)
     g_MemoryPool->Unlock();
 }
 
-inline FS_Packet::FS_Packet(UInt64 ownerId, char *buff, Int32 packetSize)
+inline FS_Packet::FS_Packet(UInt64 ownerId, SOCKET sock, char *buff, Int32 packetSize)
     : _packetSize(packetSize)
     , _buff(buff)
     ,_ownerId(ownerId)
+    ,_socket(sock)
     ,_lastPos(packetSize)
 {
 }
 
 inline FS_Packet::~FS_Packet()
 {
-    ClearBuffer();
+    Clear();
 }
 
-inline void FS_Packet::FromMsg(UInt64 ownerId, NetMsg_DataHeader *header)
+inline void FS_Packet::FromMsg(UInt64 ownerId, SOCKET socket, NetMsg_DataHeader *header)
 {
-    ClearBuffer();
+    Clear();
     g_MemoryPool->Lock();
     _buff = g_MemoryPool->Alloc<char>(static_cast<size_t>(header->_packetLength));
     g_MemoryPool->Unlock();
     _packetSize = header->_packetLength;
     _ownerId = ownerId;
+    _socket(socket);
     _lastPos = header->_packetLength;
 }
 
-inline void FS_Packet::FromMsg(UInt64 ownerId, const char *data, Int32 len)
+inline void FS_Packet::FromMsg(NetMsg_DataHeader *header)
 {
-    ClearBuffer();
+
+}
+
+inline void FS_Packet::FromMsg(UInt64 ownerId, SOCKET socket, const char *data, Int32 len)
+{
+    Clear();
     g_MemoryPool->Lock();
     _buff = g_MemoryPool->Alloc<char>(static_cast<size_t>(len));
     g_MemoryPool->Unlock();
@@ -114,7 +123,7 @@ inline char *FS_Packet::GiveupBuffer(Int32 &packetSize, Int32 &lastPos)
     return buff;
 }
 
-inline void FS_Packet::ClearBuffer()
+inline void FS_Packet::Clear()
 {
     if(_buff)
     {
@@ -124,6 +133,8 @@ inline void FS_Packet::ClearBuffer()
         _buff = NULL;
         _packetSize = 0;
         _ownerId = 0;
+        SocketUtil::DestroySocket(_socket);
+        _socket = INVALID_SOCKET;
         _lastPos = 0;
         Fs_SafeFree(_ioData._completedCallback);
     }
