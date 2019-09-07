@@ -40,6 +40,7 @@
 #include "base/common/memorypool/memorypool.h"
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/socket/socket.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -48,20 +49,21 @@ class BASE_EXPORT FS_Packet
     OBJ_POOL_CREATE_DEF(FS_Packet);
 
 public:
-    FS_Packet(UInt64 ownerId);
-    FS_Packet(UInt64 ownerId, Int32 packetSize);
-    FS_Packet(UInt64 ownerId, char *buff, Int32 packetSize);
+    FS_Packet(UInt64 ownerId, SOCKET sock);
+    FS_Packet(UInt64 ownerId, SOCKET sock, Int32 packetSize);
+    FS_Packet(UInt64 ownerId, SOCKET sock, char *buff, Int32 packetSize);
     ~FS_Packet();
 
 public:
     void Pop(Int32 len);
-    void FromMsg(UInt64 ownerId, NetMsg_DataHeader *header);
-    void FromMsg(UInt64 ownerId, const char *data, Int32 len);
+    void FromMsg(UInt64 ownerId, SOCKET socket, NetMsg_DataHeader *header);
+    void FromMsg(NetMsg_DataHeader *header);
+    void FromMsg(UInt64 ownerId, SOCKET socket, const char *data, Int32 len);
     NetMsg_DataHeader *CastToMsg();
     template<typename T>
     T *CastToMsg();
     char *GiveupBuffer(Int32 &packetSize, Int32 &lastPos);
-    void ClearBuffer();
+    void Clear();
 
     IO_DATA_BASE *MakeRecvIoData();
     IO_DATA_BASE *MakeSendIoData();
@@ -78,6 +80,7 @@ private:
 private:
     Int32 _packetSize;
     UInt64 _ownerId;
+    SOCKET _socket;
     char *_buff;
     Int32 _lastPos;
     IO_DATA_BASE _ioData = {};

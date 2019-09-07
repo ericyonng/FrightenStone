@@ -44,6 +44,9 @@ inline Sender::Sender()
 
 inline Sender::~Sender()
 {
+    if(_pool)
+        _pool->Clear();
+    Fs_SafeFree(_pool);
     STLUtil::DelListContainer(_queue);
 }
 

@@ -37,12 +37,12 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/assist/utils/Impl/STLUtil.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Packet;
 class BASE_EXPORT PacketQueueNode;
-class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT FS_Iocp;
 
 class BASE_EXPORT Sender
