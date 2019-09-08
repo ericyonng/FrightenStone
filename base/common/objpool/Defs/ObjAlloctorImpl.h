@@ -49,6 +49,7 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     ,_nodeCnt(0)
     ,_bytesOccupied(0)
     ,_objInUse(0)
+    ,_lastDeleted(NULL)
 {
     // 初始化节点
     _header = new AlloctorNode<ObjType>(_nodeCapacity);
@@ -91,7 +92,8 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
 {
     _locker.Lock();
     // free的对象构成链表用于下次分配
-    _lastDeleted.push_front((ObjType *)ptr);
+    *((ObjType **)ptr) = _lastDeleted;
+    _lastDeleted = reinterpret_cast<ObjType *>(ptr);
     --_objInUse;
     _locker.Unlock();
 }
@@ -99,10 +101,10 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
 template<typename ObjType>
 inline void *IObjAlloctor<ObjType>::AllocNoLocker()
 {
-    if(!_lastDeleted.empty())
+    if(_lastDeleted)
     {
-        auto ptr = _lastDeleted.front();
-        _lastDeleted.pop_front();
+        ObjType *ptr = _lastDeleted;
+        _lastDeleted = *((ObjType **)(_lastDeleted));
         ++_objInUse;
 
         return ptr;
@@ -124,7 +126,8 @@ template<typename ObjType>
 inline void IObjAlloctor<ObjType>::FreeNoLocker(void *ptr)
 {
     // free的对象构成链表用于下次分配
-    _lastDeleted.push_front((ObjType *)ptr);
+    *((ObjType **)ptr) = _lastDeleted;
+    _lastDeleted = reinterpret_cast<ObjType *>(ptr);
     --_objInUse;
 }
 
