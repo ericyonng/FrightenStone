@@ -89,7 +89,8 @@ private:
 
 protected:
     void *_curNodeObjs;                     // 当前节点的对象池缓冲
-    std::list<ObjType *> _lastDeleted;      // free对象构成的链表指针指向的内存存储的是上一次释放的对象的地址
+    //std::list<ObjType *> _lastDeleted;      // free对象构成的链表指针指向的内存存储的是上一次释放的对象的地址
+    ObjType *_lastDeleted;
     size_t _alloctedInCurNode;              // 当前节点已分配的对象个数
     const size_t _nodeCapacity;             // 每个节点对象个数
     AlloctorNode<ObjType> *_header;         // 头节点
