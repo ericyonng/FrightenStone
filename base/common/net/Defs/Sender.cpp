@@ -52,8 +52,16 @@ void Sender::Start()
 void Sender::SendPacket(FS_Packet *packet)
 {
     // 添加到队列
-    // post
-    // 
+    PacketQueueNode *node = new PacketQueueNode;
+    node->_packet = packet;
+    _queue.push_back(node);
+    node->_iterNode = --_queue.end();
+    const auto clientId = packet->GetOwnerId();
+    auto iterPacketNodes = _clientIdRefPacketNodes.find(clientId);
+    if(iterPacketNodes == _clientIdRefPacketNodes.end())
+        iterPacketNodes = _clientIdRefPacketNodes.insert(std::make_pair(clientId, std::set<PacketQueueNode *>())).first;
+
+    iterPacketNodes->second.insert(node);
 }
 
 void Sender::_OnWork(const FS_ThreadPool *pool)

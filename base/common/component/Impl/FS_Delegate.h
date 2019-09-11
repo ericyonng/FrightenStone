@@ -38,6 +38,10 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
 
+#ifndef FS_DELG_ADAPTARG
+#define FS_DELG_ADAPTARG(arg)   std::forward<decltype(arg)>(arg)
+#endif
+
 FS_NAMESPACE_BEGIN
 
 // T:类，R回调返回值类型，Args回调函数参数包

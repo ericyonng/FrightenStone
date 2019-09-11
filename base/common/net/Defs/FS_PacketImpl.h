@@ -169,6 +169,11 @@ inline bool FS_Packet::NeedWrite() const
     return _lastPos > 0;
 }
 
+inline UInt64 FS_Packet::GetOwnerId() const
+{
+    return _ownerId;
+}
+
 FS_NAMESPACE_END
 
 #endif

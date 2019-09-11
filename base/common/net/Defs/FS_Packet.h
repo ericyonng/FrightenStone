@@ -72,6 +72,7 @@ public:
     bool IsEmpty();
     bool HasMsg() const;
     bool NeedWrite() const;
+    UInt64 GetOwnerId() const;
 
 private:
     void _OnSendSucCallback(Int32 transferBytes);
