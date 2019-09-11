@@ -64,6 +64,7 @@ public:
     FS_Iocp *_sender;
     Locker _locker;
     std::list<PacketQueueNode *> _queue;
+    std::map<UInt64, std::set<PacketQueueNode *>> _clientIdRefPacketNodes;
 };
 
 FS_NAMESPACE_END

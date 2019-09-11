@@ -68,16 +68,15 @@ class BASE_EXPORT FS_Packet;
 struct BASE_EXPORT PacketQueueNode
 {
     OBJ_POOL_CREATE_DEF(PacketQueueNode);
-    PacketQueueNode(const std::list<FS_Packet *>::iterator &iterNode, FS_Packet *packet);
+    PacketQueueNode();
     ~PacketQueueNode();
 
-    std::list<FS_Packet *>::iterator _iterNode;
+    std::list<PacketQueueNode *>::iterator _iterNode;
     FS_Packet *_packet;
 };
 
-inline PacketQueueNode::PacketQueueNode(const std::list<FS_Packet *>::iterator &iterNode, FS_Packet *packet)
-    :_iterNode(iterNode)
-    , _packet(packet)
+inline PacketQueueNode::PacketQueueNode()
+    : _packet(NULL)
 {
 }
 
