@@ -40,6 +40,7 @@ FS_NAMESPACE_BEGIN
 inline Sender::Sender()
     :_pool(NULL)
 {
+    _sender = new FS_Iocp()
 }
 
 inline Sender::~Sender()
