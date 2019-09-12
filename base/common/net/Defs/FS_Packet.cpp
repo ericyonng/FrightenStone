@@ -61,6 +61,7 @@ IO_DATA_BASE *FS_Packet::MakeRecvIoData()
         _ioData._wsaBuff.buf = _buff + _lastPos;
         _ioData._wsaBuff.len = len;
         _ioData._ownerId = _ownerId;
+        _ioData._sock = _socket;
         if(!_ioData._completedCallback)
             _ioData._completedCallback = DelegatePlusFactory::Create(this, &FS_Packet::_OnRecvSucCallback);
 
@@ -80,6 +81,7 @@ IO_DATA_BASE *FS_Packet::MakeSendIoData()
         _ioData._wsaBuff.buf = _buff;
         _ioData._wsaBuff.len = _lastPos;
         _ioData._ownerId = _ownerId;
+        _ioData._sock = _socket;
         if(!_ioData._completedCallback)
             _ioData._completedCallback = DelegatePlusFactory::Create(this, &FS_Packet::_OnSendSucCallback);
 

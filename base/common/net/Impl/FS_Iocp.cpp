@@ -34,6 +34,7 @@
 #include "base/common/log/Log.h"
 #include "base/common/status/status.h"
 #include "base/common/net/Defs/IocpDefs.h"
+#include "base/common/crashhandle/CrashHandle.h"
 
 #pragma region windows api
 #include <windows.h>
@@ -305,8 +306,14 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
             return StatusDefs::Success;
         }
 
-        g_Log->e<FS_Iocp>(_LOGFMT_("clientId[%llu] WaitForMessage other error error<%d> status[%d]")
-                          ,ioEvent._data._clientId, error, StatusDefs::IOCP_PostSendFail);
+        const auto &stackBackTrace = CrashHandleUtil::FS_CaptureStackBackTrace();
+        g_Log->e<FS_Iocp>(_LOGFMT_("clientId[%llu] WaitForMessage other error error<%d> status[%d]\n"
+                                   "StackBackTrace:\n%s")
+                          , ioEvent._data._clientId
+                          , error
+                          , StatusDefs::IOCP_PostSendFail
+                          , stackBackTrace.c_str());
+
         return StatusDefs::IOCP_WaitOtherError;
     }
 

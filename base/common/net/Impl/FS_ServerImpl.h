@@ -71,7 +71,7 @@ inline void FS_Server::_AddToHeartBeatQueue(FS_Client *client)
 //                           , cpuGroup, cpuNum, threadId, _id, _clientHeartBeatQueue.size());
 }
 
-inline void FS_Server::WaitForJoining(FS_Client *client)
+inline void FS_Server::AddClientToWaitJoinQueue(FS_Client *client)
 {
     _locker.Lock();
     _waitToJoinClients.push_back(client);

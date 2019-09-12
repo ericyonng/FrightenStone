@@ -36,11 +36,13 @@
 #include "base/exportbase.h"
 #include "base/common/net/Impl/FS_Server.h"
 #include "base/common/objpool/objpool.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Iocp;
 struct BASE_EXPORT IO_EVENT;
+class BASE_EXPORT Sender;
 
  // 网络消息转发处理服务类
 class BASE_EXPORT FS_IocpMsgTransferServer :public FS_Server
@@ -68,11 +70,16 @@ protected:
     virtual Int32 _OnClientNetEventHandle();
     Int32 _ListenIocpNetEvents();
     virtual void _OnClientJoin(FS_Client *client);
+    virtual void _OnClientDestroy(UInt64 clientId);
+    bool _IsClientDestroy(UInt64 clientId);
     #pragma endregion
 
 private:
     FS_Iocp *_iocpClientMsgTransfer;        // 只收发客户端消息，不监听连入
+    Sender *_sender;
     IO_EVENT *_ioEvent;
+    Locker _aliveGuard;
+    std::set<UInt64> _aliveClientIds;
 };
 
 FS_NAMESPACE_END

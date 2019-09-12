@@ -43,8 +43,6 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_NetBuffer;
-
 /* iocp若干定义类型 */
 class BASE_EXPORT IocpDefs
 {
@@ -64,7 +62,7 @@ public:
 };
 
 /* packet节点 */
-class BASE_EXPORT FS_Packet;
+class FS_Packet;
 struct BASE_EXPORT PacketQueueNode
 {
     OBJ_POOL_CREATE_DEF(PacketQueueNode);
@@ -73,28 +71,16 @@ struct BASE_EXPORT PacketQueueNode
 
     std::list<PacketQueueNode *>::iterator _iterNode;
     FS_Packet *_packet;
+    bool _isPost;
 };
-
-inline PacketQueueNode::PacketQueueNode()
-    : _packet(NULL)
-{
-}
-
-inline PacketQueueNode::~PacketQueueNode()
-{
-    Fs_SafeFree(_packet);
-}
 
 struct BASE_EXPORT IO_DATA_BASE
 {
     OBJ_POOL_CREATE(IO_DATA_BASE, _objPoolHelper);
 
 public:
-    IO_DATA_BASE():_node(NULL), {}
-    ~IO_DATA_BASE()
-    {
-        Fs_SafeFree(_completedCallback);
-    }
+    IO_DATA_BASE():_node(NULL){}
+    ~IO_DATA_BASE();
 
     // 重叠体
     OVERLAPPED _overlapped{0};          // 使用重叠体可以关联到iodatabase,在投递accept时候传入
@@ -132,12 +118,6 @@ struct BASE_EXPORT IO_EVENT
     ULong _bytesTrans = 0;                      // 传输的字节数
 };
 
-inline IO_EVENT::IO_EVENT()
-    :_data{NULL}
-    ,_ioData(NULL)
-    ,_bytesTrans(0)
-{
-}
 
 FS_NAMESPACE_END
 

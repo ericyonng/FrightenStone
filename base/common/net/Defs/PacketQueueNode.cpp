@@ -21,25 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : PacketQueueNode.h
+ * @file  : PacketQueueNode.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/6
+ * @date  : 2019/09/13
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Defs_PacketQueueNode_H__
-#define __Base_Common_Net_Defs_PacketQueueNode_H__
-#pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "stdafx.h"
+#include "base/common/net/Defs/PacketQueueNode.h"
 
 FS_NAMESPACE_BEGIN
 
-
 FS_NAMESPACE_END
-
-#endif

@@ -39,6 +39,7 @@
 #include "base/common/net/Impl/FS_Iocp.h"
 #include "base/common/net/Interface/INetEvent.h"
 #include "base/common/log/Log.h"
+#include "base/common/net/Defs/Sender.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,7 +48,10 @@ OBJ_POOL_CREATE_IMPL(FS_IocpMsgTransferServer, _objPoolHelper, __DEF_OBJ_POOL_OB
 FS_IocpMsgTransferServer::FS_IocpMsgTransferServer()
     :_iocpClientMsgTransfer(new FS_Iocp)
     ,_ioEvent(new IO_EVENT)
+    ,_sender(NULL)
 {
+    auto __isClientDestroy = DelegatePlusFactory::Create(this, &FS_IocpMsgTransferServer::_IsClientDestroy);
+    _sender = new Sender(__isClientDestroy);
     _iocpClientMsgTransfer->Create();
 }
 
@@ -258,4 +262,24 @@ void FS_IocpMsgTransferServer::_OnClientJoin(FS_Client *client)
     }
 }
 
+void FS_IocpMsgTransferServer::_OnClientDestroy(UInt64 clientId)
+{
+    _aliveGuard.Lock();
+    _aliveClientIds.erase(clientId);
+    _aliveGuard.Unlock();
+}
+
+bool FS_IocpMsgTransferServer::_IsClientDestroy(UInt64 clientId)
+{
+    _aliveGuard.Lock();
+    auto iterClientId = _aliveClientIds.find(clientId);
+    if(iterClientId == _aliveClientIds.end())
+    {
+        _aliveGuard.Unlock();
+        return true;
+    }
+    _aliveGuard.Unlock();
+    return false;
+}
 FS_NAMESPACE_END
+

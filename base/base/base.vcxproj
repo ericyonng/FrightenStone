@@ -442,6 +442,7 @@
     <ClCompile Include="..\common\net\Defs\FS_NetBufferArray.cpp" />
     <ClCompile Include="..\common\net\Defs\FS_Packet.cpp" />
     <ClCompile Include="..\common\net\Defs\IocpDefs.cpp" />
+    <ClCompile Include="..\common\net\Defs\PacketQueueNode.cpp" />
     <ClCompile Include="..\common\net\Defs\Sender.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Client.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Iocp.cpp" />
