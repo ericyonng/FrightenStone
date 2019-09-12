@@ -111,6 +111,7 @@ protected:
     void _OnClientLeaveByHeartBeat(FS_Client *client);
     void _OnClientLeave(UInt64 clientId);
     virtual void _OnClientJoin(FS_Client *client);
+    virtual void _OnClientDestroy(UInt64 clientId);
     void _OnPrepareNetRecv(FS_Client *client);
 
     bool _IsClientRemoved(UInt64 clientId);

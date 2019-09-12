@@ -78,13 +78,34 @@ inline void FS_Packet::FromMsg(UInt64 ownerId, SOCKET socket, NetMsg_DataHeader 
     g_MemoryPool->Unlock();
     _packetSize = header->_packetLength;
     _ownerId = ownerId;
-    _socket(socket);
+    _socket = socket;
     _lastPos = header->_packetLength;
 }
 
 inline void FS_Packet::FromMsg(NetMsg_DataHeader *header)
 {
+    FromMsg(reinterpret_cast<const char *>(header), header->_packetLength);
+}
 
+inline void FS_Packet::FromMsg(const char *data, Int32 len)
+{
+    if(_buff)
+    {
+        g_MemoryPool->Lock();
+        g_MemoryPool->Free(_buff);
+        g_MemoryPool->Unlock();
+        _buff = NULL;
+        _packetSize = 0;
+        _lastPos = 0;
+        Fs_SafeFree(_ioData._completedCallback);
+    }
+
+    g_MemoryPool->Lock();
+    _buff = g_MemoryPool->Alloc<char>(static_cast<size_t>(len));
+    g_MemoryPool->Unlock();
+    _packetSize = len;
+    _lastPos = len;
+    ::memcpy(_buff, data, len);
 }
 
 inline void FS_Packet::FromMsg(UInt64 ownerId, SOCKET socket, const char *data, Int32 len)
@@ -172,6 +193,11 @@ inline bool FS_Packet::NeedWrite() const
 inline UInt64 FS_Packet::GetOwnerId() const
 {
     return _ownerId;
+}
+
+inline SOCKET FS_Packet::GetSocket() const
+{
+    return _socket;
 }
 
 FS_NAMESPACE_END

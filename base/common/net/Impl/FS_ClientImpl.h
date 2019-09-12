@@ -34,14 +34,6 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_Client::~FS_Client()
-{
-    _id = 0;
-    Close();
-    Fs_SafeFree(_recvBuff);
-    STLUtil::DelListContainer(_sendBuff);
-}
-
 inline void FS_Client::SendData(NetMsg_DataHeader *header)
 {
     _SendData((const char *)header, header->_packetLength);
@@ -50,43 +42,6 @@ inline void FS_Client::SendData(NetMsg_DataHeader *header)
 inline void FS_Client::SendData(const char *data, Int32 len)
 {
     _SendData(data, len);
-}
-
-inline NetMsg_DataHeader *FS_Client::FrontRecvMsg()
-{
-    return _recvBuff->CastToMsg();
-}
-
-inline void FS_Client::PopRecvFrontMsg()
-{
-    if(HasRecvMsg())
-        _recvBuff->Pop(FrontRecvMsg()->_packetLength);
-}
-
-inline void FS_Client::PopSendBuffFront()
-{
-    if(!_sendBuff.empty())
-    {
-        auto front = _sendBuff.front();
-        Fs_SafeFree(front);
-        _sendBuff.pop_front();
-    }
-}
-
-inline bool FS_Client::IsSendBufferFrontFinish()
-{
-    if(!_sendBuff.empty())
-    {
-        auto front = _sendBuff.front();
-        return front->IsEmpty();
-    }
-
-    return true;
-}
-
-inline bool FS_Client::IsSendBufferFirstNull()
-{
-    return !_sendBuff.empty() && !_sendBuff.front();
 }
 
 inline void FS_Client::UpdateHeartBeatExpiredTime()
@@ -109,13 +64,6 @@ inline bool FS_Client::IsPostRecv() const
     return _isPostRecv;
 }
 
-inline void FS_Client::_SendData(const char *data, Int32 len)
-{
-    FS_Packet *newData = new FS_Packet(_id);
-    newData->FromMsg(_id, data, len);
-    _sendBuff.push_back(newData);
-}
-
 inline SOCKET FS_Client::GetSocket() const
 {
     return _sockfd;
@@ -124,16 +72,6 @@ inline SOCKET FS_Client::GetSocket() const
 inline UInt64 FS_Client::GetId() const
 {
     return _id;
-}
-
-inline bool FS_Client::HasRecvMsg() const
-{
-    return _recvBuff->HasMsg();
-}
-
-inline bool FS_Client::NeedWrite() const
-{
-    return !_sendBuff.empty();
 }
 
 inline bool FS_Client::IsDestroy() const

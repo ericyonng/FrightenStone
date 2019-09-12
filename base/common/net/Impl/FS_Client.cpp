@@ -32,10 +32,8 @@
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_Client.h"
 #include "base/common/socket/socket.h"
-#include "base/common/net/Defs/FS_NetBuffer.h"
 #include "base/common/log/Log.h"
-#include "base/common/net/Defs/FS_NetDefs.h"
-#include "base/common/net/Defs/FS_NetBufferArray.h"
+#include "base/common/net/Defs/FS_Packet.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -50,6 +48,51 @@ FS_Client::FS_Client(UInt64 clientId
     , _recvBuff(new  FS_Packet(clientId, recvSize))
 {
     UpdateHeartBeatExpiredTime();
+}
+
+FS_Client::~FS_Client()
+{
+    _id = 0;
+    Close();
+    Fs_SafeFree(_recvBuff);
+    STLUtil::DelListContainer(_sendBuff);
+}
+
+NetMsg_DataHeader *FS_Client::FrontRecvMsg()
+{
+    return _recvBuff->CastToMsg();
+}
+
+void FS_Client::PopRecvFrontMsg()
+{
+    if(HasRecvMsg())
+        _recvBuff->Pop(FrontRecvMsg()->_packetLength);
+}
+
+void FS_Client::PopSendBuffFront()
+{
+    if(!_sendBuff.empty())
+    {
+        auto front = _sendBuff.front();
+        Fs_SafeFree(front);
+        _sendBuff.pop_front();
+    }
+}
+
+bool FS_Client::IsSendBufferFrontFinish()
+{
+    if(!_sendBuff.empty())
+    {
+        auto front = _sendBuff.front();
+        return front->IsEmpty();
+    }
+
+    return true;
+}
+
+bool FS_Client::IsSendBufferFirstNull()
+{
+    return !_sendBuff.empty() && !_sendBuff.front();
 }
 
 #ifdef FS_USE_IOCP
@@ -88,6 +131,23 @@ void FS_Client::ResetPostSend()
 }
 
 #endif
+
+void FS_Client::_SendData(const char *data, Int32 len)
+{
+    FS_Packet *newData = new FS_Packet(_id, _sockfd);
+    newData->FromMsg(data, len);
+    _sendBuff.push_back(newData);
+}
+
+bool FS_Client::HasRecvMsg() const
+{
+    return _recvBuff->HasMsg();
+}
+
+bool FS_Client::NeedWrite() const
+{
+    return !_sendBuff.empty();
+}
 
 void FS_Client::Close()
 {

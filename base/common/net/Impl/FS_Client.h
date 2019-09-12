@@ -42,11 +42,10 @@
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/net/Defs/FS_NetBufferArray.h"
-#include "base/common/net/Defs/FS_Packet.h"
 #include "base/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
-
+class BASE_EXPORT  FS_Packet;
 class BASE_EXPORT FS_Client
 {
     OBJ_POOL_CREATE(FS_Client, _objPoolHelper);

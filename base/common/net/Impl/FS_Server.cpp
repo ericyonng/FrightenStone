@@ -208,6 +208,7 @@ void FS_Server::_DetectClientHeartTime()
 
 void FS_Server::_OnClientLeave(FS_Client *client)
 {
+    _OnClientDestroy(client->GetId());
     _eventHandleObj->OnNetLeave(client);
     _clientsChange = true;
     g_Log->net<FS_Server>("_OnClientLeave sock[%llu] clientId[%llu]", client->GetSocket(), client->GetId());
@@ -248,6 +249,11 @@ void FS_Server::_OnClientLeaveByHeartBeat(FS_Client *client)
 void FS_Server::_OnClientJoin(FS_Client *client)
 {
     // ...
+}
+
+void FS_Server::_OnClientDestroy(UInt64 clientId)
+{
+    //...
 }
 
 void FS_Server::_OnPrepareNetRecv(FS_Client *client)

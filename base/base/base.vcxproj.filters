@@ -1175,5 +1175,8 @@
     <ClCompile Include="..\common\net\Defs\Sender.cpp">
       <Filter>common\net\Defs</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\net\Defs\PacketQueueNode.cpp">
+      <Filter>common\net\Defs</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

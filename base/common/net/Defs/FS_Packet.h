@@ -58,6 +58,7 @@ public:
     void Pop(Int32 len);
     void FromMsg(UInt64 ownerId, SOCKET socket, NetMsg_DataHeader *header);
     void FromMsg(NetMsg_DataHeader *header);
+    void FromMsg(const char *data, Int32 len);
     void FromMsg(UInt64 ownerId, SOCKET socket, const char *data, Int32 len);
     NetMsg_DataHeader *CastToMsg();
     template<typename T>
@@ -73,6 +74,7 @@ public:
     bool HasMsg() const;
     bool NeedWrite() const;
     UInt64 GetOwnerId() const;
+    SOCKET GetSocket() const;
 
 private:
     void _OnSendSucCallback(Int32 transferBytes);

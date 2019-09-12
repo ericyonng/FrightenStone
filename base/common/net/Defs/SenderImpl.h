@@ -37,20 +37,10 @@
 
 FS_NAMESPACE_BEGIN
 
-inline Sender::Sender()
-    :_pool(NULL)
-{
-    _sender = new FS_Iocp()
-}
-
 inline Sender::~Sender()
 {
-    if(_pool)
-        _pool->Clear();
-    Fs_SafeFree(_pool);
-    STLUtil::DelListContainer(_queue);
+    Close();
 }
-
 
 FS_NAMESPACE_END
 
