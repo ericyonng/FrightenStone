@@ -77,6 +77,7 @@ public:
     // 接收数据 处理粘包 拆分包
     void AddClientToWaitJoinQueue(FS_Client *client);
     void Start();
+    virtual void OnStart();
     virtual void BeforeClose();
     void Close();
     #pragma endregion

@@ -52,6 +52,7 @@ Sender::Sender(const IDelegatePlus<bool, UInt64> *isClientDestroy)
 
 void Sender::Start()
 {
+    _sender->Create();
     _pool = new FS_ThreadPool(0, 1);
     auto task = DelegatePlusFactory::Create(this, &Sender::_OnWork);
     if(!_pool->AddTask(task))
@@ -80,6 +81,7 @@ void Sender::Close()
     Fs_SafeFree(_isClientDestroy);
     for(auto &iterQueue : _sendingQueue)
         STLUtil::DelListContainer(iterQueue.second);
+    _needPostClientIds.clear();
 }
 
 void Sender::SendPacket(FS_Packet *packet)
@@ -100,7 +102,7 @@ void Sender::SendPacket(FS_Packet *packet)
     }
 
     _packetCacheQueue.push_back(packet);
-    _locker.Sinal();
+    //_locker.Sinal();
     _locker.Unlock();
 }
 
@@ -123,49 +125,47 @@ void Sender::_OnWork(const FS_ThreadPool *pool)
     while(!pool->IsClearingPool()&&!_isDestroy)
     {
         // 等待队列发送数据到来
-        if(_sendingQueue.empty())
+        //if(_needPostClientIds.empty())
         {// 队列中无数据则等待数据到来
             _locker.Lock();
-            const Int32 st = _locker.Wait();
-            if(st != StatusDefs::Success)
-                g_Log->w<Sender>(_LOGFMT_("lock wait with error[%d]"), st);
-
-            // 缓冲队列是否有数据
-            if(_packetCacheQueue.empty())
-            {
-                _locker.Unlock();
-                continue;
-            }
-
             // 缓冲队列数据转移到正式的待发送队列 若第一次则会关联iocp
             for(auto &packet : _packetCacheQueue)
                 _Add2SendQueue(packet);
             _packetCacheQueue.clear();
             _locker.Unlock();
         }
-        
-        // post数据
-        
-        for(auto iterQueue = _sendingQueue.begin();
-            iterQueue != _sendingQueue.end();)
+
+        if(_sendingQueue.empty())
         {
-            // 客户端已消耗则销毁数据
-            clientId = iterQueue->first;
+            SocketUtil::Sleep(1);
+            continue;
+        }
+        
+        // post数据 
+        clientId = 0;
+        for(auto iterClientId = _needPostClientIds.begin();
+            iterClientId!=_needPostClientIds.end();
+            iterClientId = _needPostClientIds.erase(iterClientId))
+        {
+            clientId = *iterClientId;
+            auto iterQueue = _sendingQueue.find(clientId);
             if((*_isClientDestroy)(FS_DELG_ADAPTARG(clientId)))
             {
-                g_Log->w<Sender>(_LOGFMT_("clientId[%llu] is destroyed"), iterQueue->first);
+                g_Log->w<Sender>(_LOGFMT_("clientId[%llu] is destroyed"), clientId);
                 STLUtil::DelListContainer(iterQueue->second);
-                iterQueue = _sendingQueue.erase(iterQueue);
+                _sendingQueue.erase(iterQueue);
                 continue;
             }
-
+            
             // 若需要继续发送数据则postsend
             queueNode = iterQueue->second.front();
             if(queueNode->_isPost)
             {
-                ++iterQueue;
+                g_Log->e<Sender>(_LOGFMT_("node has post clientId[%llu] socket[%llu]")
+                                 , clientId, queueNode->_packet->GetSocket());
                 continue;
             }
+
 
             forPostPacket = queueNode->_packet;
             auto ioData = forPostPacket->MakeSendIoData();
@@ -173,18 +173,16 @@ void Sender::_OnWork(const FS_ThreadPool *pool)
             if(_sender->PostSend(forPostPacket->GetSocket(), ioData) != StatusDefs::Success)
             {
                 g_Log->net<Sender>("_OnWork postsend fail clientid[%llu] sock[%llu]"
-                                                     , forPostPacket->GetOwnerId(), forPostPacket->GetSocket());
+                                   , forPostPacket->GetOwnerId(), forPostPacket->GetSocket());
 
                 SocketUtil::DestroySocket(forPostPacket->GetSocket());
                 STLUtil::DelListContainer(iterQueue->second);
-                iterQueue = _sendingQueue.erase(iterQueue);
+                _sendingQueue.erase(iterQueue);
                 continue;
             }
             queueNode->_isPost = true;
-
-            ++iterQueue;
         }
-        
+
         // 等待发送完成，超时1ms
         while(true)
         {
@@ -278,12 +276,14 @@ Int32 Sender::_WaitForNetResponse()
         auto clientPacket = node->_packet;
         if(clientPacket->IsEmpty())
         {
-            Fs_SafeFree(clientPacket);
             clientQueue.erase(node->_iterNode);
             Fs_SafeFree(node);
             if(clientQueue.empty())
                 _sendingQueue.erase(iterClientQueue);
         }
+
+        if(!clientQueue.empty())
+            _needPostClientIds.insert(clientId);
     }
     else
     {
@@ -318,6 +318,9 @@ void Sender::_Add2SendQueue(FS_Packet *packet)
     node->_packet = packet;
     sendingQueue.push_back(node);
     node->_iterNode = --sendingQueue.end();
+
+    if(!sendingQueue.front()->_isPost)
+        _needPostClientIds.insert(ownerId);
 }
 
 void Sender::_RemoveFromQueue(UInt64 clientId)
@@ -329,6 +332,7 @@ void Sender::_RemoveFromQueue(UInt64 clientId)
     SocketUtil::DestroySocket(clientQueue.front()->_packet->GetSocket());
     STLUtil::DelListContainer(clientQueue);
     _sendingQueue.erase(iterQueue);
+    _needPostClientIds.erase(clientId);
 }
 
 void Sender::_ClearData()
@@ -336,6 +340,7 @@ void Sender::_ClearData()
     STLUtil::DelListContainer(_packetCacheQueue);
     for(auto &iterQueue : _sendingQueue)
         STLUtil::DelListContainer(iterQueue.second);
+    _needPostClientIds.clear();
 }
 
 FS_NAMESPACE_END

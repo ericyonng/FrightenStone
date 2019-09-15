@@ -75,6 +75,12 @@ void FS_Server::Start()
 {
     auto clientMsgTrasfer = DelegatePlusFactory::Create(this, &FS_Server::_OnWorking);
     _threadPool->AddTask(clientMsgTrasfer);
+    OnStart();
+}
+
+void FS_Server::OnStart()
+{
+    // ...
 }
 
 void FS_Server::BeforeClose()

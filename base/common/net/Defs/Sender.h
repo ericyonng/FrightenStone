@@ -74,6 +74,7 @@ public:
     bool _isDestroy;
     std::list<FS_Packet *> _packetCacheQueue;   // 待转移到发送队列的缓冲队列
     std::map<UInt64, std::list<PacketQueueNode *>> _sendingQueue; // key:clientId
+    std::set<UInt64> _needPostClientIds;
     IDelegatePlus<void> *_quitIocp;
     const IDelegatePlus<bool, UInt64> *_isClientDestroy;
 };

@@ -43,6 +43,7 @@
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/net/Defs/FS_NetBufferArray.h"
 #include "base/common/assist/utils/Impl/STLUtil.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 class BASE_EXPORT  FS_Packet;
@@ -61,23 +62,19 @@ public:
     void SendData(NetMsg_DataHeader *header);
     // 返回值 len 或 SOCKET_ERROR
     void SendData(const char *data, Int32 len);
+    void SetSender(IDelegatePlus<void, FS_Packet *> *sendFunc);
 
     NetMsg_DataHeader *FrontRecvMsg();
     void PopRecvFrontMsg();
-    void PopSendBuffFront();
-    bool IsSendBufferFrontFinish();
-    bool IsSendBufferFirstNull();
 
     void UpdateHeartBeatExpiredTime();
 
     #ifdef FS_USE_IOCP
     IO_DATA_BASE *MakeRecvIoData();
-    IO_DATA_BASE *MakeSendIoData();
 
     bool IsPostIoChange() const;
     bool IsPostSend() const;
     bool IsPostRecv() const;
-    void ResetPostSend();
     void ResetPostRecv();
     #endif // FS_USE_IOCP
 
@@ -90,7 +87,6 @@ public:
     SOCKET GetSocket() const;
     UInt64 GetId() const;
     bool HasRecvMsg() const;
-    bool NeedWrite() const;
     bool IsDestroy() const;
     const Time &GetHeartBeatExpiredTime() const;
     void Close();
@@ -117,7 +113,7 @@ private:
     // 第二缓冲区 接收消息缓冲区
     FS_Packet *_recvBuff;
     // 发送缓冲区
-    std::list<FS_Packet *> _sendBuff;
+    IDelegatePlus<void, FS_Packet *> *_sendFunc;
     // 心跳过期时间
     Time _heartBeatExpiredTime; // 心跳过期时间
 

@@ -58,14 +58,21 @@ FS_IocpMsgTransferServer::FS_IocpMsgTransferServer()
 FS_IocpMsgTransferServer::~FS_IocpMsgTransferServer()
 {
     Close();
+    Fs_SafeFree(_sender);
     Fs_SafeFree(_iocpClientMsgTransfer);
     Fs_SafeFree(_ioEvent);
+}
+
+void FS_IocpMsgTransferServer::OnStart()
+{
+    _sender->Start();
 }
 
 void FS_IocpMsgTransferServer::BeforeClose()
 {
     g_Log->net<FS_IocpMsgTransferServer>("FS_IocpMsgTransferServer%d.BeforeClose begin quit iocp", _id);
     // 退出iocp
+    _sender->Close();
     _iocpClientMsgTransfer->PostQuit();
 }
 
@@ -86,23 +93,7 @@ Int32 FS_IocpMsgTransferServer::_OnClientNetEventHandle()
             _OnClientLeaveAndEraseFromQueue(iterClient);
             continue;
         }
-
-        if(client->NeedWrite())
-        {
-            auto ioData = client->MakeSendIoData();
-            if(ioData)
-            {
-                if(_iocpClientMsgTransfer->PostSend(client->GetSocket(), ioData) != StatusDefs::Success)
-                {
-                    g_Log->net<FS_IocpMsgTransferServer>("_BeforeClientMsgTransfer postsend fail clientid[%llu] sock[%llu]"
-                                                         , client->GetId(), client->GetSocket());
-
-                    _OnClientLeaveAndEraseFromQueue(iterClient);
-                    continue;
-                }
-            }
-        }
-
+        
         // TODO:需要考虑在1ms内客户端是否需要多次recv，
         // 只有没投递过recv的客户端才可以投递recv，
         // 避免多次投递，当客户端销毁后有可能recv才完成
@@ -194,50 +185,6 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
         _msgArrivedClientIds.insert(clientId);
         _needToPostClientIds.insert(clientId);
     }
-    else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
-    {// 发送数据 完成 Completion
-
-        if(_ioEvent->_bytesTrans <= 0)
-        {// 客户端断开处理
-            g_Log->any<FS_IocpMsgTransferServer>("client sock[%llu] clientId[%llu] IO_TYPE::IO_SEND bytesTrans[%lu]"
-                                                 , client->GetSocket()
-                                                 , clientId
-                                                 , _ioEvent->_bytesTrans);
-            g_Log->net<FS_IocpMsgTransferServer>("client sock[%llu] clientId[%llu] will remove IO_TYPE::IO_SEND bytesTrans[%lu]"
-                                                 , client->GetSocket()
-                                                 , clientId
-                                                 , _ioEvent->_bytesTrans);
-            _RmClient(client);
-            return ret;
-        }
-
-        // 判断是否断开 已断开的有可能是上次postsend只后1ms内系统没有完成send，同时客户端被移除导致
-        if(client->IsDestroy())
-        {
-            g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("IO_SEND clientId[%llu] is destroy")
-                                                , client->GetId());
-        }
-
-//         g_Log->net<FS_IocpMsgTransferServer>("client id[%llu], socket id[%llu], send suc bytestrans[%lu]"
-//                                              , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans);
-        
-        // 完成回调
-        (*_ioEvent->_ioData->_completedCallback)(std::forward<Int32>(static_cast<Int32>(_ioEvent->_bytesTrans)));
-        client->ResetPostSend();
-        if(client->IsSendBufferFrontFinish())
-            client->PopSendBuffFront();
-
-        if(client->IsSendBufferFirstNull())
-        {
-            g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("SEND BUFFER FIRST NODE IS NULL"
-                                                        "client id[%llu], socket id[%llu], bytesTrans[%lu]\nstack trace back:\n%s")
-                                               , client->GetId(), client->GetSocket(), _ioEvent->_bytesTrans
-                                               , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
-        }
-
-        if(client->NeedWrite())
-            _needToPostClientIds.insert(clientId);
-    }
     else 
     {
         g_Log->e<FS_IocpMsgTransferServer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
@@ -249,8 +196,11 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
 void FS_IocpMsgTransferServer::_OnClientJoin(FS_Client *client)
 {
     // 玩家连入时监听玩家数据
+    client->SetSender(DelegatePlusFactory::Create(_sender, &Sender::SendPacket));
     _iocpClientMsgTransfer->Reg(client->GetSocket(), client->GetId());
     auto ioData = client->MakeRecvIoData();
+    _aliveGuard.Lock();
+    _aliveClientIds.insert(client->GetId());
     if(ioData)
     {
         if(_iocpClientMsgTransfer->PostRecv(client->GetSocket(), ioData) != StatusDefs::Success)
@@ -258,8 +208,10 @@ void FS_IocpMsgTransferServer::_OnClientJoin(FS_Client *client)
             g_Log->net<FS_IocpMsgTransferServer>("_OnClientJoin PostRecv fail clientid[%llu] sock[%llu]"
                                                  , client->GetId(), client->GetSocket());
             client->Close();
+            _aliveClientIds.erase(client->GetId());
         }
     }
+    _aliveGuard.Unlock();
 }
 
 void FS_IocpMsgTransferServer::_OnClientDestroy(UInt64 clientId)
