@@ -44,6 +44,11 @@ inline void FS_Client::SendData(const char *data, Int32 len)
     _SendData(data, len);
 }
 
+inline void FS_Client::SetSender(IDelegatePlus<void, FS_Packet *> *sendFunc)
+{
+    _sendFunc = sendFunc;
+}
+
 inline void FS_Client::UpdateHeartBeatExpiredTime()
 {
     _heartBeatExpiredTime.FlushAppendTime(CLIENT_HREAT_DEAD_TIME*Time::_microSecondPerMilliSecond);

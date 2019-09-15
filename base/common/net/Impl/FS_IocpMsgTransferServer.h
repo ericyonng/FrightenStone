@@ -53,6 +53,7 @@ public:
     virtual ~FS_IocpMsgTransferServer() noexcept;
 
 public:
+    virtual void OnStart();
     // 在关闭服务前做些处理比如退出iocp
     virtual void BeforeClose();
 

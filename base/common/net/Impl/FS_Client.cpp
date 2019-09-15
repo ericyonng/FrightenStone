@@ -45,7 +45,7 @@ FS_Client::FS_Client(UInt64 clientId
                             , Int32 recvSize)
     : _id(clientId)
     , _sockfd(sockfd)
-    , _recvBuff(new  FS_Packet(clientId, recvSize))
+    , _recvBuff(new  FS_Packet(clientId, sockfd, recvSize))
 {
     UpdateHeartBeatExpiredTime();
 }
@@ -55,7 +55,7 @@ FS_Client::~FS_Client()
     _id = 0;
     Close();
     Fs_SafeFree(_recvBuff);
-    STLUtil::DelListContainer(_sendBuff);
+    Fs_SafeFree(_sendFunc);
 }
 
 NetMsg_DataHeader *FS_Client::FrontRecvMsg()
@@ -69,32 +69,6 @@ void FS_Client::PopRecvFrontMsg()
         _recvBuff->Pop(FrontRecvMsg()->_packetLength);
 }
 
-void FS_Client::PopSendBuffFront()
-{
-    if(!_sendBuff.empty())
-    {
-        auto front = _sendBuff.front();
-        Fs_SafeFree(front);
-        _sendBuff.pop_front();
-    }
-}
-
-bool FS_Client::IsSendBufferFrontFinish()
-{
-    if(!_sendBuff.empty())
-    {
-        auto front = _sendBuff.front();
-        return front->IsEmpty();
-    }
-
-    return true;
-}
-
-bool FS_Client::IsSendBufferFirstNull()
-{
-    return !_sendBuff.empty() && !_sendBuff.front();
-}
-
 #ifdef FS_USE_IOCP
 IO_DATA_BASE *FS_Client::MakeRecvIoData()
 {
@@ -105,15 +79,6 @@ IO_DATA_BASE *FS_Client::MakeRecvIoData()
     return _recvBuff->MakeRecvIoData();
 }
 
-IO_DATA_BASE *FS_Client::MakeSendIoData()
-{
-    if(_isPostSend || _sendBuff.empty())
-        return NULL;
-
-    _isPostSend = true;
-    return _sendBuff.front()->MakeSendIoData();
-}
-
 void FS_Client::ResetPostRecv()
 {
     if(!_isPostRecv)
@@ -122,31 +87,18 @@ void FS_Client::ResetPostRecv()
     _isPostRecv = false;
 }
 
-void FS_Client::ResetPostSend()
-{
-    if(!_isPostSend)
-        g_Log->e<FS_Client>(_LOGFMT_("send2iocp _isPostSend is false"));
-
-    _isPostSend = false;
-}
-
 #endif
 
 void FS_Client::_SendData(const char *data, Int32 len)
 {
     FS_Packet *newData = new FS_Packet(_id, _sockfd);
     newData->FromMsg(data, len);
-    _sendBuff.push_back(newData);
+    (*_sendFunc)(FS_DELG_ADAPTARG(newData));
 }
 
 bool FS_Client::HasRecvMsg() const
 {
     return _recvBuff->HasMsg();
-}
-
-bool FS_Client::NeedWrite() const
-{
-    return !_sendBuff.empty();
 }
 
 void FS_Client::Close()
