@@ -42,8 +42,8 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT FS_ClassFactory
 {
 public:
-    template<typename T, typename... Args>
-    static T *Create(Args&&... args);
+    template<typename ObjType, typename... Args>
+    static ObjType *Create(Args&&... args);
 };
 
 FS_NAMESPACE_END

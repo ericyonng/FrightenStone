@@ -44,7 +44,7 @@ inline void FS_Client::SendData(const char *data, Int32 len)
     _SendData(data, len);
 }
 
-inline void FS_Client::SetSender(IDelegatePlus<void, FS_Packet *> *sendFunc)
+inline void FS_Client::SetSender(IDelegate<void, FS_Packet *> *sendFunc)
 {
     _sendFunc = sendFunc;
 }

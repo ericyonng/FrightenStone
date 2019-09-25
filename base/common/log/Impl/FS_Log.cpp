@@ -66,7 +66,7 @@ FS_Log::~FS_Log()
     // FinishModule();
 }
 
-void FS_Log::UnInstallLogHookFunc(Int32 level, const IDelegatePlus<void, const LogData *> *delegate)
+void FS_Log::UnInstallLogHookFunc(Int32 level, const IDelegate<void, const LogData *> *delegate)
 {
     if(!_levelRefHook[level])
         return;
@@ -84,7 +84,7 @@ void FS_Log::UnInstallLogHookFunc(Int32 level, const IDelegatePlus<void, const L
     }
 }
 
-void FS_Log::UnInstallBeforeLogHookFunc(Int32 level, const IDelegatePlus<void, LogData *> *delegate)
+void FS_Log::UnInstallBeforeLogHookFunc(Int32 level, const IDelegate<void, LogData *> *delegate)
 {
     if(!_levelRefBeforeLogHook[level])
         return;
@@ -242,7 +242,7 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
             iterHook != _levelRefBeforeLogHook[level]->end();
             ++iterHook)
         {
-            (*(*iterHook))(std::forward<LogData *>(logData));
+            (*iterHook)->Invoke(std::forward<LogData *>(logData));
         }
     }
 
@@ -266,7 +266,7 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
             iterHook != _levelRefHook[level]->end();
             ++iterHook)
         {
-            (*(*iterHook))(&cache);
+            (*iterHook)->Invoke(&cache);
         }
     }
 }

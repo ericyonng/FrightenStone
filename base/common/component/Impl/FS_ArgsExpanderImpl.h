@@ -36,23 +36,23 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename T>
+template<typename ObjType>
 template<typename... Args>
-inline void FS_ArgsExpander<T>::Expand(Args&&... args)
+inline void FS_ArgsExpander<ObjType>::Expand(Args&&... args)
 {
     
 }
 
-template<typename T>
+template<typename ObjType>
 template<typename Arg0, typename... Args>
-inline void FS_RecursiveArgsExpander<T>::Expand(Arg0&& arg0, Args&&... rest)
+inline void FS_RecursiveArgsExpander<ObjType>::Expand(Arg0&& arg0, Args&&... rest)
 {
     Expand(std::forward<Args>(rest)...);
 }
 
-template<typename T>
+template<typename ObjType>
 template<typename Arg0>
-inline void FS_RecursiveArgsExpander<T>::Expand(Arg0&& arg0)
+inline void FS_RecursiveArgsExpander<ObjType>::Expand(Arg0&& arg0)
 {
 }
 

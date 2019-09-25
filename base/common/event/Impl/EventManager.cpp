@@ -36,7 +36,7 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_ListenerStub EventManager::AddListener(int id, IDelegatePlus<void, FS_Event *> *listener, const FS_ListenerStub &bindedStub /*= FS_INVALID_LISTENER_STUB*/)
+FS_ListenerStub EventManager::AddListener(int id, IDelegate<void, FS_Event *> *listener, const FS_ListenerStub &bindedStub /*= FS_INVALID_LISTENER_STUB*/)
 {
     if(id <= 0 || listener == NULL)
     {
@@ -129,7 +129,7 @@ void EventManager::FireEvent(FS_Event *event)
         {
             _Listener &listener = *lIt;
             if(listener._listenCallBack)
-                (*listener._listenCallBack)(std::forward<FS_Event *>(event));
+                listener._listenCallBack->Invoke(std::forward<FS_Event *>(event));
         }
     }
 

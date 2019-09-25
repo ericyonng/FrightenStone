@@ -71,18 +71,18 @@ public:
         g_Log->InitModule("testdelegate");
         fs::CrashHandleUtil::InitCrashHandleParams();
         Test1 test1;
-        fs::IDelegatePlus<void> *delegate = fs::DelegatePlusFactory::Create(&test1, &Test1::print);
-        (*delegate)();
+        fs::IDelegate<void> *delegate = fs::DelegatePlusFactory::Create(&test1, &Test1::print);
+        delegate->Invoke();
         delete delegate;
         auto delegate3 = fs::DelegatePlusFactory::Create(print3);
-        (*delegate3)();
+        delegate3->Invoke();
         auto delegate4 = fs::DelegatePlusFactory::Create(&print3);
-        (*delegate4)();
+        delegate4->Invoke();
         auto delegate5 = fs::DelegatePlusFactory::Create(&Test1::print2);
-        (*delegate5)();
+        delegate5->Invoke();
 
         auto delegate6 = fs::DelegatePlusFactory::Create(&print4);
-        (*delegate6)(1, 10);
+        delegate6->Invoke(1, 10);
 
         std::function<void()> func = Test1::print32;
 
@@ -94,12 +94,12 @@ public:
 
 
         auto delegate7 = fs::DelegatePlusFactory::Create<decltype(func), void>(func);
-        (*delegate7)();
+        delegate7->Invoke();
 
         auto delegate8 = fs::DelegatePlusFactory::Create<decltype(__lambda), void, int>(std::forward<decltype(__lambda)>(__lambda));
-        (*delegate8)(1);
+        delegate8->Invoke(1);
         delegate8 = NULL;
-        (*delegate8)(1);
+        delegate8->Invoke(1);
     }
 };
 

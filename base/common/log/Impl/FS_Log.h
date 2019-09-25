@@ -69,16 +69,16 @@ public:
     virtual ~FS_Log();
 
     /* 功能函数 */
-    virtual void UnInstallLogHookFunc(Int32 level, const IDelegatePlus<void, const LogData *> *delegate);
-    virtual void UnInstallBeforeLogHookFunc(Int32 level, const IDelegatePlus<void, LogData *> *delegate);
+    virtual void UnInstallLogHookFunc(Int32 level, const IDelegate<void, const LogData *> *delegate);
+    virtual void UnInstallBeforeLogHookFunc(Int32 level, const IDelegate<void, LogData *> *delegate);
     virtual Int32 InitModule(const Byte8 *rootDirName);
     virtual void FinishModule();
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     
 protected:
     /* 日志hook */
-    virtual IDelegatePlus<void, const LogData *> * _InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate);    // 抽象的delegate
-    virtual const IDelegatePlus<void, LogData *> *_InstallBeforeLogHookFunc(Int32 level, IDelegatePlus<void, LogData *> *delegate);
+    virtual IDelegate<void, const LogData *> * _InstallLogHookFunc(Int32 level, IDelegate<void, const LogData *> *delegate);    // 抽象的delegate
+    virtual const IDelegate<void, LogData *> *_InstallBeforeLogHookFunc(Int32 level, IDelegate<void, LogData *> *delegate);
     // 日志相关
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData);
 
@@ -100,8 +100,8 @@ private:
 
     FS_ThreadPool *_threadPool;                                                 // 线程池
     FS_String _rootDirName;                                                     // 进程名
-    std::list<IDelegatePlus<void, const LogData *> *> *_levelRefHook[LogLevel::End];         // 日志级别对应的hook
-    std::list<IDelegatePlus<void, LogData *> *> *_levelRefBeforeLogHook[LogLevel::End];         // 写日志前日志级别对应的hook 用于修改日志内容等
+    std::list<IDelegate<void, const LogData *> *> *_levelRefHook[LogLevel::End];         // 日志级别对应的hook
+    std::list<IDelegate<void, LogData *> *> *_levelRefBeforeLogHook[LogLevel::End];         // 写日志前日志级别对应的hook 用于修改日志内容等
     Int32 _threadWorkIntervalMsTime;                                            // 日志线程工作间隔时间
 
     /* 日志文件内容 */
@@ -110,7 +110,7 @@ private:
 
     LogFile *_logFiles[LogDefs::LOG_QUANTITY];                              // 日志id日志文件 创建后文件只允许读不允许增删改
     std::list<LogData *> *_logDatas[LogDefs::LOG_QUANTITY];                 // 日志id日志内容
-    IDelegatePlus<void, Int32> *_threadWriteLogDelegate;                    // 日志线程写日志委托
+    IDelegate<void, Int32> *_threadWriteLogDelegate;                    // 日志线程写日志委托
     std::list<LogData *> *_logCaches[LogDefs::LOG_QUANTITY];                // 缓冲变量，提高性能
 };
 

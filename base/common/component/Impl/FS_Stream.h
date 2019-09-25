@@ -78,12 +78,12 @@ public:
     /* 读字节流 */
     #pragma region Read
 public:
-    template<typename T>
-    bool Read(T &n, bool isOffset = true);
-    template<typename T>
-    UInt32 ReadArray(T *arr, UInt32 len);
-    template<typename T>
-    bool ReadWithoutOffsetPos(T &n);
+    template<typename ObjType>
+    bool Read(ObjType &n, bool isOffset = true);
+    template<typename ObjType>
+    UInt32 ReadArray(ObjType *arr, UInt32 len);
+    template<typename ObjType>
+    bool ReadWithoutOffsetPos(ObjType &n);
 
     Byte8 ReadInt8();
     Int16 ReadInt16();
@@ -102,10 +102,10 @@ public:
     /* 写字节流 */
     #pragma region Write
 public:
-    template<typename T>
-    bool Write(const T &n);
-    template<typename T>
-    bool WriteArray(T *data, UInt32 len);
+    template<typename ObjType>
+    bool Write(const ObjType &n);
+    template<typename ObjType>
+    bool WriteArray(ObjType *data, UInt32 len);
     bool Write(const FS_String &str);
     bool Write(const std::string &str);
     bool WriteInt8(Byte8 n);

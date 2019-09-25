@@ -71,12 +71,12 @@ void MemleakMonitor::Start()
     _printInfoPool->AddTask(DelegatePlusFactory::Create(this, &MemleakMonitor::_PrintInfoPerSeconds));
 }
 
-void MemleakMonitor::RegisterObjPoolCallback(const char *name, IDelegatePlus<size_t, Int64 &> *callback)
+void MemleakMonitor::RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &> *callback)
 {
     _locker.Lock();
     auto iterCallbacks = _objNameRefPrintCallback.find(name);
     if(iterCallbacks == _objNameRefPrintCallback.end())
-        iterCallbacks = _objNameRefPrintCallback.insert(std::make_pair(name, new std::vector<IDelegatePlus<size_t, Int64 &> *>)).first;
+        iterCallbacks = _objNameRefPrintCallback.insert(std::make_pair(name, new std::vector<IDelegate<size_t, Int64 &> *>)).first;
     iterCallbacks->second->push_back(callback);
     _locker.Unlock();
 }
@@ -99,7 +99,7 @@ void MemleakMonitor::UnRegisterObjPool(const char *name)
     _locker.Unlock();
 }
 
-void MemleakMonitor::RegisterMemPoolPrintCallback(const IDelegatePlus<void> *callback)
+void MemleakMonitor::RegisterMemPoolPrintCallback(const IDelegate<void> *callback)
 {
     _locker.Lock();
     _memPoolPrintCallback = callback;
@@ -122,7 +122,7 @@ void MemleakMonitor::PrintObjPoolInfo() const
         for(auto &callback : *iterCallbacks.second)
         {
             Int64 curOccupied = 0;
-            totalPoolInUsedBytes += (*callback)(curOccupied);
+            totalPoolInUsedBytes += callback->Invoke(curOccupied);
             totalOccupiedBytes += curOccupied;
         }
     }
@@ -148,7 +148,7 @@ void MemleakMonitor::PrintObjPoolInfo(const char *objName) const
     for(auto &callback : *iterCallBacks->second)
     {
         Int64 curOccupied = 0;
-        totalPoolInUsedBytes += (*callback)(curOccupied);
+        totalPoolInUsedBytes += callback->Invoke(curOccupied);
         totalOccupiedBytes += curOccupied;
     }
 
@@ -197,7 +197,7 @@ void MemleakMonitor::PrintPoolAll() const
     PrintSysMemoryInfo();
     // 内存池信息
     if(_memPoolPrintCallback)
-        (*_memPoolPrintCallback)();
+        _memPoolPrintCallback->Invoke();
     // 打印对象池
     PrintObjPoolInfo();
 }

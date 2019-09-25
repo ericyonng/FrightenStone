@@ -347,16 +347,16 @@ inline bool FS_String::isspace() const
 
 #pragma endregion
 
-template<typename T>
-inline void FS_String::_append_fmt_str(const Byte8 *fmtstr, const T &val)
+template<typename ObjType>
+inline void FS_String::_append_fmt_str(const Byte8 *fmtstr, const ObjType &val)
 {
     auto len = sprintf(_cache, fmtstr, val);
     _cache[len] = 0;
     _buffer += _cache;
 }
 
-template<typename T>
-void FS_String::_append_fmt_str(const Byte8 *fmtstr, Int16 bufferSize, const T &val)
+template<typename ObjType>
+void FS_String::_append_fmt_str(const Byte8 *fmtstr, Int16 bufferSize, const ObjType &val)
 {
     Byte8 *bufferCache = new Byte8[bufferSize];
     bufferCache[0] = 0;
@@ -418,21 +418,21 @@ inline FS_String &FS_String::FormatCompatibilityNoFmt(const std::string &fmt, co
     return Append(rest...);
 }
 
-template<typename T>
-inline void FS_String::_AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val)
+template<typename ObjType>
+inline void FS_String::_AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, ObjType &&val)
 {
     _DoAppendFormat(fmtLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, val);
 }
 
-template<typename T, typename... Args>
-inline void FS_String::_AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val, Args&&... rest)
+template<typename ObjType, typename... Args>
+inline void FS_String::_AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, ObjType &&val, Args&&... rest)
 {
     _DoAppendFormat(fmtLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, val);
     _AppendFormat(fmtLeft, startPlaceHolderIndex, nextPlaceHolderIndex, obj, std::forward<Args>(rest)...);
 }
 
-template<typename T>
-inline void FS_String::_DoAppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val)
+template<typename ObjType>
+inline void FS_String::_DoAppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, ObjType &&val)
 {
     if(startPlaceHolderIndex == std::string::npos)
     {
@@ -445,7 +445,7 @@ inline void FS_String::_DoAppendFormat(const std::string &fmtLeft, UInt64 &start
         fmtLeft.substr(startPlaceHolderIndex);
 
     {
-        UInt64 bufferSize = strCache.length() + 1 + GetBufferAddapterSize<T>::GetBufferNeeded(std::forward<T>(val)) + 1;
+        UInt64 bufferSize = strCache.length() + 1 + GetBufferAddapterSize<ObjType>::GetBufferNeeded(std::forward<ObjType>(val)) + 1;
         fs::SmartPtr<Byte8, AssistObjsDefs::MultiDelete> bufferCache = new char[bufferSize];
 
         auto len = sprintf(static_cast<char *>(bufferCache), strCache.c_str(), val);
@@ -457,13 +457,13 @@ inline void FS_String::_DoAppendFormat(const std::string &fmtLeft, UInt64 &start
     NextPlaceHolderPos(fmtLeft, startPlaceHolderIndex, nextPlaceHolderIndex);
 }
 
-template< typename T>
-inline void FS_String::_Append(T &&arg)
+template< typename ObjType>
+inline void FS_String::_Append(ObjType &&arg)
 {
     (*this) << arg;
 }
-template<typename T, typename... Args>
-inline void FS_String::_Append(T &&arg, Args&&... rest)
+template<typename ObjType, typename... Args>
+inline void FS_String::_Append(ObjType &&arg, Args&&... rest)
 {
     (*this) << arg;
     _Append(std::forward<Args>(rest)...);

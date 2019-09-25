@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename T>
+template<typename ObjType>
 struct GetBufferAddapterSize
 {
     static Int16 GetBufferNeeded(const char *&val)

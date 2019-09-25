@@ -51,11 +51,11 @@ public:
     static IMemoryPoolMgr *GetInstance();
     virtual Int32 InitPool() = 0;
     virtual void FinishPool() = 0;
-    template<typename T>
-    T *Alloc(size_t bytes);
+    template<typename ObjType>
+    ObjType *Alloc(size_t bytes);
     virtual void *Alloc(size_t bytes) = 0;
-    template<typename T>
-    T *Realloc(void *ptr, size_t bytes);
+    template<typename ObjType>
+    ObjType *Realloc(void *ptr, size_t bytes);
     virtual void *Realloc(void *ptr, size_t bytes) = 0;
     virtual void  Free(void *ptr) = 0;
     virtual void  AddRef(void *ptr) = 0;
@@ -64,16 +64,16 @@ public:
     virtual void PrintMemPoolInfo() const = 0;
 };
 
-template<typename T>
-inline T *IMemoryPoolMgr::Alloc(size_t bytes)
+template<typename ObjType>
+inline ObjType *IMemoryPoolMgr::Alloc(size_t bytes)
 {
-    return reinterpret_cast<T *>(Alloc(bytes));
+    return reinterpret_cast<ObjType *>(Alloc(bytes));
 }
 
-template<typename T>
-inline T *IMemoryPoolMgr::Realloc(void *ptr, size_t bytes)
+template<typename ObjType>
+inline ObjType *IMemoryPoolMgr::Realloc(void *ptr, size_t bytes)
 {
-    return reinterpret_cast<T *>(Realloc(ptr, bytes));
+    return reinterpret_cast<ObjType *>(Realloc(ptr, bytes));
 }
 FS_NAMESPACE_END
 

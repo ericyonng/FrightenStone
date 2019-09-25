@@ -42,42 +42,42 @@
 FS_NAMESPACE_BEGIN
 
 #pragma region constructor
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-SmartPtr<T, delMethod>::SmartPtr()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+SmartPtr<ObjType, delMethod>::SmartPtr()
     :_ptr(NULL)
 {
 
 }
 
-template<typename T,  AssistObjsDefs::DelMethods delMethod>
-SmartPtr<T, delMethod>::SmartPtr(T *ptr)
+template<typename ObjType,  AssistObjsDefs::DelMethods delMethod>
+SmartPtr<ObjType, delMethod>::SmartPtr(ObjType *ptr)
     :_ptr(ptr)
 {
 
 }
 
-template<typename T,  AssistObjsDefs::DelMethods delMethod>
-SmartPtr<T, delMethod>::SmartPtr(SmartPtr<T, delMethod> &&obj)
+template<typename ObjType,  AssistObjsDefs::DelMethods delMethod>
+SmartPtr<ObjType, delMethod>::SmartPtr(SmartPtr<ObjType, delMethod> &&obj)
 {
     _ptr = obj.pop();
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-SmartPtr<T, delMethod>::~SmartPtr()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+SmartPtr<ObjType, delMethod>::~SmartPtr()
 {
     Release();
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline T *SmartPtr<T, delMethod>::pop()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline ObjType *SmartPtr<ObjType, delMethod>::pop()
 {
-    T *obj = _ptr;
+    ObjType *obj = _ptr;
     _ptr = NULL;
     return obj;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline void SmartPtr<T, delMethod>::Release()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline void SmartPtr<ObjType, delMethod>::Release()
 {
     _delObj.Release(_ptr);
     _ptr = NULL;
@@ -85,8 +85,8 @@ inline void SmartPtr<T, delMethod>::Release()
 #pragma endregion
 
 #pragma region operations
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline SmartPtr<T, delMethod> &SmartPtr<T, delMethod>::operator =(T *ptr)
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline SmartPtr<ObjType, delMethod> &SmartPtr<ObjType, delMethod>::operator =(ObjType *ptr)
 {
     if(_ptr == ptr)
         return *this;
@@ -97,83 +97,83 @@ inline SmartPtr<T, delMethod> &SmartPtr<T, delMethod>::operator =(T *ptr)
     return *this;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline SmartPtr<T, delMethod> &SmartPtr<T, delMethod>::operator =(SmartPtr<T, delMethod> &&ptr) noexcept
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline SmartPtr<ObjType, delMethod> &SmartPtr<ObjType, delMethod>::operator =(SmartPtr<ObjType, delMethod> &&ptr) noexcept
 {
     _ptr = ptr.pop();
     return *this;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline SmartPtr<T, delMethod>::operator void *()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline SmartPtr<ObjType, delMethod>::operator void *()
 {
     return _ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline SmartPtr<T, delMethod>::operator const void *() const
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline SmartPtr<ObjType, delMethod>::operator const void *() const
 {
     return _ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline SmartPtr<T, delMethod>::operator T *()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline SmartPtr<ObjType, delMethod>::operator ObjType *()
 {
     return _ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline SmartPtr<T, delMethod>::operator const T *() const
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline SmartPtr<ObjType, delMethod>::operator const ObjType *() const
 {
     return _ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline T *SmartPtr<T, delMethod>::operator->()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline ObjType *SmartPtr<ObjType, delMethod>::operator->()
 {
     return _ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline const T *SmartPtr<T, delMethod>::operator->() const
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline const ObjType *SmartPtr<ObjType, delMethod>::operator->() const
 {
     return _ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline T &SmartPtr<T, delMethod>::operator [](int index)
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline ObjType &SmartPtr<ObjType, delMethod>::operator [](int index)
 {
-    T *ptr = _ptr;
+    ObjType *ptr = _ptr;
     if(ptr)
         ptr += index;
 
     return *ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline const T &SmartPtr<T, delMethod>::operator [](int index) const
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline const ObjType &SmartPtr<ObjType, delMethod>::operator [](int index) const
 {
-    T *ptr = _ptr;
+    ObjType *ptr = _ptr;
     if(ptr)
         ptr += index;
 
     return *ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod /*= AssistObjsDefs::Delete*/>
-inline const T& SmartPtr<T, delMethod>::operator*() const
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod /*= AssistObjsDefs::Delete*/>
+inline const ObjType& SmartPtr<ObjType, delMethod>::operator*() const
 {
     return *_ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod /*= SmartPtrEnums::Delete*/>
-inline T& SmartPtr<T, delMethod>::operator*()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod /*= SmartPtrEnums::Delete*/>
+inline ObjType& SmartPtr<ObjType, delMethod>::operator*()
 {
     return *_ptr;
 }
 
-template<typename T, AssistObjsDefs::DelMethods delMethod>
-inline SmartPtr<T, delMethod>::operator bool()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline SmartPtr<ObjType, delMethod>::operator bool()
 {
     return (_ptr != NULL);
 }

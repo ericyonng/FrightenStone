@@ -60,7 +60,7 @@ public:
     // 添加任务 请确保同一个任务只投递一次，避免多线程处理同一任务的情况出现（除非线程池只有一个线程）
     bool AddTask(ITask &task, bool forceNewThread = false, Int32 numOfThreadToCreateIfNeed = 1);
     // 添加delegate任务 delegate内部释放 请确保同一个任务只投递一次，避免多线程处理同一任务的情况出现（除非线程池只有一个线程）
-    bool AddTask(IDelegatePlus<void, const FS_ThreadPool *> *callback, bool forceNewThread = false, Int32 numOfThreadToCreateIfNeed = 1);
+    bool AddTask(IDelegate<void, const FS_ThreadPool *> *callback, bool forceNewThread = false, Int32 numOfThreadToCreateIfNeed = 1);
     // 线程任务执行
     static unsigned __stdcall ThreadHandler(void *param);
 

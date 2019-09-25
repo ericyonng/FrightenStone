@@ -39,7 +39,7 @@ inline void FS_MainIocpServer::BeforeClose()
 {
     _mainLocker.Lock();
     if(_closeIocpDelegate)
-        (*_closeIocpDelegate)();
+        _closeIocpDelegate->Invoke();
     _mainLocker.Unlock();
 }
 #pragma endregion

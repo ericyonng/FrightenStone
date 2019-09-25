@@ -58,12 +58,12 @@ public:
     Int32 Schedule(const Time &startTime, Int64 milliSecPeriod);
 
     // 设置超时执行函数
-    template<typename T>
-    void SetTimeOutHandler(T *objType, void (T::*handler)(FS_Timer *, const Time &, const Time &));
+    template<typename ObjType>
+    void SetTimeOutHandler(ObjType *objType, void (ObjType::*handler)(FS_Timer *, const Time &, const Time &));
     void SetTimeOutHandler(void(*handler)(FS_Timer *, const Time &, const Time &));
     // 设置cancel执行函数
-    template<typename T>
-    void SetCancelHandler(T *objType, void (T::*handler)(FS_Timer *));
+    template<typename ObjType>
+    void SetCancelHandler(ObjType *objType, void (ObjType::*handler)(FS_Timer *));
     void SetCancelHandler(void(*handler)(FS_Timer *));
 
     // 由timewheel调用超时
@@ -77,9 +77,9 @@ private:
     TimeData *_timeData;
     TimeSlice _periodCache;     // schedule时使用的周期缓冲
     // 超时委托 param1:返回值, param2:FS_Timer, param3:lastWheelTime, param4:curTime
-    IDelegatePlus<void, FS_Timer *, const Time &, const Time &> *_timeOutDelegate;
+    IDelegate<void, FS_Timer *, const Time &, const Time &> *_timeOutDelegate;
     // 注销委托
-    IDelegatePlus<void, FS_Timer *> *_cancelTimerDelegate;
+    IDelegate<void, FS_Timer *> *_cancelTimerDelegate;
 };
 
 FS_NAMESPACE_END

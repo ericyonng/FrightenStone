@@ -213,13 +213,13 @@ inline void ILog::any(const char *fmt, const Args&... args)
 }
 
 template<typename ObjType>
-inline const IDelegatePlus<void, const LogData *> *ILog::InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData))
+inline const IDelegate<void, const LogData *> *ILog::InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData))
 {
     auto newDelegate = DelegatePlusFactory::Create(obj, func);
     return _InstallLogHookFunc(level, newDelegate);
 }
 
-inline const IDelegatePlus<void, const LogData *> * ILog::InstallLogHookFunc(Int32 level, void(*func)(const LogData *logData))
+inline const IDelegate<void, const LogData *> * ILog::InstallLogHookFunc(Int32 level, void(*func)(const LogData *logData))
 {
     auto newDelegate = DelegatePlusFactory::Create(func);
     return _InstallLogHookFunc(level, newDelegate);
@@ -227,13 +227,13 @@ inline const IDelegatePlus<void, const LogData *> * ILog::InstallLogHookFunc(Int
 
 // hook与具体类型有关
 template<typename ObjType>
-inline const IDelegatePlus<void, LogData *> * ILog::InstallBeforeLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(LogData *logData))
+inline const IDelegate<void, LogData *> * ILog::InstallBeforeLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(LogData *logData))
 {
     auto newDelegate = DelegatePlusFactory::Create(obj, func);
     return _InstallBeforeLogHookFunc(level, newDelegate);
 }
 
-inline const IDelegatePlus<void, LogData *> *ILog::InstallBeforeLogHookFunc(Int32 level, void(*func)(LogData *logData))
+inline const IDelegate<void, LogData *> *ILog::InstallBeforeLogHookFunc(Int32 level, void(*func)(LogData *logData))
 {
     auto newDelegate = DelegatePlusFactory::Create(func);
     return _InstallBeforeLogHookFunc(level, newDelegate);

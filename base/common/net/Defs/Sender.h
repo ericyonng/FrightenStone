@@ -50,7 +50,7 @@ class BASE_EXPORT Sender
 {
     OBJ_POOL_CREATE_DEF(Sender);
 public:
-    Sender(const IDelegatePlus<bool, UInt64> *isClientDestroy);
+    Sender(const IDelegate<bool, UInt64> *isClientDestroy);
     ~Sender();
 
     void Start();
@@ -75,8 +75,8 @@ public:
     std::list<FS_Packet *> _packetCacheQueue;   // 待转移到发送队列的缓冲队列
     std::map<UInt64, std::list<PacketQueueNode *>> _sendingQueue; // key:clientId
     std::set<UInt64> _needPostClientIds;
-    IDelegatePlus<void> *_quitIocp;
-    const IDelegatePlus<bool, UInt64> *_isClientDestroy;
+    IDelegate<void> *_quitIocp;
+    const IDelegate<bool, UInt64> *_isClientDestroy;
 };
 
 FS_NAMESPACE_END

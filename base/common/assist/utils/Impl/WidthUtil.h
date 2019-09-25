@@ -43,14 +43,14 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT WidthUtil
 {
 public:
-    template<typename T>
+    template<typename ObjType>
     static int GetBinaryWidth();
-    template<typename T>
-    static int GetBinaryWidth(T val);
-    template<typename T>
+    template<typename ObjType>
+    static int GetBinaryWidth(ObjType val);
+    template<typename ObjType>
     static int GetDecimalWidth();
-    template<typename T>
-    static int GetDecimalWidth(T val);
+    template<typename ObjType>
+    static int GetDecimalWidth(ObjType val);
 };
 
 FS_NAMESPACE_END

@@ -32,43 +32,43 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename T>
-Locker Singleton<T>::_locker;
+template<typename ObjType>
+Locker Singleton<ObjType>::_locker;
 
-template<typename T>
-SmartPtr<T> Singleton<T>::_pObj = NULL;
+template<typename ObjType>
+SmartPtr<ObjType> Singleton<ObjType>::_pObj = NULL;
 
-template<typename T>
-inline T *Singleton<T>::GetInstance()
+template<typename ObjType>
+inline ObjType *Singleton<ObjType>::GetInstance()
 {
     _locker.Lock();
-    T *pObj = _pObj;
+    ObjType *pObj = _pObj;
     if(NULL != pObj)
     {
         _locker.Unlock();
         return pObj;
     }
 
-    _pObj = new T;
+    _pObj = new ObjType;
     pObj = _pObj;
     _locker.Unlock();
 
     return pObj;
 }
 
-template<typename T>
+template<typename ObjType>
 template<typename... Args>
-inline T *Singleton<T>::GetInstance(Args &&... args)
+inline ObjType *Singleton<ObjType>::GetInstance(Args &&... args)
 {
     _locker.Lock();
-    T *pObj = _pObj;
+    ObjType *pObj = _pObj;
     if(NULL != pObj)
     {
         _locker.Unlock();
         return pObj;
     }
 
-    _pObj = new T(std::forward<Args>(args)...);
+    _pObj = new ObjType(std::forward<Args>(args)...);
     pObj = _pObj;
     _locker.Unlock();
 

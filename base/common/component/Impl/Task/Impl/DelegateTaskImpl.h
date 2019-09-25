@@ -34,7 +34,7 @@
 
 FS_NAMESPACE_BEGIN
 
-inline DelegateTask::DelegateTask(const FS_ThreadPool *pool, IDelegatePlus<void, const FS_ThreadPool *> *callback)
+inline DelegateTask::DelegateTask(const FS_ThreadPool *pool, IDelegate<void, const FS_ThreadPool *> *callback)
     :_pool(pool)
     ,_callback(callback)
 {

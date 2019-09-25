@@ -76,7 +76,7 @@ protected:
 
 private:
     Locker _mainLocker;
-    IDelegatePlus<void> *_closeIocpDelegate;    // 委托执行关服时退出iocp
+    IDelegate<void> *_closeIocpDelegate;    // 委托执行关服时退出iocp
 };
 
 FS_NAMESPACE_END

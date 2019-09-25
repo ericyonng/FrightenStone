@@ -215,10 +215,10 @@ void IMemoryAlloctor::_NewNode()
     ++_curNodeCnt;
 
     _InitNode(newNode);
-    (*_updateMemPoolOccupied)(std::forward<size_t>(newNode->_nodeSize));
+    _updateMemPoolOccupied->Invoke(std::forward<size_t>(newNode->_nodeSize));
 }
 
-MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegatePlus<void, size_t> *updateMemPoolOccupied, const bool &canCreateNewNode)
+MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied, const bool &canCreateNewNode)
     :IMemoryAlloctor(canCreateNewNode)
 {
     _blockAmount = blockAmount;

@@ -126,10 +126,10 @@ inline NetMsg_DataHeader *FS_Packet::CastToMsg()
     return reinterpret_cast<NetMsg_DataHeader *>(_buff);
 }
 
-template<typename T>
-inline T *FS_Packet::CastToMsg()
+template<typename ObjType>
+inline ObjType *FS_Packet::CastToMsg()
 {
-    return reinterpret_cast<T*>(_buff);
+    return reinterpret_cast<ObjType*>(_buff);
 }
 
 inline char *FS_Packet::GiveupBuffer(Int32 &packetSize, Int32 &lastPos)

@@ -36,10 +36,10 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename T, typename... Args>
-T *FS_ClassFactory::Create(Args&&... args)
+template<typename ObjType, typename... Args>
+ObjType *FS_ClassFactory::Create(Args&&... args)
 {
-    return new T(std::forward<Args>(args)...);
+    return new ObjType(std::forward<Args>(args)...);
 }
 
 FS_NAMESPACE_END
