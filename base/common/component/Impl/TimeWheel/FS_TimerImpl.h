@@ -45,8 +45,8 @@ inline Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
     return Schedule(Time::Now(), milliSecPeriod);
 }
 
-template<typename T>
-inline void FS_Timer::SetTimeOutHandler(T *objType, void (T::*handler)(FS_Timer *, const Time &, const Time &))
+template<typename ObjType>
+inline void FS_Timer::SetTimeOutHandler(ObjType *objType, void (ObjType::*handler)(FS_Timer *, const Time &, const Time &))
 {
     if(UNLIKELY(_timeOutDelegate))
         Fs_SafeFree(_timeOutDelegate);
@@ -64,8 +64,8 @@ inline void FS_Timer::SetTimeOutHandler(void(*handler)(FS_Timer *, const Time &,
         _timeOutDelegate = DelegatePlusFactory::Create(handler);
 }
 
-template<typename T>
-inline void FS_Timer::SetCancelHandler(T *objType, void (T::*handler)(FS_Timer *))
+template<typename ObjType>
+inline void FS_Timer::SetCancelHandler(ObjType *objType, void (ObjType::*handler)(FS_Timer *))
 {
     if(UNLIKELY(_cancelTimerDelegate))
         Fs_SafeFree(_cancelTimerDelegate);

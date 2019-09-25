@@ -197,7 +197,7 @@ void MemoryPoolMgr::_Init(size_t begin, size_t end, IMemoryAlloctor *alloctor)
 
 void MemoryPoolMgr::_RegisterPrintCallback()
 {
-    _printCallback = const_cast<IDelegatePlus<void> *>(DelegatePlusFactory::Create(this, &MemoryPoolMgr::PrintMemPoolInfo));
+    _printCallback = const_cast<IDelegate<void> *>(DelegatePlusFactory::Create(this, &MemoryPoolMgr::PrintMemPoolInfo));
     if(!g_MemleakMonitor)
         g_MemleakMonitor = MemleakMonitor::GetInstance();
     g_MemleakMonitor->RegisterMemPoolPrintCallback(_printCallback);

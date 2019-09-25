@@ -47,23 +47,23 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename T>
+template<typename ObjType>
 class Singleton
 {
 public:
-    static T *GetInstance();
+    static ObjType *GetInstance();
     template<typename... Args>
-    static T *GetInstance(Args &&... args);
+    static ObjType *GetInstance(Args &&... args);
 
 private:
     Singleton(void) = delete;
     ~Singleton(void) = delete;
-    Singleton(const Singleton<T>&) = delete;
-    Singleton(Singleton<T>&&) = delete;
-    Singleton& operator = (const Singleton<T>&) = delete;
+    Singleton(const Singleton<ObjType>&) = delete;
+    Singleton(Singleton<ObjType>&&) = delete;
+    Singleton& operator = (const Singleton<ObjType>&) = delete;
 
 private:
-    static SmartPtr<T> _pObj;
+    static SmartPtr<ObjType> _pObj;
     static Locker          _locker;
 };
 

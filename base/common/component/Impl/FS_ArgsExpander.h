@@ -38,7 +38,7 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename T>
+template<typename ObjType>
 class BASE_EXPORT FS_ArgsExpander
 {
 public:
@@ -46,7 +46,7 @@ public:
     static void Expand(Args&&... args);
 };
 
-template<typename T>
+template<typename ObjType>
 class BASE_EXPORT FS_RecursiveArgsExpander
 {
 public:

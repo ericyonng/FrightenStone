@@ -199,23 +199,23 @@ public:
     // startIndex 必须为当前要格式化的%所在位置 NextPlaceHolderPos输出下一个未被格式化的位置outIndex 输出std::string::npos表示结束
     static std::string NextPlaceHolderPos(const std::string &strFmt, UInt64 startIndex, UInt64 &outIndex);
 private:
-    template<typename T>
-    void _AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);
-    template<typename T, typename... Args>
-    void _AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val, Args&&... rest);   //Args&...
-    template<typename T>
-    void _DoAppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, T &&val);
-    template< typename T>
-    void _Append(T &&arg);
-    template<typename T, typename... Args>
-    void _Append(T &&arg, Args&&... rest);
+    template<typename ObjType>
+    void _AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, ObjType &&val);
+    template<typename ObjType, typename... Args>
+    void _AppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, ObjType &&val, Args&&... rest);   //Args&...
+    template<typename ObjType>
+    void _DoAppendFormat(const std::string &fmtLeft, UInt64 &startPlaceHolderIndex, UInt64 &nextPlaceHolderIndex, FS_String &obj, ObjType &&val);
+    template< typename ObjType>
+    void _Append(ObjType &&arg);
+    template<typename ObjType, typename... Args>
+    void _Append(ObjType &&arg, Args&&... rest);
     #pragma endregion
 
 private:
-    template<typename T>
-    void _append_fmt_str(const Byte8 *fmtstr, const T &val);
-    template<typename T>
-    void _append_fmt_str(const Byte8 *fmtstr, Int16 bufferSize, const T &val);
+    template<typename ObjType>
+    void _append_fmt_str(const Byte8 *fmtstr, const ObjType &val);
+    template<typename ObjType>
+    void _append_fmt_str(const Byte8 *fmtstr, Int16 bufferSize, const ObjType &val);
     void _append_fmt_str_cstyle(const Byte8 *fmtstr, ...);
 
 private:

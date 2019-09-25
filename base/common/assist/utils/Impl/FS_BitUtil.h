@@ -40,11 +40,11 @@
 class BASE_EXPORT FS_BitUtil
 {
 public:
-    template <typename T>
-    static bool IsSet(T val, UInt32 pos);
+    template <typename ObjType>
+    static bool IsSet(ObjType val, UInt32 pos);
 
-    template <typename T>
-    static T Set(T val, UInt32 pos, bool flag);
+    template <typename ObjType>
+    static ObjType Set(ObjType val, UInt32 pos, bool flag);
 };
 
 #include "base/common/assist/utils/Impl/FS_BitUtilImpl.h"

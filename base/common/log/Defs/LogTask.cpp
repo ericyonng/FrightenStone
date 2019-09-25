@@ -38,7 +38,7 @@
 
 FS_NAMESPACE_BEGIN
 
-LogTask::LogTask(FS_ThreadPool *pool, IDelegatePlus<void, Int32> *taskDelegate, Int32 workIntervalMsTime, Int32 logFileIndex)
+LogTask::LogTask(FS_ThreadPool *pool, IDelegate<void, Int32> *taskDelegate, Int32 workIntervalMsTime, Int32 logFileIndex)
     :_taskDelegate(taskDelegate)
     ,_pool(pool)
     ,_workIntervalMsTime(workIntervalMsTime)
@@ -59,12 +59,12 @@ Int32 LogTask::Run()
         // 结束任务判断
         if(_pool->IsClearingPool())
         {
-            (*_taskDelegate)(std::forward<Int32>(_logFileIndex));
+            _taskDelegate->Invoke(std::forward<Int32>(_logFileIndex));
             break;
         }
 
         // 写日志
-        (*_taskDelegate)(std::forward<Int32>(_logFileIndex));
+        _taskDelegate->Invoke(std::forward<Int32>(_logFileIndex));
 
         // 休息一会儿
         Sleep(_workIntervalMsTime);

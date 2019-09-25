@@ -60,7 +60,7 @@ public:
      * delegate由内部释放，外部不释放
      */
     virtual FS_ListenerStub AddListener(int id,
-                                          IDelegatePlus<void, FS_Event *> *listener,
+                                          IDelegate<void, FS_Event *> *listener,
                                           const FS_ListenerStub &bindedStub = FS_INVALID_LISTENER_STUB);
 
     /**
@@ -112,7 +112,7 @@ protected:
         FS_ListenerStub _stub;
 
         int _evId;
-        IDelegatePlus<void, FS_Event *> *_listenCallBack;
+        IDelegate<void, FS_Event *> *_listenCallBack;
 
         _Listener();
     };

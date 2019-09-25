@@ -31,6 +31,7 @@
  */
 #include "stdafx.h"
 #include "base/common/component/Impl/Task/Impl/DelegateTask.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
 
 // OBJ_POOL_CREATE_IMPL(fs::DelegateTask, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 
@@ -38,7 +39,7 @@ FS_NAMESPACE_BEGIN
 
 Int32 DelegateTask::Run()
 {
-    (*_callback)(std::forward<const FS_ThreadPool *>(_pool));
+    _callback->Invoke(DELEGATE_ARGS(_pool));
     return StatusDefs::Success;
 }
 

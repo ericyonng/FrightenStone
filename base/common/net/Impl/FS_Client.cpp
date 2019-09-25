@@ -93,7 +93,7 @@ void FS_Client::_SendData(const char *data, Int32 len)
 {
     FS_Packet *newData = new FS_Packet(_id, _sockfd);
     newData->FromMsg(data, len);
-    (*_sendFunc)(FS_DELG_ADAPTARG(newData));
+    _sendFunc->Invoke(DELEGATE_ARGS(newData));
 }
 
 bool FS_Client::HasRecvMsg() const

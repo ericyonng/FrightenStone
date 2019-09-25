@@ -98,14 +98,14 @@ protected:
     size_t          _blockSize;             // 内存块大小
     size_t          _effectiveBlockSize;    // 有效内存块大小（扣除MemoryBlock的内存大小）
 
-    IDelegatePlus<void, size_t> *_updateMemPoolOccupied = NULL;
+    IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
     const bool &_canCreateNewNode;
 };
 
 class MemoryAlloctor : public IMemoryAlloctor
 {
 public:
-    MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegatePlus<void, size_t> *updateMemPoolOccupied, const bool &canCreateNewNode);
+    MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied, const bool &canCreateNewNode);
     virtual ~MemoryAlloctor();
 };
 

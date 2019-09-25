@@ -61,8 +61,8 @@ public:
     void FromMsg(const char *data, Int32 len);
     void FromMsg(UInt64 ownerId, SOCKET socket, const char *data, Int32 len);
     NetMsg_DataHeader *CastToMsg();
-    template<typename T>
-    T *CastToMsg();
+    template<typename ObjType>
+    ObjType *CastToMsg();
     char *GiveupBuffer(Int32 &packetSize, Int32 &lastPos);
     void Clear();
 

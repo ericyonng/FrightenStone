@@ -169,8 +169,8 @@ inline FS_String StringUtil::Num2Str(Float val, Int32 radix)
     return Num2Str<Double>(val, radix);
 }
 
-template <typename T>
-inline FS_String StringUtil::Num2Str(T val, Int32 radix)
+template <typename ObjType>
+inline FS_String StringUtil::Num2Str(ObjType val, Int32 radix)
 {
     if(radix != 10 && radix != 16)
         radix = 10;
@@ -180,7 +180,7 @@ inline FS_String StringUtil::Num2Str(T val, Int32 radix)
         str._buffer += "0x";
 
     UInt64 ptrVal = 0;
-    ::memcpy(&ptrVal, &val, sizeof(T) > sizeof(UInt64) ? sizeof(UInt64) : sizeof(T));
+    ::memcpy(&ptrVal, &val, sizeof(ObjType) > sizeof(UInt64) ? sizeof(UInt64) : sizeof(ObjType));
     return (str + Num2Str<UInt64>(ptrVal, radix));
 }
 

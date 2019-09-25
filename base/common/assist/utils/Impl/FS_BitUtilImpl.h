@@ -32,19 +32,19 @@
 #ifdef __Base_Common_Assist_Utils_Impl_FS_BitUtil_H__
 #pragma once
 
-template <typename T>
-inline bool FS_BitUtil::IsSet(T val, UInt32 pos)
+template <typename ObjType>
+inline bool FS_BitUtil::IsSet(ObjType val, UInt32 pos)
 {
-    return (val & (static_cast<T>(1) << pos)) != 0;
+    return (val & (static_cast<ObjType>(1) << pos)) != 0;
 }
 
-template <typename T>
-inline T FS_BitUtil::Set(T val, UInt32 pos, bool flag)
+template <typename ObjType>
+inline ObjType FS_BitUtil::Set(ObjType val, UInt32 pos, bool flag)
 {
     if(flag)
-        return val | (static_cast<T>(1) << pos);
+        return val | (static_cast<ObjType>(1) << pos);
 
-    return val &= ~(static_cast<T>(1) << pos);
+    return val &= ~(static_cast<ObjType>(1) << pos);
 }
 
 #endif // __Base_Common_Assist_Utils_Impl_FS_BitUtil_H__

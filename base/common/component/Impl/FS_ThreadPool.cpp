@@ -101,7 +101,7 @@ bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 
     return true;
 }
 
-bool FS_ThreadPool::AddTask(IDelegatePlus<void, const FS_ThreadPool *> *callback, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
+bool FS_ThreadPool::AddTask(IDelegate<void, const FS_ThreadPool *> *callback, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
 {
     // 创建一个delegate task
     DelegateTask *newTask = new DelegateTask(this, callback);

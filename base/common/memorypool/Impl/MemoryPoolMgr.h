@@ -76,11 +76,11 @@ private:
     std::vector<IMemoryAlloctor *> _allAlloctors;                   // 用于释放
     bool _isInit;
     Locker _locker;
-    IDelegatePlus<void> *_printCallback;
+    IDelegate<void> *_printCallback;
     size_t _curTotalOccupiedBytes = 0;      // 当前内存池占用的总字节数
     bool _canCreateNewNode = true;
     const size_t _maxCanAllocMemLimit;
-    IDelegatePlus<void, size_t> *_updateMemPoolOccupied = NULL;
+    IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
 };
 
 inline void MemoryPoolMgr::Lock()

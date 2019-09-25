@@ -34,19 +34,19 @@
 
 FS_NAMESPACE_BEGIN
 
-inline IDelegatePlus<void, const LogData *> *FS_Log::_InstallLogHookFunc(Int32 level, IDelegatePlus<void, const LogData *> *delegate)
+inline IDelegate<void, const LogData *> *FS_Log::_InstallLogHookFunc(Int32 level, IDelegate<void, const LogData *> *delegate)
 {
     if(!_levelRefHook[level])
-        _levelRefHook[level] = new  std::list<IDelegatePlus<void, const LogData *> *>;
+        _levelRefHook[level] = new  std::list<IDelegate<void, const LogData *> *>;
 
     _levelRefHook[level]->push_back(delegate);
     return delegate;
 }
 
-inline const IDelegatePlus<void, LogData *> *FS_Log::_InstallBeforeLogHookFunc(Int32 level, IDelegatePlus<void, LogData *> *delegate)
+inline const IDelegate<void, LogData *> *FS_Log::_InstallBeforeLogHookFunc(Int32 level, IDelegate<void, LogData *> *delegate)
 {
     if(!_levelRefBeforeLogHook[level])
-        _levelRefBeforeLogHook[level] = new  std::list<IDelegatePlus<void, LogData *> *>;
+        _levelRefBeforeLogHook[level] = new  std::list<IDelegate<void, LogData *> *>;
 
     _levelRefBeforeLogHook[level]->push_back(delegate);
     return delegate;

@@ -64,8 +64,8 @@ public:
     static FS_String I64toA(Int64 value, Int32 radix);
     static FS_String UI64toA(UInt64 value, Int32 radix);
 
-    template <typename T>
-    static FS_String Num2Str(T val, Int32 radix = 10);
+    template <typename ObjType>
+    static FS_String Num2Str(ObjType val, Int32 radix = 10);
     static bool MakeMd5(const FS_String &src, FS_String &outMd5);
     static bool ToHexString(const FS_String &src, FS_String &outHexString);
     static void PreInstertTime(const Time &time, FS_String &src);

@@ -62,7 +62,7 @@ public:
     void SendData(NetMsg_DataHeader *header);
     // 返回值 len 或 SOCKET_ERROR
     void SendData(const char *data, Int32 len);
-    void SetSender(IDelegatePlus<void, FS_Packet *> *sendFunc);
+    void SetSender(IDelegate<void, FS_Packet *> *sendFunc);
 
     NetMsg_DataHeader *FrontRecvMsg();
     void PopRecvFrontMsg();
@@ -113,7 +113,7 @@ private:
     // 第二缓冲区 接收消息缓冲区
     FS_Packet *_recvBuff;
     // 发送缓冲区
-    IDelegatePlus<void, FS_Packet *> *_sendFunc;
+    IDelegate<void, FS_Packet *> *_sendFunc;
     // 心跳过期时间
     Time _heartBeatExpiredTime; // 心跳过期时间
 

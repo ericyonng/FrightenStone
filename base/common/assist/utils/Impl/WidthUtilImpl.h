@@ -36,19 +36,19 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename T>
+template<typename ObjType>
 inline int WidthUtil::GetBinaryWidth()
 {
     int cnt = 1;
-    auto max = (std::numeric_limits<T>::max)();
+    auto max = (std::numeric_limits<ObjType>::max)();
     while((max /= 2) != 0)
         ++cnt;
 
     return cnt;
 }
 
-template<typename T>
-inline int WidthUtil::GetBinaryWidth(T val)
+template<typename ObjType>
+inline int WidthUtil::GetBinaryWidth(ObjType val)
 {
     int cnt = 1;
     while((val /= 2) != 0)
@@ -57,19 +57,19 @@ inline int WidthUtil::GetBinaryWidth(T val)
     return cnt;
 }
 
-template<typename T>
+template<typename ObjType>
 inline int WidthUtil::GetDecimalWidth()
 {
     int cnt = 1;
-    T max = (std::numeric_limits<T>::max)();
+    ObjType max = (std::numeric_limits<ObjType>::max)();
     while((max /= 10) != 0)
         ++cnt;
 
     return cnt;
 }
 
-template<typename T>
-inline int WidthUtil::GetDecimalWidth(T val)
+template<typename ObjType>
+inline int WidthUtil::GetDecimalWidth(ObjType val)
 {
     int cnt = 1;
     while((val /= 10) != 0)

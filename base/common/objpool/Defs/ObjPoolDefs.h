@@ -56,7 +56,7 @@ class BASE_EXPORT ObjPoolMethods
 {
 public:
     static void PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_t totalObjBlocks, size_t objBlockSizes, size_t bytesOccupied, size_t memObjInUsingCnt, size_t memInUsingBytes);
-    static void RegisterToMemleakMonitor(const char *objName, IDelegatePlus<size_t, Int64 &> *callback);
+    static void RegisterToMemleakMonitor(const char *objName, IDelegate<size_t, Int64 &> *callback);
     static void UnRegisterMemleakDelegate(const char *objName);
 };
 

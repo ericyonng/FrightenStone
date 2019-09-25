@@ -48,7 +48,7 @@ class BASE_EXPORT DelegateTask : public ITask
 {
     // OBJ_POOL_CREATE(DelegateTask, _objPoolHelper);
 public:
-    DelegateTask(const FS_ThreadPool *pool, IDelegatePlus<void, const FS_ThreadPool *> *callback);
+    DelegateTask(const FS_ThreadPool *pool, IDelegate<void, const FS_ThreadPool *> *callback);
     virtual ~DelegateTask();
 
     virtual Int32 Run();
@@ -56,7 +56,7 @@ public:
 
 private:
     const FS_ThreadPool *_pool;                             // 线程池对象
-    IDelegatePlus<void, const FS_ThreadPool *> *_callback;    // 需要释放
+    IDelegate<void, const FS_ThreadPool *> *_callback;    // 需要释放
 };
 
 FS_NAMESPACE_END

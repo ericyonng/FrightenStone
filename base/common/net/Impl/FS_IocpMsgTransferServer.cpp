@@ -179,7 +179,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
         }
 
         // 完成回调
-        (*_ioEvent->_ioData->_completedCallback)(std::forward<Int32>(static_cast<Int32>(_ioEvent->_bytesTrans)));
+        _ioEvent->_ioData->_completedCallback->Invoke(std::forward<Int32>(static_cast<Int32>(_ioEvent->_bytesTrans)));
         client->ResetPostRecv();
         _OnPrepareNetRecv(client);
         _msgArrivedClientIds.insert(clientId);

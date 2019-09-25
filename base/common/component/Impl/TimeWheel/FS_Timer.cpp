@@ -62,7 +62,7 @@ void FS_Timer::Cancel()
     if(isCancel != _timeData->_isCancel && 
        _cancelTimerDelegate)
     {
-        (*_cancelTimerDelegate)(this);
+        _cancelTimerDelegate->Invoke(this);
     }
 }
 
@@ -95,7 +95,7 @@ void FS_Timer::OnTimeOut(const Time &curWheelTIme)
         _lastTimeOutTime = curWheelTIme - _timeData->_period;
 
     if(_timeOutDelegate)
-        (*_timeOutDelegate)(this, _lastTimeOutTime, curWheelTIme);
+        _timeOutDelegate->Invoke(this, _lastTimeOutTime, curWheelTIme);
     
     // 更新上次超时时间
     _lastTimeOutTime = curWheelTIme;

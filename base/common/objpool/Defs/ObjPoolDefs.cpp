@@ -31,7 +31,7 @@ void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_
                , bytesOccupied);
 }
 
-void ObjPoolMethods::RegisterToMemleakMonitor(const char *objName, IDelegatePlus<size_t, Int64 &> *callback)
+void ObjPoolMethods::RegisterToMemleakMonitor(const char *objName, IDelegate<size_t, Int64 &> *callback)
 {
     // TODO
     if(!g_MemleakMonitor)

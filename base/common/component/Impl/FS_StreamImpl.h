@@ -79,11 +79,11 @@ inline void FS_Stream::SetWritePos(Int32 n)
 #pragma endregion
 
 #pragma region read
-template<typename T>
-inline bool FS_Stream::Read(T &n, bool isOffset)
+template<typename ObjType>
+inline bool FS_Stream::Read(ObjType &n, bool isOffset)
 {
     // 计算要读取数据的字节长度
-    Int32 objSize = static_cast<Int32>(sizeof(T));
+    Int32 objSize = static_cast<Int32>(sizeof(ObjType));
 
     // 判断能不能读
     if(CanRead(objSize))
@@ -98,12 +98,12 @@ inline bool FS_Stream::Read(T &n, bool isOffset)
         return true;
     }
 
-    g_Log->e<FS_Stream>(_LOGFMT_("error, Cant Read. struct name[%s]."), typeid(T).name());
+    g_Log->e<FS_Stream>(_LOGFMT_("error, Cant Read. struct name[%s]."), typeid(ObjType).name());
     return false;
 }
 
-template<typename T>
-inline UInt32 FS_Stream::ReadArray(T *arr, UInt32 len)
+template<typename ObjType>
+inline UInt32 FS_Stream::ReadArray(ObjType *arr, UInt32 len)
 {
     UInt32 elementCnt = 0;
 
@@ -114,7 +114,7 @@ inline UInt32 FS_Stream::ReadArray(T *arr, UInt32 len)
     if(elementCnt <= len)
     {
         // 计算数组的字节长度
-        Int32 bytes = static_cast<Int32>(elementCnt * sizeof(T));
+        Int32 bytes = static_cast<Int32>(elementCnt * sizeof(ObjType));
 
         // 判断能不能读出
         if( CanRead(static_cast<Int32>(bytes + sizeof(UInt32))) )
@@ -131,12 +131,12 @@ inline UInt32 FS_Stream::ReadArray(T *arr, UInt32 len)
         }
     }
 
-    g_Log->e<FS_Stream>(_LOGFMT_("error,ReadArray failed. element name[%s]."), typeid(T).name());
+    g_Log->e<FS_Stream>(_LOGFMT_("error,ReadArray failed. element name[%s]."), typeid(ObjType).name());
     return 0;
 }
 
-template<typename T>
-inline bool FS_Stream::ReadWithoutOffsetPos(T &n)
+template<typename ObjType>
+inline bool FS_Stream::ReadWithoutOffsetPos(ObjType &n)
 {
     return Read(n, false);
 }
@@ -221,16 +221,16 @@ inline bool FS_Stream::ReadString(FS_String &str)
 
 #pragma region Write
 
-template<typename T>
-inline bool FS_Stream::Write(const T &n)
+template<typename ObjType>
+inline bool FS_Stream::Write(const ObjType &n)
 {
     // 计算要写入数据的字节长度
-    Int32 len = static_cast<Int32>(sizeof(T));
+    Int32 len = static_cast<Int32>(sizeof(ObjType));
 
     bool canWrite = CanWrite(len);
     if(!canWrite && !_isPoolCreate)
     {// 不能写入且不是内存池创建的缓冲区
-        g_Log->e<FS_Stream>(_LOGFMT_("Write failed. obj name[%s]"), typeid(T).name());
+        g_Log->e<FS_Stream>(_LOGFMT_("Write failed. obj name[%s]"), typeid(ObjType).name());
         return false;
     }
     else if(!canWrite)
@@ -249,17 +249,17 @@ inline bool FS_Stream::Write(const T &n)
     return true;
 }
 
-template<typename T>
-inline bool FS_Stream::WriteArray(T *data, UInt32 len)
+template<typename ObjType>
+inline bool FS_Stream::WriteArray(ObjType *data, UInt32 len)
 {
     // 计算要写入数组的字节长度
-    auto bytes = sizeof(T)*len;
+    auto bytes = sizeof(ObjType)*len;
 
     // 判断能不能写入
     bool canWrite = CanWrite(static_cast<Int32>(bytes + sizeof(UInt32)));
     if(!canWrite && !_isPoolCreate)
     {// 不能写入且不是内存池创建的缓冲区
-        g_Log->e<FS_Stream>(_LOGFMT_("WriteArray failed. obj name[%s]"), typeid(T).name());
+        g_Log->e<FS_Stream>(_LOGFMT_("WriteArray failed. obj name[%s]"), typeid(ObjType).name());
         return false;
     }
     else if(!canWrite)

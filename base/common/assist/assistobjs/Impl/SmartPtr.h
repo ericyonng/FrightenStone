@@ -45,46 +45,46 @@
 FS_NAMESPACE_BEGIN
 
 // ÖÇÄÜ¶ÔÏó
-template<typename T, AssistObjsDefs::DelMethods delMethod = AssistObjsDefs::Delete>
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod = AssistObjsDefs::Delete>
 class SmartPtr
 {
     #pragma region constructor
-    SmartPtr(const SmartPtr<T, delMethod> &obj) = delete;
-    SmartPtr<T, delMethod> &operator =(const SmartPtr<T, delMethod> &ptr) = delete;
+    SmartPtr(const SmartPtr<ObjType, delMethod> &obj) = delete;
+    SmartPtr<ObjType, delMethod> &operator =(const SmartPtr<ObjType, delMethod> &ptr) = delete;
 public:
     SmartPtr();
-    SmartPtr(T *ptr);
-    SmartPtr(SmartPtr<T, delMethod> &&obj);
+    SmartPtr(ObjType *ptr);
+    SmartPtr(SmartPtr<ObjType, delMethod> &&obj);
     virtual ~SmartPtr();
-    T *pop();
+    ObjType *pop();
     void Release();
     #pragma endregion
 
     #pragma region operations
 public:
-    SmartPtr<T, delMethod> &operator =(T *ptr);
-    SmartPtr<T, delMethod> &operator =(SmartPtr<T, delMethod> &&ptr) noexcept;
+    SmartPtr<ObjType, delMethod> &operator =(ObjType *ptr);
+    SmartPtr<ObjType, delMethod> &operator =(SmartPtr<ObjType, delMethod> &&ptr) noexcept;
     operator void *();
     operator const void *() const;
 
-    operator T *();
-    operator const T *() const;
+    operator ObjType *();
+    operator const ObjType *() const;
     // operator SmartPtr<T, delMethod> &();
-    T *operator->();
-    const T *operator->() const;
+    ObjType *operator->();
+    const ObjType *operator->() const;
 
-    T& operator [](int index);    // no out-range detect
-    const T& operator [](int index) const;    // no out-range detect
-    T& operator *();
-    const T& operator *() const;
+    ObjType& operator [](int index);    // no out-range detect
+    const ObjType& operator [](int index) const;    // no out-range detect
+    ObjType& operator *();
+    const ObjType& operator *() const;
 
     explicit operator bool();
     #pragma endregion
 
     #pragma region member
 protected:
-    T *_ptr;
-    AutoDelObj<T, delMethod> _delObj;
+    ObjType *_ptr;
+    AutoDelObj<ObjType, delMethod> _delObj;
     #pragma endregion
 };
 
