@@ -45,6 +45,7 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT FS_Timer
 {
 public:
+    // 默认使用的时间轮盘对象是g_TimeWheel
     FS_Timer(TimeWheel *timeWheel = NULL);
     virtual ~FS_Timer();
 
