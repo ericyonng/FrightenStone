@@ -77,4 +77,16 @@
 //     bool operator(const FS_Client *l, const FS_Client *r) const;
 // };
 
+// 网络模型定义
+class NetModuleType
+{
+public:
+    enum
+    {
+        None = 0,
+        Iocp,
+        Epoll,
+    };
+};
+
 #endif
