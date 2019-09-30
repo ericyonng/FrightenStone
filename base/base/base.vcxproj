@@ -337,6 +337,8 @@
     <ClInclude Include="..\common\net\Defs\PacketQueueNode.h" />
     <ClInclude Include="..\common\net\Defs\Sender.h" />
     <ClInclude Include="..\common\net\Defs\SenderImpl.h" />
+    <ClInclude Include="..\common\net\Impl\FS_Addr.h" />
+    <ClInclude Include="..\common\net\Impl\FS_AddrImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_Client.h" />
     <ClInclude Include="..\common\net\Impl\FS_ClientImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_Iocp.h" />
@@ -351,9 +353,13 @@
     <ClInclude Include="..\common\net\Impl\FS_MsgWriteStreamImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_Server.h" />
     <ClInclude Include="..\common\net\Impl\FS_ServerImpl.h" />
+    <ClInclude Include="..\common\net\Impl\FS_SessionMgr.h" />
+    <ClInclude Include="..\common\net\Impl\FS_SessionMgrImpl.h" />
     <ClInclude Include="..\common\net\Impl\FS_TcpServer.h" />
     <ClInclude Include="..\common\net\Impl\FS_TcpServerImpl.h" />
     <ClInclude Include="..\common\net\Impl\Iocp\Example.h" />
+    <ClInclude Include="..\common\net\Impl\FS_Session.h" />
+    <ClInclude Include="..\common\net\Impl\FS_SessionImpl.h" />
     <ClInclude Include="..\common\net\Interface\INetEvent.h" />
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\protocol\defs\ProtocolDefs.h" />
@@ -444,6 +450,7 @@
     <ClCompile Include="..\common\net\Defs\IocpDefs.cpp" />
     <ClCompile Include="..\common\net\Defs\PacketQueueNode.cpp" />
     <ClCompile Include="..\common\net\Defs\Sender.cpp" />
+    <ClCompile Include="..\common\net\Impl\FS_Addr.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Client.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Iocp.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_IocpMsgTransferServer.cpp" />
@@ -451,8 +458,10 @@
     <ClCompile Include="..\common\net\Impl\FS_MsgReadStream.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_MsgWriteStream.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Server.cpp" />
+    <ClCompile Include="..\common\net\Impl\FS_SessionMgr.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_TcpServer.cpp" />
     <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp" />
+    <ClCompile Include="..\common\net\Impl\FS_Session.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
     <ClCompile Include="..\common\objpool\Defs\ObjPoolDefs.cpp" />
     <ClCompile Include="..\common\objpool\Impl\ObjPoolHelper.cpp" />
