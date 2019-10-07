@@ -21,16 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_SessionMgr.h
+ * @file  : FS_ServerCore.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2019/10/07
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_SessionMgr_H__
-#define __Base_Common_Net_Impl_FS_SessionMgr_H__
+#ifndef __Base_Common_Net_Impl_FS_ServerCore_H__
+#define __Base_Common_Net_Impl_FS_ServerCore_H__
 #pragma once
 
 #include "base/exportbase.h"
@@ -38,27 +38,47 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Session;
+class BASE_EXPORT IFS_ServerConfigMgr;
+class BASE_EXPORT IFS_Connector;
+class BASE_EXPORT IFS_MsgTransfer;
+class BASE_EXPORT IFS_MsgHandler;
+class BASE_EXPORT FS_SessionMgr;
 
-class BASE_EXPORT FS_SessionMgr
+class BASE_EXPORT FS_ServerCore
 {
 public:
-    FS_SessionMgr();
-    ~FS_SessionMgr();
+    FS_ServerCore();
+    virtual ~FS_ServerCore();
 
+    /* 对外接口 */
+    #pragma region api
 public:
-    Int32 Start();
-    void Close();
+    virtual Int32 Start();
+    virtual void Close();
+    #pragma endregion
 
-    void AddNewSession(UInt64 sessionId, FS_Session *session);
-    void EraseSession(UInt64 sessionId);
+    /* 内部方法 */
+    #pragma region inner api
+private:
+    Int32 _ReadConfig();
+    Int32 _CreateNetModules();
+    Int32 _StartModules();
+
+    Int32 _BeforeStart();
+    Int32 _OnStart();
+    Int32 _AfterStart();
+    #pragma endregion
 
 private:
-    std::map<UInt64, FS_Session *> _sessions;
+    IFS_ServerConfigMgr *_serverConfigMgr;
+    IFS_Connector *_connector;
+    IFS_MsgTransfer *_msgTransfer;
+    IFS_MsgHandler *_msgHandler;
+    FS_SessionMgr *_sessiomMgr;
 };
 
 FS_NAMESPACE_END
 
-#include "base/common/net/Impl/FS_SessionMgrImpl.h"
+#include "base/common/net/Impl/FS_ServerCoreImpl.h"
 
 #endif

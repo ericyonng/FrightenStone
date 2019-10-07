@@ -21,16 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_SessionMgr.h
+ * @file  : FS_MsgHandlerFactory.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2019/10/07
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_SessionMgr_H__
-#define __Base_Common_Net_Impl_FS_SessionMgr_H__
+#ifndef __Base_Common_Net_Impl_FS_MsgHandlerFactory_H__
+#define __Base_Common_Net_Impl_FS_MsgHandlerFactory_H__
+
 #pragma once
 
 #include "base/exportbase.h"
@@ -38,27 +39,13 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Session;
+class BASE_EXPORT IFS_MsgHandler;
 
-class BASE_EXPORT FS_SessionMgr
+class BASE_EXPORT FS_MsgHandlerFactory
 {
 public:
-    FS_SessionMgr();
-    ~FS_SessionMgr();
-
-public:
-    Int32 Start();
-    void Close();
-
-    void AddNewSession(UInt64 sessionId, FS_Session *session);
-    void EraseSession(UInt64 sessionId);
-
-private:
-    std::map<UInt64, FS_Session *> _sessions;
+    static IFS_MsgHandler *Create();
 };
 
 FS_NAMESPACE_END
-
-#include "base/common/net/Impl/FS_SessionMgrImpl.h"
-
 #endif
