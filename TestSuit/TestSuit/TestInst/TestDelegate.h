@@ -63,6 +63,12 @@ static void print4(int a, int b)
     std::cout << "print3"<< a << b << std::endl;
 }
 
+static void print5(const int &a, const int &b)
+{
+    std::cout << "print3" << a << b << std::endl;
+}
+
+
 class TestDelegate
 {
 public:
@@ -81,8 +87,10 @@ public:
         auto delegate5 = fs::DelegatePlusFactory::Create(&Test1::print2);
         delegate5->Invoke();
 
-        auto delegate6 = fs::DelegatePlusFactory::Create(&print4);
+        auto delegate6 = fs::DelegatePlusFactory::Create(&print5);
         delegate6->Invoke(1, 10);
+        const int a = 1, b = 10;
+        delegate6->Invoke(a, b);
 
         std::function<void()> func = Test1::print32;
 
@@ -97,6 +105,7 @@ public:
         delegate7->Invoke();
 
         auto delegate8 = fs::DelegatePlusFactory::Create<decltype(__lambda), void, int>(std::forward<decltype(__lambda)>(__lambda));
+        delegate8->Invoke(1);
         delegate8->Invoke(1);
         delegate8 = NULL;
         delegate8->Invoke(1);
