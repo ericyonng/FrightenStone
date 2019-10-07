@@ -149,7 +149,7 @@ void Sender::_OnWork(const FS_ThreadPool *pool)
         {
             clientId = *iterClientId;
             auto iterQueue = _sendingQueue.find(clientId);
-            if(_isClientDestroy->Invoke(DELEGATE_ARGS(clientId)))
+            if(_isClientDestroy->Invoke(clientId))
             {
                 g_Log->w<Sender>(_LOGFMT_("clientId[%llu] is destroyed"), clientId);
                 STLUtil::DelListContainer(iterQueue->second);
@@ -260,7 +260,7 @@ Int32 Sender::_WaitForNetResponse()
 
         const SOCKET clientSocket = _ioEvent->_ioData->_sock;
         // 判断是否断开 已断开的有可能是上次postsend只后1ms内系统没有完成send，同时客户端被移除导致
-        if(_isClientDestroy->Invoke(DELEGATE_ARGS(clientId)))
+        if(_isClientDestroy->Invoke(clientId))
         {
             g_Log->e<Sender>(_LOGFMT_("IO_SEND clientId[%llu] clientSocket[%llu] is destroy")
                                                , clientId, clientSocket);
@@ -269,7 +269,7 @@ Int32 Sender::_WaitForNetResponse()
         }
 
         // 完成回调
-        _ioEvent->_ioData->_completedCallback->Invoke(DELEGATE_ARGS(static_cast<Int32>(_ioEvent->_bytesTrans)));
+        _ioEvent->_ioData->_completedCallback->Invoke(_ioEvent->_bytesTrans);
         auto node = _ioEvent->_ioData->_node;
 
         node->_isPost = false;

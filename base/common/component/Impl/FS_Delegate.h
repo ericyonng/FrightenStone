@@ -38,10 +38,6 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
 
-#ifndef DELEGATE_ARGS
-#define DELEGATE_ARGS(arg)   std::forward<decltype(arg)>(arg)
-#endif
-
 FS_NAMESPACE_BEGIN
 
 // R回调返回值类型，Args回调函数参数包 委托基类 用于解耦具体类型，创建类型无关的委托
@@ -53,8 +49,8 @@ public:
     virtual ~IDelegate();
     // 左值会绑定成左值引用，右值会绑定成右值引用
     // 请注意引用折叠适当使用std::forward可以完美的将参数传入，原来什么类型传入后绑定的就是什么类型
-    virtual Rtn Invoke(Args&&... args) = 0;
-    virtual Rtn Invoke(Args&&... args) const = 0;
+    virtual Rtn Invoke(Args... args) = 0;
+    virtual Rtn Invoke(Args... args) const = 0;
     virtual void Release();
 };
 
@@ -66,8 +62,8 @@ public:
     DelegateClass(ObjType *t, Rtn(ObjType::*f)(Args...) const);
     virtual ~DelegateClass();
 
-    virtual Rtn Invoke(Args&&... args);
-    virtual Rtn Invoke(Args&&... args) const;
+    virtual Rtn Invoke(Args... args);
+    virtual Rtn Invoke(Args... args) const;
 
 private:
     ObjType *_obj;
@@ -82,8 +78,8 @@ public:
     DelegateFunction(Rtn(*f)(Args...));
     virtual ~DelegateFunction();
 
-    virtual Rtn Invoke(Args&&... args);
-    virtual Rtn Invoke(Args&&... args) const;
+    virtual Rtn Invoke(Args... args);
+    virtual Rtn Invoke(Args... args) const;
 
 private:
     Rtn(*_f)(Args...);
@@ -98,8 +94,8 @@ public:
     DelegateCustomFunc(CustomFuncType const&customFunc);
     virtual ~DelegateCustomFunc();
 
-    virtual Rtn Invoke(Args&&...);
-    virtual Rtn Invoke(Args&&... args) const;
+    virtual Rtn Invoke(Args... args);
+    virtual Rtn Invoke(Args... args) const;
 
 private:
     CustomFuncType _customFun;

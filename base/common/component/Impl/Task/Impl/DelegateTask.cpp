@@ -39,7 +39,7 @@ FS_NAMESPACE_BEGIN
 
 Int32 DelegateTask::Run()
 {
-    _callback->Invoke(DELEGATE_ARGS(_pool));
+    _callback->Invoke(_pool);
     return StatusDefs::Success;
 }
 

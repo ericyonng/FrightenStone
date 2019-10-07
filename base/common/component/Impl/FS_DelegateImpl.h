@@ -76,13 +76,13 @@ inline DelegateClass<ObjType, Rtn, Args...>::~DelegateClass()
 }
 
 template <typename ObjType, typename Rtn, typename... Args>
-inline Rtn DelegateClass<ObjType, Rtn, Args...>::Invoke(Args&&... args)
+inline Rtn DelegateClass<ObjType, Rtn, Args...>::Invoke(Args... args)
 {
     return (_obj->*_f)(std::forward<Args>(args)...);
 }
 
 template <typename ObjType, typename Rtn, typename... Args>
-inline Rtn DelegateClass<ObjType, Rtn, Args...>::Invoke(Args&&... args) const
+inline Rtn DelegateClass<ObjType, Rtn, Args...>::Invoke(Args... args) const
 {
     return (_obj->*_f)(std::forward<Args>(args)...);
 }
@@ -99,13 +99,13 @@ inline DelegateFunction<Rtn, Args...>::~DelegateFunction()
 }
 
 template <typename Rtn, typename... Args>
-inline Rtn DelegateFunction<Rtn, Args...>::Invoke(Args&&... args)
+inline Rtn DelegateFunction<Rtn, Args...>::Invoke(Args... args)
 {
     return (*_f)(std::forward<Args>(args)...);
 }
 
 template <typename Rtn, typename... Args>
-inline Rtn DelegateFunction<Rtn, Args...>::Invoke(Args&&... args) const
+inline Rtn DelegateFunction<Rtn, Args...>::Invoke(Args... args) const
 {
     return (*_f)(std::forward<Args>(args)...);
 }
@@ -130,13 +130,13 @@ inline DelegateCustomFunc<CustomFuncType, Rtn, Args...>::~DelegateCustomFunc()
 }
 
 template <typename CustomFuncType, typename Rtn, typename... Args>
-inline Rtn DelegateCustomFunc<CustomFuncType, Rtn, Args...>::Invoke(Args&&... args)
+inline Rtn DelegateCustomFunc<CustomFuncType, Rtn, Args...>::Invoke(Args... args)
 {
     return _customFun(std::forward<Args>(args)...);
 }
 
 template <typename CustomFuncType, typename Rtn, typename... Args>
-inline Rtn DelegateCustomFunc<CustomFuncType, Rtn, Args...>::Invoke(Args&&... args) const
+inline Rtn DelegateCustomFunc<CustomFuncType, Rtn, Args...>::Invoke(Args... args) const
 {
     return _customFun(std::forward<Args>(args)...);
 }

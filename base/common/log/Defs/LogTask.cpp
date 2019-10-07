@@ -59,12 +59,12 @@ Int32 LogTask::Run()
         // 结束任务判断
         if(_pool->IsClearingPool())
         {
-            _taskDelegate->Invoke(std::forward<Int32>(_logFileIndex));
+            _taskDelegate->Invoke(_logFileIndex);
             break;
         }
 
         // 写日志
-        _taskDelegate->Invoke(std::forward<Int32>(_logFileIndex));
+        _taskDelegate->Invoke(_logFileIndex);
 
         // 休息一会儿
         Sleep(_workIntervalMsTime);
