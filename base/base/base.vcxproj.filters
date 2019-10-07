@@ -945,6 +945,57 @@
     <ClInclude Include="..\common\net\Impl\FS_AddrImpl.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_ServerCore.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_ServerCoreImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_ServerConfigMgr.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_ServerConfigMgrFactory.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_ConnectorFactory.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_Connector.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_ConnectorImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpConnector.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_MsgTransfer.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_MsgTransferImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_MsgTransferFactory.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpMsgTransfer.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpMsgTransferImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_MsgHandler.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpMsgHandler.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpMsgHandlerImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_MsgHandlerFactory.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1203,6 +1254,42 @@
       <Filter>common\net\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\net\Impl\FS_Addr.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_ServerCore.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\IFS_ServerConfigMgr.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_ServerConfigMgrFactory.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_ConnectorFactory.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\IFS_Connector.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_IocpConnector.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\IFS_MsgTransfer.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_MsgTransferFactory.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_IocpMsgTransfer.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\IFS_MsgHandler.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_IocpMsgHandler.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_MsgHandlerFactory.cpp">
       <Filter>common\net\Impl</Filter>
     </ClCompile>
   </ItemGroup>

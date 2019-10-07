@@ -31,3 +31,40 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
+#include "base/common/net/Impl/FS_Session.h"
+
+#include "base/common/status/status.h"
+
+FS_NAMESPACE_BEGIN
+
+FS_SessionMgr::FS_SessionMgr()
+{
+
+}
+
+FS_SessionMgr::~FS_SessionMgr()
+{
+
+}
+
+Int32 FS_SessionMgr::Start()
+{
+    return StatusDefs::Success;
+}
+
+void FS_SessionMgr::Close()
+{
+
+}
+
+void FS_SessionMgr::AddNewSession(UInt64 sessionId, FS_Session *session)
+{
+
+}
+
+void FS_SessionMgr::EraseSession(UInt64 sessionId)
+{
+
+}
+
+FS_NAMESPACE_END
