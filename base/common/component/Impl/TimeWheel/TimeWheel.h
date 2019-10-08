@@ -54,6 +54,8 @@ public:
     // 转动时间轮盘
     void RotateWheel();
 
+    // 是否注册
+    bool IsRegister(TimeData *timeData) const;
     // 注册超时数据
     Int32 Register(TimeData *timeData);
     // 取消注册
@@ -80,6 +82,7 @@ private:
     Time _curTime;                  // 当前时间戳
     std::set<TimeData *, TimeDataLess> _timeDatas;
     std::vector<AsynTimeData *> _asynData;          // 异步执行
+    std::map<TimeData *, Int32> _asynRegisterFlag;  // 为异步建立索引,value:register+1,unrigister-1,
 
     Int64 _increaseId;              // 递增id
 };

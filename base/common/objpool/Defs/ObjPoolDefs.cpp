@@ -7,13 +7,14 @@ FS_NAMESPACE_BEGIN
 
 const Int32 ObjPoolDefs::__g_FreeRate = 50;           // 释放内存时判断内存块利用率低于__g_BusyThresholdValue百分数时转为可用区内存
 
-void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_t totalObjBlocks, size_t objBlockSize, size_t bytesOccupied, size_t memObjInUsingCnt, size_t memInUsingBytes)
+void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_t totalObjBlocks, size_t objBlockSize, size_t bytesOccupied, size_t memObjInUsingCnt, size_t memInUsingBytes, const char *extStr)
 {
     if(memInUsingBytes)
     {// 内存泄漏打印内存泄漏
-        g_Log->objpool("obj name[%s], pool node cnt[%llu] totalObjBlockCnt[%llu] objBlockSize[%llu] pool memory bytes occupiedBytes[%llu]"
+        g_Log->objpool("obj name[%s], extStr[%s] pool node cnt[%llu] totalObjBlockCnt[%llu] objBlockSize[%llu] pool memory bytes occupiedBytes[%llu]"
                        " memObjInUsingCnt[%llu] memInUsingBytes[%llu]"
                        , objName
+                       , extStr
                        , nodeCnt
                        , totalObjBlocks
                        , objBlockSize
@@ -23,15 +24,16 @@ void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_
     }
     
     // 打印内存占用信息
-    g_Log->objpool("[objpool memory info]: obj name[%s], pool node cnt[%llu] totalObjBlockCnt[%llu] objBlockSize[%llu] pool memory bytes occupiedBytes[%llu]"
+    g_Log->objpool("[objpool memory info]: obj name[%s], extStr[%s], pool node cnt[%llu] totalObjBlockCnt[%llu] objBlockSize[%llu] pool memory bytes occupiedBytes[%llu]"
                , objName
+               , extStr
                , nodeCnt
                , totalObjBlocks
                , objBlockSize
                , bytesOccupied);
 }
 
-void ObjPoolMethods::RegisterToMemleakMonitor(const char *objName, IDelegate<size_t, Int64 &> *callback)
+void ObjPoolMethods::RegisterToMemleakMonitor(const char *objName, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback)
 {
     // TODO
     if(!g_MemleakMonitor)

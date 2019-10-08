@@ -39,11 +39,25 @@ FS_NAMESPACE_BEGIN
 
 bool TimeDataLess::operator ()(const TimeData *l, const TimeData *r) const
 {
+    if(!l || !r)
+        return l < r;
+
     if(l == r)
         return l < r;
 
     if(l->_expiredTime == r->_expiredTime)
+    {
+        if(l->_timeWheelUniqueId == 0 || r->_timeWheelUniqueId == 0)
+            return l < r;
+
+        if(l->_timeWheelUniqueId == r->_timeWheelUniqueId)
+            return l < r;
+
         return l->_timeWheelUniqueId < r->_timeWheelUniqueId;
+    }
+
+    if(l->_expiredTime == 0 || r->_expiredTime == 0)
+        return l < r;
 
     return l->_expiredTime < r->_expiredTime;
 }

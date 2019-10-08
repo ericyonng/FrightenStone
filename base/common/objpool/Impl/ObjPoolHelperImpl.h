@@ -54,7 +54,11 @@ inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
     _locker.Lock();
 #endif
 
-    Fs_SafeFree(_alloctor);
+//     Int64 poolOccupiedBytes = 0;
+//     Int64 objInUsed = 0;
+//     const char *extStr = "ObjPoolHelper will destruct";
+//     PrintObjPool(poolOccupiedBytes, objInUsed, extStr);
+    // Fs_SafeFree(_alloctor);
 
 #if __FS_THREAD_SAFE__
     _locker.Unlock();
@@ -86,8 +90,9 @@ inline size_t ObjPoolHelper<ObjType>::GetPoolBytesOccupied() const
 }
 
 template<typename ObjType>
-inline size_t ObjPoolHelper<ObjType>::PrintObjPool(Int64 &poolOccupiedBytes)
+inline size_t ObjPoolHelper<ObjType>::PrintObjPool(Int64 &poolOccupiedBytes, Int64 &objInUsed, const char *extStr)
 {
+    objInUsed = _alloctor->GetObjInUse();
     auto memInUsingBytes = _alloctor->GetObjInUse()*IObjAlloctor<ObjType>::_objBlockSize;
     poolOccupiedBytes = _alloctor->GetBytesOccupied();
     ObjPoolMethods::PrintObjPoolInfo(typeid(ObjType).name()
@@ -96,7 +101,8 @@ inline size_t ObjPoolHelper<ObjType>::PrintObjPool(Int64 &poolOccupiedBytes)
                                      , _alloctor->GetObjBlockSize()
                                      , _alloctor->GetBytesOccupied()
                                      , _alloctor->GetObjInUse()
-                                     , memInUsingBytes);
+                                     , memInUsingBytes
+                                     , extStr);
 
     return memInUsingBytes;
 }

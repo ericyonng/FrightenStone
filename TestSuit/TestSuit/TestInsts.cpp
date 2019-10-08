@@ -62,6 +62,15 @@
 
 void TestInsts::Run()
 {
-    TestTimeWheel::Run();
+    auto __testWeel = [](const fs::FS_ThreadPool *pool)->void
+    {
+        TestTimeWheel::Run(pool);
+    };
+
+    auto deleg = fs::DelegatePlusFactory::Create<decltype(__testWeel), void, const fs::FS_ThreadPool *>(__testWeel);
+    fs::FS_ThreadPool * pool = new fs::FS_ThreadPool(0, 1);
+    pool->AddTask(deleg);
+    getchar();
+    pool->Clear();
     // TestJson::Run();
 }

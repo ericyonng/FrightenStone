@@ -45,6 +45,11 @@ inline Int32 FS_Timer::Schedule(Int64 milliSecPeriod)
     return Schedule(Time::Now(), milliSecPeriod);
 }
 
+inline bool FS_Timer::IsScheduling() const
+{
+    return _timeWheel->IsRegister(_timeData);
+}
+
 template<typename ObjType>
 inline void FS_Timer::SetTimeOutHandler(ObjType *objType, void (ObjType::*handler)(FS_Timer *, const Time &, const Time &))
 {

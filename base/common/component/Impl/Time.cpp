@@ -69,11 +69,15 @@ Time::Time()
     :_rawTime(0)
     ,_gmtTimeStruct{0}
     ,_localTimeStruct{0}
+    , _cache(NULL)
+    , _cache2(NULL)
 {
 
 }
 
 Time::Time(const Time &other)
+    :_cache(NULL)
+    ,_cache2(NULL)
 {
     _rawTime = other._rawTime;
     _gmtTimeStruct = other._gmtTimeStruct;

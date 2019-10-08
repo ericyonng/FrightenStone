@@ -52,7 +52,7 @@ public:
     static MemleakMonitor *GetInstance();
     void Start();
 
-    void RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &> *callback);
+    void RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback);
     void UnRegisterObjPool(const char *name);
     void RegisterMemPoolPrintCallback(const IDelegate<void> *callback);
     void UnRegisterMemPoolPrintCallback();
@@ -71,7 +71,7 @@ private:
 
 private:
     static Locker _locker;
-    std::map<FS_String, std::vector<IDelegate<size_t, Int64 &> *> *> _objNameRefPrintCallback;
+    std::map<FS_String, std::vector<IDelegate<size_t, Int64 &, Int64 &, const char *> *> *> _objNameRefPrintCallback;
     const IDelegate<void> *_memPoolPrintCallback;
 
     FS_ThreadPool *_printInfoPool;
