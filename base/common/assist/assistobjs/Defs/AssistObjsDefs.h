@@ -47,6 +47,7 @@
 // inner use
 
 #endif
+FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT AssistObjsDefs
 {
@@ -59,8 +60,6 @@ public:
         NoDel,
     };
 };
-
-FS_NAMESPACE_BEGIN
 
 // auto free obj
 template<typename Type, AssistObjsDefs::DelMethods del>

@@ -47,7 +47,7 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename ObjType>
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod = AssistObjsDefs::Delete>
 class Singleton
 {
 public:
@@ -63,7 +63,7 @@ private:
     Singleton& operator = (const Singleton<ObjType>&) = delete;
 
 private:
-    static SmartPtr<ObjType> _pObj;
+    static SmartPtr<ObjType, delMethod> _pObj;
     static Locker          _locker;
 };
 
