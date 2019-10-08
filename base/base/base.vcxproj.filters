@@ -996,6 +996,9 @@
     <ClInclude Include="..\common\net\Impl\FS_MsgHandlerFactory.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Defs\FS_SessionInfo.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1291,6 +1294,9 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Impl\FS_MsgHandlerFactory.cpp">
       <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Defs\FS_SessionInfo.cpp">
+      <Filter>common\net\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

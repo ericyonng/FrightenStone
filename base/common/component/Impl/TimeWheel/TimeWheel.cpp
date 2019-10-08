@@ -46,6 +46,7 @@ TimeWheel::TimeWheel(const TimeSlice &resolutionSlice)
     :_resolutionSlice(resolutionSlice)
     ,_increaseId(0)
     ,_curTime(Time::Now())
+    ,_rotating(0)
 {
 
 }
@@ -56,6 +57,8 @@ TimeWheel::~TimeWheel()
 
 void TimeWheel::RotateWheel()
 {
+    _BeforeRotateWheel();
+
     // 更新时间
     if(UNLIKELY(_curTime == 0))
     {
@@ -82,7 +85,8 @@ void TimeWheel::RotateWheel()
 
         // 执行超时delegate
         timeData->_isRotatingWheel = true;
-        timeData->_timer->OnTimeOut(_curTime);
+        if(!timeData->_isCancel)// 本轮循环中若被cancel掉也不会执行timeout
+            timeData->_timer->OnTimeOut(_curTime);
         timeData->_isRotatingWheel = false;
 
         // 重新加入
@@ -100,12 +104,17 @@ void TimeWheel::RotateWheel()
         timeData->_expiredTime.FlushTime(timeData->_expiredTime.GetMicroTimestamp() + timeData->_period.GetTotalMicroSeconds());
         _timeDatas.insert(timeData);
     }
+
+    _AfterRotateWheel();
 }
 
 Int32 TimeWheel::Register(TimeData *timeData)
 {
-    if(timeData->_isRotatingWheel)
+    if(timeData->_isRotatingWheel||_IsRotating())
+    {
+        _NewAsynTimeData(AsynOpType::Op_Register, timeData);
         return StatusDefs::TimeWheel_CantRegisterWhenRotatingWheel;
+    }
 
     const auto expiredTime = timeData->_expiredTime.GetMicroTimestamp();
     if(UNLIKELY(!expiredTime))
@@ -123,4 +132,26 @@ Int32 TimeWheel::Register(TimeData *timeData)
     return StatusDefs::Success;
 }
 
+void TimeWheel::_AfterRotateWheel()
+{
+    if(--_rotating <= 0)
+    {
+        _rotating = 0;
+        for(auto &asynData : _asynData)
+        {
+            if(asynData->_opType == AsynOpType::Op_Register)
+            {
+                Register(asynData->_timeData);
+            }
+            else if(asynData->_opType == AsynOpType::Op_UnRegister)
+            {
+                UnRegister(asynData->_timeData);
+            }
+        }
+
+        STLUtil::DelVectorContainer(_asynData);
+    }
+}
+
 FS_NAMESPACE_END
+

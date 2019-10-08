@@ -21,60 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TestTrigger.h
+ * @file  : FS_SessionInfo.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/10/8
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Test_TestTrigger_H__
-#define __Test_TestTrigger_H__
-
-#pragma once
 #include "stdafx.h"
+#include "base/common/net/Defs/FS_SessionInfo.h"
+#include "base/common/net/Impl/FS_Addr.h"
 
-class TestTriggerDefs
+#include "base/common/socket/socket.h"
+
+OBJ_POOL_CREATE_DEF_IMPL(fs::FS_SessionInfo, __DEF_OBJ_POOL_OBJ_NUM__)
+
+FS_NAMESPACE_BEGIN
+
+FS_SessionInfo::FS_SessionInfo()
+    :_sock(INVALID_SOCKET)
+    ,_addr(new FS_Addr)
 {
-public:
-    enum
-    {
-        Begin = 0,
-        Test,
-        End,
-    };
 
-    enum
-    {
-        TestTrigger = 0,
-    };
-    static bool CanInterrupt(Int32 occasion);
-};
-
-bool TestTriggerDefs::CanInterrupt(Int32 occasion)
-{
-    if(occasion > Begin && occasion < End)
-        return true;
-
-    return false;
 }
 
-class TestTrigger
+FS_SessionInfo::~FS_SessionInfo()
 {
-public:
-    static void Run()
-    {
-        fs::Trigger trigger(fs::DelegatePlusFactory::Create(&TestTriggerDefs::CanInterrupt));
-        auto __testTriggerFunc = [](fs::TriggerExecuteBody *thisExecBody) ->Int32
-        {
-            std::cout << "hello trigger" << std::endl;
-            return StatusDefs::Success;
-        };
-        auto testTriggerFunc = fs::DelegatePlusFactory::Create<decltype(__testTriggerFunc), Int32, fs::TriggerExecuteBody *>(__testTriggerFunc);
-        trigger.Reg(TestTriggerDefs::Test, TestTriggerDefs::TestTrigger, *testTriggerFunc);
-        trigger.Exec(TestTriggerDefs::Test);
-        Fs_SafeFree(testTriggerFunc);
-    }
-};
-#endif
+    if(_sock != INVALID_SOCKET)
+        SocketUtil::DestroySocket(_sock);
+
+    _sock = INVALID_SOCKET;
+}
+
+FS_NAMESPACE_END

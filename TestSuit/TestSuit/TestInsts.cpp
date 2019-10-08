@@ -62,6 +62,6 @@
 
 void TestInsts::Run()
 {
-    TestServer::Run();
+    TestTimeWheel::Run();
     // TestJson::Run();
 }

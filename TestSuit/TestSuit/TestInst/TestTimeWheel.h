@@ -56,8 +56,22 @@ static void TimeOut(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs
     std::cout << "static test TimeOut : timer:" << timer->ToString() << std::endl;
 }
 
+static void TimeOut4(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
+{
+    std::cout << "static test TimeOut4:" << std::endl;
+
+    std::cout << "static test TimeOut4 : curTime:" << curTime.ToString() << std::endl;
+    std::cout << "static test TimeOut4 : timer:" << timer->ToString() << std::endl;
+    static Int32 cnt = 5;
+    if(--cnt <= 0)
+        timer->Cancel();
+}
+
 static void TimeOut2(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
 {
+    fs::FS_Timer *timer4 = new fs::FS_Timer;
+    timer4->SetTimeOutHandler(&TimeOut4);
+    timer4->Schedule(2000);
     std::cout << "static test TimeOut2:" << std::endl;
 
     std::cout << "static test TimeOut2 : curTime:" << curTime.ToString() << std::endl;
@@ -66,6 +80,7 @@ static void TimeOut2(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const f
     if(--cnt <= 0)
         timer->Cancel();
 }
+
 
 static void Cancel(fs::FS_Timer *timer)
 {

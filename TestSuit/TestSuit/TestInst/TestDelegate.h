@@ -96,7 +96,7 @@ public:
 
         auto __lambda = [&test1](int i)->void
         {
-            std::cout << "this is lambda" << std::endl;
+            std::cout << "this is lambda" << "i:" << i << std::endl;
             return test1.print();
         };
 
@@ -109,6 +109,10 @@ public:
         delegate8->Invoke(1);
         delegate8 = NULL;
         delegate8->Invoke(1);
+
+        // 创建委托副本
+        auto delegate9 = delegate8->CreateNewCopy();
+        delegate9->Invoke(9);
     }
 };
 
