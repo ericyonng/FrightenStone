@@ -71,12 +71,12 @@ void MemleakMonitor::Start()
     _printInfoPool->AddTask(DelegatePlusFactory::Create(this, &MemleakMonitor::_PrintInfoPerSeconds));
 }
 
-void MemleakMonitor::RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &> *callback)
+void MemleakMonitor::RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback)
 {
     _locker.Lock();
     auto iterCallbacks = _objNameRefPrintCallback.find(name);
     if(iterCallbacks == _objNameRefPrintCallback.end())
-        iterCallbacks = _objNameRefPrintCallback.insert(std::make_pair(name, new std::vector<IDelegate<size_t, Int64 &> *>)).first;
+        iterCallbacks = _objNameRefPrintCallback.insert(std::make_pair(name, new std::vector<IDelegate<size_t, Int64 &, Int64 &, const char *> *>)).first;
     iterCallbacks->second->push_back(callback);
     _locker.Unlock();
 }
@@ -117,19 +117,23 @@ void MemleakMonitor::PrintObjPoolInfo() const
 {
     size_t totalPoolInUsedBytes = 0;
     Int64 totalOccupiedBytes = 0;
+    Int64 totalObjInUsedCnt = 0;
+    const char *extStr = "";
     for(auto &iterCallbacks : _objNameRefPrintCallback)
     {
         for(auto &callback : *iterCallbacks.second)
         {
             Int64 curOccupied = 0;
-            totalPoolInUsedBytes += callback->Invoke(curOccupied);
+            Int64 objInUsed = 0;
+            totalPoolInUsedBytes += callback->Invoke(curOccupied, objInUsed, extStr);
             totalOccupiedBytes += curOccupied;
+            totalObjInUsedCnt += objInUsed;
         }
     }
 
     // 打印内存泄漏
-    g_Log->objpool("objpool: total total pool in used bytes[%llu] total pool occupied bytes[%lld]"
-                   , totalPoolInUsedBytes, totalOccupiedBytes);
+    g_Log->objpool("objpool: total total pool in used bytes[%llu] totalObjInUsedCnt[%lld] total pool occupied bytes[%lld]"
+                   , totalPoolInUsedBytes, totalObjInUsedCnt, totalOccupiedBytes);
     g_Log->objpool("=========================================================");
 
     // 打印系统信息
@@ -141,20 +145,24 @@ void MemleakMonitor::PrintObjPoolInfo(const char *objName) const
 {
     size_t totalPoolInUsedBytes = 0;
     Int64 totalOccupiedBytes = 0;
+    Int64 totalObjInUsedCnt = 0;
     auto iterCallBacks = _objNameRefPrintCallback.find(objName);
     if(iterCallBacks == _objNameRefPrintCallback.end())
         return;
 
+    const char *extStr = "";
     for(auto &callback : *iterCallBacks->second)
     {
         Int64 curOccupied = 0;
-        totalPoolInUsedBytes += callback->Invoke(curOccupied);
+        Int64 objInUsed = 0;
+        totalPoolInUsedBytes += callback->Invoke(curOccupied, objInUsed, extStr);
         totalOccupiedBytes += curOccupied;
+        totalObjInUsedCnt += objInUsed;
     }
 
     // 打印内存泄漏
-    g_Log->objpool("objpool objname[%s]:  total total pool in used bytes[%llu] total pool occupied bytes[%lld]"
-                   ,objName, totalPoolInUsedBytes, totalOccupiedBytes);
+    g_Log->objpool("objpool objname[%s]:  total total pool in used bytes[%llu] totalObjInUsedCnt[%lld] total pool occupied bytes[%lld]"
+                   ,objName, totalPoolInUsedBytes, totalObjInUsedCnt, totalOccupiedBytes);
 
     // 打印系统信息
 //     g_Log->sys<MemleakMonitor>(_LOGFMT_("objpool objname[%s]:  total total pool in used bytes[%llu] total pool occupied bytes[%lld]")

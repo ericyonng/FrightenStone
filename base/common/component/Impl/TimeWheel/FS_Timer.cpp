@@ -64,6 +64,8 @@ void FS_Timer::Cancel()
     {
         _cancelTimerDelegate->Invoke(this);
     }
+
+    _timeWheel->UnRegister(_timeData);
 }
 
 Int32 FS_Timer::Schedule(const Time &startTime, Int64 milliSecPeriod)

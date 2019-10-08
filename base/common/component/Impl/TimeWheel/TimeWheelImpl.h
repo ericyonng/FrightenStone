@@ -34,6 +34,18 @@
 
 FS_NAMESPACE_BEGIN
 
+inline bool TimeWheel::IsRegister(TimeData *timeData) const
+{
+    auto iterFlag = _asynRegisterFlag.find(timeData);
+    if(iterFlag == _asynRegisterFlag.end())
+        return _timeDatas.find(timeData) != _timeDatas.end();
+
+    if(iterFlag->second)
+        return true;
+
+    return 0;
+}
+
 inline void TimeWheel::UnRegister(TimeData *timeData)
 {
     if(UNLIKELY(timeData->_isRotatingWheel||_IsRotating()))
@@ -94,6 +106,17 @@ inline AsynTimeData *TimeWheel::_NewAsynTimeData(Int32 opType, TimeData *timeDat
     newData->_opType = opType;
     newData->_timeData = timeData;
     _asynData.push_back(newData);
+
+    auto iterFlag = _asynRegisterFlag.find(timeData);
+    if(iterFlag == _asynRegisterFlag.end())
+        iterFlag = _asynRegisterFlag.insert(std::make_pair(timeData, 0)).first;
+
+    if(opType == AsynOpType::Op_Register){
+        iterFlag->second = 1;
+    }else{
+        iterFlag->second = 0;
+    }
+
     return newData;
 }
 

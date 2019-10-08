@@ -57,6 +57,7 @@ public:
     // 以当前时间为基准，设置超时周期
     Int32 Schedule(Int64 milliSecPeriod);
     Int32 Schedule(const Time &startTime, Int64 milliSecPeriod);
+    bool IsScheduling() const;
 
     // 设置超时执行函数
     template<typename ObjType>

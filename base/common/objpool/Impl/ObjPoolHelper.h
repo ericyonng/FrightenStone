@@ -56,7 +56,7 @@ public:
     const char *GetObjName() const;
     size_t GetMemleakBytes() const;
     size_t GetPoolBytesOccupied() const;
-    size_t PrintObjPool(Int64 &poolOccupiedBytes);
+    size_t PrintObjPool(Int64 &poolOccupiedBytes, Int64 &objInUsed, const char *extStr);
 
     // 分配器行为接口
     IObjAlloctor<ObjType> *operator->();
@@ -76,46 +76,46 @@ FS_NAMESPACE_END
 #undef  OBJ_POOL_CREATE
 #define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                                       \
 public:                                                                                                 \
-        void  *operator new(size_t bytes)       { return _objpool_helper._alloctor->Alloc();}           \
-        void   operator delete(void *ptr)       { _objpool_helper._alloctor->Free(ptr);}                \
+        void  *operator new(size_t bytes)       { return _objpool_helper->_alloctor->Alloc();}           \
+        void   operator delete(void *ptr)       { _objpool_helper->_alloctor->Free(ptr);}                \
         static size_t GetMemleakNum();                                                                  \
                                                                                                         \
         template<typename... Args>                                                                      \
         static ObjType *New(Args &&... args)                                                            \
         {                                                                                               \
-            return _objpool_helper->New(std::forward<Args>(args)...);                                   \
+            return _objpool_helper->_alloctor->New(std::forward<Args>(args)...);                                   \
         }                                                                                               \
                                                                                                         \
         static ObjType *NewWithoutConstruct()                                                           \
         {                                                                                               \
-            return _objpool_helper->NewWithoutConstruct();                                              \
+            return _objpool_helper->_alloctor->NewWithoutConstruct();                                              \
         }                                                                                               \
                                                                                                         \
         template<typename... Args>                                                                      \
         static ObjType *NewByPtr(void *ptr, Args &&... args)                                            \
         {                                                                                               \
-            return _objpool_helper->NewByPtr(ptr, std::forward<Args>(args)...);                         \
+            return _objpool_helper->_alloctor->NewByPtr(ptr, std::forward<Args>(args)...);                         \
         }                                                                                               \
                                                                                                         \
         static void Delete(ObjType *ptr)                                                                \
         {                                                                                               \
-            _objpool_helper->Delete(ptr);                                                               \
+            _objpool_helper->_alloctor->Delete(ptr);                                                               \
         }                                                                                               \
                                                                                                         \
         static void DeleteWithoutDestructor(ObjType *ptr)                                               \
         {                                                                                               \
-            _objpool_helper->DeleteWithoutDestructor(ptr);                                              \
+            _objpool_helper->_alloctor->DeleteWithoutDestructor(ptr);                                              \
         }                                                                                               \
                                                                                                         \
-        static fs::ObjPoolHelper<ObjType> _objpool_helper
+        static fs::ObjPoolHelper<ObjType> *_objpool_helper
 
 // 在实现文件中需要添加
 #undef OBJ_POOL_CREATE_IMPL
 #define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                       \
-fs::ObjPoolHelper<ObjType> ObjType::_objpool_helper(objAmount);                                         \
+fs::ObjPoolHelper<ObjType> *ObjType::_objpool_helper = new fs::ObjPoolHelper<ObjType>(objAmount);       \
 size_t ObjType::GetMemleakNum()                                                                         \
 {                                                                                                       \
-    return _objpool_helper.GetMemleakObjNum();                                                          \
+    return _objpool_helper->GetMemleakObjNum();                                                          \
 }
 
 // 默认以_objPoolHelper命名对象池变量名

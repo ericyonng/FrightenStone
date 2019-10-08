@@ -44,6 +44,7 @@ public:
         if(lastWheelTime.GetLocalMinute() != curTime.GetLocalMinute())
         {
             std::cout << "cross minitue" << std::endl;
+            timer->Cancel();
         }
     }
 };
@@ -54,6 +55,7 @@ static void TimeOut(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs
 
     std::cout << "static test TimeOut : curTime:" << curTime.ToString() << std::endl;
     std::cout << "static test TimeOut : timer:" << timer->ToString() << std::endl;
+    timer->Cancel();
 }
 
 static void TimeOut4(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
@@ -62,16 +64,17 @@ static void TimeOut4(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const f
 
     std::cout << "static test TimeOut4 : curTime:" << curTime.ToString() << std::endl;
     std::cout << "static test TimeOut4 : timer:" << timer->ToString() << std::endl;
-    static Int32 cnt = 5;
-    if(--cnt <= 0)
-        timer->Cancel();
 }
 
 static void TimeOut2(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curTime)
 {
-    fs::FS_Timer *timer4 = new fs::FS_Timer;
-    timer4->SetTimeOutHandler(&TimeOut4);
-    timer4->Schedule(2000);
+    static fs::FS_Timer *timer4 = new fs::FS_Timer;
+    if(!timer4->IsScheduling())
+    {
+        timer4->SetTimeOutHandler(&TimeOut4);
+        timer4->Schedule(2000);
+    }
+
     std::cout << "static test TimeOut2:" << std::endl;
 
     std::cout << "static test TimeOut2 : curTime:" << curTime.ToString() << std::endl;
@@ -90,14 +93,18 @@ static void Cancel(fs::FS_Timer *timer)
 class TestTimeWheel
 {
 public:
-    static void Run()
+    static void Run(const fs::FS_ThreadPool *pool)
     {
+        g_Log->InitModule("TestTimeWheel");
+        g_MemleakMonitor->Start();
+
         // 设置时间轮盘参数
 //         fs::TimeSlice resolution(0, 100);
 //         fs::TimeWheel timeWheel(resolution);
         fs::FS_Timer timer;
         fs::FS_Timer timer2;
         fs::FS_Timer timer3;
+
 
         // 设置超时执行函数
         TestWheel1 test1;
@@ -122,6 +129,8 @@ public:
 
             // 修正下一帧时间
             fs::g_TimeWheel.GetModifiedResolution(waitMilliSec);
+            if(pool->IsClearingPool())
+                break;
         }
     }
 };

@@ -40,7 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_IMPL(TimeWheel, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+OBJ_POOL_CREATE_IMPL(TimeWheel, _objPoolHelper, 2)
 
 TimeWheel::TimeWheel(const TimeSlice &resolutionSlice)
     :_resolutionSlice(resolutionSlice)
@@ -53,6 +53,7 @@ TimeWheel::TimeWheel(const TimeSlice &resolutionSlice)
 
 TimeWheel::~TimeWheel()
 {
+    STLUtil::DelVectorContainer(_asynData);
 }
 
 void TimeWheel::RotateWheel()
@@ -150,6 +151,7 @@ void TimeWheel::_AfterRotateWheel()
         }
 
         STLUtil::DelVectorContainer(_asynData);
+        _asynRegisterFlag.clear();
     }
 }
 
