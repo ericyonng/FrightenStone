@@ -34,12 +34,12 @@ s/*!
 #include "base/common/log/Impl/FS_Log.h"
 #include "base/common/status/status.h"
 
-fs::ILog *g_Log = fs::Singleton<fs::FS_Log>::GetInstance();
+fs::ILog *g_Log = fs::ILog::GetInstance();
 FS_NAMESPACE_BEGIN
 
 ILog *ILog::GetInstance()
 {
-    return Singleton<FS_Log>::GetInstance();
+    return Singleton<FS_Log, AssistObjsDefs::NoDel>::GetInstance();
 }
 
 FS_NAMESPACE_END

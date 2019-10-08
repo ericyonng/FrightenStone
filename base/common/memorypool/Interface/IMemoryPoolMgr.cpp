@@ -49,7 +49,7 @@ IMemoryPoolMgr::~IMemoryPoolMgr()
 
 IMemoryPoolMgr *IMemoryPoolMgr::GetInstance()
 {
-    return Singleton<MemoryPoolMgr>::GetInstance();
+    return Singleton<MemoryPoolMgr, AssistObjsDefs::NoDel>::GetInstance();
 }
 
 FS_NAMESPACE_END

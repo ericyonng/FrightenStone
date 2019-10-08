@@ -32,14 +32,14 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename ObjType>
-Locker Singleton<ObjType>::_locker;
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+Locker Singleton<ObjType, delMethod>::_locker;
 
-template<typename ObjType>
-SmartPtr<ObjType> Singleton<ObjType>::_pObj = NULL;
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+SmartPtr<ObjType, delMethod> Singleton<ObjType, delMethod>::_pObj = NULL;
 
-template<typename ObjType>
-inline ObjType *Singleton<ObjType>::GetInstance()
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
+inline ObjType *Singleton<ObjType, delMethod>::GetInstance()
 {
     _locker.Lock();
     ObjType *pObj = _pObj;
@@ -56,9 +56,9 @@ inline ObjType *Singleton<ObjType>::GetInstance()
     return pObj;
 }
 
-template<typename ObjType>
+template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
 template<typename... Args>
-inline ObjType *Singleton<ObjType>::GetInstance(Args &&... args)
+inline ObjType *Singleton<ObjType, delMethod>::GetInstance(Args &&... args)
 {
     _locker.Lock();
     ObjType *pObj = _pObj;
