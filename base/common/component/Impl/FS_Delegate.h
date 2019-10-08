@@ -51,6 +51,7 @@ public:
     // 请注意引用折叠适当使用std::forward可以完美的将参数传入，原来什么类型传入后绑定的就是什么类型
     virtual Rtn Invoke(Args... args) = 0;
     virtual Rtn Invoke(Args... args) const = 0;
+    virtual IDelegate<Rtn, Args...> *CreateNewCopy() const = 0;
     virtual void Release();
 };
 
@@ -64,6 +65,7 @@ public:
 
     virtual Rtn Invoke(Args... args);
     virtual Rtn Invoke(Args... args) const;
+    virtual IDelegate<Rtn, Args...> *CreateNewCopy() const;
 
 private:
     ObjType *_obj;
@@ -80,6 +82,7 @@ public:
 
     virtual Rtn Invoke(Args... args);
     virtual Rtn Invoke(Args... args) const;
+    virtual IDelegate<Rtn, Args...> *CreateNewCopy() const;
 
 private:
     Rtn(*_f)(Args...);
@@ -96,6 +99,7 @@ public:
 
     virtual Rtn Invoke(Args... args);
     virtual Rtn Invoke(Args... args) const;
+    virtual IDelegate<Rtn, Args...> *CreateNewCopy() const;
 
 private:
     CustomFuncType _customFun;

@@ -47,7 +47,7 @@ class BASE_EXPORT FS_Session
 {
     OBJ_POOL_CREATE_DEF(FS_Session);
 public:
-    explicit FS_Session(UInt64 sessionId, SOCKET sock, const FS_SessionMgr *sessionMgr);
+    explicit FS_Session(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr);
     ~FS_Session();
 
 public:
@@ -73,7 +73,7 @@ private:
     SOCKET _sock;
     std::list<FS_Packet *> _recvPackets;
     std::list<FS_Packet *> _toSend;
-    const FS_SessionMgr *_sessionMgr;
+    FS_SessionMgr *_sessionMgr;
 };
 
 FS_NAMESPACE_END

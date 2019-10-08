@@ -74,4 +74,10 @@ FS_String TimeData::ToString() const
     return info;
 }
 
+AsynTimeData::AsynTimeData()
+    :_opType(AsynOpType::Op_None)
+    ,_timeData(NULL)
+{
+}
+
 FS_NAMESPACE_END

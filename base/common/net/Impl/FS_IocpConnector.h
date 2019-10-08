@@ -47,7 +47,7 @@ public:
 public:
     virtual Int32 Start();
     virtual void Close();
-
+   
 private:
 };
 

@@ -38,6 +38,7 @@
 #include "base/common/component/Defs/TriggerDefs.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
 #include<functional>
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -46,13 +47,14 @@ class BASE_EXPORT TriggerOccasion;
 class BASE_EXPORT Trigger
 {
 public:
-    Trigger(const std::function<bool(Int32 thisOccation)> &canInterrupt);
+    Trigger(IDelegate<bool, Int32> *canInterrupt);
     virtual ~Trigger();
 
 public:
+    // 外部请释放delegate，内部会创建delegate的副本
     Int32 Reg(Int32 occasion
                 , Int32 triggerType
-                , const std::function<Int32(TriggerExecuteBody *)> &exec
+                , const IDelegate<Int32, TriggerExecuteBody *> &exec // 外部请释放delegate，内部会创建delegate的副本
                 , Int32 execTimes = 1
                 , Int32 addType = TriggerDefs::AddIfExist); // 
 
@@ -69,7 +71,7 @@ private:
     friend class TriggerOccasion;
     std::map<Int32, TriggerOccasion *> _occasions;     // key:occationtype
     std::map<Int32, std::set<Int32>> _triggerTypeRefOccasions;        // key:triggerType, val:set(occations) 
-    const std::function<bool(Int32 thisOccation)> _canInterrupt;        // 
+    IDelegate<bool, Int32> *_canInterrupt;  // bool:return,Int32:thisOccation
 };
 
 FS_NAMESPACE_END

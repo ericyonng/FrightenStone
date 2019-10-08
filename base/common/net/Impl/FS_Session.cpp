@@ -37,11 +37,11 @@
 
 #include "base/common/assist/utils/Impl/STLUtil.h"
 
+OBJ_POOL_CREATE_DEF_IMPL(fs::FS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
+
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
-
-FS_Session::FS_Session(UInt64 sessionId, SOCKET sock, const FS_SessionMgr *sessionMgr)
+FS_Session::FS_Session(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr)
     :_sessionId(sessionId)
     ,_sessionMgr(sessionMgr)
     ,_addr(new FS_Addr)

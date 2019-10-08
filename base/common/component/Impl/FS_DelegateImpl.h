@@ -87,6 +87,12 @@ inline Rtn DelegateClass<ObjType, Rtn, Args...>::Invoke(Args... args) const
     return (_obj->*_f)(std::forward<Args>(args)...);
 }
 
+template <typename ObjType, typename Rtn, typename... Args>
+inline IDelegate<Rtn, Args...> *DelegateClass<ObjType, Rtn, Args...>::CreateNewCopy() const
+{
+    return DelegatePlusFactory::Create(_obj, _f);
+}
+
 template <typename Rtn, typename... Args>
 inline DelegateFunction<Rtn, Args...>::DelegateFunction(Rtn(*f)(Args...))
     :_f(f)
@@ -108,6 +114,12 @@ template <typename Rtn, typename... Args>
 inline Rtn DelegateFunction<Rtn, Args...>::Invoke(Args... args) const
 {
     return (*_f)(std::forward<Args>(args)...);
+}
+
+template <typename Rtn, typename... Args>
+inline IDelegate<Rtn, Args...> *DelegateFunction<Rtn, Args...>::CreateNewCopy() const
+{
+    return DelegatePlusFactory::Create(_f);
 }
 
 template <typename CustomFuncType, typename Rtn, typename... Args>
@@ -139,6 +151,12 @@ template <typename CustomFuncType, typename Rtn, typename... Args>
 inline Rtn DelegateCustomFunc<CustomFuncType, Rtn, Args...>::Invoke(Args... args) const
 {
     return _customFun(std::forward<Args>(args)...);
+}
+
+template <typename CustomFuncType, typename Rtn, typename... Args>
+inline IDelegate<Rtn, Args...> *DelegateCustomFunc<CustomFuncType, Rtn, Args...>::CreateNewCopy() const
+{
+    return DelegatePlusFactory::Create<decltype(_customFun), Rtn, Args...>(_customFun);
 }
 
 template <typename ObjType, typename Rtn, typename... Args>

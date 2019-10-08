@@ -39,6 +39,7 @@
 #include <functional>
 #include <set>
 #include <map>
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -64,10 +65,11 @@ struct BASE_EXPORT TriggerExecuteBody
 {
 public:
     TriggerExecuteBody(Int32 triggerType, Int32 execTimes = 1);
+    ~TriggerExecuteBody();
 
     Int32 _execTimes;
     Int32 _triggerType;
-    std::function<Int32(TriggerExecuteBody *)> _exec;
+    IDelegate<Int32, TriggerExecuteBody *> *_exec;
 };
 
 class BASE_EXPORT TriggerOccasion
@@ -77,7 +79,7 @@ public:
     virtual ~TriggerOccasion();
 
 public:
-    Int32 Reg(Int32 triggerType, const std::function<Int32(TriggerExecuteBody *)> &exec, Int32 execTimes = 1);
+    Int32 Reg(Int32 triggerType, const IDelegate<Int32, TriggerExecuteBody *> &exec, Int32 execTimes = 1);
     Int32 Exec(std::set<Int32> &triggerType2Erase);
     void Erase(Int32 triggerType);
     bool IsExist(Int32 triggerType) const;

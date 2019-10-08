@@ -41,8 +41,14 @@ FS_NAMESPACE_BEGIN
 TriggerExecuteBody::TriggerExecuteBody(Int32 triggerType, Int32 execTimes /*= 1*/)
     :_execTimes(execTimes)
     ,_triggerType(triggerType)
+    ,_exec(NULL)
 {
 
+}
+
+TriggerExecuteBody::~TriggerExecuteBody()
+{
+    Fs_SafeFree(_exec);
 }
 
 TriggerOccasion::TriggerOccasion(Trigger *trigger, Int32 occasion)
@@ -57,7 +63,7 @@ TriggerOccasion::~TriggerOccasion()
     STLUtil::DelMapContainer(_triggerTypeRefBodys);
 }
 
-Int32 TriggerOccasion::Reg(Int32 triggerType, const std::function<Int32(TriggerExecuteBody *)> &exec, Int32 execTimes /*= 1*/)
+Int32 TriggerOccasion::Reg(Int32 triggerType, const IDelegate<Int32, TriggerExecuteBody *> &exec, Int32 execTimes /*= 1*/)
 {
     if(UNLIKELY(execTimes != TriggerDefs::Trig_Infinite && execTimes < 0))
         return StatusDefs::ParamError;
@@ -67,7 +73,7 @@ Int32 TriggerOccasion::Reg(Int32 triggerType, const std::function<Int32(TriggerE
         return StatusDefs::Trigger_TriggerTypeRepeatInOccasion;
 
     TriggerExecuteBody *newBody = new TriggerExecuteBody(triggerType, execTimes);
-    newBody->_exec = exec;
+    newBody->_exec = exec.CreateNewCopy();
     _triggerTypeRefBodys.insert(std::make_pair(triggerType, newBody));
 
     return StatusDefs::Success;
@@ -82,8 +88,7 @@ Int32 TriggerOccasion::Exec(std::set<Int32> &triggerType2Erase)
         auto body = iterBody->second;
         if(body->_execTimes != 0)
         {
-            ret = body->_exec(body);    
-
+            ret = body->_exec->Invoke(body);
             if(body->_execTimes != TriggerDefs::Trig_Infinite &&
                ret == StatusDefs::Success)
                 body->_execTimes = std::max<Int32>(body->_execTimes - 1, 0);
@@ -101,7 +106,7 @@ Int32 TriggerOccasion::Exec(std::set<Int32> &triggerType2Erase)
 
         if(ret != StatusDefs::Success)
         {
-            if(_trigger->_canInterrupt(_occasion))
+            if(_trigger->_canInterrupt->Invoke(_occasion))
                 return ret;
         }
     }

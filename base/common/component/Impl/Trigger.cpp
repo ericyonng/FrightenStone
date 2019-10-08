@@ -37,7 +37,7 @@
 
 FS_NAMESPACE_BEGIN
 
-Trigger::Trigger(const std::function<bool(Int32 thisOccation)> &canInterrupt)
+Trigger::Trigger(IDelegate<bool, Int32> *canInterrupt)
     :_canInterrupt(canInterrupt)
 {
 
@@ -45,10 +45,11 @@ Trigger::Trigger(const std::function<bool(Int32 thisOccation)> &canInterrupt)
 
 Trigger::~Trigger()
 {
+    Fs_SafeFree(_canInterrupt);
     STLUtil::DelMapContainer(_occasions);
 }
 
-Int32 Trigger::Reg(Int32 occasion, Int32 triggerType, const std::function<Int32(TriggerExecuteBody *)> &exec, Int32 execTimes /*= 1 */, Int32 addType /*= TriggerDefs::AddIfExist*/)
+Int32 Trigger::Reg(Int32 occasion, Int32 triggerType, const IDelegate<Int32, TriggerExecuteBody *> &exec, Int32 execTimes /*= 1 */, Int32 addType /*= TriggerDefs::AddIfExist*/)
 {
     switch(addType)
     {

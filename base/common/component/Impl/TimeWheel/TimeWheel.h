@@ -68,12 +68,18 @@ public:
 private:
     // 产生timewheel生命周期中唯一id
     Int64 _NewIncreasId();
+    bool _IsRotating() const;
+    void _BeforeRotateWheel();
+    void _AfterRotateWheel();
+    AsynTimeData *_NewAsynTimeData(Int32 opType, TimeData *timeData);
 
 private:
+    Int64 _rotating;                        // 是否正在转动
     const TimeSlice _resolutionSlice;       // 每一轮时间切片长度
     // Time _nowTimeToJudgeWheelTimeOut;   // 当前时间用于判断是否达到轮盘处理的最小扫描时间
     Time _curTime;                  // 当前时间戳
     std::set<TimeData *, TimeDataLess> _timeDatas;
+    std::vector<AsynTimeData *> _asynData;          // 异步执行
 
     Int64 _increaseId;              // 递增id
 };

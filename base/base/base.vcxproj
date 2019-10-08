@@ -331,6 +331,7 @@
     <ClInclude Include="..\common\net\Defs\FS_NetDefs.h" />
     <ClInclude Include="..\common\net\Defs\FS_Packet.h" />
     <ClInclude Include="..\common\net\Defs\FS_PacketImpl.h" />
+    <ClInclude Include="..\common\net\Defs\FS_SessionInfo.h" />
     <ClInclude Include="..\common\net\Defs\HeartBeatComp.h" />
     <ClInclude Include="..\common\net\Defs\HeartBeatCompImpl.h" />
     <ClInclude Include="..\common\net\Defs\IocpDefs.h" />
@@ -464,6 +465,7 @@
     <ClCompile Include="..\common\net\Defs\FS_NetBuffer.cpp" />
     <ClCompile Include="..\common\net\Defs\FS_NetBufferArray.cpp" />
     <ClCompile Include="..\common\net\Defs\FS_Packet.cpp" />
+    <ClCompile Include="..\common\net\Defs\FS_SessionInfo.cpp" />
     <ClCompile Include="..\common\net\Defs\IocpDefs.cpp" />
     <ClCompile Include="..\common\net\Defs\PacketQueueNode.cpp" />
     <ClCompile Include="..\common\net\Defs\Sender.cpp" />

@@ -36,8 +36,11 @@ FS_NAMESPACE_BEGIN
 
 inline void TimeWheel::UnRegister(TimeData *timeData)
 {
-    if(UNLIKELY(timeData->_isRotatingWheel))
+    if(UNLIKELY(timeData->_isRotatingWheel||_IsRotating()))
+    {
+        _NewAsynTimeData(AsynOpType::Op_UnRegister, timeData);
         return;
+    }
 
     if(LIKELY(timeData->_timeWheelUniqueId))
         _timeDatas.erase(timeData);
@@ -73,6 +76,25 @@ inline const Time &TimeWheel::GetCurTime() const
 inline Int64 TimeWheel::_NewIncreasId()
 {
     return ++_increaseId;
+}
+
+inline bool TimeWheel::_IsRotating() const
+{
+    return _rotating > 0;
+}
+
+inline void TimeWheel::_BeforeRotateWheel()
+{
+    ++_rotating;
+}
+
+inline AsynTimeData *TimeWheel::_NewAsynTimeData(Int32 opType, TimeData *timeData)
+{
+    auto newData = new AsynTimeData;
+    newData->_opType = opType;
+    newData->_timeData = timeData;
+    _asynData.push_back(newData);
+    return newData;
 }
 
 FS_NAMESPACE_END

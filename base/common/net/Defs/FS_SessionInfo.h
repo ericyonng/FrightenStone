@@ -21,75 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TimeWheelData.h
+ * @file  : FS_SessionInfo.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/6
+ * @date  : 2019/10/8
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Component_Impl_TimeWheel_Comp_TimeData_H__
-#define __Base_Common_Component_Impl_TimeWheel_Comp_TimeData_H__
+
+#ifndef __Base_Common_Net_Defs_FS_SessionInfo_H__
+#define __Base_Common_Net_Defs_FS_SessionInfo_H__
+
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/TimeSlice.h"
-#include <list>
+#include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
-class TimeSlice;
-class Time;
-class TimeData;
-class FS_Timer;
+class BASE_EXPORT FS_Addr;
 
-class BASE_EXPORT TimeDataLess
+struct BASE_EXPORT FS_SessionInfo
 {
-public:
-    bool operator ()(const TimeData *l, const TimeData *r) const;
-};
+    OBJ_POOL_CREATE_DEF(FS_SessionInfo);
 
-class BASE_EXPORT TimeData
-{
-public:
-    explicit TimeData(FS_Timer *timer);
-    virtual ~TimeData();
+    FS_SessionInfo();
+    ~FS_SessionInfo();
 
-    FS_String ToString() const;
-
-    // 超时时间
-    Time _expiredTime;
-    // 是否取消
-    bool _isCancel;
-    // 是否正在转动时间轮盘 转动时间轮盘时候的注册与反注册操作将在afterrotatingwheel中执行
-    bool _isRotatingWheel;
-    // timewheel给的唯一id，由timewheel更新
-    Int64 _timeWheelUniqueId;
-    // timer
-    FS_Timer *_timer;
-    // 超时周期
-    TimeSlice _period;
-};
-
-class BASE_EXPORT AsynOpType
-{
-public:
-    enum
-    {
-        Op_None = 0,            // 无效
-        Op_Register = 1,        // 注册
-        Op_UnRegister = 2,      // 反注册
-    };
-};
-
-class BASE_EXPORT AsynTimeData
-{
-public:
-    AsynTimeData();
-    Int32 _opType;                      // AsynOpType
-    TimeData * _timeData;               // 定时数据
+    SOCKET _sock;
+    FS_Addr *_addr;
 };
 
 FS_NAMESPACE_END
