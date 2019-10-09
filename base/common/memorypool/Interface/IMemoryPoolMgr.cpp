@@ -34,7 +34,7 @@
 #include "base/common/memorypool/Impl/MemoryPoolMgr.h"
 #include "base/common/log/Log.h"
 
-fs::IMemoryPoolMgr *g_MemoryPool = fs::MemoryPoolMgr::GetInstance();
+fs::IMemoryPoolMgr *g_MemoryPool = fs::IMemoryPoolMgr::GetInstance();
 
 FS_NAMESPACE_BEGIN
 
@@ -46,7 +46,13 @@ IMemoryPoolMgr::IMemoryPoolMgr()
 IMemoryPoolMgr::~IMemoryPoolMgr()
 {
     g_Log->i<IMemoryPoolMgr>(_LOGFMT_("IMemoryPoolMgr destructor"));
+    g_Log->i<IMemoryPoolMgr>(_LOGFMT_("this %p"), this);
     g_Log->FlushAllFile();
+}
+
+void IMemoryPoolMgr::Release()
+{
+    delete this;
 }
 
 IMemoryPoolMgr *IMemoryPoolMgr::GetInstance()

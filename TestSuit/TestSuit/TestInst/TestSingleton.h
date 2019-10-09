@@ -55,6 +55,13 @@ public:
     static void Run()
     {
         g_MemleakMonitor->Start();
+        TestSingletomExample *example = new TestSingletomExample;
+        g_Log->i<TestSingleton>(_LOGFMT_("mempool addr %p"), g_MemoryPool);
+        auto mempoolMgr = fs::Singleton<fs::MemoryPoolMgr, fs::AssistObjsDefs::SelfRelease>::GetInstance();
+        mempoolMgr->InitPool();
+        g_Log->i<TestSingleton>(_LOGFMT_("mempool addr %p"), mempoolMgr);
+        delete g_MemoryPool;
+        delete example;
     }
 };
 #endif

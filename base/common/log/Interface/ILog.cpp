@@ -33,8 +33,8 @@ s/*!
 #include "base/common/log/Interface/ILog.h"
 #include "base/common/log/Impl/FS_Log.h"
 #include "base/common/status/status.h"
-
-// fs::ILog *g_Log = fs::ILog::GetInstance();
+    
+// fs::ILog *g_LogObj = NULL;
 FS_NAMESPACE_BEGIN
 
 ILog *ILog::GetInstance()

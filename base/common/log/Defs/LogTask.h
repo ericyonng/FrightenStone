@@ -44,7 +44,7 @@ class FS_ThreadPool;
 class LogTask :public ITask
 {
 public:
-    LogTask(FS_ThreadPool *pool, IDelegate<void, Int32> *taskDelegate, Int32 workIntervalMsTime, Int32 logFileIndex);
+    LogTask(FS_ThreadPool *pool, IDelegate<void, Int32> *taskDelegate, Int32 workIntervalMsTime, Int32 logFileIndex, ConditionLocker &locker);
     virtual ~LogTask();
 
     // 任务执行体
@@ -55,6 +55,7 @@ protected:
     FS_ThreadPool *_pool;
     Int32 _workIntervalMsTime;    // 写日志时间间隔
     Int32 _logFileIndex;
+    ConditionLocker &_lock;     // 外部立即唤醒线程的机制
 };
 
 

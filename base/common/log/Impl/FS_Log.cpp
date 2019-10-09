@@ -121,6 +121,10 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
         _flielocker[i] = new ConditionLocker();
 
+    // 初始化用于唤醒日志线程锁
+    for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
+        _wakeupToWriteLog[i] = new ConditionLocker();
+
     // TODO:初始化log config options
     _ReadConfig();
 
@@ -136,10 +140,9 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     _threadWriteLogDelegate = DelegatePlusFactory::Create(this, &FS_Log::_OnThreadWriteLog);
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
     {
-        ITask *logTask = new LogTask(_threadPool, _threadWriteLogDelegate, _threadWorkIntervalMsTime, i);
+        ITask *logTask = new LogTask(_threadPool, _threadWriteLogDelegate, _threadWorkIntervalMsTime, i, *_wakeupToWriteLog[i]);
         ASSERT(_threadPool->AddTask(*logTask, true));
     }
-
 
     _isInit = true;
     _locker.Unlock();
@@ -152,6 +155,9 @@ void FS_Log::FinishModule()
         return;
 
     _isFinish = true;
+
+    // 清空日志
+    FlushAllFile();
 
     // 关闭线程池
     _threadPool->Clear();
@@ -184,7 +190,9 @@ void FS_Log::FinishModule()
 
         Fs_SafeFree(_levelRefBeforeLogHook[i]);
     }
+
     Fs_SafeFree(_threadPool);
+    STLUtil::DelArray(_wakeupToWriteLog);
     STLUtil::DelArray(_flielocker);
     STLUtil::DelArray(_logCaches);
 }
@@ -192,7 +200,11 @@ void FS_Log::FinishModule()
 void FS_Log::FlushAllFile()
 {
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
-        _OnThreadWriteLog(i);
+    {
+        _wakeupToWriteLog[i]->Lock();
+        _wakeupToWriteLog[i]->Sinal();
+        _wakeupToWriteLog[i]->Unlock();
+    }
 }
 
 Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName)
@@ -330,12 +342,9 @@ void FS_Log::_ReadConfig()
 }
 
 void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
-{// TODO:测试
+{
     // 1.转移到缓冲区（只交换list指针）
     _flielocker[logFileIndex]->Lock();
-//     FS_String str;
-//     str.AppendFormat("\nthreadid[%lu] logfileIndex[%d]\n", SystemUtil::GetCurrentThreadId(), logFileIndex);
-//     _OutputToConsole(LogLevel::Any, str);
     if(_logDatas[logFileIndex]->empty())
     {
         _flielocker[logFileIndex]->Unlock();
@@ -343,12 +352,12 @@ void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
     }
 
     // 只交换数据队列指针拷贝最少，最快，而且交换后_logDatas队列是空的相当于清空了数据 保证缓冲队列前几个都不为NULL, 碰到NULL表示结束
-    std::list<LogData *> *&swapCache = _logCaches[logFileIndex];
+    std::list<LogData *> *swapCache = _logCaches[logFileIndex]; // 由于主线程不会共享_logCaches所以是线程安全的（每个日志文件线程只有一个线程）,请保证外部其他线程不会调用本接口，需要立即写日志请调用flushall接口
     std::list<LogData *> *cache4RealLog = NULL;
     cache4RealLog = _logDatas[logFileIndex];
     _logDatas[logFileIndex] = swapCache;
-    _flielocker[logFileIndex]->Unlock();
     swapCache = cache4RealLog;
+    _flielocker[logFileIndex]->Unlock();
 
     if(swapCache->empty())
         return;

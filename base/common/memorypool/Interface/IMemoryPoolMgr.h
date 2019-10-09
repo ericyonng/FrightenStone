@@ -46,6 +46,7 @@ class BASE_EXPORT IMemoryPoolMgr
 public:
     IMemoryPoolMgr();
     virtual ~IMemoryPoolMgr();
+    virtual void Release();
 
 public:
     static IMemoryPoolMgr *GetInstance();
@@ -78,4 +79,5 @@ inline ObjType *IMemoryPoolMgr::Realloc(void *ptr, size_t bytes)
 FS_NAMESPACE_END
 
 extern BASE_EXPORT fs::IMemoryPoolMgr *g_MemoryPool;
+
 #endif
