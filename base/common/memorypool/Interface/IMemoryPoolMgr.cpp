@@ -34,8 +34,6 @@
 #include "base/common/memorypool/Impl/MemoryPoolMgr.h"
 #include "base/common/log/Log.h"
 
-fs::IMemoryPoolMgr *g_MemoryPool = fs::IMemoryPoolMgr::GetInstance();
-
 FS_NAMESPACE_BEGIN
 
 IMemoryPoolMgr::IMemoryPoolMgr()

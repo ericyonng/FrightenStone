@@ -38,6 +38,5 @@
 // interface...
 #include "base/common/memorypool/Defs/MemoryPoolCreateDefs.h"
 #include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
-#include "base/common/memorypool/Impl/MemoryPoolMgr.h"
 
 #endif

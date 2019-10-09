@@ -56,11 +56,11 @@ public:
     {
         g_MemleakMonitor->Start();
         TestSingletomExample *example = new TestSingletomExample;
-        g_Log->i<TestSingleton>(_LOGFMT_("mempool addr %p"), g_MemoryPool);
-        auto mempoolMgr = fs::Singleton<fs::MemoryPoolMgr, fs::AssistObjsDefs::SelfRelease>::GetInstance();
-        mempoolMgr->InitPool();
-        g_Log->i<TestSingleton>(_LOGFMT_("mempool addr %p"), mempoolMgr);
-        delete g_MemoryPool;
+        g_MemoryPool->InitPool();
+        auto log3 = g_Log;
+        auto log = fs::ILog::GetInstance();
+        auto log2 = fs::ILog::GetInstance();
+        g_Log->i<TestSingleton>(_LOGFMT_("log3:%p,log[%p],log2[%p]"), log3, log, log2);
         delete example;
     }
 };
