@@ -124,6 +124,47 @@ FS_String FS_String::ToHexString() const
     return info;
 }
 
+void FS_String::CompressString()
+{
+    const auto strSize = _buffer.size();
+    if(strSize == 0)
+        return;
+
+    auto len = strlen(_buffer.c_str());
+    if(strSize > len)
+    {
+        _buffer.erase(len, strSize - len);
+    }
+}
+
+const FS_String &FS_String::RemoveZeroTail()
+{
+    const Int64 bufferSize = static_cast<Int64>(_buffer.size());
+    if(bufferSize == 0)
+        return *this;
+
+    auto pos = _buffer.find_first_of((const char)(0), 0);
+    if(pos == std::string::npos)
+        return *this;
+
+    _buffer.erase(pos, bufferSize - pos);
+    return *this;
+}
+
+const FS_String &FS_String::RemoveHeadZero()
+{
+    const Int64 bufferSize = static_cast<Int64>(_buffer.size());
+    if(bufferSize == 0)
+        return *this;
+
+    auto pos = _buffer.find_first_not_of((const char)(0), 0);
+    if(pos == std::string::npos)
+        return *this;
+
+    _buffer.erase(0, pos);
+    return *this;
+}
+
 FS_String::_These FS_String::Split(char sep, size_type max_split) const
 {
     return this->Split(FS_String(sep), max_split);

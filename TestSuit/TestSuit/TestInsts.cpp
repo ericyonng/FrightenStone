@@ -59,18 +59,21 @@
 #include "TestSuit/TestSuit/TestInst/TestEvent.h"
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
 #include "TestSuit/TestSuit/TestInst/TestFS_List.h"
+#include "TestSuit/TestSuit/TestInst/TestSingleton.h"
 
 void TestInsts::Run()
 {
-    auto __testWeel = [](const fs::FS_ThreadPool *pool)->void
-    {
-        TestTimeWheel::Run(pool);
-    };
-
-    auto deleg = fs::DelegatePlusFactory::Create<decltype(__testWeel), void, const fs::FS_ThreadPool *>(__testWeel);
-    fs::FS_ThreadPool * pool = new fs::FS_ThreadPool(0, 1);
-    pool->AddTask(deleg);
+//     auto __testWeel = [](const fs::FS_ThreadPool *pool)->void
+//     {
+//         TestTimeWheel::Run(pool);
+//     };
+// 
+//     auto deleg = fs::DelegatePlusFactory::Create<decltype(__testWeel), void, const fs::FS_ThreadPool *>(__testWeel);
+//     fs::FS_ThreadPool * pool = new fs::FS_ThreadPool(0, 1);
+//     pool->AddTask(deleg);
+//     getchar();
+//     pool->Clear();
+    TestSingleton::Run();
     getchar();
-    pool->Clear();
     // TestJson::Run();
 }

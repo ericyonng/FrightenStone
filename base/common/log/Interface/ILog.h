@@ -57,6 +57,7 @@ public:
 
     virtual Int32 InitModule(const Byte8 *rootDir) = 0;
     virtual void FinishModule() = 0;
+    virtual void FlushAllFile() = 0;
 
     // json日志
 
@@ -129,7 +130,7 @@ FS_NAMESPACE_END
 #include "base/common/log/Interface/ILogImpl.h"
 
 // 需要验证多进程下是否公用一个对象
-extern BASE_EXPORT fs::ILog *g_Log;
-//#define g_Log fs::ILog::GetInstance()
+// extern BASE_EXPORT fs::ILog *g_Log;
+#define g_Log fs::ILog::GetInstance()
 
 #endif

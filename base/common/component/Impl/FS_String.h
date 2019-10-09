@@ -118,6 +118,9 @@ public:
     void Clear();
     void Swap(FS_String &&str);
     FS_String ToHexString() const;
+    void CompressString();      // 去除字符串末尾的\0压缩空间只对0结尾的字符串有效
+    const FS_String &RemoveZeroTail();      // 移除容器中尾部的0
+    const FS_String &RemoveHeadZero();      // 移除容器中首部的0
 
     FS_String &AppendBitData(const char *bitData, Int64 dataSize);
     _These Split(char sep, size_type max_split = -1) const;    // only ascii

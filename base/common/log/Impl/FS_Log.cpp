@@ -56,14 +56,17 @@ FS_Log::FS_Log()
     , _levelRefBeforeLogHook{NULL}
     , _logFiles{NULL}
     , _logDatas{NULL}
-    ,_logCaches{NULL}
+    , _logCaches{NULL}
 {
-
+    // log根目录名以进程名+Log
+    auto programName = FS_FileUtil::ExtractFileWithoutExtension(SystemUtil::GetCurProgramName().RemoveZeroTail());
+    programName.AppendFormat("%s", "Log");
+    InitModule(programName.c_str());
 }
 
 FS_Log::~FS_Log()
 {
-    // FinishModule();
+    FinishModule();
 }
 
 void FS_Log::UnInstallLogHookFunc(Int32 level, const IDelegate<void, const LogData *> *delegate)
@@ -184,6 +187,12 @@ void FS_Log::FinishModule()
     Fs_SafeFree(_threadPool);
     STLUtil::DelArray(_flielocker);
     STLUtil::DelArray(_logCaches);
+}
+
+void FS_Log::FlushAllFile()
+{
+    for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
+        _OnThreadWriteLog(i);
 }
 
 Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName)

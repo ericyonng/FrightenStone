@@ -476,4 +476,17 @@ FS_String FS_FileUtil::ExtractFileExtension(const FS_String &fileName)
 
     return fileName.GetRaw().substr(endPos, fileName.GetLength() - endPos);
 }
+
+FS_String FS_FileUtil::ExtractFileWithoutExtension(const FS_String &fileName)
+{
+    auto endPos = fileName.GetRaw().rfind('.', fileName.GetLength() - 1);
+    if(endPos == std::string::npos)
+        return fileName;
+
+    if(endPos == 0)
+        return "";
+
+    return fileName.GetRaw().substr(0, endPos);
+}
 FS_NAMESPACE_END
+

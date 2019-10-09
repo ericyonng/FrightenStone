@@ -170,6 +170,7 @@
     <ClInclude Include="TestInst\TestObjPool.h" />
     <ClInclude Include="TestInst\TestRandom.h" />
     <ClInclude Include="TestInst\TestServer.h" />
+    <ClInclude Include="TestInst\TestSingleton.h" />
     <ClInclude Include="TestInst\TestString.h" />
     <ClInclude Include="TestInst\TestSystemUtil.h" />
     <ClInclude Include="TestInst\TestThreadPool.h" />

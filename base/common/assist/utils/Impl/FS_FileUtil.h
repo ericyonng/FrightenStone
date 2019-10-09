@@ -72,6 +72,7 @@ public:
     static void InsertFileTime(const FS_String &extensionName, const Time &timestamp, FS_String &fileName);
     static void InsertFileTail(const FS_String &extensionName, const char *tail, FS_String &fileName);
     static FS_String ExtractFileExtension(const FS_String &fileName);
+    static FS_String ExtractFileWithoutExtension(const FS_String &fileName);
 };
 
 FS_NAMESPACE_END
