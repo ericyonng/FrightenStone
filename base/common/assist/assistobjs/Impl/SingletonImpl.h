@@ -58,7 +58,7 @@ inline ObjType *Singleton<ObjType, delMethod>::GetInstance()
 
 template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
 template<typename... Args>
-inline ObjType *Singleton<ObjType, delMethod>::GetInstance(Args &&... args)
+inline ObjType *Singleton<ObjType, delMethod>::GetInstance(Args... args)
 {
     _locker.Lock();
     ObjType *pObj = _pObj;

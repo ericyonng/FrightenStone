@@ -54,9 +54,7 @@ class TestSingleton
 public:
     static void Run()
     {
-        g_Log->InitModule("testsingleton");
         g_MemleakMonitor->Start();
-        auto testSimgletonObj = fs::Singleton<TestSingletomExample>::GetInstance();
     }
 };
 #endif

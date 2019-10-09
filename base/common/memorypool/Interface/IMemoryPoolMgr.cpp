@@ -32,6 +32,7 @@
 #include "stdafx.h"
 #include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 #include "base/common/memorypool/Impl/MemoryPoolMgr.h"
+#include "base/common/log/Log.h"
 
 fs::IMemoryPoolMgr *g_MemoryPool = fs::MemoryPoolMgr::GetInstance();
 
@@ -44,7 +45,8 @@ IMemoryPoolMgr::IMemoryPoolMgr()
 
 IMemoryPoolMgr::~IMemoryPoolMgr()
 {
-
+    g_Log->i<IMemoryPoolMgr>(_LOGFMT_("IMemoryPoolMgr destructor"));
+    g_Log->FlushAllFile();
 }
 
 IMemoryPoolMgr *IMemoryPoolMgr::GetInstance()
