@@ -1,4 +1,4 @@
-s/*!
+/*!
  * MIT License
  *
  * Copyright (c) 2019 ericyonng<120453674@qq.com>
@@ -21,25 +21,42 @@ s/*!
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ILog.cpp
+ * @file  : TestSingleton.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/06/24
+ * @date  : 2019/10/9
  * @brief :
+ * 
  *
- *
- *
+ * 
  */
+
+#ifndef __Test_TestSingleton_H__
+#define __Test_TestSingleton_H__
+#pragma once
 #include "stdafx.h"
-#include "base/common/log/Interface/ILog.h"
-#include "base/common/log/Impl/FS_Log.h"
-#include "base/common/status/status.h"
 
-// fs::ILog *g_Log = fs::ILog::GetInstance();
-FS_NAMESPACE_BEGIN
-
-ILog *ILog::GetInstance()
+class TestSingletomExample
 {
-    return Singleton<FS_Log, AssistObjsDefs::NoDel>::GetInstance();
-}
+public:
+    TestSingletomExample()
+    {
+        g_Log->i<TestSingletomExample>(_LOGFMT_("TestSingletomExample constructor"));
+    }
+    ~TestSingletomExample()
+    {
+        g_Log->i<TestSingletomExample>(_LOGFMT_("TestSingletomExample destructor"));
+        g_Log->FlushAllFile();
+    }
+};
 
-FS_NAMESPACE_END
+class TestSingleton
+{
+public:
+    static void Run()
+    {
+        g_Log->InitModule("testsingleton");
+        g_MemleakMonitor->Start();
+        auto testSimgletonObj = fs::Singleton<TestSingletomExample>::GetInstance();
+    }
+};
+#endif
