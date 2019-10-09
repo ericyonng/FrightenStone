@@ -62,6 +62,36 @@ public:
     }
 };
 
+const Int32 performanceCnt = 1000000;
+class TestTlsTablePerformanceTask
+{
+public:
+    static void Task(const fs::FS_ThreadPool *pool)
+    {
+        fs::FS_TlsTable *tlsTable = NULL;
+        fs::Time nowTime1, nowTime2;
+        nowTime1.FlushTime();
+        for(Int32 i = 0; i < performanceCnt; ++i)
+        {
+            tlsTable = g_ThreadTlsTableMgr->GetAndCreateThisThreadTable();
+            g_ThreadTlsTableMgr->FreeThisThreadTable();
+            tlsTable = NULL;
+        }
+        nowTime2.FlushTime();
+
+        if(!tlsTable)
+            tlsTable = g_ThreadTlsTableMgr->CreateThisThreadTable();
+
+        auto tlsElem = tlsTable->GetElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
+        if(!tlsElem)
+            tlsElem = tlsTable->AllocElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
+
+        const Int32 threadId = static_cast<Int32>(fs::SystemUtil::GetCurrentThreadId());
+        g_Log->i<TestTlsTablePerformanceTask>(_LOGFMT_("threadId[%d], escape[%lld] tlsTablecnt[%d]")
+                                              , threadId, (nowTime2 - nowTime1).GetTotalMicroSeconds(), tlsElem->count);
+    }
+};
+
 class TestFSTlsTable
 {
 public:
@@ -71,8 +101,9 @@ public:
         fs::FS_ThreadPool pool(0, 10);
         for(Int32 i = 0; i < 10; ++i)
         {
-            auto testTlsTask = fs::DelegatePlusFactory::Create(&TestTlsTableTask::Task);
-            pool.AddTask(testTlsTask, true);
+            //auto testTlsTask = fs::DelegatePlusFactory::Create(&TestTlsTableTask::Task);
+            auto testTlsPerformanceTask = fs::DelegatePlusFactory::Create(&TestTlsTablePerformanceTask::Task);
+            pool.AddTask(testTlsPerformanceTask, true);
         }
         getchar();
     }

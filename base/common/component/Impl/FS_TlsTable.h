@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TlsElementDefs.cpp
+ * @file  : FS_TlsTable.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/9
  * @brief :
@@ -29,10 +29,43 @@
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/assist/utils/Defs/TlsElementDefs.h"
+
+#ifndef __Base_Common_Component_Impl_FS_TlsTable_H__
+#define __Base_Common_Component_Impl_FS_TlsTable_H__
+
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(Tls_Rtti, 2);
-OBJ_POOL_CREATE_DEF_IMPL(Tls_TestTls, 10);
+
+struct BASE_EXPORT ITlsBase;
+
+// 请不要过度依赖于线程局部存储
+// 请勿频繁创建
+// 请保证线程周期内都不会释放,数组类型元素请在外部包装成派生于ITlsBase基类的结构体，再进行存储
+class BASE_EXPORT FS_TlsTable
+{
+public:
+    FS_TlsTable();
+    ~FS_TlsTable();
+
+public:
+    template<typename ObjType>
+    ObjType *GetElement(Int32 type);
+    template<typename ObjType, typename... Args>
+    ObjType *AllocElement(Int32 type, Args... args);
+    void Erase(Int32 type);
+
+private:
+    std::map<Int32, ITlsBase *> _elementTypeRefElements;
+};
+
 FS_NAMESPACE_END
+
+#include "base/common/component/Impl/FS_TlsTableImpl.h"
+
+
+
+#endif

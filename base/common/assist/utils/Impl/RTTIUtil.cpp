@@ -31,8 +31,9 @@
  */
 #include "stdafx.h"
 #include "base/common/assist/utils/Impl/RTTIUtil.h"
-#include "base/common/assist/utils/Defs/TlsElementDefs.h"
-#include "base/common/assist/utils/Defs/FS_TlsTable.h"
+#include "base/common/component/Defs/TlsElementDefs.h"
+#include "base/common/component/Impl/FS_TlsTable.h"
+#include "base/common/component/Impl/ThreadTlsTableMgr.h"
 
 FS_NAMESPACE_BEGIN
 

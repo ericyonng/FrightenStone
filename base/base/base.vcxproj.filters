@@ -1002,26 +1002,32 @@
     <ClInclude Include="..\common\assist\utils\Impl\RTTIUtil.h">
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\assist\utils\Defs\FS_TlsTable.h">
-      <Filter>common\assist\utils\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\assist\utils\Defs\FS_TlsTableImpl.h">
-      <Filter>common\assist\utils\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\assist\utils\Defs\TlsElementDefs.h">
-      <Filter>common\assist\utils\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\assist\utils\Defs\TlsElementDefsImpl.h">
-      <Filter>common\assist\utils\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\assist\utils\Defs\ITlsBase.h">
-      <Filter>common\assist\utils\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\assist\utils\Defs\ITlsBaseImpl.h">
-      <Filter>common\assist\utils\Defs</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\assist\utils\Impl\RTTIUtilImpl.h">
       <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Defs\TlsElementDefs.h">
+      <Filter>common\component\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Defs\TlsElementDefsImpl.h">
+      <Filter>common\component\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Defs\ITlsBase.h">
+      <Filter>common\component\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Defs\ITlsBaseImpl.h">
+      <Filter>common\component\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_TlsTable.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\FS_TlsTableImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\ThreadTlsTableMgr.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\ThreadTlsTableMgrImpl.h">
+      <Filter>common\component\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1325,11 +1331,14 @@
     <ClCompile Include="..\common\assist\utils\Impl\RTTIUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\assist\utils\Defs\FS_TlsTable.cpp">
-      <Filter>common\assist\utils\Defs</Filter>
+    <ClCompile Include="..\common\component\Defs\TlsElementDefs.cpp">
+      <Filter>common\component\Defs</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\assist\utils\Defs\TlsElementDefs.cpp">
-      <Filter>common\assist\utils\Defs</Filter>
+    <ClCompile Include="..\common\component\Impl\FS_TlsTable.cpp">
+      <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\ThreadTlsTableMgr.cpp">
+      <Filter>common\component\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

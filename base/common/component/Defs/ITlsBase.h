@@ -29,8 +29,9 @@
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Impl_Defs_ITlsBase_H__
-#define __Base_Common_Assist_Utils_Impl_Defs_ITlsBase_H__
+
+#ifndef __Base_Common_Component_Defs_ITlsBase_H__
+#define __Base_Common_Component_Defs_ITlsBase_H__
 #pragma once
 
 #include "base/exportbase.h"
@@ -50,7 +51,7 @@ struct BASE_EXPORT ITlsBase
 
 FS_NAMESPACE_END
 
-#include "base/common/assist/utils/Defs/ITlsBaseImpl.h"
+#include "base/common/component/Defs/ITlsBaseImpl.h"
 
 #endif
 

@@ -60,5 +60,8 @@
 #include "base/common/component/Impl/FS_Stream.h"
 #include "base/common/component/Impl/SingletonAgency.h"
 #include "base/common/component/Impl/FS_List/FS_List.h"
+#include "base/common/component/Defs/TlsElementDefs.h"
+#include "base/common/component/Impl/FS_TlsTable.h"
+#include "base/common/component/Impl/ThreadTlsTableMgr.h"
 
 #endif

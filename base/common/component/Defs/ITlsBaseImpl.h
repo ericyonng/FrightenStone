@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_TlsTableImpl.h
+ * @file  : ITlsBaseImpl.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/9
  * @brief :
@@ -29,49 +29,19 @@
  *
  * 
  */
-#ifdef __Base_Common_Assist_Utils_Impl_Defs_FS_TlsTable_H__
+
+#ifdef __Base_Common_Component_Defs_ITlsBase_H__
 #pragma once
 
 FS_NAMESPACE_BEGIN
 
-inline FS_TlsTable::FS_TlsTable()
+inline ITlsBase::ITlsBase()
 {
+
 }
 
-template<typename ObjType>
-inline ObjType *FS_TlsTable::GetElement(Int32 type)
+inline ITlsBase::~ITlsBase()
 {
-    auto iterElement = _elementTypeRefElements.find(type);
-    if(iterElement == _elementTypeRefElements.end())
-        return NULL;
-
-    return static_cast<ObjType *>(iterElement->second);
-}
-
-template<typename ObjType, typename... Args>
-inline ObjType *FS_TlsTable::AllocElement(Int32 type, Args... args)
-{
-    auto iterElement = _elementTypeRefElements.find(type);
-    if(iterElement == _elementTypeRefElements.end())
-    {
-        ITlsBase *newObj = new ObjType(std::forward<Args>(args)...);
-        iterElement = _elementTypeRefElements.insert(std::make_pair(type, newObj)).first;
-    }
-
-    return static_cast<ObjType *>(iterElement->second);
-}
-
-inline ThreadTlsTableMgr::ThreadTlsTableMgr()
-{
-}
-
-inline FS_TlsTable *ThreadTlsTableMgr::GetAndCreateThisThreadTable()
-{
-    auto tlsTable = GetThisThreadTable();
-    if(!tlsTable)
-        tlsTable = CreateThisThreadTable();
-
-    return tlsTable;
 }
 
 FS_NAMESPACE_END
