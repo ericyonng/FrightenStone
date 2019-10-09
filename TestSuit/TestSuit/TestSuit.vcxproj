@@ -160,6 +160,7 @@
     <ClInclude Include="TestInst\TestFile.h" />
     <ClInclude Include="TestInst\TestFSDirectory.h" />
     <ClInclude Include="TestInst\TestFSFileUtil.h" />
+    <ClInclude Include="TestInst\TestFSTlsTable.h" />
     <ClInclude Include="TestInst\TestFS_List.h" />
     <ClInclude Include="TestInst\TestIocpExample.h" />
     <ClInclude Include="TestInst\TestJson.h" />

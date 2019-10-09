@@ -21,40 +21,70 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : utils.h
+ * @file  : TlsElementDefs.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/10/9
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Utils_H__
-#define __Base_Common_Assist_Utils_Utils_H__
 
-
+#ifndef __Base_Common_Assist_Utils_Impl_Defs_TlsElementDefs_H__
+#define __Base_Common_Assist_Utils_Impl_Defs_TlsElementDefs_H__
 #pragma once
 
-// defs ...
-#include "base/common/assist/utils/Defs/SystemUtilDefs.h"
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/assist/utils/Defs/ITlsBase.h"
+#include "base/common/objpool/objpool.h"
 
-// Impl ...
-// Interface ...
-#include "base/common/assist/utils/Impl/ToolUtil.h"
-#include "base/common/assist/utils/Impl/ThreadUtil.h"
-#include "base/common/assist/utils/Impl/STLUtil.h"
-#include "base/common/assist/utils/Impl/TimeUtil.h"
-#include "base/common/assist/utils/Impl/StringUtil.h"
-#include "base/common/assist/utils/Impl/FS_DirectoryUtil.h"
-#include "base/common/assist/utils/Impl/FS_FileUtil.h"
-#include "base/common/assist/utils/Impl/WidthUtil.h"
-#include "base/common/assist/utils/Impl/SystemUtil.h"
-#include "base/common/assist/utils/Defs/SystemUtilDefs.h"
-#include "base/common/assist/utils/Impl/KeyGeneratorUtil.h"
-#include "base/common/assist/utils/Impl/MathUtil.h"
-#include "base/common/assist/utils/Impl/FS_GuidUtil.h"
-#include "base/common/assist/utils/Defs/TlsElementDefs.h"
-#include "base/common/assist/utils/Defs/FS_TlsTable.h"
-#include "base/common/assist/utils/Impl/RTTIUtil.h"
+// 类型识别缓冲大小
+#ifndef __FS_RTTI_BUF_SIZE__
+#define __FS_RTTI_BUF_SIZE__    512
+#endif
 
-#endif // !__Base_Common_Assist_Utils_Utils_H__
+FS_NAMESPACE_BEGIN
+
+// 所有局部存储对象请派生于ITlsBase
+// 线程局部存储需要存储的对象类型
+class BASE_EXPORT TlsElemType
+{
+public:
+    enum
+    {
+        Begin = 0,
+        Tls_Rtti,           // 类型识别
+        Tls_TestTls,        // 测试tls
+        End,
+    };
+};
+
+// 类型识别线程局部存储
+struct BASE_EXPORT Tls_Rtti : public ITlsBase
+{
+    OBJ_POOL_CREATE_DEF(Tls_Rtti);
+
+    Tls_Rtti();
+    virtual ~Tls_Rtti();
+    virtual void Release();
+
+    char rtti[__FS_RTTI_BUF_SIZE__];
+};
+
+// 测试线程局部存储
+struct BASE_EXPORT Tls_TestTls : public ITlsBase
+{
+    OBJ_POOL_CREATE_DEF(Tls_TestTls);
+
+    Tls_TestTls();
+    virtual ~Tls_TestTls();
+
+    Int32 count;
+};
+
+FS_NAMESPACE_END
+
+#include "base/common/assist/utils/Defs/TlsElementDefsImpl.h"
+
+#endif

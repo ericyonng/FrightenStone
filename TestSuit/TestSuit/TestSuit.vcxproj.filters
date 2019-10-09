@@ -105,6 +105,9 @@
     <ClInclude Include="TestInst\TestSingleton.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TestInst\TestFSTlsTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

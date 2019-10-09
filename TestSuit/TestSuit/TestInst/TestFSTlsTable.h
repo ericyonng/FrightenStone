@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TerstSmartVar.h
+ * @file  : TestFSTlsTable.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/9
  * @brief :
@@ -29,26 +29,54 @@
  *
  * 
  */
-#ifndef __Test_TestSmartVar_H__
-#define __Test_TestSmartVar_H__
-
+#ifndef __Test_TestFSTlsTable_H__
+#define __Test_TestFSTlsTable_H__
 #pragma once
+
 #include "stdafx.h"
 
-class TestSmartVar
+class TestTlsTableTask
+{
+public:
+    static void Task(const fs::FS_ThreadPool *pool)
+    {
+        auto tlsTable = g_ThreadTlsTableMgr->GetAndCreateThisThreadTable();
+        auto testElem = tlsTable->GetElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
+        if(!testElem)
+            testElem = tlsTable->AllocElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
+
+        Int32 &tlsCount = testElem->count;
+        Int32 threadId = fs::SystemUtil::GetCurrentThreadId();
+        for(Int32 i = 0; i < 10; ++i)
+        {
+            g_Log->i<TestTlsTableTask>(_LOGFMT_("threadId[%d], tlsCount[%d]"), threadId, tlsCount);
+            ++tlsCount;
+            Sleep(1000);
+        }
+
+        // 释放本线程资源
+        g_ThreadTlsTableMgr->FreeThisThreadTable();
+
+        // 线程结束
+        g_Log->i<TestTlsTableTask>(_LOGFMT_("TestTlsTableTask end"));
+    }
+};
+
+class TestFSTlsTable
 {
 public:
     static void Run()
     {
-        fs::SmartVarRtti::InitRttiTypeNames();
-        fs::SmartVar var;
-        var["Insert"] = 11;
-        var["Insert2"] = fs::FS_String("wo");
-        bool isInsert = var["Insert"].AsBool();
-        std::cout << var.ToString() << std::endl;
-        std::cout << isInsert << std::endl;
-
+        g_Log->InitModule(NULL);
+        fs::FS_ThreadPool pool(0, 10);
+        for(Int32 i = 0; i < 10; ++i)
+        {
+            auto testTlsTask = fs::DelegatePlusFactory::Create(&TestTlsTableTask::Task);
+            pool.AddTask(testTlsTask, true);
+        }
+        getchar();
     }
 };
 
 #endif
+

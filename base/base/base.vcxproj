@@ -189,7 +189,13 @@
     <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtrImpl.h" />
     <ClInclude Include="..\common\assist\utils\Defs\FS_GuidUtilDefs.h" />
     <ClInclude Include="..\common\assist\utils\Defs\FS_IPUtilDefs.h" />
+    <ClInclude Include="..\common\assist\utils\Defs\FS_TlsTable.h" />
+    <ClInclude Include="..\common\assist\utils\Defs\FS_TlsTableImpl.h" />
+    <ClInclude Include="..\common\assist\utils\Defs\ITlsBase.h" />
+    <ClInclude Include="..\common\assist\utils\Defs\ITlsBaseImpl.h" />
     <ClInclude Include="..\common\assist\utils\Defs\SystemUtilDefs.h" />
+    <ClInclude Include="..\common\assist\utils\Defs\TlsElementDefs.h" />
+    <ClInclude Include="..\common\assist\utils\Defs\TlsElementDefsImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h" />
@@ -198,6 +204,8 @@
     <ClInclude Include="..\common\assist\utils\Impl\FS_IPUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\KeyGeneratorUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\MathUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\RTTIUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\RTTIUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\STLUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\STLUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\StringUtil.h" />
@@ -404,7 +412,9 @@
     <ClCompile Include="..\..\3rd\tiny-utf8\lib\tinyutf8.cpp" />
     <ClCompile Include="..\common\Application\Interface\IApplication.cpp" />
     <ClCompile Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.cpp" />
+    <ClCompile Include="..\common\assist\utils\Defs\FS_TlsTable.cpp" />
     <ClCompile Include="..\common\assist\utils\Defs\SystemUtilDefs.cpp" />
+    <ClCompile Include="..\common\assist\utils\Defs\TlsElementDefs.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_BitUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_DirectoryUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
@@ -412,6 +422,7 @@
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\KeyGeneratorUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\MathUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\RTTIUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\StringUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\SystemUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\ThreadUtil.cpp" />

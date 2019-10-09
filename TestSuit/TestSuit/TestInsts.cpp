@@ -60,6 +60,7 @@
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
 #include "TestSuit/TestSuit/TestInst/TestFS_List.h"
 #include "TestSuit/TestSuit/TestInst/TestSingleton.h"
+#include "TestSuit/TestSuit/TestInst/TestFSTlsTable.h"
 
 void TestInsts::Run()
 {
@@ -73,7 +74,7 @@ void TestInsts::Run()
 //     pool->AddTask(deleg);
 //     getchar();
 //     pool->Clear();
-    TestSingleton::Run();
+    TestFSTlsTable::Run();
     getchar();
     // TestJson::Run();
 }

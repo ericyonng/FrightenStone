@@ -35,6 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -54,6 +55,7 @@ public:
     #pragma region api
 public:
     virtual Int32 Start();
+    virtual void Wait();
     virtual void Close();
     #pragma endregion
     
@@ -93,6 +95,10 @@ private:
     Int32 _BeforeStart();
     Int32 _OnStart();
     Int32 _AfterStart();
+
+    void _WillClose();
+    void _BeforeClose();
+    void _AfterClose();
     #pragma endregion
 
 private:
@@ -101,6 +107,7 @@ private:
     IFS_MsgTransfer *_msgTransfer;                  // 消息传输器
     IFS_MsgHandler *_msgHandler;                    // 消息处理器
     FS_SessionMgr *_sessiomMgr;                     // 会话管理
+    ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
 };
 
 FS_NAMESPACE_END

@@ -115,7 +115,16 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     }
 
     // 根目录
-    _rootDirName = rootDirName;
+    if(!rootDirName)
+    {
+        auto programName = FS_FileUtil::ExtractFileWithoutExtension(SystemUtil::GetCurProgramName().RemoveZeroTail());
+        programName.AppendFormat("%s", "Log");
+        _rootDirName = programName;
+    }
+    else
+    {
+        _rootDirName = rootDirName;
+    }
 
     // 初始化文件锁
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)

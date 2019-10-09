@@ -999,6 +999,30 @@
     <ClInclude Include="..\common\net\Defs\FS_SessionInfo.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\RTTIUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\FS_TlsTable.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\FS_TlsTableImpl.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\TlsElementDefs.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\TlsElementDefsImpl.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\ITlsBase.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Defs\ITlsBaseImpl.h">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\RTTIUtilImpl.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1297,6 +1321,15 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Defs\FS_SessionInfo.cpp">
       <Filter>common\net\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\RTTIUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Defs\FS_TlsTable.cpp">
+      <Filter>common\assist\utils\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Defs\TlsElementDefs.cpp">
+      <Filter>common\assist\utils\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
