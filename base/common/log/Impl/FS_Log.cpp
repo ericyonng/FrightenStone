@@ -272,6 +272,11 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
     
     // 3.将日志数据放入队列
     _flielocker[fileUniqueIndex]->Lock();
+    if(_isFinish)
+    {
+        _flielocker[fileUniqueIndex]->Unlock();
+        return;
+    }
     _logDatas[fileUniqueIndex]->push_back(logData);
     _flielocker[fileUniqueIndex]->Unlock();
 
@@ -352,7 +357,7 @@ void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
     }
 
     // 只交换数据队列指针拷贝最少，最快，而且交换后_logDatas队列是空的相当于清空了数据 保证缓冲队列前几个都不为NULL, 碰到NULL表示结束
-    std::list<LogData *> *swapCache = _logCaches[logFileIndex]; // 由于主线程不会共享_logCaches所以是线程安全的（每个日志文件线程只有一个线程）,请保证外部其他线程不会调用本接口，需要立即写日志请调用flushall接口
+    std::list<LogData *> *&swapCache = _logCaches[logFileIndex]; // 由于主线程不会共享_logCaches所以是线程安全的（每个日志文件线程只有一个线程）,请保证外部其他线程不会调用本接口，需要立即写日志请调用flushall接口
     std::list<LogData *> *cache4RealLog = NULL;
     cache4RealLog = _logDatas[logFileIndex];
     _logDatas[logFileIndex] = swapCache;
