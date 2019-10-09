@@ -53,7 +53,7 @@ class Singleton
 public:
     static ObjType *GetInstance();
     template<typename... Args>
-    static ObjType *GetInstance(Args &&... args);
+    static ObjType *GetInstance(Args... args);
 
 private:
     Singleton(void) = delete;

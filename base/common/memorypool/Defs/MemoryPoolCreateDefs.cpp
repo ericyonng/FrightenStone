@@ -32,6 +32,7 @@
 #include "stdafx.h"
 #include "base/common/memorypool/Defs/MemoryPoolCreateDefs.h"
 #include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
+#include "base/common/log/Log.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -41,7 +42,8 @@ MemoryPoolHelper::MemoryPoolHelper()
 
 MemoryPoolHelper::~MemoryPoolHelper()
 {
-
+    g_Log->i<MemoryPoolHelper>(_LOGFMT_("MemoryPoolHelper destructor"));
+    g_Log->FlushAllFile();
 }
 
 void *MemoryPoolHelper::Alloc(size_t bytes)

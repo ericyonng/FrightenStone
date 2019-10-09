@@ -74,48 +74,48 @@ FS_NAMESPACE_END
 /// 内存池创建对象便利宏
 // 声明中需要添加 便利宏不支持基本数据类型 基本数据类型请直接定义一个helper对象
 #undef  OBJ_POOL_CREATE
-#define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                                       \
-public:                                                                                                 \
-        void  *operator new(size_t bytes)       { return _objpool_helper->_alloctor->Alloc();}           \
-        void   operator delete(void *ptr)       { _objpool_helper->_alloctor->Free(ptr);}                \
-        static size_t GetMemleakNum();                                                                  \
-                                                                                                        \
-        template<typename... Args>                                                                      \
-        static ObjType *New(Args &&... args)                                                            \
-        {                                                                                               \
-            return _objpool_helper->_alloctor->New(std::forward<Args>(args)...);                                   \
-        }                                                                                               \
-                                                                                                        \
-        static ObjType *NewWithoutConstruct()                                                           \
-        {                                                                                               \
-            return _objpool_helper->_alloctor->NewWithoutConstruct();                                              \
-        }                                                                                               \
-                                                                                                        \
-        template<typename... Args>                                                                      \
-        static ObjType *NewByPtr(void *ptr, Args &&... args)                                            \
-        {                                                                                               \
-            return _objpool_helper->_alloctor->NewByPtr(ptr, std::forward<Args>(args)...);                         \
-        }                                                                                               \
-                                                                                                        \
-        static void Delete(ObjType *ptr)                                                                \
-        {                                                                                               \
-            _objpool_helper->_alloctor->Delete(ptr);                                                               \
-        }                                                                                               \
-                                                                                                        \
-        static void DeleteWithoutDestructor(ObjType *ptr)                                               \
-        {                                                                                               \
-            _objpool_helper->_alloctor->DeleteWithoutDestructor(ptr);                                              \
-        }                                                                                               \
-                                                                                                        \
+#define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                                                   \
+public:                                                                                                             \
+        void  *operator new(size_t bytes)       { return _objpool_helper->_alloctor->Alloc();}                      \
+        void   operator delete(void *ptr)       { _objpool_helper->_alloctor->Free(ptr);}                           \
+        static size_t GetMemleakNum();                                                                              \
+                                                                                                                    \
+        template<typename... Args>                                                                                  \
+        static ObjType *New(Args &&... args)                                                                        \
+        {                                                                                                           \
+            return _objpool_helper->_alloctor->New(std::forward<Args>(args)...);                                    \
+        }                                                                                                           \
+                                                                                                                    \
+        static ObjType *NewWithoutConstruct()                                                                       \
+        {                                                                                                           \
+            return _objpool_helper->_alloctor->NewWithoutConstruct();                                               \
+        }                                                                                                           \
+                                                                                                                    \
+        template<typename... Args>                                                                                  \
+        static ObjType *NewByPtr(void *ptr, Args &&... args)                                                        \
+        {                                                                                                           \
+            return _objpool_helper->_alloctor->NewByPtr(ptr, std::forward<Args>(args)...);                          \
+        }                                                                                                           \
+                                                                                                                    \
+        static void Delete(ObjType *ptr)                                                                            \
+        {                                                                                                           \
+            _objpool_helper->_alloctor->Delete(ptr);                                                                \
+        }                                                                                                           \
+                                                                                                                    \
+        static void DeleteWithoutDestructor(ObjType *ptr)                                                           \
+        {                                                                                                           \
+            _objpool_helper->_alloctor->DeleteWithoutDestructor(ptr);                                               \
+        }                                                                                                           \
+                                                                                                                    \
         static fs::ObjPoolHelper<ObjType> *_objpool_helper
 
 // 在实现文件中需要添加
 #undef OBJ_POOL_CREATE_IMPL
-#define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                       \
-fs::ObjPoolHelper<ObjType> *ObjType::_objpool_helper = new fs::ObjPoolHelper<ObjType>(objAmount);       \
-size_t ObjType::GetMemleakNum()                                                                         \
-{                                                                                                       \
-    return _objpool_helper->GetMemleakObjNum();                                                          \
+#define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                                   \
+fs::ObjPoolHelper<ObjType> *ObjType::_objpool_helper = fs::Singleton<fs::ObjPoolHelper<ObjType>, fs::AssistObjsDefs::NoDel>::GetInstance(objAmount);       \
+size_t ObjType::GetMemleakNum()                                                                                     \
+{                                                                                                                   \
+    return _objpool_helper->GetMemleakObjNum();                                                                     \
 }
 
 // 默认以_objPoolHelper命名对象池变量名
