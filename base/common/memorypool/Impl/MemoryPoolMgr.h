@@ -111,4 +111,7 @@ FS_NAMESPACE_END
 
 // #define g_MemoryPool g_MemoryPoolAgency
 
+// template class BASE_EXPORT fs::Singleton<fs::MemoryPoolMgr, fs::AssistObjsDefs::NoDel>;
+// #define g_MemoryPool  static_cast<fs::IMemoryPoolMgr *>(fs::Singleton<fs::MemoryPoolMgr, fs::AssistObjsDefs::NoDel>::GetInstance())
+
 #endif

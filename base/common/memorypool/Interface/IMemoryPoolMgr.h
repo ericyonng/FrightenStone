@@ -78,6 +78,7 @@ inline ObjType *IMemoryPoolMgr::Realloc(void *ptr, size_t bytes)
 }
 FS_NAMESPACE_END
 
-extern BASE_EXPORT fs::IMemoryPoolMgr *g_MemoryPool;
+// extern BASE_EXPORT fs::IMemoryPoolMgr *g_MemoryPool;
+#define g_MemoryPool  fs::IMemoryPoolMgr::GetInstance()
 
 #endif
