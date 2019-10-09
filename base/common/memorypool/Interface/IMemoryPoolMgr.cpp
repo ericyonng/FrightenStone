@@ -43,9 +43,6 @@ IMemoryPoolMgr::IMemoryPoolMgr()
 
 IMemoryPoolMgr::~IMemoryPoolMgr()
 {
-    g_Log->i<IMemoryPoolMgr>(_LOGFMT_("IMemoryPoolMgr destructor"));
-    g_Log->i<IMemoryPoolMgr>(_LOGFMT_("this %p"), this);
-    g_Log->FlushAllFile();
 }
 
 void IMemoryPoolMgr::Release()

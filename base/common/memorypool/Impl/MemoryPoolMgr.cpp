@@ -58,8 +58,6 @@ MemoryPoolMgr::MemoryPoolMgr()
 MemoryPoolMgr::~MemoryPoolMgr()
 {
     FinishPool();
-    g_Log->i<MemoryPoolMgr>(_LOGFMT_("MemoryPoolMgr destructor"));
-    g_Log->FlushAllFile();
 }
 
 Int32 MemoryPoolMgr::InitPool()
