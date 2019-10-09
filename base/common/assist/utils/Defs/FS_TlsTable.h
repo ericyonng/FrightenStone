@@ -81,12 +81,12 @@ private:
     std::map<Int32, FS_TlsTable *> _threadIdRefTlsTable;
 };
 
-template class BASE_EXPORT Singleton<ThreadTlsTableMgr>;
+template class BASE_EXPORT Singleton<ThreadTlsTableMgr, AssistObjsDefs::NoDel>;
 
 FS_NAMESPACE_END
 
 #include "base/common/assist/utils/Defs/FS_TlsTableImpl.h"
 
-#define g_ThreadTlsTableMgr fs::Singleton<fs::ThreadTlsTableMgr>::GetInstance()
+#define g_ThreadTlsTableMgr fs::Singleton<fs::ThreadTlsTableMgr, fs::AssistObjsDefs::NoDel>::GetInstance()
 
 #endif
