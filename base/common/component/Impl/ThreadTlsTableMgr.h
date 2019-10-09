@@ -21,70 +21,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TlsElementDefs.h
+ * @file  : ThreadTlsTableMgr.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/9
+ * @date  : 2019/10/10
  * @brief :
  * 
  *
  * 
  */
-
-#ifndef __Base_Common_Assist_Utils_Impl_Defs_TlsElementDefs_H__
-#define __Base_Common_Assist_Utils_Impl_Defs_TlsElementDefs_H__
+#ifndef __Base_Common_Component_Impl_ThreadTlsTableMgr_H__
+#define __Base_Common_Component_Impl_ThreadTlsTableMgr_H__
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/assist/utils/Defs/ITlsBase.h"
-#include "base/common/objpool/objpool.h"
-
-// 类型识别缓冲大小
-#ifndef __FS_RTTI_BUF_SIZE__
-#define __FS_RTTI_BUF_SIZE__    512
-#endif
+#include "base/common/assist/assistobjs/Impl/Singleton.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
-// 所有局部存储对象请派生于ITlsBase
-// 线程局部存储需要存储的对象类型
-class BASE_EXPORT TlsElemType
+class BASE_EXPORT FS_TlsTable;
+
+class BASE_EXPORT ThreadTlsTableMgr
 {
 public:
-    enum
-    {
-        Begin = 0,
-        Tls_Rtti,           // 类型识别
-        Tls_TestTls,        // 测试tls
-        End,
-    };
+    ThreadTlsTableMgr();
+    ~ThreadTlsTableMgr();
+
+public:
+    FS_TlsTable *GetThisThreadTable();
+    FS_TlsTable *GetThisThreadTableNoLock();
+    FS_TlsTable *GetAndCreateThisThreadTable();
+    FS_TlsTable *CreateThisThreadTable();
+    void FreeThisThreadTable();
+
+private:
+    FS_TlsTable *_GetThisThreadTable();
+    FS_TlsTable *_CreateThisThreadTable();
+
+private:
+    Locker _guard;
+    std::map<Int32, FS_TlsTable *> _threadIdRefTlsTable;
 };
 
-// 类型识别线程局部存储
-struct BASE_EXPORT Tls_Rtti : public ITlsBase
-{
-    OBJ_POOL_CREATE_DEF(Tls_Rtti);
-
-    Tls_Rtti();
-    virtual ~Tls_Rtti();
-    virtual void Release();
-
-    char rtti[__FS_RTTI_BUF_SIZE__];
-};
-
-// 测试线程局部存储
-struct BASE_EXPORT Tls_TestTls : public ITlsBase
-{
-    OBJ_POOL_CREATE_DEF(Tls_TestTls);
-
-    Tls_TestTls();
-    virtual ~Tls_TestTls();
-
-    Int32 count;
-};
+template class BASE_EXPORT Singleton<ThreadTlsTableMgr, AssistObjsDefs::NoDel>;
 
 FS_NAMESPACE_END
 
-#include "base/common/assist/utils/Defs/TlsElementDefsImpl.h"
+#include "base/common/component/Impl/ThreadTlsTableMgrImpl.h"
+
+#define g_ThreadTlsTableMgr fs::Singleton<fs::ThreadTlsTableMgr, fs::AssistObjsDefs::NoDel>::GetInstance()
 
 #endif

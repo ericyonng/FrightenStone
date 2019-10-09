@@ -21,43 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_TlsTable.cpp
+ * @file  : ThreadTlsTableMgr.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/9
+ * @date  : 2019/10/10
  * @brief :
  * 
  *
  * 
  */
 #include "stdafx.h"
-#include "base/common/assist/utils/Defs/FS_TlsTable.h"
-#include "base/common/assist/utils/Defs/ITlsBase.h"
+#include "base/common/component/Impl/FS_TlsTable.h"
+#include "base/common/component/Impl/ThreadTlsTableMgr.h"
 #include "base/common/assist/utils/Impl/STLUtil.h"
 #include "base/common/assist/utils/Impl/SystemUtil.h"
 
 FS_NAMESPACE_BEGIN
-
-FS_TlsTable::~FS_TlsTable()
-{
-    STLUtil::DelMapContainer(_elementTypeRefElements);
-}
-
-void FS_TlsTable::Erase(Int32 type)
-{
-    auto iterElement = _elementTypeRefElements.find(type);
-    if(iterElement == _elementTypeRefElements.end())
-        return;
-
-    iterElement->second->Release();
-    _elementTypeRefElements.erase(iterElement);
-}
 
 ThreadTlsTableMgr::~ThreadTlsTableMgr()
 {
     STLUtil::DelMapContainer(_threadIdRefTlsTable);
 }
 
-FS_TlsTable *ThreadTlsTableMgr::GetThisThreadTable()
+FS_TlsTable *ThreadTlsTableMgr::GetThisThreadTableNoLock()
 {
     const Int32 threadId = static_cast<Int32>(SystemUtil::GetCurrentThreadId());
     auto iterTable = _threadIdRefTlsTable.find(threadId);
@@ -65,20 +50,6 @@ FS_TlsTable *ThreadTlsTableMgr::GetThisThreadTable()
         return NULL;
 
     return iterTable->second;
-}
-
-FS_TlsTable *ThreadTlsTableMgr::CreateThisThreadTable()
-{
-    const Int32 threadId = static_cast<Int32>(SystemUtil::GetCurrentThreadId());
-
-    _guard.Lock();
-    auto iterTable = _threadIdRefTlsTable.find(threadId);
-    if(iterTable == _threadIdRefTlsTable.end())
-        iterTable = _threadIdRefTlsTable.insert(std::make_pair(threadId, new FS_TlsTable())).first;
-    FS_TlsTable *newTable = iterTable->second;
-    _guard.Unlock();
-
-    return newTable;
 }
 
 void ThreadTlsTableMgr::FreeThisThreadTable()
@@ -92,11 +63,32 @@ void ThreadTlsTableMgr::FreeThisThreadTable()
         _guard.Unlock();
         return;
     }
+
     FS_TlsTable *tlsTable = iterTable->second;
     _threadIdRefTlsTable.erase(iterTable);
     _guard.Unlock();
 
     Fs_SafeFree(tlsTable);
+}
+
+FS_TlsTable *ThreadTlsTableMgr::_GetThisThreadTable()
+{
+    const Int32 threadId = static_cast<Int32>(SystemUtil::GetCurrentThreadId());
+    auto iterTable = _threadIdRefTlsTable.find(threadId);
+    if(iterTable == _threadIdRefTlsTable.end())
+        return NULL;
+
+    return iterTable->second;
+}
+
+FS_TlsTable *ThreadTlsTableMgr::_CreateThisThreadTable()
+{
+    const Int32 threadId = static_cast<Int32>(SystemUtil::GetCurrentThreadId());
+    auto iterTable = _threadIdRefTlsTable.find(threadId);
+    if(iterTable == _threadIdRefTlsTable.end())
+        iterTable = _threadIdRefTlsTable.insert(std::make_pair(threadId, new FS_TlsTable())).first;
+
+    return iterTable->second;
 }
 
 FS_NAMESPACE_END

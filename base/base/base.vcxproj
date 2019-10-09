@@ -189,13 +189,7 @@
     <ClInclude Include="..\common\assist\assistobjs\Impl\SmartPtrImpl.h" />
     <ClInclude Include="..\common\assist\utils\Defs\FS_GuidUtilDefs.h" />
     <ClInclude Include="..\common\assist\utils\Defs\FS_IPUtilDefs.h" />
-    <ClInclude Include="..\common\assist\utils\Defs\FS_TlsTable.h" />
-    <ClInclude Include="..\common\assist\utils\Defs\FS_TlsTableImpl.h" />
-    <ClInclude Include="..\common\assist\utils\Defs\ITlsBase.h" />
-    <ClInclude Include="..\common\assist\utils\Defs\ITlsBaseImpl.h" />
     <ClInclude Include="..\common\assist\utils\Defs\SystemUtilDefs.h" />
-    <ClInclude Include="..\common\assist\utils\Defs\TlsElementDefs.h" />
-    <ClInclude Include="..\common\assist\utils\Defs\TlsElementDefsImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_BitUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_DirectoryUtil.h" />
@@ -246,6 +240,10 @@
     <ClInclude Include="..\common\common.h" />
     <ClInclude Include="..\common\component\component.h" />
     <ClInclude Include="..\common\component\Defs\FS_AesDefs.h" />
+    <ClInclude Include="..\common\component\Defs\ITlsBase.h" />
+    <ClInclude Include="..\common\component\Defs\ITlsBaseImpl.h" />
+    <ClInclude Include="..\common\component\Defs\TlsElementDefs.h" />
+    <ClInclude Include="..\common\component\Defs\TlsElementDefsImpl.h" />
     <ClInclude Include="..\common\component\Defs\TriggerDefs.h" />
     <ClInclude Include="..\common\component\Impl\Aes\FS_Aes.h" />
     <ClInclude Include="..\common\component\Impl\BufferAddapter.h" />
@@ -274,6 +272,8 @@
     <ClInclude Include="..\common\component\Impl\FS_String.h" />
     <ClInclude Include="..\common\component\Impl\FS_StringImpl.h" />
     <ClInclude Include="..\common\component\Impl\FS_ThreadPool.h" />
+    <ClInclude Include="..\common\component\Impl\FS_TlsTable.h" />
+    <ClInclude Include="..\common\component\Impl\FS_TlsTableImpl.h" />
     <ClInclude Include="..\common\component\Impl\GlobalInitialize.h" />
     <ClInclude Include="..\common\component\Impl\SingletonAgency.h" />
     <ClInclude Include="..\common\component\Impl\SingletonAgencyImpl.h" />
@@ -286,6 +286,8 @@
     <ClInclude Include="..\common\component\Impl\Task\Impl\DelegateTaskImpl.h" />
     <ClInclude Include="..\common\component\Impl\Task\Interface\ITask.h" />
     <ClInclude Include="..\common\component\Impl\Task\Task.h" />
+    <ClInclude Include="..\common\component\Impl\ThreadTlsTableMgr.h" />
+    <ClInclude Include="..\common\component\Impl\ThreadTlsTableMgrImpl.h" />
     <ClInclude Include="..\common\component\Impl\Time.h" />
     <ClInclude Include="..\common\component\Impl\TimeSlice.h" />
     <ClInclude Include="..\common\component\Impl\TimeSliceImpl.h" />
@@ -412,9 +414,7 @@
     <ClCompile Include="..\..\3rd\tiny-utf8\lib\tinyutf8.cpp" />
     <ClCompile Include="..\common\Application\Interface\IApplication.cpp" />
     <ClCompile Include="..\common\assist\assistobjs\Defs\AssistObjsDefs.cpp" />
-    <ClCompile Include="..\common\assist\utils\Defs\FS_TlsTable.cpp" />
     <ClCompile Include="..\common\assist\utils\Defs\SystemUtilDefs.cpp" />
-    <ClCompile Include="..\common\assist\utils\Defs\TlsElementDefs.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_BitUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_DirectoryUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
@@ -434,6 +434,7 @@
     <ClCompile Include="..\common\asyn\Lock\Impl\Locker.cpp" />
     <ClCompile Include="..\common\basedefs\DataType\InnerDataType\Defs\LockerHandle.cpp" />
     <ClCompile Include="..\common\basedefs\Macro\ForAll\GlobalDefs.cpp" />
+    <ClCompile Include="..\common\component\Defs\TlsElementDefs.cpp" />
     <ClCompile Include="..\common\component\Defs\TriggerDefs.cpp" />
     <ClCompile Include="..\common\component\Impl\Aes\FS_Aes.cpp" />
     <ClCompile Include="..\common\component\Impl\File\FS_File.cpp" />
@@ -445,11 +446,13 @@
     <ClCompile Include="..\common\component\Impl\FS_Stream.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_String.cpp" />
     <ClCompile Include="..\common\component\Impl\FS_ThreadPool.cpp" />
+    <ClCompile Include="..\common\component\Impl\FS_TlsTable.cpp" />
     <ClCompile Include="..\common\component\Impl\GlobalInitialize.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVar.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarTraits.cpp" />
     <ClCompile Include="..\common\component\Impl\Task\Impl\DelegateTask.cpp" />
+    <ClCompile Include="..\common\component\Impl\ThreadTlsTableMgr.cpp" />
     <ClCompile Include="..\common\component\Impl\Time.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeSlice.cpp" />
     <ClCompile Include="..\common\component\Impl\TimeWheel\Comp\TimeData.cpp" />

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ITlsBaseImpl.h
+ * @file  : FS_TlsTable.cpp
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/9
  * @brief :
@@ -29,21 +29,27 @@
  *
  * 
  */
-
-#ifdef __Base_Common_Assist_Utils_Impl_Defs_ITlsBase_H__
-#pragma once
+#include "stdafx.h"
+#include "base/common/component/Impl/FS_TlsTable.h"
+#include "base/common/component/Defs/ITlsBase.h"
+#include "base/common/assist/utils/Impl/STLUtil.h"
+#include "base/common/assist/utils/Impl/SystemUtil.h"
 
 FS_NAMESPACE_BEGIN
 
-inline ITlsBase::ITlsBase()
+FS_TlsTable::~FS_TlsTable()
 {
-
+    STLUtil::DelMapContainer(_elementTypeRefElements);
 }
 
-inline ITlsBase::~ITlsBase()
+void FS_TlsTable::Erase(Int32 type)
 {
+    auto iterElement = _elementTypeRefElements.find(type);
+    if(iterElement == _elementTypeRefElements.end())
+        return;
+
+    iterElement->second->Release();
+    _elementTypeRefElements.erase(iterElement);
 }
 
 FS_NAMESPACE_END
-
-#endif
