@@ -38,11 +38,12 @@
 
 FS_NAMESPACE_BEGIN
 
-LogTask::LogTask(FS_ThreadPool *pool, IDelegate<void, Int32> *taskDelegate, Int32 workIntervalMsTime, Int32 logFileIndex)
+LogTask::LogTask(FS_ThreadPool *pool, IDelegate<void, Int32> *taskDelegate, Int32 workIntervalMsTime, Int32 logFileIndex, ConditionLocker &locker)
     :_taskDelegate(taskDelegate)
     ,_pool(pool)
     ,_workIntervalMsTime(workIntervalMsTime)
     ,_logFileIndex(logFileIndex)
+    ,_lock(locker)
 {
 
 }
@@ -67,7 +68,9 @@ Int32 LogTask::Run()
         _taskDelegate->Invoke(_logFileIndex);
 
         // ÐÝÏ¢Ò»»á¶ù
-        Sleep(_workIntervalMsTime);
+        _lock.Lock();
+        _lock.Wait(_workIntervalMsTime);
+        _lock.Unlock();
     }
 
     return StatusDefs::Success;

@@ -107,6 +107,7 @@ private:
 
     /* 日志文件内容 */
     ConditionLocker *_flielocker[LogDefs::LOG_QUANTITY];                    // 日志文件锁
+    ConditionLocker *_wakeupToWriteLog[LogDefs::LOG_QUANTITY];              // 唤醒日志线程去写日志
     ConditionLocker _locker;                                                // 系统锁
 
     LogFile *_logFiles[LogDefs::LOG_QUANTITY];                              // 日志id日志文件 创建后文件只允许读不允许增删改
