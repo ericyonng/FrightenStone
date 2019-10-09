@@ -46,6 +46,7 @@
 #include "base/common/log/Log.h"
 #include "base/common/assist/utils/utils.h"
 #include "base/common/crashhandle/CrashHandle.h"
+#include "base/common/socket/socket.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -73,8 +74,11 @@ Int32 FS_ServerCore::Start()
     // 1.时区
     TimeUtil::SetTimeZone();
 
-    // 2.log初始化
-    Int32 ret = g_Log->InitModule("FS_ServerCore");
+    // 2.类型识别
+    SmartVarRtti::InitRttiTypeNames();
+
+    // 3.log初始化
+    Int32 ret = g_Log->InitModule(NULL);
     if(ret != StatusDefs::Success)
     {
         FS_String str;
@@ -83,7 +87,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 3. crash dump switch start
+    // 4. crash dump switch start
     ret = fs::CrashHandleUtil::InitCrashHandleParams();
     if(ret != StatusDefs::Success)
     {
@@ -91,23 +95,23 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 4.启动前...
-    ret = _BeforeStart();
+    // 5.Socket环境
+    ret = SocketUtil::InitSocketEnv();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("_BeforeStart fail ret[%d]"), ret);
+        g_Log->e<FS_ServerCore>(_LOGFMT_("InitSocketEnv fail ret[%d]"), ret);
         return ret;
     }
 
-    // 5. 读取配置
+    // 6. 读取配置
     ret = _ReadConfig();
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_ServerCore>(_LOGFMT_("_ReadConfig fail ret[%d]"), ret);
         return ret;
     }
-
-    // 5.启动服务器模块
+    
+    // 7.创建服务器模块
     ret = _CreateNetModules();
     if(ret != StatusDefs::Success)
     {
@@ -115,7 +119,15 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 6.start 模块
+    // 8.启动前...
+    ret = _BeforeStart();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("_BeforeStart fail ret[%d]"), ret);
+        return ret;
+    }
+
+    // 9.start 模块
     ret = _StartModules();
     if(ret != StatusDefs::Success)
     {
@@ -123,7 +135,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 7.onstart
+    // 10.onstart
     ret = _OnStart();
     if(ret != StatusDefs::Success)
     {
@@ -131,7 +143,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 8._AfterStart
+    // 11._AfterStart
     ret = _AfterStart();
     if(ret != StatusDefs::Success)
     {
@@ -142,9 +154,29 @@ Int32 FS_ServerCore::Start()
     return StatusDefs::Success;
 }
 
+void FS_ServerCore::Wait()
+{
+    _waitForClose.Lock();
+    _waitForClose.Wait();
+    _waitForClose.Unlock();
+}
+
 void FS_ServerCore::Close()
 {
+    // 断开所有依赖
+    _WillClose();
 
+    // 各自自个模块移除资源
+    _BeforeClose();
+
+    // 移除服务器核心模块
+    _connector->Close();
+    _msgTransfer->Close();
+    _msgHandler->Close();
+    _sessiomMgr->Close();
+
+    // 最后处理
+    _AfterClose();
 }
 
 #pragma endregion
@@ -218,6 +250,21 @@ Int32 FS_ServerCore::_OnStart()
 Int32 FS_ServerCore::_AfterStart()
 {
     return StatusDefs::Success;
+}
+
+void FS_ServerCore::_WillClose()
+{
+
+}
+
+void FS_ServerCore::_BeforeClose()
+{
+
+}
+
+void FS_ServerCore::_AfterClose()
+{
+
 }
 
 #pragma endregion

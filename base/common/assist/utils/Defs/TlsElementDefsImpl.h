@@ -21,40 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : utils.h
+ * @file  : TlsElementDefsImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/10/9
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Assist_Utils_Utils_H__
-#define __Base_Common_Assist_Utils_Utils_H__
-
-
+#ifdef __Base_Common_Assist_Utils_Impl_Defs_TlsElementDefs_H__
 #pragma once
 
-// defs ...
-#include "base/common/assist/utils/Defs/SystemUtilDefs.h"
+FS_NAMESPACE_BEGIN
 
-// Impl ...
-// Interface ...
-#include "base/common/assist/utils/Impl/ToolUtil.h"
-#include "base/common/assist/utils/Impl/ThreadUtil.h"
-#include "base/common/assist/utils/Impl/STLUtil.h"
-#include "base/common/assist/utils/Impl/TimeUtil.h"
-#include "base/common/assist/utils/Impl/StringUtil.h"
-#include "base/common/assist/utils/Impl/FS_DirectoryUtil.h"
-#include "base/common/assist/utils/Impl/FS_FileUtil.h"
-#include "base/common/assist/utils/Impl/WidthUtil.h"
-#include "base/common/assist/utils/Impl/SystemUtil.h"
-#include "base/common/assist/utils/Defs/SystemUtilDefs.h"
-#include "base/common/assist/utils/Impl/KeyGeneratorUtil.h"
-#include "base/common/assist/utils/Impl/MathUtil.h"
-#include "base/common/assist/utils/Impl/FS_GuidUtil.h"
-#include "base/common/assist/utils/Defs/TlsElementDefs.h"
-#include "base/common/assist/utils/Defs/FS_TlsTable.h"
-#include "base/common/assist/utils/Impl/RTTIUtil.h"
+inline Tls_Rtti::Tls_Rtti()
+{
+    rtti[0] = 0;
+}
 
-#endif // !__Base_Common_Assist_Utils_Utils_H__
+inline Tls_Rtti::~Tls_Rtti()
+{
+
+}
+
+inline void Tls_Rtti::Release()
+{
+    delete this;
+}
+
+inline Tls_TestTls::Tls_TestTls()
+    :count(0)
+{
+}
+
+inline Tls_TestTls::~Tls_TestTls()
+{
+}
+
+FS_NAMESPACE_END
+
+#endif
