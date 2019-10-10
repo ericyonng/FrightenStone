@@ -67,15 +67,14 @@ class TestSystemTlsTableTask
 public:
     static void Task(const fs::FS_ThreadPool *pool)
     {
-        auto tlsTable = fs::FS_TlsUtil::GetUtilTlsTable();
-        auto testElem = tlsTable->GetElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
-        if(!testElem)
-            testElem = tlsTable->AllocElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
-
-        Int32 &tlsCount = testElem->count;
         Int32 threadId = fs::SystemUtil::GetCurrentThreadId();
         for(Int32 i = 0; i < 10; ++i)
         {
+            auto tlsTable = fs::FS_TlsUtil::GetUtilTlsTable();
+            auto testElem = tlsTable->GetElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
+            if(!testElem)
+                testElem = tlsTable->AllocElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
+            Int32 &tlsCount = testElem->count;
             g_Log->i<TestSystemTlsTableTask>(_LOGFMT_("threadId[%d], tlsCount[%d]"), threadId, tlsCount);
             ++tlsCount;
         }
@@ -121,9 +120,10 @@ public:
     {
         fs::FS_TlsTable *tlsTable = NULL;
         fs::Time nowTime1, nowTime2;
+        //fs::FS_TlsUtil::UtilGetAndCreateWithDefBuilder<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
         nowTime1.FlushTime();
         for(Int32 i = 0; i < performanceCnt; ++i)
-            tlsTable = fs::FS_TlsUtil::GetUtilTlsTable();
+            fs::FS_TlsUtil::GetUtilTlsTable();
         nowTime2.FlushTime();
 
         if(!tlsTable)

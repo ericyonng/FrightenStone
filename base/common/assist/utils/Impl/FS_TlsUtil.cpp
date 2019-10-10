@@ -32,7 +32,7 @@
 #include "stdafx.h"
 #include "base/common/assist/utils/Impl/FS_TlsUtil.h"
 #include "base/common/component/Defs/Tls/FS_TlsHandle.h"
-#include "base/common/component/Impl/FS_TlsTable.h"
+//#include "base/common/component/Impl/FS_TlsTable.h"
 #include "base/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
