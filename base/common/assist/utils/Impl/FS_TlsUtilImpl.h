@@ -59,6 +59,17 @@ inline void FS_TlsUtil::FreeUtilTlsTable()
     FreeTlsTable(GetUtileTlsHandle());
 }
 
+template<typename ObjType>
+inline ObjType *FS_TlsUtil::UtilGetAndCreateWithDefBuilder(Int32 elemType)
+{
+    auto tlsTable = GetUtilTlsTable();
+    auto elem = tlsTable->GetElement<ObjType>(elemType);
+    if(!elem)
+        elem = tlsTable->AllocElement<ObjType>(elemType);
+
+    return elem;
+}
+
 FS_NAMESPACE_END
 
 #endif

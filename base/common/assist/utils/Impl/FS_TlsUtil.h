@@ -38,6 +38,7 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/component/Defs/Tls/FS_TlsHandle.h"
 #include "base/common/status/status.h"
+#include "base/common/component/Impl/FS_TlsTable.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -52,6 +53,8 @@ public:
     static void DestroyUtilTlsHandle();
     static FS_TlsTable *GetUtilTlsTable();
     static void FreeUtilTlsTable();
+    template<typename ObjType>
+    static ObjType *UtilGetAndCreateWithDefBuilder(Int32 elemType);
 
     // Ö¸¶¨tlshandle
     static FS_TlsHandle CreateTlsHandle();
