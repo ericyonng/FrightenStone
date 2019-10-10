@@ -34,6 +34,7 @@
 #include "base/common/component/Defs/TlsElementDefs.h"
 #include "base/common/component/Impl/FS_TlsTable.h"
 #include "base/common/component/Impl/ThreadTlsTableMgr.h"
+#include "base/common/assist/utils/Impl/FS_TlsUtil.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -57,10 +58,7 @@ FS_NAMESPACE_BEGIN
 const char *RTTIUtil::GetByTypeName(const char *rawTypeName)
 {
 #if _WIN32
-    auto tlsTable = g_ThreadTlsTableMgr->GetThisThreadTable();
-    if(!tlsTable)
-        tlsTable = g_ThreadTlsTableMgr->CreateThisThreadTable();
-
+    auto tlsTable = fs::FS_TlsUtil::GetUtilTlsTable();
     auto tlsRtti = tlsTable->GetElement<fs::Tls_Rtti>(fs::TlsElemType::Tls_Rtti);
     if(!tlsRtti)
         tlsRtti = tlsTable->AllocElement<fs::Tls_Rtti>(fs::TlsElemType::Tls_Rtti);
@@ -98,10 +96,7 @@ const char *RTTIUtil::GetByTypeName(const char *rawTypeName)
 #ifndef _WIN32
 const char *RTTIUtil::GetCxxDemangle(const char *name)
 {
-    auto tlsTable = g_ThreadTlsTableMgr->GetThisThreadTable();
-    if(!tlsTable)
-        tlsTable = g_ThreadTlsTableMgr->CreateThisThreadTable();
-
+    auto tlsTable = fs::FS_TlsUtil::GetUtilTlsTable();
     if(UNLIKELY(!tlsTable))
         return "";
 
