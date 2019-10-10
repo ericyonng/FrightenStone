@@ -35,7 +35,7 @@
 FS_NAMESPACE_BEGIN
 
 inline EventManager::_Listener::_Listener()
-    : _stub()
+    : _stub(FS_INVALID_LISTENER_STUB)
     , _evId(0)
     , _listenCallBack(NULL)
 {
@@ -44,6 +44,7 @@ inline EventManager::_Listener::_Listener()
 
 inline EventManager::EventManager()
 : _firing(0)
+,_maxListenerStub(0)
 {
 
 }
@@ -55,8 +56,7 @@ inline EventManager::~EventManager()
         it++)
     {
         _Op &op = *it;
-        if(op._listener._listenCallBack)
-            FS_Release(op._listener._listenCallBack);
+        FS_Release(op._listener._listenCallBack);
     }
 
     for(_ListenersMap::iterator mIt = _listeners.begin();
@@ -69,8 +69,7 @@ inline EventManager::~EventManager()
             lIt++)
         {
             _Listener &listener = *lIt;
-            if(listener._listenCallBack)
-                FS_Release(listener._listenCallBack);
+            FS_Release(listener._listenCallBack);
         }
     }
 }
@@ -78,10 +77,12 @@ inline EventManager::~EventManager()
 inline int EventManager::RemoveListenerX(FS_ListenerStub &stub)
 {
     if(RemoveListener(stub) != StatusDefs::Success)
+    {
+        stub = FS_INVALID_LISTENER_STUB;
         return StatusDefs::Error;
+    }
 
-    stub.Clear();
-
+    stub = FS_INVALID_LISTENER_STUB;
     return StatusDefs::Success;
 }
 

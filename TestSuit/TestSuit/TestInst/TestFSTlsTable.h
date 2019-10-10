@@ -35,7 +35,7 @@
 
 #include "stdafx.h"
 
-class TestTlsTableTask
+class TestTlsTableTask 
 {
 public:
     static void Task(const fs::FS_ThreadPool *pool)

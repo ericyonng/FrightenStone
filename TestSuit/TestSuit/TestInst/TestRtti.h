@@ -21,27 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : EventDefs.h
+ * @file  : TestRtti.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/31
+ * @date  : 2019/10/10
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Event_Defs_EventDefs_H__
-#define __Base_Common_Event_Defs_EventDefs_H__
-
+#ifndef __Test_TestRtti_H__
+#define __Test_TestRtti_H__
 #pragma once
 
+#include "stdafx.h"
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
+class TestRttiObj
+{
+public:
+};
 
-// 事件存根
-typedef UInt64 BASE_EXPORT FS_ListenerStub;
+struct TestRttiStruct
+{
 
-// 无效存根
-#define FS_INVALID_LISTENER_STUB 0
+};
+
+class TestRtti
+{
+public:
+    static void Run()
+    {
+        fs::FS_TlsUtil::CreateUtilTlsHandle();
+        std::cout << fs::RTTIUtil::GetByType<Int32>() << std::endl;
+        std::cout << fs::RTTIUtil::GetByType<TestRttiObj>() << std::endl;
+        std::cout << fs::RTTIUtil::GetByType<TestRttiObj *>() << std::endl;
+        std::cout << fs::RTTIUtil::GetByType<TestRttiStruct>() << std::endl;
+        std::cout << fs::RTTIUtil::GetByType<TestRttiStruct *>() << std::endl;
+    }
+};
 
 #endif

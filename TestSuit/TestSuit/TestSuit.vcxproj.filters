@@ -108,6 +108,9 @@
     <ClInclude Include="TestInst\TestFSTlsTable.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TestInst\TestRtti.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
