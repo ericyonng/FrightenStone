@@ -149,6 +149,7 @@ protected:
 
 protected:
     int _firing;
+    FS_ListenerStub _maxListenerStub;
 
     // 延迟到afterevent执行相关事件
     typedef std::vector<_Op> _DelayedOps;
@@ -160,7 +161,7 @@ protected:
     _ListenersMap _listeners;
 
     // 存根对应的监听回调
-    typedef std::map<FS_String, _Listener> _StubIndexedListeners;
+    typedef std::map<FS_ListenerStub, _Listener> _StubIndexedListeners;
     _StubIndexedListeners _stubListeners;
 };
 

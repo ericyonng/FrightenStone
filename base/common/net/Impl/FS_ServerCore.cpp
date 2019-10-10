@@ -77,8 +77,18 @@ Int32 FS_ServerCore::Start()
     // 2.类型识别
     SmartVarRtti::InitRttiTypeNames();
 
-    // 3.log初始化
-    Int32 ret = g_Log->InitModule(NULL);
+    // 3.初始化线程局部存储句柄
+    Int32 ret = FS_TlsUtil::CreateUtilTlsHandle(); 
+    if(ret != StatusDefs::Success)
+    {
+        FS_String str;
+        str.AppendFormat("CreateUtilTlsHandle fail ret[%d]", ret);
+        ASSERTBOX(str.c_str());
+        return ret;
+    }
+
+    // 4.log初始化
+    ret = g_Log->InitModule(NULL);
     if(ret != StatusDefs::Success)
     {
         FS_String str;
@@ -87,7 +97,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 4. crash dump switch start
+    // 5. crash dump switch start
     ret = fs::CrashHandleUtil::InitCrashHandleParams();
     if(ret != StatusDefs::Success)
     {
@@ -95,7 +105,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 5.Socket环境
+    // 6.Socket环境
     ret = SocketUtil::InitSocketEnv();
     if(ret != StatusDefs::Success)
     {
@@ -103,7 +113,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 6. 读取配置
+    // 7. 读取配置
     ret = _ReadConfig();
     if(ret != StatusDefs::Success)
     {
@@ -111,7 +121,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
     
-    // 7.创建服务器模块
+    // 8.创建服务器模块
     ret = _CreateNetModules();
     if(ret != StatusDefs::Success)
     {
@@ -119,7 +129,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 8.启动前...
+    // 9.启动前...
     ret = _BeforeStart();
     if(ret != StatusDefs::Success)
     {
@@ -127,7 +137,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 9.start 模块
+    // 10.start 模块
     ret = _StartModules();
     if(ret != StatusDefs::Success)
     {
@@ -135,7 +145,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 10.onstart
+    // 11.onstart
     ret = _OnStart();
     if(ret != StatusDefs::Success)
     {
@@ -143,7 +153,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 11._AfterStart
+    // 12._AfterStart
     ret = _AfterStart();
     if(ret != StatusDefs::Success)
     {

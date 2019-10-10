@@ -44,7 +44,7 @@ FS_ListenerStub EventManager::AddListener(int id, IDelegate<void, FS_Event *> *l
         return FS_INVALID_LISTENER_STUB;
     }
 
-    FS_String stub;
+    FS_ListenerStub stub = FS_INVALID_LISTENER_STUB;
     if(bindedStub != FS_INVALID_LISTENER_STUB)
     {
         if(_SearchStub(bindedStub))
@@ -56,7 +56,7 @@ FS_ListenerStub EventManager::AddListener(int id, IDelegate<void, FS_Event *> *l
         stub = bindedStub;
     }
     else
-        stub = FS_GuidUtil::GenStr();
+        stub = ++_maxListenerStub;
 
     _Op op;
     op._addOp = true;
@@ -68,7 +68,7 @@ FS_ListenerStub EventManager::AddListener(int id, IDelegate<void, FS_Event *> *l
     if(IsFiring())
     {
         _delayedOps.push_back(op);
-        return FS_INVALID_LISTENER_STUB;
+        return op._listener._stub;
     }
 
     if(ProcessEventOperation(op) != StatusDefs::Success)
@@ -77,7 +77,7 @@ FS_ListenerStub EventManager::AddListener(int id, IDelegate<void, FS_Event *> *l
         return FS_INVALID_LISTENER_STUB;
     }
 
-    return op._listener._stub.c_str();
+    return op._listener._stub;
 }
 
 int EventManager::RemoveListener(int id)
@@ -103,7 +103,7 @@ int EventManager::RemoveListener(const FS_ListenerStub &stub)
 {
     _Op op;
     op._addOp = false;
-    op._listener._stub << stub;
+    op._listener._stub = stub;
 
     // 正在fire则放入延迟队列，延迟执行
     if(IsFiring())
@@ -125,7 +125,7 @@ void EventManager::FireEvent(FS_Event *event)
         _Listeners &listeners = mIt->second;
         for(_Listeners::iterator lIt = listeners.begin();
             lIt != listeners.end();
-            lIt++)
+            ++lIt)
         {
             _Listener &listener = *lIt;
             if(listener._listenCallBack)
@@ -146,7 +146,7 @@ void EventManager::FireEvent(FS_Event *event)
 
 bool EventManager::_SearchStub(const FS_ListenerStub &stub) const
 {
-    return (_stubListeners.find(stub) != _stubListeners.end()) ? true : false;
+    return _stubListeners.find(stub) != _stubListeners.end();
 }
 
 int EventManager::ProcessEventOperation(EventManager::_Op &op)
@@ -175,7 +175,7 @@ int EventManager::ProcessEventOperation(EventManager::_Op &op)
             _Listeners &listeners = mIt->second;
             for(_Listeners::iterator lIt = listeners.begin();
                 lIt != listeners.end();
-                lIt++)
+                ++lIt)
             {
                 _Listener &l = *lIt;
 
@@ -197,7 +197,7 @@ int EventManager::ProcessEventOperation(EventManager::_Op &op)
             _Listeners &listeners = mIt->second;
             for(_Listeners::iterator lIt = listeners.begin();
                 lIt != listeners.end();
-                lIt++)
+                ++lIt)
             {
                 _Listener &l = *lIt;
                 if(l._stub == listener._stub)
