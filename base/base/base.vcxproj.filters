@@ -328,6 +328,12 @@
     <Filter Include="common\component\Impl\FS_List\Impl">
       <UniqueIdentifier>{fadd69c1-087e-4a5d-a57b-2d34bb14ce58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\component\Impl\Tls">
+      <UniqueIdentifier>{f2ed6d80-7a3f-42e3-811b-2d999ffe9693}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Defs\Tls">
+      <UniqueIdentifier>{4c92a3f4-fc88-4e45-bf2e-1b641469b325}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1029,6 +1035,15 @@
     <ClInclude Include="..\common\component\Impl\ThreadTlsTableMgrImpl.h">
       <Filter>common\component\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Defs\Tls\FS_TlsHandle.h">
+      <Filter>common\component\Defs\Tls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_TlsUtil.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\assist\utils\Impl\FS_TlsUtilImpl.h">
+      <Filter>common\assist\utils\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1339,6 +1354,9 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\ThreadTlsTableMgr.cpp">
       <Filter>common\component\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\assist\utils\Impl\FS_TlsUtil.cpp">
+      <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

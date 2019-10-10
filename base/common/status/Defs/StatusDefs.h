@@ -141,6 +141,10 @@ public:
         IOCP_Quit = 1511,                                       // iocpÍË³ö
         #pragma endregion
 
+        #pragma region Tls[1600, 1699]
+        Tls_CreateHandleFail = 1600,                            // tlshandle´´½¨Ê§°Ü
+        #pragma endregion
+
     };
 };
 

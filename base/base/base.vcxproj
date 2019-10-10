@@ -196,6 +196,8 @@
     <ClInclude Include="..\common\assist\utils\Impl\FS_FileUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_GuidUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\FS_IPUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\FS_TlsUtil.h" />
+    <ClInclude Include="..\common\assist\utils\Impl\FS_TlsUtilImpl.h" />
     <ClInclude Include="..\common\assist\utils\Impl\KeyGeneratorUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\MathUtil.h" />
     <ClInclude Include="..\common\assist\utils\Impl\RTTIUtil.h" />
@@ -244,6 +246,7 @@
     <ClInclude Include="..\common\component\Defs\ITlsBaseImpl.h" />
     <ClInclude Include="..\common\component\Defs\TlsElementDefs.h" />
     <ClInclude Include="..\common\component\Defs\TlsElementDefsImpl.h" />
+    <ClInclude Include="..\common\component\Defs\Tls\FS_TlsHandle.h" />
     <ClInclude Include="..\common\component\Defs\TriggerDefs.h" />
     <ClInclude Include="..\common\component\Impl\Aes\FS_Aes.h" />
     <ClInclude Include="..\common\component\Impl\BufferAddapter.h" />
@@ -420,6 +423,7 @@
     <ClCompile Include="..\common\assist\utils\Impl\FS_FileUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_GuidUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\FS_IPUtil.cpp" />
+    <ClCompile Include="..\common\assist\utils\Impl\FS_TlsUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\KeyGeneratorUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\MathUtil.cpp" />
     <ClCompile Include="..\common\assist\utils\Impl\RTTIUtil.cpp" />
