@@ -168,6 +168,7 @@
     <ClInclude Include="TestInst\TestLogModule.h" />
     <ClInclude Include="TestInst\TestMathUtil.h" />
     <ClInclude Include="TestInst\TestMemoryPool.h" />
+    <ClInclude Include="TestInst\TestInterfaceComps.h" />
     <ClInclude Include="TestInst\TestObjPool.h" />
     <ClInclude Include="TestInst\TestRandom.h" />
     <ClInclude Include="TestInst\TestRtti.h" />

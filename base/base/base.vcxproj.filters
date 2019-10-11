@@ -1044,6 +1044,15 @@
     <ClInclude Include="..\common\assist\utils\Impl\FS_TlsUtilImpl.h">
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\InterfaceComps.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\InterfaceCompsImpl.h">
+      <Filter>common\component\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Defs\ServerCompsDef.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

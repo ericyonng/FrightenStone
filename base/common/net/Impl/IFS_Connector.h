@@ -35,6 +35,9 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/InterfaceComps.h"
+#include "base/common/net/Defs/ServerCompsDef.h"
+#include "base/common/component/Impl/SmartVar/SmartVar.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -49,6 +52,9 @@ public:
 public:
     virtual Int32 Start() = 0;
     virtual void Close() = 0;
+
+private:
+    InterfaceComps<ServerInterfaceCompsType, ServerInterfaceCompsType::End, void, const SmartVar &> _interfaceComps;
 
 //     /* TCP ³£¹æ²Ù×÷ */
 //     #pragma region tcp normal operate

@@ -63,5 +63,6 @@
 #include "base/common/component/Defs/TlsElementDefs.h"
 #include "base/common/component/Impl/FS_TlsTable.h"
 #include "base/common/component/Impl/ThreadTlsTableMgr.h"
+#include "base/common/component/Impl/InterfaceComps.h"
 
 #endif

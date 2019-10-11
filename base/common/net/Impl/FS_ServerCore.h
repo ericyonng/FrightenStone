@@ -39,6 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT FS_Session;
 class BASE_EXPORT IFS_ServerConfigMgr;
 class BASE_EXPORT IFS_Connector;
 class BASE_EXPORT IFS_MsgTransfer;

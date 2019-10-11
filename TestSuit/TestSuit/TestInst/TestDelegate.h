@@ -99,15 +99,13 @@ public:
             std::cout << "this is lambda" << "i:" << i << std::endl;
             return test1.print();
         };
-
-
+        
         auto delegate7 = fs::DelegatePlusFactory::Create<decltype(func), void>(func);
         delegate7->Invoke();
 
-        auto delegate8 = fs::DelegatePlusFactory::Create<decltype(__lambda), void, int>(std::forward<decltype(__lambda)>(__lambda));
+        auto delegate8 = fs::DelegatePlusFactory::Create<decltype(__lambda), void, int>(__lambda);
         delegate8->Invoke(1);
         delegate8->Invoke(1);
-        delegate8 = NULL;
         delegate8->Invoke(1);
 
         // 创建委托副本
