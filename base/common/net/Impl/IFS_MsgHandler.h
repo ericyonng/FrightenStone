@@ -36,6 +36,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -46,8 +47,13 @@ public:
     virtual ~IFS_MsgHandler();
 
 public:
+    virtual Int32 BeforeStart() { return StatusDefs::Success; }
     virtual Int32 Start() = 0;
+    virtual Int32 AfterStart() { return StatusDefs::Success; }
+    virtual void WillClose() {} // 断开与模块之间的依赖
+    virtual void BeforeClose() {}
     virtual void Close() = 0;
+    virtual void AfterClose() {}
 
     virtual void OnRecv() = 0;
     virtual void OnConnect() = 0;

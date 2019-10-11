@@ -47,14 +47,32 @@ FS_SessionMgr::~FS_SessionMgr()
 
 }
 
+Int32 FS_SessionMgr::BeforeStart()
+{
+    return StatusDefs::Success;
+}
+
 Int32 FS_SessionMgr::Start()
 {
     return StatusDefs::Success;
 }
 
+Int32 FS_SessionMgr::AfterStart()
+{
+    return StatusDefs::Success;
+}
+
+void FS_SessionMgr::BeforeClose()
+{
+}
+
 void FS_SessionMgr::Close()
 {
 
+}
+
+void FS_SessionMgr::AfterClose()
+{
 }
 
 void FS_SessionMgr::AddNewSession(UInt64 sessionId, FS_Session *session)

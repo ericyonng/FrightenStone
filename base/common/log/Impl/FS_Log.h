@@ -71,7 +71,7 @@ public:
     /* ¹¦ÄÜº¯Êý */
     virtual void UnInstallLogHookFunc(Int32 level, const IDelegate<void, const LogData *> *delegate);
     virtual void UnInstallBeforeLogHookFunc(Int32 level, const IDelegate<void, LogData *> *delegate);
-    virtual Int32 InitModule(const Byte8 *rootDirName);
+    virtual Int32 InitModule(const Byte8 *rootDirName = NULL);
     virtual void FinishModule();
     virtual void FlushAllFile();
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);

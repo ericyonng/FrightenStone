@@ -45,6 +45,7 @@ class BASE_EXPORT IFS_Connector;
 class BASE_EXPORT IFS_MsgTransfer;
 class BASE_EXPORT IFS_MsgHandler;
 class BASE_EXPORT FS_SessionMgr;
+class BASE_EXPORT FS_CpuInfo;
 
 class BASE_EXPORT FS_ServerCore
 {
@@ -60,31 +61,31 @@ public:
     virtual void Close();
     #pragma endregion
     
-//     /* 网络事件 */
-//     #pragma region net event
-//     /*
-//     * brief: 
-//     *       1. FS_Server 4 多个线程触发 不安全 如果只开启1个FS_Server就是安全的
-//     *       2. _OnNetMonitorTask 监听网络任务 OnRun(旧版) 建议多条线程去做monitor而不是单条线程，完成端口的get是线程安全的
-//     *       3. OnNetJoin 玩家加入 线程不安全
-//     *       4. OnNetLeave 玩家掉线 线程不安全
-//     *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）线程不安全 NetMsg_DataHeader 转发到其他线程需要拷贝避免消息被覆盖
-//     *       6. OnNetRecv 接收到数据 线程不安全
-//     */
-// protected:
-//     void _OnConnected(FS_Session *session);
-//     void _OnDisconnected(FS_Session *session);
-//     void _OnMsgArrived(FS_Session *session);
-// 
-// protected:
-//     // 服务器负载情况
-//     virtual void _OnSvrRuningDataRecord(const FS_ThreadPool *threadPool) = 0;
-// 
-//     // 网络操作
-// protected:
-//     void _AddSessionToMsgTrasfer(FS_Session *client);
-//     void _StatisticsMsgPerSecond();
-//     #pragma endregion
+    /* 网络事件 */
+    #pragma region net event
+    /*
+    * brief: 
+    *       1. FS_Server 4 多个线程触发 不安全 如果只开启1个FS_Server就是安全的
+    *       2. _OnNetMonitorTask 监听网络任务 OnRun(旧版) 建议多条线程去做monitor而不是单条线程，完成端口的get是线程安全的
+    *       3. OnNetJoin 玩家加入 线程不安全
+    *       4. OnNetLeave 玩家掉线 线程不安全
+    *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）线程不安全 NetMsg_DataHeader 转发到其他线程需要拷贝避免消息被覆盖
+    *       6. OnNetRecv 接收到数据 线程不安全
+    */
+protected:
+    void _OnConnected(FS_Session *session);
+    void _OnDisconnected(FS_Session *session);
+    void _OnMsgArrived(FS_Session *session);
+
+protected:
+    // 服务器负载情况
+    // virtual void _OnSvrRuningDataRecord(const FS_ThreadPool *threadPool) = 0;
+
+    // 网络操作
+protected:
+    void _AddSessionToMsgTrasfer(FS_Session *client);
+    void _StatisticsMsgPerSecond();
+    #pragma endregion
 
     /* 内部方法 */
     #pragma region inner api
@@ -100,13 +101,19 @@ private:
     void _WillClose();
     void _BeforeClose();
     void _AfterClose();
+
+    // 将监听的接口注册到模块中
+    void _RegisterToModule();
     #pragma endregion
 
 private:
+    FS_CpuInfo *_cpuInfo;                            // cpu信息
     IFS_ServerConfigMgr *_serverConfigMgr;          // 服务器配置
-    IFS_Connector *_connector;                      // 连接器
-    IFS_MsgTransfer *_msgTransfer;                  // 消息传输器
+
+    std::vector<IFS_Connector *> _connectors;       // 多线程连接器
+    std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息传输器
     IFS_MsgHandler *_msgHandler;                    // 消息处理器
+
     FS_SessionMgr *_sessiomMgr;                     // 会话管理
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
 };
@@ -114,5 +121,7 @@ private:
 FS_NAMESPACE_END
 
 #include "base/common/net/Impl/FS_ServerCoreImpl.h"
+
+extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;
 
 #endif

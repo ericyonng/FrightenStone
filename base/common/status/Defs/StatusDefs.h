@@ -145,6 +145,10 @@ public:
         Tls_CreateHandleFail = 1600,                            // tlshandle¥¥Ω® ß∞‹
         #pragma endregion
 
+        #pragma region IocpConnector[1700, 1799]
+        IocpConnector_StartFailOfMonitorTaskFailure = 1700,     // iocpconnector ÃÌº”monitor task ß∞‹
+        #pragma endregion
+
     };
 };
 
