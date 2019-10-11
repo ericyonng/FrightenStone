@@ -55,7 +55,7 @@ public:
     ILog();
     virtual ~ILog();
 
-    virtual Int32 InitModule(const Byte8 *rootDir) = 0;
+    virtual Int32 InitModule(const Byte8 *rootDir = NULL) = 0;
     virtual void FinishModule() = 0;
     virtual void FlushAllFile() = 0;
 

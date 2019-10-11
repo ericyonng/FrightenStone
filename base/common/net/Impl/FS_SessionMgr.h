@@ -47,8 +47,13 @@ public:
     ~FS_SessionMgr();
 
 public:
+    Int32 BeforeStart();
     Int32 Start();
+    Int32 AfterStart();
+    virtual void WillClose() {} // 断开与模块之间的依赖
+    void BeforeClose();
     void Close();
+    void AfterClose();
 
     void AddNewSession(UInt64 sessionId, FS_Session *session);
     void EraseSession(UInt64 sessionId);

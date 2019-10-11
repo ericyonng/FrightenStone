@@ -36,8 +36,14 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/net/Impl/IFS_Connector.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT FS_Session;
+
 class BASE_EXPORT FS_IocpConnector : public IFS_Connector
 {
 public:
@@ -45,10 +51,60 @@ public:
     virtual ~FS_IocpConnector();
 
 public:
+    virtual Int32 BeforeStart();
     virtual Int32 Start();
+    virtual void BeforeClose();
     virtual void Close();
+    virtual void RegisterConnected(IDelegate<void, FS_Session *> *callback);
    
+    /* TCP 常规操作 */
+    #pragma region tcp normal operate
+    /*
+    * brief:
+    *       1. - InitSocket 初始化Socket等
+    *       2. - Bind 绑定IP和端口号
+    *       3. - Listen 监听端口号
+    */
 private:
+    SOCKET _InitSocket();
+    Int32 _Bind(const Byte8 *ip, UInt16 port);
+    Int32 _Listen(Int32 unconnectQueueLen = SOMAXCONN);
+    #pragma endregion
+
+    /* 网络事件 */
+    #pragma region net event
+    /*
+    * brief: 
+    *       1. FS_Server 4 多个线程触发 不安全 如果只开启1个FS_Server就是安全的
+    *       2. _OnNetMonitorTask 监听网络任务 OnRun(旧版) 建议多条线程去做monitor而不是单条线程，完成端口的get是线程安全的
+    *       3. OnNetJoin 玩家加入 线程不安全
+    *       4. OnNetLeave 玩家掉线 线程不安全
+    *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）线程不安全 NetMsg_DataHeader 转发到其他线程需要拷贝避免消息被覆盖
+    *       6. OnNetRecv 接收到数据 线程不安全
+    */
+private:
+    void _OnIocpAccept(SOCKET sock);
+    void _OnIocpMonitorTask(const FS_ThreadPool *threadPool);
+    #pragma endregion
+
+    /* 数据成员 */
+    #pragma region data member
+private:
+    // 线程 
+    FS_ThreadPool *_threadPool;
+    SOCKET _sock;
+
+    // 网络事件回调
+    IDelegate<void, FS_Session *> *_onConnected;
+    IDelegate<void> *_closeIocpDelegate;
+
+    // 客户端连接上限
+    Locker _locker;
+    Int32 _clientAcceptCnt;
+    Int32 _maxClient;
+    UInt64 _clientMaxId;
+    const UInt64 _maxClientIdLimit;
+#pragma endregion
 };
 
 FS_NAMESPACE_END

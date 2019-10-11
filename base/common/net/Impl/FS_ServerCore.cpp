@@ -47,25 +47,29 @@
 #include "base/common/assist/utils/utils.h"
 #include "base/common/crashhandle/CrashHandle.h"
 #include "base/common/socket/socket.h"
+#include "base/common/component/Impl/FS_CpuInfo.h"
+
+fs::FS_ServerCore *g_ServerCore = NULL;
 
 FS_NAMESPACE_BEGIN
-
 FS_ServerCore::FS_ServerCore()
     :_serverConfigMgr(NULL)
-    ,_connector(NULL)
-    ,_msgTransfer(NULL)
+    ,_cpuInfo(new FS_CpuInfo)
     ,_msgHandler(NULL)
     ,_sessiomMgr(NULL)
 {
+    g_ServerCore = this;
 }
 
 FS_ServerCore::~FS_ServerCore()
 {
     Fs_SafeFree(_sessiomMgr);
     Fs_SafeFree(_msgHandler);
-    Fs_SafeFree(_msgTransfer);
-    Fs_SafeFree(_connector);
+    STLUtil::DelVectorContainer(_msgTransfers);
+    STLUtil::DelVectorContainer(_connectors);
+    Fs_SafeFree(_cpuInfo);
     Fs_SafeFree(_serverConfigMgr);
+    g_ServerCore = NULL;
 }
 
 #pragma region api
@@ -105,6 +109,13 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
+    // cpu信息初始化
+    if(!_cpuInfo->Initialize())
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("Initialize cpuinfo fail"));
+        return StatusDefs::Failed;
+    }
+
     // 6.Socket环境
     ret = SocketUtil::InitSocketEnv();
     if(ret != StatusDefs::Success)
@@ -129,7 +140,10 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 9.启动前...
+    // 9.注册接口
+    _RegisterToModule();
+
+    // 10.启动前...
     ret = _BeforeStart();
     if(ret != StatusDefs::Success)
     {
@@ -137,7 +151,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 10.start 模块
+    // 11.start 模块
     ret = _StartModules();
     if(ret != StatusDefs::Success)
     {
@@ -145,7 +159,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 11.onstart
+    // 12.onstart
     ret = _OnStart();
     if(ret != StatusDefs::Success)
     {
@@ -153,7 +167,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 12._AfterStart
+    // 13._AfterStart
     ret = _AfterStart();
     if(ret != StatusDefs::Success)
     {
@@ -180,8 +194,10 @@ void FS_ServerCore::Close()
     _BeforeClose();
 
     // 移除服务器核心模块
-    _connector->Close();
-    _msgTransfer->Close();
+    for(auto &connector : _connectors)
+        connector->Close();
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->Close();
     _msgHandler->Close();
     _sessiomMgr->Close();
 
@@ -189,6 +205,13 @@ void FS_ServerCore::Close()
     _AfterClose();
 }
 
+#pragma endregion
+
+/* 网络事件 */
+#pragma region
+void FS_ServerCore::_OnConnected(FS_Session *session)
+{
+}
 #pragma endregion
 
 #pragma region inner api
@@ -207,8 +230,16 @@ Int32 FS_ServerCore::_ReadConfig()
 
 Int32 FS_ServerCore::_CreateNetModules()
 {
-    _connector = FS_ConnectorFactory::Create();
-    _msgTransfer = FS_MsgTransferFactory::Create();
+    const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
+
+    _connectors.resize(cpuCnt);
+    for(Int32 i = 0; i < cpuCnt; ++i)
+        _connectors.push_back(FS_ConnectorFactory::Create());
+
+    _msgTransfers.resize(cpuCnt);
+    for(Int32 i = 0; i < cpuCnt; ++i)
+        _msgTransfers.push_back(FS_MsgTransferFactory::Create());
+
     _msgHandler = FS_MsgHandlerFactory::Create();
     _sessiomMgr = new FS_SessionMgr();
     return StatusDefs::Success;
@@ -216,18 +247,25 @@ Int32 FS_ServerCore::_CreateNetModules()
 
 Int32 FS_ServerCore::_StartModules()
 {
-    auto ret = _connector->Start();
-    if(ret != StatusDefs::Success)
+    Int32 ret = StatusDefs::Success;
+    for(auto &connector : _connectors)
     {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("connector start fail ret[%d]"), ret);
-        return ret;
+        ret = connector->Start();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("connector start fail ret[%d]"), ret);
+            return ret;
+        }
     }
 
-    ret = _msgTransfer->Start();
-    if(ret != StatusDefs::Success)
+    for(auto &msgTransfer : _msgTransfers)
     {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("msgTransfer start fail ret[%d]"), ret);
-        return ret;
+        ret = msgTransfer->Start();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("msgTransfer start fail ret[%d]"), ret);
+            return ret;
+        }
     }
 
     ret = _msgHandler->Start();
@@ -249,6 +287,41 @@ Int32 FS_ServerCore::_StartModules()
 
 Int32 FS_ServerCore::_BeforeStart()
 {
+    Int32 ret = StatusDefs::Success;
+    for(auto &connector : _connectors)
+    {
+        ret = connector->BeforeStart();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("connector BeforeStart fail ret[%d]"), ret);
+            return ret;
+        }
+    }
+
+    for(auto &msgTransfer : _msgTransfers)
+    {
+        ret = msgTransfer->BeforeStart();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("msgTransfer BeforeStart fail ret[%d]"), ret);
+            return ret;
+        }
+    }
+
+    ret = _msgHandler->BeforeStart();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler BeforeStart fail ret[%d]"), ret);
+        return ret;
+    }
+
+    ret = _sessiomMgr->BeforeStart();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("sessiomMgr BeforeStart fail ret[%d]"), ret);
+        return ret;
+    }
+
     return StatusDefs::Success;
 }
 
@@ -259,22 +332,97 @@ Int32 FS_ServerCore::_OnStart()
 
 Int32 FS_ServerCore::_AfterStart()
 {
+    Int32 ret = StatusDefs::Success;
+    for(auto &connector : _connectors)
+    {
+        ret = connector->AfterStart();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("connector AfterStart fail ret[%d]"), ret);
+            return ret;
+        }
+    }
+
+    for(auto &msgTransfer : _msgTransfers)
+    {
+        ret = msgTransfer->AfterStart();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("msgTransfer AfterStart fail ret[%d]"), ret);
+            return ret;
+        }
+    }
+
+    ret = _msgHandler->AfterStart();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler AfterStart fail ret[%d]"), ret);
+        return ret;
+    }
+
+    ret = _sessiomMgr->AfterStart();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("sessiomMgr AfterStart fail ret[%d]"), ret);
+        return ret;
+    }
+
     return StatusDefs::Success;
 }
 
 void FS_ServerCore::_WillClose()
 {
+    for(auto &connector : _connectors)
+        connector->WillClose();
 
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->WillClose();
+
+    _msgHandler->WillClose();
+    _sessiomMgr->WillClose();
 }
 
 void FS_ServerCore::_BeforeClose()
 {
+    for(auto &connector : _connectors)
+        connector->BeforeClose();
 
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->BeforeClose();
+
+    _msgHandler->BeforeClose();
+    _sessiomMgr->BeforeClose();
 }
 
 void FS_ServerCore::_AfterClose()
 {
+    for(auto &connector : _connectors)
+        connector->AfterClose();
 
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->AfterClose();
+
+    _msgHandler->AfterClose();
+    _sessiomMgr->AfterClose();
+}
+
+void FS_ServerCore::_RegisterToModule()
+{
+    for(auto &connector : _connectors)
+    {
+        auto onConnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnConnected);
+        connector->RegisterConnected(onConnectedRes);
+    }
+
+    // TODO:
+//     for(auto &msgTransfer : _msgTransfers)
+//     {
+//         msgTransfer
+//     }
+//         msgTransfer->AfterClose();
+// 
+//     _msgHandler->AfterClose();
+//     _sessiomMgr->AfterClose();
 }
 
 #pragma endregion
