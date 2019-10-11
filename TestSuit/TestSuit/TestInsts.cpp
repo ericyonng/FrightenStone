@@ -62,6 +62,7 @@
 #include "TestSuit/TestSuit/TestInst/TestSingleton.h"
 #include "TestSuit/TestSuit/TestInst/TestFSTlsTable.h"
 #include "TestSuit/TestSuit/TestInst/TestRtti.h"
+#include "TestSuit/TestSuit/TestInst/TestInterfaceComps.h"
 
 void TestInsts::Run()
 {
@@ -75,7 +76,7 @@ void TestInsts::Run()
 //     pool->AddTask(deleg);
 //     getchar();
 //     pool->Clear();
-    TestRtti::Run();
+    TestInterfaceComps::Run();
     getchar();
     // TestJson::Run();
 }
