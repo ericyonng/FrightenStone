@@ -66,6 +66,7 @@ public:
     *       3. - Listen 监听端口号
     */
 private:
+    void _ReadConfig();
     SOCKET _InitSocket();
     Int32 _Bind(const Byte8 *ip, UInt16 port);
     Int32 _Listen(Int32 unconnectQueueLen = SOMAXCONN);
@@ -83,7 +84,7 @@ private:
     *       6. OnNetRecv 接收到数据 线程不安全
     */
 private:
-    void _OnIocpAccept(SOCKET sock);
+    void _OnConnected(SOCKET sock);
     void _OnIocpMonitorTask(const FS_ThreadPool *threadPool);
     #pragma endregion
 
@@ -100,10 +101,10 @@ private:
 
     // 客户端连接上限
     Locker _locker;
-    Int32 _clientAcceptCnt;
-    Int32 _maxClient;
-    UInt64 _clientMaxId;
-    const UInt64 _maxClientIdLimit;
+    Int32 _curSessionCnt;
+    Int32 _maxSessionQuantityLimit;
+    UInt64 _curMaxSessionId;
+    const UInt64 _maxSessionIdLimit;
 #pragma endregion
 };
 

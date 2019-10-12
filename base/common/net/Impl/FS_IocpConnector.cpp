@@ -39,6 +39,7 @@
 #include "base/common/socket/socket.h"
 #include "base/common/net/Impl/FS_Session.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
+#include "base/common/assist/utils/Impl/SystemUtil.h"
 
 FS_NAMESPACE_BEGIN
 FS_IocpConnector::FS_IocpConnector()
@@ -46,12 +47,13 @@ FS_IocpConnector::FS_IocpConnector()
     ,_sock(INVALID_SOCKET)
     , _onConnected(NULL)
     ,_closeIocpDelegate(NULL)
-    ,_clientAcceptCnt(0)
-    , _maxClient(0)
-    ,_clientMaxId(0)
-    ,_maxClientIdLimit((std::numeric_limits<UInt64>::max)())
+    ,_curSessionCnt(0)
+    , _maxSessionQuantityLimit(0)
+    ,_curMaxSessionId(0)
+    ,_maxSessionIdLimit((std::numeric_limits<UInt64>::max)())
 {
-
+    // TODO:读取配置
+     _maxSessionQuantityLimit = FD_SETSIZE;
 }
 
 FS_IocpConnector::~FS_IocpConnector()
@@ -64,6 +66,8 @@ FS_IocpConnector::~FS_IocpConnector()
 Int32 FS_IocpConnector::BeforeStart()
 {
     // TODO:读取配置初始化变量
+    _ReadConfig();
+
     _threadPool = new FS_ThreadPool(0, 1);
     return StatusDefs::Success;
 }
@@ -93,6 +97,11 @@ void FS_IocpConnector::RegisterConnected(IDelegate<void, FS_Session *> *callback
 {
     Fs_SafeFree(_onConnected);
     _onConnected = callback;
+}
+
+void FS_IocpConnector::_ReadConfig()
+{
+    // TODO:
 }
 
 SOCKET FS_IocpConnector::_InitSocket()
@@ -172,7 +181,7 @@ Int32 FS_IocpConnector::_Listen(Int32 unconnectQueueLen)
     return StatusDefs::Success;
 }
 
-void FS_IocpConnector::_OnIocpAccept(SOCKET sock)
+void FS_IocpConnector::_OnConnected(SOCKET sock)
 {
     // 1. accept 等待接受客户端连接
  // sockaddr_in clientAddr = {};
@@ -183,10 +192,10 @@ void FS_IocpConnector::_OnIocpAccept(SOCKET sock)
         return;
     }
 
-    if(_clientAcceptCnt < _maxClient && _clientMaxId < _maxClientIdLimit)
+    if(_curSessionCnt < _maxSessionQuantityLimit && _curMaxSessionId < _maxSessionIdLimit)
     {
-        ++_clientMaxId;
-        ++_clientAcceptCnt;
+        ++_curMaxSessionId;
+        ++_curSessionCnt;
         SocketUtil::MakeReUseAddr(sock);
 
         // TODO:连接回调
@@ -197,7 +206,7 @@ void FS_IocpConnector::_OnIocpAccept(SOCKET sock)
     else {
         // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
         SocketUtil::DestroySocket(sock);
-        g_Log->w<FS_IocpConnector>(_LOGFMT_("Accept to MaxClient[%d] or curMaxId[%llu] too large"), _maxClient, _clientMaxId);
+        g_Log->w<FS_IocpConnector>(_LOGFMT_("Accept to MaxClient[%d] or curMaxId[%llu] too large"), _maxSessionQuantityLimit, _curMaxSessionId);
     }
 }
 
@@ -245,15 +254,15 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
         // 处理iocp退出
         if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys<FS_IocpConnector>(_LOGFMT_("iocp退出 code=%lld"), ioEvent._data._code);
+            g_Log->sys<FS_IocpConnector>(_LOGFMT_("iocp退出 threadId<%lu> code=%lld")
+                                         , SystemUtil::GetCurrentThreadId(), ioEvent._data._code);
             break;
         }
 
         // 接受连接 完成
         if(IocpDefs::IO_ACCEPT == ioEvent._ioData->_ioType)
         {
-            // CELLLog_Info("新客户端加入 sockfd=%d", ioEvent.pIoData->sockfd);
-            _OnIocpAccept(ioEvent._ioData->_sock);
+            _OnConnected(ioEvent._ioData->_sock);
 
             // 继续向IOCP投递接受连接任务
             listenIocp->PostAccept(_sock, &ioData);
