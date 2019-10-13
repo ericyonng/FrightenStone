@@ -41,7 +41,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Packet;
+class BASE_EXPORT FS_Packet2;
 struct BASE_EXPORT PacketQueueNode;
 class BASE_EXPORT FS_Iocp;
 struct BASE_EXPORT IO_EVENT;
@@ -55,14 +55,14 @@ public:
 
     void Start();
     void Close();
-    void SendPacket(FS_Packet *packet);
+    void SendPacket(FS_Packet2 *packet);
 
 private:
     void _OnWork(const FS_ThreadPool *pool);
     void _OnSendSuc(PacketQueueNode *node, Int32 transferBytes);
     Int32 _WaitForNetResponse();
 
-    void _Add2SendQueue(FS_Packet *packet);
+    void _Add2SendQueue(FS_Packet2 *packet);
     void _RemoveFromQueue(UInt64 clientId);
     void _ClearData();
 
@@ -72,7 +72,7 @@ public:
     IO_EVENT *_ioEvent;
     ConditionLocker _locker;
     bool _isDestroy;
-    std::list<FS_Packet *> _packetCacheQueue;   // 待转移到发送队列的缓冲队列
+    std::list<FS_Packet2 *> _packetCacheQueue;   // 待转移到发送队列的缓冲队列
     std::map<UInt64, std::list<PacketQueueNode *>> _sendingQueue; // key:clientId
     std::set<UInt64> _needPostClientIds;
     IDelegate<void> *_quitIocp;

@@ -21,72 +21,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_Session.h
+ * @file  : FS_IocpBuffer.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2019/10/13
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_Session_H__
-#define __Base_Common_Net_Impl_FS_Session_H__
+#ifndef __Base_Common_Net_Defs_FS_IocpBuffer_H__
+#define __Base_Common_Net_Defs_FS_IocpBuffer_H__
+
 #pragma once
+
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/net/Defs/IFS_Buffer.h"
+#include "base/common/net/Defs/IocpDefs.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/net/protocol/protocol.h"
 #include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_SessionMgr;
-class BASE_EXPORT IFS_Packet;
-class BASE_EXPORT FS_Addr;
-struct BASE_EXPORT NetMsg_DataHeader;
-class BASE_EXPORT IFS_Buffer;
-
-// TODO: IFS_Session, FS_IocpSession, FS_EpollSession
-
-class BASE_EXPORT FS_Session
+class BASE_EXPORT FS_IocpBuffer : public IFS_Buffer
 {
-    OBJ_POOL_CREATE_DEF(FS_Session);
+    OBJ_POOL_CREATE_DEF(FS_IocpBuffer);
 public:
-    explicit FS_Session(UInt64 sessionId, SOCKET sock);
-    ~FS_Session();
+    explicit FS_IocpBuffer(size_t bufferSize);
+    virtual ~FS_IocpBuffer();
 
 public:
+    bool BindTo(UInt64 sessionId, SOCKET sock);
+    IoDataBase *MakeRecvIoData();
+    IoDataBase *MakeSendIoData();
+    bool HasMsg() const;
+    bool NeedWrite() const;
     UInt64 GetSessionId() const;
     SOCKET GetSocket() const;
-    const FS_Addr *GetAddr() const;
-    bool HasMsgToRead() const;
-
-    /* 事件 */
-public:
-    // 客户端销毁
-    void OnDestroy();
-    // 客户端连入
-    void OnConnect();
-    // 心跳连接超时
-    void OnHeartBeatTimeOut();
-    void OnMsgArrived();
-    
-public:
-    void BindToSender(IDelegate<void >)
-    bool Send(NetMsg_DataHeader *header);
 
 private:
-    void _Destroy();
+    void _OnSendSucCallback(size_t transferBytes);
+    void _OnRecvSucCallback(size_t transferBytes);
 
 private:
-    UInt64 _sessionId;
-    FS_Addr *_addr;
-    SOCKET _sock;
-    IFS_Buffer *_recvBuffer;
-    std::list<IFS_Buffer *> _toSend;
-    FS_SessionMgr *_sessionMgr;
+    UInt64 _sessionId;      // FS_Packet生命周期内不变更
+    SOCKET _socket;         // FS_Packet生命周期内不变更
+    IoDataBase _ioData;
 };
 
 FS_NAMESPACE_END
 
-#include "base/common/net/Impl/FS_SessionImpl.h"
+#include "base/common/net/Defs/FS_IocpBufferImpl.h"
 
 #endif

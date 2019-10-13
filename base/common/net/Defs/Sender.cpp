@@ -35,7 +35,7 @@
 #include "base/common/component/Impl/FS_ThreadPool.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/log/Log.h"
-#include "base/common/net/Defs/FS_Packet.h"
+#include "base/common/net/Defs/FS_Packet2.h"
 #include "base/common/net/Impl/FS_Iocp.h"
 
 FS_NAMESPACE_BEGIN
@@ -84,7 +84,7 @@ void Sender::Close()
     _needPostClientIds.clear();
 }
 
-void Sender::SendPacket(FS_Packet *packet)
+void Sender::SendPacket(FS_Packet2 *packet)
 {
     // 保证包是有数据的
     if(!packet->NeedWrite())
@@ -117,7 +117,7 @@ void Sender::_OnWork(const FS_ThreadPool *pool)
     if(!_quitIocp)
         _quitIocp = DelegatePlusFactory::Create<decltype(__quitIocp), void>(__quitIocp);
 
-    FS_Packet *forPostPacket = NULL;
+    FS_Packet2 *forPostPacket = NULL;
     PacketQueueNode *queueNode = NULL;
     UInt64 clientId = 0;
     Int32 netSt = StatusDefs::Success;
@@ -269,7 +269,7 @@ Int32 Sender::_WaitForNetResponse()
         }
 
         // 完成回调
-        _ioEvent->_ioData->_completedCallback->Invoke(_ioEvent->_bytesTrans);
+        _ioEvent->_ioData->_callback->Invoke(_ioEvent->_bytesTrans);
         auto node = _ioEvent->_ioData->_node;
 
         node->_isPost = false;
@@ -294,7 +294,7 @@ Int32 Sender::_WaitForNetResponse()
     return ret;
 }
 
-void Sender::_Add2SendQueue(FS_Packet *packet)
+void Sender::_Add2SendQueue(FS_Packet2 *packet)
 {
     const UInt64 ownerId = packet->GetOwnerId();
     const SOCKET sock = packet->GetSocket();

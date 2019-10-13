@@ -46,7 +46,7 @@
 #include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
-class BASE_EXPORT  FS_Packet;
+class BASE_EXPORT  FS_Packet2;
 class BASE_EXPORT FS_Client
 {
     OBJ_POOL_CREATE(FS_Client, _objPoolHelper);
@@ -62,7 +62,7 @@ public:
     void SendData(NetMsg_DataHeader *header);
     // 返回值 len 或 SOCKET_ERROR
     void SendData(const char *data, Int32 len);
-    void SetSender(IDelegate<void, FS_Packet *> *sendFunc);
+    void SetSender(IDelegate<void, FS_Packet2 *> *sendFunc);
 
     NetMsg_DataHeader *FrontRecvMsg();
     void PopRecvFrontMsg();
@@ -70,7 +70,7 @@ public:
     void UpdateHeartBeatExpiredTime();
 
     #ifdef FS_USE_IOCP
-    IO_DATA_BASE *MakeRecvIoData();
+    IoDataBase *MakeRecvIoData();
 
     bool IsPostIoChange() const;
     bool IsPostSend() const;
@@ -111,9 +111,9 @@ private:
     // socket fd_set  file desc set
     SOCKET _sockfd;
     // 第二缓冲区 接收消息缓冲区
-    FS_Packet *_recvBuff;
+    FS_Packet2 *_recvBuff;
     // 发送缓冲区
-    IDelegate<void, FS_Packet *> *_sendFunc;
+    IDelegate<void, FS_Packet2 *> *_sendFunc;
     // 心跳过期时间
     Time _heartBeatExpiredTime; // 心跳过期时间
 

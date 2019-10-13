@@ -91,6 +91,7 @@ void FS_IocpConnector::BeforeClose()
 
 void FS_IocpConnector::Close()
 {
+    _threadPool->Clear();
 }
 
 void FS_IocpConnector::RegisterConnected(IDelegate<void, FS_Session *> *callback)
@@ -231,7 +232,7 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
     const int len = 1024;
     char buf[len] = {};
 
-    IO_DATA_BASE ioData = {};
+    IoDataBase ioData = {};
     ioData._wsaBuff.buf = buf;
     ioData._wsaBuff.len = len;
 

@@ -159,7 +159,7 @@ Int32 FS_Iocp::LoadAcceptEx(SOCKET listenSocket)
 #pragma endregion
 
 #pragma region
-Int32 FS_Iocp::PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData)
+Int32 FS_Iocp::PostAccept(SOCKET listenSocket, IoDataBase *ioData)
 {
     ioData->_ioType = IocpDefs::IO_ACCEPT;
     ioData->_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -184,7 +184,7 @@ Int32 FS_Iocp::PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData)
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::PostRecv(SOCKET targetSock, IO_DATA_BASE *ioData)
+Int32 FS_Iocp::PostRecv(SOCKET targetSock, IoDataBase *ioData)
 {
     ioData->_ioType = IocpDefs::IO_RECV;
     DWORD flags = 0;
@@ -211,7 +211,7 @@ Int32 FS_Iocp::PostRecv(SOCKET targetSock, IO_DATA_BASE *ioData)
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::PostSend(SOCKET targetSock, IO_DATA_BASE *ioData)
+Int32 FS_Iocp::PostSend(SOCKET targetSock, IoDataBase *ioData)
 {
     ioData->_ioType = IocpDefs::IO_SEND;
     DWORD flags = 0;

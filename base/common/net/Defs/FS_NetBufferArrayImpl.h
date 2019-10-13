@@ -90,12 +90,12 @@ inline bool FS_NetBufferArray::IsFirstNodeNull() const
     return !_buffers.front();
 }
 
-inline IO_DATA_BASE *FS_NetBufferArray::MakeRecvIoData(SOCKET sockfd)
+inline IoDataBase *FS_NetBufferArray::MakeRecvIoData(SOCKET sockfd)
 {
     return _buffers.back()->MakeRecvIoData(sockfd);
 }
 
-inline IO_DATA_BASE *FS_NetBufferArray::MakeSendIoData(SOCKET sockfd)
+inline IoDataBase *FS_NetBufferArray::MakeSendIoData(SOCKET sockfd)
 {// 从最早的数据发送
     return _buffers.front()->MakeSendIoData(sockfd);
 }
