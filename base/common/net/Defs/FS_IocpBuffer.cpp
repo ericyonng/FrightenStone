@@ -21,73 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_ClientImpl.h
+ * @file  : FS_IocpBuffer.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/5
+ * @date  : 2019/10/14
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Base_Common_Net_Impl_FS_Client_H__
-#pragma once
+
+#include "stdafx.h"
+#include "base/common/net/Defs/FS_IocpBuffer.h"
 
 FS_NAMESPACE_BEGIN
-
-inline void FS_Client::SendData(NetMsg_DataHeader *header)
-{
-    _SendData((const char *)header, header->_packetLength);
-}
-
-inline void FS_Client::SendData(const char *data, Int32 len)
-{
-    _SendData(data, len);
-}
-
-inline void FS_Client::SetSender(IDelegate<void, FS_Packet2 *> *sendFunc)
-{
-    _sendFunc = sendFunc;
-}
-
-inline void FS_Client::UpdateHeartBeatExpiredTime()
-{
-    _heartBeatExpiredTime.FlushAppendTime(CLIENT_HREAT_DEAD_TIME*Time::_microSecondPerMilliSecond);
-}
-
-inline bool FS_Client::IsPostIoChange() const
-{
-    return _isPostRecv || _isPostSend;
-}
-
-inline bool FS_Client::IsPostSend() const
-{
-    return _isPostSend;
-}
-
-inline bool FS_Client::IsPostRecv() const
-{
-    return _isPostRecv;
-}
-
-inline SOCKET FS_Client::GetSocket() const
-{
-    return _sockfd;
-}
-
-inline UInt64 FS_Client::GetId() const
-{
-    return _id;
-}
-
-inline bool FS_Client::IsDestroy() const
-{
-    return _sockfd == INVALID_SOCKET;
-}
-
-inline  const Time &FS_Client::GetHeartBeatExpiredTime() const
-{
-    return _heartBeatExpiredTime;
-}
-
+OBJ_POOL_CREATE_DEF_IMPL(FS_IocpBuffer, __DEF_OBJ_POOL_OBJ_NUM__);
 FS_NAMESPACE_END
-#endif

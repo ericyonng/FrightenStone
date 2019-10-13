@@ -185,7 +185,7 @@ bool FS_NetBuffer::HasMsg() const
 
 #pragma region iocp
 #ifdef FS_USE_IOCP
-IO_DATA_BASE *FS_NetBuffer::MakeRecvIoData(SOCKET sockfd)
+IoDataBase *FS_NetBuffer::MakeRecvIoData(SOCKET sockfd)
 {
     int len = _buffSize - _lastPos;
     if(len > 0)
@@ -199,7 +199,7 @@ IO_DATA_BASE *FS_NetBuffer::MakeRecvIoData(SOCKET sockfd)
     return NULL;
 }
 
-IO_DATA_BASE *FS_NetBuffer::MakeSendIoData(SOCKET sockfd)
+IoDataBase *FS_NetBuffer::MakeSendIoData(SOCKET sockfd)
 {
     if(_lastPos > 0)
     {

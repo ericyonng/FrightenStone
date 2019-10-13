@@ -30,11 +30,11 @@
  * 
  */
 #include "stdafx.h"
-#include "base/common/net/Defs/FS_Packet.h"
+#include "base/common/net/Defs/FS_Packet2.h"
 #include "base/common/net/Defs/IocpDefs.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_IMPL(IO_DATA_BASE, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_IMPL(IoDataBase, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
 OBJ_POOL_CREATE_IMPL(IO_EVENT, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
 OBJ_POOL_CREATE_DEF_IMPL(PacketQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
 
@@ -49,9 +49,9 @@ PacketQueueNode::PacketQueueNode()
 {
 }
 
-IO_DATA_BASE::~IO_DATA_BASE()
+IoDataBase::~IoDataBase()
 {
-    Fs_SafeFree(_completedCallback);
+    Fs_SafeFree(_callback);
 }
 
 IO_EVENT::IO_EVENT()

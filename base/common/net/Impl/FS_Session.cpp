@@ -33,7 +33,9 @@
 #include "base/common/net/Impl/FS_Session.h"
 #include "base/common/net/Impl/FS_Addr.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
-#include "base/common/net/Defs/FS_Packet.h"
+#include "base/common/net/Defs/FS_Packet2.h"
+#include "base/common/net/Defs/FS_IocpBuffer.h"
+#include "base/common/net/protocol/protocol.h"
 
 #include "base/common/assist/utils/Impl/STLUtil.h"
 
@@ -41,9 +43,9 @@ OBJ_POOL_CREATE_DEF_IMPL(fs::FS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 
-FS_Session::FS_Session(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr)
+FS_Session::FS_Session(UInt64 sessionId, SOCKET sock)
     :_sessionId(sessionId)
-    ,_sessionMgr(sessionMgr)
+    ,_sessionMgr(NULL)
     ,_addr(new FS_Addr)
     ,_sock(sock)
 {
@@ -52,19 +54,16 @@ FS_Session::FS_Session(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr)
 
 FS_Session::~FS_Session()
 {
-    STLUtil::DelListContainer(_recvPackets);
-    STLUtil::DelListContainer(_toSend);
-}
+    _Destroy();
 
+}
 
 bool FS_Session::HasMsgToRead() const
 {
-    return false;
-}
-
-bool FS_Session::HasMsgToSend() const
-{
-    return false;
+#ifdef _WIN32
+    return _recvBuffer->CastToBuffer<FS_IocpBuffer>()->HasMsg();
+#else
+#endif
 }
 
 void FS_Session::OnDestroy()
@@ -82,5 +81,27 @@ void FS_Session::OnHeartBeatTimeOut()
 
 }
 
+void FS_Session::OnMsgArrived()
+{
+}
+
+bool FS_Session::Send(NetMsg_DataHeader *header)
+{
+}
+
+void FS_Session::_Destroy()
+{
+    Fs_SafeFree(_addr);
+    if(_sock != INVALID_SOCKET)
+    {
+        SocketUtil::DestroySocket(_sock);
+        _sock = INVALID_SOCKET;
+    }
+
+    Fs_SafeFree(_recvBuffer);
+    STLUtil::DelListContainer(_toSend);
+}
+
 FS_NAMESPACE_END
+
 

@@ -21,72 +21,67 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_Session.h
+ * @file  : IFS_Buffer.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2019/10/13
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_Session_H__
-#define __Base_Common_Net_Impl_FS_Session_H__
+#ifndef __Base_Common_Net_Defs_IFS_Buffer_H__
+#define __Base_Common_Net_Defs_IFS_Buffer_H__
+
 #pragma once
+
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
+#include "base/common/log/Log.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_SessionMgr;
-class BASE_EXPORT IFS_Packet;
-class BASE_EXPORT FS_Addr;
-struct BASE_EXPORT NetMsg_DataHeader;
-class BASE_EXPORT IFS_Buffer;
-
-// TODO: IFS_Session, FS_IocpSession, FS_EpollSession
-
-class BASE_EXPORT FS_Session
+class BASE_EXPORT IFS_Buffer
 {
-    OBJ_POOL_CREATE_DEF(FS_Session);
 public:
-    explicit FS_Session(UInt64 sessionId, SOCKET sock);
-    ~FS_Session();
+    explicit IFS_Buffer(size_t bufferSize);
+    virtual ~IFS_Buffer();
 
 public:
-    UInt64 GetSessionId() const;
-    SOCKET GetSocket() const;
-    const FS_Addr *GetAddr() const;
-    bool HasMsgToRead() const;
-
-    /* 事件 */
-public:
-    // 客户端销毁
-    void OnDestroy();
-    // 客户端连入
-    void OnConnect();
-    // 心跳连接超时
-    void OnHeartBeatTimeOut();
-    void OnMsgArrived();
+    void PopFront(size_t bytesLen);
+    bool PushBack(const Byte8 *data, size_t len);
+    void Clear();
+    bool IsEmpty() const;
+    bool IsFull() const;
+    size_t GetLength() const;
+    size_t GetTotalSize() const;
+    size_t GetRest() const;
+    char *GetData();
+    const char *GetData() const;
+    template<typename ObjType>
+    ObjType *CastToData();
+    template<typename ObjType>
+    const ObjType *CastToData() const;
+    template<typename ObjType>
+    ObjType *CastToBuffer();
+    template<typename ObjType>
+    const ObjType *CastToBuffer() const;
     
-public:
-    void BindToSender(IDelegate<void >)
-    bool Send(NetMsg_DataHeader *header);
+protected:
+    size_t &_GetCurPos();
 
 private:
+    void _Init();
     void _Destroy();
 
 private:
-    UInt64 _sessionId;
-    FS_Addr *_addr;
-    SOCKET _sock;
-    IFS_Buffer *_recvBuffer;
-    std::list<IFS_Buffer *> _toSend;
-    FS_SessionMgr *_sessionMgr;
+    size_t _bufferSize;
+    char *_buff;
+    size_t _curPos;     // 当前数据末尾位置
 };
 
 FS_NAMESPACE_END
 
-#include "base/common/net/Impl/FS_SessionImpl.h"
+#include "base/common/net/Defs/IFS_BufferImpl.h"
 
 #endif

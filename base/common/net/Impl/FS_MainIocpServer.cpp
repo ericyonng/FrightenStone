@@ -85,7 +85,7 @@ void FS_MainIocpServer::_OnNetMonitorTask(const FS_ThreadPool *pool)
     const int len = 1024;
     char buf[len] = {};
 
-    IO_DATA_BASE ioData = {};
+    IoDataBase ioData = {};
     ioData._wsaBuff.buf = buf;
     ioData._wsaBuff.len = len;
 

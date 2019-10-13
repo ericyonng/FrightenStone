@@ -179,7 +179,7 @@ Int32 FS_IocpMsgTransferServer::_ListenIocpNetEvents()
         }
 
         // 完成回调
-        _ioEvent->_ioData->_completedCallback->Invoke(_ioEvent->_bytesTrans);
+        _ioEvent->_ioData->_callback->Invoke(_ioEvent->_bytesTrans);
         client->ResetPostRecv();
         _OnPrepareNetRecv(client);
         _msgArrivedClientIds.insert(clientId);

@@ -33,7 +33,7 @@
 #include "base/common/net/Impl/FS_Client.h"
 #include "base/common/socket/socket.h"
 #include "base/common/log/Log.h"
-#include "base/common/net/Defs/FS_Packet.h"
+#include "base/common/net/Defs/FS_Packet2.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -45,7 +45,7 @@ FS_Client::FS_Client(UInt64 clientId
                             , Int32 recvSize)
     : _id(clientId)
     , _sockfd(sockfd)
-    , _recvBuff(new  FS_Packet(clientId, sockfd, recvSize))
+    , _recvBuff(new  FS_Packet2(clientId, sockfd, recvSize))
 {
     UpdateHeartBeatExpiredTime();
 }
@@ -70,7 +70,7 @@ void FS_Client::PopRecvFrontMsg()
 }
 
 #ifdef FS_USE_IOCP
-IO_DATA_BASE *FS_Client::MakeRecvIoData()
+IoDataBase *FS_Client::MakeRecvIoData()
 {
     if(_isPostRecv)
         return NULL;
@@ -91,7 +91,7 @@ void FS_Client::ResetPostRecv()
 
 void FS_Client::_SendData(const char *data, Int32 len)
 {
-    FS_Packet *newData = new FS_Packet(_id, _sockfd);
+    FS_Packet2 *newData = new FS_Packet2(_id, _sockfd);
     newData->FromMsg(data, len);
     _sendFunc->Invoke(newData);
 }

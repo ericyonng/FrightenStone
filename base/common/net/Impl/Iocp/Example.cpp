@@ -212,7 +212,7 @@ int Example::Run()
     // lpdwBytesReceived返回接受数据长度，若不想等待客户端发送数据，这个地方可以填0
     iocp.LoadAcceptEx(sockServer);
     // LoadAcceptEx(sockServer);
-    IO_DATA_BASE ioData[CLIENT_QUANTITY] = {};
+    IoDataBase ioData[CLIENT_QUANTITY] = {};
     for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
         iocp.PostAccept(sockServer, &ioData[i]);
 

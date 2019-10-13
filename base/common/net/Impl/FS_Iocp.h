@@ -40,7 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
-struct BASE_EXPORT IO_DATA_BASE;
+struct BASE_EXPORT IoDataBase;
 struct BASE_EXPORT IO_EVENT;
 
 class BASE_EXPORT FS_Iocp
@@ -87,9 +87,9 @@ public:
     *                              它会一个一个消息的从完成队列中取出不需要担心线程安全问题
     */
 public:
-    Int32 PostAccept(SOCKET listenSocket, IO_DATA_BASE *ioData);
-    Int32 PostRecv(SOCKET targetSock, IO_DATA_BASE *ioData);
-    Int32 PostSend(SOCKET targetSock, IO_DATA_BASE *ioData);
+    Int32 PostAccept(SOCKET listenSocket, IoDataBase *ioData);
+    Int32 PostRecv(SOCKET targetSock, IoDataBase *ioData);
+    Int32 PostSend(SOCKET targetSock, IoDataBase *ioData);
     Int32 PostQuit();
     Int32 WaitForCompletion(IO_EVENT &ioEvent, ULong millisec = INFINITE);
     #pragma endregion

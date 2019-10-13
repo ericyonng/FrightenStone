@@ -62,7 +62,7 @@ public:
 };
 
 /* packet节点 */
-class FS_Packet;
+class FS_Packet2;
 struct BASE_EXPORT PacketQueueNode
 {
     OBJ_POOL_CREATE_DEF(PacketQueueNode);
@@ -70,28 +70,28 @@ struct BASE_EXPORT PacketQueueNode
     ~PacketQueueNode();
 
     std::list<PacketQueueNode *>::iterator _iterNode;
-    FS_Packet *_packet;
+    FS_Packet2 *_packet;
     bool _isPost;
 };
 
-struct BASE_EXPORT IO_DATA_BASE
+struct BASE_EXPORT IoDataBase
 {
-    OBJ_POOL_CREATE(IO_DATA_BASE, _objPoolHelper);
+    OBJ_POOL_CREATE(IoDataBase, _objPoolHelper);
 
 public:
-    IO_DATA_BASE():_node(NULL){}
-    ~IO_DATA_BASE();
+    IoDataBase():_node(NULL){}
+    ~IoDataBase();
 
     // 重叠体
     OVERLAPPED _overlapped{0};          // 使用重叠体可以关联到iodatabase,在投递accept时候传入
     Int32 _ioType = 0;
-    UInt64 _ownerId = 0;                   // 客户端唯一id
+    UInt64 _sessionId = 0;                   // 会话唯一id
     SOCKET _sock = INVALID_SOCKET;
     union
     {
         PacketQueueNode *_node;         // packet所在的队列节点
     };
-    IDelegate<void, Int32> *_completedCallback = NULL; // 完成时的回调
+    IDelegate<void, size_t> *_callback = NULL; // 完成时的回调
 
     // 没必要每个客户端指定一个缓冲，太大了，
     // 因为iocp取数据 时候数据是从队列中先进先出的方式被拷贝出来，
@@ -113,7 +113,7 @@ struct BASE_EXPORT IO_EVENT
         SOCKET _socket;                         // 套接字
         Int64 _code;                            // 状态码
     }_data;   // 绑定完成端口时，绑定的完成键，在完成时会回传，建议回传clientId,用于判断客户端是否存在
-    IO_DATA_BASE *_ioData = NULL;               // 重叠体自定义的数据
+    IoDataBase *_ioData = NULL;               // 重叠体自定义的数据
     // SOCKET _socket = INVALID_SOCKET;            // completionkey返回的socket socket在客户端断开后会被复用
     ULong _bytesTrans = 0;                      // 传输的字节数
 };

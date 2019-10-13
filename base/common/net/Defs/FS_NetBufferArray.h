@@ -71,8 +71,8 @@ public:
 #pragma region iocp
 public:
 #ifdef FS_USE_IOCP
-    IO_DATA_BASE *MakeRecvIoData(SOCKET sockfd);
-    IO_DATA_BASE *MakeSendIoData(SOCKET sockfd);
+    IoDataBase *MakeRecvIoData(SOCKET sockfd);
+    IoDataBase *MakeSendIoData(SOCKET sockfd);
 
     // 从iocp读入或写入iocp时 buffer相应调整
     bool OnReadFromIocp(std::list<FS_NetBuffer *>::iterator &iterNode, int recvBytes);
