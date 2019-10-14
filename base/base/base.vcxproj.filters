@@ -927,12 +927,6 @@
     <ClInclude Include="..\common\net\Defs\PacketQueueNode.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_Session.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_SessionImpl.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\net\Impl\FS_SessionMgr.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
@@ -1073,6 +1067,21 @@
     </ClInclude>
     <ClInclude Include="..\common\net\Defs\FS_BufferFactory.h">
       <Filter>common\net\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_Session.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_SessionImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_SessionFactory.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpSession.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpSessionImpl.h">
+      <Filter>common\net\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1322,9 +1331,6 @@
     <ClCompile Include="..\common\net\Defs\PacketQueueNode.cpp">
       <Filter>common\net\Defs</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\net\Impl\FS_Session.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\net\Impl\FS_SessionMgr.cpp">
       <Filter>common\net\Impl</Filter>
     </ClCompile>
@@ -1396,6 +1402,15 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Defs\FS_BufferFactory.cpp">
       <Filter>common\net\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\IFS_Session.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_SessionFactory.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_IocpSession.cpp">
+      <Filter>common\net\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

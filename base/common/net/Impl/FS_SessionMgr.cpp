@@ -31,7 +31,7 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
-#include "base/common/net/Impl/FS_Session.h"
+#include "base/common/net/Impl/IFS_Session.h"
 
 #include "base/common/status/status.h"
 
@@ -75,7 +75,7 @@ void FS_SessionMgr::AfterClose()
 {
 }
 
-void FS_SessionMgr::AddNewSession(UInt64 sessionId, FS_Session *session)
+void FS_SessionMgr::AddNewSession(UInt64 sessionId, IFS_Session *session)
 {
 
 }

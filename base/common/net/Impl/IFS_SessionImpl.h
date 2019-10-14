@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_SessionMgr.h
+ * @file  : IFS_SessionImpl.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/9/30
  * @brief :
@@ -29,41 +29,52 @@
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_SessionMgr_H__
-#define __Base_Common_Net_Impl_FS_SessionMgr_H__
+#ifdef __Base_Common_Net_Impl_IFS_Session_H__
 #pragma once
-
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
-
-class BASE_EXPORT FS_SessionMgr
+inline UInt64 IFS_Session::GetSessionId() const
 {
-public:
-    FS_SessionMgr();
-    ~FS_SessionMgr();
+    return _sessionId;
+}
 
-public:
-    Int32 BeforeStart();
-    Int32 Start();
-    Int32 AfterStart();
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    void BeforeClose();
-    void Close();
-    void AfterClose();
+inline SOCKET IFS_Session::GetSocket() const
+{
+    return _sock;
+}
 
-    void AddNewSession(UInt64 sessionId, IFS_Session *session);
-    void EraseSession(UInt64 sessionId);
+inline const FS_Addr *IFS_Session::GetAddr() const
+{
+    return _addr;
+}
 
-private:
-    std::map<UInt64, IFS_Session *> _sessions;
-};
+template<typename ObjType>
+inline ObjType *IFS_Session::CastTo()
+{
+    return reinterpret_cast<ObjType *>(this);
+}
+
+template<typename ObjType>
+inline const ObjType *IFS_Session::CastTo() const
+{
+    return reinterpret_cast<ObjType *>(this);
+}
+
+inline void IFS_Session::Lock()
+{
+    _lock.Lock();
+}
+
+inline void IFS_Session::Unlock()
+{
+    _lock.Unlock();
+}
+
+inline void IFS_Session::UpdateHeartBeatExpiredTime()
+{
+    _heartBeatExpiredTime.FlushAppendTime(CLIENT_HREAT_DEAD_TIME*Time::_microSecondPerMilliSecond);
+}
 
 FS_NAMESPACE_END
-
-#include "base/common/net/Impl/FS_SessionMgrImpl.h"
 
 #endif
