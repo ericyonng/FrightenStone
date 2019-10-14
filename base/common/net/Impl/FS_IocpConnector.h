@@ -42,7 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Session;
+class BASE_EXPORT IFS_Session;
 
 class BASE_EXPORT FS_IocpConnector : public IFS_Connector
 {
@@ -55,7 +55,7 @@ public:
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
-    virtual void RegisterConnected(IDelegate<void, FS_Session *> *callback);
+    virtual void RegisterConnected(IDelegate<void, IFS_Session *> *callback);
    
     /* TCP 常规操作 */
     #pragma region tcp normal operate
@@ -96,7 +96,7 @@ private:
     SOCKET _sock;
 
     // 网络事件回调
-    IDelegate<void, FS_Session *> *_onConnected;
+    IDelegate<void, IFS_Session *> *_onConnected;
     IDelegate<void> *_closeIocpDelegate;
 
     // 客户端连接上限

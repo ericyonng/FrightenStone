@@ -42,7 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Session;
+class BASE_EXPORT IFS_Session;
 
 class BASE_EXPORT IFS_Connector
 {
@@ -60,7 +60,7 @@ public:
     virtual void AfterClose() {}
 
     // 回调接口
-    virtual void RegisterConnected(IDelegate<void, FS_Session *> *callback);
+    virtual void RegisterConnected(IDelegate<void, IFS_Session *> *callback);
 };
 
 FS_NAMESPACE_END

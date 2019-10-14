@@ -37,7 +37,7 @@
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
 #include "base/common/socket/socket.h"
-#include "base/common/net/Impl/FS_Session.h"
+#include "base/common/net/Impl/IFS_Session.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
 #include "base/common/assist/utils/Impl/SystemUtil.h"
 
@@ -94,7 +94,7 @@ void FS_IocpConnector::Close()
     _threadPool->Clear();
 }
 
-void FS_IocpConnector::RegisterConnected(IDelegate<void, FS_Session *> *callback)
+void FS_IocpConnector::RegisterConnected(IDelegate<void, IFS_Session *> *callback)
 {
     Fs_SafeFree(_onConnected);
     _onConnected = callback;
@@ -200,7 +200,7 @@ void FS_IocpConnector::_OnConnected(SOCKET sock)
         SocketUtil::MakeReUseAddr(sock);
 
         // TODO:连接回调
-        FS_Session *newSession = NULL;
+        IFS_Session *newSession = NULL;
         _onConnected->Invoke(newSession);
         // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
     }

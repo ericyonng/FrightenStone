@@ -209,7 +209,7 @@ void FS_ServerCore::Close()
 
 /* ÍøÂçÊÂ¼ş */
 #pragma region
-void FS_ServerCore::_OnConnected(FS_Session *session)
+void FS_ServerCore::_OnConnected(IFS_Session *session)
 {
 }
 #pragma endregion

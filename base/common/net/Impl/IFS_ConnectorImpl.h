@@ -33,7 +33,7 @@
 
 FS_NAMESPACE_BEGIN
 
-inline void IFS_Connector::RegisterConnected(IDelegate<void, FS_Session *> *callback)
+inline void IFS_Connector::RegisterConnected(IDelegate<void, IFS_Session *> *callback)
 {
 
 }

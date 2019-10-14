@@ -21,49 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_SessionMgr.h
+ * @file  : FS_IocpSessionImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2019/10/14
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_SessionMgr_H__
-#define __Base_Common_Net_Impl_FS_SessionMgr_H__
-#pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
+#ifdef __Base_Common_Net_Impl_FS_IocpSession_H__
+#pragma once
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
-
-class BASE_EXPORT FS_SessionMgr
+inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock)
+    :IFS_Session(sessionId, sock)
+    ,_sender(NULL)
+    ,_isPostRecv(false)
+    ,_isPostSend(false)
 {
-public:
-    FS_SessionMgr();
-    ~FS_SessionMgr();
+}
 
-public:
-    Int32 BeforeStart();
-    Int32 Start();
-    Int32 AfterStart();
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    void BeforeClose();
-    void Close();
-    void AfterClose();
+inline FS_IocpSession::~FS_IocpSession()
+{
+    Fs_SafeFree(_sender);
+}
 
-    void AddNewSession(UInt64 sessionId, IFS_Session *session);
-    void EraseSession(UInt64 sessionId);
+inline void FS_IocpSession::BindToSender(IDelegate<void, IFS_Buffer *> *sender)
+{
+    Fs_SafeFree(_sender);
+    _sender = sender;
+}
 
-private:
-    std::map<UInt64, IFS_Session *> _sessions;
-};
+inline bool FS_IocpSession::_OnSend(IFS_Buffer *newBuffer)
+{
+    _sender->Invoke(newBuffer);
+}
 
 FS_NAMESPACE_END
-
-#include "base/common/net/Impl/FS_SessionMgrImpl.h"
-
 #endif

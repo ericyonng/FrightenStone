@@ -21,49 +21,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_SessionMgr.h
+ * @file  : FS_IocpSession.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2019/10/14
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_SessionMgr_H__
-#define __Base_Common_Net_Impl_FS_SessionMgr_H__
+#ifndef __Base_Common_Net_Impl_FS_IocpSession_H__
+#define __Base_Common_Net_Impl_FS_IocpSession_H__
+
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/net/Impl/IFS_Session.h"
+#include "base/common/net/Defs/IocpDefs.h"
+#include "base/common/net/protocol/protocol.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
-
-class BASE_EXPORT FS_SessionMgr
+class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
 public:
-    FS_SessionMgr();
-    ~FS_SessionMgr();
+    FS_IocpSession(UInt64 sessionId, SOCKET sock);
+    virtual ~FS_IocpSession();
 
 public:
-    Int32 BeforeStart();
-    Int32 Start();
-    Int32 AfterStart();
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    void BeforeClose();
-    void Close();
-    void AfterClose();
+    void BindToSender(IDelegate<void, IFS_Buffer *> *sender);
 
-    void AddNewSession(UInt64 sessionId, IFS_Session *session);
-    void EraseSession(UInt64 sessionId);
+    NetMsg_DataHeader *FrontRecvMsg();
+    void PopFrontRecvMsg();
+
+    IoDataBase *MakeRecvIoData();
+    IoDataBase *MakeSendIoData();
+
+    bool IsPostIoChange() const;
+    bool IsPostSend() const;
+    bool IsPostRecv() const;
+    void ResetPostSend();
+    void ResetPostRecv();
+
+protected:
+    virtual bool _OnSend(IFS_Buffer *newBuffer);
 
 private:
-    std::map<UInt64, IFS_Session *> _sessions;
+    IDelegate<void, IFS_Buffer *> *_sender;
+
+#ifdef FS_USE_IOCP
+    bool _isPostRecv;
+    bool _isPostSend;
+#endif
 };
 
 FS_NAMESPACE_END
 
-#include "base/common/net/Impl/FS_SessionMgrImpl.h"
+#include "base/common/net/Impl/FS_IocpSessionImpl.h"
 
 #endif

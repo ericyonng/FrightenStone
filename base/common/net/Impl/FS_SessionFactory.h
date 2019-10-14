@@ -21,16 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_SessionMgr.h
+ * @file  : FS_SessionFactory.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2019/10/14
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_SessionMgr_H__
-#define __Base_Common_Net_Impl_FS_SessionMgr_H__
+
+#ifndef __Base_Common_Net_Impl_FS_SessionFactory_H__
+#define __Base_Common_Net_Impl_FS_SessionFactory_H__
+
 #pragma once
 
 #include "base/exportbase.h"
@@ -40,30 +42,12 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IFS_Session;
 
-class BASE_EXPORT FS_SessionMgr
+class BASE_EXPORT FS_SessionFactory
 {
 public:
-    FS_SessionMgr();
-    ~FS_SessionMgr();
-
-public:
-    Int32 BeforeStart();
-    Int32 Start();
-    Int32 AfterStart();
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    void BeforeClose();
-    void Close();
-    void AfterClose();
-
-    void AddNewSession(UInt64 sessionId, IFS_Session *session);
-    void EraseSession(UInt64 sessionId);
-
-private:
-    std::map<UInt64, IFS_Session *> _sessions;
+    static IFS_Session *Create(UInt64 sessionId, SOCKET sock);
 };
 
 FS_NAMESPACE_END
-
-#include "base/common/net/Impl/FS_SessionMgrImpl.h"
 
 #endif

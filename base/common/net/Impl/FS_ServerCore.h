@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Session;
+class BASE_EXPORT IFS_Session;
 class BASE_EXPORT IFS_ServerConfigMgr;
 class BASE_EXPORT IFS_Connector;
 class BASE_EXPORT IFS_MsgTransfer;
@@ -73,9 +73,9 @@ public:
     *       6. OnNetRecv 接收到数据 线程不安全
     */
 protected:
-    void _OnConnected(FS_Session *session);
-    void _OnDisconnected(FS_Session *session);
-    void _OnMsgArrived(FS_Session *session);
+    void _OnConnected(IFS_Session *session);
+    void _OnDisconnected(IFS_Session *session);
+    void _OnMsgArrived(IFS_Session *session);
 
 protected:
     // 服务器负载情况
@@ -83,7 +83,7 @@ protected:
 
     // 网络操作
 protected:
-    void _AddSessionToMsgTrasfer(FS_Session *client);
+    void _AddSessionToMsgTrasfer(IFS_Session *client);
     void _StatisticsMsgPerSecond();
     #pragma endregion
 
