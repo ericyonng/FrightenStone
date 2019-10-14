@@ -85,7 +85,7 @@ public:
     bool Send(NetMsg_DataHeader *header);   // 请外部调用的时候务必加锁
 
 protected:
-    virtual bool _OnSend(IFS_Buffer *newBuffer) = 0;
+    virtual bool _OnSend() = 0;
 
 private:
     void _Destroy();
