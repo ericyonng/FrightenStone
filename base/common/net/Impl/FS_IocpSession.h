@@ -49,7 +49,7 @@ public:
     virtual ~FS_IocpSession();
 
 public:
-    void BindToSender(IDelegate<void, IFS_Buffer *> *sender);
+    void BindToSender(IDelegate<void, IoDataBase *> *sender);
 
     NetMsg_DataHeader *FrontRecvMsg();
     void PopFrontRecvMsg();
@@ -64,10 +64,10 @@ public:
     void ResetPostRecv();
 
 protected:
-    virtual bool _OnSend(IFS_Buffer *newBuffer);
+    virtual bool _OnSend();
 
 private:
-    IDelegate<void, IFS_Buffer *> *_sender;
+    IDelegate<void, IoDataBase *> *_sender;
 
 #ifdef FS_USE_IOCP
     bool _isPostRecv;

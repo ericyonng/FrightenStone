@@ -48,15 +48,44 @@ inline FS_IocpSession::~FS_IocpSession()
     Fs_SafeFree(_sender);
 }
 
-inline void FS_IocpSession::BindToSender(IDelegate<void, IFS_Buffer *> *sender)
+inline void FS_IocpSession::BindToSender(IDelegate<void, IoDataBase *> *sender)
 {
     Fs_SafeFree(_sender);
     _sender = sender;
 }
 
-inline bool FS_IocpSession::_OnSend(IFS_Buffer *newBuffer)
+inline bool FS_IocpSession::IsPostIoChange() const
 {
-    _sender->Invoke(newBuffer);
+    return _isPostRecv || _isPostSend;
+}
+
+inline bool FS_IocpSession::IsPostSend() const
+{
+    return _isPostSend;
+}
+
+inline bool FS_IocpSession::IsPostRecv() const
+{
+    return _isPostRecv;
+}
+
+inline void FS_IocpSession::ResetPostSend()
+{
+    _isPostSend = false;
+}
+
+inline void FS_IocpSession::ResetPostRecv()
+{
+    _isPostRecv = false;
+}
+
+inline bool FS_IocpSession::_OnSend()
+{
+    auto ioData = MakeSendIoData();
+    if(ioData)
+        _sender->Invoke(ioData);
+
+    return true;
 }
 
 FS_NAMESPACE_END

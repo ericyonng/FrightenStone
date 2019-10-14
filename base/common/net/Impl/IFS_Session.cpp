@@ -114,14 +114,7 @@ bool IFS_Session::Send(NetMsg_DataHeader *header)
     }
 
     _toSend.push_back(newBuffer);
-    bool isSend = _OnSend(newBuffer);
-    if(!isSend)
-    {
-        Fs_SafeFree(newBuffer);
-        _toSend.pop_back();
-    }
-
-    return isSend;
+    return _OnSend();
 }
 
 void IFS_Session::_Destroy()

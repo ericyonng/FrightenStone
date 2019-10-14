@@ -31,7 +31,37 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_IocpSession.h"
+#include "base/common/net/Defs/FS_IocpBuffer.h"
 
 FS_NAMESPACE_BEGIN
+
+NetMsg_DataHeader *FS_IocpSession::FrontRecvMsg()
+{
+    return _recvBuffer->CastToData<NetMsg_DataHeader>();
+}
+
+void FS_IocpSession::PopFrontRecvMsg()
+{
+    if(HasMsgToRead())
+        _recvBuffer->PopFront(FrontRecvMsg()->_packetLength);
+}
+
+IoDataBase *FS_IocpSession::MakeRecvIoData()
+{
+    if(_isPostRecv)
+        return NULL;
+
+    _isPostRecv = true;
+    return _recvBuffer->CastToBuffer<FS_IocpBuffer>()->MakeRecvIoData();
+}
+
+IoDataBase *FS_IocpSession::MakeSendIoData()
+{
+    if(_isPostSend || _toSend.empty())
+        return NULL;
+
+    _isPostSend = true;
+    return _toSend.front()->CastToBuffer<FS_IocpBuffer>()->MakeSendIoData();
+}
 
 FS_NAMESPACE_END
