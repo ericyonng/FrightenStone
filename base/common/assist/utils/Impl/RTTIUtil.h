@@ -48,7 +48,7 @@ public:
 
 #ifndef _WIN32
     // 非windows平台下的类型识别
-    const char *GetCxxDemangle(const char *name);
+    static const char *GetCxxDemangle(const char *name);
 #endif
 };
 

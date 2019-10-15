@@ -34,6 +34,8 @@
 #include "base/common/net/Impl/IFS_Session.h"
 
 #include "base/common/status/status.h"
+#include "base/common/assist/utils/utils.h"
+#include "base/common/crashhandle/CrashHandle.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -68,21 +70,39 @@ void FS_SessionMgr::BeforeClose()
 
 void FS_SessionMgr::Close()
 {
-
+    for(auto &iterSession : _sessions)
+        iterSession.second->Close();
 }
 
 void FS_SessionMgr::AfterClose()
 {
+    // ÇåÀí
+    STLUtil::DelMapContainer(_sessions);
 }
 
 void FS_SessionMgr::AddNewSession(UInt64 sessionId, IFS_Session *session)
 {
-
+    _sessions.insert(std::make_pair(sessionId, session));
 }
 
 void FS_SessionMgr::EraseSession(UInt64 sessionId)
 {
+    auto iterSession = _sessions.find(sessionId);
+    if(iterSession == _sessions.end())
+    {
+        g_Log->e<FS_SessionMgr>(_LOGFMT_("sessionId[%llu] not found"), sessionId);
+        return;
+    }
 
+    auto session = iterSession->second;
+    if(!session->CanDestroy())
+    {
+        g_Log->e<FS_SessionMgr>(_LOGFMT_("cant destroy session sessionId[%llu], stack trace back:[%s]")
+                                , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+    }
+
+    Fs_SafeFree(iterSession->second);
+    _sessions.erase(iterSession);
 }
 
 FS_NAMESPACE_END

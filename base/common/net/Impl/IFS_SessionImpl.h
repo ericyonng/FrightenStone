@@ -48,6 +48,11 @@ inline const FS_Addr *IFS_Session::GetAddr() const
     return _addr;
 }
 
+inline bool IFS_Session::HasMsgToSend() const
+{
+    return !_toSend.empty();
+}
+
 template<typename ObjType>
 inline ObjType *IFS_Session::CastTo()
 {
@@ -58,6 +63,21 @@ template<typename ObjType>
 inline const ObjType *IFS_Session::CastTo() const
 {
     return reinterpret_cast<ObjType *>(this);
+}
+
+inline bool IFS_Session::IsClose() const
+{
+    return _sock == INVALID_SOCKET;
+}
+
+inline const Time &IFS_Session::GetHeartBeatExpiredTime() const
+{
+    return _heartBeatExpiredTime;
+}
+
+inline bool IFS_Session::CanDestroy() const
+{
+    return true;
 }
 
 inline void IFS_Session::Lock()
@@ -75,15 +95,6 @@ inline void IFS_Session::UpdateHeartBeatExpiredTime()
     _heartBeatExpiredTime.FlushAppendTime(CLIENT_HREAT_DEAD_TIME*Time::_microSecondPerMilliSecond);
 }
 
-inline bool IFS_Session::IsClose() const
-{
-    return _sock == INVALID_SOCKET;
-}
-
-const Time &IFS_Session::GetHeartBeatExpiredTime() const
-{
-    return _heartBeatExpiredTime;
-}
 
 FS_NAMESPACE_END
 
