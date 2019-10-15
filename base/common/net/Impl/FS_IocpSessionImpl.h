@@ -43,11 +43,6 @@ inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, FS_SessionM
 {
 }
 
-inline FS_IocpSession::~FS_IocpSession()
-{
-    Fs_SafeFree(_sender);
-}
-
 inline void FS_IocpSession::BindToSender(IDelegate<void, IoDataBase *> *sender)
 {
     Fs_SafeFree(_sender);
