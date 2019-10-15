@@ -60,6 +60,12 @@ IFS_Session::~IFS_Session()
 
 }
 
+void IFS_Session::Close()
+{
+    if(_sock != INVALID_SOCKET)
+        SocketUtil::DestroySocket(_sock);
+}
+
 bool IFS_Session::HasMsgToRead() const
 {
 #ifdef _WIN32

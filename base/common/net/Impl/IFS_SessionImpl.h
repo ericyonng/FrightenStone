@@ -75,6 +75,16 @@ inline void IFS_Session::UpdateHeartBeatExpiredTime()
     _heartBeatExpiredTime.FlushAppendTime(CLIENT_HREAT_DEAD_TIME*Time::_microSecondPerMilliSecond);
 }
 
+inline bool IFS_Session::IsClose() const
+{
+    return _sock == INVALID_SOCKET;
+}
+
+const Time &IFS_Session::GetHeartBeatExpiredTime() const
+{
+    return _heartBeatExpiredTime;
+}
+
 FS_NAMESPACE_END
 
 #endif

@@ -53,7 +53,7 @@ public:
     static Int32 SetBlock(MYSOCKET socket);
     static Int32 MakeReUseAddr(MYSOCKET socket);
     static Int32 MakeNoDelay(MYSOCKET socket);
-    static Int32 DestroySocket(MYSOCKET socket);
+    static Int32 DestroySocket(MYSOCKET &socket);
 
     // 获取对象地址信息 0表示成功其他值为错误信息
     static Int32 GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError);

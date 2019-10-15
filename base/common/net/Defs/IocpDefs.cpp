@@ -32,20 +32,21 @@
 #include "stdafx.h"
 #include "base/common/net/Defs/FS_Packet2.h"
 #include "base/common/net/Defs/IocpDefs.h"
+#include "base/common/net/Defs/IFS_Buffer.h"
 
 FS_NAMESPACE_BEGIN
 OBJ_POOL_CREATE_IMPL(IoDataBase, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
 OBJ_POOL_CREATE_IMPL(IO_EVENT, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
-OBJ_POOL_CREATE_DEF_IMPL(PacketQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(BufferQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
 
-PacketQueueNode::~PacketQueueNode()
+BufferQueueNode::~BufferQueueNode()
 {
-    Fs_SafeFree(_packet);
+    Fs_SafeFree(_buffer);
 }
 
-PacketQueueNode::PacketQueueNode()
-   : _packet(NULL)
-   , _isPost(false)
+BufferQueueNode::BufferQueueNode()
+   :_isPost(false)
+    ,_buffer(NULL)
 {
 }
 
