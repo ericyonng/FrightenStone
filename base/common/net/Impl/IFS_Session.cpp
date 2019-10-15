@@ -44,26 +44,22 @@ OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock)
-    :_sessionId(sessionId)
-    ,_sessionMgr(NULL)
+IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr)
+    :_isDestroy(false)
+    ,_sessionId(sessionId)
     ,_addr(new FS_Addr)
     ,_sock(sock)
-    ,_isDestroy(false)
+    ,_recvBuffer(NULL)
+    ,_sessionMgr(sessionMgr)
+    ,_recvMsgId(1)
+    ,_sendMsgId(1)
 {
-
+    _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
 }
 
 IFS_Session::~IFS_Session()
 {
     _Destroy();
-
-}
-
-void IFS_Session::Close()
-{
-    if(_sock != INVALID_SOCKET)
-        SocketUtil::DestroySocket(_sock);
 }
 
 bool IFS_Session::HasMsgToRead() const
@@ -74,28 +70,10 @@ bool IFS_Session::HasMsgToRead() const
 #endif
 }
 
-bool IFS_Session::HasMsgToSend() const
+void IFS_Session::Close()
 {
-    return !_toSend.empty();
-}
-
-void IFS_Session::OnDestroy()
-{
-
-}
-
-void IFS_Session::OnConnect()
-{
-
-}
-
-void IFS_Session::OnHeartBeatTimeOut()
-{
-
-}
-
-void IFS_Session::OnMsgArrived()
-{
+    if(_sock != INVALID_SOCKET)
+        SocketUtil::DestroySocket(_sock);
 }
 
 bool IFS_Session::Send(NetMsg_DataHeader *header)
@@ -121,6 +99,25 @@ bool IFS_Session::Send(NetMsg_DataHeader *header)
 
     _toSend.push_back(newBuffer);
     return _OnSend();
+}
+
+void IFS_Session::OnDestroy()
+{
+
+}
+
+void IFS_Session::OnConnect()
+{
+
+}
+
+void IFS_Session::OnHeartBeatTimeOut()
+{
+
+}
+
+void IFS_Session::OnMsgArrived()
+{
 }
 
 void IFS_Session::_Destroy()

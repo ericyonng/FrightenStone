@@ -334,6 +334,7 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
             backTrace.AppendBitData("\n", 1);
     }
 #else // Non-Win32
+    char rtti[__FS_RTTI_BUF_SIZE__] = {};
     const int frames = ::backtrace(stack, captureFrames + skipFrames);
     char **strs = ::backtrace_symbols(stack, frames);
     if(LIKELY(strs))
@@ -361,13 +362,13 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
                 *addrOffsetBeg = '\0';
 
                 int status = 0;
-                size_t length = sizeof(libTls->commonTls.rtti);
-                abi::__cxa_demangle(parenthesisBeg, libTls->commonTls.rtti, &length, &status);
+                size_t length = sizeof(rtti);
+                abi::__cxa_demangle(parenthesisBeg, rtti, &length, &status);
                 *addrOffsetBeg = oldAddrOffsetBegCh;
                 if(status == 0)
                 {
                     backTrace.AppendBitData(strs[i], parenthesisBeg - strs[i]);
-                    backTrace << libTls->commonTls.rtti;
+                    backTrace << rtti;
                     backTrace << addrOffsetBeg;
                 }
                 else

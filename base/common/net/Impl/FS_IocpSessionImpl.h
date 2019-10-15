@@ -35,8 +35,8 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock)
-    :IFS_Session(sessionId, sock)
+inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr)
+    :IFS_Session(sessionId, sock, sessionMgr)
     ,_sender(NULL)
     ,_isPostRecv(false)
     ,_isPostSend(false)
@@ -67,6 +67,11 @@ inline bool FS_IocpSession::IsPostSend() const
 inline bool FS_IocpSession::IsPostRecv() const
 {
     return _isPostRecv;
+}
+
+inline bool FS_IocpSession::CanDestroy() const
+{
+    return !IsPostIoChange();
 }
 
 inline void FS_IocpSession::OnSendSuc(size_t transferBytes, IoDataBase *ioData)

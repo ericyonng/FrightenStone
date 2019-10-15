@@ -52,13 +52,13 @@ class BASE_EXPORT IFS_Session
 {
     OBJ_POOL_CREATE_DEF(IFS_Session);
 public:
-    explicit IFS_Session(UInt64 sessionId, SOCKET sock);
+    explicit IFS_Session(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr);
     virtual ~IFS_Session();
 
+    // 获取属性与状态
 public:
     UInt64 GetSessionId() const;
     SOCKET GetSocket() const;
-    void Close();
     const FS_Addr *GetAddr() const;
     bool HasMsgToRead() const;      // 要等待消息接收完才能销毁
     bool HasMsgToSend() const;      // 要等待消息发送完才能消耗
@@ -66,11 +66,19 @@ public:
     ObjType *CastTo();
     template<typename ObjType>
     const ObjType *CastTo() const;
+    bool IsClose() const;
+    const Time &GetHeartBeatExpiredTime() const;
+    virtual bool CanDestroy() const;
+
+    // 操作
+public:
+    void Close();
     void Lock();
     void Unlock();
     void UpdateHeartBeatExpiredTime();
-    bool IsClose() const;
-    const Time &GetHeartBeatExpiredTime() const;
+
+    // 一个session只投递一个send，发完再继续发下一个，务必从队列头开始投递
+    bool Send(NetMsg_DataHeader *header);   // 请外部调用的时候务必加锁
 
     /* 事件 */
 public:
@@ -81,14 +89,12 @@ public:
     // 心跳连接超时
     void OnHeartBeatTimeOut();
     void OnMsgArrived();
-    
-public:
-    // 一个session只投递一个send，发完再继续发下一个，务必从队列头开始投递
-    bool Send(NetMsg_DataHeader *header);   // 请外部调用的时候务必加锁
 
+    // 内部
 protected:
     virtual bool _OnSend() = 0;
 
+    // 内部
 private:
     void _Destroy();
     
@@ -102,6 +108,12 @@ protected:
     IFS_Buffer *_recvBuffer;
     std::list<IFS_Buffer *> _toSend;
     FS_SessionMgr *_sessionMgr;
+
+    // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
+    Int32 _recvMsgId;
+    // 测试接收发逻辑用
+    // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
+    Int32 _sendMsgId;
 };
 
 FS_NAMESPACE_END

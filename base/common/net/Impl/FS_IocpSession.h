@@ -46,9 +46,10 @@ class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
     OBJ_POOL_CREATE_DEF(FS_IocpSession);
 public:
-    FS_IocpSession(UInt64 sessionId, SOCKET sock);
+    FS_IocpSession(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr);
     virtual ~FS_IocpSession();
 
+    // 操作
 public:
     void BindToSender(IDelegate<void, IoDataBase *> *sender);
 
@@ -58,9 +59,13 @@ public:
     IoDataBase *MakeRecvIoData();
     IoDataBase *MakeSendIoData();
 
+    // 状态
+public:
     bool IsPostIoChange() const;
     bool IsPostSend() const;
     bool IsPostRecv() const;
+    // 若要销毁session需要放到延迟队列中，且需要先closesocket然后等到所有io完成
+    virtual bool CanDestroy() const;
 
     // 事件
 public:
@@ -73,10 +78,8 @@ protected:
 private:
     IDelegate<void, IoDataBase *> *_sender;
 
-#ifdef FS_USE_IOCP
     bool _isPostRecv;
     bool _isPostSend;
-#endif
 };
 
 FS_NAMESPACE_END

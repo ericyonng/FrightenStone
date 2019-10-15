@@ -39,8 +39,8 @@
 #include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
-class FS_String;
-class Time;
+class BASE_EXPORT FS_String;
+class BASE_EXPORT Time;
 
 class BASE_EXPORT LogLevel
 {
