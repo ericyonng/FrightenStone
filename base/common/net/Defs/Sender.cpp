@@ -118,7 +118,7 @@ void Sender::_OnWork(const FS_ThreadPool *pool)
         _quitIocp = DelegatePlusFactory::Create<decltype(__quitIocp), void>(__quitIocp);
 
     FS_Packet2 *forPostPacket = NULL;
-    PacketQueueNode *queueNode = NULL;
+    BufferQueueNode *queueNode = NULL;
     UInt64 clientId = 0;
     Int32 netSt = StatusDefs::Success;
     bool isAbnormal = false;
@@ -210,7 +210,7 @@ void Sender::_OnWork(const FS_ThreadPool *pool)
     _locker.Unlock();
 }
 
-void Sender::_OnSendSuc(PacketQueueNode *node, Int32 transferBytes)
+void Sender::_OnSendSuc(BufferQueueNode *node, Int32 transferBytes)
 {
 }
 
@@ -310,11 +310,11 @@ void Sender::_Add2SendQueue(FS_Packet2 *packet)
             return;
         }
 
-        iterSendingQueue = _sendingQueue.insert(std::make_pair(ownerId, std::list<PacketQueueNode *>())).first;
+        iterSendingQueue = _sendingQueue.insert(std::make_pair(ownerId, std::list<BufferQueueNode *>())).first;
     }
 
     auto &sendingQueue = iterSendingQueue->second;
-    PacketQueueNode *node = new PacketQueueNode;
+    BufferQueueNode *node = new BufferQueueNode;
     node->_packet = packet;
     sendingQueue.push_back(node);
     node->_iterNode = --sendingQueue.end();

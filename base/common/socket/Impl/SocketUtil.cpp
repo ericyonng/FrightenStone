@@ -160,13 +160,17 @@ Int32 SocketUtil::MakeNoDelay(MYSOCKET socket)
     return StatusDefs::Success;
 }
 
-Int32 SocketUtil::DestroySocket(MYSOCKET socket)
+Int32 SocketUtil::DestroySocket(MYSOCKET &socket)
 {
 #ifdef _WIN32
     int ret = closesocket(socket);
 #else
     int ret = close(socket);
 #endif
+
+    if(ret == 0)
+        socket = INVALID_SOCKET;
+
     // if(ret < 0)
         // CELLLog_PError("destory sockfd<%d>", (int)sockfd);
     return ret == 0 ? StatusDefs::Success : StatusDefs::Socket_Error;

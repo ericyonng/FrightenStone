@@ -44,6 +44,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
+    OBJ_POOL_CREATE_DEF(FS_IocpSession);
 public:
     FS_IocpSession(UInt64 sessionId, SOCKET sock);
     virtual ~FS_IocpSession();
@@ -60,8 +61,11 @@ public:
     bool IsPostIoChange() const;
     bool IsPostSend() const;
     bool IsPostRecv() const;
-    void ResetPostSend();
-    void ResetPostRecv();
+
+    // ÊÂ¼þ
+public:
+    void OnSendSuc(size_t transferBytes, IoDataBase *ioData);
+    void OnRecvSuc(size_t transferBytes, IoDataBase *ioData);
 
 protected:
     virtual bool _OnSend();

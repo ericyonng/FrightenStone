@@ -34,7 +34,7 @@
 #include "base/common/net/Defs/FS_IocpBuffer.h"
 
 FS_NAMESPACE_BEGIN
-
+OBJ_POOL_CREATE_DEF_IMPL(FS_IocpSession, __DEF_OBJ_POOL_OBJ_NUM__)
 NetMsg_DataHeader *FS_IocpSession::FrontRecvMsg()
 {
     return _recvBuffer->CastToData<NetMsg_DataHeader>();
@@ -63,5 +63,6 @@ IoDataBase *FS_IocpSession::MakeSendIoData()
     _isPostSend = true;
     return _toSend.front()->CastToBuffer<FS_IocpBuffer>()->MakeSendIoData();
 }
+
 
 FS_NAMESPACE_END

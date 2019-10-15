@@ -62,15 +62,15 @@ public:
 };
 
 /* packet节点 */
-class FS_Packet2;
-struct BASE_EXPORT PacketQueueNode
+class BASE_EXPORT IFS_Buffer;
+struct BASE_EXPORT BufferQueueNode
 {
-    OBJ_POOL_CREATE_DEF(PacketQueueNode);
-    PacketQueueNode();
-    ~PacketQueueNode();
+    OBJ_POOL_CREATE_DEF(BufferQueueNode);
+    BufferQueueNode();
+    ~BufferQueueNode();
 
-    std::list<PacketQueueNode *>::iterator _iterNode;
-    FS_Packet2 *_packet;
+    std::list<IFS_Buffer *>::iterator _iterNode;
+    IFS_Buffer *_buffer;
     bool _isPost;
 };
 
@@ -89,7 +89,7 @@ public:
     SOCKET _sock = INVALID_SOCKET;
     union
     {
-        PacketQueueNode *_node;         // packet所在的队列节点
+        BufferQueueNode *_node;         // packet所在的队列节点
     };
     IDelegate<void, size_t> *_callback = NULL; // 完成时的回调
 

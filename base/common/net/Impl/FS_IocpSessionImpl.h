@@ -69,14 +69,22 @@ inline bool FS_IocpSession::IsPostRecv() const
     return _isPostRecv;
 }
 
-inline void FS_IocpSession::ResetPostSend()
+inline void FS_IocpSession::OnSendSuc(size_t transferBytes, IoDataBase *ioData)
 {
     _isPostSend = false;
+    ioData->_callback->Invoke(transferBytes);
+    auto bufferNode = ioData->_node;
+    if(bufferNode->_buffer->IsEmpty())
+    {
+        _toSend.erase(bufferNode->_iterNode);
+        Fs_SafeFree(ioData->_node);
+    }
 }
 
-inline void FS_IocpSession::ResetPostRecv()
+inline void FS_IocpSession::OnRecvSuc(size_t transferBytes, IoDataBase *ioData)
 {
     _isPostRecv = false;
+    ioData->_callback->Invoke(transferBytes);
 }
 
 inline bool FS_IocpSession::_OnSend()
