@@ -44,10 +44,12 @@ public:
     IFS_ServerConfigMgr();
     virtual ~IFS_ServerConfigMgr();
 
+    Int32 GetConnectorCntNeeded();
 public:
     Int32 Init();
 
 private:
+    Int32 _connectorCntNeeded;
 };
 
 FS_NAMESPACE_END

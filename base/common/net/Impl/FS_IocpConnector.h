@@ -84,7 +84,7 @@ private:
     *       6. OnNetRecv 接收到数据 线程不安全
     */
 private:
-    void _OnConnected(SOCKET sock);
+    void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo);
     void _OnIocpMonitorTask(const FS_ThreadPool *threadPool);
     #pragma endregion
 

@@ -32,6 +32,7 @@
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
 #include "base/common/net/Impl/IFS_Session.h"
+#include "base/common/net/Impl/FS_ServerCore.h"
 
 #include "base/common/status/status.h"
 #include "base/common/assist/utils/utils.h"
@@ -41,7 +42,7 @@ FS_NAMESPACE_BEGIN
 
 FS_SessionMgr::FS_SessionMgr()
 {
-
+    g_SessionMgr = this;
 }
 
 FS_SessionMgr::~FS_SessionMgr()

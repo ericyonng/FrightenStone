@@ -186,6 +186,7 @@ Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &
     memset(&dstadd_in, 0, sizeof(dstadd_in));
     socklen_t  len = sizeof(dstadd_in);
 
+    // 获取客户端地址
     if(getpeername(sSocket, (struct sockaddr*)&dstadd_in, &len) != 0)
     {
         lastError = WSAGetLastError();

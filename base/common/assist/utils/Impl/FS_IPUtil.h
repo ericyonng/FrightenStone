@@ -54,8 +54,6 @@ public:
         , FS_IPUtilDefs::FAMILY_TYPE eFamily = FS_IPUtilDefs::FAMILY_TYPE_AF_INET           // 默认ipv4
         , FS_IPUtilDefs::PROTOCOL_TYPE eProtocol = FS_IPUtilDefs::PROTOCOL_TYPE_IPPROTO_IP  // 默认任意协议 即ip协议
     );
-
-    Int32 GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError);
 };
 
 FS_NAMESPACE_END

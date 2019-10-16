@@ -69,6 +69,8 @@
 #define CLIENT_HREAT_DEAD_TIME 120000
 // 在间隔指定时间后才允许发送(单位ms)
 #define CLIENT_SEND_BUFF_TIME 200
+// connector的缓冲大小
+#define IOCP_CONNECTOR_BUFFER 1024
 
 // 心跳队列排序
 // class FS_ClientComp
@@ -88,5 +90,7 @@ public:
         Epoll,
     };
 };
+
+
 
 #endif

@@ -92,11 +92,13 @@ public:
     Int32 PostSend(SOCKET targetSock, IoDataBase *ioData);
     Int32 PostQuit();
     Int32 WaitForCompletion(IO_EVENT &ioEvent, ULong millisec = INFINITE);
+    void GetClientAddrInfo(void *wsaBuff, sockaddr_in *&clientAddr);
     #pragma endregion
 
 private:
     HANDLE _completionPort = NULL;
     LPFN_ACCEPTEX _fnAcceptEx = NULL;
+    LPFN_GETACCEPTEXSOCKADDRS _fnGetAcceptClientAddrIn = NULL;
 };
 
 FS_NAMESPACE_END

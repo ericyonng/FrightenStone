@@ -41,11 +41,12 @@
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IFS_Session;
+class BASE_EXPORT FS_SessionMgr;
 
 class BASE_EXPORT FS_SessionFactory
 {
 public:
-    static IFS_Session *Create(UInt64 sessionId, SOCKET sock);
+    static IFS_Session *Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, FS_SessionMgr *sessionMgr);
 };
 
 FS_NAMESPACE_END

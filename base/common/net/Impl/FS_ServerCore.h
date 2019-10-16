@@ -112,7 +112,7 @@ private:
 
     std::vector<IFS_Connector *> _connectors;       // 多线程连接器
     std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息传输器
-    IFS_MsgHandler *_msgHandler;                    // 消息处理器
+    IFS_MsgHandler *_msgHandler;                    // 消息处理器 业务线程处理
 
     FS_SessionMgr *_sessiomMgr;                     // 会话管理
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
@@ -123,5 +123,9 @@ FS_NAMESPACE_END
 #include "base/common/net/Impl/FS_ServerCoreImpl.h"
 
 extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;
+
+extern BASE_EXPORT fs::FS_SessionMgr *g_SessionMgr;
+
+extern BASE_EXPORT fs::IFS_MsgHandler *g_MsgHandler;
 
 #endif

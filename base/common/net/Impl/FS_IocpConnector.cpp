@@ -33,6 +33,8 @@
 #include "base/common/net/Impl/FS_IocpConnector.h"
 #include "base/common/net/Impl/FS_ServerCore.h"
 #include "base/common/net/Impl/FS_Iocp.h"
+#include "base/common/net/Impl/FS_SessionFactory.h"
+#include "base/common/net/Impl/FS_Addr.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -182,7 +184,7 @@ Int32 FS_IocpConnector::_Listen(Int32 unconnectQueueLen)
     return StatusDefs::Success;
 }
 
-void FS_IocpConnector::_OnConnected(SOCKET sock)
+void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
 {
     // 1. accept 等待接受客户端连接
  // sockaddr_in clientAddr = {};
@@ -199,9 +201,23 @@ void FS_IocpConnector::_OnConnected(SOCKET sock)
         ++_curSessionCnt;
         SocketUtil::MakeReUseAddr(sock);
 
-        // TODO:连接回调
-        IFS_Session *newSession = NULL;
+        // TODO:连接回调 
+        IFS_Session *newSession = FS_SessionFactory::Create(_curMaxSessionId, sock, addrInfo, g_SessionMgr);
+        g_SessionMgr->AddNewSession(newSession->GetSessionId(), newSession);
         _onConnected->Invoke(newSession);
+
+        auto sessionAddr = newSession->GetAddr();
+        g_Log->net<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
+                                     , newSession->GetSessionId()
+                                     , newSession->GetSocket()
+                                     , sessionAddr->GetAddr().c_str()
+                                     , sessionAddr->GetPort());
+        g_Log->any<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
+                                     , newSession->GetSessionId()
+                                     , newSession->GetSocket()
+                                     , sessionAddr->GetAddr().c_str()
+                                     , sessionAddr->GetPort());
+
         // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
     }
     else {
@@ -229,19 +245,18 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
 
     // const int len = 2 * (sizeof(sockaddr_in) + 16);
     // 不需要客户端再连接后立即发送数据的情况下最低长度len
-    const int len = 1024;
-    char buf[len] = {};
+    char buf[IOCP_CONNECTOR_BUFFER] = {};
 
     IoDataBase ioData = {};
     ioData._wsaBuff.buf = buf;
-    ioData._wsaBuff.len = len;
+    ioData._wsaBuff.len = IOCP_CONNECTOR_BUFFER;
 
     listenIocp->PostAccept(_sock, &ioData);
     IO_EVENT ioEvent = {};
     while(!threadPool->IsClearingPool())
     {
         // 监听iocp
-        auto ret = listenIocp->WaitForCompletion(ioEvent, 1);
+        auto ret = listenIocp->WaitForCompletion(ioEvent);
         if(ret == StatusDefs::IOCP_WaitTimeOut)
             continue;
 
@@ -263,7 +278,10 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
         // 接受连接 完成
         if(IocpDefs::IO_ACCEPT == ioEvent._ioData->_ioType)
         {
-            _OnConnected(ioEvent._ioData->_sock);
+            // TODO:在getacceptAddrInfo时候需要考虑线程是否安全
+            sockaddr_in *clientAddrInfo = NULL;
+            listenIocp->GetClientAddrInfo(ioEvent._ioData->_wsaBuff.buf, clientAddrInfo);
+            _OnConnected(ioEvent._ioData->_sock, clientAddrInfo);
 
             // 继续向IOCP投递接受连接任务
             listenIocp->PostAccept(_sock, &ioData);

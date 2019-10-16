@@ -50,6 +50,8 @@
 #include "base/common/component/Impl/FS_CpuInfo.h"
 
 fs::FS_ServerCore *g_ServerCore = NULL;
+fs::FS_SessionMgr *g_SessionMgr = NULL;
+fs::IFS_MsgHandler *g_MsgHandler = NULL;
 
 FS_NAMESPACE_BEGIN
 FS_ServerCore::FS_ServerCore()
@@ -69,6 +71,8 @@ FS_ServerCore::~FS_ServerCore()
     STLUtil::DelVectorContainer(_connectors);
     Fs_SafeFree(_cpuInfo);
     Fs_SafeFree(_serverConfigMgr);
+    g_SessionMgr = NULL;
+    g_MsgHandler = NULL;
     g_ServerCore = NULL;
 }
 

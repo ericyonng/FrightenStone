@@ -46,7 +46,7 @@ class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
     OBJ_POOL_CREATE_DEF(FS_IocpSession);
 public:
-    FS_IocpSession(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr);
+    FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, FS_SessionMgr *sessionMgr);
     virtual ~FS_IocpSession();
 
     // ²Ù×÷
