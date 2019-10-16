@@ -49,10 +49,11 @@ public:
     virtual Int32 Start();
     virtual void Close();
 
-    virtual void OnConnect();
+    virtual void OnConnect(IFS_Session *session);
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut();
 
+    virtual Int32 GetSessionCnt();
 private:
 };
 

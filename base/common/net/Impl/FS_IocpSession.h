@@ -39,6 +39,7 @@
 #include "base/common/net/Impl/IFS_Session.h"
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/net/protocol/protocol.h"
+#include "base/common/net/Defs/IFS_Buffer.h"
 
 FS_NAMESPACE_BEGIN
 

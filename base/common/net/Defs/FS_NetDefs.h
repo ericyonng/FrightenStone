@@ -71,6 +71,8 @@
 #define CLIENT_SEND_BUFF_TIME 200
 // connector的缓冲大小
 #define IOCP_CONNECTOR_BUFFER 1024
+// 统计服务器负载的时间间隔
+#define IOCP_STATISTIC_INTERVAL     1000    // 时间间隔单位ms
 
 // 心跳队列排序
 // class FS_ClientComp

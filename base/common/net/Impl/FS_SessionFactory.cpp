@@ -39,7 +39,7 @@ FS_NAMESPACE_BEGIN
 IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, FS_SessionMgr *sessionMgr)
 {
 #ifdef _WIN32
-    return new FS_IocpSession(sessionId, sock, addrInfo, sessionMgr)
+    return new FS_IocpSession(sessionId, sock, addrInfo, sessionMgr);
 #else
 #endif
 }

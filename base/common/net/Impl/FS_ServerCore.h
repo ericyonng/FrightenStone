@@ -36,6 +36,8 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/asyn/asyn.h"
+#include "base/common/component/Impl/Time.h"
+#include "base/common/component/Impl/TimeSlice.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -46,6 +48,9 @@ class BASE_EXPORT IFS_MsgTransfer;
 class BASE_EXPORT IFS_MsgHandler;
 class BASE_EXPORT FS_SessionMgr;
 class BASE_EXPORT FS_CpuInfo;
+class BASE_EXPORT FS_ThreadPool;
+class BASE_EXPORT TimeSlice;
+class BASE_EXPORT Time;
 
 class BASE_EXPORT FS_ServerCore
 {
@@ -71,20 +76,20 @@ public:
     *       4. OnNetLeave 玩家掉线 线程不安全
     *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）线程不安全 NetMsg_DataHeader 转发到其他线程需要拷贝避免消息被覆盖
     *       6. OnNetRecv 接收到数据 线程不安全
+            7. 接口只能由msgtransfer调度，避免线程不安全 msghandler不能有fs_session对象，只能创建user对象使用userId与sessionId关联，且不处理session的任意内容，只持有sessionId,避免导致线程不安全
     */
 protected:
     void _OnConnected(IFS_Session *session);
     void _OnDisconnected(IFS_Session *session);
-    void _OnMsgArrived(IFS_Session *session);
+    // 每接收一个完整包调用一次
+    void _OnRecvMsg(IFS_Session *session, Int64 transferBytes);
+    // 发送只能统计字节数，包数无法支持统计
+    void _OnSendMsg(IFS_Session *session, Int64 transferBytes);
 
 protected:
     // 服务器负载情况
-    // virtual void _OnSvrRuningDataRecord(const FS_ThreadPool *threadPool) = 0;
-
-    // 网络操作
-protected:
-    void _AddSessionToMsgTrasfer(IFS_Session *client);
-    void _StatisticsMsgPerSecond();
+    virtual void _OnSvrRuning(const FS_ThreadPool *threadPool);
+    void _PrintSvrLoadInfo(const TimeSlice &dis);
     #pragma endregion
 
     /* 内部方法 */
@@ -111,11 +116,21 @@ private:
     IFS_ServerConfigMgr *_serverConfigMgr;          // 服务器配置
 
     std::vector<IFS_Connector *> _connectors;       // 多线程连接器
-    std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息传输器
+    std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息收发器
     IFS_MsgHandler *_msgHandler;                    // 消息处理器 业务线程处理
 
     FS_SessionMgr *_sessiomMgr;                     // 会话管理
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
+
+    // 统计区
+    Time _lastStatisticsTime;                       // 最后一次统计的时间
+    TimeSlice _statisticsInterval;                  // 统计的时间间隔
+    std::atomic<Int64> _curSessionConnecting;       // 正连接的会话数量
+    std::atomic<Int64> _sessionConnectedBefore;     // 曾经连入的会话数量
+    std::atomic<Int64> _sessionDisconnectedCnt;     // 断开链接的会话数量
+    std::atomic<Int64> _recvMsgCountPerSecond;      // 每秒收到的包个数
+    std::atomic<Int64> _recvMsgBytesPerSecond;      // 每秒收到的包的字节数
+    std::atomic<Int64> _sendMsgBytesPerSecond;      // 每秒发送的包字节数
 };
 
 FS_NAMESPACE_END

@@ -37,6 +37,7 @@
 #include "base/common/log/Log.h"
 #include "base/common/net/Defs/FS_Packet2.h"
 #include "base/common/net/Impl/FS_Iocp.h"
+#include "base/common/net/Defs/FS_IocpBuffer.h"
 
 FS_NAMESPACE_BEGIN
 OBJ_POOL_CREATE_DEF_IMPL(Sender, __DEF_OBJ_POOL_OBJ_NUM__)
@@ -117,7 +118,7 @@ void Sender::_OnWork(const FS_ThreadPool *pool)
     if(!_quitIocp)
         _quitIocp = DelegatePlusFactory::Create<decltype(__quitIocp), void>(__quitIocp);
 
-    FS_Packet2 *forPostPacket = NULL;
+    FS_IocpBuffer *forPostPacket = NULL;
     BufferQueueNode *queueNode = NULL;
     UInt64 clientId = 0;
     Int32 netSt = StatusDefs::Success;
@@ -162,20 +163,21 @@ void Sender::_OnWork(const FS_ThreadPool *pool)
             if(queueNode->_isPost)
             {
                 g_Log->e<Sender>(_LOGFMT_("node has post clientId[%llu] socket[%llu]")
-                                 , clientId, queueNode->_packet->GetSocket());
+                                 , clientId, queueNode->_buffer->CastToBuffer<FS_IocpBuffer>()->GetSocket());
                 continue;
             }
 
 
-            forPostPacket = queueNode->_packet;
+            forPostPacket = queueNode->_buffer->CastToBuffer<FS_IocpBuffer>();
             auto ioData = forPostPacket->MakeSendIoData();
             ioData->_node = queueNode;
             if(_sender->PostSend(forPostPacket->GetSocket(), ioData) != StatusDefs::Success)
             {
                 g_Log->net<Sender>("_OnWork postsend fail clientid[%llu] sock[%llu]"
-                                   , forPostPacket->GetOwnerId(), forPostPacket->GetSocket());
+                                   , forPostPacket->GetSessionId(), forPostPacket->GetSocket());
 
-                SocketUtil::DestroySocket(forPostPacket->GetSocket());
+                auto sock = forPostPacket->GetSocket();
+                SocketUtil::DestroySocket(sock);
                 STLUtil::DelListContainer(iterQueue->second);
                 _sendingQueue.erase(iterQueue);
                 continue;
@@ -216,123 +218,124 @@ void Sender::_OnSendSuc(BufferQueueNode *node, Int32 transferBytes)
 
 Int32 Sender::_WaitForNetResponse()
 {
-    auto ret = _sender->WaitForCompletion(*_ioEvent, 1);
-    if(ret != StatusDefs::Success)
-    {
-        if(ret != StatusDefs::IOCP_WaitTimeOut)
-            g_Log->net<Sender>("_WaitForNetResponse.wait nothing but ret[%d]", ret);
-        return ret;
-    }
-
-    // 处理iocp退出
-    if(_ioEvent->_data._code == IocpDefs::IO_QUIT)
-    {
-        g_Log->sys<Sender>(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
-        return StatusDefs::IOCP_Quit;
-    }
-
-    // 判断client是否已被移除
-    UInt64 clientId = _ioEvent->_data._clientId;
-    auto iterClientQueue = _sendingQueue.find(clientId);
-    if(iterClientQueue == _sendingQueue.end())
-    {
-        g_Log->net<Sender>("clientId[%llu] is removed before", clientId);
-        return ret;
-    }
-
-    auto &clientQueue = iterClientQueue->second;
-    if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
-    {// 发送数据 完成 Completion
-
-        if(_ioEvent->_bytesTrans <= 0)
-        {// 客户端断开处理
-            g_Log->any<Sender>("client sock[%llu] clientId[%llu] IO_TYPE::IO_SEND bytesTrans[%lu]"
-                                                 , _ioEvent->_ioData->_sock
-                                                 , clientId
-                                                 , _ioEvent->_bytesTrans);
-            g_Log->net<Sender>("client sock[%llu] clientId[%llu] will remove IO_TYPE::IO_SEND bytesTrans[%lu]"
-                                                 , _ioEvent->_ioData->_sock
-                                                 , clientId
-                                                 , _ioEvent->_bytesTrans);
-            _RemoveFromQueue(clientId);
-            return ret;
-        }
-
-        const SOCKET clientSocket = _ioEvent->_ioData->_sock;
-        // 判断是否断开 已断开的有可能是上次postsend只后1ms内系统没有完成send，同时客户端被移除导致
-        if(_isClientDestroy->Invoke(clientId))
-        {
-            g_Log->e<Sender>(_LOGFMT_("IO_SEND clientId[%llu] clientSocket[%llu] is destroy")
-                                               , clientId, clientSocket);
-            _RemoveFromQueue(clientId);
-            return ret;
-        }
-
-        // 完成回调
-        _ioEvent->_ioData->_callback->Invoke(_ioEvent->_bytesTrans);
-        auto node = _ioEvent->_ioData->_node;
-
-        node->_isPost = false;
-        auto clientPacket = node->_packet;
-        if(clientPacket->IsEmpty())
-        {
-            clientQueue.erase(node->_iterNode);
-            Fs_SafeFree(node);
-            if(clientQueue.empty())
-                _sendingQueue.erase(iterClientQueue);
-        }
-
-        if(!clientQueue.empty())
-            _needPostClientIds.insert(clientId);
-    }
-    else
-    {
-        g_Log->e<Sender>(_LOGFMT_("undefine io type[%d] clientId[%llu] socket[%llu].")
-                         , _ioEvent->_ioData->_ioType, clientId, _ioEvent->_ioData->_sock);
-    }
-
-    return ret;
+//     auto ret = _sender->WaitForCompletion(*_ioEvent, 1);
+//     if(ret != StatusDefs::Success)
+//     {
+//         if(ret != StatusDefs::IOCP_WaitTimeOut)
+//             g_Log->net<Sender>("_WaitForNetResponse.wait nothing but ret[%d]", ret);
+//         return ret;
+//     }
+// 
+//     // 处理iocp退出
+//     if(_ioEvent->_data._code == IocpDefs::IO_QUIT)
+//     {
+//         g_Log->sys<Sender>(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
+//         return StatusDefs::IOCP_Quit;
+//     }
+// 
+//     // 判断client是否已被移除
+//     UInt64 clientId = _ioEvent->_data._clientId;
+//     auto iterClientQueue = _sendingQueue.find(clientId);
+//     if(iterClientQueue == _sendingQueue.end())
+//     {
+//         g_Log->net<Sender>("clientId[%llu] is removed before", clientId);
+//         return ret;
+//     }
+// 
+//     auto &clientQueue = iterClientQueue->second;
+//     if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
+//     {// 发送数据 完成 Completion
+// 
+//         if(_ioEvent->_bytesTrans <= 0)
+//         {// 客户端断开处理
+//             g_Log->any<Sender>("client sock[%llu] clientId[%llu] IO_TYPE::IO_SEND bytesTrans[%lu]"
+//                                                  , _ioEvent->_ioData->_sock
+//                                                  , clientId
+//                                                  , _ioEvent->_bytesTrans);
+//             g_Log->net<Sender>("client sock[%llu] clientId[%llu] will remove IO_TYPE::IO_SEND bytesTrans[%lu]"
+//                                                  , _ioEvent->_ioData->_sock
+//                                                  , clientId
+//                                                  , _ioEvent->_bytesTrans);
+//             _RemoveFromQueue(clientId);
+//             return ret;
+//         }
+// 
+//         const SOCKET clientSocket = _ioEvent->_ioData->_sock;
+//         // 判断是否断开 已断开的有可能是上次postsend只后1ms内系统没有完成send，同时客户端被移除导致
+//         if(_isClientDestroy->Invoke(clientId))
+//         {
+//             g_Log->e<Sender>(_LOGFMT_("IO_SEND clientId[%llu] clientSocket[%llu] is destroy")
+//                                                , clientId, clientSocket);
+//             _RemoveFromQueue(clientId);
+//             return ret;
+//         }
+// 
+//         // 完成回调
+//         _ioEvent->_ioData->_callback->Invoke(_ioEvent->_bytesTrans);
+//         auto node = _ioEvent->_ioData->_node;
+// 
+//         node->_isPost = false;
+//         auto clientPacket = node->_buffer;
+//         if(clientPacket->IsEmpty())
+//         {
+//             clientQueue.erase(node->_iterNode);
+//             Fs_SafeFree(node);
+//             if(clientQueue.empty())
+//                 _sendingQueue.erase(iterClientQueue);
+//         }
+// 
+//         if(!clientQueue.empty())
+//             _needPostClientIds.insert(clientId);
+//     }
+//     else
+//     {
+//         g_Log->e<Sender>(_LOGFMT_("undefine io type[%d] clientId[%llu] socket[%llu].")
+//                          , _ioEvent->_ioData->_ioType, clientId, _ioEvent->_ioData->_sock);
+//     }
+// 
+//     return ret;
+    return StatusDefs::Success;
 }
 
 void Sender::_Add2SendQueue(FS_Packet2 *packet)
 {
-    const UInt64 ownerId = packet->GetOwnerId();
-    const SOCKET sock = packet->GetSocket();
-    auto iterSendingQueue = _sendingQueue.find(ownerId);
-    if(iterSendingQueue == _sendingQueue.end())
-    {
-        // 关联iocp
-        const Int32 st = _sender->Reg(sock, ownerId);
-        if(st != StatusDefs::Success)
-        {
-            g_Log->net<Sender>("_Add2SendQueue: Reg socket[%llu] with complete key clientId[%llu] fail st[%d]"
-                               , sock, ownerId, st);
-            return;
-        }
-
-        iterSendingQueue = _sendingQueue.insert(std::make_pair(ownerId, std::list<BufferQueueNode *>())).first;
-    }
-
-    auto &sendingQueue = iterSendingQueue->second;
-    BufferQueueNode *node = new BufferQueueNode;
-    node->_packet = packet;
-    sendingQueue.push_back(node);
-    node->_iterNode = --sendingQueue.end();
-
-    if(!sendingQueue.front()->_isPost)
-        _needPostClientIds.insert(ownerId);
+//     const UInt64 ownerId = packet->GetOwnerId();
+//     const SOCKET sock = packet->GetSocket();
+//     auto iterSendingQueue = _sendingQueue.find(ownerId);
+//     if(iterSendingQueue == _sendingQueue.end())
+//     {
+//         // 关联iocp
+//         const Int32 st = _sender->Reg(sock, ownerId);
+//         if(st != StatusDefs::Success)
+//         {
+//             g_Log->net<Sender>("_Add2SendQueue: Reg socket[%llu] with complete key clientId[%llu] fail st[%d]"
+//                                , sock, ownerId, st);
+//             return;
+//         }
+// 
+//         iterSendingQueue = _sendingQueue.insert(std::make_pair(ownerId, std::list<BufferQueueNode *>())).first;
+//     }
+// 
+//     auto &sendingQueue = iterSendingQueue->second;
+//     BufferQueueNode *node = new BufferQueueNode;
+//     node->_packet = packet;
+//     sendingQueue.push_back(node);
+//     node->_iterNode = --sendingQueue.end();
+// 
+//     if(!sendingQueue.front()->_isPost)
+//         _needPostClientIds.insert(ownerId);
 }
 
 void Sender::_RemoveFromQueue(UInt64 clientId)
 {
-    auto iterQueue = _sendingQueue.find(clientId);
-    auto &clientQueue = iterQueue->second;
-    
-    // closesocket
-    SocketUtil::DestroySocket(clientQueue.front()->_packet->GetSocket());
-    STLUtil::DelListContainer(clientQueue);
-    _sendingQueue.erase(iterQueue);
-    _needPostClientIds.erase(clientId);
+//     auto iterQueue = _sendingQueue.find(clientId);
+//     auto &clientQueue = iterQueue->second;
+//     
+//     // closesocket
+//     SocketUtil::DestroySocket(clientQueue.front()->_packet->GetSocket());
+//     STLUtil::DelListContainer(clientQueue);
+//     _sendingQueue.erase(iterQueue);
+//     _needPostClientIds.erase(clientId);
 }
 
 void Sender::_ClearData()

@@ -36,6 +36,7 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/objpool/objpool.h"
+#include "base/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -52,6 +53,7 @@ public:
     const FS_String &GetAddr() const;
     UInt16 GetPort() const;
     bool UpdateAddrInfo();
+    FS_String ToString() const;
 
 private:
     BUFFER64 _ip;

@@ -33,6 +33,8 @@
 #include "base/common/net/Impl/IFS_ServerConfigMgr.h"
 
 #include "base/common/status/status.h"
+#include "base/common/component/Impl/FS_CpuInfo.h"
+#include "base/common/log/Log.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,10 +49,19 @@ IFS_ServerConfigMgr::~IFS_ServerConfigMgr()
 
 Int32 IFS_ServerConfigMgr::GetConnectorCntNeeded()
 {
+    return _connectorCntNeeded;
 }
 
 Int32 IFS_ServerConfigMgr::Init()
 {
+    FS_CpuInfo cpuInfo;
+    if(!cpuInfo.Initialize())
+    {
+        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("cpuInfo.Initialize fail"));
+        return StatusDefs::Failed;
+    }
+
+    _connectorCntNeeded = cpuInfo.GetCpuCoreCnt();
     return StatusDefs::Success;
 }
 

@@ -41,6 +41,8 @@
 #include "base/common/net/Impl/IFS_MsgTransfer.h"
 #include "base/common/net/Impl/IFS_MsgHandler.h"
 #include "base/common/net/Impl/IFS_Connector.h"
+#include "base/common/net/Impl/IFS_Session.h"
+#include "base/common/net/Impl/FS_Addr.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -48,6 +50,7 @@
 #include "base/common/crashhandle/CrashHandle.h"
 #include "base/common/socket/socket.h"
 #include "base/common/component/Impl/FS_CpuInfo.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
 
 fs::FS_ServerCore *g_ServerCore = NULL;
 fs::FS_SessionMgr *g_SessionMgr = NULL;
@@ -59,6 +62,12 @@ FS_ServerCore::FS_ServerCore()
     ,_cpuInfo(new FS_CpuInfo)
     ,_msgHandler(NULL)
     ,_sessiomMgr(NULL)
+    ,_curSessionConnecting{0}
+    ,_sessionConnectedBefore{0}
+    ,_sessionDisconnectedCnt{0}
+    ,_recvMsgCountPerSecond{0}
+    ,_recvMsgBytesPerSecond{0}
+    ,_sendMsgBytesPerSecond{0}
 {
     g_ServerCore = this;
 }
@@ -215,7 +224,77 @@ void FS_ServerCore::Close()
 #pragma region
 void FS_ServerCore::_OnConnected(IFS_Session *session)
 {
+    // 转到 transfer,并保证各个数据收发器均衡服务
+    IFS_MsgTransfer *minTransfer = _msgTransfers[0];
+    IFS_MsgTransfer *switchServer = NULL;
+    const Int32 cnt = static_cast<Int32>(_msgTransfers.size());
+    for(Int32 i = 0; i < cnt; ++i)
+    {
+        switchServer = _msgTransfers[i];
+        if(minTransfer->GetSessionCnt() > switchServer->GetSessionCnt())
+            minTransfer = switchServer;
+    }
+
+    minTransfer->OnConnect(session);
+
+    // 统计session数量
+    ++_curSessionConnecting;
+    ++_sessionConnectedBefore;
+
+    auto sessionAddr = session->GetAddr();
+//     g_Log->any<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected "
+//                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
+
+    g_Log->net<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected"
+                              , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
 }
+
+void FS_ServerCore::_OnDisconnected(IFS_Session *session)
+{
+    --_curSessionConnecting;
+    ++_sessionDisconnectedCnt;
+
+    // 由于是外部线程调用本接口，所以session是线程安全的
+    auto sessionAddr = session->GetAddr();
+//     g_Log->any<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> disconnected "
+//                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
+
+    g_Log->net<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> disconnected "
+                              , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
+}
+
+void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
+{
+    Time nowTime;
+    while(!threadPool->IsClearingPool())
+    {
+        // 每隔500毫秒扫描一次
+        Sleep(500);
+        nowTime.FlushTime();
+        const auto &timeSlice = nowTime - _lastStatisticsTime;
+        if(timeSlice >= _statisticsInterval)
+        {
+            _lastStatisticsTime = nowTime;
+            _PrintSvrLoadInfo(timeSlice);
+
+            // 重置参数
+            _recvMsgCountPerSecond = 0;
+            _recvMsgBytesPerSecond = 0;
+            _sendMsgBytesPerSecond = 0;
+        }
+    }
+}
+
+void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
+{
+    g_Log->any<FS_ServerCore>("timeSlice<%lld ms> connector<%d>, msgtransfer<%d>, "
+                              "Connecting<%lld> ConnectedBefore<%lld>, Disconnected<%lld>, "
+                              "RecvMsg[%lld ps], RecvMsgBytes<%lld Bps>, SendMsgBytes<%lld Bps>"
+                              , dis.GetTotalMilliSeconds(), (Int32)(_connectors.size()), (Int32)(_msgTransfers.size())
+                              , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore), (Int64)(_sessionDisconnectedCnt)
+                              , (Int64)(_recvMsgCountPerSecond), (Int64)(_recvMsgBytesPerSecond), (Int64)(_sendMsgBytesPerSecond));
+}
+
 #pragma endregion
 
 #pragma region inner api
@@ -228,6 +307,8 @@ Int32 FS_ServerCore::_ReadConfig()
         g_Log->e<FS_ServerCore>(_LOGFMT_("server config init fail ret[%d]"), ret);
         return ret;
     }
+
+    _statisticsInterval = IOCP_STATISTIC_INTERVAL * Time::_microSecondPerMilliSecond;
 
     return StatusDefs::Success;
 }
@@ -417,16 +498,6 @@ void FS_ServerCore::_RegisterToModule()
         auto onConnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnConnected);
         connector->RegisterConnected(onConnectedRes);
     }
-
-    // TODO:
-//     for(auto &msgTransfer : _msgTransfers)
-//     {
-//         msgTransfer
-//     }
-//         msgTransfer->AfterClose();
-// 
-//     _msgHandler->AfterClose();
-//     _sessiomMgr->AfterClose();
 }
 
 #pragma endregion

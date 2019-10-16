@@ -41,25 +41,6 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Packet
-{
-    OBJ_POOL_CREATE_DEF(FS_Packet);
-public:
-    FS_Packet();
-    ~FS_Packet();
-
-public:
-    void Pop()
-
-private:
-    Int32 _packetSize;
-    UInt64 _sessionId;      // FS_Packet生命周期内不变更
-    SOCKET _socket;         // FS_Packet生命周期内不变更
-    char *_buff;
-    Int32 _lastPos;
-    IoDataBase _ioData = {};
-};
-
 FS_NAMESPACE_END
 
 #endif

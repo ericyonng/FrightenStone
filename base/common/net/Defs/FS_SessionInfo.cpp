@@ -41,7 +41,7 @@ FS_NAMESPACE_BEGIN
 
 FS_SessionInfo::FS_SessionInfo()
     :_sock(INVALID_SOCKET)
-    ,_addr(new FS_Addr)
+    ,_addr(NULL)// TODO:
 {
 
 }
