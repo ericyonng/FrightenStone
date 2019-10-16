@@ -60,5 +60,17 @@ FS_NAMESPACE_END
 #define IS_VALID_SOCKET_IDD(x)  (((x)!=INVALID_SOCKET_IDD)&&((x)!=0))   // 是否有效的socketIDD
 #endif
 
+#ifndef __FS_DATA_1KB__
+#define __FS_DATA_1KB__     1024 
+#endif
+
+#ifndef __FS_DATA_1MB__
+#define __FS_DATA_1MB__     1048576
+#endif
+
+#ifndef __FS_DATA_1GB__
+#define __FS_DATA_1GB__     1073741824
+#endif
+
 #endif
 

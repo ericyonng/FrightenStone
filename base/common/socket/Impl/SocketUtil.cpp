@@ -362,4 +362,41 @@ Int32 SocketUtil::GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TY
     return StatusDefs::Success;
 }
 
+FS_String SocketUtil::ToFmtSpeedPerSec(Int64 bytesps)
+{
+    // 小于1MB大于1KB的使用KB/s
+    // 大于1MB小于1GB的使用MB/s
+    // 大于1GB的使用GB/s 
+    // 精度保留3位小数
+    FS_String info;
+    if(bytesps < __FS_DATA_1KB__)
+    {// 小于1KB的使用B/s
+        info.AppendFormat("%lld B/s", bytesps);
+        return info;
+    }
+    else if(bytesps >= __FS_DATA_1KB__ && bytesps < __FS_DATA_1MB__)
+    {
+        double speedData = static_cast<double>(bytesps);
+        speedData = speedData / __FS_DATA_1KB__;
+        info.AppendFormat("%.3lf KB/s", speedData);
+        return info;
+    }
+    else if(bytesps >= __FS_DATA_1MB__ && bytesps < __FS_DATA_1GB__)
+    {
+        double speedData = static_cast<double>(bytesps);
+        speedData = speedData / __FS_DATA_1MB__;
+        info.AppendFormat("%.3lf MB/s", speedData);
+        return info;
+    }
+    else if(bytesps >= __FS_DATA_1GB__)
+    {
+        double speedData = static_cast<double>(bytesps);
+        speedData = speedData / __FS_DATA_1GB__;
+        info.AppendFormat("%.3lf GB/s", speedData);
+        return info;
+    }
+
+    return "";
+}
 FS_NAMESPACE_END
+

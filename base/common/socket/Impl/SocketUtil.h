@@ -82,6 +82,8 @@ public:
     // 获取socket缓冲区大小
     static Int32 GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 &cacheSize);
 
+    static FS_String ToFmtSpeedPerSec(Int64 bytesps);
+
 private:
     static bool _isInitEnv;
 };
