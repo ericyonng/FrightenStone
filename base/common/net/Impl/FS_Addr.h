@@ -35,12 +35,31 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT IFS_Session;
+
 class BASE_EXPORT FS_Addr
 {
+    OBJ_POOL_CREATE_DEF(FS_Addr);
 public:
+    FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo);
+    ~FS_Addr();
+
+public:
+    const FS_String &GetAddr() const;
+    UInt16 GetPort() const;
+    bool UpdateAddrInfo();
+
+private:
+    BUFFER64 _ip;
+    FS_String _strIp;
+    char *_ipPtr;
+    UInt16 _port;
+    sockaddr_in _addrInfo;
+    IFS_Session *_session;
 };
 
 FS_NAMESPACE_END

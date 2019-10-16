@@ -149,9 +149,28 @@ Int32 FS_Iocp::LoadAcceptEx(SOCKET listenSocket)
                 &dwBytes, NULL, NULL) != 0)
     {
         auto error = WSAGetLastError();
-        g_Log->e<FS_Iocp>(_LOGFMT_("load acceptex fail windows error[%d] statuscode[%d]")
+        g_Log->e<FS_Iocp>(_LOGFMT_("load acceptex fail windows error[%d] statuscode[%d] IOCP_LoadAcceptExError")
                           , error, StatusDefs::IOCP_LoadAcceptExError);
         return StatusDefs::IOCP_LoadAcceptExError;
+    }
+
+    // 获取GetAcceptExSockAddrs函数指针
+    GUID GuidGetAcceptExSockAddrs = WSAID_GETACCEPTEXSOCKADDRS;
+    if(WSAIoctl(
+        listenSocket,
+        SIO_GET_EXTENSION_FUNCTION_POINTER,
+        &GuidGetAcceptExSockAddrs,
+        sizeof(GuidGetAcceptExSockAddrs),
+        &_fnGetAcceptClientAddrIn,
+        sizeof(_fnGetAcceptClientAddrIn),
+        &dwBytes,
+        NULL,
+        NULL) != 0)
+    {
+        auto error = WSAGetLastError();
+        g_Log->e<FS_Iocp>(_LOGFMT_("load _fnGetAcceptClientAddrIn fail windows error[%d] statuscode[%d] IOCP_LoadGetAcceptExSockAddrFunFail")
+                          , error, StatusDefs::IOCP_LoadGetAcceptExSockAddrFunFail);
+        return StatusDefs::IOCP_LoadGetAcceptExSockAddrFunFail;
     }
 
     return StatusDefs::Success;
@@ -319,6 +338,24 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
 
     return StatusDefs::Success;
 }
+
+void FS_Iocp::GetClientAddrInfo(void *wsaBuff, sockaddr_in *&clientAddr)
+{
+    // todo 需要测试返回的clientAddr是否是系统内核对应的 sockaddr_in信息，还是说可以外部提供一个sockaddr_in对象传入，然后系统去填充
+    // 测试方法：可以先传入sockaddr_in的实体对象，判断实体对象最终有没被填充，再传入一个指针，判断该指针是否是系统对应的wsabuff的指针
+    sockaddr_in *localAddr = NULL;
+    Int32 localLen = sizeof(sockaddr_in);
+    Int32 remoteLen = sizeof(sockaddr_in);
+    _fnGetAcceptClientAddrIn(wsaBuff
+                             , 0
+                             , sizeof(sockaddr_in) + 16     // msdn指定参数
+                             , sizeof(sockaddr_in) + 16     // msdn指定参数
+                             , (LPSOCKADDR *)(&localAddr)    // 获取本地地址
+                             , &localLen
+                             , (LPSOCKADDR *)(&clientAddr)   // 获取远程客户端地址
+                             , &remoteLen);
+}
+
 #pragma endregion
 
 FS_NAMESPACE_END

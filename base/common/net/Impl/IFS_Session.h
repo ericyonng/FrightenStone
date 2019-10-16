@@ -52,7 +52,7 @@ class BASE_EXPORT IFS_Session
 {
     OBJ_POOL_CREATE_DEF(IFS_Session);
 public:
-    explicit IFS_Session(UInt64 sessionId, SOCKET sock, FS_SessionMgr *sessionMgr);
+    explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, FS_SessionMgr *sessionMgr);
     virtual ~IFS_Session();
 
     // 获取属性与状态

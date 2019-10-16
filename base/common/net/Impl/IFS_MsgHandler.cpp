@@ -32,11 +32,13 @@
 
 #include "stdafx.h"
 #include "base/common/net/Impl/IFS_MsgHandler.h"
+#include "base/common/net/Impl/FS_ServerCore.h"
 
 FS_NAMESPACE_BEGIN
 
 IFS_MsgHandler::IFS_MsgHandler()
 {
+    g_MsgHandler = this;
 }
 
 IFS_MsgHandler::~IFS_MsgHandler()

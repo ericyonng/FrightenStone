@@ -45,6 +45,10 @@ IFS_ServerConfigMgr::~IFS_ServerConfigMgr()
 
 }
 
+Int32 IFS_ServerConfigMgr::GetConnectorCntNeeded()
+{
+}
+
 Int32 IFS_ServerConfigMgr::Init()
 {
     return StatusDefs::Success;
