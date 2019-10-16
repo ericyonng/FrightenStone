@@ -287,12 +287,13 @@ void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
 
 void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
 {
+    const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond);
     g_Log->any<FS_ServerCore>("timeSlice<%lld ms> connector<%d>, msgtransfer<%d>, "
                               "Connecting<%lld> ConnectedBefore<%lld>, Disconnected<%lld>, "
-                              "RecvMsg[%lld ps], RecvMsgBytes<%lld Bps>, SendMsgBytes<%lld Bps>"
+                              "RecvMsg[%lld ps], RecvMsgBytes<%lld Bps>, SendMsgSpeed<%s>"
                               , dis.GetTotalMilliSeconds(), (Int32)(_connectors.size()), (Int32)(_msgTransfers.size())
                               , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore), (Int64)(_sessionDisconnectedCnt)
-                              , (Int64)(_recvMsgCountPerSecond), (Int64)(_recvMsgBytesPerSecond), (Int64)(_sendMsgBytesPerSecond));
+                              , (Int64)(_recvMsgCountPerSecond), (Int64)(_recvMsgBytesPerSecond), sendSpeed.c_str());
 }
 
 #pragma endregion
