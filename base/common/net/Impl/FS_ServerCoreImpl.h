@@ -34,6 +34,18 @@
 
 FS_NAMESPACE_BEGIN
 
+inline void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
+{
+    ++_recvMsgCountPerSecond;
+    _recvMsgBytesPerSecond += transferBytes;
+}
+
+inline void FS_ServerCore::_OnSendMsg(IFS_Session *session, Int64 transferBytes)
+{
+    _sendMsgBytesPerSecond += transferBytes;
+}
+
+
 FS_NAMESPACE_END
 
 #endif

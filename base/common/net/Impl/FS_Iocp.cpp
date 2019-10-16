@@ -297,7 +297,7 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
         if(ERROR_NETNAME_DELETED == error)
         {
             g_Log->net<FS_Iocp>("WaitForMessage client closed clientId=%llu\n error<%d> status[%d]"
-                       , ioEvent._ioData->_ownerId, error, StatusDefs::IOCP_IODisconnect);
+                       , ioEvent._ioData->_sessionId, error, StatusDefs::IOCP_IODisconnect);
 //             g_Log->any<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
 //                                 , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
             // 此时ioevent的数据被正确的填充，只是ioEvent._bytesTrans<=0这个事件可以在recv事件做处理

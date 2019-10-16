@@ -160,7 +160,7 @@ inline void IFS_Buffer::_Init()
     }
 
     g_MemoryPool->Lock();
-    _buff = g_MemoryPool->Alloc<char>(bufferSize);
+    _buff = g_MemoryPool->Alloc<char>(_bufferSize);
     g_MemoryPool->Unlock();
     _curPos = 0;
 }

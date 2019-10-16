@@ -79,8 +79,8 @@ private:
     void _Clear();
 
 private:
-    void _OnSendSucCallback(Int32 transferBytes);
-    void _OnRecvSucCallback(Int32 transferBytes);
+    void _OnSendSucCallback(size_t transferBytes);
+    void _OnRecvSucCallback(size_t transferBytes);
 
 private:
     Int32 _packetSize;
@@ -93,6 +93,6 @@ private:
 
 FS_NAMESPACE_END
 
-#include "base/common/net/Defs/FS_PacketImpl.h"
+#include "base/common/net/Defs/FS_Packet2Impl.h"
 
 #endif

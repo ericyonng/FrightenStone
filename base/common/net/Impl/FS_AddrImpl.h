@@ -17,6 +17,13 @@ inline UInt16 FS_Addr::GetPort() const
     return _port;
 }
 
+inline FS_String FS_Addr::ToString() const
+{
+    FS_String info;
+    info.AppendFormat("%s:%hu", _ip, _port);
+    return info;
+}
+
 FS_NAMESPACE_END
 
 #endif

@@ -52,7 +52,7 @@ void FS_IocpMsgTransfer::Close()
 {
 }
 
-void FS_IocpMsgTransfer::OnConnect()
+void FS_IocpMsgTransfer::OnConnect(IFS_Session *session)
 {
 }
 
@@ -63,6 +63,11 @@ void FS_IocpMsgTransfer::OnDestroy()
 
 void FS_IocpMsgTransfer::OnHeartBeatTimeOut()
 {
+}
+
+Int32 FS_IocpMsgTransfer::GetSessionCnt()
+{
+    return 0;
 }
 
 FS_NAMESPACE_END

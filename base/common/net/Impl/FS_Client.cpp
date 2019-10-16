@@ -45,7 +45,7 @@ FS_Client::FS_Client(UInt64 clientId
                             , Int32 recvSize)
     : _id(clientId)
     , _sockfd(sockfd)
-    , _recvBuff(new  FS_Packet2(clientId, sockfd, recvSize))
+    , _recvBuff(new  FS_Packet2(clientId))
 {
     UpdateHeartBeatExpiredTime();
 }
@@ -91,7 +91,7 @@ void FS_Client::ResetPostRecv()
 
 void FS_Client::_SendData(const char *data, Int32 len)
 {
-    FS_Packet2 *newData = new FS_Packet2(_id, _sockfd);
+    FS_Packet2 *newData = new FS_Packet2(_id);
     newData->FromMsg(data, len);
     _sendFunc->Invoke(newData);
 }

@@ -73,7 +73,7 @@ inline IoDataBase *FS_IocpBuffer::MakeRecvIoData()
         return NULL;
 
     _ioData._wsaBuff.buf = GetData() + GetLength();
-    _ioData._wsaBuff.len = rest;
+    _ioData._wsaBuff.len = static_cast<ULong>(rest);
     _ioData._sessionId = _sessionId;
     _ioData._sock = _socket;
     if(!_ioData._callback)
@@ -95,7 +95,7 @@ inline IoDataBase *FS_IocpBuffer::MakeSendIoData()
         return NULL;
 
     _ioData._wsaBuff.buf = GetData();
-    _ioData._wsaBuff.len = len;
+    _ioData._wsaBuff.len = static_cast<ULong>(len);
     _ioData._sessionId = _sessionId;
     _ioData._sock = _socket;
     if(!_ioData._callback)

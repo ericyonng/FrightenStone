@@ -39,6 +39,8 @@
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT IFS_Session;
+
 class BASE_EXPORT IFS_MsgTransfer
 {
 public:
@@ -54,9 +56,12 @@ public:
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    virtual void OnConnect() = 0;
+    virtual void OnConnect(IFS_Session *session) = 0;
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut() = 0;
+
+    // 会话个数
+    virtual Int32 GetSessionCnt() = 0;
 };
 
 FS_NAMESPACE_END

@@ -60,7 +60,7 @@ IoDataBase *FS_Packet2::MakeRecvIoData()
     {
         _ioData._wsaBuff.buf = _buff + _lastPos;
         _ioData._wsaBuff.len = len;
-        _ioData._ownerId = _ownerId;
+        _ioData._sessionId = _sessionId;
         _ioData._sock = _socket;
         if(!_ioData._callback)
             _ioData._callback = DelegatePlusFactory::Create(this, &FS_Packet2::_OnRecvSucCallback);
@@ -94,13 +94,13 @@ IoDataBase *FS_Packet2::MakeSendIoData()
     return NULL;
 }
 
-void FS_Packet2::_OnSendSucCallback(Int32 transferBytes)
+void FS_Packet2::_OnSendSucCallback(size_t transferBytes)
 {
     // 写入iocp完成多少字节则buffer响应减少多少字节
     if(_lastPos < transferBytes)
     {
         g_Log->e<FS_Packet2>(_LOGFMT_("_ownerId[%llu] packetsize<%d> _lastPos<%d> transferBytes<%d>")
-                               , _ioData._ownerId, _packetSize, _lastPos, transferBytes);
+                               , _ioData._sessionId, _packetSize, _lastPos, transferBytes);
         return;
     }
 
@@ -111,22 +111,22 @@ void FS_Packet2::_OnSendSucCallback(Int32 transferBytes)
     }
     else {
         // _lastPos=2000 实际发送ret=1000
-        _lastPos -= transferBytes;
+        _lastPos -= static_cast<Int32>(transferBytes);
         memcpy(_buff, _buff + transferBytes, _lastPos);
     }
 }
 
-void FS_Packet2::_OnRecvSucCallback(Int32 transferBytes)
+void FS_Packet2::_OnRecvSucCallback(size_t transferBytes)
 {
     // 从iocp读入buffer则buffer数据增加相应字节
     if(transferBytes > 0 && _packetSize - _lastPos >= transferBytes)
     {
-        _lastPos += transferBytes;
+        _lastPos += static_cast<Int32>(transferBytes);
         return;
     }
 
     g_Log->e<FS_Packet2>(_LOGFMT_("_ownerId<%llu> _packetSize<%d> _lastPos<%d> transferBytes<%d>")
-                           , _ioData._ownerId, _packetSize, _lastPos, transferBytes);
+                           , _ioData._sessionId, _packetSize, _lastPos, transferBytes);
 }
 
 FS_NAMESPACE_END

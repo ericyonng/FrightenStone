@@ -34,36 +34,16 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_Packet2::FS_Packet2(UInt64 ownerId, SOCKET sock)
+inline FS_Packet2::FS_Packet2(UInt64 ownerId)
     : _packetSize(0)
     , _buff(NULL)
-    , _ownerId(ownerId)
-    ,_socket(sock)
+    , _sessionId(ownerId)
+    ,_socket(0)
     , _lastPos(0)
 {
 
 }
 
-inline FS_Packet2::FS_Packet2(UInt64 ownerId, SOCKET sock, Int32 packetSize)
-    :_packetSize(packetSize)
-    ,_buff(NULL)
-    ,_ownerId(ownerId)
-    ,_socket(sock)
-    ,_lastPos(0)
-{
-    g_MemoryPool->Lock();
-    _buff = g_MemoryPool->Alloc<char>(packetSize);
-    g_MemoryPool->Unlock();
-}
-
-inline FS_Packet2::FS_Packet2(UInt64 ownerId, SOCKET sock, char *buff, Int32 packetSize)
-    : _packetSize(packetSize)
-    , _buff(buff)
-    ,_ownerId(ownerId)
-    ,_socket(sock)
-    ,_lastPos(packetSize)
-{
-}
 
 inline FS_Packet2::~FS_Packet2()
 {
@@ -115,7 +95,7 @@ inline void FS_Packet2::FromMsg(UInt64 ownerId, SOCKET socket, const char *data,
     _buff = g_MemoryPool->Alloc<char>(static_cast<size_t>(len));
     g_MemoryPool->Unlock();
     _packetSize = len;
-    _ownerId = ownerId;
+    _sessionId = ownerId;
     _lastPos = len;
 
     ::memcpy(_buff, data, len);
@@ -139,7 +119,7 @@ inline char *FS_Packet2::GiveupBuffer(Int32 &packetSize, Int32 &lastPos)
 
     _packetSize = 0;
     _buff = NULL;
-    _ownerId = 0;
+    _sessionId = 0;
     _lastPos = 0;
     return buff;
 }
@@ -153,7 +133,7 @@ inline void FS_Packet2::Clear()
         g_MemoryPool->Unlock();
         _buff = NULL;
         _packetSize = 0;
-        _ownerId = 0;
+        _sessionId = 0;
         SocketUtil::DestroySocket(_socket);
         _socket = INVALID_SOCKET;
         _lastPos = 0;
@@ -190,9 +170,9 @@ inline bool FS_Packet2::NeedWrite() const
     return _lastPos > 0;
 }
 
-inline UInt64 FS_Packet2::GetOwnerId() const
+inline UInt64 FS_Packet2::GetSessionId() const
 {
-    return _ownerId;
+    return _sessionId;
 }
 
 inline SOCKET FS_Packet2::GetSocket() const
