@@ -61,6 +61,7 @@ public:
     virtual void OnHeartBeatTimeOut() = 0;
 
     // 会话个数
+    virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback) = 0;
     virtual Int32 GetSessionCnt() = 0;
 };
 

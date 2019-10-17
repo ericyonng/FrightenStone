@@ -109,7 +109,7 @@ struct BASE_EXPORT IO_EVENT
     union
     {
         void *_ptr;                             // 传入自定义数据,绑定完成端口时
-        UInt64 _clientId;                       // 传入client唯一id
+        UInt64 _sessionId;                      // 传入session唯一id
         SOCKET _socket;                         // 套接字
         Int64 _code;                            // 状态码
     }_data;   // 绑定完成端口时，绑定的完成键，在完成时会回传，建议回传clientId,用于判断客户端是否存在

@@ -41,6 +41,8 @@
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_ThreadPool;
+class BASE_EXPORT FS_Iocp;
+class BASE_EXPORT IO_EVENT;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
@@ -53,23 +55,42 @@ public:
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
+    virtual void AfterClose();
 
     virtual void OnConnect(IFS_Session *session);
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut();
 
+    virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback);
     virtual Int32 GetSessionCnt();
 
 private:
     virtual void _OnMoniterMsg(const FS_ThreadPool *pool);
+    Int32 _ListenNetEvents();
+    void _MoveToSessions();
+    void _CheckHeartbeat();
+    void _DoSessionPost();
+
+    // 网络事件
+private:
+    void _OnDisconnected(IFS_Session *session);
+
+    // 辅助
+private:
+    IFS_Session *_GetSession(UInt64 sessionId);
+
 
 private:
-    std::map<UInt64, IFS_Session *> _sessions;  // key:sessionId
-
     Locker _locker;
+    std::atomic<Int32> _sessionCnt;             // 会话个数
+    std::map<UInt64, IFS_Session *> _sessions;  // key:sessionId
     std::deque<IFS_Session *> _willAddSessions; // 将要加入的sessions
 
     FS_ThreadPool *_threadPool;
+    FS_Iocp *_iocp;
+    IO_EVENT *_ioEvent;
+
+    IDelegate<void, IFS_Session *> *_disconnectedCallback;
 };
 
 FS_NAMESPACE_END

@@ -102,6 +102,13 @@ void FS_IocpConnector::RegisterConnected(IDelegate<void, IFS_Session *> *callbac
     _onConnected = callback;
 }
 
+void FS_IocpConnector::OnDisconnected(IFS_Session *session)
+{
+    _locker.Lock();
+    --_curSessionCnt;
+    _locker.Unlock();
+}
+
 void FS_IocpConnector::_ReadConfig()
 {
     // TODO:
@@ -192,10 +199,13 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
         return;
     }
 
+    _locker.Lock();
     if(_curSessionCnt < _maxSessionQuantityLimit && _curMaxSessionId < _maxSessionIdLimit)
     {
-        ++_curMaxSessionId;
         ++_curSessionCnt;
+        _locker.Unlock();
+
+        ++_curMaxSessionId;
         SocketUtil::MakeReUseAddr(sock);
 
         // TODO:连接回调 
@@ -217,10 +227,17 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
         // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
     }
     else {
+        _locker.Unlock();
+
         // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
         SocketUtil::DestroySocket(sock);
         g_Log->w<FS_IocpConnector>(_LOGFMT_("Accept to MaxClient[%d] or curMaxId[%llu] too large"), _maxSessionQuantityLimit, _curMaxSessionId);
     }
+}
+
+void FS_IocpConnector::_OnDisconnected(IFS_Session *session)
+{
+
 }
 
 void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
