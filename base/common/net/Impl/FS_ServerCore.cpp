@@ -60,6 +60,7 @@ FS_NAMESPACE_BEGIN
 FS_ServerCore::FS_ServerCore()
     :_serverConfigMgr(NULL)
     ,_cpuInfo(new FS_CpuInfo)
+    ,_connector(NULL)
     ,_msgHandler(NULL)
     ,_curSessionConnecting{0}
     ,_sessionConnectedBefore{0}
@@ -73,9 +74,9 @@ FS_ServerCore::FS_ServerCore()
 
 FS_ServerCore::~FS_ServerCore()
 {
+    Fs_SafeFree(_connector);
     Fs_SafeFree(_msgHandler);
     STLUtil::DelVectorContainer(_msgTransfers);
-    STLUtil::DelVectorContainer(_connectors);
     Fs_SafeFree(_cpuInfo);
     Fs_SafeFree(_serverConfigMgr);
     g_SessionMgr = NULL;
@@ -205,8 +206,7 @@ void FS_ServerCore::Close()
     _BeforeClose();
 
     // 移除服务器核心模块
-    for(auto &connector : _connectors)
-        connector->Close();
+    _connector->Close();
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->Close();
     _msgHandler->Close();
@@ -220,7 +220,8 @@ void FS_ServerCore::Close()
 /* 网络事件 */
 #pragma region
 void FS_ServerCore::_OnConnected(IFS_Session *session)
-{
+{// 只有connector调用接口
+
     // 转到 transfer,并保证各个数据收发器均衡服务
     IFS_MsgTransfer *minTransfer = _msgTransfers[0];
     IFS_MsgTransfer *switchServer = NULL;
@@ -250,6 +251,8 @@ void FS_ServerCore::_OnDisconnected(IFS_Session *session)
 {
     --_curSessionConnecting;
     ++_sessionDisconnectedCnt;
+
+    _connector->OnDisconnected(session);
 
     // 由于是外部线程调用本接口，所以session是线程安全的
     auto sessionAddr = session->GetAddr();
@@ -285,10 +288,10 @@ void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
 void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
 {
     const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond);
-    g_Log->any<FS_ServerCore>("timeSlice<%lld ms> connector<%d>, msgtransfer<%d>, "
+    g_Log->any<FS_ServerCore>("timeSlice<%lld ms> msgtransfer<%d>, "
                               "Connecting<%lld> ConnectedBefore<%lld>, Disconnected<%lld>, "
                               "RecvMsg[%lld ps], RecvMsgBytes<%lld Bps>, SendMsgSpeed<%s>"
-                              , dis.GetTotalMilliSeconds(), (Int32)(_connectors.size()), (Int32)(_msgTransfers.size())
+                              , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size())
                               , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore), (Int64)(_sessionDisconnectedCnt)
                               , (Int64)(_recvMsgCountPerSecond), (Int64)(_recvMsgBytesPerSecond), sendSpeed.c_str());
 }
@@ -314,9 +317,7 @@ Int32 FS_ServerCore::_ReadConfig()
 Int32 FS_ServerCore::_CreateNetModules()
 {
     // TODO:与客户端的连接点只能是一个，因为端口只有一个
-    _connectors.resize(1);
-    for(Int32 i = 0; i < 1; ++i)
-        _connectors.push_back(FS_ConnectorFactory::Create());
+    _connector = FS_ConnectorFactory::Create();
 
     const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
     _msgTransfers.resize(cpuCnt);
@@ -330,14 +331,11 @@ Int32 FS_ServerCore::_CreateNetModules()
 Int32 FS_ServerCore::_StartModules()
 {
     Int32 ret = StatusDefs::Success;
-    for(auto &connector : _connectors)
+    ret = _connector->Start();
+    if(ret != StatusDefs::Success)
     {
-        ret = connector->Start();
-        if(ret != StatusDefs::Success)
-        {
-            g_Log->e<FS_ServerCore>(_LOGFMT_("connector start fail ret[%d]"), ret);
-            return ret;
-        }
+        g_Log->e<FS_ServerCore>(_LOGFMT_("connector start fail ret[%d]"), ret);
+        return ret;
     }
 
     for(auto &msgTransfer : _msgTransfers)
@@ -363,18 +361,17 @@ Int32 FS_ServerCore::_StartModules()
 Int32 FS_ServerCore::_BeforeStart()
 {
     Int32 ret = StatusDefs::Success;
-    for(auto &connector : _connectors)
+    ret = _connector->BeforeStart();
+    if(ret != StatusDefs::Success)
     {
-        ret = connector->BeforeStart();
-        if(ret != StatusDefs::Success)
-        {
-            g_Log->e<FS_ServerCore>(_LOGFMT_("connector BeforeStart fail ret[%d]"), ret);
-            return ret;
-        }
+        g_Log->e<FS_ServerCore>(_LOGFMT_("connector BeforeStart fail ret[%d]"), ret);
+        return ret;
     }
 
     for(auto &msgTransfer : _msgTransfers)
     {
+        auto onDisconnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnDisconnected);
+        msgTransfer->RegisterDisconnected(onDisconnectedRes);
         ret = msgTransfer->BeforeStart();
         if(ret != StatusDefs::Success)
         {
@@ -401,14 +398,11 @@ Int32 FS_ServerCore::_OnStart()
 Int32 FS_ServerCore::_AfterStart()
 {
     Int32 ret = StatusDefs::Success;
-    for(auto &connector : _connectors)
+    ret = _connector->AfterStart();
+    if(ret != StatusDefs::Success)
     {
-        ret = connector->AfterStart();
-        if(ret != StatusDefs::Success)
-        {
-            g_Log->e<FS_ServerCore>(_LOGFMT_("connector AfterStart fail ret[%d]"), ret);
-            return ret;
-        }
+        g_Log->e<FS_ServerCore>(_LOGFMT_("connector AfterStart fail ret[%d]"), ret);
+        return ret;
     }
 
     for(auto &msgTransfer : _msgTransfers)
@@ -433,8 +427,7 @@ Int32 FS_ServerCore::_AfterStart()
 
 void FS_ServerCore::_WillClose()
 {
-    for(auto &connector : _connectors)
-        connector->WillClose();
+    _connector->WillClose();
 
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->WillClose();
@@ -444,8 +437,7 @@ void FS_ServerCore::_WillClose()
 
 void FS_ServerCore::_BeforeClose()
 {
-    for(auto &connector : _connectors)
-        connector->BeforeClose();
+    _connector->BeforeClose();
 
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->BeforeClose();
@@ -455,8 +447,7 @@ void FS_ServerCore::_BeforeClose()
 
 void FS_ServerCore::_AfterClose()
 {
-    for(auto &connector : _connectors)
-        connector->AfterClose();
+    _connector->AfterClose();
 
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->AfterClose();
@@ -466,11 +457,8 @@ void FS_ServerCore::_AfterClose()
 
 void FS_ServerCore::_RegisterToModule()
 {
-    for(auto &connector : _connectors)
-    {
-        auto onConnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnConnected);
-        connector->RegisterConnected(onConnectedRes);
-    }
+    auto onConnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnConnected);
+    _connector->RegisterConnected(onConnectedRes);
 }
 
 #pragma endregion

@@ -115,7 +115,8 @@ private:
     FS_CpuInfo *_cpuInfo;                            // cpu信息
     IFS_ServerConfigMgr *_serverConfigMgr;          // 服务器配置
 
-    std::vector<IFS_Connector *> _connectors;       // 多线程连接器
+    Locker _locker;
+    IFS_Connector * _connector;                     // 连接器
     std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息收发器
     IFS_MsgHandler *_msgHandler;                    // 消息处理器 业务线程处理
 

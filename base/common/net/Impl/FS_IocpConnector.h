@@ -56,7 +56,7 @@ public:
     virtual void BeforeClose();
     virtual void Close();
     virtual void RegisterConnected(IDelegate<void, IFS_Session *> *callback);
-   
+    virtual void OnDisconnected(IFS_Session *session);
     /* TCP ³£¹æ²Ù×÷ */
     #pragma region tcp normal operate
     /*
@@ -85,6 +85,7 @@ private:
     */
 private:
     void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo);
+    void _OnDisconnected(IFS_Session *session);
     void _OnIocpMonitorTask(const FS_ThreadPool *threadPool);
     #pragma endregion
 
