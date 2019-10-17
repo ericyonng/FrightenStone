@@ -61,7 +61,6 @@ FS_ServerCore::FS_ServerCore()
     :_serverConfigMgr(NULL)
     ,_cpuInfo(new FS_CpuInfo)
     ,_msgHandler(NULL)
-    ,_sessiomMgr(NULL)
     ,_curSessionConnecting{0}
     ,_sessionConnectedBefore{0}
     ,_sessionDisconnectedCnt{0}
@@ -74,7 +73,6 @@ FS_ServerCore::FS_ServerCore()
 
 FS_ServerCore::~FS_ServerCore()
 {
-    Fs_SafeFree(_sessiomMgr);
     Fs_SafeFree(_msgHandler);
     STLUtil::DelVectorContainer(_msgTransfers);
     STLUtil::DelVectorContainer(_connectors);
@@ -212,7 +210,6 @@ void FS_ServerCore::Close()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->Close();
     _msgHandler->Close();
-    _sessiomMgr->Close();
 
     // 最后处理
     _AfterClose();
@@ -316,18 +313,17 @@ Int32 FS_ServerCore::_ReadConfig()
 
 Int32 FS_ServerCore::_CreateNetModules()
 {
-    const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
-
-    _connectors.resize(cpuCnt);
-    for(Int32 i = 0; i < cpuCnt; ++i)
+    // TODO:与客户端的连接点只能是一个，因为端口只有一个
+    _connectors.resize(1);
+    for(Int32 i = 0; i < 1; ++i)
         _connectors.push_back(FS_ConnectorFactory::Create());
 
+    const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
     _msgTransfers.resize(cpuCnt);
     for(Int32 i = 0; i < cpuCnt; ++i)
         _msgTransfers.push_back(FS_MsgTransferFactory::Create());
 
     _msgHandler = FS_MsgHandlerFactory::Create();
-    _sessiomMgr = new FS_SessionMgr();
     return StatusDefs::Success;
 }
 
@@ -361,13 +357,6 @@ Int32 FS_ServerCore::_StartModules()
         return ret;
     }
 
-    ret = _sessiomMgr->Start();
-    if(ret != StatusDefs::Success)
-    {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("sessiomMgr start fail ret[%d]"), ret);
-        return ret;
-    }
-
     return StatusDefs::Success;
 }
 
@@ -398,13 +387,6 @@ Int32 FS_ServerCore::_BeforeStart()
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler BeforeStart fail ret[%d]"), ret);
-        return ret;
-    }
-
-    ret = _sessiomMgr->BeforeStart();
-    if(ret != StatusDefs::Success)
-    {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("sessiomMgr BeforeStart fail ret[%d]"), ret);
         return ret;
     }
 
@@ -446,13 +428,6 @@ Int32 FS_ServerCore::_AfterStart()
         return ret;
     }
 
-    ret = _sessiomMgr->AfterStart();
-    if(ret != StatusDefs::Success)
-    {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("sessiomMgr AfterStart fail ret[%d]"), ret);
-        return ret;
-    }
-
     return StatusDefs::Success;
 }
 
@@ -465,7 +440,6 @@ void FS_ServerCore::_WillClose()
         msgTransfer->WillClose();
 
     _msgHandler->WillClose();
-    _sessiomMgr->WillClose();
 }
 
 void FS_ServerCore::_BeforeClose()
@@ -477,7 +451,6 @@ void FS_ServerCore::_BeforeClose()
         msgTransfer->BeforeClose();
 
     _msgHandler->BeforeClose();
-    _sessiomMgr->BeforeClose();
 }
 
 void FS_ServerCore::_AfterClose()
@@ -489,7 +462,6 @@ void FS_ServerCore::_AfterClose()
         msgTransfer->AfterClose();
 
     _msgHandler->AfterClose();
-    _sessiomMgr->AfterClose();
 }
 
 void FS_ServerCore::_RegisterToModule()

@@ -186,9 +186,6 @@ Int32 FS_IocpConnector::_Listen(Int32 unconnectQueueLen)
 
 void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
 {
-    // 1. accept 等待接受客户端连接
- // sockaddr_in clientAddr = {};
- // int nAddrLen = sizeof(sockaddr_in);
     if(INVALID_SOCKET == sock)
     {
         g_Log->e<FS_IocpConnector>(_LOGFMT_("_IocpAccept.sock invalid socket"));
@@ -202,8 +199,7 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
         SocketUtil::MakeReUseAddr(sock);
 
         // TODO:连接回调 
-        IFS_Session *newSession = FS_SessionFactory::Create(_curMaxSessionId, sock, addrInfo, g_SessionMgr);
-        g_SessionMgr->AddNewSession(newSession->GetSessionId(), newSession);
+        IFS_Session *newSession = FS_SessionFactory::Create(_curMaxSessionId, sock, addrInfo);
         _onConnected->Invoke(newSession);
 
         auto sessionAddr = newSession->GetAddr();

@@ -32,10 +32,13 @@
 
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_IocpMsgTransfer.h"
+
 #include "base/common/status/status.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
 
 FS_NAMESPACE_BEGIN
 FS_IocpMsgTransfer::FS_IocpMsgTransfer()
+    :_threadPool(NULL)
 {
 }
 
@@ -43,9 +46,19 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
 {
 }
 
+Int32 FS_IocpMsgTransfer::BeforeStart()
+{
+    _threadPool = new FS_ThreadPool(0, 1);
+    return StatusDefs::Success;
+}
+
 Int32 FS_IocpMsgTransfer::Start()
 {
     return StatusDefs::Success;
+}
+
+void FS_IocpMsgTransfer::BeforeClose()
+{
 }
 
 void FS_IocpMsgTransfer::Close()
@@ -54,6 +67,9 @@ void FS_IocpMsgTransfer::Close()
 
 void FS_IocpMsgTransfer::OnConnect(IFS_Session *session)
 {
+    _locker.Lock();
+    _willAddSessions.push_back(session);
+    _locker.Unlock();
 }
 
 void FS_IocpMsgTransfer::OnDestroy()
@@ -68,6 +84,16 @@ void FS_IocpMsgTransfer::OnHeartBeatTimeOut()
 Int32 FS_IocpMsgTransfer::GetSessionCnt()
 {
     return 0;
+}
+
+void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
+{
+    while(!pool->IsClearingPool())
+    {
+        // 1.将待连入的session转移到容器中
+        // 2.投递接收数据事件
+        // 3.
+    }
 }
 
 FS_NAMESPACE_END

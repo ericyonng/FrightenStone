@@ -119,7 +119,7 @@ private:
     std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息收发器
     IFS_MsgHandler *_msgHandler;                    // 消息处理器 业务线程处理
 
-    FS_SessionMgr *_sessiomMgr;                     // 会话管理
+    // TODO:sessionmgr可能需要移除避免锁冲突
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
 
     // 统计区

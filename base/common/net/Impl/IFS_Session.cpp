@@ -44,13 +44,12 @@ OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, FS_SessionMgr *sessionMgr)
+IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
     :_isDestroy(false)
     ,_sessionId(sessionId)
     ,_addr(new FS_Addr(this, addrInfo))
     ,_sock(sock)
     ,_recvBuffer(NULL)
-    ,_sessionMgr(sessionMgr)
     ,_recvMsgId(1)
     ,_sendMsgId(1)
 {
