@@ -36,8 +36,11 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/net/Impl/IFS_MsgTransfer.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT FS_ThreadPool;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
@@ -46,7 +49,9 @@ public:
     virtual ~FS_IocpMsgTransfer();
 
 public:
+    virtual Int32 BeforeStart();
     virtual Int32 Start();
+    virtual void BeforeClose();
     virtual void Close();
 
     virtual void OnConnect(IFS_Session *session);
@@ -54,7 +59,17 @@ public:
     virtual void OnHeartBeatTimeOut();
 
     virtual Int32 GetSessionCnt();
+
 private:
+    virtual void _OnMoniterMsg(const FS_ThreadPool *pool);
+
+private:
+    std::map<UInt64, IFS_Session *> _sessions;  // key:sessionId
+
+    Locker _locker;
+    std::deque<IFS_Session *> _willAddSessions; // 将要加入的sessions
+
+    FS_ThreadPool *_threadPool;
 };
 
 FS_NAMESPACE_END

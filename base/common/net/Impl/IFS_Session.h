@@ -52,7 +52,7 @@ class BASE_EXPORT IFS_Session
 {
     OBJ_POOL_CREATE_DEF(IFS_Session);
 public:
-    explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, FS_SessionMgr *sessionMgr);
+    explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
     virtual ~IFS_Session();
 
     // 获取属性与状态
@@ -107,7 +107,6 @@ protected:
     Time _heartBeatExpiredTime; // 心跳过期时间
     IFS_Buffer *_recvBuffer;
     std::list<IFS_Buffer *> _toSend;
-    FS_SessionMgr *_sessionMgr;
 
     // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
     Int32 _recvMsgId;

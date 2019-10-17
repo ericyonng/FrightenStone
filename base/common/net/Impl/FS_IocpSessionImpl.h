@@ -35,8 +35,8 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, FS_SessionMgr *sessionMgr)
-    :IFS_Session(sessionId, sock, addrInfo, sessionMgr)
+inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
+    :IFS_Session(sessionId, sock, addrInfo)
     ,_sender(NULL)
     ,_isPostRecv(false)
     ,_isPostSend(false)

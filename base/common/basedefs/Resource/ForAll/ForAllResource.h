@@ -41,6 +41,7 @@
 #include <thread>
 #include<algorithm>
 #include <stdexcept>
+#include <deque>
 #pragma endregion
 
 

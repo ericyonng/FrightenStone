@@ -46,7 +46,7 @@ class BASE_EXPORT FS_SessionMgr;
 class BASE_EXPORT FS_SessionFactory
 {
 public:
-    static IFS_Session *Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, FS_SessionMgr *sessionMgr);
+    static IFS_Session *Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
 };
 
 FS_NAMESPACE_END
