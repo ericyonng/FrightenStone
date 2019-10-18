@@ -234,6 +234,7 @@ void FS_ServerCore::_OnConnected(IFS_Session *session)
     }
 
     minTransfer->OnConnect(session);
+    _msgHandler->OnConnect(session->GetSessionId(), minTransfer);
 
     // 统计session数量
     ++_curSessionConnecting;
@@ -252,6 +253,7 @@ void FS_ServerCore::_OnDisconnected(IFS_Session *session)
     --_curSessionConnecting;
     ++_sessionDisconnectedCnt;
 
+    _msgHandler->OnDisconnected(session);
     _connector->OnDisconnected(session);
 
     // 由于是外部线程调用本接口，所以session是线程安全的
@@ -261,6 +263,13 @@ void FS_ServerCore::_OnDisconnected(IFS_Session *session)
 
     g_Log->net<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> disconnected "
                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
+}
+
+void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
+{
+    ++_recvMsgCountPerSecond;
+    _recvMsgBytesPerSecond += transferBytes;
+    _msgHandler->OnRecv(session);
 }
 
 void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)

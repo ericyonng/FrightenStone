@@ -37,10 +37,12 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/status/status.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IFS_Session;
+class BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT IFS_MsgHandler
 {
 public:
@@ -57,11 +59,12 @@ public:
     virtual void AfterClose() {}
 
     virtual void OnRecv(IFS_Session *session) = 0;
-    virtual void OnConnect() = 0;
+    virtual void OnDisconnected(IFS_Session *session) = 0;
+    virtual void OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer) = 0;
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut() = 0;
 
-    virtual Int32 SendData() = 0;
+    virtual void SendData(IFS_MsgTransfer *transfer, UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
 };
 
 FS_NAMESPACE_END

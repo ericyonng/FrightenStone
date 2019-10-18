@@ -52,7 +52,7 @@ public:
 
     // ²Ù×÷
 public:
-    void BindToSender(IDelegate<void, IoDataBase *> *sender);
+    void BindSender(IDelegate<bool, FS_IocpSession *> *sender);
 
     NetMsg_DataHeader *FrontRecvMsg();
     void PopFrontRecvMsg();
@@ -77,10 +77,10 @@ public:
     void OnRecvSuc(size_t transferBytes, IoDataBase *ioData);
 
 protected:
-    virtual bool _OnSend();
+    virtual void _OnSend();
 
 private:
-    IDelegate<void, IoDataBase *> *_sender;
+    IDelegate<bool, FS_IocpSession *> *_sender;
 
     bool _isPostRecv;
     bool _isPostSend;

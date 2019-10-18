@@ -38,6 +38,8 @@
 #include "base/common/component/Impl/TimeSlice.h"
 #include <iostream>
 
+fs::TimeWheel *g_BusinessTimeWheel = NULL;
+
 FS_NAMESPACE_BEGIN
 
 OBJ_POOL_CREATE_IMPL(TimeWheel, _objPoolHelper, 2)

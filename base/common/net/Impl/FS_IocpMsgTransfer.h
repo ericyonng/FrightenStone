@@ -37,12 +37,14 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/net/Impl/IFS_MsgTransfer.h"
 #include "base/common/asyn/asyn.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT FS_Iocp;
 class BASE_EXPORT IO_EVENT;
+class BASE_EXPORT FS_IocpSession;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
@@ -57,9 +59,12 @@ public:
     virtual void Close();
     virtual void AfterClose();
 
+    // 网络
     virtual void OnConnect(IFS_Session *session);
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut();
+    // msg内存池创建 其他线程调用本接口，send需要加锁
+    virtual void OnSendData(UInt64 sessionId, NetMsg_DataHeader *msg);
 
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback);
     virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
@@ -68,14 +73,11 @@ public:
 
 private:
     virtual void _OnMoniterMsg(const FS_ThreadPool *pool);
-    Int32 _ListenNetEvents();
-    void _MoveToSessions();
-    void _CheckHeartbeat();
-    void _DoSessionPost();
 
     // 网络事件 线程不安全
 private:
     void _OnDisconnected(IFS_Session *session);
+    bool _DoSend(FS_IocpSession *session);
 
     // 辅助
 private:

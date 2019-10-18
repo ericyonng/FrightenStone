@@ -100,7 +100,8 @@ bool IFS_Session::Send(NetMsg_DataHeader *header)
     }
 
     _toSend.push_back(newBuffer);
-    return _OnSend();
+    _OnSend();
+    return true;
 }
 
 void IFS_Session::OnDestroy()
