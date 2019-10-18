@@ -98,7 +98,7 @@ public:
 
     // 内部
 protected:
-    virtual bool _OnSend() = 0;
+    virtual void _OnSend() = 0;
 
     // 内部
 private:

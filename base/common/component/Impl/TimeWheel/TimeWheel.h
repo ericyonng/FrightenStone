@@ -91,4 +91,6 @@ FS_NAMESPACE_END
 
 #include "base/common/component/Impl/TimeWheel/TimeWheelImpl.h"
 
+extern BASE_EXPORT fs::TimeWheel *g_BusinessTimeWheel;
+
 #endif

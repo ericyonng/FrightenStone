@@ -36,8 +36,16 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/net/Impl/IFS_MsgHandler.h"
+#include "base/common/asyn/asyn.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include <set>
 
 FS_NAMESPACE_BEGIN
+
+class BASE_EXPORT FS_ThreadPool;
+class BASE_EXPORT IFS_Session;
+class BASE_EXPORT NetMsg_DataHeader;
+class BASE_EXPORT IFS_MsgTransfer;
 
 class BASE_EXPORT FS_IocpMsgHandler : public IFS_MsgHandler
 {
@@ -46,18 +54,42 @@ public:
     virtual ~FS_IocpMsgHandler();
 
 public:
+    virtual Int32 BeforeStart();
     virtual Int32 Start();
+    virtual void BeforeClose();
     virtual void Close();
 
     virtual void OnRecv(IFS_Session *session);
-    virtual void OnConnect();
+    virtual void OnDisconnected(IFS_Session *session);
+    virtual void OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer);
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut();
 
-    virtual Int32 SendData();
+    virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg);
 
 private:
+    // msgData会拷贝到内存池创建的缓冲区中 线程不安全，外部需要加锁
     void _MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData);
+    void _OnBusinessProcessThread(const FS_ThreadPool *pool);
+    void _OnBusinessProcessing();
+    void _DoBusinessProcess(UInt64 sessionId, NetMsg_DataHeader *msgData);
+    void _OnDelaySessionDisconnect(UInt64 sessionId);
+
+private:
+    bool _isClose;
+    ConditionLocker _locker;
+    FS_ThreadPool *_pool;
+
+    // 数据在线程结束时清理
+    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _sessionIdRefMsgs;
+    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _sessionIdRefMsgCache;      // 缓存：转移消息链表指针即可消耗小
+    std::map<UInt64, IFS_MsgTransfer *> _sessionIdRefTransfer;
+    std::set<UInt64> _delayDisconnectedSessions;
+    std::set<UInt64> _delayDisconnectedSessionsCache;
+
+    // 业务层资源
+    TimeSlice _resolutionInterval;      // 时钟轮盘时间间隔
+    TimeWheel *_timeWheel;
 };
 
 FS_NAMESPACE_END

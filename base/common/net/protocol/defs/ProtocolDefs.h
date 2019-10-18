@@ -26,7 +26,7 @@
  * @date  : 2019/5/24
  * @brief :
  * 
- *
+ *      !!!!注意发送数据到客户端时候iocp网络层使用的是内存池，所以请在网络层注意下，业务层可任意，业务层不适用内存池
  * 
  */
 #ifndef __Base_Common_Net_Protocol_Defs_ProtocolDefs_H__

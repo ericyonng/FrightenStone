@@ -35,6 +35,12 @@
 
 FS_NAMESPACE_BEGIN
 
+inline void FS_IocpMsgHandler::RegisterSendSucCallback(IDelegate<void, UInt64, NetMsg_DataHeader *> *callback)
+{
+    Fs_SafeFree(_sessionSender);
+    _sessionSender = callback;
+}
+
 FS_NAMESPACE_END
 
 #endif
