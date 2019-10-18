@@ -119,17 +119,17 @@ Int32 FS_Iocp::Reg(SOCKET sockfd, void *ptr)
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::Reg(SOCKET sockfd, UInt64 clientId)
+Int32 FS_Iocp::Reg(SOCKET sockfd, UInt64 sessionId)
 {
     // 关联IOCP 与 sockfd
 // completionKey传入的一个数值，完成时会原样传回来; NumberOfConcurrentThreads这个参数在关联完成端口时被忽略
 // completekey可以是自定义的结构体指针或者其他数据的指针，便于获取完成状态时候识别 当处于关联时numofthread会被忽略
-    HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, ULONG_PTR(clientId), 0);
+    HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, ULONG_PTR(sessionId), 0);
     if(!ret)
     {
         auto err = GetLastError();
         g_Log->e<FS_Iocp>(_LOGFMT_("Reg sockfd[%llu] clientId[%llu] to completionport failed windows error<%d> status[%d]")
-                          , sockfd, clientId, err, StatusDefs::IOCP_RegSocketToCompletionPortFail);
+                          , sockfd, sessionId, err, StatusDefs::IOCP_RegSocketToCompletionPortFail);
         return StatusDefs::IOCP_RegSocketToCompletionPortFail;
     }
 
@@ -277,7 +277,7 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
     // 以及重叠结构ioDataPtr 用于获取数据重叠结构会原样返回
     ioEvent._bytesTrans = 0;
     ioEvent._ioData = NULL;
-    ioEvent._data._clientId = 0;
+    ioEvent._data._sessionId = 0;
     if(FALSE == GetQueuedCompletionStatus(_completionPort
                                           , &ioEvent._bytesTrans
                                           , reinterpret_cast<PULONG_PTR>(&ioEvent._data)
@@ -308,8 +308,8 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
 
         if(ERROR_CONNECTION_ABORTED == error)
         {// TODO:这个错误码要不要处理
-            g_Log->w<FS_Iocp>(_LOGFMT_("clientId[%llu] WaitForMessage invalid client socket error<%d> status<%d>")
-                              , ioEvent._data._clientId, error, StatusDefs::Unknown);
+            g_Log->w<FS_Iocp>(_LOGFMT_("sessionId[%llu] WaitForMessage invalid client socket error<%d> status<%d>")
+                              , ioEvent._data._sessionId, error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
         if(ERROR_SEM_TIMEOUT == error)
@@ -317,18 +317,18 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
             g_Log->w<FS_Iocp>(_LOGFMT_("pressure is too large for this machine."
                                        " please improve machine performance or "
                                        "expand net card bandwidth error<%d> status<%d>"
-                                       "clientId<%llu> bytesTrans<%lu>")
+                                       "sessionId<%llu> bytesTrans<%lu>")
                               , error
                               , StatusDefs::Unknown
-                              , ioEvent._data._clientId
+                              , ioEvent._data._sessionId
                               , ioEvent._bytesTrans);
             return StatusDefs::Success;
         }
 
         const auto &stackBackTrace = CrashHandleUtil::FS_CaptureStackBackTrace();
-        g_Log->e<FS_Iocp>(_LOGFMT_("clientId[%llu] WaitForMessage other error error<%d> status[%d]\n"
+        g_Log->e<FS_Iocp>(_LOGFMT_("sessionId[%llu] WaitForMessage other error error<%d> status[%d]\n"
                                    "StackBackTrace:\n%s")
-                          , ioEvent._data._clientId
+                          , ioEvent._data._sessionId
                           , error
                           , StatusDefs::IOCP_PostSendFail
                           , stackBackTrace.c_str());

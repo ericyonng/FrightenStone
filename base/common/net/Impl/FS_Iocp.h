@@ -66,8 +66,8 @@ public:
     Int32 Create();
     void Destroy();
     Int32 Reg(SOCKET sockfd);
-    Int32 Reg(SOCKET sockfd, void *ptr);
-    Int32 Reg(SOCKET sockfd, UInt64 clientId);
+    Int32 Reg(SOCKET sockfd, void *ptr);    // 第二个参数是完成时回传的completekey
+    Int32 Reg(SOCKET sockfd, UInt64 sessionId); // 第二个参数是完成时回传的completekey
     Int32 LoadAcceptEx(SOCKET listenSocket);
     #pragma endregion
 
@@ -87,9 +87,11 @@ public:
     *                              它会一个一个消息的从完成队列中取出不需要担心线程安全问题
     */
 public:
+    // post线程安全
     Int32 PostAccept(SOCKET listenSocket, IoDataBase *ioData);
     Int32 PostRecv(SOCKET targetSock, IoDataBase *ioData);
     Int32 PostSend(SOCKET targetSock, IoDataBase *ioData);
+
     Int32 PostQuit();
     Int32 WaitForCompletion(IO_EVENT &ioEvent, ULong millisec = INFINITE);
     void GetClientAddrInfo(void *wsaBuff, sockaddr_in *&clientAddr);

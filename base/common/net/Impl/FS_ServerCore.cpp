@@ -370,8 +370,14 @@ Int32 FS_ServerCore::_BeforeStart()
 
     for(auto &msgTransfer : _msgTransfers)
     {
+        // ×¢²á½Ó¿Ú
         auto onDisconnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnDisconnected);
+        auto onRecvSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsg);
+        auto onSendSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSendMsg);
         msgTransfer->RegisterDisconnected(onDisconnectedRes);
+        msgTransfer->RegisterRecvSucCallback(onRecvSucRes);
+        msgTransfer->RegisterSendSucCallback(onSendSucRes);
+
         ret = msgTransfer->BeforeStart();
         if(ret != StatusDefs::Success)
         {

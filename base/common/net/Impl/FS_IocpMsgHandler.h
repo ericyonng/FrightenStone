@@ -49,12 +49,15 @@ public:
     virtual Int32 Start();
     virtual void Close();
 
-    virtual void OnRecv();
+    virtual void OnRecv(IFS_Session *session);
     virtual void OnConnect();
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut();
 
     virtual Int32 SendData();
+
+private:
+    void _MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData);
 };
 
 FS_NAMESPACE_END

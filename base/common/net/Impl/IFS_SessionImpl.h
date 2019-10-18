@@ -53,6 +53,16 @@ inline bool IFS_Session::HasMsgToSend() const
     return !_toSend.empty();
 }
 
+inline bool IFS_Session::IsListen() const
+{
+    return _isListen;
+}
+
+inline void IFS_Session::SetListener(bool isListen)
+{
+    _isListen = isListen;
+}
+
 template<typename ObjType>
 inline ObjType *IFS_Session::CastTo()
 {
@@ -78,6 +88,21 @@ inline const Time &IFS_Session::GetHeartBeatExpiredTime() const
 inline bool IFS_Session::CanDestroy() const
 {
     return true;
+}
+
+inline void IFS_Session::MaskDestroy()
+{
+    _maskDestroy = true;
+}
+
+inline bool IFS_Session::IsDelayDestroy() const
+{
+    return _maskDestroy;
+}
+
+inline IFS_Buffer *IFS_Session::GetRecvBuffer()
+{
+    return _recvBuffer;
 }
 
 inline void IFS_Session::Lock()

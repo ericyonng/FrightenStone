@@ -49,6 +49,16 @@ inline void FS_IocpSession::BindToSender(IDelegate<void, IoDataBase *> *sender)
     _sender = sender;
 }
 
+inline void FS_IocpSession::ResetPostRecvMask()
+{
+    _isPostRecv = false;
+}
+
+inline void FS_IocpSession::ResetPostSendMask()
+{
+    _isPostSend = false;
+}
+
 inline bool FS_IocpSession::IsPostIoChange() const
 {
     return _isPostRecv || _isPostSend;
@@ -62,6 +72,11 @@ inline bool FS_IocpSession::IsPostSend() const
 inline bool FS_IocpSession::IsPostRecv() const
 {
     return _isPostRecv;
+}
+
+inline bool FS_IocpSession::CanPost() const
+{
+    return !(_isDestroy || _maskDestroy || !IsClose());
 }
 
 inline bool FS_IocpSession::CanDestroy() const

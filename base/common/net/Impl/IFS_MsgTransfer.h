@@ -62,6 +62,8 @@ public:
 
     // 会话个数
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback) = 0;
+    virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback) = 0;
+    virtual void RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback) = 0;
     virtual Int32 GetSessionCnt() = 0;
 };
 

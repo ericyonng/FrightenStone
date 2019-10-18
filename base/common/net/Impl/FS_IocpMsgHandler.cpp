@@ -31,6 +31,8 @@
  */
 #include "stdafx.h"
 #include "base/common/net/Impl/FS_IocpMsgHandler.h"
+#include "base/common/net/Impl/FS_IocpSession.h"
+#include "base/common/net/Defs/FS_IocpBuffer.h"
 
 #include "base/common/status/status.h"
 
@@ -56,9 +58,19 @@ void FS_IocpMsgHandler::Close()
 
 }
 
-void FS_IocpMsgHandler::OnRecv()
+void FS_IocpMsgHandler::OnRecv(IFS_Session *session)
 {
+    auto iocpSession = session->CastTo<FS_IocpSession>();
+    auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
+    while(recvBuffer->HasMsg())
+    {
+        auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
+        _MoveToBusinessLayer(session, frontMsg);
+        recvBuffer->PopFront(frontMsg->_packetLength);
+    }
 
+    // 更新心跳
+    iocpSession->UpdateHeartBeatExpiredTime();
 }
 
 void FS_IocpMsgHandler::OnConnect()
@@ -79,4 +91,11 @@ Int32 FS_IocpMsgHandler::SendData()
     return StatusDefs::Success;
 }
 
+void FS_IocpMsgHandler::_MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData)
+{
+    // TODO:转移消息到业务处理层
+    // 只需要sessionId与数据拷贝到业务处理层即可
+}
+
 FS_NAMESPACE_END
+
