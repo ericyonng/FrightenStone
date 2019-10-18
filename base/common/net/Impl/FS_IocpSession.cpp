@@ -58,6 +58,9 @@ void FS_IocpSession::PopFrontRecvMsg()
 
 IoDataBase *FS_IocpSession::MakeRecvIoData()
 {
+    if(!CanPost())
+        return NULL;
+
     if(_isPostRecv)
         return NULL;
 
@@ -67,12 +70,14 @@ IoDataBase *FS_IocpSession::MakeRecvIoData()
 
 IoDataBase *FS_IocpSession::MakeSendIoData()
 {
+    if(!CanPost())
+        return NULL;
+
     if(_isPostSend || _toSend.empty())
         return NULL;
 
     _isPostSend = true;
     return _toSend.front()->CastToBuffer<FS_IocpBuffer>()->MakeSendIoData();
 }
-
 
 FS_NAMESPACE_END

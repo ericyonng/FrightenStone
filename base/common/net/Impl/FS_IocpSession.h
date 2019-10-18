@@ -59,12 +59,15 @@ public:
 
     IoDataBase *MakeRecvIoData();
     IoDataBase *MakeSendIoData();
+    void ResetPostRecvMask();
+    void ResetPostSendMask();
 
     // 状态
 public:
     bool IsPostIoChange() const;
     bool IsPostSend() const;
     bool IsPostRecv() const;
+    bool CanPost() const;
     // 若要销毁session需要放到延迟队列中，且需要先closesocket然后等到所有io完成
     virtual bool CanDestroy() const;
 

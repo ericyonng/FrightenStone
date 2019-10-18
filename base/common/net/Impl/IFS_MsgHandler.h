@@ -40,6 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT IFS_Session;
 class BASE_EXPORT IFS_MsgHandler
 {
 public:
@@ -55,7 +56,7 @@ public:
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    virtual void OnRecv() = 0;
+    virtual void OnRecv(IFS_Session *session) = 0;
     virtual void OnConnect() = 0;
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut() = 0;

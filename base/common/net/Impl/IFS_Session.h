@@ -62,6 +62,8 @@ public:
     const FS_Addr *GetAddr() const;
     bool HasMsgToRead() const;      // 要等待消息接收完才能销毁
     bool HasMsgToSend() const;      // 要等待消息发送完才能消耗
+    bool IsListen() const;          // 是否监听套接字
+    void SetListener(bool isListen);
     template<typename ObjType>
     ObjType *CastTo();
     template<typename ObjType>
@@ -69,6 +71,9 @@ public:
     bool IsClose() const;
     const Time &GetHeartBeatExpiredTime() const;
     virtual bool CanDestroy() const;
+    void MaskDestroy(); // 若还有post操作则先maskdestroy，再在最后的时候真正的destroy掉
+    bool IsDelayDestroy() const;
+    IFS_Buffer *GetRecvBuffer();
 
     // 操作
 public:
@@ -86,6 +91,7 @@ public:
     void OnDestroy();
     // 客户端连入
     void OnConnect();
+    void OnDisconnect();
     // 心跳连接超时
     void OnHeartBeatTimeOut();
     void OnMsgArrived();
@@ -100,10 +106,13 @@ private:
     
 protected:
     bool _isDestroy;
+    bool _maskDestroy;
     Locker _lock;
     UInt64 _sessionId;
     FS_Addr *_addr;
     SOCKET _sock;
+    std::atomic<Int32> _lastErrorReason;
+    bool _isListen;
     Time _heartBeatExpiredTime; // 心跳过期时间
     IFS_Buffer *_recvBuffer;
     std::list<IFS_Buffer *> _toSend;

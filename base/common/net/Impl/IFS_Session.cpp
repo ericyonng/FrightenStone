@@ -49,9 +49,12 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
     ,_sessionId(sessionId)
     ,_addr(new FS_Addr(this, addrInfo))
     ,_sock(sock)
+    ,_isListen(false)
     ,_recvBuffer(NULL)
     ,_recvMsgId(1)
     ,_sendMsgId(1)
+    ,_lastErrorReason{StatusDefs::Success}
+    ,_maskDestroy(false)
 {
     _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
 }
@@ -106,6 +109,11 @@ void IFS_Session::OnDestroy()
 }
 
 void IFS_Session::OnConnect()
+{
+
+}
+
+void IFS_Session::OnDisconnect()
 {
 
 }

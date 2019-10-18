@@ -62,6 +62,8 @@ public:
     virtual void OnHeartBeatTimeOut();
 
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback);
+    virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
+    virtual void RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
     virtual Int32 GetSessionCnt();
 
 private:
@@ -71,7 +73,7 @@ private:
     void _CheckHeartbeat();
     void _DoSessionPost();
 
-    // 网络事件
+    // 网络事件 线程不安全
 private:
     void _OnDisconnected(IFS_Session *session);
 
@@ -84,13 +86,14 @@ private:
     Locker _locker;
     std::atomic<Int32> _sessionCnt;             // 会话个数
     std::map<UInt64, IFS_Session *> _sessions;  // key:sessionId
-    std::deque<IFS_Session *> _willAddSessions; // 将要加入的sessions
 
     FS_ThreadPool *_threadPool;
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;
 
-    IDelegate<void, IFS_Session *> *_disconnectedCallback;
+    IDelegate<void, IFS_Session *> *_serverCoreDisconnectedCallback;
+    IDelegate<void, IFS_Session *, Int64> *_serverCoreRecvSucCallback;
+    IDelegate<void, IFS_Session *, Int64> *_serverCoreSendSucCallback;
 };
 
 FS_NAMESPACE_END

@@ -38,19 +38,22 @@
 #include "base/common/net/Impl/FS_Iocp.h"
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/log/Log.h"
+#include "base/common/crashhandle/CrashHandle.h"
+#include "base/common/net/Impl/IFS_Session.h"
+#include "base/common/net/Impl/FS_IocpSession.h"
 
 FS_NAMESPACE_BEGIN
 FS_IocpMsgTransfer::FS_IocpMsgTransfer()
     :_threadPool(NULL)
     ,_iocp(NULL)
     ,_ioEvent(NULL)
-    ,_disconnectedCallback(NULL)
+    ,_serverCoreDisconnectedCallback(NULL)
 {
 }
 
 FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
 {
-    Fs_SafeFree(_disconnectedCallback);
+    Fs_SafeFree(_serverCoreDisconnectedCallback);
     Fs_SafeFree(_threadPool);
     Fs_SafeFree(_iocp);
     Fs_SafeFree(_ioEvent);
@@ -86,7 +89,7 @@ void FS_IocpMsgTransfer::Close()
 
 void FS_IocpMsgTransfer::AfterClose()
 {
-    Fs_SafeFree(_disconnectedCallback);
+    Fs_SafeFree(_serverCoreDisconnectedCallback);
 }
 
 void FS_IocpMsgTransfer::OnConnect(IFS_Session *session)
@@ -108,8 +111,20 @@ void FS_IocpMsgTransfer::OnHeartBeatTimeOut()
 
 void FS_IocpMsgTransfer::RegisterDisconnected(IDelegate<void, IFS_Session *> *callback)
 {
-    Fs_SafeFree(_disconnectedCallback);
-    _disconnectedCallback = callback;
+    Fs_SafeFree(_serverCoreDisconnectedCallback);
+    _serverCoreDisconnectedCallback = callback;
+}
+
+void FS_IocpMsgTransfer::RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback)
+{
+    Fs_SafeFree(_serverCoreRecvSucCallback);
+    _serverCoreRecvSucCallback = callback;
+}
+
+void FS_IocpMsgTransfer::RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback)
+{
+    Fs_SafeFree(_serverCoreSendSucCallback);
+    _serverCoreSendSucCallback = callback;
 }
 
 Int32 FS_IocpMsgTransfer::GetSessionCnt()
@@ -121,9 +136,93 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 {
     while(!pool->IsClearingPool())
     {
-        // 1.将待连入的session转移到容器中
-        // 2.投递接收数据事件
-        // 3.
+        // 等待网络消息
+        const Int32 ret = _iocp->WaitForCompletion(*_ioEvent);
+        if(ret != StatusDefs::Success)
+        {
+            if(ret == StatusDefs::IOCP_WaitTimeOut)
+                continue;
+
+            g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("_OnMoniterMsg.wait nothing but ret[%d] monitor end.", ret));
+            break;
+        }
+
+        // 处理iocp退出
+        if(_ioEvent->_data._code == IocpDefs::IO_QUIT)
+        {
+            g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
+            break;
+        }
+
+        const UInt64 sessionId = _ioEvent->_data._sessionId;
+
+        // 1.判断会话是否存在
+        _locker.Lock();
+        auto session = _GetSession(sessionId);
+        if(!session)
+        {
+            g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] is removed before.\n stack trace back:\n%s")
+                                         , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+            _locker.Unlock();
+            continue;
+        }
+
+        if(IocpDefs::IO_RECV == _ioEvent->_ioData->_ioType)
+        {// 接收数据 完成 Completion
+
+            if(_ioEvent->_bytesTrans <= 0)
+            {// 客户端断开处理
+                g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] clientId[%llu] IO_TYPE::RECV bytesTrans[%lu] disconnected"
+                                               , session->GetSessionId()
+                                               , session->GetSocket(),
+                                               _ioEvent->_bytesTrans);
+                g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] clientId[%llu] IO_TYPE::RECV bytesTrans[%lu] disconnected"
+                                               , session->GetSessionId()
+                                               , session->GetSocket(),
+                                               _ioEvent->_bytesTrans);
+                _OnDisconnected(session);
+                _locker.Unlock();
+                continue;
+            }
+
+            auto iocpSession = session->CastTo<FS_IocpSession>();
+            iocpSession->OnRecvSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
+
+            // 消息接收回调
+            _serverCoreRecvSucCallback->Invoke(session, _ioEvent->_bytesTrans);
+
+            // 重新投递接收
+            if(iocpSession->CanPost())
+            {
+                auto ioData = iocpSession->MakeRecvIoData();
+                if(ioData)
+                {
+                    Int32 st = _iocp->PostRecv(iocpSession->GetSocket(), ioData);
+                    if(st != StatusDefs::Success)
+                    {
+                        iocpSession->ResetPostRecvMask();
+                        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
+                                                     , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
+                        _OnDisconnected(iocpSession);
+                        _locker.Unlock();
+                        continue;
+                    }
+                }
+            }
+
+            // 客户端已经断开连接
+            if(iocpSession->IsClose())
+                _OnDisconnected(iocpSession);
+        }
+        else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
+        {
+        }
+        else
+        {
+            g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
+        }
+
+        _locker.Unlock();
     }
 }
 
@@ -195,10 +294,39 @@ Int32 FS_IocpMsgTransfer::_ListenEvent()
     return ret;
 }
 
+void FS_IocpMsgTransfer::_OnRecvSuc(IFS_Session *session)
+{
+
+}
+
+void FS_IocpMsgTransfer::_OnSendSuc(IFS_Session *session)
+{
+
+}
+
 void FS_IocpMsgTransfer::_OnDisconnected(IFS_Session *session)
 {
+    // 若有post未完成则延迟移除会话
+    auto iocpSession = session->CastTo<FS_IocpSession>();
+    if(iocpSession->IsPostIoChange())
+    {
+        iocpSession->MaskDestroy();
+        if(!iocpSession->IsClose())
+            iocpSession->Close();
+        return;
+    }
+
+    // 断开与销毁事件
+    if(!iocpSession->IsClose())
+        iocpSession->Close();
+    session->OnDisconnect();
+    session->OnDestroy();
+
+    // 移除会话
+    Fs_SafeFree(session);
+    _sessions.erase(session->GetSessionId());
     --_sessionCnt;
-    _disconnectedCallback->Invoke(session);
+    _serverCoreDisconnectedCallback->Invoke(session);
 }
 
 IFS_Session *FS_IocpMsgTransfer::_GetSession(UInt64 sessionId)
