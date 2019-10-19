@@ -42,7 +42,6 @@ FS_NAMESPACE_BEGIN
 
 FS_SessionMgr::FS_SessionMgr()
 {
-    g_SessionMgr = this;
 }
 
 FS_SessionMgr::~FS_SessionMgr()

@@ -38,10 +38,9 @@
  // Interface ...
 #include <base\common\net\protocol\protocol.h>
 #include "base\common\net\Impl\Iocp\Example.h"
-#include "base\common\net\Impl\FS_MainIocpServer.h"
 #include "base\common\net\Impl\FS_MsgReadStream.h"
 #include "base\common\net\Impl\FS_MsgWriteStream.h"
-#include "base\common\net\Impl\FS_Client.h"
+#include "base\common\net\Impl\FS_ServerCore.h"
 
 #endif
 

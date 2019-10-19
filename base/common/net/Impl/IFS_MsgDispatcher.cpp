@@ -21,29 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_MainIocpServerImpl.h
+ * @file  : IFS_MsgDispatcher.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/8
+ * @date  : 2019/10/07
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Base_Common_Net_Impl_FS_MainIocpServer_H__
-#pragma once
+
+#include "stdafx.h"
+#include "base/common/net/Impl/IFS_MsgDispatcher.h"
+#include "base/common/net/Impl/FS_ServerCore.h"
 
 FS_NAMESPACE_BEGIN
 
-#pragma region start close
-inline void FS_MainIocpServer::BeforeClose()
+IFS_MsgDispatcher::IFS_MsgDispatcher()
 {
-    _mainLocker.Lock();
-    if(_closeIocpDelegate)
-        _closeIocpDelegate->Invoke();
-    _mainLocker.Unlock();
 }
-#pragma endregion
+
+IFS_MsgDispatcher::~IFS_MsgDispatcher()
+{
+
+}
 
 FS_NAMESPACE_END
-
-#endif

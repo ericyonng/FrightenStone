@@ -148,8 +148,22 @@ public:
 
         #pragma region IocpConnector[1700, 1799]
         IocpConnector_StartFailOfMonitorTaskFailure = 1700,     // iocpconnector 添加monitor task失败
+        IocpConnector_CreateCfgIniFail = 1701,                  // 创建配置文件失败
+        IocpConnector_InitDefIniFail = 1702,                    // 初始化写入默认配置失败
+        IocpConnector_InitListenSocketFail = 1703,              // 初始化监听套接字失败
         #pragma endregion
 
+        #pragma region IocpMsgTransfer[1800, 1899]
+        IocpMsgTransfer_StartFailOfMoniterMsgFailure = 1800,    // iocpmsgtransfer 添加monitor任务时候失败
+        #pragma endregion
+
+        #pragma region FS_IocpMsgHandler[1900, 1999]
+        FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure = 1901,   // FS_IocpMsgHandler 添加线程任务失败
+        #pragma endregion
+
+        #pragma region FS_ServerCore[2000, 2099]
+        FS_ServerCore_StartFailOfSvrRuningTaskFailure = 2000,       // 添加svrruing线程任务时候失败
+        #pragma endregion
     };
 };
 

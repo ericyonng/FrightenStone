@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpMsgHandler.cpp
+ * @file  : FS_IocpMsgDispatcher.cpp
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/07
  * @brief :
@@ -30,7 +30,7 @@
  * 
  */
 #include "stdafx.h"
-#include "base/common/net/Impl/FS_IocpMsgHandler.h"
+#include "base/common/net/Impl/FS_IocpMsgDispatcher.h"
 #include "base/common/net/Impl/FS_IocpSession.h"
 #include "base/common/net/Defs/FS_IocpBuffer.h"
 #include "base/common/net/Impl/IFS_MsgTransfer.h"
@@ -46,19 +46,22 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_IocpMsgHandler::FS_IocpMsgHandler()
+FS_IocpMsgDispatcher::FS_IocpMsgDispatcher()
     :_pool(NULL)
-    ,_isClose(false)
+    , _isClose{false}
     ,_timeWheel(NULL)
 {
 
 }
 
-FS_IocpMsgHandler::~FS_IocpMsgHandler()
+FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
 {
+    Fs_SafeFree(_pool);
+    Fs_SafeFree(_timeWheel);
+    g_BusinessTimeWheel = NULL;
 }
 
-Int32 FS_IocpMsgHandler::BeforeStart()
+Int32 FS_IocpMsgDispatcher::BeforeStart()
 {
     _resolutionInterval = 100 * Time::_microSecondPerMilliSecond;
     _timeWheel = new TimeWheel(_resolutionInterval);
@@ -67,24 +70,32 @@ Int32 FS_IocpMsgHandler::BeforeStart()
     return StatusDefs::Success;
 }
 
-Int32 FS_IocpMsgHandler::Start()
+Int32 FS_IocpMsgDispatcher::Start()
 {
+    auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_OnBusinessProcessThread);
+    if(!_pool->AddTask(task, true))
+    {
+        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("add task fail"));
+        return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
+    }
+
     return StatusDefs::Success;
 }
 
-void FS_IocpMsgHandler::BeforeClose()
+void FS_IocpMsgDispatcher::BeforeClose()
 {
     _locker.Lock();
-    _isClose = true;
     _sessionIdRefTransfer.clear();
     _locker.Unlock();
+}
+
+void FS_IocpMsgDispatcher::Close()
+{
+    _isClose = true;
 
     // 线程退出
     _pool->Clear();
-}
 
-void FS_IocpMsgHandler::Close()
-{
     g_BusinessTimeWheel = NULL;
 
     // 清理数据
@@ -111,7 +122,7 @@ void FS_IocpMsgHandler::Close()
     STLUtil::DelMapContainer(_sessionIdRefMsgCache);
 }
 
-void FS_IocpMsgHandler::OnRecv(IFS_Session *session)
+void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session)
 {
     auto iocpSession = session->CastTo<FS_IocpSession>();
     auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
@@ -132,12 +143,9 @@ void FS_IocpMsgHandler::OnRecv(IFS_Session *session)
     }
     
     _locker.Unlock();
-
-    // 更新心跳
-    iocpSession->UpdateHeartBeatExpiredTime();
 }
 
-void FS_IocpMsgHandler::OnDisconnected(IFS_Session *session)
+void FS_IocpMsgDispatcher::OnDisconnected(IFS_Session *session)
 {
     _locker.Lock();
     _sessionIdRefTransfer.erase(session->GetSessionId());
@@ -145,7 +153,7 @@ void FS_IocpMsgHandler::OnDisconnected(IFS_Session *session)
     _locker.Unlock();
 }
 
-void FS_IocpMsgHandler::OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer)
+void FS_IocpMsgDispatcher::OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer)
 {
     _locker.Lock();
     if(!_isClose)
@@ -153,22 +161,20 @@ void FS_IocpMsgHandler::OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer)
         auto iterTransfer = _sessionIdRefTransfer.find(sessionId);
         if(iterTransfer == _sessionIdRefTransfer.end())
             _sessionIdRefTransfer.insert(std::make_pair(sessionId, transfer));
-
-        _sessionIdRefMsgs.find(sessionId)
     }
     _locker.Unlock();
 }
 
-void FS_IocpMsgHandler::OnDestroy()
+void FS_IocpMsgDispatcher::OnDestroy()
 {
 }
 
-void FS_IocpMsgHandler::OnHeartBeatTimeOut()
+void FS_IocpMsgDispatcher::OnHeartBeatTimeOut()
 {
 
 }
 
-void FS_IocpMsgHandler::SendData(UInt64 sessionId, NetMsg_DataHeader *msg)
+void FS_IocpMsgDispatcher::SendData(UInt64 sessionId, NetMsg_DataHeader *msg)
 { 
     // 数据拷贝
     g_MemoryPool->Lock();
@@ -199,31 +205,14 @@ void FS_IocpMsgHandler::SendData(UInt64 sessionId, NetMsg_DataHeader *msg)
     }
 }
 
-void FS_IocpMsgHandler::_MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData)
-{
-    // TODO:转移消息到业务处理层
-    // 只需要sessionId与数据拷贝到业务处理层即可
-    const UInt64 sessionId = session->GetSessionId();
-    auto iterMsgs = _sessionIdRefMsgs.find(sessionId);
-    if(iterMsgs == _sessionIdRefMsgs.end())
-        iterMsgs = _sessionIdRefMsgs.insert(std::make_pair(sessionId, new std::list<NetMsg_DataHeader *>)).first;
-    
-    // 拷贝数据
-    g_MemoryPool->Lock();
-    char *buffer = g_MemoryPool->Alloc<char>(msgData->_packetLength);
-    g_MemoryPool->Unlock();
-    ::memcpy(buffer, msgData, msgData->_packetLength);
-    iterMsgs->second->push_back(reinterpret_cast<NetMsg_DataHeader *>(buffer));
-}
-
-void FS_IocpMsgHandler::_OnBusinessProcessThread(const FS_ThreadPool *pool)
+void FS_IocpMsgDispatcher::_OnBusinessProcessThread(const FS_ThreadPool *pool)
 {// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
 
     _timeWheel->GetModifiedResolution(_resolutionInterval);
     while(!pool->IsClearingPool())
     {
         _locker.Lock();
-        _locker.Wait(_resolutionInterval.GetTotalMilliSeconds());
+        _locker.Wait(static_cast<ULong>(_resolutionInterval.GetTotalMilliSeconds()));
         _locker.Unlock();
 
         // 先执行定时器事件
@@ -240,7 +229,24 @@ void FS_IocpMsgHandler::_OnBusinessProcessThread(const FS_ThreadPool *pool)
     }
 }
 
-void FS_IocpMsgHandler::_OnBusinessProcessing()
+void FS_IocpMsgDispatcher::_MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData)
+{
+    // TODO:转移消息到业务处理层
+    // 只需要sessionId与数据拷贝到业务处理层即可
+    const UInt64 sessionId = session->GetSessionId();
+    auto iterMsgs = _sessionIdRefMsgs.find(sessionId);
+    if(iterMsgs == _sessionIdRefMsgs.end())
+        iterMsgs = _sessionIdRefMsgs.insert(std::make_pair(sessionId, new std::list<NetMsg_DataHeader *>)).first;
+    
+    // 拷贝数据
+    g_MemoryPool->Lock();
+    char *buffer = g_MemoryPool->Alloc<char>(msgData->_packetLength);
+    g_MemoryPool->Unlock();
+    ::memcpy(buffer, msgData, msgData->_packetLength);
+    iterMsgs->second->push_back(reinterpret_cast<NetMsg_DataHeader *>(buffer));
+}
+
+void FS_IocpMsgDispatcher::_OnBusinessProcessing()
 {
     // 将网络数据转移到缓冲区
     _locker.Lock();
@@ -287,12 +293,12 @@ void FS_IocpMsgHandler::_OnBusinessProcessing()
     _delayDisconnectedSessionsCache.clear();
 }
 
-void FS_IocpMsgHandler::_DoBusinessProcess(UInt64 sessionId, NetMsg_DataHeader *msgData)
+void FS_IocpMsgDispatcher::_DoBusinessProcess(UInt64 sessionId, NetMsg_DataHeader *msgData)
 {
-
+    // TODO:处理单一消息业务逻辑部分
 }
 
-void FS_IocpMsgHandler::_OnDelaySessionDisconnect(UInt64 sessionId)
+void FS_IocpMsgDispatcher::_OnDelaySessionDisconnect(UInt64 sessionId)
 {
     // TODO:真实的session断开
 }

@@ -39,12 +39,13 @@
 #include "base/common/asyn/asyn.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/net/Impl/IFS_Session.h"
+#include "base/common/net/Defs/HeartBeatComp.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT FS_Iocp;
-class BASE_EXPORT IO_EVENT;
+struct BASE_EXPORT IO_EVENT;
 class BASE_EXPORT FS_IocpSession;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
@@ -63,7 +64,7 @@ public:
     // 网络
     virtual void OnConnect(IFS_Session *session);
     virtual void OnDestroy();
-    virtual void OnHeartBeatTimeOut();
+    virtual void OnHeartBeatTimeOut(IFS_Session *session);
     // msg内存池创建 其他线程调用本接口，send需要加锁
     virtual void OnSendData(UInt64 sessionId, NetMsg_DataHeader *msg);
 
@@ -86,14 +87,17 @@ private:
     // 辅助
 private:
     IFS_Session *_GetSession(UInt64 sessionId);
-    void _ClearSessions();
+    void _ClearSessionsWhenClose();
 
+    void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
+    void _CheckSessionHeartbeat();  // 线程安全
 
 private:
     Locker _locker;
     std::atomic<Int32> _sessionCnt;             // 会话个数
     std::map<UInt64, IFS_Session *> _sessions;  // key:sessionId
-
+    Time _curTime;
+    std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列
     FS_ThreadPool *_threadPool;
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;

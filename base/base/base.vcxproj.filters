@@ -810,35 +810,11 @@
     <ClInclude Include="..\common\net\Interface\INetEvent.h">
       <Filter>common\net\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_TcpServer.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\net\Defs\FS_NetDefs.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_TcpServerImpl.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_Server.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_ServerImpl.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_Client.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_ClientImpl.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\objpool\Defs\FS_ObjPoolDefs.h">
       <Filter>common\objpool\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_NetBuffer.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_NetBufferImpl.h">
-      <Filter>common\net\Defs</Filter>
     </ClInclude>
     <ClInclude Include="..\common\memorypool\Defs\MemoryPoolDefs.h">
       <Filter>common\memorypool\Defs</Filter>
@@ -853,18 +829,6 @@
       <Filter>common\net\Impl</Filter>
     </ClInclude>
     <ClInclude Include="..\common\net\Impl\FS_IocpImpl.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_IocpMsgTransferServer.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_IocpMsgTransferServerImpl.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_MainIocpServer.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_MainIocpServerImpl.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
     <ClInclude Include="..\common\component\Impl\FS_Stream.h">
@@ -897,12 +861,6 @@
     <ClInclude Include="..\common\net\Defs\HeartBeatCompImpl.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_NetBufferArray.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_NetBufferArrayImpl.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\component\Impl\FS_List\FS_List.h">
       <Filter>common\component\Impl\FS_List</Filter>
     </ClInclude>
@@ -917,15 +875,6 @@
     </ClInclude>
     <ClInclude Include="..\common\component\Impl\FS_List\Defs\ListNodeImpl.h">
       <Filter>common\component\Impl\FS_List\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\Sender.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\SenderImpl.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\PacketQueueNode.h">
-      <Filter>common\net\Defs</Filter>
     </ClInclude>
     <ClInclude Include="..\common\net\Impl\FS_SessionMgr.h">
       <Filter>common\net\Impl</Filter>
@@ -978,21 +927,6 @@
     <ClInclude Include="..\common\net\Impl\FS_IocpMsgTransferImpl.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\net\Impl\IFS_MsgHandler.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_IocpMsgHandler.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_IocpMsgHandlerImpl.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Impl\FS_MsgHandlerFactory.h">
-      <Filter>common\net\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_SessionInfo.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\assist\utils\Impl\RTTIUtil.h">
       <Filter>common\assist\utils\Impl</Filter>
     </ClInclude>
@@ -1041,18 +975,6 @@
     <ClInclude Include="..\common\net\Defs\ServerCompsDef.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_Packet2.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_Packet.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_Packet2Impl.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\net\Defs\FS_PacketImpl.h">
-      <Filter>common\net\Defs</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\net\Defs\IFS_Buffer.h">
       <Filter>common\net\Defs</Filter>
     </ClInclude>
@@ -1081,6 +1003,18 @@
       <Filter>common\net\Impl</Filter>
     </ClInclude>
     <ClInclude Include="..\common\net\Impl\FS_IocpSessionImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_MsgDispatcher.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpMsgDispatcher.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_IocpMsgDispatcherImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\FS_MsgDispatcherFactory.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1289,25 +1223,7 @@
     <ClCompile Include="..\common\event\Impl\FS_Event.cpp">
       <Filter>common\event\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\net\Impl\FS_TcpServer.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Impl\FS_Server.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Impl\FS_Client.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Defs\FS_NetBuffer.cpp">
-      <Filter>common\net\Defs</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\net\Impl\FS_Iocp.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Impl\FS_IocpMsgTransferServer.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Impl\FS_MainIocpServer.cpp">
       <Filter>common\net\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\FS_Stream.cpp">
@@ -1319,17 +1235,8 @@
     <ClCompile Include="..\common\net\Impl\FS_MsgWriteStream.cpp">
       <Filter>common\net\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\net\Defs\FS_NetBufferArray.cpp">
-      <Filter>common\net\Defs</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\component\Impl\FS_List\Impl\FS_List.cpp">
       <Filter>common\component\Impl\FS_List\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Defs\Sender.cpp">
-      <Filter>common\net\Defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Defs\PacketQueueNode.cpp">
-      <Filter>common\net\Defs</Filter>
     </ClCompile>
     <ClCompile Include="..\common\net\Impl\FS_SessionMgr.cpp">
       <Filter>common\net\Impl</Filter>
@@ -1364,18 +1271,6 @@
     <ClCompile Include="..\common\net\Impl\FS_IocpMsgTransfer.cpp">
       <Filter>common\net\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\net\Impl\IFS_MsgHandler.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Impl\FS_IocpMsgHandler.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Impl\FS_MsgHandlerFactory.cpp">
-      <Filter>common\net\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Defs\FS_SessionInfo.cpp">
-      <Filter>common\net\Defs</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\assist\utils\Impl\RTTIUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
@@ -1391,12 +1286,6 @@
     <ClCompile Include="..\common\assist\utils\Impl\FS_TlsUtil.cpp">
       <Filter>common\assist\utils\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\net\Defs\FS_Packet2.cpp">
-      <Filter>common\net\Defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\net\Defs\FS_Packet.cpp">
-      <Filter>common\net\Defs</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\net\Defs\FS_IocpBuffer.cpp">
       <Filter>common\net\Defs</Filter>
     </ClCompile>
@@ -1410,6 +1299,15 @@
       <Filter>common\net\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\net\Impl\FS_IocpSession.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\IFS_MsgDispatcher.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_IocpMsgDispatcher.cpp">
+      <Filter>common\net\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\Impl\FS_MsgDispatcherFactory.cpp">
       <Filter>common\net\Impl</Filter>
     </ClCompile>
   </ItemGroup>

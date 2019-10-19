@@ -35,6 +35,7 @@
 #include "base/common/net/Impl/FS_Iocp.h"
 #include "base/common/net/Impl/FS_SessionFactory.h"
 #include "base/common/net/Impl/FS_Addr.h"
+#include "base/common/net/Defs/IocpDefs.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -42,6 +43,7 @@
 #include "base/common/net/Impl/IFS_Session.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
 #include "base/common/assist/utils/Impl/SystemUtil.h"
+#include "base/common/component/Impl/File/FS_IniFile.h"
 
 FS_NAMESPACE_BEGIN
 FS_IocpConnector::FS_IocpConnector()
@@ -53,6 +55,7 @@ FS_IocpConnector::FS_IocpConnector()
     , _maxSessionQuantityLimit(0)
     ,_curMaxSessionId(0)
     ,_maxSessionIdLimit((std::numeric_limits<UInt64>::max)())
+    ,_linkConfig(NULL)
 {
     // TODO:读取配置
      _maxSessionQuantityLimit = FD_SETSIZE;
@@ -63,14 +66,50 @@ FS_IocpConnector::~FS_IocpConnector()
     Fs_SafeFree(_closeIocpDelegate);
     Fs_SafeFree(_onConnected);
     Fs_SafeFree(_threadPool);
+    Fs_SafeFree(_linkConfig);
 }
 
 Int32 FS_IocpConnector::BeforeStart()
 {
     // TODO:读取配置初始化变量
-    _ReadConfig();
+    auto st = _ReadConfig();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("_ReadConfig fail st[%d]"), st);
+        return st;
+    }
 
     _threadPool = new FS_ThreadPool(0, 1);
+
+    // 初始化
+    auto sock = _InitSocket();
+    if(sock == INVALID_SOCKET)
+    {
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("init listen socket fail"));
+        return StatusDefs::IocpConnector_InitListenSocketFail;
+    }
+
+    BUFFER256 buffer = {};
+    char *ptr = buffer;
+    _linkConfig->ReadStr(_segmentName.c_str(), _ipKey.c_str(), "", ptr, sizeof(buffer));
+    UInt16 port = static_cast<UInt32>(_linkConfig->ReadInt(_segmentName.c_str(), _portKey.c_str(), 0));
+
+    st = _Bind(buffer, port);
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("listen sock[%llu] bind ip[%s:%hu] fail st[%d]")
+                                   , _sock, buffer, port, st);
+        return st;
+    }
+
+    st = _Listen();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("listen sock[%llu] listen ip[%s:%hu] fail st[%d]")
+                                   , _sock, buffer, port, st);
+        return st;
+    }
+
     return StatusDefs::Success;
 }
 
@@ -88,12 +127,13 @@ Int32 FS_IocpConnector::Start()
 
 void FS_IocpConnector::BeforeClose()
 {
+    // 连接器需要再此时关闭入口
     _closeIocpDelegate->Invoke();
+    _threadPool->Clear();
 }
 
 void FS_IocpConnector::Close()
 {
-    _threadPool->Clear();
 }
 
 void FS_IocpConnector::RegisterConnected(IDelegate<void, IFS_Session *> *callback)
@@ -109,9 +149,57 @@ void FS_IocpConnector::OnDisconnected(IFS_Session *session)
     _locker.Unlock();
 }
 
-void FS_IocpConnector::_ReadConfig()
+Int32 FS_IocpConnector::_ReadConfig()
 {
-    // TODO:
+    _segmentName = "[Listener]";
+    _listenerFileName = "./ServerCfg.ini";
+    _ipKey = "ip";
+    _portKey = "port";
+
+    if(!_linkConfig)
+    {
+        _linkConfig = new FS_IniFile();
+        if(!_linkConfig->SetPath(_listenerFileName.c_str()))
+        {
+            g_Log->e<FS_IocpConnector>(_LOGFMT_("create cfg ini fail"));
+            return StatusDefs::IocpConnector_CreateCfgIniFail;
+        }
+
+        // 初始化配置文件
+        auto st = _InitDefCfgs();
+        if(st != StatusDefs::Success)
+        {
+            g_Log->e<FS_IocpConnector>(_LOGFMT_("_InitDefCfgs fail st[%d]"), st);
+            return st;
+        }
+    }
+
+    return StatusDefs::Success;
+}
+
+Int32 FS_IocpConnector::_InitDefCfgs()
+{
+    _linkConfig->WriteStr(_segmentName.c_str(), _ipKey.c_str(), "127.0.0.1");
+    _linkConfig->WriteStr(_segmentName.c_str(), _portKey.c_str(), "4567");
+
+    // 检查是否写入正确
+    BUFFER256 buffer = {};
+    char *ptr = buffer;
+    _linkConfig->ReadStr(_segmentName.c_str(), _ipKey.c_str(), "", ptr, sizeof(buffer));
+    if(strcmp(buffer, "127.0.0.1") != 0)
+    {
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("_InitDefCfgs fail ip not match"));
+        return StatusDefs::IocpConnector_InitDefIniFail;
+    }
+
+    UInt32 port = _linkConfig->ReadInt(_segmentName.c_str(), _portKey.c_str(), 0);
+    if(port != 4567)
+    {
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("_InitDefCfgs fail port not match"));
+        return StatusDefs::IocpConnector_InitDefIniFail;
+    }
+
+    return StatusDefs::Success;
 }
 
 SOCKET FS_IocpConnector::_InitSocket()
@@ -210,6 +298,7 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
 
         // TODO:连接回调 
         IFS_Session *newSession = FS_SessionFactory::Create(_curMaxSessionId, sock, addrInfo);
+        newSession->OnConnect();
         _onConnected->Invoke(newSession);
 
         auto sessionAddr = newSession->GetAddr();
@@ -237,38 +326,38 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
 
 void FS_IocpConnector::_OnDisconnected(IFS_Session *session)
 {
-
+    _locker.Lock();
+    --_curSessionCnt;
+    _locker.Unlock();
 }
 
 void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
 {
-    // 创建并绑定监听端口
+    // 1.创建并绑定监听端口
     SmartPtr<FS_Iocp> listenIocp = new FS_Iocp;
     listenIocp->Create();
     listenIocp->Reg(_sock);
     listenIocp->LoadAcceptEx(_sock);
 
-    // 定义关闭iocp
+    // 2.定义关闭iocp
     auto __quitIocpFunc = [this, &listenIocp]()->void {
         // 先关闭listensocket
         SocketUtil::DestroySocket(_sock);
         listenIocp->PostQuit();
     };
 
-    // 绑定退出iocp
+    // 3.绑定退出iocp
     _closeIocpDelegate = DelegatePlusFactory::Create<decltype(__quitIocpFunc), void>(__quitIocpFunc);
 
     // const int len = 2 * (sizeof(sockaddr_in) + 16);
     // 不需要客户端再连接后立即发送数据的情况下最低长度len
-    char buf[IOCP_CONNECTOR_BUFFER] = {};
 
-    IoDataBase ioData = {};
-    ioData._wsaBuff.buf = buf;
-    ioData._wsaBuff.len = IOCP_CONNECTOR_BUFFER;
+    // 4.预先投递FD_SETSIZE个accept 快速连入
+    char **bufArray = NULL;
+    IoDataBase **ioDataArray = NULL;
+    _PreparePostAccept(listenIocp, bufArray, ioDataArray);
 
-    // TODO:提升连接速度：一次性投递本机可连接的最高连接数，用掉一个再补充一个
-
-    listenIocp->PostAccept(_sock, &ioData);
+    // 5.监听网络连入
     IO_EVENT ioEvent = {};
     while(!threadPool->IsClearingPool())
     {
@@ -287,7 +376,7 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
         // 处理iocp退出
         if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys<FS_IocpConnector>(_LOGFMT_("iocp退出 threadId<%lu> code=%lld")
+            g_Log->sys<FS_IocpConnector>(_LOGFMT_("connector iocp退出 threadId<%lu> code=%lld")
                                          , SystemUtil::GetCurrentThreadId(), ioEvent._data._code);
             break;
         }
@@ -301,9 +390,72 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
             _OnConnected(ioEvent._ioData->_sock, clientAddrInfo);
 
             // 继续向IOCP投递接受连接任务
-            listenIocp->PostAccept(_sock, &ioData);
+            const auto st = listenIocp->PostAccept(_sock, ioEvent._ioData);
+            if(st != StatusDefs::Success)
+            {
+                g_Log->e<FS_IocpConnector>(_LOGFMT_("post accept fail whnen new session create listen sock[%llu], iodata addr[%p] st[%d]")
+                                           , _sock, ioEvent._ioData, st);
+            }
         }
     }
+
+    listenIocp->Destroy();
+    _FreePrepareAcceptBuffers(bufArray, ioDataArray);
+}
+
+void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, IoDataBase **&ioDataArray)
+{
+    // 预先创建n个缓冲加速连接过程
+    g_MemoryPool->Lock();
+    bufArray = g_MemoryPool->Alloc<char *>(FD_SETSIZE * sizeof(char *));
+    g_MemoryPool->Unlock();
+
+    for(Int32 i = 0; i < FD_SETSIZE; ++i)
+    {
+        g_MemoryPool->Lock();
+        bufArray[i] = g_MemoryPool->Alloc<char>(IOCP_CONNECTOR_BUFFER);
+        g_MemoryPool->Unlock();
+    }
+
+    // 预先创建n个iodata
+    g_MemoryPool->Lock();
+    ioDataArray = g_MemoryPool->Alloc<IoDataBase *>(sizeof(IoDataBase *)*FD_SETSIZE);
+    g_MemoryPool->Unlock();
+
+    Int32 st = StatusDefs::Success;
+    for(Int32 i = 0; i < FD_SETSIZE; ++i)
+    {
+        g_MemoryPool->Lock();
+        ioDataArray[i] = g_MemoryPool->Alloc<IoDataBase>(sizeof(IoDataBase));
+        g_MemoryPool->Unlock();
+
+        ioDataArray[i]->_wsaBuff.buf = bufArray[i];
+        ioDataArray[i]->_wsaBuff.len = IOCP_CONNECTOR_BUFFER;
+
+        st = listenIocp->PostAccept(_sock, ioDataArray[i]);
+        if(st != StatusDefs::Success)
+        {
+            g_Log->e<FS_IocpConnector>(_LOGFMT_("prepare post accept fail sock[%llu] st[%d]")
+                                       , _sock, st);
+        }
+    }
+
+    // TODO:提升连接速度：一次性投递本机可连接的最高连接数，用掉一个再补充一个
+}
+
+void FS_IocpConnector::_FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray)
+{
+    g_MemoryPool->Lock();
+    for(Int32 i = 0; i < FD_SETSIZE; ++i)
+    {
+        g_MemoryPool->Free(bufArray[i]);
+        g_MemoryPool->Free(ioDataArray[i]);
+    }
+    g_MemoryPool->Free(bufArray);
+    g_MemoryPool->Free(ioDataArray);
+    g_MemoryPool->Unlock();
 }
 
 FS_NAMESPACE_END
+
+

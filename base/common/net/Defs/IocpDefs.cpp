@@ -30,7 +30,6 @@
  * 
  */
 #include "stdafx.h"
-#include "base/common/net/Defs/FS_Packet2.h"
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/net/Defs/IFS_Buffer.h"
 

@@ -33,12 +33,12 @@
 #include "base/common/net/Impl/IFS_Session.h"
 #include "base/common/net/Impl/FS_Addr.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
-#include "base/common/net/Defs/FS_Packet2.h"
 #include "base/common/net/Defs/FS_IocpBuffer.h"
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/net/Defs/FS_BufferFactory.h"
 
 #include "base/common/assist/utils/Impl/STLUtil.h"
+#include "base/common/socket/socket.h"
 
 OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
@@ -111,7 +111,7 @@ void IFS_Session::OnDestroy()
 
 void IFS_Session::OnConnect()
 {
-
+    UpdateHeartBeatExpiredTime();
 }
 
 void IFS_Session::OnDisconnect()

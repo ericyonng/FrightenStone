@@ -35,14 +35,14 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/net/Impl/FS_Client.h"
+#include "base/common/net/Impl/IFS_Session.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT HeartBeatComp
 {
 public:
-    bool operator()(const FS_Client *l, const FS_Client *r) const;
+    bool operator()(const IFS_Session *l, const IFS_Session *r) const;
 };
 
 FS_NAMESPACE_END

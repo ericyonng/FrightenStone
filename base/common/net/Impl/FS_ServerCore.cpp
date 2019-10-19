@@ -35,11 +35,11 @@
 #include "base/common/net/Impl/FS_ServerConfigMgrFactory.h"
 #include "base/common/net/Impl/FS_ConnectorFactory.h"
 #include "base/common/net/Impl/FS_MsgTransferFactory.h"
-#include "base/common/net/Impl/FS_MsgHandlerFactory.h"
+#include "base/common/net/Impl/FS_MsgDispatcherFactory.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
 #include "base/common/net/Impl/IFS_Connector.h"
 #include "base/common/net/Impl/IFS_MsgTransfer.h"
-#include "base/common/net/Impl/IFS_MsgHandler.h"
+#include "base/common/net/Impl/IFS_MsgDispatcher.h"
 #include "base/common/net/Impl/IFS_Connector.h"
 #include "base/common/net/Impl/IFS_Session.h"
 #include "base/common/net/Impl/FS_Addr.h"
@@ -53,8 +53,6 @@
 #include "base/common/component/Impl/FS_ThreadPool.h"
 
 fs::FS_ServerCore *g_ServerCore = NULL;
-fs::FS_SessionMgr *g_SessionMgr = NULL;
-fs::IFS_MsgHandler *g_MsgHandler = NULL;
 
 FS_NAMESPACE_BEGIN
 FS_ServerCore::FS_ServerCore()
@@ -62,6 +60,7 @@ FS_ServerCore::FS_ServerCore()
     ,_cpuInfo(new FS_CpuInfo)
     ,_connector(NULL)
     ,_msgHandler(NULL)
+    ,_pool(NULL)
     ,_curSessionConnecting{0}
     ,_sessionConnectedBefore{0}
     ,_sessionDisconnectedCnt{0}
@@ -74,13 +73,12 @@ FS_ServerCore::FS_ServerCore()
 
 FS_ServerCore::~FS_ServerCore()
 {
+    Fs_SafeFree(_pool);
     Fs_SafeFree(_connector);
     Fs_SafeFree(_msgHandler);
     STLUtil::DelVectorContainer(_msgTransfers);
     Fs_SafeFree(_cpuInfo);
     Fs_SafeFree(_serverConfigMgr);
-    g_SessionMgr = NULL;
-    g_MsgHandler = NULL;
     g_ServerCore = NULL;
 }
 
@@ -143,8 +141,17 @@ Int32 FS_ServerCore::Start()
         g_Log->e<FS_ServerCore>(_LOGFMT_("_ReadConfig fail ret[%d]"), ret);
         return ret;
     }
+
+    // 8.启动监控器
+    _pool = new FS_ThreadPool(0, 1);
+    auto task = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSvrRuning);
+    if(!_pool->AddTask(task, true))
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("add task fail"));
+        return StatusDefs::FS_ServerCore_StartFailOfSvrRuningTaskFailure;
+    }
     
-    // 8.创建服务器模块
+    // 9.创建服务器模块
     ret = _CreateNetModules();
     if(ret != StatusDefs::Success)
     {
@@ -152,10 +159,10 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 9.注册接口
+    // 10.注册接口
     _RegisterToModule();
 
-    // 10.启动前...
+    // 11.启动前...
     ret = _BeforeStart();
     if(ret != StatusDefs::Success)
     {
@@ -163,7 +170,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 11.start 模块
+    // 12.start 模块
     ret = _StartModules();
     if(ret != StatusDefs::Success)
     {
@@ -171,7 +178,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 12.onstart
+    // 13.onstart
     ret = _OnStart();
     if(ret != StatusDefs::Success)
     {
@@ -179,7 +186,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 13._AfterStart
+    // 14._AfterStart
     ret = _AfterStart();
     if(ret != StatusDefs::Success)
     {
@@ -213,6 +220,8 @@ void FS_ServerCore::Close()
 
     // 最后处理
     _AfterClose();
+
+    SocketUtil::ClearSocketEnv();
 }
 
 #pragma endregion
@@ -333,7 +342,7 @@ Int32 FS_ServerCore::_CreateNetModules()
     for(Int32 i = 0; i < cpuCnt; ++i)
         _msgTransfers.push_back(FS_MsgTransferFactory::Create());
 
-    _msgHandler = FS_MsgHandlerFactory::Create();
+    _msgHandler = FS_MsgDispatcherFactory::Create();
     return StatusDefs::Success;
 }
 
@@ -474,6 +483,17 @@ void FS_ServerCore::_RegisterToModule()
 {
     auto onConnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnConnected);
     _connector->RegisterConnected(onConnectedRes);
+    
+    for(auto &msgTransfer : _msgTransfers)
+    {
+        // 注册接口
+        auto onDisconnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnDisconnected);
+        auto onRecvSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsg);
+        auto onSendSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSendMsg);
+        msgTransfer->RegisterDisconnected(onDisconnectedRes);
+        msgTransfer->RegisterRecvSucCallback(onRecvSucRes);
+        msgTransfer->RegisterSendSucCallback(onSendSucRes);
+    }
 }
 
 #pragma endregion
