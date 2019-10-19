@@ -165,6 +165,11 @@ Int32 FS_IocpConnector::_ReadConfig()
             return StatusDefs::IocpConnector_CreateCfgIniFail;
         }
 
+        BUFFER512 buffer = {};
+        char *ptr = buffer;
+        if(_linkConfig->ReadAllKeyValueOfSection(_segmentName.c_str(), ptr, sizeof(buffer)))
+            return StatusDefs::Success;
+
         // 初始化配置文件
         auto st = _InitDefCfgs();
         if(st != StatusDefs::Success)

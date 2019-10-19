@@ -59,6 +59,8 @@ public:
     const char *ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize);
     UInt32 ReadInt(const char *segmentName, const char *keyName, Int32 defaultInt);
     bool WriteStr(const char *segmentName, const char *keyName, const char *wrStr);
+
+    bool ReadAllKeyValueOfSection(const char *segmentName, char *&outStr, UInt16 outSize);
 private:
     Locker _lock;
     FS_String  _filePath;
