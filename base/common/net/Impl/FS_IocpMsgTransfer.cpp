@@ -84,6 +84,10 @@ Int32 FS_IocpMsgTransfer::Start()
 
 void FS_IocpMsgTransfer::BeforeClose()
 {
+    // close所有会话，使得投递的消息马上返回
+    // 等待所有会话被移除
+    // 投递iocpquit事件
+    // 线程退出
 }
 
 void FS_IocpMsgTransfer::Close()
@@ -165,7 +169,8 @@ Int32 FS_IocpMsgTransfer::GetSessionCnt()
 }
 
 void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
-{
+{// iocp 在closesocket后会马上返回所有投递的事件，所以不可立即在post未结束时候释放session对象
+
     ULong waitTime = INFINITE;
     while(!pool->IsClearingPool() || _sessionCnt <= 0)
     {
@@ -196,7 +201,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         _locker.Lock();
         auto session = _GetSession(sessionId);
         if(!session)
-        {
+        {// 数据丢失！！！！
             g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] is removed before.\n stack trace back:\n%s")
                                          , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
             _locker.Unlock();

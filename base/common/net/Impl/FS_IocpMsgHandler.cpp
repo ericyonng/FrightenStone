@@ -229,8 +229,13 @@ void FS_IocpMsgHandler::_OnBusinessProcessThread(const FS_ThreadPool *pool)
         // 先执行定时器事件
         _timeWheel->RotateWheel();
 
+        // 从异步消息队列取得异步处理完成返回事件 TODO:
+        // 清理完成的异步事件 TODO:
+
         // 再执行业务事件
         _OnBusinessProcessing();
+
+        // 投递业务产生的异步处理事件 TODO:
         _timeWheel->GetModifiedResolution(_resolutionInterval);
     }
 }

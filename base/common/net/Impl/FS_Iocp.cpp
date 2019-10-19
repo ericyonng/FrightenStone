@@ -307,9 +307,9 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
         }
 
         if(ERROR_CONNECTION_ABORTED == error)
-        {// TODO:这个错误码要不要处理
-            g_Log->w<FS_Iocp>(_LOGFMT_("sessionId[%llu] WaitForMessage invalid client socket error<%d> status<%d>")
-                              , ioEvent._data._sessionId, error, StatusDefs::Unknown);
+        {// TODO:这个错误码要不要处理 本系统终止网络连接
+            g_Log->w<FS_Iocp>(_LOGFMT_("local system closesocket[%llu] sessionId[%llu]. WaitForMessage invalid client socket error<%d> status<%d>")
+                              ,ioEvent._ioData?INVALID_SOCKET:ioEvent._ioData->_sock, ioEvent._data._sessionId, error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
         if(ERROR_SEM_TIMEOUT == error)
