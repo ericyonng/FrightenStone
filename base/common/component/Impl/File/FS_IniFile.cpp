@@ -110,4 +110,9 @@ bool FS_IniFile::WriteStr(const char *segmentName, const char *keyName, const ch
     return WritePrivateProfileString(segmentName, keyName, wrStr, _filePath.c_str());
 }
 
+bool FS_IniFile::ReadAllKeyValueOfSection(const char *segmentName, char *&outStr, UInt16 outSize)
+{
+    return  GetPrivateProfileSection(segmentName, outStr, outSize, _filePath.c_str()) != 0;
+}
 FS_NAMESPACE_END
+
