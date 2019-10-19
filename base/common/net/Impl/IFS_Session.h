@@ -71,8 +71,9 @@ public:
     bool IsClose() const;
     const Time &GetHeartBeatExpiredTime() const;
     virtual bool CanDestroy() const;
-    void MaskDestroy(); // 若还有post操作则先maskdestroy，再在最后的时候真正的destroy掉
-    bool IsDelayDestroy() const;
+    virtual bool CanDisconnect() const;
+    void MaskClose(); // 若还有post操作则先maskdestroy，再在最后的时候真正的destroy掉
+    bool IsDelayClose() const;
     IFS_Buffer *GetRecvBuffer();
 
     // 操作
@@ -106,7 +107,7 @@ private:
     
 protected:
     bool _isDestroy;
-    bool _maskDestroy;
+    bool _maskClose;
     Locker _lock;
     UInt64 _sessionId;
     FS_Addr *_addr;

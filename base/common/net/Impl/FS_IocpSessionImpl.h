@@ -76,10 +76,15 @@ inline bool FS_IocpSession::IsPostRecv() const
 
 inline bool FS_IocpSession::CanPost() const
 {
-    return !(_isDestroy || _maskDestroy || IsClose());
+    return !(_isDestroy || _maskClose || IsClose());
 }
 
 inline bool FS_IocpSession::CanDestroy() const
+{
+    return !IsPostIoChange();
+}
+
+inline bool FS_IocpSession::CanDisconnect() const
 {
     return !IsPostIoChange();
 }

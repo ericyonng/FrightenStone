@@ -34,6 +34,16 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
+inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
+{
+    if(!session->CanDisconnect())
+    {
+        _OnDelayDisconnected(session);
+        return;
+    }
+
+    _OnDisconnected(session);
+}
 
 FS_NAMESPACE_END
 #endif

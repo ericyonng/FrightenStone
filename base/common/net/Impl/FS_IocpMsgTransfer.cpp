@@ -166,10 +166,12 @@ Int32 FS_IocpMsgTransfer::GetSessionCnt()
 
 void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 {
-    while(!pool->IsClearingPool())
+    ULong waitTime = INFINITE;
+    while(!pool->IsClearingPool() || _sessionCnt <= 0)
     {
         // 等待网络消息
-        const Int32 ret = _iocp->WaitForCompletion(*_ioEvent);
+        waitTime = pool->IsClearingPool() ? 20 : INFINITE;
+        const Int32 ret = _iocp->WaitForCompletion(*_ioEvent, waitTime);
         if(ret != StatusDefs::Success)
         {
             if(ret == StatusDefs::IOCP_WaitTimeOut)
@@ -182,6 +184,8 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         // 处理iocp退出
         if(_ioEvent->_data._code == IocpDefs::IO_QUIT)
         {
+            // TODO:退出前需要吧所有消息处理完毕
+            // 不接收任何消息，等待消息处理完 先关闭socket的读端
             g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
             break;
         }
@@ -214,7 +218,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
                                                , iocpSession->GetSessionId()
                                                , iocpSession->GetSocket(),
                                                _ioEvent->_bytesTrans);
-                _OnDisconnected(session);
+                _OnGracefullyDisconnect(session);
                 _locker.Unlock();
                 continue;
             }
@@ -236,7 +240,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
                         iocpSession->ResetPostRecvMask();
                         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
                                                      , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
-                        _OnDisconnected(iocpSession);
+                        _OnGracefullyDisconnect(iocpSession);
                         _locker.Unlock();
                         continue;
                     }
@@ -255,7 +259,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
                                                , session->GetSessionId()
                                                , session->GetSocket(),
                                                _ioEvent->_bytesTrans);
-                _OnDisconnected(session);
+                _OnGracefullyDisconnect(session);
                 _locker.Unlock();
                 continue;
             }
@@ -283,28 +287,26 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 
         // 客户端已经断开连接
         if(iocpSession->IsClose())
-            _OnDisconnected(iocpSession);
+            _OnGracefullyDisconnect(iocpSession);
 
         _locker.Unlock();
     }
+
+    // 销毁sessions 此时要保证handler要还没关闭
+    _ClearSessions();
+    // 销毁iocp
+}
+
+void FS_IocpMsgTransfer::_OnDelayDisconnected(IFS_Session *session)
+{
+    session->MaskClose();
 }
 
 void FS_IocpMsgTransfer::_OnDisconnected(IFS_Session *session)
 {
-    // 若有post未完成则延迟移除会话
-    auto iocpSession = session->CastTo<FS_IocpSession>();
-    if(iocpSession->IsPostIoChange())
-    {
-        iocpSession->MaskDestroy();
-        if(!iocpSession->IsClose())
-            iocpSession->Close();
-        return;
-    }
+    session->Close();
 
-    // 断开与销毁事件
-    if(!iocpSession->IsClose())
-        iocpSession->Close();
-
+    // servercore收到断开回调
     _serverCoreDisconnectedCallback->Invoke(session);
 
     session->OnDisconnect();
@@ -327,7 +329,7 @@ bool FS_IocpMsgTransfer::_DoSend(FS_IocpSession *session)
             session->ResetPostSendMask();
             g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
                                          , session->GetSessionId(), session->GetSocket(), st);
-            _OnDisconnected(session);
+            _OnGracefullyDisconnect(session);
             return false;
         }
     }
@@ -342,6 +344,16 @@ IFS_Session *FS_IocpMsgTransfer::_GetSession(UInt64 sessionId)
         return NULL;
 
     return iterSession->second;
+}
+
+void FS_IocpMsgTransfer::_ClearSessions()
+{
+    _locker.Lock();
+    for(auto &iterSession : _sessions)
+    {
+        _OnDisconnected(iterSession.second);
+    }
+    _locker.Unlock();
 }
 
 FS_NAMESPACE_END

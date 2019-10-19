@@ -38,6 +38,7 @@
 #include "base/common/net/Impl/IFS_MsgTransfer.h"
 #include "base/common/asyn/asyn.h"
 #include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/net/Impl/IFS_Session.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -72,16 +73,20 @@ public:
     virtual Int32 GetSessionCnt();
 
 private:
-    virtual void _OnMoniterMsg(const FS_ThreadPool *pool);
+    void _OnMoniterMsg(const FS_ThreadPool *pool);
 
     // 网络事件 线程不安全
 private:
+    void _OnGracefullyDisconnect(IFS_Session *session);
+    void _OnDelayDisconnected(IFS_Session *session);
+    // 需要判断是否可断开
     void _OnDisconnected(IFS_Session *session);
     bool _DoSend(FS_IocpSession *session);
 
     // 辅助
 private:
     IFS_Session *_GetSession(UInt64 sessionId);
+    void _ClearSessions();
 
 
 private:
