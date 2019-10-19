@@ -249,7 +249,9 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
     listenIocp->LoadAcceptEx(_sock);
 
     // 定义关闭iocp
-    auto __quitIocpFunc = [&listenIocp]()->void {
+    auto __quitIocpFunc = [this, &listenIocp]()->void {
+        // 先关闭listensocket
+        SocketUtil::DestroySocket(_sock);
         listenIocp->PostQuit();
     };
 
@@ -263,6 +265,8 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
     IoDataBase ioData = {};
     ioData._wsaBuff.buf = buf;
     ioData._wsaBuff.len = IOCP_CONNECTOR_BUFFER;
+
+    // TODO:提升连接速度：一次性投递本机可连接的最高连接数，用掉一个再补充一个
 
     listenIocp->PostAccept(_sock, &ioData);
     IO_EVENT ioEvent = {};
