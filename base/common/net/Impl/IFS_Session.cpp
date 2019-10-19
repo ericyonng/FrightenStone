@@ -54,7 +54,7 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
     ,_recvMsgId(1)
     ,_sendMsgId(1)
     ,_lastErrorReason{StatusDefs::Success}
-    ,_maskDestroy(false)
+    ,_maskClose(false)
 {
     _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
 }

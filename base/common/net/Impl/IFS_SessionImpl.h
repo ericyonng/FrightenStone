@@ -90,14 +90,19 @@ inline bool IFS_Session::CanDestroy() const
     return true;
 }
 
-inline void IFS_Session::MaskDestroy()
+inline bool IFS_Session::CanDisconnect() const
 {
-    _maskDestroy = true;
+    return true;
 }
 
-inline bool IFS_Session::IsDelayDestroy() const
+inline void IFS_Session::MaskClose()
 {
-    return _maskDestroy;
+    _maskClose = true;
+}
+
+inline bool IFS_Session::IsDelayClose() const
+{
+    return _maskClose;
 }
 
 inline IFS_Buffer *IFS_Session::GetRecvBuffer()
