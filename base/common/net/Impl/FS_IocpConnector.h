@@ -39,10 +39,14 @@
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
 #include "base/common/asyn/asyn.h"
+#include "base/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IFS_Session;
+class BASE_EXPORT FS_IniFile;
+class BASE_EXPORT FS_Iocp;
+struct BASE_EXPORT IoDataBase;
 
 class BASE_EXPORT FS_IocpConnector : public IFS_Connector
 {
@@ -66,7 +70,8 @@ public:
     *       3. - Listen 监听端口号
     */
 private:
-    void _ReadConfig();
+    Int32 _ReadConfig();
+    Int32 _InitDefCfgs();
     SOCKET _InitSocket();
     Int32 _Bind(const Byte8 *ip, UInt16 port);
     Int32 _Listen(Int32 unconnectQueueLen = SOMAXCONN);
@@ -87,6 +92,9 @@ private:
     void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo);
     void _OnDisconnected(IFS_Session *session);
     void _OnIocpMonitorTask(const FS_ThreadPool *threadPool);
+    void _PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, IoDataBase **&ioDataArray);
+    void _FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray);
+
     #pragma endregion
 
     /* 数据成员 */
@@ -106,6 +114,12 @@ private:
     Int32 _maxSessionQuantityLimit;
     UInt64 _curMaxSessionId;
     const UInt64 _maxSessionIdLimit;
+
+    FS_String _segmentName;
+    FS_String _ipKey;
+    FS_String _portKey;
+    FS_String _listenerFileName;
+    FS_IniFile *_linkConfig;
 #pragma endregion
 };
 

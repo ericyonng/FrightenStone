@@ -21,59 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_NetBufferImpl.h
+ * @file  : FS_MsgDispatcherFactory.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/8/5
+ * @date  : 2019/10/07
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Base_Common_Net_Defs_FS_NetBuffer_H__
-#pragma once
+#include "stdafx.h"
+#include "base/common/net/Impl/FS_MsgDispatcherFactory.h"
+#include "base/common/net/Impl/FS_IocpMsgDispatcher.h"
 
 FS_NAMESPACE_BEGIN
 
-inline char *FS_NetBuffer::GetData()
+IFS_MsgDispatcher *FS_MsgDispatcherFactory::Create()
 {
-    return _buff;
-}
-
-inline std::list<FS_NetBuffer *>::iterator FS_NetBuffer::GetNode()
-{
-    return _arrayNode;
-}
-
-inline FS_NetBufferArray *FS_NetBuffer::GetOwner()
-{
-    return _owner;
-}
-
-inline void FS_NetBuffer::SetNode(const std::list<FS_NetBuffer *>::iterator &iterNode)
-{
-    _arrayNode = iterNode;
-}
-
-inline bool FS_NetBuffer::NeedWrite() const
-{
-    return _lastPos > 0;
-}
-
-inline bool FS_NetBuffer::IsFull() const
-{
-    return _lastPos >= _buffSize;
-}
-
-inline bool FS_NetBuffer::IsEmpty() const
-{
-    return _lastPos <= 0;
-}
-
-inline void FS_NetBuffer::Release()
-{
-    FsDelete(this);
+#ifdef _WIN32
+    return new FS_IocpMsgDispatcher();
+#else
+#endif
 }
 
 FS_NAMESPACE_END
-
-#endif

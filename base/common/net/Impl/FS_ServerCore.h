@@ -45,12 +45,13 @@ class BASE_EXPORT IFS_Session;
 class BASE_EXPORT IFS_ServerConfigMgr;
 class BASE_EXPORT IFS_Connector;
 class BASE_EXPORT IFS_MsgTransfer;
-class BASE_EXPORT IFS_MsgHandler;
+class BASE_EXPORT IFS_MsgDispatcher;
 class BASE_EXPORT FS_SessionMgr;
 class BASE_EXPORT FS_CpuInfo;
 class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT TimeSlice;
 class BASE_EXPORT Time;
+class BASE_EXPORT IFS_BusinessLogic;
 
 class BASE_EXPORT FS_ServerCore
 {
@@ -118,10 +119,12 @@ private:
     Locker _locker;
     IFS_Connector * _connector;                     // 连接器
     std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息收发器
-    IFS_MsgHandler *_msgHandler;                    // 消息处理器 业务线程处理
+    IFS_MsgDispatcher *_msgHandler;                 // 消息处理器 业务线程处理
+    IFS_BusinessLogic *_logic;                      // 业务逻辑入口
 
     // TODO:sessionmgr可能需要移除避免锁冲突
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
+    FS_ThreadPool *_pool;
 
     // 统计区
     Time _lastStatisticsTime;                       // 最后一次统计的时间
@@ -139,9 +142,5 @@ FS_NAMESPACE_END
 #include "base/common/net/Impl/FS_ServerCoreImpl.h"
 
 extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;
-
-extern BASE_EXPORT fs::FS_SessionMgr *g_SessionMgr;
-
-extern BASE_EXPORT fs::IFS_MsgHandler *g_MsgHandler;
 
 #endif

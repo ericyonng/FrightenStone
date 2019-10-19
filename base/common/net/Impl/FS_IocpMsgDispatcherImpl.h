@@ -21,24 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : PacketQueueNode.h
+ * @file  : FS_IocpMsgHandlerImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/6
+ * @date  : 2019/10/07
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Defs_PacketQueueNode_H__
-#define __Base_Common_Net_Defs_PacketQueueNode_H__
+
+#ifdef __Base_Common_Net_Impl_FS_IocpMsgDispatcher_H__
 #pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
-
 FS_NAMESPACE_BEGIN
-
 
 FS_NAMESPACE_END
 

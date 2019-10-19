@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpMsgHandler.h
+ * @file  : FS_IocpMsgDispatcher.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/07
  * @brief :
@@ -29,29 +29,30 @@
  *
  * 
  */
-#ifndef __Base_Common_Net_Impl_FS_IocpMsgHandler_H__
-#define __Base_Common_Net_Impl_FS_IocpMsgHandler_H__
+#ifndef __Base_Common_Net_Impl_FS_IocpMsgDispatcher_H__
+#define __Base_Common_Net_Impl_FS_IocpMsgDispatcher_H__
 #pragma once
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/net/Impl/IFS_MsgHandler.h"
+#include "base/common/net/Impl/IFS_MsgDispatcher.h"
 #include "base/common/asyn/asyn.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include <set>
+#include "base/common/component/Impl/TimeSlice.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT IFS_Session;
-class BASE_EXPORT NetMsg_DataHeader;
+struct BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT IFS_MsgTransfer;
 
-class BASE_EXPORT FS_IocpMsgHandler : public IFS_MsgHandler
+class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
 public:
-    FS_IocpMsgHandler();
-    virtual ~FS_IocpMsgHandler();
+    FS_IocpMsgDispatcher();
+    virtual ~FS_IocpMsgDispatcher();
 
 public:
     virtual Int32 BeforeStart();
@@ -69,14 +70,14 @@ public:
 
 private:
     // msgData会拷贝到内存池创建的缓冲区中 线程不安全，外部需要加锁
-    void _MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData);
     void _OnBusinessProcessThread(const FS_ThreadPool *pool);
+    void _MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData);
     void _OnBusinessProcessing();
     void _DoBusinessProcess(UInt64 sessionId, NetMsg_DataHeader *msgData);
     void _OnDelaySessionDisconnect(UInt64 sessionId);
 
 private:
-    bool _isClose;
+    std::atomic<bool> _isClose;
     ConditionLocker _locker;
     FS_ThreadPool *_pool;
 
@@ -94,6 +95,6 @@ private:
 
 FS_NAMESPACE_END
 
-#include "base/common/net/Impl/FS_IocpMsgHandlerImpl.h"
+#include "base/common/net/Impl/FS_IocpMsgDispatcherImpl.h"
 
 #endif

@@ -36,10 +36,12 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/status/status.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IFS_Session;
+struct BASE_EXPORT NetMsg_DataHeader;
 
 class BASE_EXPORT IFS_MsgTransfer
 {
@@ -52,13 +54,13 @@ public:
     virtual Int32 Start() = 0;
     virtual Int32 AfterStart() { return StatusDefs::Success; }
     virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}
+    virtual void BeforeClose() {}   // 处理未决数据，初步的清理
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
     virtual void OnConnect(IFS_Session *session) = 0;
     virtual void OnDestroy() = 0;
-    virtual void OnHeartBeatTimeOut() = 0;
+    virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
     // msg内存池创建
     virtual void OnSendData(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
 

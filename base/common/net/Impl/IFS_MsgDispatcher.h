@@ -21,17 +21,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : PacketQueueNode.cpp
+ * @file  : IFS_MsgDispatcher.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/09/13
+ * @date  : 2019/10/07
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/net/Defs/PacketQueueNode.h"
+#ifndef __Base_Common_Net_Impl_IFS_MsgDispatcher_H__
+#define __Base_Common_Net_Impl_IFS_MsgDispatcher_H__
+
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/status/status.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT IFS_Session;
+struct BASE_EXPORT NetMsg_DataHeader;
+class BASE_EXPORT IFS_MsgTransfer;
+
+class BASE_EXPORT IFS_MsgDispatcher
+{
+public:
+    IFS_MsgDispatcher();
+    virtual ~IFS_MsgDispatcher();
+
+public:
+    virtual Int32 BeforeStart() { return StatusDefs::Success; }
+    virtual Int32 Start() = 0;
+    virtual Int32 AfterStart() { return StatusDefs::Success; }
+    virtual void WillClose() {} // 断开与模块之间的依赖
+    virtual void BeforeClose() {}
+    virtual void Close() = 0;
+    virtual void AfterClose() {}
+
+    virtual void OnRecv(IFS_Session *session) = 0;
+    virtual void OnDisconnected(IFS_Session *session) = 0;
+    virtual void OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer) = 0;
+    virtual void OnDestroy() = 0;
+    virtual void OnHeartBeatTimeOut() = 0;
+
+    virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
+};
+
 FS_NAMESPACE_END
+
+#endif

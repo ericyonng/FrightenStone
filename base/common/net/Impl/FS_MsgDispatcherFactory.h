@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_MsgHandler.cpp
+ * @file  : FS_MsgDispatcherFactory.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/07
  * @brief :
@@ -29,21 +29,23 @@
  *
  * 
  */
+#ifndef __Base_Common_Net_Impl_FS_MsgDispatcherFactory_H__
+#define __Base_Common_Net_Impl_FS_MsgDispatcherFactory_H__
 
-#include "stdafx.h"
-#include "base/common/net/Impl/IFS_MsgHandler.h"
-#include "base/common/net/Impl/FS_ServerCore.h"
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-IFS_MsgHandler::IFS_MsgHandler()
-{
-    g_MsgHandler = this;
-}
+class BASE_EXPORT IFS_MsgDispatcher;
 
-IFS_MsgHandler::~IFS_MsgHandler()
+class BASE_EXPORT FS_MsgDispatcherFactory
 {
-
-}
+public:
+    static IFS_MsgDispatcher *Create();
+};
 
 FS_NAMESPACE_END
+#endif

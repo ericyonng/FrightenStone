@@ -79,19 +79,45 @@ Int32 FS_IocpMsgTransfer::BeforeStart()
 
 Int32 FS_IocpMsgTransfer::Start()
 {
+    auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_OnMoniterMsg);
+    if(!_threadPool->AddTask(task, this))
+    {
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("addtask fail"));
+        return StatusDefs::IocpMsgTransfer_StartFailOfMoniterMsgFailure;
+    }
+
     return StatusDefs::Success;
 }
 
 void FS_IocpMsgTransfer::BeforeClose()
 {
     // close所有会话，使得投递的消息马上返回
-    // 等待所有会话被移除
-    // 投递iocpquit事件
-    // 线程退出
+    _locker.Lock();
+    for(auto &session : _sessions)
+        session.second->Close();
+    _locker.Unlock();
 }
 
 void FS_IocpMsgTransfer::Close()
 {
+    // 等待所有会话被移除
+    while(true)
+    {
+        if(_sessionCnt <= 0)
+            break;
+        Sleep(1000);
+    }
+
+    // 投递iocpquit事件
+    const auto st = _iocp->PostQuit();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("post quit error st[%d]"), st);
+    }
+
+    // 线程退出
+    _threadPool->Clear();
+    _iocp->Destroy();
 }
 
 void FS_IocpMsgTransfer::AfterClose()
@@ -115,34 +141,45 @@ void FS_IocpMsgTransfer::OnDestroy()
 
 }
 
-void FS_IocpMsgTransfer::OnHeartBeatTimeOut()
+void FS_IocpMsgTransfer::OnHeartBeatTimeOut(IFS_Session *session)
 {
+    g_Log->any<FS_IocpMsgTransfer>("OnHeartBeatTimeOut sessionId[%llu] sock[%llu] _OnGracefullyDisconnect"
+                                   , session->GetSessionId()
+                                   , session->GetSocket());
+    g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] _OnGracefullyDisconnect"
+                                   , session->GetSessionId()
+                                   , session->GetSocket());
+
+    _OnGracefullyDisconnect(session);
 }
 
 void FS_IocpMsgTransfer::OnSendData(UInt64 sessionId, NetMsg_DataHeader *msg)
 {
-    _locker.Lock();
-    auto iterSession = _sessions.find(sessionId);
-    if(iterSession == _sessions.end())
+    do 
     {
-        g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] has already disconnected or is not existed before"), sessionId);
-        _locker.Unlock();
-
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(msg);
-        g_MemoryPool->Unlock();
-        return;
-    }
-
-    auto iocpSession = iterSession->second->CastTo<FS_IocpSession>();
-    if(iocpSession->CanPost())
-    {
-        if(!iocpSession->Send(msg))
+        _locker.Lock();
+        auto iterSession = _sessions.find(sessionId);
+        if(iterSession == _sessions.end())
         {
-            g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg fail"), sessionId);
+            g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] has already disconnected or is not existed before"), sessionId);
+            _locker.Unlock();
+            break;
         }
-    }
-    _locker.Unlock();
+
+        auto iocpSession = iterSession->second->CastTo<FS_IocpSession>();
+        if(iocpSession->CanPost())
+        {
+            if(!iocpSession->Send(msg))
+            {
+                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg fail"), sessionId);
+            }
+        }
+        _locker.Unlock();
+    } while(0);
+
+    g_MemoryPool->Lock();
+    g_MemoryPool->Free(msg);
+    g_MemoryPool->Unlock();
 }
 
 void FS_IocpMsgTransfer::RegisterDisconnected(IDelegate<void, IFS_Session *> *callback)
@@ -171,18 +208,21 @@ Int32 FS_IocpMsgTransfer::GetSessionCnt()
 void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 {// iocp 在closesocket后会马上返回所有投递的事件，所以不可立即在post未结束时候释放session对象
 
-    ULong waitTime = INFINITE;
-    while(!pool->IsClearingPool() || _sessionCnt <= 0)
+    ULong waitTime = 1000;   // TODO可以调节（主要用于心跳检测）
+    while(!pool->IsClearingPool() || _sessionCnt > 0)
     {
         // 等待网络消息
-        waitTime = pool->IsClearingPool() ? 20 : INFINITE;
         const Int32 ret = _iocp->WaitForCompletion(*_ioEvent, waitTime);
+        
+        // 心跳处理
+        _CheckSessionHeartbeat();
+
         if(ret != StatusDefs::Success)
         {
             if(ret == StatusDefs::IOCP_WaitTimeOut)
                 continue;
 
-            g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("_OnMoniterMsg.wait nothing but ret[%d] monitor end.", ret));
+            g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("_OnMoniterMsg.wait nothing but ret[%d] monitor end."), ret);
             break;
         }
 
@@ -215,11 +255,11 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         {
             if(_ioEvent->_bytesTrans <= 0)
             {// 客户端断开处理
-                g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] clientId[%llu] IO_TYPE::RECV bytesTrans[%lu] disconnected"
+                g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lu] disconnected"
                                                , iocpSession->GetSessionId()
                                                , iocpSession->GetSocket(),
                                                _ioEvent->_bytesTrans);
-                g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] clientId[%llu] IO_TYPE::RECV bytesTrans[%lu] disconnected"
+                g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lu] disconnected"
                                                , iocpSession->GetSessionId()
                                                , iocpSession->GetSocket(),
                                                _ioEvent->_bytesTrans);
@@ -232,6 +272,8 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 
             // 消息接收回调
             _serverCoreRecvSucCallback->Invoke(session, _ioEvent->_bytesTrans);
+
+            _UpdateSessionHeartbeat(session);
 
             // 重新投递接收
             if(iocpSession->CanPost())
@@ -256,11 +298,11 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         {
             if(_ioEvent->_bytesTrans <= 0)
             {// 客户端断开处理
-                g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] clientId[%llu] IO_TYPE::IO_SEND bytesTrans[%lu] disconnected"
+                g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::IO_SEND bytesTrans[%lu] disconnected"
                                                , session->GetSessionId()
                                                , session->GetSocket(),
                                                _ioEvent->_bytesTrans);
-                g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] clientId[%llu] IO_TYPE::IO_SEND bytesTrans[%lu] disconnected"
+                g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::IO_SEND bytesTrans[%lu] disconnected"
                                                , session->GetSessionId()
                                                , session->GetSocket(),
                                                _ioEvent->_bytesTrans);
@@ -274,6 +316,8 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 
             // 消息发送回调
             _serverCoreSendSucCallback->Invoke(session, _ioEvent->_bytesTrans);
+
+            _UpdateSessionHeartbeat(session);
 
             // 重新投递接收
             if(iocpSession->CanPost() && iocpSession->HasMsgToSend())
@@ -298,13 +342,14 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
     }
 
     // 销毁sessions 此时要保证handler要还没关闭
-    _ClearSessions();
-    // 销毁iocp
+    _ClearSessionsWhenClose();
 }
 
 void FS_IocpMsgTransfer::_OnDelayDisconnected(IFS_Session *session)
 {
     session->MaskClose();
+    if(!session->IsClose())
+        session->Close();
 }
 
 void FS_IocpMsgTransfer::_OnDisconnected(IFS_Session *session)
@@ -351,15 +396,43 @@ IFS_Session *FS_IocpMsgTransfer::_GetSession(UInt64 sessionId)
     return iterSession->second;
 }
 
-void FS_IocpMsgTransfer::_ClearSessions()
+void FS_IocpMsgTransfer::_ClearSessionsWhenClose()
 {
     _locker.Lock();
     for(auto &iterSession : _sessions)
     {
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] not destroy when thread ending")
+                                     , iterSession.first);
         _OnDisconnected(iterSession.second);
     }
     _locker.Unlock();
 }
 
+void FS_IocpMsgTransfer::_UpdateSessionHeartbeat(IFS_Session *session)
+{
+    _sessionHeartbeatQueue.erase(session);
+    session->UpdateHeartBeatExpiredTime();
+    _sessionHeartbeatQueue.insert(session);
+}
+
+void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
+{
+    _curTime.FlushTime();
+    _locker.Lock();
+    for(auto iterSession = _sessionHeartbeatQueue.begin(); 
+        iterSession != _sessionHeartbeatQueue.end(); 
+        )
+    {
+        auto session = *iterSession;
+        if(session->GetHeartBeatExpiredTime() > _curTime)
+            break;
+
+        // 心跳过期
+        OnHeartBeatTimeOut(session);
+        iterSession = _sessionHeartbeatQueue.erase(iterSession);
+    }
+    _locker.Unlock();
+}
 FS_NAMESPACE_END
+
 

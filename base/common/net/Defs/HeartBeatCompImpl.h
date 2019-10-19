@@ -33,7 +33,7 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
-inline bool HeartBeatComp::operator()(const FS_Client *l, const FS_Client *r) const
+inline bool HeartBeatComp::operator()(const IFS_Session *l, const IFS_Session *r) const
 {
     if(!l || !r)
         return l < r;
