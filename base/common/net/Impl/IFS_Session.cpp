@@ -57,6 +57,7 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
     ,_maskClose(false)
 {
     _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
+    _recvBuffer->CastToBuffer<FS_IocpBuffer>()->BindTo(_sessionId, sock);
 }
 
 IFS_Session::~IFS_Session()

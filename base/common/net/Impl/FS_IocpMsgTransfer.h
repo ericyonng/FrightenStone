@@ -82,7 +82,8 @@ private:
     void _OnDelayDisconnected(IFS_Session *session);
     // 需要判断是否可断开
     void _OnDisconnected(IFS_Session *session);
-    bool _DoSend(FS_IocpSession *session);
+    bool _DoPostSend(FS_IocpSession *session);
+    bool _DoPostRecv(FS_IocpSession *session);
 
     // 辅助
 private:

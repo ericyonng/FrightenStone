@@ -35,6 +35,11 @@
 
 FS_NAMESPACE_BEGIN
 
+inline void FS_IocpMsgDispatcher::BindBusinessLogic(IFS_BusinessLogic *businessLogic)
+{
+    _logic = businessLogic;
+}
+
 FS_NAMESPACE_END
 
 #endif

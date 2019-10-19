@@ -21,28 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : net.h
+ * @file  : IFS_BusinessLogicImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/10/20
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Net_Net_H__
-#define __Base_Common_Net_Net_H__
+#ifdef __Base_Common_Net_Impl_IFS_BusinessLogic_H__
+
 #pragma once
 
- // defs ...
- // Impl ...
- // Interface ...
-#include <base\common\net\protocol\protocol.h>
-#include "base\common\net\Impl\Iocp\Example.h"
-#include "base\common\net\Impl\FS_MsgReadStream.h"
-#include "base\common\net\Impl\FS_MsgWriteStream.h"
-#include "base\common\net\Impl\FS_ServerCore.h"
-#include "base\common\net\Impl\IFS_BusinessLogic.h"
-#include "base\common\net\Impl\IFS_MsgDispatcher.h"
+FS_NAMESPACE_BEGIN
+inline IFS_BusinessLogic::IFS_BusinessLogic()
+    :_dispatcher(NULL)
+{
+}
+
+inline IFS_BusinessLogic::~IFS_BusinessLogic()
+{
+
+}
+
+inline void IFS_BusinessLogic::SetDispatcher(IFS_MsgDispatcher *dispatcher)
+{
+    _dispatcher = dispatcher;
+}
+
+FS_NAMESPACE_END
 
 #endif
-

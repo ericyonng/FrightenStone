@@ -34,6 +34,7 @@
 #include "base/common/net/Impl/FS_IocpSession.h"
 #include "base/common/net/Defs/FS_IocpBuffer.h"
 #include "base/common/net/Impl/IFS_MsgTransfer.h"
+#include "base/common/net/Impl/IFS_BusinessLogic.h"
 
 #include "base/common/memorypool/memorypool.h"
 #include "base/common/status/status.h"
@@ -50,6 +51,7 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher()
     :_pool(NULL)
     , _isClose{false}
     ,_timeWheel(NULL)
+    ,_logic(NULL)
 {
 
 }
@@ -67,6 +69,14 @@ Int32 FS_IocpMsgDispatcher::BeforeStart()
     _timeWheel = new TimeWheel(_resolutionInterval);
     g_BusinessTimeWheel = _timeWheel;
     _pool = new FS_ThreadPool(0, 1);
+
+    auto st = _logic->BeforeStart();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("_logic->BeforeStart error st[%d]"), st);
+        return st;
+    }
+
     return StatusDefs::Success;
 }
 
@@ -79,6 +89,13 @@ Int32 FS_IocpMsgDispatcher::Start()
         return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
     }
 
+    auto st = _logic->Start();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("_logic->Start error st[%d]"), st);
+        return st;
+    }
+
     return StatusDefs::Success;
 }
 
@@ -87,6 +104,8 @@ void FS_IocpMsgDispatcher::BeforeClose()
     _locker.Lock();
     _sessionIdRefTransfer.clear();
     _locker.Unlock();
+
+    _logic->BeforeClose();
 }
 
 void FS_IocpMsgDispatcher::Close()
@@ -120,6 +139,8 @@ void FS_IocpMsgDispatcher::Close()
         }
     }
     STLUtil::DelMapContainer(_sessionIdRefMsgCache);
+
+    _logic->Close();
 }
 
 void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session)
@@ -218,7 +239,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(const FS_ThreadPool *pool)
         // 先执行定时器事件
         _timeWheel->RotateWheel();
 
-        // 从异步消息队列取得异步处理完成返回事件 TODO:
+        // 从异步消息队列取得异步处理完成返回事件 TODO: 需要有异步处理队列，其他线程塞入
         // 清理完成的异步事件 TODO:
 
         // 再执行业务事件
@@ -296,11 +317,13 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
 void FS_IocpMsgDispatcher::_DoBusinessProcess(UInt64 sessionId, NetMsg_DataHeader *msgData)
 {
     // TODO:处理单一消息业务逻辑部分
+    _logic->OnMsgDispatch(sessionId, msgData);
 }
 
 void FS_IocpMsgDispatcher::_OnDelaySessionDisconnect(UInt64 sessionId)
 {
     // TODO:真实的session断开
+    _logic->OnSessionDisconnected(sessionId);
 }
 
 FS_NAMESPACE_END

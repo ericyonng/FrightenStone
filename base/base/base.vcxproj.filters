@@ -1017,6 +1017,12 @@
     <ClInclude Include="..\common\net\Impl\FS_MsgDispatcherFactory.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_BusinessLogic.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_BusinessLogicImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

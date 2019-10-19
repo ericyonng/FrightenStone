@@ -373,6 +373,8 @@
     <ClInclude Include="..\common\net\Impl\FS_SessionFactory.h" />
     <ClInclude Include="..\common\net\Impl\FS_SessionMgr.h" />
     <ClInclude Include="..\common\net\Impl\FS_SessionMgrImpl.h" />
+    <ClInclude Include="..\common\net\Impl\IFS_BusinessLogic.h" />
+    <ClInclude Include="..\common\net\Impl\IFS_BusinessLogicImpl.h" />
     <ClInclude Include="..\common\net\Impl\IFS_Connector.h" />
     <ClInclude Include="..\common\net\Impl\IFS_ConnectorImpl.h" />
     <ClInclude Include="..\common\net\Impl\IFS_MsgDispatcher.h" />
