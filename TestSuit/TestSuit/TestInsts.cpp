@@ -76,7 +76,7 @@ void TestInsts::Run()
 //     pool->AddTask(deleg);
 //     getchar();
 //     pool->Clear();
-    TestInterfaceComps::Run();
+    TestServer::Run();
     getchar();
     // TestJson::Run();
 }

@@ -94,10 +94,11 @@ inline void FS_IocpSession::OnSendSuc(size_t transferBytes, IoDataBase *ioData)
     _isPostSend = false;
     ioData->_callback->Invoke(transferBytes);
     auto bufferNode = ioData->_node;
-    if(bufferNode->_buffer->IsEmpty())
+    auto buffer = *bufferNode->_iterNode;
+    if(buffer->IsEmpty())
     {
+        Fs_SafeFree(buffer);
         _toSend.erase(bufferNode->_iterNode);
-        Fs_SafeFree(ioData->_node);
     }
 }
 

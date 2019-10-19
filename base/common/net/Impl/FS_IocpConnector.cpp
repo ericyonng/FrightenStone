@@ -151,7 +151,7 @@ void FS_IocpConnector::OnDisconnected(IFS_Session *session)
 
 Int32 FS_IocpConnector::_ReadConfig()
 {
-    _segmentName = "[Listener]";
+    _segmentName = "Listener";
     _listenerFileName = "./ServerCfg.ini";
     _ipKey = "ip";
     _portKey = "port";
@@ -313,6 +313,8 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
                                      , sessionAddr->GetAddr().c_str()
                                      , sessionAddr->GetPort());
 
+        // 投递接收数据
+        
         // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
     }
     else {

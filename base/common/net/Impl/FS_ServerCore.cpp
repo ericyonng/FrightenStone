@@ -43,6 +43,7 @@
 #include "base/common/net/Impl/IFS_Connector.h"
 #include "base/common/net/Impl/IFS_Session.h"
 #include "base/common/net/Impl/FS_Addr.h"
+#include "base/common/net/Impl/IFS_BusinessLogic.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -51,6 +52,7 @@
 #include "base/common/socket/socket.h"
 #include "base/common/component/Impl/FS_CpuInfo.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
+#include "base/common/memleak/memleak.h"
 
 fs::FS_ServerCore *g_ServerCore = NULL;
 
@@ -59,7 +61,7 @@ FS_ServerCore::FS_ServerCore()
     :_serverConfigMgr(NULL)
     ,_cpuInfo(new FS_CpuInfo)
     ,_connector(NULL)
-    ,_msgHandler(NULL)
+    ,_msgDispatcher(NULL)
     ,_pool(NULL)
     ,_curSessionConnecting{0}
     ,_sessionConnectedBefore{0}
@@ -73,9 +75,10 @@ FS_ServerCore::FS_ServerCore()
 
 FS_ServerCore::~FS_ServerCore()
 {
+    FS_Release(_logic);
     Fs_SafeFree(_pool);
     Fs_SafeFree(_connector);
-    Fs_SafeFree(_msgHandler);
+    Fs_SafeFree(_msgDispatcher);
     STLUtil::DelVectorContainer(_msgTransfers);
     Fs_SafeFree(_cpuInfo);
     Fs_SafeFree(_serverConfigMgr);
@@ -83,7 +86,7 @@ FS_ServerCore::~FS_ServerCore()
 }
 
 #pragma region api
-Int32 FS_ServerCore::Start()
+Int32 FS_ServerCore::Start(IFS_BusinessLogic *businessLogic)
 {
     // 1.时区
     TimeUtil::SetTimeZone();
@@ -142,7 +145,10 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 8.启动监控器
+    // 8.内存监控
+    g_MemleakMonitor->Start();
+
+    // 9.启动监控器
     _pool = new FS_ThreadPool(0, 1);
     auto task = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSvrRuning);
     if(!_pool->AddTask(task, true))
@@ -151,7 +157,10 @@ Int32 FS_ServerCore::Start()
         return StatusDefs::FS_ServerCore_StartFailOfSvrRuningTaskFailure;
     }
     
-    // 9.创建服务器模块
+    // 10.业务逻辑
+    _logic = businessLogic;
+
+    // 11.创建服务器模块
     ret = _CreateNetModules();
     if(ret != StatusDefs::Success)
     {
@@ -159,10 +168,10 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 10.注册接口
+    // 12.注册接口
     _RegisterToModule();
 
-    // 11.启动前...
+    // 13.启动前...
     ret = _BeforeStart();
     if(ret != StatusDefs::Success)
     {
@@ -170,7 +179,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 12.start 模块
+    // 14.start 模块
     ret = _StartModules();
     if(ret != StatusDefs::Success)
     {
@@ -178,7 +187,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 13.onstart
+    // 15.onstart
     ret = _OnStart();
     if(ret != StatusDefs::Success)
     {
@@ -186,7 +195,7 @@ Int32 FS_ServerCore::Start()
         return ret;
     }
 
-    // 14._AfterStart
+    // 16._AfterStart
     ret = _AfterStart();
     if(ret != StatusDefs::Success)
     {
@@ -216,7 +225,7 @@ void FS_ServerCore::Close()
     _connector->Close();
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->Close();
-    _msgHandler->Close();
+    _msgDispatcher->Close();
 
     // 最后处理
     _AfterClose();
@@ -243,7 +252,7 @@ void FS_ServerCore::_OnConnected(IFS_Session *session)
     }
 
     minTransfer->OnConnect(session);
-    _msgHandler->OnConnect(session->GetSessionId(), minTransfer);
+    _msgDispatcher->OnConnect(session->GetSessionId(), minTransfer);
 
     // 统计session数量
     ++_curSessionConnecting;
@@ -262,7 +271,7 @@ void FS_ServerCore::_OnDisconnected(IFS_Session *session)
     --_curSessionConnecting;
     ++_sessionDisconnectedCnt;
 
-    _msgHandler->OnDisconnected(session);
+    _msgDispatcher->OnDisconnected(session);
     _connector->OnDisconnected(session);
 
     // 由于是外部线程调用本接口，所以session是线程安全的
@@ -278,7 +287,7 @@ void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
 {
     ++_recvMsgCountPerSecond;
     _recvMsgBytesPerSecond += transferBytes;
-    _msgHandler->OnRecv(session);
+    _msgDispatcher->OnRecv(session);
 }
 
 void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
@@ -337,12 +346,13 @@ Int32 FS_ServerCore::_CreateNetModules()
     // TODO:与客户端的连接点只能是一个，因为端口只有一个
     _connector = FS_ConnectorFactory::Create();
 
-    const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
+//    const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
+    const Int32 cpuCnt = 1;
     _msgTransfers.resize(cpuCnt);
     for(Int32 i = 0; i < cpuCnt; ++i)
-        _msgTransfers.push_back(FS_MsgTransferFactory::Create());
+        _msgTransfers[i] = FS_MsgTransferFactory::Create();
 
-    _msgHandler = FS_MsgDispatcherFactory::Create();
+    _msgDispatcher = FS_MsgDispatcherFactory::Create();
     return StatusDefs::Success;
 }
 
@@ -366,7 +376,7 @@ Int32 FS_ServerCore::_StartModules()
         }
     }
 
-    ret = _msgHandler->Start();
+    ret = _msgDispatcher->Start();
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler start fail ret[%d]"), ret);
@@ -404,7 +414,7 @@ Int32 FS_ServerCore::_BeforeStart()
         }
     }
 
-    ret = _msgHandler->BeforeStart();
+    ret = _msgDispatcher->BeforeStart();
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler BeforeStart fail ret[%d]"), ret);
@@ -439,7 +449,7 @@ Int32 FS_ServerCore::_AfterStart()
         }
     }
 
-    ret = _msgHandler->AfterStart();
+    ret = _msgDispatcher->AfterStart();
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler AfterStart fail ret[%d]"), ret);
@@ -456,7 +466,7 @@ void FS_ServerCore::_WillClose()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->WillClose();
 
-    _msgHandler->WillClose();
+    _msgDispatcher->WillClose();
 }
 
 void FS_ServerCore::_BeforeClose()
@@ -466,7 +476,7 @@ void FS_ServerCore::_BeforeClose()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->BeforeClose();
 
-    _msgHandler->BeforeClose();
+    _msgDispatcher->BeforeClose();
 }
 
 void FS_ServerCore::_AfterClose()
@@ -476,7 +486,7 @@ void FS_ServerCore::_AfterClose()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->AfterClose();
 
-    _msgHandler->AfterClose();
+    _msgDispatcher->AfterClose();
 }
 
 void FS_ServerCore::_RegisterToModule()
@@ -494,6 +504,9 @@ void FS_ServerCore::_RegisterToModule()
         msgTransfer->RegisterRecvSucCallback(onRecvSucRes);
         msgTransfer->RegisterSendSucCallback(onSendSucRes);
     }
+
+    _msgDispatcher->BindBusinessLogic(_logic);
+    _logic->SetDispatcher(_msgDispatcher);
 }
 
 #pragma endregion

@@ -51,6 +51,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer()
     ,_serverCoreDisconnectedCallback(NULL)
     ,_serverCoreRecvSucCallback(NULL)
     ,_serverCoreSendSucCallback(NULL)
+    ,_sessionCnt{0}
 {
 }
 
@@ -130,9 +131,23 @@ void FS_IocpMsgTransfer::OnConnect(IFS_Session *session)
     _locker.Lock();
     _sessions.insert(std::make_pair(session->GetSessionId(), session));
     auto iocpSession = session->CastTo<FS_IocpSession>();
-    auto sender = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_DoSend);
+    auto sender = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_DoPostSend);
     iocpSession->BindSender(sender);
     ++_sessionCnt;
+
+    // 绑定iocp
+    auto st = _iocp->Reg(iocpSession->GetSocket(), iocpSession->GetSessionId());
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("reg socket[%llu] sessionId[%llu] fail st[%d]")
+                                     , session->GetSocket(), session->GetSessionId(), st);
+    }
+
+    // 投递接收数据
+    if(!_DoPostRecv(iocpSession))
+    {
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail"));
+    }
     _locker.Unlock();
 }
 
@@ -278,19 +293,10 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
             // 重新投递接收
             if(iocpSession->CanPost())
             {
-                auto ioData = iocpSession->MakeRecvIoData();
-                if(ioData)
+                if(!_DoPostRecv(iocpSession))
                 {
-                    Int32 st = _iocp->PostRecv(iocpSession->GetSocket(), ioData);
-                    if(st != StatusDefs::Success)
-                    {
-                        iocpSession->ResetPostRecvMask();
-                        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
-                                                     , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
-                        _OnGracefullyDisconnect(iocpSession);
-                        _locker.Unlock();
-                        continue;
-                    }
+                    _locker.Unlock();
+                    continue;
                 }
             }
         }
@@ -322,7 +328,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
             // 重新投递接收
             if(iocpSession->CanPost() && iocpSession->HasMsgToSend())
             {
-                if(!_DoSend(iocpSession))
+                if(!_DoPostSend(iocpSession))
                 {
                     _locker.Unlock();
                     continue;
@@ -368,7 +374,7 @@ void FS_IocpMsgTransfer::_OnDisconnected(IFS_Session *session)
     --_sessionCnt;
 }
 
-bool FS_IocpMsgTransfer::_DoSend(FS_IocpSession *session)
+bool FS_IocpMsgTransfer::_DoPostSend(FS_IocpSession *session)
 {
     auto ioData = session->MakeSendIoData();
     if(ioData)
@@ -378,6 +384,25 @@ bool FS_IocpMsgTransfer::_DoSend(FS_IocpSession *session)
         {
             session->ResetPostSendMask();
             g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
+                                         , session->GetSessionId(), session->GetSocket(), st);
+            _OnGracefullyDisconnect(session);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session)
+{
+    auto ioData = session->MakeRecvIoData();
+    if(ioData)
+    {
+        Int32 st = _iocp->PostRecv(session->GetSocket(), ioData);
+        if(st != StatusDefs::Success)
+        {
+            session->ResetPostRecvMask();
+            g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
                                          , session->GetSessionId(), session->GetSocket(), st);
             _OnGracefullyDisconnect(session);
             return false;

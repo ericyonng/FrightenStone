@@ -47,6 +47,7 @@ class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT IFS_Session;
 struct BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT IFS_MsgTransfer;
+class BASE_EXPORT IFS_BusinessLogic;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
@@ -67,12 +68,14 @@ public:
     virtual void OnHeartBeatTimeOut();
 
     virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg);
+    virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
 
 private:
     // msgData会拷贝到内存池创建的缓冲区中 线程不安全，外部需要加锁
     void _OnBusinessProcessThread(const FS_ThreadPool *pool);
     void _MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData);
     void _OnBusinessProcessing();
+
     void _DoBusinessProcess(UInt64 sessionId, NetMsg_DataHeader *msgData);
     void _OnDelaySessionDisconnect(UInt64 sessionId);
 
@@ -91,6 +94,7 @@ private:
     // 业务层资源
     TimeSlice _resolutionInterval;      // 时钟轮盘时间间隔
     TimeWheel *_timeWheel;
+    IFS_BusinessLogic *_logic;
 };
 
 FS_NAMESPACE_END

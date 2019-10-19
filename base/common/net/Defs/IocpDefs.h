@@ -70,7 +70,6 @@ struct BASE_EXPORT BufferQueueNode
     ~BufferQueueNode();
 
     std::list<IFS_Buffer *>::iterator _iterNode;
-    IFS_Buffer *_buffer;
     bool _isPost;
 };
 

@@ -40,18 +40,17 @@ OBJ_POOL_CREATE_DEF_IMPL(BufferQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
 
 BufferQueueNode::~BufferQueueNode()
 {
-    Fs_SafeFree(_buffer);
 }
 
 BufferQueueNode::BufferQueueNode()
    :_isPost(false)
-    ,_buffer(NULL)
 {
 }
 
 IoDataBase::~IoDataBase()
 {
     Fs_SafeFree(_callback);
+    Fs_SafeFree(_node);
 }
 
 IO_EVENT::IO_EVENT()

@@ -62,7 +62,7 @@ public:
     /* 对外接口 */
     #pragma region api
 public:
-    virtual Int32 Start();
+    virtual Int32 Start(IFS_BusinessLogic *businessLogic);
     virtual void Wait();
     virtual void Close();
     #pragma endregion
@@ -119,7 +119,7 @@ private:
     Locker _locker;
     IFS_Connector * _connector;                     // 连接器
     std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息收发器
-    IFS_MsgDispatcher *_msgHandler;                 // 消息处理器 业务线程处理
+    IFS_MsgDispatcher *_msgDispatcher;                 // 消息处理器 业务线程处理
     IFS_BusinessLogic *_logic;                      // 业务逻辑入口
 
     // TODO:sessionmgr可能需要移除避免锁冲突
