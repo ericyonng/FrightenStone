@@ -165,6 +165,10 @@ void FS_IocpMsgTransfer::OnHeartBeatTimeOut(IFS_Session *session)
                                    , session->GetSessionId()
                                    , session->GetSocket());
 
+    auto iocpSession = session->CastTo<FS_IocpSession>();
+    iocpSession->ResetPostRecvMask();
+    iocpSession->ResetPostSendMask();
+
     _OnGracefullyDisconnect(session);
 }
 
@@ -229,7 +233,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         // 等待网络消息
         const Int32 ret = _iocp->WaitForCompletion(*_ioEvent, waitTime);
         
-        // 心跳处理
+        // 心跳处理 closesocket会把所有的数据都清除掉
         _CheckSessionHeartbeat();
 
         if(ret != StatusDefs::Success)
@@ -354,6 +358,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 void FS_IocpMsgTransfer::_OnDelayDisconnected(IFS_Session *session)
 {
     session->MaskClose();
+   // CancelIoEx(HANDLE(session->GetSocket()), NULL);
     if(!session->IsClose())
         session->Close();
 }
@@ -369,8 +374,8 @@ void FS_IocpMsgTransfer::_OnDisconnected(IFS_Session *session)
     session->OnDestroy();
 
     // 移除会话
-    Fs_SafeFree(session);
     _sessions.erase(session->GetSessionId());
+    Fs_SafeFree(session);
     --_sessionCnt;
 }
 

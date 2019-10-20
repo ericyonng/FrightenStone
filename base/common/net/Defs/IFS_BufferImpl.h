@@ -58,8 +58,11 @@ inline void IFS_Buffer::PopFront(size_t bytesLen)
     bytesLen = _curPos > bytesLen ? bytesLen : _curPos;
     size_t n = _curPos - bytesLen;
 
+    // TODO:如果考虑性能清零可不执行
+    // ::memset(_buff, 0, bytesLen);
+
     if(n > 0)
-        ::memcpy(_buff, _buff + bytesLen, n);
+        ::memmove(_buff, _buff + bytesLen, n);
 
     _curPos = n;
 }
@@ -84,6 +87,7 @@ inline bool IFS_Buffer::PushBack(const Byte8 *data, size_t len)
 
 inline void IFS_Buffer::Clear()
 {
+    // ::memset(_buff, 0, _bufferSize);
     _curPos = 0;
 }
 

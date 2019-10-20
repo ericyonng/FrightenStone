@@ -90,15 +90,15 @@ inline bool FS_IocpSession::CanDisconnect() const
 }
 
 inline void FS_IocpSession::OnSendSuc(size_t transferBytes, IoDataBase *ioData)
-{
+{// 注意 _node 属于ioData，而ioData是buffer的数据成员，故若先释放buffer就会直接释放ioData， node就会被直接释放，所以应该先移除list中的节点再释放buffer
     _isPostSend = false;
     ioData->_callback->Invoke(transferBytes);
     auto bufferNode = ioData->_node;
     auto buffer = *bufferNode->_iterNode;
     if(buffer->IsEmpty())
     {
-        Fs_SafeFree(buffer);
         _toSend.erase(bufferNode->_iterNode);
+        Fs_SafeFree(buffer);
     }
 }
 
