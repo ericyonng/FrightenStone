@@ -212,7 +212,7 @@ Int32 TcpServer::RecvData(ClientSocket *client)
         {
             Int32 nSize = client->GetLastPos() - header->_packetLength;
             OnNetMsg(client->GetSocket(), header);
-            memcpy(client->GetMsgBuf(), client->GetMsgBuf() + header->_packetLength, nSize);
+            memmove(client->GetMsgBuf(), client->GetMsgBuf() + header->_packetLength, nSize);
             client->SetLastPos(nSize);
         }
         else {

@@ -126,7 +126,7 @@ Int32 TcpClient::RecvData()
 
             OnNetMsg(header);
 
-            memcpy(_msgBuf, _msgBuf + header->_packetLength, nSize);
+            memmove(_msgBuf, _msgBuf + header->_packetLength, nSize);
 
             _lastPos = nSize;
         }
