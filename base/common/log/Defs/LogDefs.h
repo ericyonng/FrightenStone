@@ -71,6 +71,7 @@ public:
     GENERAL_ADDLOG(SYSLOG, net)             // 网络层
     GENERAL_ADDLOG(SYSLOG, sys)             // 系统信息（用于分析）
     GENERAL_ADDLOG(SYSLOG, Any)             // 任意内容
+    GENERAL_ADDLOG(SYSLOG, Custom)          // 自定义的日志格式内容
     GENERAL_ADDLOG(TESTLOG, testcode)       // 代码测试
     DECLEAR_GENERAL_LOG_END()
 };

@@ -43,7 +43,7 @@ inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const socka
 {
 }
 
-inline void FS_IocpSession::BindSender(IDelegate<bool, FS_IocpSession *> *sender)
+inline void FS_IocpSession::BindSender(IDelegate<bool, FS_IocpSession *, bool> *sender)
 {
     Fs_SafeFree(_sender);
     _sender = sender;
@@ -57,6 +57,17 @@ inline void FS_IocpSession::ResetPostRecvMask()
 inline void FS_IocpSession::ResetPostSendMask()
 {
     _isPostSend = false;
+}
+
+inline void FS_IocpSession::ResetAllIoMask()
+{
+    _isPostSend = false;
+    _isPostRecv = false;
+}
+
+inline void FS_IocpSession::EnableDisconnect()
+{
+    ResetAllIoMask();
 }
 
 inline bool FS_IocpSession::IsPostIoChange() const
@@ -110,7 +121,7 @@ inline void FS_IocpSession::OnRecvSuc(size_t transferBytes, IoDataBase *ioData)
 
 inline void FS_IocpSession::_OnSend()
 {
-    _sender->Invoke(this);
+    _sender->Invoke(this, true);
 }
 
 FS_NAMESPACE_END

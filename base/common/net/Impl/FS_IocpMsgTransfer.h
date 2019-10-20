@@ -71,10 +71,14 @@ public:
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback);
     virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
     virtual void RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
+    virtual void RegisterHeatBeatTimeOutCallback(IDelegate<void, IFS_Session *> *callback);
     virtual Int32 GetSessionCnt();
 
 private:
     void _OnMoniterMsg(const FS_ThreadPool *pool);
+    void _HandleNetEvent(std::set<UInt64> &sessionIdsToRemove);
+    void _RemoveSessions(const std::set<UInt64> &sessionIds);
+    void _OnHeartbeatTimeOut(const std::set<UInt64> &timeoutSessionIds, std::set<UInt64> &leftSessionIdsToRemove);
 
     // 网络事件 线程不安全
 private:
@@ -82,8 +86,8 @@ private:
     void _OnDelayDisconnected(IFS_Session *session);
     // 需要判断是否可断开
     void _OnDisconnected(IFS_Session *session);
-    bool _DoPostSend(FS_IocpSession *session);
-    bool _DoPostRecv(FS_IocpSession *session);
+    bool _DoPostSend(FS_IocpSession *session, bool removeIfFail = true);
+    bool _DoPostRecv(FS_IocpSession *session, bool removeIfFail = true);
 
     // 辅助
 private:
@@ -91,7 +95,7 @@ private:
     void _ClearSessionsWhenClose();
 
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
-    void _CheckSessionHeartbeat();  // 线程安全
+    void _CheckSessionHeartbeat(std::set<UInt64> &timeoutSessionIds);  // 线程不安全
 
 private:
     Locker _locker;
@@ -106,6 +110,7 @@ private:
     IDelegate<void, IFS_Session *> *_serverCoreDisconnectedCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreRecvSucCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreSendSucCallback;
+    IDelegate<void, IFS_Session *> *_serverCoreHeartBeatTimeOutCallback;
 };
 
 FS_NAMESPACE_END

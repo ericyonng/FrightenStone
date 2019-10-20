@@ -82,6 +82,7 @@ public:
 protected:
     void _OnConnected(IFS_Session *session);
     void _OnDisconnected(IFS_Session *session);
+    void _OnHeartBeatTimeOut(IFS_Session *session);
     // 每接收一个完整包调用一次
     void _OnRecvMsg(IFS_Session *session, Int64 transferBytes);
     // 发送只能统计字节数，包数无法支持统计
@@ -135,6 +136,7 @@ private:
     std::atomic<Int64> _recvMsgCountPerSecond;      // 每秒收到的包个数
     std::atomic<Int64> _recvMsgBytesPerSecond;      // 每秒收到的包的字节数
     std::atomic<Int64> _sendMsgBytesPerSecond;      // 每秒发送的包字节数
+    std::atomic<Int64> _heartbeatTimeOutDisconnected;   // 心跳超时断开会话数
 };
 
 FS_NAMESPACE_END

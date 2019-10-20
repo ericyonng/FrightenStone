@@ -34,6 +34,12 @@
 #include "base/common/asyn/Lock/Impl/ConditionLocker.h"
 #include "base/common/status/status.h"
 #include <process.h>
+#include "base/common/basedefs/BaseDefs.h"
+
+#undef FS_IS_EVENT_WAKE_UP
+#define FS_IS_EVENT_SINAL_WAKE_UP(waitRet)   \
+(static_cast<long long>(WAIT_OBJECT_0) <= waitRet) &&\
+(waitRet <= static_cast<long long>(MAXIMUM_WAIT_OBJECTS + WAIT_OBJECT_0))
 
 FS_NAMESPACE_BEGIN
 
@@ -53,47 +59,46 @@ ConditionLocker::~ConditionLocker()
 int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
 {
     long long waitRet = WAIT_OBJECT_0;
+    auto *event = _event.load();
     while(!_isSinal)
     {
-        auto *event = _event.load();
-        if(UNLIKELY( !event))
-        {
-            _isSinal = false;
-            return StatusDefs::WaitEventFailure;
-        }
-
         Unlock();
-
         ++_waitCnt;
         waitRet = WaitForMultipleObjects(1, &event, true, milisec);
-
         Lock();
-        ResetEvent(_event.load());
         --_waitCnt;
 
-        if(UNLIKELY(waitRet == WAIT_FAILED))
+        // 不论是否被唤醒都重置事件避免消耗
+        ResetEvent(_event.load());
+
+        if(waitRet == WAIT_TIMEOUT)
+        {// 无论是否被唤醒（因为唤醒的时机恰好是超时）超时被唤醒
+            _isSinal = false;
+            return StatusDefs::WaitEventTimeOut;
+        }
+
+        // 出现错误则直接return
+        if(!FS_IS_EVENT_SINAL_WAKE_UP(waitRet))
         {
             _isSinal = false;
             return StatusDefs::WaitEventFailure;
         }
-
-        if(UNLIKELY(!_isSinal &&
-                    milisec != INFINITE))
-            break;
     }
 
-    _isSinal = false; 
-    if((static_cast<long long>(WAIT_OBJECT_0) <= waitRet) &&
-        (waitRet <= static_cast<long long>(MAXIMUM_WAIT_OBJECTS + WAIT_OBJECT_0)))
-    {
-        return StatusDefs::Success;
-    }
-    else if(waitRet == WAIT_TIMEOUT)
-    {
-        return StatusDefs::WaitEventTimeOut;
-    }
-    
-    return StatusDefs::WaitEventFailure;
+    _isSinal = false;
+    return StatusDefs::Success;
+// 
+//     if((static_cast<long long>(WAIT_OBJECT_0) <= waitRet) &&
+//         (waitRet <= static_cast<long long>(MAXIMUM_WAIT_OBJECTS + WAIT_OBJECT_0)))
+//     {// 等待是在合法的返回值（64个内核对象）
+//         return StatusDefs::Success;
+//     }
+//     else if(waitRet == WAIT_TIMEOUT)
+//     {// 超时等待
+//         return StatusDefs::WaitEventTimeOut;
+//     }
+// 
+//     return StatusDefs::WaitEventFailure;
 }
 
 bool ConditionLocker::Sinal()
@@ -141,6 +146,8 @@ bool ConditionLocker::_DestroyEvent()
 {
     if(UNLIKELY(!_event.load()))
         return true;
+
+    Broadcast();
 
     if(UNLIKELY(!CloseHandle(_event.load())))
         return false;

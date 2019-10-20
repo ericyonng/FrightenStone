@@ -212,6 +212,17 @@ inline void ILog::any(const char *fmt, const Args&... args)
     _WriteLog(LogLevel::Any, LogDefs::_SYSLOG_Any_, newLogData);
 }
 
+template<typename... Args>
+inline void ILog::custom(const char *fmt, const Args&... args)
+{
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.AppendFormat(fmt, args...) << FS_String::endl;
+
+    _WriteLog(LogLevel::Custom, LogDefs::_SYSLOG_Custom_, newLogData);
+}
+
 template<typename ObjType>
 inline const IDelegate<void, const LogData *> *ILog::InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData))
 {

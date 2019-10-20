@@ -52,7 +52,7 @@ public:
 
     // ²Ù×÷
 public:
-    void BindSender(IDelegate<bool, FS_IocpSession *> *sender);
+    void BindSender(IDelegate<bool, FS_IocpSession *, bool> *sender);
 
     NetMsg_DataHeader *FrontRecvMsg();
     void PopFrontRecvMsg();
@@ -61,6 +61,8 @@ public:
     IoDataBase *MakeSendIoData();
     void ResetPostRecvMask();
     void ResetPostSendMask();
+    void ResetAllIoMask();
+    void EnableDisconnect();
 
     // ×´Ì¬
 public:
@@ -81,7 +83,7 @@ protected:
     virtual void _OnSend();
 
 private:
-    IDelegate<bool, FS_IocpSession *> *_sender;
+    IDelegate<bool, FS_IocpSession *, bool> *_sender;
 
     bool _isPostRecv;
     bool _isPostSend;

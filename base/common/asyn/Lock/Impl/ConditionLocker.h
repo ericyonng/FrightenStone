@@ -48,6 +48,7 @@ public:
 
 #pragma region sinal
 public:
+    // 支持多线程等待sinal一次只唤醒一个线程
     int Wait(unsigned long milisec = INFINITE);
     bool Sinal();
     void Broadcast();

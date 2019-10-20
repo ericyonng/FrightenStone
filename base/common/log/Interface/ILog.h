@@ -102,6 +102,8 @@ public:
     void sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     template<typename ObjType, typename... Args>
     void any(const char *fmt, const Args&... args);
+    template<typename... Args>
+    void custom(const char *fmt, const Args&... args);
 
     /* 功能函数 */
     // hook与具体类型有关

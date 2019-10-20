@@ -176,6 +176,22 @@ Int32 SocketUtil::DestroySocket(MYSOCKET &socket)
     return ret == 0 ? StatusDefs::Success : StatusDefs::Socket_Error;
 }
 
+Int32 SocketUtil::DestroySocket2(MYSOCKET socket)
+{
+#ifdef _WIN32
+    int ret = closesocket(socket);
+#else
+    int ret = close(socket);
+#endif
+
+    if(ret == 0)
+        socket = INVALID_SOCKET;
+
+    // if(ret < 0)
+        // CELLLog_PError("destory sockfd<%d>", (int)sockfd);
+    return ret == 0 ? StatusDefs::Success : StatusDefs::Socket_Error;
+}
+
 Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError)
 {
     if(!sSocket || sSocket == INVALID_SOCKET)

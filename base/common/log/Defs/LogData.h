@@ -60,6 +60,7 @@ public:
         ObjPool,
         Sys,
         Any,
+        Custom,
 
         End,
     };
