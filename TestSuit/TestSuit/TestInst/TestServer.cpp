@@ -34,17 +34,70 @@
 
 FS_NAMESPACE_BEGIN
 
+class User
+{
+public:
+    User(UInt64 sessionId)
+        :_sessionId(sessionId)
+        ,_recvMsgId(1)
+        ,_sendMsgId(1)
+    {
+    }
+    ~User()
+    {
+    }
+
+    UInt64 _sessionId;
+    // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
+    Int32 _recvMsgId = 1;
+    // 测试接收发逻辑用
+    // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
+    Int32 _sendMsgId = 1;
+};
+
 class MyLogic : public IFS_BusinessLogic
 {
 public:
+    std::map<UInt64, User *> _users;
+
+public:
     MyLogic() {}
-    virtual ~MyLogic() {}
+    virtual ~MyLogic() 
+    {
+        STLUtil::DelMapContainer(_users);
+    }
     virtual void Release()
     {
         delete this;
     }
 
 public:
+    User *GetUser(UInt64 sessionId)
+    {
+        auto iterUser = _users.find(sessionId);
+        if(iterUser == _users.end())
+            return NULL;
+
+        return iterUser->second;
+    }
+
+    void RemoveUser(UInt64 sessionId)
+    {
+        auto iterUser = _users.find(sessionId);
+        if(iterUser == _users.end())
+            return;
+
+        Fs_SafeFree(iterUser->second);
+        _users.erase(iterUser);
+    }
+
+    User *NewUser(UInt64 sessionId)
+    {
+        auto user = new User(sessionId);
+        _users.insert(std::make_pair(sessionId, user));
+        return user;
+    }
+
     virtual Int32 Start()
     {
         return StatusDefs::Success;
@@ -56,58 +109,37 @@ public:
 
     virtual void OnMsgDispatch(UInt64 sessionId, NetMsg_DataHeader *msgData)
     {
+        auto user = GetUser(sessionId);
+        if(!user)
+            user = NewUser(sessionId);
+
         switch(msgData->_cmd)
         {
             case fs::ProtocolCmd::LoginReq:
             {
                 fs::LoginReq *login = static_cast<fs::LoginReq *>(msgData);
-
+                
                 // 检查消息ID
-//                 if(_isCheckMsgID)
-//                 {
-//                     if(login->_msgId != client->_recvMsgId)
-//                     {//当前消息ID和本地收消息次数不匹配
-//                         g_Log->e<EasyFSServer>(_LOGFMT_("OnNetMsg socket<%d> msgID<%d> _nRecvMsgID<%d> diff<%d>")
-//                                                , client->GetSocket(), login->_msgId
-//                                                , client->_recvMsgId, login->_msgId - client->_recvMsgId);
-//                     }
-// 
-//                     ++client->_recvMsgId;
-//                 }
-
-                //                 g_Log->net<EasyFSServer>("<Recv>socket<%d> loginReq, userName[%s] pwd[%s] msgId[%d] "
-                //                                         , static_cast<Int32>(client->GetSocket()), login->_userName, login->_pwd, login->_msgId);
-                                // 登录逻辑
-
-                                // ......
-                                // 回应消息
-                // if(_bSendBack)
-                {
-                    fs::LoginRes ret;
-                    ret._msgId = 0; //id检测：TODO: client->_sendMsgId;
-                    //                     g_Log->net<EasyFSServer>("<Send>socket<%d> LoginRes, _result[%d] msgId[%d] "
-                    //                                              , static_cast<Int32>(client->GetSocket()), ret._result, ret._msgId);
-                    
-                    _dispatcher->SendData(sessionId, &ret);
-                    // TODO:id检测:++client->_sendMsgId;
-
-                    //                     if(SOCKET_ERROR == client->SendData(&ret))
-                    //                     {
-                    //                         // 发送缓冲区满了，消息没发出去,目前直接抛弃了
-                    //                         // 客户端消息太多，需要考虑应对策略
-                    //                         // 正常连接，业务客户端不会有这么多消息
-                    //                         // 模拟并发测试时是否发送频率过高
-                    //                         if(_bSendFull)
-                    //                             g_Log->w<EasyFSServer>(_LOGFMT_("<Socket=%d> Send Full"), client->GetSocket());
-                    //                     }
-                    //                     else {
-                    //                     }
-
-                                        // g_Log->net<EasyFSServer>("<Socket=%d> send login res", client->GetSocket());
+                if(login->_msgId != user->_recvMsgId)
+                {//当前消息ID和本地收消息次数不匹配
+                    g_Log->e<MyLogic>(_LOGFMT_("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>")
+                                            , sessionId, login->_msgId
+                                            , user->_recvMsgId, login->_msgId - user->_recvMsgId);
                 }
 
+                ++user->_recvMsgId;
+
+                // g_Log->net<MyLogic>("<Recv>sessionId<%llu> loginReq, userName[%s] pwd[%s] msgId[%d] "
+//                                        , sessionId, login->_userName, login->_pwd, login->_msgId);
+                fs::LoginRes ret;
+                ret._msgId = user->_sendMsgId; //id检测：TODO: client->_sendMsgId;
+                // g_Log->net<MyLogic>("<Send>sessionId<%llu> LoginRes, _result[%d] msgId[%d] "
+//                                                                , sessionId, ret._result, ret._msgId);                                        
+                // _dispatcher->SendData(sessionId, &ret);
+                // ++user->_sendMsgId;
+                // g_Log->net<MyLogic>("<sessionId=%llu> send login res", sessionId);
+
                 return;
-                //CELLLog_Info("recv <Socket=%d> msgType：CMD_LOGIN, dataLen：%d,userName=%s PassWord=%s", cSock, login->dataLength, login->userName, login->PassWord);
             }//接收 消息---处理 发送   生产者 数据缓冲区  消费者 
             break;
             case fs::ProtocolCmd::LogoutReq:
@@ -170,8 +202,11 @@ public:
     }
     virtual void OnSessionDisconnected(UInt64 sessionId)
     {
-         g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
+        RemoveUser(sessionId);
+         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }
+
+
 };
 // 
 // class EasyFSServer : public fs::FS_MainIocpServer
@@ -341,7 +376,8 @@ void TestServer::Run()
     fs::MyLogic *newLogic = new fs::MyLogic;
     fs::FS_ServerCore *serverCore = new fs::FS_ServerCore();
     serverCore->Start(newLogic);
-    serverCore->Wait();
+    getchar();
+    //serverCore->Wait();
     serverCore->Close();
     Fs_SafeFree(serverCore);
 

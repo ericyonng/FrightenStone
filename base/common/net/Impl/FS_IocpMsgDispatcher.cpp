@@ -233,9 +233,11 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(const FS_ThreadPool *pool)
     while(!pool->IsClearingPool())
     {
         _locker.Lock();
-        _locker.Wait(static_cast<ULong>(_resolutionInterval.GetTotalMilliSeconds()));
+        // g_Log->any<FS_IocpMsgDispatcher>("resolution interval [%lld]", _resolutionInterval.GetTotalMilliSeconds());
+        _locker.Wait(static_cast<ULong>(_resolutionInterval.GetTotalMilliSeconds())); // 内部有lock若，发生死锁wait出不来
         _locker.Unlock();
 
+        // Sleep(100);
         // 先执行定时器事件
         _timeWheel->RotateWheel();
 

@@ -58,7 +58,7 @@ FS_IocpConnector::FS_IocpConnector()
     ,_linkConfig(NULL)
 {
     // TODO:读取配置
-     _maxSessionQuantityLimit = FD_SETSIZE;
+     _maxSessionQuantityLimit = CLIENT_QUANTITY_LIMIT;
 }
 
 FS_IocpConnector::~FS_IocpConnector()
@@ -349,7 +349,7 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
     // 2.定义关闭iocp
     auto __quitIocpFunc = [this, &listenIocp]()->void {
         // 先关闭listensocket
-        SocketUtil::DestroySocket(_sock);
+        // SocketUtil::DestroySocket(_sock);
         listenIocp->PostQuit();
     };
 
@@ -406,6 +406,7 @@ void FS_IocpConnector::_OnIocpMonitorTask(const FS_ThreadPool *threadPool)
         }
     }
 
+    SocketUtil::DestroySocket(_sock);
     listenIocp->Destroy();
     _FreePrepareAcceptBuffers(bufArray, ioDataArray);
 }
@@ -414,10 +415,10 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
 {
     // 预先创建n个缓冲加速连接过程
     g_MemoryPool->Lock();
-    bufArray = g_MemoryPool->Alloc<char *>(FD_SETSIZE * sizeof(char *));
+    bufArray = g_MemoryPool->Alloc<char *>(CLIENT_QUANTITY_LIMIT * sizeof(char *));
     g_MemoryPool->Unlock();
 
-    for(Int32 i = 0; i < FD_SETSIZE; ++i)
+    for(Int32 i = 0; i < CLIENT_QUANTITY_LIMIT; ++i)
     {
         g_MemoryPool->Lock();
         bufArray[i] = g_MemoryPool->Alloc<char>(IOCP_CONNECTOR_BUFFER);
@@ -426,11 +427,11 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
 
     // 预先创建n个iodata
     g_MemoryPool->Lock();
-    ioDataArray = g_MemoryPool->Alloc<IoDataBase *>(sizeof(IoDataBase *)*FD_SETSIZE);
+    ioDataArray = g_MemoryPool->Alloc<IoDataBase *>(sizeof(IoDataBase *)*CLIENT_QUANTITY_LIMIT);
     g_MemoryPool->Unlock();
 
     Int32 st = StatusDefs::Success;
-    for(Int32 i = 0; i < FD_SETSIZE; ++i)
+    for(Int32 i = 0; i < CLIENT_QUANTITY_LIMIT; ++i)
     {
         g_MemoryPool->Lock();
         ioDataArray[i] = g_MemoryPool->Alloc<IoDataBase>(sizeof(IoDataBase));
@@ -453,7 +454,7 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
 void FS_IocpConnector::_FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray)
 {
     g_MemoryPool->Lock();
-    for(Int32 i = 0; i < FD_SETSIZE; ++i)
+    for(Int32 i = 0; i < CLIENT_QUANTITY_LIMIT; ++i)
     {
         g_MemoryPool->Free(bufArray[i]);
         g_MemoryPool->Free(ioDataArray[i]);

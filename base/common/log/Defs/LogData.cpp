@@ -46,6 +46,7 @@ static const char *__g_LogLevelDescription[LogLevel::End + 1] =
     "ObjPool",
     "Sys",
     "Any",
+    "Custom",
 
     "Unknown"
 };

@@ -69,6 +69,7 @@ FS_ServerCore::FS_ServerCore()
     ,_recvMsgCountPerSecond{0}
     ,_recvMsgBytesPerSecond{0}
     ,_sendMsgBytesPerSecond{0}
+    ,_heartbeatTimeOutDisconnected{0}
 {
     g_ServerCore = this;
 }
@@ -226,6 +227,7 @@ void FS_ServerCore::Close()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->Close();
     _msgDispatcher->Close();
+    _pool->Clear();
 
     // 最后处理
     _AfterClose();
@@ -251,19 +253,19 @@ void FS_ServerCore::_OnConnected(IFS_Session *session)
             minTransfer = switchServer;
     }
 
-    minTransfer->OnConnect(session);
-    _msgDispatcher->OnConnect(session->GetSessionId(), minTransfer);
-
     // 统计session数量
     ++_curSessionConnecting;
     ++_sessionConnectedBefore;
 
     auto sessionAddr = session->GetAddr();
-//     g_Log->any<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected "
-//                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
+    //     g_Log->any<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected "
+    //                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
 
     g_Log->net<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected"
                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
+
+    minTransfer->OnConnect(session);
+    _msgDispatcher->OnConnect(session->GetSessionId(), minTransfer);
 }
 
 void FS_ServerCore::_OnDisconnected(IFS_Session *session)
@@ -273,14 +275,11 @@ void FS_ServerCore::_OnDisconnected(IFS_Session *session)
 
     _msgDispatcher->OnDisconnected(session);
     _connector->OnDisconnected(session);
+}
 
-    // 由于是外部线程调用本接口，所以session是线程安全的
-    auto sessionAddr = session->GetAddr();
-//     g_Log->any<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> disconnected "
-//                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
-
-    g_Log->net<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> disconnected "
-                              , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
+void FS_ServerCore::_OnHeartBeatTimeOut(IFS_Session *session)
+{
+    ++_heartbeatTimeOutDisconnected;
 }
 
 void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
@@ -315,12 +314,15 @@ void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
 void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
 {
     const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond);
-    g_Log->any<FS_ServerCore>("timeSlice<%lld ms> msgtransfer<%d>, "
-                              "Connecting<%lld> ConnectedBefore<%lld>, Disconnected<%lld>, "
-                              "RecvMsg[%lld ps], RecvMsgBytes<%lld Bps>, SendMsgSpeed<%s>"
-                              , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size())
-                              , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore), (Int64)(_sessionDisconnectedCnt)
-                              , (Int64)(_recvMsgCountPerSecond), (Int64)(_recvMsgBytesPerSecond), sendSpeed.c_str());
+    const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond);
+    g_Log->custom("<%lld ms> transfercnt<%d>, "
+                  "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
+                  "Recv[%lld qps], RecvSpeed<%s>, SendSpeed<%s>"
+                  , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size())
+                  , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore)
+                  ,(Int64)(_heartbeatTimeOutDisconnected), (Int64)(_sessionDisconnectedCnt)
+                  , (Int64)(_recvMsgCountPerSecond), recvSpeed.c_str()
+                  , sendSpeed.c_str());
 }
 
 #pragma endregion
@@ -402,9 +404,11 @@ Int32 FS_ServerCore::_BeforeStart()
         auto onDisconnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnDisconnected);
         auto onRecvSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsg);
         auto onSendSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSendMsg);
+        auto onHeartBeatTimeOutRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnHeartBeatTimeOut);
         msgTransfer->RegisterDisconnected(onDisconnectedRes);
         msgTransfer->RegisterRecvSucCallback(onRecvSucRes);
         msgTransfer->RegisterSendSucCallback(onSendSucRes);
+        msgTransfer->RegisterHeatBeatTimeOutCallback(onHeartBeatTimeOutRes);
 
         ret = msgTransfer->BeforeStart();
         if(ret != StatusDefs::Success)
@@ -505,8 +509,8 @@ void FS_ServerCore::_RegisterToModule()
         msgTransfer->RegisterSendSucCallback(onSendSucRes);
     }
 
-    _msgDispatcher->BindBusinessLogic(_logic);
     _logic->SetDispatcher(_msgDispatcher);
+    _msgDispatcher->BindBusinessLogic(_logic);
 }
 
 #pragma endregion

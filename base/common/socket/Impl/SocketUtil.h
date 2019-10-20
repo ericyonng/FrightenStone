@@ -54,6 +54,7 @@ public:
     static Int32 MakeReUseAddr(MYSOCKET socket);
     static Int32 MakeNoDelay(MYSOCKET socket);
     static Int32 DestroySocket(MYSOCKET &socket);
+    static Int32 DestroySocket2(MYSOCKET socket);
 
     // 获取对象地址信息 0表示成功其他值为错误信息 获取远程客户端地址信息 需要在accept成功完成后才可以调用
     static Int32 GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError);
