@@ -383,8 +383,15 @@ void TestServer::Run()
 {
     fs::MyLogic *newLogic = new fs::MyLogic;
     fs::FS_ServerCore *serverCore = new fs::FS_ServerCore();
-    serverCore->Start(newLogic);
-    getchar();
+    auto st = serverCore->Start(newLogic);
+    if(st == StatusDefs::Success)
+    {
+        getchar();
+    }
+    else
+    {
+        g_Log->e<TestServer>(_LOGFMT_("Start server fail st[%d] server will close now. please check! "));
+    }
     //serverCore->Wait();
     serverCore->Close();
     Fs_SafeFree(serverCore);
