@@ -37,14 +37,20 @@ FS_NAMESPACE_BEGIN
 class User
 {
 public:
-    User(UInt64 sessionId)
+    User(UInt64 sessionId, IFS_MsgDispatcher *dispatcher)
         :_sessionId(sessionId)
         ,_recvMsgId(1)
         ,_sendMsgId(1)
+        ,_dispatcher(dispatcher)
     {
     }
     ~User()
     {
+    }
+    
+    void SendData(NetMsg_DataHeader *msgData)
+    {
+        _dispatcher->SendData(_sessionId, msgData);
     }
 
     UInt64 _sessionId;
@@ -53,6 +59,7 @@ public:
     // 测试接收发逻辑用
     // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
     Int32 _sendMsgId = 1;
+    IFS_MsgDispatcher *_dispatcher;
 };
 
 class MyLogic : public IFS_BusinessLogic
@@ -93,7 +100,7 @@ public:
 
     User *NewUser(UInt64 sessionId)
     {
-        auto user = new User(sessionId);
+        auto user = new User(sessionId, _dispatcher);
         _users.insert(std::make_pair(sessionId, user));
         return user;
     }
@@ -127,18 +134,12 @@ public:
                                             , user->_recvMsgId, login->_msgId - user->_recvMsgId);
                 }
 
+                // 返回包
                 ++user->_recvMsgId;
-
-                // g_Log->net<MyLogic>("<Recv>sessionId<%llu> loginReq, userName[%s] pwd[%s] msgId[%d] "
-//                                        , sessionId, login->_userName, login->_pwd, login->_msgId);
                 fs::LoginRes ret;
-                ret._msgId = user->_sendMsgId; //id检测：TODO: client->_sendMsgId;
-                // g_Log->net<MyLogic>("<Send>sessionId<%llu> LoginRes, _result[%d] msgId[%d] "
-//                                                                , sessionId, ret._result, ret._msgId);                                        
-                // _dispatcher->SendData(sessionId, &ret);
-                // ++user->_sendMsgId;
-                // g_Log->net<MyLogic>("<sessionId=%llu> send login res", sessionId);
-
+                ret._msgId = user->_sendMsgId; 
+                user->SendData(&ret);
+                ++user->_sendMsgId;
                 return;
             }//接收 消息---处理 发送   生产者 数据缓冲区  消费者 
             break;
