@@ -298,6 +298,7 @@ void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
 void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
 {
     Time nowTime;
+    _lastStatisticsTime.FlushTime();
     while(!threadPool->IsClearingPool())
     {
         // √ø∏Ù100∫¡√Î…®√Ë“ª¥Œ
