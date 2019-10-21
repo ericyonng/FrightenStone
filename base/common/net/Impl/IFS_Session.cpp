@@ -100,6 +100,9 @@ bool IFS_Session::Send(NetMsg_DataHeader *header)
         return false;
     }
 
+//    g_Log->any<IFS_Session>("sessionId[%llu] will send msg"
+//                            , _sessionId);
+
     _toSend.push_back(newBuffer);
     _OnSend();
     return true;

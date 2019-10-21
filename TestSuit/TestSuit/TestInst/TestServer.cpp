@@ -127,12 +127,15 @@ public:
         if(!user)
             user = NewUser(sessionId);
 
+        // g_Log->any<MyLogic>("sessionid[%llu] handle a msg", sessionId);
         switch(msgData->_cmd)
         {
             case fs::ProtocolCmd::LoginReq:
             {
                 fs::LoginReq *login = static_cast<fs::LoginReq *>(msgData);
                 
+           //     g_Log->any<MyLogic>("sessionid[%llu] login username[%s], pwd[%s] msgId[%d] user recvmsgid"
+           //                         , sessionId, login->_userName, login->_pwd, login->_msgId, user->_recvMsgId);
                 // 检查消息ID
                 if(login->_msgId != user->_recvMsgId)
                 {//当前消息ID和本地收消息次数不匹配

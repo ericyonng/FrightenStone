@@ -154,6 +154,8 @@ void FS_IocpMsgTransfer::OnConnect(IFS_Session *session)
     {
         g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail"));
     }
+//    g_Log->any<FS_IocpMsgTransfer>("FS_IocpMsgTransfer::OnConnect sessionId[%llu] socket[%llu] address[%s] connected"
+//                                   , session->GetSessionId(), session->GetSocket(), session->GetAddr()->ToString().c_str());
     _locker.Unlock();
 }
 
@@ -184,6 +186,9 @@ void FS_IocpMsgTransfer::OnSendData(UInt64 sessionId, NetMsg_DataHeader *msg)
 {
     do 
     {
+//        g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] will post send a msg"
+//                                       , sessionId);
+
         _locker.Lock();
         auto iterSession = _sessions.find(sessionId);
         if(iterSession == _sessions.end())
@@ -196,6 +201,8 @@ void FS_IocpMsgTransfer::OnSendData(UInt64 sessionId, NetMsg_DataHeader *msg)
         auto iocpSession = iterSession->second->CastTo<FS_IocpSession>();
         if(iocpSession->CanPost())
         {
+//            g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] has post send a msg"
+//                                           , sessionId);
             if(!iocpSession->Send(msg))
             {
                 g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg fail"), sessionId);
@@ -256,6 +263,9 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 
         const Int32 ret = _iocp->WaitForCompletion(*_ioEvent, waitTime);
         
+//         g_Log->any<FS_IocpMsgTransfer>("iocp wake up of ret[%d] sessionId[%llu]"
+//                                        , ret, _ioEvent->_data._sessionId);
+
         // 心跳处理 closesocket会把所有的数据都清除掉
         _locker.Lock();
         sessinsToRemove = timeoutSessionIds;
@@ -279,6 +289,10 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
             g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
             break;
         }
+
+//        g_Log->any<FS_IocpMsgTransfer>("iocp wake up of ret[%d] sessionId[%llu]"
+//                                       , ret, _ioEvent->_data._sessionId);
+
 
         _HandleNetEvent(sessinsToRemove);
         _OnHeartbeatTimeOut(timeoutSessionIds, sessinsToRemove);
@@ -323,11 +337,11 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove)
     {
         if(_ioEvent->_bytesTrans <= 0)
         {// 客户端断开处理
-//             g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lu] disconnected"
-//                                            , iocpSession->GetSessionId()
-//                                            , iocpSession->GetSocket(),
-//                                            _ioEvent->_bytesTrans);
-            g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lu] disconnected"
+//            g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lu] will disconnect"
+//                                           , iocpSession->GetSessionId()
+//                                           , iocpSession->GetSocket(),
+//                                           _ioEvent->_bytesTrans);
+            g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lu] will disconnect"
                                            , iocpSession->GetSessionId()
                                            , iocpSession->GetSocket(),
                                            _ioEvent->_bytesTrans);
@@ -344,6 +358,8 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove)
 
         _UpdateSessionHeartbeat(session);
 
+//        g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] transfer[%lu] recv msg", sessionId, _ioEvent->_bytesTrans);
+
         // 重新投递接收
         if(iocpSession->CanPost())
         {
@@ -352,6 +368,9 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove)
                 sessionIdsToRemove.insert(sessionId);
                 return;
             }
+
+//            g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] re post recv ", sessionId);
+
         }
     }
     else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
@@ -373,7 +392,7 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove)
 
         auto iocpSession = session->CastTo<FS_IocpSession>();
         iocpSession->OnSendSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
-
+//        g_Log->any<FS_IocpMsgTransfer>("send suc sessionId[%llu] transfer[%lu] ", sessionId, _ioEvent->_bytesTrans);
         // 消息发送回调
         _serverCoreSendSucCallback->Invoke(session, _ioEvent->_bytesTrans);
 
@@ -387,6 +406,8 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove)
                 sessionIdsToRemove.insert(sessionId);
                 return;
             }
+
+//            g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] re post recv ", sessionId);
         }
     }
     else
@@ -553,6 +574,12 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat(std::set<UInt64> &timeoutSession
             break;
 
         timeoutSessionIds.insert(session->GetSessionId());
+//        g_Log->any<FS_IocpMsgTransfer>("nowTime[%lld][%s] sessionId[%llu] expiredtime[%llu][%s] heartbeat time out."
+//                                       , _curTime.GetMicroTimestamp(), _curTime.ToStringOfMillSecondPrecision().c_str()
+//                                       ,session->GetSessionId()
+//                                       , session->GetHeartBeatExpiredTime().GetMicroTimestamp()
+//                                       , session->GetHeartBeatExpiredTime().ToStringOfMillSecondPrecision().c_str());
+
         // 心跳过期 到ondisconnected才真正移除
         // OnHeartBeatTimeOut(session);
         // iterSession = _sessionHeartbeatQueue.erase(iterSession);

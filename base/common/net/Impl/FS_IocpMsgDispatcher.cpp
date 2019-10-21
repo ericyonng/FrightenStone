@@ -149,6 +149,8 @@ void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session, Int64 &incPacketsCnt)
     auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
     incPacketsCnt = 0;
 
+//    g_Log->any<FS_IocpMsgDispatcher>("dispatcher will recv msg");
+
     _locker.Lock();
     if(!_isClose)
     {
@@ -217,6 +219,8 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId, NetMsg_DataHeader *msg)
     }
     _locker.Unlock();
 
+//    g_Log->any<FS_IocpMsgDispatcher>("dispathcer sessionid will send data", sessionId);
+
     if(transfer)
         transfer->OnSendData(sessionId, reinterpret_cast<NetMsg_DataHeader *>(buffer));
 
@@ -259,6 +263,8 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(const FS_ThreadPool *pool)
 
 void FS_IocpMsgDispatcher::_MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData)
 {
+//    g_Log->any<FS_IocpMsgDispatcher>("will move msg to business layer");
+
     // TODO:转移消息到业务处理层
     // 只需要sessionId与数据拷贝到业务处理层即可
     const UInt64 sessionId = session->GetSessionId();

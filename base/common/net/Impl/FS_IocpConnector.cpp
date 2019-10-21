@@ -312,18 +312,13 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
                                      , sessionAddr->GetAddr().c_str()
                                      , sessionAddr->GetPort());
 
+//        g_Log->any<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
+//                                     , newSession->GetSessionId()
+//                                     , newSession->GetSocket()
+//                                     , sessionAddr->GetAddr().c_str()
+//                                     , sessionAddr->GetPort());
+
         _onConnected->Invoke(newSession);
-
-
-//         g_Log->any<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
-//                                      , newSession->GetSessionId()
-//                                      , newSession->GetSocket()
-//                                      , sessionAddr->GetAddr().c_str()
-//                                      , sessionAddr->GetPort());
-
-        // 投递接收数据
-        
-        // 获取IP地址 inet_ntoa(clientAddr.sin_addr)
     }
     else {
         _locker.Unlock();
