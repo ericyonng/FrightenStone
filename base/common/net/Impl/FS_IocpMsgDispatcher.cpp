@@ -253,6 +253,8 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(const FS_ThreadPool *pool)
         // 投递业务产生的异步处理事件 TODO:
         _timeWheel->GetModifiedResolution(_resolutionInterval);
     }
+
+    g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end"));
 }
 
 void FS_IocpMsgDispatcher::_MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData)

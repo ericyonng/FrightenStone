@@ -110,8 +110,15 @@ public:
         return StatusDefs::Success;
     }
 
+    void BeforeClose()
+    {
+        STLUtil::DelMapContainer(_users);
+        g_Log->sys<MyLogic>(_LOGFMT_("MyLogic before closed remove all users"));
+    }
+
     virtual void Close()
     {
+         g_Log->sys<MyLogic>(_LOGFMT_("MyLogic closed"));
     }
 
     virtual void OnMsgDispatch(UInt64 sessionId, NetMsg_DataHeader *msgData)
