@@ -36,6 +36,7 @@
 #include "base/common/net/Impl/FS_SessionFactory.h"
 #include "base/common/net/Impl/FS_Addr.h"
 #include "base/common/net/Defs/IocpDefs.h"
+#include "base/common/net/Defs/FS_IocpBuffer.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -304,19 +305,21 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
         // TODO:连接回调 
         IFS_Session *newSession = FS_SessionFactory::Create(_curMaxSessionId, sock, addrInfo);
         newSession->OnConnect();
-        _onConnected->Invoke(newSession);
-
         auto sessionAddr = newSession->GetAddr();
         g_Log->net<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
                                      , newSession->GetSessionId()
                                      , newSession->GetSocket()
                                      , sessionAddr->GetAddr().c_str()
                                      , sessionAddr->GetPort());
-        g_Log->any<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
-                                     , newSession->GetSessionId()
-                                     , newSession->GetSocket()
-                                     , sessionAddr->GetAddr().c_str()
-                                     , sessionAddr->GetPort());
+
+        _onConnected->Invoke(newSession);
+
+
+//         g_Log->any<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
+//                                      , newSession->GetSessionId()
+//                                      , newSession->GetSocket()
+//                                      , sessionAddr->GetAddr().c_str()
+//                                      , sessionAddr->GetPort());
 
         // 投递接收数据
         
