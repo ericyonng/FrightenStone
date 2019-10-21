@@ -143,10 +143,11 @@ void FS_IocpMsgDispatcher::Close()
     _logic->Close();
 }
 
-void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session)
+void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session, Int64 &incPacketsCnt)
 {
     auto iocpSession = session->CastTo<FS_IocpSession>();
     auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
+    incPacketsCnt = 0;
 
     _locker.Lock();
     if(!_isClose)
@@ -157,6 +158,7 @@ void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session)
             auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
             _MoveToBusinessLayer(session, frontMsg);
             recvBuffer->PopFront(frontMsg->_packetLength);
+            ++incPacketsCnt;
         }
 
         if(hasMsg)

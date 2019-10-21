@@ -284,9 +284,10 @@ void FS_ServerCore::_OnHeartBeatTimeOut(IFS_Session *session)
 
 void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
 {
-    ++_recvMsgCountPerSecond;
     _recvMsgBytesPerSecond += transferBytes;
-    _msgDispatcher->OnRecv(session);
+    Int64 incPackets = 0;
+    _msgDispatcher->OnRecv(session, incPackets);
+    _recvMsgCountPerSecond += incPackets;
 }
 
 void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
@@ -317,7 +318,7 @@ void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
     const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond);
     g_Log->custom("<%lld ms> transfercnt<%d>, "
                   "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
-                  "Recv[%lld qps], RecvSpeed<%s>, SendSpeed<%s>"
+                  "Recv[%lld pps], RecvSpeed<%s>, SendSpeed<%s>"
                   , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size())
                   , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore)
                   ,(Int64)(_heartbeatTimeOutDisconnected), (Int64)(_sessionDisconnectedCnt)

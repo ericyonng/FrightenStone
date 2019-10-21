@@ -61,7 +61,7 @@ public:
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    virtual void OnRecv(IFS_Session *session) = 0;
+    virtual void OnRecv(IFS_Session *session, Int64 &incPacketsCnt) = 0;
     virtual void OnDisconnected(IFS_Session *session) = 0;
     virtual void OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer) = 0;
     virtual void OnDestroy() = 0;
