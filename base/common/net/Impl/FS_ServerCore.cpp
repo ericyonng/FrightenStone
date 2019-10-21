@@ -356,8 +356,8 @@ Int32 FS_ServerCore::_CreateNetModules()
     // TODO:与客户端的连接点只能是一个，因为端口只有一个
     _connector = FS_ConnectorFactory::Create();
 
-//    const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
-    const Int32 cpuCnt = 1;
+    //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
+    const Int32 cpuCnt = 8;
     _msgTransfers.resize(cpuCnt);
     for(Int32 i = 0; i < cpuCnt; ++i)
         _msgTransfers[i] = FS_MsgTransferFactory::Create();
