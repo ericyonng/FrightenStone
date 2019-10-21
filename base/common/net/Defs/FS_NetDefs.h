@@ -73,7 +73,7 @@
 #define IOCP_CONNECTOR_BUFFER 1024
 // 统计服务器负载的时间间隔
 #define IOCP_STATISTIC_INTERVAL     1000    // 时间间隔单位ms
-#define CLIENT_QUANTITY_LIMIT   10000
+#define CLIENT_QUANTITY_LIMIT   100000
 
 // 心跳队列排序
 // class FS_ClientComp

@@ -169,6 +169,7 @@ void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session)
 void FS_IocpMsgDispatcher::OnDisconnected(IFS_Session *session)
 {
     _locker.Lock();
+    auto sessionId = session->GetSessionId();
     _sessionIdRefTransfer.erase(session->GetSessionId());
     _delayDisconnectedSessions.insert(session->GetSessionId());
     _locker.Unlock();
@@ -260,7 +261,8 @@ void FS_IocpMsgDispatcher::_MoveToBusinessLayer(IFS_Session *session, NetMsg_Dat
     auto iterMsgs = _sessionIdRefMsgs.find(sessionId);
     if(iterMsgs == _sessionIdRefMsgs.end())
         iterMsgs = _sessionIdRefMsgs.insert(std::make_pair(sessionId, new std::list<NetMsg_DataHeader *>)).first;
-    
+    _newMsgSessionIds.insert(sessionId);
+
     // 拷贝数据
     g_MemoryPool->Lock();
     char *buffer = g_MemoryPool->Alloc<char>(msgData->_packetLength);
@@ -275,19 +277,21 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
     _locker.Lock();
     UInt64 sessionId = 0;
     std::list<NetMsg_DataHeader *> *temp = NULL;
-    for(auto iterMsgList = _sessionIdRefMsgs.begin(); 
-        iterMsgList != _sessionIdRefMsgs.end(); 
-        ++iterMsgList)
+    for(auto &sessionId : _newMsgSessionIds)
     {
-        sessionId = iterMsgList->first;
+        auto iterMsgList = _sessionIdRefMsgs.find(sessionId);
+        if(iterMsgList == _sessionIdRefMsgs.end())
+            continue;
+
         auto iterMsgCahceList = _sessionIdRefMsgCache.find(sessionId);
         if(iterMsgCahceList == _sessionIdRefMsgCache.end())
             iterMsgCahceList = _sessionIdRefMsgCache.insert(std::make_pair(sessionId, new std::list<NetMsg_DataHeader *>)).first;
-        
+
         temp = iterMsgCahceList->second;
         iterMsgCahceList->second = iterMsgList->second;
         iterMsgList->second = temp;
     }
+    _newMsgSessionIds.clear();
     _delayDisconnectedSessionsCache = _delayDisconnectedSessions;
     _delayDisconnectedSessions.clear();
     _locker.Unlock();
@@ -326,6 +330,51 @@ void FS_IocpMsgDispatcher::_OnDelaySessionDisconnect(UInt64 sessionId)
 {
     // TODO:真实的session断开
     _logic->OnSessionDisconnected(sessionId);
+
+    // 移除消息
+    _locker.Lock();
+    {// 真实数据链表
+        auto iterMsgs = _sessionIdRefMsgs.find(sessionId);
+        if(iterMsgs != _sessionIdRefMsgs.end())
+        {
+            bool hasMsgNotHandle = false;
+            for(auto &msg : *iterMsgs->second)
+            {
+                hasMsgNotHandle = true;
+                g_MemoryPool->Lock();
+                g_MemoryPool->Free(msg);
+                g_MemoryPool->Unlock();
+            }
+
+            if(hasMsgNotHandle)
+                g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("sessionId[%llu] has msg not handle in msg cache when disconnect"), sessionId);
+
+            Fs_SafeFree(iterMsgs->second);
+            _sessionIdRefMsgs.erase(iterMsgs);
+        }
+    }
+
+    {
+        auto iterMsgs = _sessionIdRefMsgCache.find(sessionId);
+        if(iterMsgs != _sessionIdRefMsgCache.end())
+        {
+            bool hasMsgNotHandle = false;
+            for(auto &msg : *iterMsgs->second)
+            {
+                hasMsgNotHandle = true;
+                g_MemoryPool->Lock();
+                g_MemoryPool->Free(msg);
+                g_MemoryPool->Unlock();
+            }
+
+            if(hasMsgNotHandle)
+                g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("sessionId[%llu] has msg not handle in msg cache when disconnect"), sessionId);
+
+            Fs_SafeFree(iterMsgs->second);
+            _sessionIdRefMsgCache.erase(iterMsgs);
+        }
+    }
+    _locker.Unlock();
 }
 
 FS_NAMESPACE_END
