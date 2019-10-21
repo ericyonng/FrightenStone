@@ -229,6 +229,11 @@ void FS_ServerCore::Close()
     _msgDispatcher->Close();
     _pool->Clear();
 
+    // 最后一刻扫描
+    TimeSlice timeSlice;
+    timeSlice = Time::_microSecondPerSecond;
+    _PrintSvrLoadInfo(timeSlice);
+
     // 最后处理
     _AfterClose();
 

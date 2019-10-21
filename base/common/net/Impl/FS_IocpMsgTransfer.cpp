@@ -286,6 +286,8 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         _locker.Unlock();
     }
 
+    g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("transfer thread end"));
+
     // 销毁sessions 此时要保证handler要还没关闭
     _ClearSessionsWhenClose();
 }
