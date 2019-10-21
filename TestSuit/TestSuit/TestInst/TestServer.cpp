@@ -379,8 +379,23 @@ public:
 
 FS_NAMESPACE_END
 
+
+static union {
+    char c[4];
+    unsigned long l;
+} endian_test = {{'l', '?', '?', 'b'}};
+
 void TestServer::Run()
 {
+    endian_test;
+    if((char)(endian_test.l) == 'b')
+    {
+        printf("big endian\n");
+    }
+    else
+    {
+        printf("little endian\n");
+    }
     fs::MyLogic *newLogic = new fs::MyLogic;
     fs::FS_ServerCore *serverCore = new fs::FS_ServerCore();
     auto st = serverCore->Start(newLogic);
