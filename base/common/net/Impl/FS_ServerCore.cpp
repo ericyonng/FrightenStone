@@ -262,12 +262,12 @@ void FS_ServerCore::_OnConnected(IFS_Session *session)
     ++_curSessionConnecting;
     ++_sessionConnectedBefore;
 
-    auto sessionAddr = session->GetAddr();
+    // auto sessionAddr = session->GetAddr();
     //     g_Log->any<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected "
     //                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
 
-    g_Log->net<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected"
-                              , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
+//     g_Log->net<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected"
+//                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
 
     minTransfer->OnConnect(session);
     _msgDispatcher->OnConnect(session->GetSessionId(), minTransfer);
@@ -322,13 +322,14 @@ void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
 {
     const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond * Time::_millisecondPerSecond / dis.GetTotalMilliSeconds());
     const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond * Time::_millisecondPerSecond / dis.GetTotalMilliSeconds());
+    const Int64 pps = _recvMsgCountPerSecond * Time::_millisecondPerSecond / dis.GetTotalMilliSeconds();
     g_Log->custom("<%lld ms> transfercnt<%d>, "
                   "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
                   "Recv[%lld pps], RecvSpeed<%s>, SendSpeed<%s>"
                   , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size())
                   , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore)
                   ,(Int64)(_heartbeatTimeOutDisconnected), (Int64)(_sessionDisconnectedCnt)
-                  , (Int64)(_recvMsgCountPerSecond), recvSpeed.c_str()
+                  , pps, recvSpeed.c_str()
                   , sendSpeed.c_str());
 }
 
