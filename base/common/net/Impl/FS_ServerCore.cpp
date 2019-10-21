@@ -300,8 +300,8 @@ void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
     Time nowTime;
     while(!threadPool->IsClearingPool())
     {
-        // Ã¿¸ô500ºÁÃëÉ¨ÃèÒ»´Î
-        Sleep(500);
+        // Ã¿¸ô100ºÁÃëÉ¨ÃèÒ»´Î
+        Sleep(100);
         nowTime.FlushTime();
         const auto &timeSlice = nowTime - _lastStatisticsTime;
         if(timeSlice >= _statisticsInterval)
@@ -319,8 +319,8 @@ void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
 
 void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
 {
-    const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond);
-    const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond);
+    const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond * Time::_millisecondPerSecond / dis.GetTotalMilliSeconds());
+    const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond * Time::_millisecondPerSecond / dis.GetTotalMilliSeconds());
     g_Log->custom("<%lld ms> transfercnt<%d>, "
                   "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
                   "Recv[%lld pps], RecvSpeed<%s>, SendSpeed<%s>"
