@@ -214,11 +214,11 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId, NetMsg_DataHeader *msg)
         auto iterTransfer = _sessionIdRefTransfer.find(sessionId);
         if(iterTransfer != _sessionIdRefTransfer.end())
             transfer = iterTransfer->second;
-
-        if(transfer)
-            transfer->OnSendData(sessionId, reinterpret_cast<NetMsg_DataHeader *>(buffer));
     }
     _locker.Unlock();
+
+    if(transfer)
+        transfer->OnSendData(sessionId, reinterpret_cast<NetMsg_DataHeader *>(buffer));
 
     // 未发出去（会话断开）
     if(!transfer)
