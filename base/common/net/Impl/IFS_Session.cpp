@@ -58,6 +58,7 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
 {
     _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
     _recvBuffer->CastToBuffer<FS_IocpBuffer>()->BindTo(_sessionId, sock);
+    UpdateHeartBeatExpiredTime();
 }
 
 IFS_Session::~IFS_Session()
@@ -115,7 +116,7 @@ void IFS_Session::OnDestroy()
 
 void IFS_Session::OnConnect()
 {
-    UpdateHeartBeatExpiredTime();
+    //UpdateHeartBeatExpiredTime();
 }
 
 void IFS_Session::OnDisconnect()

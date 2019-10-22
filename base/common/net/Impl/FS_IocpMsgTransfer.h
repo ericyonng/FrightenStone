@@ -97,8 +97,10 @@ private:
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
     void _CheckSessionHeartbeat(std::set<UInt64> &timeoutSessionIds);  // 线程不安全
 
+    void _PostSessions();
+    void _LinkCacheToSessions();
+
 private:
-    Locker _locker;
     std::atomic<Int32> _sessionCnt;             // 会话个数
     std::map<UInt64, IFS_Session *> _sessions;  // key:sessionId
     Time _curTime;
@@ -106,6 +108,18 @@ private:
     FS_ThreadPool *_threadPool;
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;
+
+    // 缓冲区
+    Locker _connectorGuard;
+    std::atomic<bool> _hasNewSessionLinkin;     // 
+    std::list<IFS_Session *> _linkSessionCache; // 连入的会话缓冲区
+    std::list<IFS_Session *> _linkSessionSwitchCache; // 连入的会话缓冲转换区
+    // 待发送的会话缓冲区
+    Locker _asynSendGuard;
+    std::atomic<bool> _isSendCacheDirtied;
+    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendQueueCache; // key:sessionId
+    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendQueue;  // key:sessionId
+    
 
     IDelegate<void, IFS_Session *> *_serverCoreDisconnectedCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreRecvSucCallback;

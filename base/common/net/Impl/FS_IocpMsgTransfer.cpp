@@ -55,6 +55,8 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer()
     ,_serverCoreSendSucCallback(NULL)
     ,_serverCoreHeartBeatTimeOutCallback(NULL)
     ,_sessionCnt{0}
+    ,_hasNewSessionLinkin(false)
+    ,_isSendCacheDirtied(false)
 {
 }
 
@@ -134,29 +136,11 @@ void FS_IocpMsgTransfer::AfterClose()
 
 void FS_IocpMsgTransfer::OnConnect(IFS_Session *session)
 {
-    _locker.Lock();
-    _sessions.insert(std::make_pair(session->GetSessionId(), session));
-    auto iocpSession = session->CastTo<FS_IocpSession>();
-    auto sender = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_DoPostSend);
-    iocpSession->BindSender(sender);
+    _connectorGuard.Lock();
+    _linkSessionCache.push_back(session);
+    _hasNewSessionLinkin = true;
+    _connectorGuard.Unlock();
     ++_sessionCnt;
-
-    // 绑定iocp
-    auto st = _iocp->Reg(iocpSession->GetSocket(), iocpSession->GetSessionId());
-    if(st != StatusDefs::Success)
-    {
-        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("reg socket[%llu] sessionId[%llu] fail st[%d]")
-                                     , session->GetSocket(), session->GetSessionId(), st);
-    }
-
-    // 投递接收数据
-    if(!_DoPostRecv(iocpSession))
-    {
-        g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail"));
-    }
-//    g_Log->any<FS_IocpMsgTransfer>("FS_IocpMsgTransfer::OnConnect sessionId[%llu] socket[%llu] address[%s] connected"
-//                                   , session->GetSessionId(), session->GetSocket(), session->GetAddr()->ToString().c_str());
-    _locker.Unlock();
 }
 
 void FS_IocpMsgTransfer::OnDestroy()
@@ -253,26 +237,37 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
     std::set<UInt64> sessinsToRemove;
     while(!pool->IsClearingPool() || _sessionCnt > 0)
     {
+        _LinkCacheToSessions();
+
+        // 没有会话跳过
+        if(_sessions.empty())
+        {
+            SocketUtil::Sleep(1);
+            continue;
+        }
+
         // 等待网络消息
         timeoutSessionIds.clear();
         sessinsToRemove.clear();
-
-        _locker.Lock();
         _CheckSessionHeartbeat(timeoutSessionIds);
-        _locker.Unlock();
+        _PostSessions();
 
-        const Int32 ret = _iocp->WaitForCompletion(*_ioEvent, waitTime);
+        Int32 ret = StatusDefs::Success;
+        while(true)
+        {
+            ret = _iocp->WaitForCompletion(*_ioEvent, waitTime);
+            if(ret != StatusDefs::Success)
+            {
+                if(ret == StatusDefs::IOCP_WaitTimeOut)
+                    ret = StatusDefs::Success;
+                break;
+            }            
+        }
         
-//         g_Log->any<FS_IocpMsgTransfer>("iocp wake up of ret[%d] sessionId[%llu]"
-//                                        , ret, _ioEvent->_data._sessionId);
-
-        // 心跳处理 closesocket会把所有的数据都清除掉
-        _locker.Lock();
         sessinsToRemove = timeoutSessionIds;
         if(ret != StatusDefs::Success)
         {
             _OnHeartbeatTimeOut(timeoutSessionIds, sessinsToRemove);
-            _locker.Unlock();
             if(ret == StatusDefs::IOCP_WaitTimeOut)
                 continue;
 
@@ -586,6 +581,94 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat(std::set<UInt64> &timeoutSession
     }
 }
 
-FS_NAMESPACE_END
+void FS_IocpMsgTransfer::_PostSessions()
+{
+    if(_isSendCacheDirtied)
+    {
+        std::list<NetMsg_DataHeader *> *msgs = NULL;
+        _asynSendGuard.Lock();
+        _isSendCacheDirtied = false;
+        for(auto &iterQueue : _asynSendQueueCache)
+        {
+            auto iterMsgs = _asynSendQueue.find(iterQueue.first);
+            if(iterMsgs == _asynSendQueue.end())
+                iterMsgs = _asynSendQueue.insert(std::make_pair(iterQueue.first, new std::list<NetMsg_DataHeader *>)).first;
 
+            msgs = iterQueue.second;
+            iterQueue.second = iterMsgs->second;
+            iterMsgs->second = msgs;
+        }
+        _asynSendGuard.Unlock();
+
+        msgs = NULL;
+        for(auto &iterMsgs : _asynSendQueue)
+        {
+            auto iterSession = _sessions.find(iterMsgs.first);
+            if(iterSession == _sessions.end())
+            {
+                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] has already disconnected or is not existed before"), sessionId);
+                continue;
+            }
+
+            auto iocpSession = iterSession->second->CastTo<FS_IocpSession>();
+            for(auto &msg : *iterMsgs.second)
+            {
+                if(iocpSession->CanPost())
+                {
+                    if(!iocpSession->Send(msg))
+                    {
+                        g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg fail"), sessionId);
+                    }
+                }
+
+                // 释放
+                g_MemoryPool->Lock();
+                g_MemoryPool->Free(msg);
+                g_MemoryPool->Unlock();
+            }
+        }
+    }
+
+}
+
+void FS_IocpMsgTransfer::_LinkCacheToSessions()
+{
+    if(_hasNewSessionLinkin)
+    {
+        _connectorGuard.Lock();
+        _linkSessionSwitchCache = _linkSessionCache;
+        _linkSessionCache.clear();
+        _hasNewSessionLinkin = false;
+        _connectorGuard.Unlock();
+
+
+        for(auto &session : _linkSessionSwitchCache)
+        {
+            _sessions.insert(std::make_pair(session->GetSessionId(), session));
+            auto iocpSession = session->CastTo<FS_IocpSession>();
+            auto sender = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_DoPostSend);
+            iocpSession->BindSender(sender);
+
+            // 绑定iocp
+            auto st = _iocp->Reg(iocpSession->GetSocket(), iocpSession->GetSessionId());
+            if(st != StatusDefs::Success)
+            {
+                g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("reg socket[%llu] sessionId[%llu] fail st[%d]")
+                                             , session->GetSocket(), session->GetSessionId(), st);
+            }
+
+            // 投递接收数据
+            if(!_DoPostRecv(iocpSession))
+            {
+                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail"));
+            }
+
+        }
+
+        _linkSessionSwitchCache.clear();
+    }
+
+}
+
+FS_NAMESPACE_END
 
