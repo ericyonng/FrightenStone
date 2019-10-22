@@ -62,7 +62,8 @@ public:
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
     // msg内存池创建
-    virtual void OnSendData(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
+    virtual void AsynSend(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
+
 
     // 会话个数
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback) = 0;
