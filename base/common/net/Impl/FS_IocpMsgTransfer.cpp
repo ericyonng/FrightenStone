@@ -250,41 +250,15 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         // post recv
         for(auto &sessionId : toPostRecv)
         {
-            auto session = _GetSession(sessionId);
-            if(!session)
-            {
-                g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] is not exist"), sessionId);
-                continue;
-            }
-
-            auto iocpSession = session->CastTo<FS_IocpSession>();
-            if(!iocpSession->CanPost())
-                continue;
-
-            if(!_DoPostRecv(iocpSession, false))
-            {
+            if(!_DoPostRecv(_GetSession(sessionId)->CastTo<FS_IocpSession>(), false))
                 sessinsToRemove.insert(sessionId);
-            }
         }
 
         // post send
         for(auto &sessionId : toPostSend)
         {
-            auto session = _GetSession(sessionId);
-            if(!session)
-            {
-                g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] is not exist"), sessionId);
-                continue;
-            }
-
-            auto iocpSession = session->CastTo<FS_IocpSession>();
-            if(iocpSession->CanPost() && iocpSession->HasMsgToSend())
-            {
-                if(!_DoPostSend(iocpSession, false))
-                {
-                    sessinsToRemove.insert(sessionId);
-                }
-            }
+            if(!_DoPostSend(_GetSession(sessionId)->CastTo<FS_IocpSession>(), false))
+                sessinsToRemove.insert(sessionId);
         }
         
         if(ret != StatusDefs::Success)
@@ -361,6 +335,7 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
             iocpSession->ResetPostRecvMask();
             sessionIdsToRemove.insert(sessionId);
             toPostRecv.erase(sessionId);
+            toPostSend.erase(sessionId);
             return;
         }
 
@@ -402,6 +377,7 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
             iocpSession->ResetPostSendMask();
             sessionIdsToRemove.insert(sessionId);
             toPostSend.erase(sessionId);
+            toPostRecv.erase(sessionId);
             return;
         }
 

@@ -152,8 +152,8 @@ void FS_IocpConnector::OnDisconnected(IFS_Session *session)
 
 Int32 FS_IocpConnector::_ReadConfig()
 {
-    _segmentName = "Listener";
-    _listenerFileName = "./ServerCfg.ini";
+    _segmentName = SVR_CFG_LISTENER_SEG;
+    _listenerFileName = SVR_CONFIG_PATH_NAME;
     _ipKey = "ip";
     _portKey = "port";
 

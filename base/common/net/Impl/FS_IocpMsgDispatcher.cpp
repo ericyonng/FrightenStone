@@ -152,7 +152,7 @@ void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session, Int64 &incPacketsCnt)
 
 //    g_Log->any<FS_IocpMsgDispatcher>("dispatcher will recv msg");
 
-    g_Log->net<FS_IocpMsgDispatcher>("time will recv begin.");
+    //g_Log->net<FS_IocpMsgDispatcher>("time will recv begin.");
     _locker.Lock();
     if(!_isClose)
     {
@@ -172,7 +172,7 @@ void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session, Int64 &incPacketsCnt)
         }
     }    
     _locker.Unlock();
-    g_Log->net<FS_IocpMsgDispatcher>("time will recv end.");
+    //g_Log->net<FS_IocpMsgDispatcher>("time will recv end.");
 }
 
 void FS_IocpMsgDispatcher::OnDisconnected(IFS_Session *session)
