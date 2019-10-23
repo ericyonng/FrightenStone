@@ -320,16 +320,15 @@ void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
 
 void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
 {
-    const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond * Time::_millisecondPerSecond / dis.GetTotalMilliSeconds());
-    const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond * Time::_millisecondPerSecond / dis.GetTotalMilliSeconds());
-    const Int64 pps = _recvMsgCountPerSecond * Time::_millisecondPerSecond / dis.GetTotalMilliSeconds();
+    const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond);
+    const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond);
     g_Log->custom("<%lld ms> transfercnt<%d>, "
                   "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
                   "Recv[%lld pps], RecvSpeed<%s>, SendSpeed<%s>"
                   , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size())
                   , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore)
                   ,(Int64)(_heartbeatTimeOutDisconnected), (Int64)(_sessionDisconnectedCnt)
-                  , pps, recvSpeed.c_str()
+                  , Int64(_recvMsgCountPerSecond), recvSpeed.c_str()
                   , sendSpeed.c_str());
 }
 
@@ -357,7 +356,7 @@ Int32 FS_ServerCore::_CreateNetModules()
     _connector = FS_ConnectorFactory::Create();
 
     //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
-    const Int32 cpuCnt = 8;
+    const Int32 cpuCnt = 1;
     _msgTransfers.resize(cpuCnt);
     for(Int32 i = 0; i < cpuCnt; ++i)
         _msgTransfers[i] = FS_MsgTransferFactory::Create();
