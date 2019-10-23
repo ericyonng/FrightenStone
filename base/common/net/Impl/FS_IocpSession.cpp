@@ -42,7 +42,7 @@ FS_IocpSession::~FS_IocpSession()
     if(!CanDestroy())
         g_Log->e<FS_IocpSession>(_LOGFMT_("has io uncompleted please check"));
 
-        Fs_SafeFree(_asynSender);
+        Fs_SafeFree(_sender);
 }
 
 NetMsg_DataHeader *FS_IocpSession::FrontRecvMsg()

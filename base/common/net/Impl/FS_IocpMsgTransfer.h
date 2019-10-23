@@ -66,7 +66,7 @@ public:
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut(IFS_Session *session);
     // msg内存池创建 其他线程调用本接口，send需要加锁
-    virtual void OnSendData(UInt64 sessionId, NetMsg_DataHeader *msg);
+    virtual void AsynSend(UInt64 sessionId, NetMsg_DataHeader *msg);
 
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback);
     virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
@@ -76,7 +76,7 @@ public:
 
 private:
     void _OnMoniterMsg(const FS_ThreadPool *pool);
-    void _HandleNetEvent(std::set<UInt64> &sessionIdsToRemove);
+    void _HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, std::set<UInt64> &toPostRecv, std::set<UInt64> &toPostSend);
     void _RemoveSessions(const std::set<UInt64> &sessionIds);
     void _OnHeartbeatTimeOut(const std::set<UInt64> &timeoutSessionIds, std::set<UInt64> &leftSessionIdsToRemove);
 
@@ -98,6 +98,7 @@ private:
     void _CheckSessionHeartbeat(std::set<UInt64> &timeoutSessionIds);  // 线程不安全
 
     void _PostSessions();
+    void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
     void _LinkCacheToSessions();
 
 private:

@@ -82,12 +82,15 @@ private:
 private:
     std::atomic<bool> _isClose;
     ConditionLocker _locker;
+    ConditionLocker _connectLocker;
     FS_ThreadPool *_pool;
 
     // 数据在线程结束时清理
+    std::atomic<bool> _isDataDirtied;
     std::set<UInt64> _newMsgSessionIds;     // TODO:最新的sessionId用于索引最新的数据避免全session遍历
     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _sessionIdRefMsgs;
     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _sessionIdRefMsgCache;      // 缓存：转移消息链表指针即可消耗小
+    std::list<std::list<NetMsg_DataHeader *> *> _toFree;
     std::map<UInt64, IFS_MsgTransfer *> _sessionIdRefTransfer;
     std::set<UInt64> _delayDisconnectedSessions;
     std::set<UInt64> _delayDisconnectedSessionsCache;

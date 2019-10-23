@@ -87,7 +87,7 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
         _usableBlockHeader = _usableBlockHeader->_nextBlock;
         newBlock->_alloctor = this;
         newBlock->_isInPool = true;
-        // ASSERT(newBlock->_ref == 0);
+        ASSERT(newBlock->_ref == 0);
         newBlock->_ref = 1;
     }
     
