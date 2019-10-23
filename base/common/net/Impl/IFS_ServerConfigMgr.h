@@ -35,9 +35,11 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT FS_IniFile;
 class BASE_EXPORT IFS_ServerConfigMgr
 {
 public:
@@ -48,8 +50,18 @@ public:
 public:
     Int32 Init();
 
+    // ∂¡≈‰÷√
+public:
+    FS_String GetListenIp() const;
+    UInt16 GetListenPort() const;
+    Int32 GetTransferCnt() const;
+
+private:
+    Int32 _InitDefCfgs();
+
 private:
     Int32 _connectorCntNeeded;
+    FS_IniFile *_ini;
 };
 
 FS_NAMESPACE_END

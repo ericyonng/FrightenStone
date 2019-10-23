@@ -55,6 +55,7 @@
 #include "base/common/memleak/memleak.h"
 
 fs::FS_ServerCore *g_ServerCore = NULL;
+fs::IFS_ServerConfigMgr *g_SvrCfg = NULL;
 
 FS_NAMESPACE_BEGIN
 FS_ServerCore::FS_ServerCore()
@@ -356,7 +357,7 @@ Int32 FS_ServerCore::_CreateNetModules()
     _connector = FS_ConnectorFactory::Create();
 
     //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
-    const Int32 cpuCnt = 1;
+    const Int32 cpuCnt = g_SvrCfg->GetTransferCnt();
     _msgTransfers.resize(cpuCnt);
     for(Int32 i = 0; i < cpuCnt; ++i)
         _msgTransfers[i] = FS_MsgTransferFactory::Create();

@@ -74,6 +74,17 @@
 // 统计服务器负载的时间间隔
 #define IOCP_STATISTIC_INTERVAL     1000    // 时间间隔单位ms
 #define CLIENT_QUANTITY_LIMIT   200000
+#define SVR_CONFIG_PATH_NAME    "./ServerCfg.ini"   // 服务器配置
+
+#pragma region Listener 默认配置
+#define SVR_CFG_LISTENER_SEG                "Listener"
+#define SVR_CFG_TRANSFER_SEG_CNT_KEY        "TransferCnt"
+#define SVR_CFG_TRANSFER_SEG_CNT            "8"             // 数据传输支持8线程
+#define SVR_CFG_LISTENER_IP_KEY             "ip"
+#define SVR_CFG_LISTENER_IP                 "127.0.0.1"
+#define SVR_CFG_LISTENER_PORT_KEY           "port"
+#define SVR_CFG_LISTENER_PORT               "4567"
+#pragma endregion
 
 // 心跳队列排序
 // class FS_ClientComp

@@ -144,5 +144,6 @@ FS_NAMESPACE_END
 #include "base/common/net/Impl/FS_ServerCoreImpl.h"
 
 extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;
+extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;
 
 #endif
