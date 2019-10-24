@@ -233,6 +233,8 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         sessinsToRemove = timeoutSessionIds;
         _PostSessions();
 
+        // do some post
+
         Int32 ret = StatusDefs::Success;
         while(true)
         {
@@ -246,6 +248,8 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 
             _HandleNetEvent(sessinsToRemove, toPostRecv, toPostSend);
         }
+
+        // 组合生成一个
 
         // post recv
         for(auto &sessionId : toPostRecv)
