@@ -238,6 +238,8 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         _CheckSessionHeartbeat(sessinsToRemove);
         _PostSessions();
 
+        // do some post
+
         Int32 ret = StatusDefs::Success;
         while(true)
         {
@@ -624,13 +626,9 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
     if(_hasNewSessionLinkin)
     {
         _connectorGuard.Lock();
-        _linkSessionSwitchCache = _linkSessionCache;
-        _linkSessionCache.clear();
-        _hasNewSessionLinkin = false;
-        _connectorGuard.Unlock();
-
-        for(auto &session : _linkSessionSwitchCache)
+        for(auto iterSession = _linkSessionCache.begin(); iterSession!=_linkSessionCache.end();)
         {
+            auto session = *iterSession;
             _sessions.insert(std::make_pair(session->GetSessionId(), session));
             auto iocpSession = session->CastTo<FS_IocpSession>();
             auto sender = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_DoPostSend);
@@ -650,9 +648,10 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
                 g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail"));
             }
 
+            iterSession = _linkSessionCache.erase(iterSession);
         }
-
-        _linkSessionSwitchCache.clear();
+        _hasNewSessionLinkin = false;
+        _connectorGuard.Unlock();
     }
 }
 
