@@ -209,10 +209,9 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 {// iocp 在closesocket后会马上返回所有投递的事件，所以不可立即在post未结束时候释放session对象
 
     ULong waitTime = 1;   // TODO可以调节（主要用于心跳检测）
-    std::set<UInt64> timeoutSessionIds;
-    std::set<UInt64> sessinsToRemove;
-    std::set<UInt64> toPostRecv;
-    std::set<UInt64> toPostSend;
+    std::set<IFS_Session *> sessinsToRemove;
+    std::set<IFS_Session *> toPostRecv;
+    std::set<IFS_Session *> toPostSend;
     while(!pool->IsClearingPool() || _sessionCnt > 0)
     {
         _LinkCacheToSessions();
@@ -225,12 +224,10 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         }
 
         // 等待网络消息
-        timeoutSessionIds.clear();
         sessinsToRemove.clear();
         toPostRecv.clear();
         toPostSend.clear();
-        _CheckSessionHeartbeat(timeoutSessionIds);
-        sessinsToRemove = timeoutSessionIds;
+        _CheckSessionHeartbeat(sessinsToRemove);
         _PostSessions();
 
         // do some post
@@ -430,8 +427,8 @@ void FS_IocpMsgTransfer::_RemoveSessions(const std::set<UInt64> &sessionIds)
         if(!session)
             continue;
 
-        // _OnDisconnected(session);
-        _OnGracefullyDisconnect(session);
+        _OnDisconnected(session);
+        // _OnGracefullyDisconnect(session);
     }
 }
 
@@ -556,7 +553,7 @@ void FS_IocpMsgTransfer::_UpdateSessionHeartbeat(IFS_Session *session)
     _sessionHeartbeatQueue.insert(session);
 }
 
-void FS_IocpMsgTransfer::_CheckSessionHeartbeat(std::set<UInt64> &timeoutSessionIds)
+void FS_IocpMsgTransfer::_CheckSessionHeartbeat(std::set<IFS_Session *> &sessionsToRemove)
 {
     _curTime.FlushTime();
     for(auto iterSession = _sessionHeartbeatQueue.begin(); 
@@ -567,7 +564,7 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat(std::set<UInt64> &timeoutSession
         if(session->GetHeartBeatExpiredTime() > _curTime)
             break;
 
-        timeoutSessionIds.insert(session->GetSessionId());
+        sessionsToRemove.insert(session);
 //        g_Log->any<FS_IocpMsgTransfer>("nowTime[%lld][%s] sessionId[%llu] expiredtime[%llu][%s] heartbeat time out."
 //                                       , _curTime.GetMicroTimestamp(), _curTime.ToStringOfMillSecondPrecision().c_str()
 //                                       ,session->GetSessionId()
@@ -650,13 +647,9 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
     if(_hasNewSessionLinkin)
     {
         _connectorGuard.Lock();
-        _linkSessionSwitchCache = _linkSessionCache;
-        _linkSessionCache.clear();
-        _hasNewSessionLinkin = false;
-        _connectorGuard.Unlock();
-
-        for(auto &session : _linkSessionSwitchCache)
+        for(auto iterSession = _linkSessionCache.begin(); iterSession!=_linkSessionCache.end();)
         {
+            auto session = *iterSession;
             _sessions.insert(std::make_pair(session->GetSessionId(), session));
             auto iocpSession = session->CastTo<FS_IocpSession>();
             auto sender = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_DoPostSend);
@@ -676,9 +669,10 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
                 g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail"));
             }
 
+            iterSession = _linkSessionCache.erase(iterSession);
         }
-
-        _linkSessionSwitchCache.clear();
+        _hasNewSessionLinkin = false;
+        _connectorGuard.Unlock();
     }
 
 }

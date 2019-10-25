@@ -95,7 +95,7 @@ private:
     void _ClearSessionsWhenClose();
 
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
-    void _CheckSessionHeartbeat(std::set<UInt64> &timeoutSessionIds);  // 线程不安全
+    void _CheckSessionHeartbeat(std::set<IFS_Session *> &sessionsToRemove);  // 线程不安全
 
     void _PostSessions();
     void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
@@ -114,7 +114,6 @@ private:
     Locker _connectorGuard;
     std::atomic<bool> _hasNewSessionLinkin;     // 
     std::list<IFS_Session *> _linkSessionCache; // 连入的会话缓冲区
-    std::list<IFS_Session *> _linkSessionSwitchCache; // 连入的会话缓冲转换区
     // 待发送的会话缓冲区
     Locker _asynSendGuard;
     std::atomic<bool> _isSendCacheDirtied;
