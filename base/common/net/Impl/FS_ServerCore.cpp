@@ -60,6 +60,7 @@
 fs::FS_ServerCore *g_ServerCore = NULL;
 fs::IFS_ServerConfigMgr *g_SvrCfg = NULL;
 fs::IFS_MsgDispatcher *g_Dispatcher = NULL;
+fs::IFS_BusinessLogic *g_Logic = NULL;
 
 FS_NAMESPACE_BEGIN
 FS_ServerCore::FS_ServerCore()
@@ -242,6 +243,7 @@ void FS_ServerCore::Close()
     // 最后处理
     _AfterClose();
 
+    STLUtil::DelVectorContainer(_logics);
     SocketUtil::ClearSocketEnv();
 }
 
@@ -283,7 +285,7 @@ void FS_ServerCore::_OnDisconnected(IFS_Session *session)
     --_curSessionConnecting;
     ++_sessionDisconnectedCnt;
 
-    _msgDispatcher->OnDisconnected(session);
+    // _msgDispatcher->OnDisconnected(session);
     _connector->OnDisconnected(session);
 }
 
@@ -300,7 +302,7 @@ void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
     // _recvMsgCountPerSecond += incPackets;
 }
 
-void FS_ServerCore::_OnRecvMsgAmount(IFS_Session *session)
+void FS_ServerCore::_OnRecvMsgAmount(std::list<IFS_Session *> &sessions, std::set<IFS_Session *> &toPostSend, Int32 transferId)
 {
 //     auto iocpSession = session->CastTo<FS_IocpSession>();
 //     auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
@@ -312,9 +314,32 @@ void FS_ServerCore::_OnRecvMsgAmount(IFS_Session *session)
 //         ++_recvMsgCountPerSecond;
 //     }
 
-    Int64 incPackets = 0;
-    _msgDispatcher->OnRecv(session, incPackets);
-    _recvMsgCountPerSecond += incPackets;
+    IFS_Session *session = NULL;
+    FS_IocpSession *iocpSession = NULL;
+    UInt64 sessionId = 0;
+    for(auto iterSession = sessions.begin(); iterSession != sessions.end();)
+    {
+        session = *iterSession;
+        sessionId = session->GetSessionId();
+        iocpSession = session->CastTo<FS_IocpSession>();
+        auto recvBuffer = session->CastTo<FS_IocpSession>()->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
+        while(recvBuffer->HasMsg())
+        {
+            auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
+            _logics[transferId]->OnMsgDispatch(session, frontMsg);
+            recvBuffer->PopFront(frontMsg->_packetLength);
+            ++_recvMsgCountPerSecond;
+        }
+
+        if(iocpSession->CanPost() && iocpSession->HasMsgToSend())
+            toPostSend.insert(session);
+
+        iterSession = sessions.erase(iterSession);
+    }
+
+//     Int64 incPackets = 0;
+//     //_msgDispatcher->OnRecv(sessions, incPackets);
+//     _recvMsgCountPerSecond += incPackets;
 }
 
 void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
@@ -380,8 +405,12 @@ Int32 FS_ServerCore::_CreateNetModules()
     //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
     const Int32 cpuCnt = g_SvrCfg->GetTransferCnt();
     _msgTransfers.resize(cpuCnt);
+    _logics.resize(cpuCnt);
     for(Int32 i = 0; i < cpuCnt; ++i)
-        _msgTransfers[i] = FS_MsgTransferFactory::Create();
+    {
+        _logics[i] = new BusinessExample;
+        _msgTransfers[i] = FS_MsgTransferFactory::Create(i);
+    }
 
     _msgDispatcher = FS_MsgDispatcherFactory::Create();
     return StatusDefs::Success;
@@ -532,15 +561,15 @@ void FS_ServerCore::_RegisterToModule()
         // 注册接口
         auto onDisconnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnDisconnected);
         auto onRecvSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsg);
-        auto onRecvAmountRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsgAmount);
+        // auto onRecvAmountRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsgAmount);
         auto onSendSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSendMsg);
         msgTransfer->RegisterDisconnected(onDisconnectedRes);
         msgTransfer->RegisterRecvSucCallback(onRecvSucRes);
         msgTransfer->RegisterSendSucCallback(onSendSucRes);
-        msgTransfer->RegisterRecvAmountCallback(onRecvAmountRes);
+        // msgTransfer->RegisterRecvAmountCallback(onRecvAmountRes);
     }
 
-    _logic->SetDispatcher(_msgDispatcher);
+    // _logic->SetDispatcher(_msgDispatcher);
     _msgDispatcher->BindBusinessLogic(_logic);
 }
 

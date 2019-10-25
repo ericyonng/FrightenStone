@@ -72,11 +72,14 @@ Int32 FS_IocpMsgDispatcher::BeforeStart()
     g_BusinessTimeWheel = _timeWheel;
     _pool = new FS_ThreadPool(0, 1);
 
-    auto st = _logic->BeforeStart();
-    if(st != StatusDefs::Success)
+    if(_logic)
     {
-        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("_logic->BeforeStart error st[%d]"), st);
-        return st;
+        auto st = _logic->BeforeStart();
+        if(st != StatusDefs::Success)
+        {
+            g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("_logic->BeforeStart error st[%d]"), st);
+            return st;
+        }
     }
 
     return StatusDefs::Success;
@@ -84,18 +87,21 @@ Int32 FS_IocpMsgDispatcher::BeforeStart()
 
 Int32 FS_IocpMsgDispatcher::Start()
 {
-    auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_OnBusinessProcessThread);
-    if(!_pool->AddTask(task, true))
-    {
-        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("add task fail"));
-        return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
-    }
+//     auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_OnBusinessProcessThread);
+//     if(!_pool->AddTask(task, true))
+//     {
+//         g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("add task fail"));
+//         return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
+//     }
 
-    auto st = _logic->Start();
-    if(st != StatusDefs::Success)
+    if(_logic)
     {
-        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("_logic->Start error st[%d]"), st);
-        return st;
+        auto st = _logic->Start();
+        if(st != StatusDefs::Success)
+        {
+            g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("_logic->Start error st[%d]"), st);
+            return st;
+        }
     }
 
     return StatusDefs::Success;
@@ -107,7 +113,8 @@ void FS_IocpMsgDispatcher::BeforeClose()
     _sessionIdRefTransfer.clear();
     _connectLocker.Unlock();
 
-    _logic->BeforeClose();
+    if(_logic)
+        _logic->BeforeClose();
 }
 
 void FS_IocpMsgDispatcher::Close()
@@ -142,28 +149,35 @@ void FS_IocpMsgDispatcher::Close()
     }
     STLUtil::DelMapContainer(_sessionIdRefMsgCache);
 
-    _logic->Close();
+    if(_logic)
+        _logic->Close();
 }
 
-void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session, Int64 &incPacketsCnt)
+void FS_IocpMsgDispatcher::OnRecv(std::list<IFS_Session *> &sessions, Int64 &incPacketsCnt)
 {
-    auto iocpSession = session->CastTo<FS_IocpSession>();
-    auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
     incPacketsCnt = 0;
 
-//    g_Log->any<FS_IocpMsgDispatcher>("dispatcher will recv msg");
-
-    //g_Log->net<FS_IocpMsgDispatcher>("time will recv begin.");
     _locker.Lock();
     if(!_isClose)
     {
-        bool hasMsg = recvBuffer->HasMsg();
-        while(recvBuffer->HasMsg())
+        IFS_Session *session = NULL;
+        bool hasMsg = false;
+        for(auto iterSession = sessions.begin(); iterSession != sessions.end();)
         {
-            auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
-            _MoveToBusinessLayer(session, frontMsg);
-            recvBuffer->PopFront(frontMsg->_packetLength);
-            ++incPacketsCnt;
+            session = *iterSession;
+            auto iocpSession = session->CastTo<FS_IocpSession>();
+            auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
+            
+            hasMsg |= recvBuffer->HasMsg();
+            while(recvBuffer->HasMsg())
+            {
+                auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
+                _MoveToBusinessLayer(session, frontMsg);
+                recvBuffer->PopFront(frontMsg->_packetLength);
+                ++incPacketsCnt;
+            }
+
+            iterSession = sessions.erase(iterSession);
         }
 
         if(hasMsg)
@@ -173,17 +187,16 @@ void FS_IocpMsgDispatcher::OnRecv(IFS_Session *session, Int64 &incPacketsCnt)
         }
     }    
     _locker.Unlock();
-    //g_Log->net<FS_IocpMsgDispatcher>("time will recv end.");
 }
 
 void FS_IocpMsgDispatcher::OnDisconnected(IFS_Session *session)
 {
-    _connectLocker.Lock();
-    auto sessionId = session->GetSessionId();
-    _sessionIdRefTransfer.erase(session->GetSessionId());
-    _delayDisconnectedSessions.insert(session->GetSessionId());
-    _isDataDirtied = true;
-    _connectLocker.Unlock();
+//     _connectLocker.Lock();
+//     auto sessionId = session->GetSessionId();
+//     _sessionIdRefTransfer.erase(session->GetSessionId());
+//     _delayDisconnectedSessions.insert(session->GetSessionId());
+//     _isDataDirtied = true;
+//     _connectLocker.Unlock();
 }
 
 void FS_IocpMsgDispatcher::OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer)
@@ -345,13 +358,15 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
 void FS_IocpMsgDispatcher::_DoBusinessProcess(UInt64 sessionId, NetMsg_DataHeader *msgData)
 {
     // TODO:处理单一消息业务逻辑部分
-    _logic->OnMsgDispatch(sessionId, msgData);
+    if(_logic)
+        _logic->OnMsgDispatch(sessionId, msgData);
 }
 
 void FS_IocpMsgDispatcher::_OnDelaySessionDisconnect(UInt64 sessionId)
 {
     // TODO:真实的session断开
-    _logic->OnSessionDisconnected(sessionId);
+    if(_logic)
+        _logic->OnSessionDisconnected(sessionId);
 
     // 移除消息
     _locker.Lock();

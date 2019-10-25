@@ -45,7 +45,7 @@ class BASE_EXPORT IFS_MsgTransfer;
 class BASE_EXPORT FS_MsgTransferFactory
 {
 public:
-    static IFS_MsgTransfer *Create();
+    static IFS_MsgTransfer *Create(Int32 id);
 };
 
 FS_NAMESPACE_END

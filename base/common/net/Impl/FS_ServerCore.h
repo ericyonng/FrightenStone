@@ -55,6 +55,7 @@ class BASE_EXPORT IFS_BusinessLogic;
 
 class BASE_EXPORT FS_ServerCore
 {
+    friend class FS_IocpMsgTransfer;
 public:
     FS_ServerCore();
     virtual ~FS_ServerCore();
@@ -85,7 +86,7 @@ protected:
     void _OnHeartBeatTimeOut(IFS_Session *session);
     // 每接收一个完整包调用一次
     void _OnRecvMsg(IFS_Session *session, Int64 transferBytes);
-    void _OnRecvMsgAmount(IFS_Session *session);
+    void _OnRecvMsgAmount(std::list<IFS_Session *> &sessions, std::set<IFS_Session *> &toPostSend, Int32 transferId);
     // 发送只能统计字节数，包数无法支持统计
     void _OnSendMsg(IFS_Session *session, Int64 transferBytes);
 
@@ -123,6 +124,7 @@ private:
     std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息收发器
     IFS_MsgDispatcher *_msgDispatcher;                 // 消息处理器 业务线程处理
     IFS_BusinessLogic *_logic;                      // 业务逻辑入口
+    std::vector<IFS_BusinessLogic *> _logics;
 
     // TODO:sessionmgr可能需要移除避免锁冲突
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
@@ -147,5 +149,6 @@ FS_NAMESPACE_END
 extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;
 extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;
 extern BASE_EXPORT fs::IFS_MsgDispatcher *g_Dispatcher;
+extern BASE_EXPORT fs::IFS_BusinessLogic *g_Logic;
 
 #endif

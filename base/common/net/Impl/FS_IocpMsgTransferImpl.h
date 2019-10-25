@@ -34,6 +34,26 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
+
+inline Int32 FS_IocpMsgTransfer::_DoEvents()
+{
+    Int32 ret = StatusDefs::Success;
+    while(true)
+    {
+        ret = _HandleNetEvent();
+        if(ret == StatusDefs::IOCP_WaitTimeOut)
+        {
+            return StatusDefs::Success;
+        }
+        else if(ret != StatusDefs::Success)
+        {
+            return ret;
+        }
+    }
+
+    return ret;
+}
+
 inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
 {
     if(!session->CanDisconnect())
@@ -45,36 +65,15 @@ inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
     _OnDisconnected(session);
 }
 
-inline void FS_IocpMsgTransfer::_OnMsgArrived()
+inline void FS_IocpMsgTransfer::_RemoveSessions()
 {
-    // 处理消息到达
-    for(auto iterSession = _msgArriviedSessions.begin(); iterSession != _msgArriviedSessions.end();)
+    IFS_Session *session = NULL;
+    for(auto iterSsession = _toRemove.begin(); iterSsession!=_toRemove.end();)
     {
-        auto session = *iterSession;
-        _serverCoreRecvAmountCallback->Invoke(session);
-        iterSession = _msgArriviedSessions.erase(iterSession);
-    }
-}
-
-inline void FS_IocpMsgTransfer::_RemoveSessions(std::set<IFS_Session *> &sessions)
-{
-    for(auto &session : sessions)
-    {
+        session = *iterSsession;
         _OnDisconnected(session);
+        iterSsession = _toRemove.erase(iterSsession);
         // _OnGracefullyDisconnect(session);
-    }
-}
-
-inline void FS_IocpMsgTransfer::_OnHeartbeatTimeOut(const std::set<UInt64> &timeoutSessionIds, std::set<UInt64> &leftSessionIdsToRemove)
-{
-    for(auto &sessionId : timeoutSessionIds)
-    {
-        leftSessionIdsToRemove.erase(sessionId);
-        auto session = _GetSession(sessionId);
-        if(!session)
-            continue;
-
-        OnHeartBeatTimeOut(session);
     }
 }
 

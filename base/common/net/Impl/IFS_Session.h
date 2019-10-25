@@ -98,10 +98,6 @@ public:
     void OnMsgArrived();
 
     // 内部
-protected:
-    virtual void _OnSend() = 0;
-
-    // 内部
 private:
     void _Destroy();
     

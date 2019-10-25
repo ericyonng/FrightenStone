@@ -37,6 +37,7 @@ FS_NAMESPACE_BEGIN
 inline IFS_BusinessLogic::IFS_BusinessLogic()
     :_dispatcher(NULL)
 {
+    g_Logic = this;
 }
 
 inline IFS_BusinessLogic::~IFS_BusinessLogic()
