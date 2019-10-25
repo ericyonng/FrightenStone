@@ -39,10 +39,9 @@ OBJ_POOL_CREATE_DEF_IMPL(FS_IocpSession, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_IocpSession::~FS_IocpSession()
 {
-//     if(!CanDestroy())
-//         g_Log->e<FS_IocpSession>(_LOGFMT_("has io uncompleted please check"));
+    if(!CanDestroy())
+        g_Log->e<FS_IocpSession>(_LOGFMT_("has io uncompleted please check"));
 
-        Fs_SafeFree(_sender);
 }
 
 NetMsg_DataHeader *FS_IocpSession::FrontRecvMsg()

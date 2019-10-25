@@ -33,192 +33,197 @@
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
 
 FS_NAMESPACE_BEGIN
-
-class User
-{
-public:
-    User(UInt64 sessionId, IFS_MsgDispatcher *dispatcher)
-        :_sessionId(sessionId)
-        ,_recvMsgId(1)
-        ,_sendMsgId(1)
-        ,_dispatcher(dispatcher)
-    {
-    }
-    ~User()
-    {
-    }
-    
-    void SendData(NetMsg_DataHeader *msgData)
-    {
-        _dispatcher->SendData(_sessionId, msgData);
-    }
-
-    UInt64 _sessionId;
-    // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
-    Int32 _recvMsgId = 1;
-    // 测试接收发逻辑用
-    // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
-    Int32 _sendMsgId = 1;
-    IFS_MsgDispatcher *_dispatcher;
-};
-
-class MyLogic : public IFS_BusinessLogic
-{
-public:
-    std::map<UInt64, User *> _users;
-
-public:
-    MyLogic() {}
-    virtual ~MyLogic() 
-    {
-        STLUtil::DelMapContainer(_users);
-    }
-    virtual void Release()
-    {
-        delete this;
-    }
-
-public:
-    User *GetUser(UInt64 sessionId)
-    {
-        auto iterUser = _users.find(sessionId);
-        if(iterUser == _users.end())
-            return NULL;
-
-        return iterUser->second;
-    }
-
-    void RemoveUser(UInt64 sessionId)
-    {
-        auto iterUser = _users.find(sessionId);
-        if(iterUser == _users.end())
-            return;
-
-        Fs_SafeFree(iterUser->second);
-        _users.erase(iterUser);
-    }
-
-    User *NewUser(UInt64 sessionId)
-    {
-        auto user = new User(sessionId, _dispatcher);
-        _users.insert(std::make_pair(sessionId, user));
-        return user;
-    }
-
-    virtual Int32 Start()
-    {
-        return StatusDefs::Success;
-    }
-
-    void BeforeClose()
-    {
-        STLUtil::DelMapContainer(_users);
-        g_Log->sys<MyLogic>(_LOGFMT_("MyLogic before closed remove all users"));
-    }
-
-    virtual void Close()
-    {
-         g_Log->sys<MyLogic>(_LOGFMT_("MyLogic closed"));
-    }
-
-    virtual void OnMsgDispatch(UInt64 sessionId, NetMsg_DataHeader *msgData)
-    {
-        auto user = GetUser(sessionId);
-        if(!user)
-            user = NewUser(sessionId);
-
-        // g_Log->any<MyLogic>("sessionid[%llu] handle a msg", sessionId);
-        switch(msgData->_cmd)
-        {
-            case fs::ProtocolCmd::LoginReq:
-            {
-                fs::LoginReq *login = static_cast<fs::LoginReq *>(msgData);
-                
-           //     g_Log->any<MyLogic>("sessionid[%llu] login username[%s], pwd[%s] msgId[%d] user recvmsgid"
-           //                         , sessionId, login->_userName, login->_pwd, login->_msgId, user->_recvMsgId);
-                // 检查消息ID
-                if(login->_msgId != user->_recvMsgId)
-                {//当前消息ID和本地收消息次数不匹配
-                    g_Log->e<MyLogic>(_LOGFMT_("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>")
-                                            , sessionId, login->_msgId
-                                            , user->_recvMsgId, login->_msgId - user->_recvMsgId);
-                }
-
-                // 返回包
-                ++user->_recvMsgId;
-                fs::LoginRes ret;
-                ret._msgId = user->_sendMsgId; 
-                user->SendData(&ret);
-                ++user->_sendMsgId;
-                return;
-            }//接收 消息---处理 发送   生产者 数据缓冲区  消费者 
-            break;
-            case fs::ProtocolCmd::LogoutReq:
-            {
-                fs::FS_MsgReadStream r(msgData);
-                // 读取消息长度
-                r.ReadInt16();
-                // 读取消息命令
-                r.GetNetMsgCmd();
-                auto n1 = r.ReadInt8();
-                auto n2 = r.ReadInt16();
-                auto n3 = r.ReadInt32();
-                auto n4 = r.ReadFloat();
-                auto n5 = r.ReadDouble();
-                uint32_t n = 0;
-                r.ReadWithoutOffsetPos(n);
-                char name[32] = {};
-                auto n6 = r.ReadArray(name, 32);
-                char pw[32] = {};
-                auto n7 = r.ReadArray(pw, 32);
-                int ata[10] = {};
-                auto n8 = r.ReadArray(ata, 10);
-                ///
-                fs::FS_MsgWriteStream s(128);
-                s.SetNetMsgCmd(fs::ProtocolCmd::LogoutNty);
-                s.WriteInt8(n1);
-                s.WriteInt16(n2);
-                s.WriteInt32(n3);
-                s.WriteFloat(n4);
-                s.WriteDouble(n5);
-                s.WriteArray(name, n6);
-                s.WriteArray(pw, n7);
-                s.WriteArray(ata, n8);
-                s.Finish();
-
-                // TODO:需要支持流发送
-//                 _dispatcher->SendData(sessionId, )
-//                 client->SendData(*s.GetDataAddr(), s.GetWrLength());
-                //                 g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> logout")
-                //                                        , static_cast<Int32>(client->GetSocket()));
-                return;
-            }
-            break;
-            case fs::ProtocolCmd::CheckHeartReq:
-            {
-                fs::CheckHeartRes ret;
-                _dispatcher->SendData(sessionId, &ret);
-                //g_Log->any("socket<%d> CheckHeartReq", static_cast<Int32>(client->GetSocket()));
-                return;
-            }
-            default:
-            {
-                g_Log->w<MyLogic>(_LOGFMT_("recv <sessionId=%llu> undefine msgType,dataLen：%hu")
-                                       , sessionId, msgData->_packetLength);
-            }
-            break;
-        }
-
-        return;
-    }
-    virtual void OnSessionDisconnected(UInt64 sessionId)
-    {
-        RemoveUser(sessionId);
-         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
-    }
-
-
-};
+// 
+// class User
+// {
+// public:
+//     User(UInt64 sessionId, IFS_MsgDispatcher *dispatcher)
+//         :_sessionId(sessionId)
+//         ,_recvMsgId(1)
+//         ,_sendMsgId(1)
+//         ,_dispatcher(dispatcher)
+//     {
+//     }
+//     ~User()
+//     {
+//     }
+//     
+//     void SendData(IFS_Session *session, NetMsg_DataHeader *msgData)
+//     {
+//         session->Send(msgData);
+//     }
+// 
+//     UInt64 _sessionId;
+//     // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
+//     Int32 _recvMsgId = 1;
+//     // 测试接收发逻辑用
+//     // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
+//     Int32 _sendMsgId = 1;
+//     IFS_MsgDispatcher *_dispatcher;
+// };
+// 
+// class MyLogic : public IFS_BusinessLogic
+// {
+// public:
+//     std::map<UInt64, User *> _users;
+// 
+// public:
+//     MyLogic() {}
+//     virtual ~MyLogic() 
+//     {
+//         STLUtil::DelMapContainer(_users);
+//     }
+//     virtual void Release()
+//     {
+//         delete this;
+//     }
+// 
+// public:
+//     User *GetUser(UInt64 sessionId)
+//     {
+//         auto iterUser = _users.find(sessionId);
+//         if(iterUser == _users.end())
+//             return NULL;
+// 
+//         return iterUser->second;
+//     }
+// 
+//     void RemoveUser(UInt64 sessionId)
+//     {
+//         auto iterUser = _users.find(sessionId);
+//         if(iterUser == _users.end())
+//             return;
+// 
+//         Fs_SafeFree(iterUser->second);
+//         _users.erase(iterUser);
+//     }
+// 
+//     User *NewUser(UInt64 sessionId)
+//     {
+//         auto user = new User(sessionId, _dispatcher);
+//         _users.insert(std::make_pair(sessionId, user));
+//         return user;
+//     }
+// 
+//     virtual Int32 Start()
+//     {
+//         return StatusDefs::Success;
+//     }
+// 
+//     void BeforeClose()
+//     {
+//         STLUtil::DelMapContainer(_users);
+//         g_Log->sys<MyLogic>(_LOGFMT_("MyLogic before closed remove all users"));
+//     }
+// 
+//     virtual void Close()
+//     {
+//          g_Log->sys<MyLogic>(_LOGFMT_("MyLogic closed"));
+//     }
+// 
+//     virtual void OnMsgDispatch(fs::IFS_Session *session, NetMsg_DataHeader *msgData)
+//     {
+//         auto sessionId = session->GetSessionId();
+//         auto user = GetUser(sessionId);
+//         if(!user)
+//             user = NewUser(sessionId);
+// 
+//         // g_Log->any<MyLogic>("sessionid[%llu] handle a msg", sessionId);
+//         switch(msgData->_cmd)
+//         {
+//             case fs::ProtocolCmd::LoginReq:
+//             {
+//                 fs::LoginReq *login = static_cast<fs::LoginReq *>(msgData);
+// 
+//                 //     g_Log->any<MyLogic>("sessionid[%llu] login username[%s], pwd[%s] msgId[%d] user recvmsgid"
+//                 //                         , sessionId, login->_userName, login->_pwd, login->_msgId, user->_recvMsgId);
+//                      // 检查消息ID
+//                 if(login->_msgId != user->_recvMsgId)
+//                 {//当前消息ID和本地收消息次数不匹配
+//                     g_Log->e<MyLogic>(_LOGFMT_("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>")
+//                                       , sessionId, login->_msgId
+//                                       , user->_recvMsgId, login->_msgId - user->_recvMsgId);
+//                 }
+// 
+//                 // 返回包
+//                 ++user->_recvMsgId;
+//                 fs::LoginRes ret;
+//                 ret._msgId = user->_sendMsgId;
+//                 user->SendData(session, &ret);
+//                 ++user->_sendMsgId;
+//                 return;
+//             }//接收 消息---处理 发送   生产者 数据缓冲区  消费者 
+//             break;
+//             case fs::ProtocolCmd::LogoutReq:
+//             {
+//                 fs::FS_MsgReadStream r(msgData);
+//                 // 读取消息长度
+//                 r.ReadInt16();
+//                 // 读取消息命令
+//                 r.GetNetMsgCmd();
+//                 auto n1 = r.ReadInt8();
+//                 auto n2 = r.ReadInt16();
+//                 auto n3 = r.ReadInt32();
+//                 auto n4 = r.ReadFloat();
+//                 auto n5 = r.ReadDouble();
+//                 uint32_t n = 0;
+//                 r.ReadWithoutOffsetPos(n);
+//                 char name[32] = {};
+//                 auto n6 = r.ReadArray(name, 32);
+//                 char pw[32] = {};
+//                 auto n7 = r.ReadArray(pw, 32);
+//                 int ata[10] = {};
+//                 auto n8 = r.ReadArray(ata, 10);
+//                 ///
+//                 fs::FS_MsgWriteStream s(128);
+//                 s.SetNetMsgCmd(fs::ProtocolCmd::LogoutNty);
+//                 s.WriteInt8(n1);
+//                 s.WriteInt16(n2);
+//                 s.WriteInt32(n3);
+//                 s.WriteFloat(n4);
+//                 s.WriteDouble(n5);
+//                 s.WriteArray(name, n6);
+//                 s.WriteArray(pw, n7);
+//                 s.WriteArray(ata, n8);
+//                 s.Finish();
+// 
+//                 // TODO:需要支持流发送
+// //                 _dispatcher->SendData(sessionId, )
+// //                 client->SendData(*s.GetDataAddr(), s.GetWrLength());
+//                 //                 g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> logout")
+//                 //                                        , static_cast<Int32>(client->GetSocket()));
+//                 return;
+//             }
+//             break;
+//             case fs::ProtocolCmd::CheckHeartReq:
+//             {
+//                 fs::CheckHeartRes ret;
+//                 _dispatcher->SendData(sessionId, &ret);
+//                 //g_Log->any("socket<%d> CheckHeartReq", static_cast<Int32>(client->GetSocket()));
+//                 return;
+//             }
+//             default:
+//             {
+//                 g_Log->w<MyLogic>(_LOGFMT_("recv <sessionId=%llu> undefine msgType,dataLen：%hu")
+//                                   , sessionId, msgData->_packetLength);
+//             }
+//             break;
+//         }
+// 
+//         return;
+//     }
+//     virtual void OnMsgDispatch(UInt64 sessionId, NetMsg_DataHeader *msgData)
+//     {
+//        
+//     }
+//     virtual void OnSessionDisconnected(UInt64 sessionId)
+//     {
+//         RemoveUser(sessionId);
+//          // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
+//     }
+// 
+// 
+// };
 // 
 // class EasyFSServer : public fs::FS_MainIocpServer
 // {
@@ -399,9 +404,9 @@ void TestServer::Run()
     {
         printf("little endian\n");
     }
-    fs::MyLogic *newLogic = new fs::MyLogic;
+    //fs::MyLogic *newLogic = new fs::MyLogic;
     fs::FS_ServerCore *serverCore = new fs::FS_ServerCore();
-    auto st = serverCore->Start(newLogic);
+    auto st = serverCore->Start(NULL);
     if(st == StatusDefs::Success)
     {
         getchar();

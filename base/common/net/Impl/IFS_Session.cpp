@@ -105,7 +105,6 @@ bool IFS_Session::Send(NetMsg_DataHeader *header)
 //                            , _sessionId);
 
     _toSend.push_back(newBuffer);
-    _OnSend();
     return true;
 }
 

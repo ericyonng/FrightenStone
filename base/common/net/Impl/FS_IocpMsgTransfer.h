@@ -51,7 +51,7 @@ class BASE_EXPORT FS_IocpSession;
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
 public:
-    FS_IocpMsgTransfer();
+    FS_IocpMsgTransfer(Int32 id);
     virtual ~FS_IocpMsgTransfer();
 
 public:
@@ -70,17 +70,17 @@ public:
 
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback);
     virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
-    virtual void RegisterRecvAmountCallback(IDelegate<void, IFS_Session *> *callback);
+    virtual void RegisterRecvAmountCallback(IDelegate<void, std::list<IFS_Session *> &> *callback);
     virtual void RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
     virtual void RegisterHeatBeatTimeOutCallback(IDelegate<void, IFS_Session *> *callback);
     virtual Int32 GetSessionCnt();
 
 private:
     void _OnMoniterMsg(const FS_ThreadPool *pool);
-    void _HandleNetEvent(std::set<IFS_Session *> &sessionIdsToRemove, std::set<IFS_Session *> &toPostRecv, std::set<IFS_Session *> &toPostSend);
+    Int32 _DoEvents();
+    Int32 _HandleNetEvent();
     void _OnMsgArrived();
-    void _RemoveSessions(std::set<IFS_Session *> &sessionIds);
-    void _OnHeartbeatTimeOut(const std::set<UInt64> &timeoutSessionIds, std::set<UInt64> &leftSessionIdsToRemove);
+    void _RemoveSessions();
 
     // 网络事件 线程不安全
 private:
@@ -97,13 +97,16 @@ private:
     void _ClearSessionsWhenClose();
 
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
-    void _CheckSessionHeartbeat(std::set<IFS_Session *> &timeoutSessions);  // 线程不安全
+    void _CheckSessionHeartbeat();  // 线程不安全
 
-    void _PostSessions();
+    void _PostEventsToIocp();
+
+    void _AsynSendFromDispatcher(std::set<IFS_Session *> &toRemove);
     void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
     void _LinkCacheToSessions();
 
 private:
+    Int32 _id;
     std::atomic<Int32> _sessionCnt;             // 会话个数
     std::map<UInt64, IFS_Session *> _sessions;  // key:sessionId
     Time _curTime;
@@ -114,19 +117,23 @@ private:
 
     // 缓冲区
     Locker _connectorGuard;
-    std::atomic<bool> _hasNewSessionLinkin;     // 
-    std::list<IFS_Session *> _linkSessionCache; // 连入的会话缓冲区
-    std::list<IFS_Session *> _msgArriviedSessions;      // 消息到达的会话
+    std::atomic<bool> _hasNewSessionLinkin;         // 
+    std::list<IFS_Session *> _linkSessionCache;     // 连入的会话缓冲区
+    std::list<IFS_Session *> _msgArriviedSessions;  // 消息到达的会话
+
     // 待发送的会话缓冲区
     Locker _asynSendGuard;
     std::atomic<bool> _isSendCacheDirtied;
-    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendQueueCache; // key:sessionId
-    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendQueue;  // key:sessionId
-    
+    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueueCache; // key:sessionId
+    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueue;  // key:sessionId
+
+    std::set<IFS_Session *> _toPostRecv;
+    std::set<IFS_Session *> _toPostSend;
+    std::set<IFS_Session *> _toRemove;
 
     IDelegate<void, IFS_Session *> *_serverCoreDisconnectedCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreRecvSucCallback;
-    IDelegate<void, IFS_Session *> *_serverCoreRecvAmountCallback;
+    IDelegate<void, std::list<IFS_Session *> &> *_serverCoreRecvAmountCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreSendSucCallback;
     IDelegate<void, IFS_Session *> *_serverCoreHeartBeatTimeOutCallback;
 };

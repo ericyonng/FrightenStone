@@ -37,16 +37,9 @@ FS_NAMESPACE_BEGIN
 
 inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
     :IFS_Session(sessionId, sock, addrInfo)
-    ,_sender(NULL)
     ,_isPostRecv(false)
     ,_isPostSend(false)
 {
-}
-
-inline void FS_IocpSession::BindSender(IDelegate<bool, FS_IocpSession *, bool> *sender)
-{
-    Fs_SafeFree(_sender);
-    _sender = sender;
 }
 
 inline void FS_IocpSession::ResetPostRecvMask()
@@ -118,11 +111,5 @@ inline void FS_IocpSession::OnRecvSuc(size_t transferBytes, IoDataBase *ioData)
     _isPostRecv = false;
     ioData->_callback->Invoke(transferBytes);
 }
-
-inline void FS_IocpSession::_OnSend()
-{
-    _sender->Invoke(this, true);
-}
-
 FS_NAMESPACE_END
 #endif
