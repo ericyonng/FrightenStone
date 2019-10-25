@@ -45,6 +45,39 @@ inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
     _OnDisconnected(session);
 }
 
+inline void FS_IocpMsgTransfer::_OnMsgArrived()
+{
+    // 处理消息到达
+    for(auto iterSession = _msgArriviedSessions.begin(); iterSession != _msgArriviedSessions.end();)
+    {
+        auto session = *iterSession;
+        _serverCoreRecvAmountCallback->Invoke(session);
+        iterSession = _msgArriviedSessions.erase(iterSession);
+    }
+}
+
+inline void FS_IocpMsgTransfer::_RemoveSessions(std::set<IFS_Session *> &sessions)
+{
+    for(auto &session : sessions)
+    {
+        _OnDisconnected(session);
+        // _OnGracefullyDisconnect(session);
+    }
+}
+
+inline void FS_IocpMsgTransfer::_OnHeartbeatTimeOut(const std::set<UInt64> &timeoutSessionIds, std::set<UInt64> &leftSessionIdsToRemove)
+{
+    for(auto &sessionId : timeoutSessionIds)
+    {
+        leftSessionIdsToRemove.erase(sessionId);
+        auto session = _GetSession(sessionId);
+        if(!session)
+            continue;
+
+        OnHeartBeatTimeOut(session);
+    }
+}
+
 FS_NAMESPACE_END
 #endif
 

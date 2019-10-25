@@ -52,6 +52,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer()
     ,_ioEvent(NULL)
     ,_serverCoreDisconnectedCallback(NULL)
     ,_serverCoreRecvSucCallback(NULL)
+    ,_serverCoreRecvAmountCallback(NULL)
     ,_serverCoreSendSucCallback(NULL)
     ,_serverCoreHeartBeatTimeOutCallback(NULL)
     ,_sessionCnt{0}
@@ -62,6 +63,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer()
 
 FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
 {
+    Fs_SafeFree(_serverCoreRecvAmountCallback);
     Fs_SafeFree(_serverCoreSendSucCallback);
     Fs_SafeFree(_serverCoreRecvSucCallback);
     Fs_SafeFree(_serverCoreDisconnectedCallback);
@@ -155,7 +157,7 @@ void FS_IocpMsgTransfer::OnHeartBeatTimeOut(IFS_Session *session)
 //                                    , session->GetSessionId()
 //                                    , session->GetSocket());
 
-    _serverCoreHeartBeatTimeOutCallback->Invoke(session);
+    
     auto iocpSession = session->CastTo<FS_IocpSession>();
     iocpSession->ResetPostRecvMask();
     iocpSession->ResetPostSendMask();
@@ -188,6 +190,12 @@ void FS_IocpMsgTransfer::RegisterRecvSucCallback(IDelegate<void, IFS_Session *, 
     _serverCoreRecvSucCallback = callback;
 }
 
+void FS_IocpMsgTransfer::RegisterRecvAmountCallback(IDelegate<void, IFS_Session *> *callback)
+{
+    Fs_SafeFree(_serverCoreRecvAmountCallback);
+    _serverCoreRecvAmountCallback = callback;
+}
+
 void FS_IocpMsgTransfer::RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback)
 {
     Fs_SafeFree(_serverCoreSendSucCallback);
@@ -209,10 +217,9 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
 {// iocp 在closesocket后会马上返回所有投递的事件，所以不可立即在post未结束时候释放session对象
 
     ULong waitTime = 1;   // TODO可以调节（主要用于心跳检测）
-    std::set<UInt64> timeoutSessionIds;
-    std::set<UInt64> sessinsToRemove;
-    std::set<UInt64> toPostRecv;
-    std::set<UInt64> toPostSend;
+    std::set<IFS_Session *> sessinsToRemove;
+    std::set<IFS_Session *> toPostRecv;
+    std::set<IFS_Session *> toPostSend;
     while(!pool->IsClearingPool() || _sessionCnt > 0)
     {
         _LinkCacheToSessions();
@@ -225,12 +232,10 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
         }
 
         // 等待网络消息
-        timeoutSessionIds.clear();
         sessinsToRemove.clear();
         toPostRecv.clear();
         toPostSend.clear();
-        _CheckSessionHeartbeat(timeoutSessionIds);
-        sessinsToRemove = timeoutSessionIds;
+        _CheckSessionHeartbeat(sessinsToRemove);
         _PostSessions();
 
         Int32 ret = StatusDefs::Success;
@@ -247,23 +252,25 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
             _HandleNetEvent(sessinsToRemove, toPostRecv, toPostSend);
         }
 
+        _OnMsgArrived();
+
         // post recv
-        for(auto &sessionId : toPostRecv)
+        for(auto &session : toPostRecv)
         {
-            if(!_DoPostRecv(_GetSession(sessionId)->CastTo<FS_IocpSession>(), false))
-                sessinsToRemove.insert(sessionId);
+            if(!_DoPostRecv(session->CastTo<FS_IocpSession>(), false))
+                sessinsToRemove.insert(session);
         }
 
         // post send
-        for(auto &sessionId : toPostSend)
+        for(auto &session : toPostSend)
         {
-            if(!_DoPostSend(_GetSession(sessionId)->CastTo<FS_IocpSession>(), false))
-                sessinsToRemove.insert(sessionId);
+            if(!_DoPostSend(session->CastTo<FS_IocpSession>(), false))
+                sessinsToRemove.insert(session);
         }
         
         if(ret != StatusDefs::Success)
         {
-            _OnHeartbeatTimeOut(timeoutSessionIds, sessinsToRemove);
+            _RemoveSessions(sessinsToRemove);
             g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("_OnMoniterMsg.wait nothing but ret[%d] monitor end."), ret);
             break;
         }
@@ -276,13 +283,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
             g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("iocp退出 code=%lld"), _ioEvent->_data._code);
             break;
         }
-
-//        g_Log->any<FS_IocpMsgTransfer>("iocp wake up of ret[%d] sessionId[%llu]"
-//                                       , ret, _ioEvent->_data._sessionId);
-
-
         
-        _OnHeartbeatTimeOut(timeoutSessionIds, sessinsToRemove);
         _RemoveSessions(sessinsToRemove);
     }
 
@@ -292,7 +293,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
     _ClearSessionsWhenClose();
 }
 
-void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, std::set<UInt64> &toPostRecv, std::set<UInt64> &toPostSend)
+void FS_IocpMsgTransfer::_HandleNetEvent(std::set<IFS_Session *> &sessionIdsToRemove, std::set<IFS_Session *> &toPostRecv, std::set<IFS_Session *> &toPostSend)
 {
     const UInt64 sessionId = _ioEvent->_data._sessionId;
 
@@ -333,9 +334,10 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
                                            _ioEvent->_bytesTrans);
 
             iocpSession->ResetPostRecvMask();
-            sessionIdsToRemove.insert(sessionId);
-            toPostRecv.erase(sessionId);
-            toPostSend.erase(sessionId);
+            iocpSession->MaskClose();
+            sessionIdsToRemove.insert(session);
+            toPostRecv.erase(session);
+            toPostSend.erase(session);
             return;
         }
 
@@ -343,7 +345,7 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
 
         // 消息接收回调
         _serverCoreRecvSucCallback->Invoke(session, _ioEvent->_bytesTrans);
-
+        _msgArriviedSessions.push_back(session);
         _UpdateSessionHeartbeat(session);
 
 //        g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] transfer[%lu] recv msg", sessionId, _ioEvent->_bytesTrans);
@@ -351,7 +353,7 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
         // 重新投递接收
         if(iocpSession->CanPost())
         {
-            toPostRecv.insert(sessionId);
+            toPostRecv.insert(session);
 //             if(!_DoPostRecv(iocpSession, false))
 //             {
 //                 sessionIdsToRemove.insert(sessionId);
@@ -375,9 +377,10 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
             iocpSession->ResetPostSendMask();
-            sessionIdsToRemove.insert(sessionId);
-            toPostSend.erase(sessionId);
-            toPostRecv.erase(sessionId);
+            iocpSession->MaskClose();
+            sessionIdsToRemove.insert(session);
+            toPostSend.erase(session);
+            toPostRecv.erase(session);
             return;
         }
 
@@ -392,7 +395,7 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
         // 重新投递接收
         if(iocpSession->CanPost() && iocpSession->HasMsgToSend())
         {
-            toPostSend.insert(sessionId);
+            toPostSend.insert(session);
 //             if(!_DoPostSend(iocpSession, false))
 //             {
 //                 sessionIdsToRemove.insert(sessionId);
@@ -405,7 +408,7 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
     else
     {
         iocpSession->EnableDisconnect();
-        sessionIdsToRemove.insert(sessionId);
+        sessionIdsToRemove.insert(session);
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
     }
 
@@ -414,33 +417,7 @@ void FS_IocpMsgTransfer::_HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, s
     {
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("session is closed sessionId[%llu]."), sessionId);
         // iocpSession->EnableDisconnect();
-        sessionIdsToRemove.insert(sessionId);
-    }
-}
-
-void FS_IocpMsgTransfer::_RemoveSessions(const std::set<UInt64> &sessionIds)
-{
-    for(auto &sessionId : sessionIds)
-    {
-        auto session = _GetSession(sessionId);
-        if(!session)
-            continue;
-
-        // _OnDisconnected(session);
-        _OnGracefullyDisconnect(session);
-    }
-}
-
-void FS_IocpMsgTransfer::_OnHeartbeatTimeOut(const std::set<UInt64> &timeoutSessionIds, std::set<UInt64> &leftSessionIdsToRemove)
-{
-    for(auto &sessionId : timeoutSessionIds)
-    {
-        leftSessionIdsToRemove.erase(sessionId);
-        auto session = _GetSession(sessionId);
-        if(!session)
-            continue;
-
-        OnHeartBeatTimeOut(session);
+        sessionIdsToRemove.insert(session);
     }
 }
 
@@ -552,7 +529,7 @@ void FS_IocpMsgTransfer::_UpdateSessionHeartbeat(IFS_Session *session)
     _sessionHeartbeatQueue.insert(session);
 }
 
-void FS_IocpMsgTransfer::_CheckSessionHeartbeat(std::set<UInt64> &timeoutSessionIds)
+void FS_IocpMsgTransfer::_CheckSessionHeartbeat(std::set<IFS_Session *> &timeoutSessions)
 {
     _curTime.FlushTime();
     for(auto iterSession = _sessionHeartbeatQueue.begin(); 
@@ -563,7 +540,8 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat(std::set<UInt64> &timeoutSession
         if(session->GetHeartBeatExpiredTime() > _curTime)
             break;
 
-        timeoutSessionIds.insert(session->GetSessionId());
+        timeoutSessions.insert(session);
+        _serverCoreHeartBeatTimeOutCallback->Invoke(session);
 //        g_Log->any<FS_IocpMsgTransfer>("nowTime[%lld][%s] sessionId[%llu] expiredtime[%llu][%s] heartbeat time out."
 //                                       , _curTime.GetMicroTimestamp(), _curTime.ToStringOfMillSecondPrecision().c_str()
 //                                       ,session->GetSessionId()
@@ -600,7 +578,7 @@ void FS_IocpMsgTransfer::_PostSessions()
             auto iterSession = _sessions.find(iterMsgs->first);
             if(iterSession == _sessions.end())
             {
-                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] has already disconnected or is not existed before"), iterMsgs->first);
+                // g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] has already disconnected or is not existed before"), iterMsgs->first);
                 _FreeSendList(iterMsgs->second);
                 iterMsgs = _asynSendQueue.erase(iterMsgs);
                 continue;
@@ -676,7 +654,6 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
 
         _linkSessionSwitchCache.clear();
     }
-
 }
 
 FS_NAMESPACE_END

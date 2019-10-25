@@ -35,6 +35,7 @@
 #include "base/common/net/Defs/FS_IocpBuffer.h"
 #include "base/common/net/Impl/IFS_MsgTransfer.h"
 #include "base/common/net/Impl/IFS_BusinessLogic.h"
+#include "base/common/net/Impl/FS_ServerCore.h"
 
 #include "base/common/memorypool/memorypool.h"
 #include "base/common/status/status.h"
@@ -54,7 +55,7 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher()
     ,_logic(NULL)
     ,_isDataDirtied{false}
 {
-
+    g_Dispatcher = this;
 }
 
 FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
