@@ -85,6 +85,7 @@ protected:
     void _OnHeartBeatTimeOut(IFS_Session *session);
     // 每接收一个完整包调用一次
     void _OnRecvMsg(IFS_Session *session, Int64 transferBytes);
+    void _OnRecvMsgAmount(IFS_Session *session);
     // 发送只能统计字节数，包数无法支持统计
     void _OnSendMsg(IFS_Session *session, Int64 transferBytes);
 
@@ -145,5 +146,6 @@ FS_NAMESPACE_END
 
 extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;
 extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;
+extern BASE_EXPORT fs::IFS_MsgDispatcher *g_Dispatcher;
 
 #endif

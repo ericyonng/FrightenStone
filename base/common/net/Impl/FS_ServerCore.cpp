@@ -44,6 +44,9 @@
 #include "base/common/net/Impl/IFS_Session.h"
 #include "base/common/net/Impl/FS_Addr.h"
 #include "base/common/net/Impl/IFS_BusinessLogic.h"
+#include "base/common/net/protocol/protocol.h"
+#include "base/common/net/Impl/FS_IocpSession.h"
+#include "base/common/net/Defs/FS_IocpBuffer.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -56,6 +59,7 @@
 
 fs::FS_ServerCore *g_ServerCore = NULL;
 fs::IFS_ServerConfigMgr *g_SvrCfg = NULL;
+fs::IFS_MsgDispatcher *g_Dispatcher = NULL;
 
 FS_NAMESPACE_BEGIN
 FS_ServerCore::FS_ServerCore()
@@ -291,6 +295,23 @@ void FS_ServerCore::_OnHeartBeatTimeOut(IFS_Session *session)
 void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
 {
     _recvMsgBytesPerSecond += transferBytes;
+    // Int64 incPackets = 0;
+    // _msgDispatcher->OnRecv(session, incPackets);
+    // _recvMsgCountPerSecond += incPackets;
+}
+
+void FS_ServerCore::_OnRecvMsgAmount(IFS_Session *session)
+{
+//     auto iocpSession = session->CastTo<FS_IocpSession>();
+//     auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
+//     while(recvBuffer->HasMsg())
+//     {
+//         auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
+//         _logic->OnMsgDispatch(session->GetSessionId(), frontMsg);
+//         recvBuffer->PopFront(frontMsg->_packetLength);
+//         ++_recvMsgCountPerSecond;
+//     }
+
     Int64 incPackets = 0;
     _msgDispatcher->OnRecv(session, incPackets);
     _recvMsgCountPerSecond += incPackets;
@@ -511,10 +532,12 @@ void FS_ServerCore::_RegisterToModule()
         // ×¢²á½Ó¿Ú
         auto onDisconnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnDisconnected);
         auto onRecvSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsg);
+        auto onRecvAmountRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsgAmount);
         auto onSendSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSendMsg);
         msgTransfer->RegisterDisconnected(onDisconnectedRes);
         msgTransfer->RegisterRecvSucCallback(onRecvSucRes);
         msgTransfer->RegisterSendSucCallback(onSendSucRes);
+        msgTransfer->RegisterRecvAmountCallback(onRecvAmountRes);
     }
 
     _logic->SetDispatcher(_msgDispatcher);

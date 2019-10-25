@@ -70,14 +70,16 @@ public:
 
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback);
     virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
+    virtual void RegisterRecvAmountCallback(IDelegate<void, IFS_Session *> *callback);
     virtual void RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
     virtual void RegisterHeatBeatTimeOutCallback(IDelegate<void, IFS_Session *> *callback);
     virtual Int32 GetSessionCnt();
 
 private:
     void _OnMoniterMsg(const FS_ThreadPool *pool);
-    void _HandleNetEvent(std::set<UInt64> &sessionIdsToRemove, std::set<UInt64> &toPostRecv, std::set<UInt64> &toPostSend);
-    void _RemoveSessions(const std::set<UInt64> &sessionIds);
+    void _HandleNetEvent(std::set<IFS_Session *> &sessionIdsToRemove, std::set<IFS_Session *> &toPostRecv, std::set<IFS_Session *> &toPostSend);
+    void _OnMsgArrived();
+    void _RemoveSessions(std::set<IFS_Session *> &sessionIds);
     void _OnHeartbeatTimeOut(const std::set<UInt64> &timeoutSessionIds, std::set<UInt64> &leftSessionIdsToRemove);
 
     // 网络事件 线程不安全
@@ -95,7 +97,7 @@ private:
     void _ClearSessionsWhenClose();
 
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
-    void _CheckSessionHeartbeat(std::set<UInt64> &timeoutSessionIds);  // 线程不安全
+    void _CheckSessionHeartbeat(std::set<IFS_Session *> &timeoutSessions);  // 线程不安全
 
     void _PostSessions();
     void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
@@ -115,6 +117,7 @@ private:
     std::atomic<bool> _hasNewSessionLinkin;     // 
     std::list<IFS_Session *> _linkSessionCache; // 连入的会话缓冲区
     std::list<IFS_Session *> _linkSessionSwitchCache; // 连入的会话缓冲转换区
+    std::list<IFS_Session *> _msgArriviedSessions;      // 消息到达的会话
     // 待发送的会话缓冲区
     Locker _asynSendGuard;
     std::atomic<bool> _isSendCacheDirtied;
@@ -124,6 +127,7 @@ private:
 
     IDelegate<void, IFS_Session *> *_serverCoreDisconnectedCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreRecvSucCallback;
+    IDelegate<void, IFS_Session *> *_serverCoreRecvAmountCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreSendSucCallback;
     IDelegate<void, IFS_Session *> *_serverCoreHeartBeatTimeOutCallback;
 };
