@@ -209,30 +209,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
     while(!pool->IsClearingPool() || _sessionCnt > 0)
     {
         // 1.将连入的session加入
-        if(_hasNewSessionLinkin)
-        {
-            _connectorGuard.Lock();
-            for(auto iterSession = _linkSessionCache.begin(); iterSession != _linkSessionCache.end();)
-            {
-                auto session = *iterSession;
-                _sessions.insert(std::make_pair(session->GetSessionId(), session));
-                auto iocpSession = session->CastTo<FS_IocpSession>();
-
-                // 绑定iocp
-                auto st = _iocp->Reg(iocpSession->GetSocket(), iocpSession->GetSessionId());
-                if(st != StatusDefs::Success)
-                {
-                    g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("reg socket[%llu] sessionId[%llu] fail st[%d]")
-                                                 , session->GetSocket(), session->GetSessionId(), st);
-                }
-
-                // 投递接收数据
-                _toPostRecv.insert(session);
-                iterSession = _linkSessionCache.erase(iterSession);
-            }
-            _hasNewSessionLinkin = false;
-            _connectorGuard.Unlock();
-        }
+        _LinkCacheToSessions();
 
         // 3.判断是否有session
         if(_sessions.empty())
@@ -618,12 +595,11 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
     if(_hasNewSessionLinkin)
     {
         _connectorGuard.Lock();
-        for(auto iterSession = _linkSessionCache.begin(); iterSession!=_linkSessionCache.end();)
+        for(auto iterSession = _linkSessionCache.begin(); iterSession != _linkSessionCache.end();)
         {
             auto session = *iterSession;
             _sessions.insert(std::make_pair(session->GetSessionId(), session));
             auto iocpSession = session->CastTo<FS_IocpSession>();
-            auto sender = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_DoPostSend);
 
             // 绑定iocp
             auto st = _iocp->Reg(iocpSession->GetSocket(), iocpSession->GetSessionId());
@@ -634,11 +610,7 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
             }
 
             // 投递接收数据
-            if(!_DoPostRecv(iocpSession))
-            {
-                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail"));
-            }
-
+            _toPostRecv.insert(session);
             iterSession = _linkSessionCache.erase(iterSession);
         }
         _hasNewSessionLinkin = false;
