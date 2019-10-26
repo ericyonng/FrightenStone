@@ -34,7 +34,7 @@
 #pragma once
 
 
- //SOCKET
+ // SOCKET
 #ifdef _WIN32
 #undef FD_SETSIZE
 #define FD_SETSIZE      100000
@@ -76,7 +76,7 @@
 #define CLIENT_QUANTITY_LIMIT   200000
 #define SVR_CONFIG_PATH_NAME    "./ServerCfg.ini"   // 服务器配置
 
-#pragma region Listener 默认配置
+#pragma region Listener default config
 #define SVR_CFG_LISTENER_SEG                "Listener"
 #define SVR_CFG_TRANSFER_SEG_CNT_KEY        "TransferCnt"
 #define SVR_CFG_TRANSFER_SEG_CNT            "8"             // 数据传输支持8线程
@@ -104,7 +104,5 @@ public:
         Epoll,
     };
 };
-
-
 
 #endif
