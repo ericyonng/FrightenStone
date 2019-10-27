@@ -57,4 +57,9 @@ IMemoryPoolMgr *IMemoryPoolMgr::GetInstance()
     return Singleton<MemoryPoolMgr, AssistObjsDefs::NoDel>::GetInstance();
 }
 
+IMemoryPoolMgr *IMemoryPoolMgr::NewInstance()
+{
+    return new MemoryPoolMgr();
+}
+
 FS_NAMESPACE_END

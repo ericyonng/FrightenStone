@@ -156,7 +156,7 @@ void IMemoryAlloctor::PrintMemInfo() const
 {
     // 单独的内存池日志 [当前内存池占用内存情况,内存池使用情况]
     g_Log->mempool("blockSize[%llu] nodecnt[%lld],total bytes occupied[%lld],memblock in used bytes[%lld]"
-                   ,_blockSize, _curNodeCnt, _curNodeCnt*_blockAmount*_blockSize, _memBlockInUse*_blockSize);
+                   ,_blockSize, (Int64)_curNodeCnt, _curNodeCnt*_blockAmount*_blockSize, _memBlockInUse*_blockSize);
 }
 
 void IMemoryAlloctor::InitMemory()
@@ -203,7 +203,7 @@ void IMemoryAlloctor::FinishMemory()
 
     // 内存泄漏打印
     if(_memBlockInUse)
-        g_Log->memleak("memory pool memleak info: amount[%lld] size[%lld];", _memBlockInUse, _memBlockInUse*_blockSize);
+        g_Log->memleak("memory pool memleak info: amount[%lld] size[%lld];", (Int64)_memBlockInUse, _memBlockInUse*_blockSize);
 }
 
 void IMemoryAlloctor::_NewNode()

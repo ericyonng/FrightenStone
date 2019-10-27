@@ -342,7 +342,7 @@ void FS_ServerCore::_OnRecvMsgAmount(std::list<IFS_Session *> &sessions, std::se
 //     _recvMsgCountPerSecond += incPackets;
 }
 
-void FS_ServerCore::_OnSvrRuning(const FS_ThreadPool *threadPool)
+void FS_ServerCore::_OnSvrRuning(FS_ThreadPool *threadPool)
 {
     Time nowTime;
     _lastStatisticsTime.FlushTime();

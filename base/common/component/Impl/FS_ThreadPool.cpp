@@ -34,6 +34,8 @@
 #include "base/common/component/Impl/Task/Task.h"
 #include <iostream>
 
+#include "base/common/assist/utils/utils.h"
+
 #pragma region 
 #ifdef _WIN32
 #include <process.h>     // 
@@ -101,7 +103,7 @@ bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 
     return true;
 }
 
-bool FS_ThreadPool::AddTask(IDelegate<void, const FS_ThreadPool *> *callback, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
+bool FS_ThreadPool::AddTask(IDelegate<void, FS_ThreadPool *> *callback, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
 {
     // 创建一个delegate task
     DelegateTask *newTask = new DelegateTask(this, callback);
@@ -113,6 +115,12 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
     FS_ThreadPool *pool = static_cast<FS_ThreadPool *>(param);
     auto &locker = pool->_locker;
     auto &taskList = pool->_tasks;
+    bool needInitMemPool = pool->_initThreadMemPoolWhenThreadStart;
+    auto &threadIdRefMemPool = pool->_threadIdRefMemPool;
+
+    // 创建线程局部内存池
+    if(needInitMemPool)
+        ASSERT(pool->NewCurThreadMemPool());
 
     bool isEmpty = false;
     while(!pool->_isDestroy || !isEmpty)
@@ -150,6 +158,9 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
         throw std::logic_error("thread pool task thread crash");
         std::cout << "hello crash" << std::endl;
     }
+
+    // 释放线程局部存储资源
+    FS_TlsUtil::FreeUtilTlsTable();
 
     std::cout << "_endthreadex end" << std::endl;
     _endthreadex(0L);

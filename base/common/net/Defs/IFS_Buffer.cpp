@@ -21,36 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : DelegateTaskImpl.h
+ * @file  : IFS_Buffer.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/26
+ * @date  : 2019/10/27
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Base_Common_Component_Impl_Task_Impl_DelegateTask_H__
-#pragma once
+#include "stdafx.h"
+#include "base/common/net/Defs/IFS_Buffer.h"
+#include "base/common/assist/utils/utils.h"
 
 FS_NAMESPACE_BEGIN
 
-inline DelegateTask::DelegateTask(FS_ThreadPool *pool, IDelegate<void, FS_ThreadPool *> *callback)
-    :_pool(pool)
-    ,_callback(callback)
-{
-}
-
-inline DelegateTask::~DelegateTask()
-{
-}
-
-inline Int32 DelegateTask::Release()
-{
-    Fs_SafeFree(_callback);
-    delete this;
-    return StatusDefs::Success;
-}
-
 FS_NAMESPACE_END
-
-#endif

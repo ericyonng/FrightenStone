@@ -50,6 +50,7 @@ public:
 
 public:
     static IMemoryPoolMgr *GetInstance();
+    static IMemoryPoolMgr *NewInstance();
     virtual Int32 InitPool() = 0;
     virtual void FinishPool() = 0;
     template<typename ObjType>
@@ -78,6 +79,7 @@ inline ObjType *IMemoryPoolMgr::Realloc(void *ptr, size_t bytes)
 }
 FS_NAMESPACE_END
 
+// 不建议适用全局内存池建议使用线程局部内存池
 extern BASE_EXPORT fs::IMemoryPoolMgr *g_MemoryPool;
 // #define g_MemoryPool  fs::IMemoryPoolMgr::GetInstance()
 

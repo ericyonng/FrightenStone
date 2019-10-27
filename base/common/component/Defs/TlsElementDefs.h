@@ -46,6 +46,8 @@
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT IMemoryPoolMgr;
+
 // 所有局部存储对象请派生于ITlsBase
 // 线程局部存储需要存储的对象类型
 class BASE_EXPORT TlsElemType
@@ -56,6 +58,7 @@ public:
         Begin = 0,
         Tls_Rtti,           // 类型识别
         Tls_TestTls,        // 测试tls
+        Tls_MemoryPool,     // 内存池
         End,
     };
 };
@@ -83,6 +86,16 @@ struct BASE_EXPORT Tls_TestTls : public ITlsBase
     Int32 count;
 };
 
+// 线程局部内存池，仅限于线程生命周期内使用，其他情况会出现未定义
+struct BASE_EXPORT Tls_MemoryPool : public ITlsBase
+{
+    OBJ_POOL_CREATE_DEF(Tls_MemoryPool);
+
+    Tls_MemoryPool();
+    virtual ~Tls_MemoryPool();
+
+    IMemoryPoolMgr *_pool;
+};
 FS_NAMESPACE_END
 
 #include "base/common/component/Defs/TlsElementDefsImpl.h"

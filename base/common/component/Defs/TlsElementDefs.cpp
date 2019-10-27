@@ -31,8 +31,24 @@
  */
 #include "stdafx.h"
 #include "base/common/component/Defs/TlsElementDefs.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 OBJ_POOL_CREATE_DEF_IMPL(Tls_Rtti, 2);
 OBJ_POOL_CREATE_DEF_IMPL(Tls_TestTls, 10);
+OBJ_POOL_CREATE_DEF_IMPL(Tls_MemoryPool, 1);
+
+Tls_MemoryPool::Tls_MemoryPool()
+{
+    _pool = IMemoryPoolMgr::NewInstance();
+}
+
+Tls_MemoryPool::~Tls_MemoryPool()
+{
+    if(_pool)
+        _pool->FinishPool();
+
+    FS_Release(_pool);
+}
+
 FS_NAMESPACE_END

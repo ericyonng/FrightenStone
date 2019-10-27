@@ -253,7 +253,7 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId, NetMsg_DataHeader *msg)
     }
 }
 
-void FS_IocpMsgDispatcher::_OnBusinessProcessThread(const FS_ThreadPool *pool)
+void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 {// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
 
     _timeWheel->GetModifiedResolution(_resolutionInterval);

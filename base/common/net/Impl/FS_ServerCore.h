@@ -92,7 +92,7 @@ protected:
 
 protected:
     // 服务器负载情况
-    virtual void _OnSvrRuning(const FS_ThreadPool *threadPool);
+    virtual void _OnSvrRuning(FS_ThreadPool *threadPool);
     void _PrintSvrLoadInfo(const TimeSlice &dis);
     #pragma endregion
 

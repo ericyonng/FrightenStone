@@ -47,7 +47,7 @@ public:
 class MyObj
 {
 public:
-    void CallBack(const fs::FS_ThreadPool *pool)
+    void CallBack(fs::FS_ThreadPool *pool)
     {
         std::cout << "this is my obj call back" << std::endl;
     }
