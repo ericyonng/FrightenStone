@@ -52,7 +52,7 @@ MemoryPoolMgr::MemoryPoolMgr()
     ,_printCallback(NULL)
     ,_maxCanAllocMemLimit(__MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_POOL_ALIGN_BYTES__*__MEMORY_POOL_ALIGN_BYTES__)
 {
-    // InitPool();
+    InitPool();
 }
 
 MemoryPoolMgr::~MemoryPoolMgr()
