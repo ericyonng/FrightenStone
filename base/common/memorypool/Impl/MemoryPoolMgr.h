@@ -68,19 +68,20 @@ public:
 private:
     void  _Init(size_t begin, size_t end, IMemoryAlloctor *alloctor);
     void _RegisterPrintCallback();
-    void _UnRegisterPrintCallback();
+    void _UnRegisterPrintCallback(Int32 threadId);
     void _UpdateMemPoolOccupied(size_t newOccupiedBytes);
 
 private:
     IMemoryAlloctor *_alloctors[__MEMORY_POOL_MAXBLOCK_LIMIT__];  // 内存分配器O(1)复杂度，最大支持__MEMORY_POOL_MAXBLOCK_LIMIT__的内存分配其他内存由系统分配
     std::vector<IMemoryAlloctor *> _allAlloctors;                   // 用于释放
-    bool _isInit;
+    std::atomic<bool> _isInit;
     Locker _locker;
     IDelegate<void> *_printCallback;
-    size_t _curTotalOccupiedBytes = 0;      // 当前内存池占用的总字节数
-    bool _canCreateNewNode = true;
+    std::atomic<size_t> _curTotalOccupiedBytes = 0;      // 当前内存池占用的总字节数
+    std::atomic<bool> _canCreateNewNode = true;
     const size_t _maxCanAllocMemLimit;
     IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
+    std::atomic<Int32> _curThreadId;
 };
 
 inline void MemoryPoolMgr::Lock()

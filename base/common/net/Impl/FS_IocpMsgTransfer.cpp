@@ -201,7 +201,7 @@ Int32 FS_IocpMsgTransfer::GetSessionCnt()
     return _sessionCnt;
 }
 
-void FS_IocpMsgTransfer::_OnMoniterMsg(const FS_ThreadPool *pool)
+void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 {// iocp 在closesocket后会马上返回所有投递的事件，所以不可立即在post未结束时候释放session对象
 
     ULong waitTime = 1;   // TODO可以调节（主要用于心跳检测）
@@ -277,6 +277,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 
             iocpSession->ResetPostRecvMask();
             iocpSession->MaskClose();
+            iocpSession->Close();
             _toRemove.insert(session);
             _toPostRecv.erase(session);
             _toPostSend.erase(session);
@@ -308,6 +309,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            _ioEvent->_bytesTrans);
             iocpSession->ResetPostSendMask();
             iocpSession->MaskClose();
+            iocpSession->Close();
             _toRemove.insert(session);
             _toPostRecv.erase(session);
             _toPostSend.erase(session);
@@ -478,6 +480,8 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
         _toPostRecv.erase(session);
         _toPostSend.erase(session);
         _serverCoreHeartBeatTimeOutCallback->Invoke(session);
+        session->MaskClose();
+        session->Close();
 //        g_Log->any<FS_IocpMsgTransfer>("nowTime[%lld][%s] sessionId[%llu] expiredtime[%llu][%s] heartbeat time out."
 //                                       , _curTime.GetMicroTimestamp(), _curTime.ToStringOfMillSecondPrecision().c_str()
 //                                       ,session->GetSessionId()

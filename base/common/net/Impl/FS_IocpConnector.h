@@ -91,7 +91,7 @@ private:
 private:
     void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo);
     void _OnDisconnected(IFS_Session *session);
-    void _OnIocpMonitorTask(const FS_ThreadPool *threadPool);
+    void _OnIocpMonitorTask(FS_ThreadPool *threadPool);
     void _PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, IoDataBase **&ioDataArray);
     void _FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray);
 

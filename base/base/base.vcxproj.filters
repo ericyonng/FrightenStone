@@ -1316,5 +1316,8 @@
     <ClCompile Include="..\common\net\Impl\FS_MsgDispatcherFactory.cpp">
       <Filter>common\net\Impl</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\net\Defs\IFS_Buffer.cpp">
+      <Filter>common\net\Defs</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

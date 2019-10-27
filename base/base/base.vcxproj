@@ -475,6 +475,7 @@
     <ClCompile Include="..\common\memorypool\Interface\IMemoryPoolMgr.cpp" />
     <ClCompile Include="..\common\net\Defs\FS_BufferFactory.cpp" />
     <ClCompile Include="..\common\net\Defs\FS_IocpBuffer.cpp" />
+    <ClCompile Include="..\common\net\Defs\IFS_Buffer.cpp" />
     <ClCompile Include="..\common\net\Defs\IocpDefs.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_Addr.cpp" />
     <ClCompile Include="..\common\net\Impl\FS_ConnectorFactory.cpp" />

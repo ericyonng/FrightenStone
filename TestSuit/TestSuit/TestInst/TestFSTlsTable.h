@@ -65,7 +65,7 @@ public:
 class TestSystemTlsTableTask
 {
 public:
-    static void Task(const fs::FS_ThreadPool *pool)
+    static void Task(fs::FS_ThreadPool *pool)
     {
         Int32 threadId = fs::SystemUtil::GetCurrentThreadId();
         for(Int32 i = 0; i < 10; ++i)

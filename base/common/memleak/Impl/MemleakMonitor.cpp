@@ -42,8 +42,7 @@ FS_NAMESPACE_BEGIN
 
 Locker MemleakMonitor::_locker;
 MemleakMonitor::MemleakMonitor()
-    :_memPoolPrintCallback(NULL)
-    ,_printInfoPool(new FS_ThreadPool(0, 1))
+    :_printInfoPool(new FS_ThreadPool(0, 1))
 {
     
 }
@@ -53,6 +52,7 @@ MemleakMonitor::~MemleakMonitor()
     _printInfoPool->Clear();
     Fs_SafeFree(_printInfoPool);
     STLUtil::DelMapContainer(_objNameRefPrintCallback);
+    _threadIdRefMemPoolPrintCallback.clear();
 }
 
 MemleakMonitor *MemleakMonitor::GetInstance()
@@ -99,17 +99,17 @@ void MemleakMonitor::UnRegisterObjPool(const char *name)
     _locker.Unlock();
 }
 
-void MemleakMonitor::RegisterMemPoolPrintCallback(const IDelegate<void> *callback)
+void MemleakMonitor::RegisterMemPoolPrintCallback(Int32 threadId, const IDelegate<void> *callback)
 {
     _locker.Lock();
-    _memPoolPrintCallback = callback;
+    _threadIdRefMemPoolPrintCallback.insert(std::make_pair(threadId, callback));
     _locker.Unlock();
 }
 
-void MemleakMonitor::UnRegisterMemPoolPrintCallback()
+void MemleakMonitor::UnRegisterMemPoolPrintCallback(Int32 threadId)
 {
     _locker.Lock();
-    _memPoolPrintCallback = NULL;
+    _threadIdRefMemPoolPrintCallback.erase(threadId);
     _locker.Unlock();
 }
 
@@ -204,13 +204,17 @@ void MemleakMonitor::PrintPoolAll() const
     // 系统内存信息
     PrintSysMemoryInfo();
     // 内存池信息
-    if(_memPoolPrintCallback)
-        _memPoolPrintCallback->Invoke();
+    for(auto &iterCallback : _threadIdRefMemPoolPrintCallback)
+    {
+        auto callback = iterCallback.second;
+        callback->Invoke();
+    }
+
     // 打印对象池
     PrintObjPoolInfo();
 }
 
-void MemleakMonitor::_PrintInfoPerSeconds(const FS_ThreadPool *pool)
+void MemleakMonitor::_PrintInfoPerSeconds(FS_ThreadPool *pool)
 {
     while(!pool->IsClearingPool())
     {

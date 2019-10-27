@@ -82,16 +82,16 @@ protected:
     void _InitNode(MemBlocksNode *newNode);
 
 protected:
-    bool            _isFinish;
-    char            *_curBuf;               // 整个已申请的内存地址
-    MemoryBlock     *_usableBlockHeader;    // 结点 next方向是可用的未分配的内存块，分配时候给_usableBlockHeader节点，释放时候要释放的节点插在_usableBlockHeader之前当作可用节点头
-    MemoryBlock     *_lastDeleted;          // free链表
-    Int64           _memBlockInUse;         // 正在使用的内存块个数
+    std::atomic<bool>   _isFinish;
+    char                *_curBuf;               // 整个已申请的内存地址
+    MemoryBlock         *_usableBlockHeader;    // 结点 next方向是可用的未分配的内存块，分配时候给_usableBlockHeader节点，释放时候要释放的节点插在_usableBlockHeader之前当作可用节点头
+    MemoryBlock         *_lastDeleted;          // free链表
+    std::atomic<Int64>   _memBlockInUse;         // 正在使用的内存块个数
 
     /* 内存节点 */
     MemBlocksNode *_header;                 // 头节点
     MemBlocksNode *_lastNode;               // 当前最新节点
-    Int64 _curNodeCnt;                      // 节点个数
+    std::atomic<Int64> _curNodeCnt;                      // 节点个数
 
     // 最新的节点
     size_t          _blockAmount;           // 内存块总数量

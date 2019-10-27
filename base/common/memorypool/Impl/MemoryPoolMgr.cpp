@@ -52,7 +52,7 @@ MemoryPoolMgr::MemoryPoolMgr()
     ,_printCallback(NULL)
     ,_maxCanAllocMemLimit(__MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_POOL_ALIGN_BYTES__*__MEMORY_POOL_ALIGN_BYTES__)
 {
-    InitPool();
+    // InitPool();
 }
 
 MemoryPoolMgr::~MemoryPoolMgr()
@@ -68,6 +68,8 @@ Int32 MemoryPoolMgr::InitPool()
         _locker.Unlock();
         return StatusDefs::Success;
     }
+
+    _curThreadId = SystemUtil::GetCurrentThreadId();
     _updateMemPoolOccupied = DelegatePlusFactory::Create(this, &MemoryPoolMgr::_UpdateMemPoolOccupied);
     Int32 multi = __MEMORY_POOL_MINIMUM_BLOCK__;
     for(Int32 i = 0; i < __MEMORY_POOL_MAXBLOCK_LIMIT__; )
@@ -89,7 +91,10 @@ Int32 MemoryPoolMgr::InitPool()
 
 void MemoryPoolMgr::FinishPool()
 {
-    _UnRegisterPrintCallback();
+    if(!_isInit)
+        return;
+
+    _UnRegisterPrintCallback(_curThreadId);
 
     _locker.Lock();
     _isInit = false;
@@ -176,6 +181,7 @@ void MemoryPoolMgr::PrintMemPoolInfo() const
 {
     size_t totalOccupiedBytes = 0;
     size_t bytesInUsed = 0;
+    g_Log->mempool("threadId[%d] mem pool total info:", (Int32)(_curThreadId));
     for(auto &alloctor : _allAlloctors)
     {
         alloctor->PrintMemInfo();
@@ -200,13 +206,13 @@ void MemoryPoolMgr::_RegisterPrintCallback()
     _printCallback = const_cast<IDelegate<void> *>(DelegatePlusFactory::Create(this, &MemoryPoolMgr::PrintMemPoolInfo));
     if(!g_MemleakMonitor)
         g_MemleakMonitor = MemleakMonitor::GetInstance();
-    g_MemleakMonitor->RegisterMemPoolPrintCallback(_printCallback);
+    g_MemleakMonitor->RegisterMemPoolPrintCallback(_curThreadId, _printCallback);
 }
 
-void MemoryPoolMgr::_UnRegisterPrintCallback()
+void MemoryPoolMgr::_UnRegisterPrintCallback(Int32 threadId)
 {
+    g_MemleakMonitor->UnRegisterMemPoolPrintCallback(threadId);
     FS_Release(_printCallback);
-    g_MemleakMonitor->UnRegisterMemPoolPrintCallback();
 }
 
 FS_NAMESPACE_END

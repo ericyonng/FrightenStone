@@ -72,7 +72,7 @@ public:
 
 private:
     // msgData会拷贝到内存池创建的缓冲区中 线程不安全，外部需要加锁
-    void _OnBusinessProcessThread(const FS_ThreadPool *pool);
+    void _OnBusinessProcessThread(FS_ThreadPool *pool);
     void _MoveToBusinessLayer(IFS_Session *session, NetMsg_DataHeader *msgData);
     void _OnBusinessProcessing();
 

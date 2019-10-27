@@ -76,7 +76,7 @@ public:
     virtual Int32 GetSessionCnt();
 
 private:
-    void _OnMoniterMsg(const FS_ThreadPool *pool);
+    void _OnMoniterMsg(FS_ThreadPool *pool);
     Int32 _DoEvents();
     Int32 _HandleNetEvent();
     void _OnMsgArrived();

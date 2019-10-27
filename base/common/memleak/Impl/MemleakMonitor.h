@@ -54,8 +54,8 @@ public:
 
     void RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback);
     void UnRegisterObjPool(const char *name);
-    void RegisterMemPoolPrintCallback(const IDelegate<void> *callback);
-    void UnRegisterMemPoolPrintCallback();
+    void RegisterMemPoolPrintCallback(Int32 threadId, const IDelegate<void> *callback);
+    void UnRegisterMemPoolPrintCallback(Int32 threadId);
 
     void PrintObjPoolInfo() const;
     // 请使用typeid作为objName
@@ -67,12 +67,12 @@ public:
     void PrintPoolAll() const;
 
 private:
-    void _PrintInfoPerSeconds(const FS_ThreadPool *pool);
+    void _PrintInfoPerSeconds(FS_ThreadPool *pool);
 
 private:
     static Locker _locker;
     std::map<FS_String, std::vector<IDelegate<size_t, Int64 &, Int64 &, const char *> *> *> _objNameRefPrintCallback;
-    const IDelegate<void> *_memPoolPrintCallback;
+    std::map<Int32, const IDelegate<void> *> _threadIdRefMemPoolPrintCallback;
 
     FS_ThreadPool *_printInfoPool;
 };
