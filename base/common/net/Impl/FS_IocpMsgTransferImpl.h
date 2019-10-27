@@ -34,26 +34,6 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
-
-inline Int32 FS_IocpMsgTransfer::_DoEvents()
-{
-    Int32 ret = StatusDefs::Success;
-    while(true)
-    {
-        ret = _HandleNetEvent();
-        if(ret == StatusDefs::IOCP_WaitTimeOut)
-        {
-            return StatusDefs::Success;
-        }
-        else if(ret != StatusDefs::Success)
-        {
-            return ret;
-        }
-    }
-
-    return ret;
-}
-
 inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
 {
     if(!session->CanDisconnect())

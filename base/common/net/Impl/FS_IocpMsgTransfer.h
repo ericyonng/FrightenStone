@@ -81,6 +81,7 @@ private:
     Int32 _HandleNetEvent();
     void _OnMsgArrived();
     void _RemoveSessions();
+    void _RemoveSession(IFS_Session *session);
 
     // 网络事件 线程不安全
 private:
