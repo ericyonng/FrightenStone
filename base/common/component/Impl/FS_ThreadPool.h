@@ -141,25 +141,6 @@ inline IMemoryPoolMgr *FS_ThreadPool::GetThreadMemPool(Int32 threadId)
     return iterMemPool->second;
 }
 
-inline IMemoryPoolMgr *FS_ThreadPool::NewCurThreadMemPool()
-{
-    // 创建内存池
-    IMemoryPoolMgr *memPool = NULL;
-    auto tlsTable = FS_TlsUtil::GetUtilTlsTable();
-    auto tlsMemPool = tlsTable->GetElement<Tls_MemoryPool>(TlsElemType::Tls_MemoryPool);
-    if(!tlsMemPool)
-        tlsMemPool = tlsTable->AllocElement<Tls_MemoryPool>(TlsElemType::Tls_MemoryPool);
-
-    memPool = tlsMemPool->_pool;
-    if(memPool)
-        ASSERT(memPool->InitPool() != StatusDefs::Success);
-
-    _locker.Lock();
-    _threadIdRefMemPool[SystemUtil::GetCurrentThreadId()] = memPool;
-    _locker.Unlock();
-    return memPool;
-}
-
 #pragma endregion
 
 FS_NAMESPACE_END

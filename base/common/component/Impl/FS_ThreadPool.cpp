@@ -219,6 +219,25 @@ void FS_ThreadPool::SetThreadLimit(Int32 minNum, Int32 maxNum)
     }
 }
 
+IMemoryPoolMgr *FS_ThreadPool::NewCurThreadMemPool()
+{
+    // ´´½¨ÄÚ´æ³Ø
+    IMemoryPoolMgr *memPool = NULL;
+    auto tlsTable = FS_TlsUtil::GetUtilTlsTable();
+    auto tlsMemPool = tlsTable->GetElement<Tls_MemoryPool>(TlsElemType::Tls_MemoryPool);
+    if(!tlsMemPool)
+        tlsMemPool = tlsTable->AllocElement<Tls_MemoryPool>(TlsElemType::Tls_MemoryPool);
+
+    memPool = tlsMemPool->_pool;
+    if(memPool)
+        ASSERT(memPool->InitPool() != StatusDefs::Success);
+
+    _locker.Lock();
+    _threadIdRefMemPool[SystemUtil::GetCurrentThreadId()] = memPool;
+    _locker.Unlock();
+    return memPool;
+}
+
 bool FS_ThreadPool::_CreateThread(Int32 numToCreate)
 {
     if(numToCreate <= 0 || numToCreate > (_maxNum - _curTotalNum))
