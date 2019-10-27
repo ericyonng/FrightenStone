@@ -470,7 +470,7 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
     _curTime.FlushTime();
     for(auto iterSession = _sessionHeartbeatQueue.begin(); 
         iterSession != _sessionHeartbeatQueue.end(); 
-        ++iterSession)
+        )
     {
         auto session = *iterSession;
         if(session->GetHeartBeatExpiredTime() > _curTime)
@@ -480,8 +480,8 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
         _toPostRecv.erase(session);
         _toPostSend.erase(session);
         _serverCoreHeartBeatTimeOutCallback->Invoke(session);
-        session->MaskClose();
-        session->Close();
+         session->MaskClose();
+         session->Close();
 //        g_Log->any<FS_IocpMsgTransfer>("nowTime[%lld][%s] sessionId[%llu] expiredtime[%llu][%s] heartbeat time out."
 //                                       , _curTime.GetMicroTimestamp(), _curTime.ToStringOfMillSecondPrecision().c_str()
 //                                       ,session->GetSessionId()
@@ -490,7 +490,7 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
 
         // 心跳过期 到ondisconnected才真正移除
         // OnHeartBeatTimeOut(session);
-        // iterSession = _sessionHeartbeatQueue.erase(iterSession);
+        iterSession = _sessionHeartbeatQueue.erase(iterSession);
     }
 }
 

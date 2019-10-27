@@ -71,8 +71,8 @@ inline void FS_IocpMsgTransfer::_RemoveSessions()
     for(auto iterSsession = _toRemove.begin(); iterSsession!=_toRemove.end();)
     {
         session = *iterSsession;
-        //_OnGracefullyDisconnect(session);
-         _OnDisconnected(session);
+        _OnGracefullyDisconnect(session);
+        //_OnDisconnected(session);
         iterSsession = _toRemove.erase(iterSsession);
         // _OnGracefullyDisconnect(session);
     }
