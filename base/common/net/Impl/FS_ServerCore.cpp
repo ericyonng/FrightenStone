@@ -254,16 +254,9 @@ void FS_ServerCore::Close()
 void FS_ServerCore::_OnConnected(IFS_Session *session)
 {// 只有connector调用接口
 
-    // 转到 transfer,并保证各个数据收发器均衡服务
-    IFS_MsgTransfer *minTransfer = _msgTransfers[0];
-    IFS_MsgTransfer *switchServer = NULL;
-    const Int32 cnt = static_cast<Int32>(_msgTransfers.size());
-    for(Int32 i = 0; i < cnt; ++i)
-    {
-        switchServer = _msgTransfers[i];
-        if(minTransfer->GetSessionCnt() > switchServer->GetSessionCnt())
-            minTransfer = switchServer;
-    }
+    // 求余法，将session分配到各个消息处理模块
+    const auto sessionHash = session->GetSessionId() % _msgTransfers.size();
+    auto minTransfer = _msgTransfers[sessionHash];
 
     // 统计session数量
     ++_curSessionConnecting;
