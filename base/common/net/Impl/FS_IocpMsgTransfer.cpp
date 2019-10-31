@@ -312,13 +312,12 @@ Int32 FS_IocpMsgTransfer::_DoEvents()
 
 Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 {
-    auto ret = _iocp->WaitForCompletion(*_ioEvent, 1);
+    auto ret = _iocp->WaitForCompletion(*_ioEvent, 20);
     if(ret != StatusDefs::Success)
         return ret;
 
-    const UInt64 sessionId = _ioEvent->_data._sessionId;
-
     // 1.判断会话是否存在
+    const UInt64 sessionId = _ioEvent->_data._sessionId;
     auto session = _GetSession(sessionId);
     if(!session)
     {// 数据丢失,最大可能是已经断开链接了！！！！
@@ -327,9 +326,8 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
         return StatusDefs::Success;
     }
 
-    auto iocpSession = session->CastTo<FS_IocpSession>();
-
     // 2.处理接收与发送
+    auto iocpSession = session->CastTo<FS_IocpSession>();
     if(IocpDefs::IO_RECV == _ioEvent->_ioData->_ioType)
     {
         if(_ioEvent->_bytesTrans <= 0)
@@ -339,8 +337,8 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , iocpSession->GetSocket(),
                                            _ioEvent->_bytesTrans);
 
-            iocpSession->ResetAllIoMask();
-            _RemoveSession(session);
+            iocpSession->ResetPostRecvMask();
+            _OnGracefullyDisconnect(session);
             return StatusDefs::Success;
         }
 
@@ -370,8 +368,8 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSessionId()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
-            iocpSession->ResetAllIoMask();
-            _RemoveSession(session);
+            iocpSession->ResetPostSendMask();
+            _OnGracefullyDisconnect(session);
             return StatusDefs::Success;
         }
 
@@ -703,7 +701,16 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
             }
 
             // 投递接收数据
-            _toPostRecv.insert(session);
+            if(!_DoPostRecv(iocpSession))
+            {
+                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu] serverId[%d]", session->GetSessionId(), _id));
+                _RemoveSession(session);
+            }
+            else
+            {
+                _UpdateSessionHeartbeat(session);
+            }
+
             iterSession = _linkSessionCache.erase(iterSession);
         }
         _hasNewSessionLinkin = false;
