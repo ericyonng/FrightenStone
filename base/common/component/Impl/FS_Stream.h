@@ -49,7 +49,7 @@ class BASE_EXPORT FS_Stream
 {
     OBJ_POOL_CREATE(FS_Stream, _objPoolHelper);
 public:
-    FS_Stream(Byte8 *data, Int32 size, bool needDelete = false);
+    FS_Stream(Byte8 *data, Int32 size, bool needDelete = false, bool isPoolCreate = false);
     FS_Stream(Int32 size = 1024);
     virtual ~FS_Stream();
 

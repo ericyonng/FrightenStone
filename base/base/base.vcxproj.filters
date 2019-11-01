@@ -334,6 +334,18 @@
     <Filter Include="common\component\Defs\Tls">
       <UniqueIdentifier>{4c92a3f4-fc88-4e45-bf2e-1b641469b325}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\component\Impl\MessageQueue">
+      <UniqueIdentifier>{d98a817e-8635-4401-ac0d-58921c41fa75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\MessageQueue\Defs">
+      <UniqueIdentifier>{ce12f190-257e-4926-9c22-73eed97fc583}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\MessageQueue\Impl">
+      <UniqueIdentifier>{dc682dd1-cada-440e-94b9-f848daea8a0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\component\Impl\MessageQueue\Interface">
+      <UniqueIdentifier>{460d37d2-3c87-4cc8-b270-075010e32089}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1023,6 +1035,27 @@
     <ClInclude Include="..\common\net\Impl\IFS_BusinessLogicImpl.h">
       <Filter>common\net\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\MessageQueue.h">
+      <Filter>common\component\Impl\MessageQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueueMgr.h">
+      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueueMgrImpl.h">
+      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueue.h">
+      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueueImpl.h">
+      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\FS_MessageBlock.h">
+      <Filter>common\component\Impl\MessageQueue\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\FS_MessageBlockImpl.h">
+      <Filter>common\component\Impl\MessageQueue\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1318,6 +1351,15 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Defs\IFS_Buffer.cpp">
       <Filter>common\net\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\MessageQueue\Impl\MessageQueueMgr.cpp">
+      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\MessageQueue\Impl\MessageQueue.cpp">
+      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\MessageQueue\Defs\FS_MessageBlock.cpp">
+      <Filter>common\component\Impl\MessageQueue\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
