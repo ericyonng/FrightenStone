@@ -64,5 +64,6 @@
 #include "base/common/component/Impl/FS_TlsTable.h"
 #include "base/common/component/Impl/ThreadTlsTableMgr.h"
 #include "base/common/component/Impl/InterfaceComps.h"
+#include "base/common/component/Impl/MessageQueue/MessageQueue.h"
 
 #endif

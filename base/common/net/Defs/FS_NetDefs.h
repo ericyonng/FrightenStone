@@ -73,7 +73,7 @@
 #define IOCP_CONNECTOR_BUFFER 1024
 // 统计服务器负载的时间间隔
 #define IOCP_STATISTIC_INTERVAL     1000    // 时间间隔单位ms
-#define CLIENT_QUANTITY_LIMIT   200000
+#define CLIENT_QUANTITY_LIMIT   10000
 #define SVR_CONFIG_PATH_NAME    "./ServerCfg.ini"   // 服务器配置
 
 #pragma region Listener default config

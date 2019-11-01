@@ -34,10 +34,11 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_Stream::FS_Stream(Byte8 *data, Int32 size, bool needDelete)
+inline FS_Stream::FS_Stream(Byte8 *data, Int32 size, bool needDelete, bool isPoolCreate)
     :_buff(data)
     , _size(size)
     , _needDelete(needDelete)
+    ,_isPoolCreate(isPoolCreate)
 {
 }
 
