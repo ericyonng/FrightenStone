@@ -47,7 +47,7 @@ class BASE_EXPORT FS_MsgWriteStream :public FS_Stream
 {
     OBJ_POOL_CREATE_DEF(FS_MsgWriteStream);
 public:
-    FS_MsgWriteStream(char *data, int size, bool isDelete = false);
+    FS_MsgWriteStream(char *data, int size, bool isDelete = false, bool isPoolCreate = false);
     FS_MsgWriteStream(int size = 1024);
 
     /* Ð´Èë×Ö½ÚÁ÷ */

@@ -60,6 +60,7 @@ int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
 {
     long long waitRet = WAIT_OBJECT_0;
     auto *event = _event.load();
+    bool oldSinal = _isSinal;
     while(!_isSinal)
     {
         Unlock();
@@ -84,6 +85,9 @@ int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
             return StatusDefs::WaitEventFailure;
         }
     }
+
+    if(oldSinal)
+        ResetEvent(_event.load());
 
     _isSinal = false;
     return StatusDefs::Success;

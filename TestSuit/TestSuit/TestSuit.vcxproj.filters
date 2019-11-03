@@ -114,6 +114,9 @@
     <ClInclude Include="TestInst\TestInterfaceComps.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TestInst\TestMessageQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

@@ -1038,12 +1038,6 @@
     <ClInclude Include="..\common\component\Impl\MessageQueue\MessageQueue.h">
       <Filter>common\component\Impl\MessageQueue</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueueMgr.h">
-      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueueMgrImpl.h">
-      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueue.h">
       <Filter>common\component\Impl\MessageQueue\Impl</Filter>
     </ClInclude>
@@ -1351,9 +1345,6 @@
     </ClCompile>
     <ClCompile Include="..\common\net\Defs\IFS_Buffer.cpp">
       <Filter>common\net\Defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\component\Impl\MessageQueue\Impl\MessageQueueMgr.cpp">
-      <Filter>common\component\Impl\MessageQueue\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\MessageQueue\Impl\MessageQueue.cpp">
       <Filter>common\component\Impl\MessageQueue\Impl</Filter>

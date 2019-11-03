@@ -122,7 +122,7 @@ void FS_IocpMsgDispatcher::Close()
     _isClose = true;
 
     // 线程退出
-    _pool->Clear();
+    _pool->Close();
 
     g_BusinessTimeWheel = NULL;
 
@@ -257,7 +257,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 {// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
 
     _timeWheel->GetModifiedResolution(_resolutionInterval);
-    while(!pool->IsClearingPool())
+    while(pool->IsPoolWorking())
     {
         _locker.Lock();
         // g_Log->any<FS_IocpMsgDispatcher>("resolution interval [%lld]", _resolutionInterval.GetTotalMilliSeconds());

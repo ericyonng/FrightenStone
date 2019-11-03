@@ -169,7 +169,7 @@ void FS_Log::FinishModule()
     FlushAllFile();
 
     // 关闭线程池
-    _threadPool->Clear();
+    _threadPool->Close();
 
     // 清理数据
     Fs_SafeFree(_threadWriteLogDelegate);

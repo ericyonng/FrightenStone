@@ -33,8 +33,8 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
-inline FS_MsgWriteStream::FS_MsgWriteStream(char *data, int size, bool isDelete)
-    :FS_Stream(data, size, isDelete)
+inline FS_MsgWriteStream::FS_MsgWriteStream(char *data, int size, bool isDelete, bool isPoolCreate)
+    :FS_Stream(data, size, isDelete, isPoolCreate)
 {
     // 预先占领消息长度所需空间 避免写入字节流时覆盖了长度位置
     Write<UInt16>(0);

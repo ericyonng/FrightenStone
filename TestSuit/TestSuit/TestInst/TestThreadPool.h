@@ -70,7 +70,7 @@ public:
 //         }
 
         pool->AddTask(fs::DelegatePlusFactory::Create(&myObj, &MyObj::CallBack));
-        pool->Clear();
+        pool->Close();
     }
 };
 

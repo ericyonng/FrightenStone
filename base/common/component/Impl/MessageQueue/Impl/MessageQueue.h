@@ -36,35 +36,61 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/asyn/asyn.h"
+#include "base/common/objpool/objpool.h"
+#include "base/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT FS_MessageBlock;
+class BASE_EXPORT FS_ThreadPool;
 
 // 消息队列遵循FIFO原则，接收端取一条处理一条
 class BASE_EXPORT MessageQueue
 {
+    OBJ_POOL_CREATE_DEF(MessageQueue);
+
+public:
+    MessageQueue();
+    virtual ~MessageQueue();
+
+public:
+    Int32 BeforeStart();
+    Int32 Start();
+    void BeforeClose();
+    void Close();
+
 public:
     // 压入末节点
-    void Push(bool isLock = true);
-    // 从前节点弹出
-    void Pop(bool isLock = true);
+    void PushLock();
+    bool Push(std::list<FS_MessageBlock *> &msgs);
+    void PushUnlock();
 
-    // 消息队列接收端
-    void RecieverWait();
-
-    // 消息队列发送端
-    void WakeupReciever();
-    void SenderLock();
-    void SenderUnlock();
+    // 其他线程等待消息到来并从前节点弹出
+    void PopLock();
+    // 成功返回超时WaitEventTimeOut或者成功Success
+    Int32 WaitForPoping(std::list<FS_MessageBlock *> &exportMsgsOut, ULong timeoutMilisec = INFINITE);
+    void PopUnlock();
 
 private:
-    void _HandleMsg(FS_MessageBlock *msgBlock);
+    void _MsgQueueWaiterThread(FS_ThreadPool *pool);
 
 private:
-    std::list<FS_MessageBlock *> _msgBlocks;            // 消息队列
+    ConditionLocker _msgGeneratorGuard;
+    std::atomic_bool _msgGeneratorChange;
+    std::list<FS_MessageBlock *> _msgGeneratorQueue;
+    std::list<FS_MessageBlock *> _msgSwitchQueue;
+
+    ConditionLocker _msgConsumerGuard;
+    std::atomic_bool _msgComsumerQueueChange;
+    std::list<FS_MessageBlock *> _msgComsumerQueue;
+
+    std::atomic_bool _isWorking;
+    FS_ThreadPool *_pool;
 };
 
 FS_NAMESPACE_END
+
+#include "base/common/component/Impl/MessageQueue/Impl/MessageQueueImpl.h"
 
 #endif

@@ -73,7 +73,7 @@ void FS_ThreadPool::Release()
 bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
 {
     _locker.Lock();
-    if(_isDestroy || _isStopAddingTask || _isClearPool)
+    if(_isDestroy || _isStopAddingTask || !_isPoolWorking)
     {
         _locker.Unlock();
         return false;
@@ -168,16 +168,16 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
     return 0L;
 }
 
-void FS_ThreadPool::Clear()
+void FS_ThreadPool::Close()
 {
     _locker.Lock();
-    if(_isClearPool)
+    if(!_isPoolWorking)
     {
         _locker.Unlock();
         return;
     }
 
-    _isClearPool = true;
+    _isPoolWorking = false;
     _isStopAddingTask = true;
     _isDestroy = true;
     _locker.Unlock();
@@ -205,7 +205,7 @@ void FS_ThreadPool::Clear()
 
 void FS_ThreadPool::SetThreadLimit(Int32 minNum, Int32 maxNum)
 {
-    if(maxNum > _maxNum || _isDestroy || _isStopAddingTask || _isClearPool)
+    if(maxNum > _maxNum || _isDestroy || _isStopAddingTask || !_isPoolWorking)
         return;
 
     Int32 maxNumTmp = _maxNum;

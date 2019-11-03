@@ -34,8 +34,59 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
+inline void MessageQueue::PushLock()
+{
+    _msgGeneratorGuard.Lock();
+}
 
+inline bool MessageQueue::Push(std::list<FS_MessageBlock *> &msgs)
+{
+    if(UNLIKELY(!_isWorking))
+        return false;
 
+    for(auto iterMsgBlock = msgs.begin(); iterMsgBlock != msgs.end();)
+    {
+        _msgGeneratorQueue.push_back(*iterMsgBlock);
+        iterMsgBlock = msgs.erase(iterMsgBlock);
+    }
+    _msgGeneratorChange = true;
+    _msgGeneratorGuard.Sinal();
+    return true;
+}
+
+inline void MessageQueue::PushUnlock()
+{
+    _msgGeneratorGuard.Unlock();
+}
+
+inline void MessageQueue::PopLock()
+{
+    _msgConsumerGuard.Lock();
+}
+
+inline Int32 MessageQueue::WaitForPoping(std::list<FS_MessageBlock *> &exportMsgsOut, ULong timeoutMilisec)
+{
+    if(UNLIKELY(!_isWorking))
+        return StatusDefs::NotWorking;
+
+    Int32 st = _msgConsumerGuard.Wait(timeoutMilisec);
+    if(_msgComsumerQueueChange)
+    {
+        for(auto iterMsgBlock = _msgComsumerQueue.begin(); iterMsgBlock != _msgComsumerQueue.end();)
+        {
+            exportMsgsOut.push_back(*iterMsgBlock);
+            iterMsgBlock = _msgComsumerQueue.erase(iterMsgBlock);
+        }
+        _msgComsumerQueueChange = false;
+    }
+
+    return st;
+}
+
+inline void MessageQueue::PopUnlock()
+{
+    _msgConsumerGuard.Unlock();
+}
 
 FS_NAMESPACE_END
 

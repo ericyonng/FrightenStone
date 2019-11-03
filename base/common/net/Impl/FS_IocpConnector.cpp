@@ -130,7 +130,7 @@ void FS_IocpConnector::BeforeClose()
 {
     // 连接器需要再此时关闭入口
     _closeIocpDelegate->Invoke();
-    _threadPool->Clear();
+    _threadPool->Close();
 }
 
 void FS_IocpConnector::Close()
@@ -364,7 +364,7 @@ void FS_IocpConnector::_OnIocpMonitorTask(FS_ThreadPool *threadPool)
 
     // 5.监听网络连入
     IO_EVENT ioEvent = {};
-    while(!threadPool->IsClearingPool())
+    while(threadPool->IsPoolWorking())
     {
         // 监听iocp
         auto ret = listenIocp->WaitForCompletion(ioEvent);

@@ -63,6 +63,7 @@
 #include "TestSuit/TestSuit/TestInst/TestFSTlsTable.h"
 #include "TestSuit/TestSuit/TestInst/TestRtti.h"
 #include "TestSuit/TestSuit/TestInst/TestInterfaceComps.h"
+#include "TestSuit/TestSuit/TestInst/TestMessageQueue.h"
 
 void TestInsts::Run()
 {
@@ -76,7 +77,7 @@ void TestInsts::Run()
 //     pool->AddTask(deleg);
 //     getchar();
 //     pool->Clear();
-    TestServer::Run();
+    TestMessageQueue::Run();
     getchar();
     // TestJson::Run();
 }

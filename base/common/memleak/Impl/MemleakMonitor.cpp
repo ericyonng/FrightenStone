@@ -49,7 +49,7 @@ MemleakMonitor::MemleakMonitor()
 
 MemleakMonitor::~MemleakMonitor()
 {
-    _printInfoPool->Clear();
+    _printInfoPool->Close();
     Fs_SafeFree(_printInfoPool);
     STLUtil::DelMapContainer(_objNameRefPrintCallback);
     _threadIdRefMemPoolPrintCallback.clear();
@@ -216,7 +216,7 @@ void MemleakMonitor::PrintPoolAll() const
 
 void MemleakMonitor::_PrintInfoPerSeconds(FS_ThreadPool *pool)
 {
-    while(!pool->IsClearingPool())
+    while(pool->IsPoolWorking())
     {
         Sleep(1000);
         _locker.Lock();
