@@ -48,7 +48,7 @@ class BASE_EXPORT FS_MsgReadStream :public FS_Stream
     OBJ_POOL_CREATE(FS_MsgReadStream, _objPoolHelper);
 public:
     FS_MsgReadStream(NetMsg_DataHeader *header);
-    FS_MsgReadStream(char *data, Int32 size, bool isDelete = false);
+    FS_MsgReadStream(char *data, Int32 size, bool isDelete = false, bool isPoolCreate = false);
     virtual ~FS_MsgReadStream();
 
 public:

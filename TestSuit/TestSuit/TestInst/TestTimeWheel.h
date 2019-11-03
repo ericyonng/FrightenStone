@@ -129,7 +129,7 @@ public:
 
             // 修正下一帧时间
             fs::g_TimeWheel.GetModifiedResolution(waitMilliSec);
-            if(pool->IsClearingPool())
+            if(!pool->IsPoolWorking())
                 break;
         }
     }

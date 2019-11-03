@@ -67,7 +67,7 @@ public:
     static unsigned __stdcall ThreadHandler(void *param);
 
     // 清理线程池
-    void Clear();
+    void Close();
     // 停止添加任务
     void StopAdd();
     // 开启添加任务
@@ -75,7 +75,7 @@ public:
     // 设置最小最大线程数
     void SetThreadLimit(Int32 minNum, Int32 maxNum);
     // 是否正在清理线程池
-    bool IsClearingPool() const;
+    bool IsPoolWorking() const;
     // 设置是否使用线程级无锁内存池 线程级内存池只对剩余未创建的线程有效
     void SetInitThreadMemPoolWhenThreadStart(bool needInit);
     void Lock();
@@ -94,7 +94,7 @@ private:
     std::atomic<Int32> _waitNum{0};                     // 正在挂起的线程数
     std::atomic<bool> _isDestroy{false};                // 是否销毁线程池
     std::atomic<bool> _isStopAddingTask{false};         // 是否停止添加任务
-    std::atomic<bool> _isClearPool{false};              // 是否正在清理线程池
+    std::atomic<bool> _isPoolWorking{true};             // 线程池是否工作
     std::atomic<bool> _initThreadMemPoolWhenThreadStart{false};      // 创建线程时候是否初始化线程局部内存池（只对剩余未创建的线程有效）(该部分内存仅限于线程生命周期内使用)
     std::map<Int32, IMemoryPoolMgr *> _threadIdRefMemPool;  // 线程局部内存池
     ConditionLocker _locker;                            // 线程安全对象
@@ -112,9 +112,9 @@ inline void FS_ThreadPool::EnableAdd()
     _isStopAddingTask = false;
 }
 
-inline bool FS_ThreadPool::IsClearingPool() const
+inline bool FS_ThreadPool::IsPoolWorking() const
 {
-    return _isClearPool;
+    return _isPoolWorking;
 }
 
 inline void FS_ThreadPool::SetInitThreadMemPoolWhenThreadStart(bool needInit)

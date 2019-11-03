@@ -41,5 +41,7 @@
 // 一个通用的任意一个系统都可以加入的消息队列
 // 每个系统消息接收的回调接口注册
 // 
+#include "base/common/component/Impl/MessageQueue/Defs/FS_MessageBlock.h"
+#include "base/common/component/Impl/MessageQueue/Impl/MessageQueue.h"
 
 #endif

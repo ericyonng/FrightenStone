@@ -40,8 +40,8 @@ inline FS_MsgReadStream::FS_MsgReadStream(NetMsg_DataHeader *header)
 
 }
 
-inline FS_MsgReadStream::FS_MsgReadStream(char *data, Int32 size, bool isDelete)
-    :FS_Stream(data, size, isDelete)
+inline FS_MsgReadStream::FS_MsgReadStream(char *data, Int32 size, bool isDelete, bool isPoolCreate)
+    :FS_Stream(data, size, isDelete, isPoolCreate)
 {
     OffsetWrLenOnWrChange(size);
 

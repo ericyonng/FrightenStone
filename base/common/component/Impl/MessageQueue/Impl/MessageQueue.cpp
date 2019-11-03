@@ -32,6 +32,109 @@
 #include "stdafx.h"
 #include "base/common/component/Impl/MessageQueue/Impl/MessageQueue.h"
 
-FS_NAMESPACE_BEGIN
+#include "base/common/status/status.h"
+#include "base/common/component/Impl/FS_ThreadPool.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/log/Log.h"
 
+FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(MessageQueue, __DEF_OBJ_POOL_OBJ_NUM__);
+
+MessageQueue::MessageQueue()
+    :_msgGeneratorChange{false}
+    ,_msgComsumerQueueChange(false)
+    ,_pool(NULL)
+    ,_isWorking{false}
+{
+}
+
+MessageQueue::~MessageQueue()
+{
+    if(_isWorking)
+    {
+        BeforeClose();
+        Close();
+    }
+
+    Fs_SafeFree(_pool);
+}
+
+Int32 MessageQueue::BeforeStart()
+{
+    _pool = new FS_ThreadPool(0, 1);
+    return StatusDefs::Success;
+}
+
+Int32 MessageQueue::Start()
+{
+    auto task = DelegatePlusFactory::Create(this, &MessageQueue::_MsgQueueWaiterThread);
+    if(!_pool->AddTask(task, true))
+    {
+        Fs_SafeFree(task);
+        g_Log->e<MessageQueue>(_LOGFMT_("message queue add task fail"));
+        return StatusDefs::Error;
+    }
+
+    return StatusDefs::Success;
+}
+
+void MessageQueue::BeforeClose()
+{
+    // 唤醒消费者线程
+    _msgGeneratorGuard.Lock();
+    _isWorking = false;
+    _msgGeneratorGuard.Sinal();
+    _msgGeneratorGuard.Unlock();
+
+    if(_pool)
+        _pool->Close();
+
+    _msgConsumerGuard.Broadcast();
+}
+
+void MessageQueue::Close()
+{
+
+}
+
+void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
+{
+    _isWorking = true;
+    while(pool->IsPoolWorking()|| _msgGeneratorChange)
+    {
+        if(_isWorking)
+        {
+            _msgGeneratorGuard.Lock();
+            _msgGeneratorGuard.Wait();
+            _msgGeneratorGuard.Unlock();
+        }
+
+        // 生产者消息转移到缓存
+        _msgGeneratorGuard.Lock();
+        for(auto iterMsgBlock = _msgGeneratorQueue.begin(); iterMsgBlock != _msgGeneratorQueue.end();)
+        {
+            _msgSwitchQueue.push_back(*iterMsgBlock);
+            iterMsgBlock = _msgGeneratorQueue.erase(iterMsgBlock);
+        }
+        _msgGeneratorChange = false;
+        _msgGeneratorGuard.Unlock();
+
+        _msgConsumerGuard.Lock();
+        for(auto iterMsgBlock = _msgSwitchQueue.begin(); iterMsgBlock != _msgSwitchQueue.end();)
+        {
+            _msgComsumerQueue.push_back(*iterMsgBlock);
+            iterMsgBlock = _msgSwitchQueue.erase(iterMsgBlock);
+        }
+        _msgComsumerQueueChange = true;
+        _msgConsumerGuard.Sinal();
+        _msgConsumerGuard.Unlock();
+    }
+
+    _msgConsumerGuard.Lock();
+    _msgConsumerGuard.ResetSinal();
+    _msgConsumerGuard.Unlock();
+
+    _isWorking = false;
+}
 FS_NAMESPACE_END
+

@@ -77,6 +77,25 @@ inline void FS_Stream::SetWritePos(Int32 n)
 {
     _writePos = n;
 }
+
+template<typename StreamObjType>
+inline StreamObjType *FS_Stream::CastTo()
+{
+    return reinterpret_cast<StreamObjType *>(this);
+}
+
+template<typename ObjType>
+inline bool FS_Stream::SerializeFrom(const ObjType &obj)
+{
+    return obj.SerializeTo(this);
+}
+
+template<typename ObjType>
+inline bool FS_Stream::DeserializeTo(ObjType &obj)
+{
+    return obj.DeserializeFrom(this);
+}
+
 #pragma endregion
 
 #pragma region read

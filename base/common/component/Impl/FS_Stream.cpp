@@ -64,6 +64,11 @@ FS_Stream::~FS_Stream()
     }
 }
 
+void FS_Stream::Release()
+{
+    delete this;
+}
+
 bool FS_Stream::ReadString(std::string &str)
 {
     UInt32 len = 0;

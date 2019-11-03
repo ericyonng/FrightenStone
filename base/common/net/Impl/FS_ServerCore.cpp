@@ -233,7 +233,7 @@ void FS_ServerCore::Close()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->Close();
     _msgDispatcher->Close();
-    _pool->Clear();
+    _pool->Close();
 
     // 最后一刻扫描
     TimeSlice timeSlice;
@@ -339,7 +339,7 @@ void FS_ServerCore::_OnSvrRuning(FS_ThreadPool *threadPool)
 {
     Time nowTime;
     _lastStatisticsTime.FlushTime();
-    while(!threadPool->IsClearingPool())
+    while(threadPool->IsPoolWorking())
     {
         // 每隔100毫秒扫描一次
         Sleep(100);

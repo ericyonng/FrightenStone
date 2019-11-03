@@ -52,6 +52,7 @@ public:
     FS_Stream(Byte8 *data, Int32 size, bool needDelete = false, bool isPoolCreate = false);
     FS_Stream(Int32 size = 1024);
     virtual ~FS_Stream();
+    virtual void Release();
 
     /* 辅助 */
     #pragma region assist
@@ -73,6 +74,14 @@ public:
     void OffsetWrLenOnWrChange(Int32 len);
     void OffsetOnReadChange(Int32 len);
     void SetWritePos(Int32 n);
+    template<typename StreamObjType>
+    StreamObjType *CastTo();
+
+    // 序列化反序列化（ObjType 必须有SerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)接口）
+    template<typename ObjType>
+    bool SerializeFrom(const ObjType &obj);
+    template<typename ObjType>
+    bool DeserializeTo(ObjType &obj);
     #pragma endregion
 
     /* 读字节流 */

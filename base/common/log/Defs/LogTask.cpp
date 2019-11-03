@@ -58,7 +58,7 @@ Int32 LogTask::Run()
     while(true)
     {
         // ½áÊøÈÎÎñÅÐ¶Ï
-        if(_pool->IsClearingPool())
+        if(!_pool->IsPoolWorking())
         {
             _taskDelegate->Invoke(_logFileIndex);
             break;

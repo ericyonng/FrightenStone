@@ -126,7 +126,7 @@ void FS_IocpMsgTransfer::Close()
     }
 
     // 线程退出
-    _threadPool->Clear();
+    _threadPool->Close();
     _iocp->Destroy();
 }
 
@@ -206,7 +206,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 
     ULong waitTime = 1;   // TODO可以调节（主要用于心跳检测）
     Int32 ret = StatusDefs::Success;
-    while(!pool->IsClearingPool() || _sessionCnt > 0)
+    while(pool->IsPoolWorking() || _sessionCnt > 0)
     {
         // 1.将连入的session加入
         _LinkCacheToSessions();
@@ -703,7 +703,7 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
             // 投递接收数据
             if(!_DoPostRecv(iocpSession))
             {
-                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu] serverId[%d]", session->GetSessionId(), _id));
+                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu] serverId[%d]"), session->GetSessionId(), _id);
                 _RemoveSession(session);
             }
             else
