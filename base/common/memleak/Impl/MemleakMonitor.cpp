@@ -35,7 +35,7 @@
 #include "base/common/component/Impl/FS_ThreadPool.h"
 #include "base/common/assist/utils/utils.h"
 
-fs::MemleakMonitor *g_MemleakMonitor = NULL;
+fs::MemleakMonitor *g_MemleakMonitor = fs::MemleakMonitor::GetInstance();
 
 
 FS_NAMESPACE_BEGIN

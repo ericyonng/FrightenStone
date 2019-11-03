@@ -70,14 +70,14 @@ inline Int32 MessageQueue::WaitForPoping(std::list<FS_MessageBlock *> &exportMsg
         return StatusDefs::NotWorking;
 
     Int32 st = _msgConsumerGuard.Wait(timeoutMilisec);
-    if(_msgComsumerQueueChange)
+    if(_msgConsumerQueueChange)
     {
-        for(auto iterMsgBlock = _msgComsumerQueue.begin(); iterMsgBlock != _msgComsumerQueue.end();)
+        for(auto iterMsgBlock = _msgConsumerQueue.begin(); iterMsgBlock != _msgConsumerQueue.end();)
         {
             exportMsgsOut.push_back(*iterMsgBlock);
-            iterMsgBlock = _msgComsumerQueue.erase(iterMsgBlock);
+            iterMsgBlock = _msgConsumerQueue.erase(iterMsgBlock);
         }
-        _msgComsumerQueueChange = false;
+        _msgConsumerQueueChange = false;
     }
 
     return st;
@@ -86,6 +86,80 @@ inline Int32 MessageQueue::WaitForPoping(std::list<FS_MessageBlock *> &exportMsg
 inline void MessageQueue::PopUnlock()
 {
     _msgConsumerGuard.Unlock();
+}
+
+inline bool ConcurrentMessageQueue::IsWorking() const
+{
+    return _isWorking;
+}
+
+inline void ConcurrentMessageQueue::PushLock(UInt32 generatorQueueId)
+{
+    _genoratorGuards[generatorQueueId]->Lock();
+}
+
+inline bool ConcurrentMessageQueue::Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs)
+{
+    if(UNLIKELY(!_isWorking))
+        return false;
+
+    if(_generatorMsgQueues[generatorQueueId]->empty())
+    {
+        std::list<FS_MessageBlock *> *gemTemp = NULL;
+        gemTemp = msgs;
+        msgs = _generatorMsgQueues[generatorQueueId];
+        _generatorMsgQueues[generatorQueueId] = gemTemp;
+    }
+    else
+    {
+        for(auto iterMsgBlock = msgs->begin(); iterMsgBlock != msgs->end();)
+        {
+            _generatorMsgQueues[generatorQueueId]->push_back(*iterMsgBlock);
+            iterMsgBlock = msgs->erase(iterMsgBlock);
+        }
+    }
+
+    *_generatorChange[generatorQueueId] = true;
+    _genoratorGuards[generatorQueueId]->Sinal();
+    return true;
+}
+
+inline void ConcurrentMessageQueue::PushUnlock(UInt32 generatorQueueId)
+{
+    _genoratorGuards[generatorQueueId]->Unlock();
+}
+
+inline void ConcurrentMessageQueue::PopLock(UInt32 consumerQueueId)
+{
+    _consumerGuards[consumerQueueId]->Lock();
+}
+
+// 成功返回超时WaitEventTimeOut或者成功Success
+inline Int32 ConcurrentMessageQueue::WaitForPoping(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec)
+{
+    Int32 st = _consumerGuards[consumerQueueId]->Wait(timeoutMilisec);
+    if(*_msgConsumerQueueChanges[consumerQueueId])
+    {
+        auto temp = exportMsgsOut;
+        exportMsgsOut = _consumerMsgQueues[consumerQueueId];
+        _consumerMsgQueues[consumerQueueId] = temp;
+        *_msgConsumerQueueChanges[consumerQueueId] = false;
+    }
+
+    return st;
+}
+
+inline void ConcurrentMessageQueue::PopUnlock(UInt32 consumerQueueId)
+{
+    _consumerGuards[consumerQueueId]->Unlock();
+}
+
+inline bool ConcurrentMessageQueue::HasMsgToConsume(UInt32 consumerQueueId) const
+{
+    _consumerGuards[consumerQueueId]->Lock();
+    bool isEmpty = _consumerMsgQueues[consumerQueueId]->empty();
+    _consumerGuards[consumerQueueId]->Unlock();
+    return !isEmpty;
 }
 
 FS_NAMESPACE_END

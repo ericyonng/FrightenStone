@@ -282,6 +282,8 @@
     <ClInclude Include="..\common\component\Impl\InterfaceCompsImpl.h" />
     <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\FS_MessageBlock.h" />
     <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\FS_MessageBlockImpl.h" />
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\MessageQueueTask.h" />
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\MessageQueueTaskImpl.h" />
     <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueue.h" />
     <ClInclude Include="..\common\component\Impl\MessageQueue\Impl\MessageQueueImpl.h" />
     <ClInclude Include="..\common\component\Impl\MessageQueue\MessageQueue.h" />
@@ -451,6 +453,7 @@
     <ClCompile Include="..\common\component\Impl\FS_TlsTable.cpp" />
     <ClCompile Include="..\common\component\Impl\GlobalInitialize.cpp" />
     <ClCompile Include="..\common\component\Impl\MessageQueue\Defs\FS_MessageBlock.cpp" />
+    <ClCompile Include="..\common\component\Impl\MessageQueue\Defs\MessageQueueTask.cpp" />
     <ClCompile Include="..\common\component\Impl\MessageQueue\Impl\MessageQueue.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVar.cpp" />
     <ClCompile Include="..\common\component\Impl\SmartVar\SmartVarArithmetic.cpp" />

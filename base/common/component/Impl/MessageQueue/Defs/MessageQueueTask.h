@@ -21,59 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ConditionLocker.h
+ * @file  : MessageQueueTask.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/11/04
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_Asyn_Lock_Impl_ConditionLocker_H__
-#define __Base_Common_Asyn_Lock_Impl_ConditionLocker_H__
-
+#ifndef __Base_Common_Component_Impl_MessageQueue_Defs_MessageQueueTask_H__
+#define __Base_Common_Component_Impl_MessageQueue_Defs_MessageQueueTask_H__
 
 #pragma once
-#include<base\exportbase.h>
-#include <base\common\common.h>
-#include "base\common\asyn\Lock\Impl\Locker.h"
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
+#include "base/common/component/Impl/Task/Task.h"
+#include "base/common/component/Impl/FS_Delegate.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ConditionLocker : public Locker
+class BASE_EXPORT FS_ThreadPool;
+
+class BASE_EXPORT MessageQueueTask : ITask 
 {
 public:
-    ConditionLocker();
-    virtual ~ConditionLocker();
+    MessageQueueTask(UInt32 messageQueueId, FS_ThreadPool *pool, IDelegate<void, ITask *, FS_ThreadPool *> *callback);
+    virtual ~MessageQueueTask();
 
-#pragma region sinal
 public:
-    // 支持多线程等待sinal一次只唤醒一个线程
-    int Wait(unsigned long milisec = INFINITE);
-    bool Sinal();
-    bool HasWaiter();
-    void Broadcast();
-    void ResetSinal();
-#pragma endregion
+    virtual Int32 Run();
+    UInt32 GetQueueId();
 
-    #pragma region inner
 private:
-    bool _InitAnonymousEvent();
-    bool _DestroyEvent();
-    #pragma endregion
-
-#pragma region member
-private:
-    std::atomic<void *> _event;
-    std::atomic<bool> _isSinal;
-    std::atomic<long long> _waitCnt;
-#pragma endregion
+    UInt32 _messageQueueId;
+    FS_ThreadPool *_pool;
+    IDelegate<void, ITask *, FS_ThreadPool *> *_callback;
 };
 
-inline bool ConditionLocker::HasWaiter()
-{
-    return _waitCnt > 0;
-}
 FS_NAMESPACE_END
 
-#endif // !__Base_Common_Asyn_Lock_Impl_ConditionLocker_H__
+#include "base/common/component/Impl/MessageQueue/Defs/MessageQueueTaskImpl.h"
+
+#endif
