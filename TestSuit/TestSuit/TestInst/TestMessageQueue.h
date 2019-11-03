@@ -39,7 +39,7 @@
 // 8个生产者线程 1个消费者线程
 #undef TEST_GENERATOR_QUANTITY
 #define TEST_GENERATOR_QUANTITY 8
-fs::ConcurrentMessageQueue g_testMsgQueue(TEST_GENERATOR_QUANTITY);
+fs::ConcurrentMessageQueue g_testMsgQueue(TEST_GENERATOR_QUANTITY, 2);
 
 struct TestMessage
 {
@@ -63,7 +63,7 @@ public:
         fs::Time start, end;
         start.FlushTime();
         bool isFirst = true;
-        while(pool->IsPoolWorking()||g_testMsgQueue.HasMsgToConsume(0)||!msgBlocks->empty())
+        while(pool->IsPoolWorking() || g_testMsgQueue.HasMsgToConsume(0) || !msgBlocks->empty())
         {
             g_testMsgQueue.PopLock(0);
             g_testMsgQueue.WaitForPoping(0, msgBlocks);
@@ -88,9 +88,46 @@ public:
         }
 
         end.FlushTime();
-        g_Log->any<ComsumerTask>("comsumer end consum [%lld] msgs escape time[%llu]"
+        g_Log->any<ComsumerTask>("comsumer[0] end consum [%lld] msgs escape time[%llu]"
                                  , countMsg, (end - start).GetTotalMicroSeconds());
     }
+
+    static void Handler2(fs::FS_ThreadPool *pool)
+    {
+        std::list<fs::FS_MessageBlock *> *msgBlocks = new std::list<fs::FS_MessageBlock *>;
+        Int64 countMsg = 0;
+        fs::Time start, end;
+        start.FlushTime();
+        bool isFirst = true;
+        while(pool->IsPoolWorking() || g_testMsgQueue.HasMsgToConsume(1) || !msgBlocks->empty())
+        {
+            g_testMsgQueue.PopLock(1);
+            g_testMsgQueue.WaitForPoping(1, msgBlocks);
+            g_testMsgQueue.PopUnlock(1);
+
+            if(isFirst)
+            {
+                isFirst = false;
+                start.FlushTime();
+            }
+
+            // Sleep(30000);
+            for(auto iterMsgBlock = msgBlocks->begin(); iterMsgBlock != msgBlocks->end();)
+            {
+                auto msgBlock = *iterMsgBlock;
+                TestMessage msg;
+                msgBlock->_data->DeserializeTo(msg);
+                Fs_SafeFree(msgBlock);
+                ++countMsg;
+                iterMsgBlock = msgBlocks->erase(iterMsgBlock);
+            }
+        }
+
+        end.FlushTime();
+        g_Log->any<ComsumerTask>("comsumer[1] end consum [%lld] msgs escape time[%llu]"
+                                 , countMsg, (end - start).GetTotalMicroSeconds());
+    }
+    
 };
 
 class GeneratorTask :fs::ITask
@@ -181,9 +218,11 @@ public:
         g_testMsgQueue.BeforeStart();
         g_testMsgQueue.Start();
 
-        fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, 9);
+        fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, 10);
         auto comsumerTask = fs::DelegatePlusFactory::Create(&ComsumerTask::Handler);
         pool->AddTask(comsumerTask, true);
+        auto comsumerTask2 = fs::DelegatePlusFactory::Create(&ComsumerTask::Handler2);
+        pool->AddTask(comsumerTask2, true);
         
         for(UInt32 i = 0; i < TEST_GENERATOR_QUANTITY; ++i)
         {
