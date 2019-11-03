@@ -44,8 +44,9 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT FS_MessageBlock;
 class BASE_EXPORT FS_ThreadPool;
+class BASE_EXPORT ITask;
 
-// 消息队列遵循FIFO原则，接收端取一条处理一条
+// 消息队列遵循FIFO原则，单一生产者对单一消费者
 class BASE_EXPORT MessageQueue
 {
     OBJ_POOL_CREATE_DEF(MessageQueue);
@@ -82,10 +83,62 @@ private:
     std::list<FS_MessageBlock *> _msgSwitchQueue;
 
     ConditionLocker _msgConsumerGuard;
-    std::atomic_bool _msgComsumerQueueChange;
-    std::list<FS_MessageBlock *> _msgComsumerQueue;
+    std::atomic_bool _msgConsumerQueueChange;
+    std::list<FS_MessageBlock *> _msgConsumerQueue;
 
     std::atomic_bool _isWorking;
+    FS_ThreadPool *_pool;
+};
+
+// 建议使用多生产者单一消费者模型
+// 多生产者对多消费者并发型消息队列 生产者与消费者数量必须呈倍数关系，以便均衡的分配消息
+class BASE_EXPORT ConcurrentMessageQueue
+{
+    OBJ_POOL_CREATE_DEF(ConcurrentMessageQueue);
+public:
+    ConcurrentMessageQueue(UInt32 generatorQuantity, UInt32 consumerQuantity = 1);
+    ~ConcurrentMessageQueue();
+
+public:
+    Int32 BeforeStart();
+    Int32 Start();
+    void BeforeClose();
+    void Close();
+    bool IsWorking() const;
+
+public:
+    // 压入末节点
+    void PushLock(UInt32 generatorQueueId);
+    bool Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs);
+    void PushUnlock(UInt32 generatorQueueId);
+
+    // 其他线程等待消息到来并从前节点弹出
+    void PopLock(UInt32 consumerQueueId);
+    // 成功返回超时WaitEventTimeOut或者成功Success  exportMsgsOut 必须是堆创建
+    Int32 WaitForPoping(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec = INFINITE);
+    void PopUnlock(UInt32 consumerQueueId);
+    bool HasMsgToConsume(UInt32 consumerQueueId) const;
+
+private:
+    void _Generator2ConsumerQueueTask(ITask *task, FS_ThreadPool *pool);
+
+private:
+    /* 生产者 */
+    std::vector<ConditionLocker *> _genoratorGuards;
+    std::vector<std::atomic_bool *> _generatorChange;
+    std::vector<std::list<FS_MessageBlock *> *> _generatorMsgQueues;
+    std::vector<std::list<FS_MessageBlock *> *> _msgSwitchQueues;
+
+    /* 消费者参数 */
+    std::vector<ConditionLocker *>  _consumerGuards;
+    std::vector<std::atomic_bool *> _msgConsumerQueueChanges;
+    std::vector<std::list<FS_MessageBlock *> *> _consumerMsgQueues;
+
+    /* 系统参数 */
+    std::atomic<UInt32> _generatorQuantity;
+    std::atomic<UInt32> _consumerQuantity;
+    std::atomic_bool _isWorking;
+    std::atomic_bool _isStart;
     FS_ThreadPool *_pool;
 };
 

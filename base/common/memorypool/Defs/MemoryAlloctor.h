@@ -61,7 +61,7 @@ class BASE_EXPORT IMemoryAlloctor
 {
     friend class MemoryPoolMgr;
 public:
-    IMemoryAlloctor(const bool &canCreateNewNode);
+    IMemoryAlloctor(std::atomic<bool> &canCreateNewNode);
     virtual ~IMemoryAlloctor();
 
 public:
@@ -99,13 +99,13 @@ protected:
     size_t          _effectiveBlockSize;    // 有效内存块大小（扣除MemoryBlock的内存大小）
 
     IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
-    const bool &_canCreateNewNode;
+    std::atomic<bool> &_canCreateNewNode;
 };
 
 class MemoryAlloctor : public IMemoryAlloctor
 {
 public:
-    MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied, const bool &canCreateNewNode);
+    MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied, std::atomic<bool> &canCreateNewNode);
     virtual ~MemoryAlloctor();
 };
 

@@ -24,7 +24,7 @@ private:
     Int64 _int64obj;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10240000)
+OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10)
 
 
 class TestObjPoolObj2

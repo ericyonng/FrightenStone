@@ -1050,6 +1050,12 @@
     <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\FS_MessageBlockImpl.h">
       <Filter>common\component\Impl\MessageQueue\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\MessageQueueTask.h">
+      <Filter>common\component\Impl\MessageQueue\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\MessageQueueTaskImpl.h">
+      <Filter>common\component\Impl\MessageQueue\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1350,6 +1356,9 @@
       <Filter>common\component\Impl\MessageQueue\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\MessageQueue\Defs\FS_MessageBlock.cpp">
+      <Filter>common\component\Impl\MessageQueue\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\component\Impl\MessageQueue\Defs\MessageQueueTask.cpp">
       <Filter>common\component\Impl\MessageQueue\Defs</Filter>
     </ClCompile>
   </ItemGroup>
