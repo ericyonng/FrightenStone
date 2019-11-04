@@ -34,6 +34,16 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
+inline Int32 FS_IocpMsgTransfer::GetSessionCnt()
+{
+    return _sessionCnt;
+}
+
+inline void FS_IocpMsgTransfer::AttachMsgQueue(ConcurrentMessageQueue *messageQueue)
+{
+    _messageQueue = messageQueue;
+}
+
 inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
 {
     if(!session->CanDisconnect())

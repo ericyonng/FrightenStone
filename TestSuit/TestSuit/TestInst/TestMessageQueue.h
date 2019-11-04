@@ -65,7 +65,7 @@ public:
         fs::Time start, end;
         start.FlushTime();
         bool isFirst = true;
-        while(g_testMsgQueue.IsWorking() || g_testMsgQueue.HasMsgToConsume(0) || !msgBlocks->empty())
+        while(g_testMsgQueue.InHandling(0) || !msgBlocks->empty())
         {
             g_testMsgQueue.PopLock(0);
             g_testMsgQueue.WaitForPoping(0, msgBlocks);
@@ -101,7 +101,7 @@ public:
         fs::Time start, end;
         start.FlushTime();
         bool isFirst = true;
-        while(pool->IsPoolWorking() || g_testMsgQueue.HasMsgToConsume(1) || !msgBlocks->empty())
+        while(g_testMsgQueue.InHandling(1) || !msgBlocks->empty())
         {
             g_testMsgQueue.PopLock(1);
             g_testMsgQueue.WaitForPoping(1, msgBlocks);
@@ -154,17 +154,14 @@ public:
         start.FlushTime();
         while(_pool->IsPoolWorking())
         {
-            for(Int32 i = 0; i < TEST_SESSION_CNT; ++i)
-            {
-                TestMessage newMsg;
-                sprintf(newMsg._buffer, "queueId[%u] ni hao messagequeue %lld", _queueId, count);
-                ++count;
+            TestMessage newMsg;
+            sprintf(newMsg._buffer, "queueId[%u] ni hao messagequeue %lld", _queueId, count);
+            ++count;
 
-                fs::FS_MessageBlock *newMsgBlock = new fs::FS_MessageBlock;
-                newMsgBlock->_data = new fs::FS_Stream(256);
-                newMsgBlock->_data->SerializeFrom(newMsg);
-                msgBlocks->push_back(newMsgBlock);
-            }
+            fs::FS_MessageBlock *newMsgBlock = new fs::FS_MessageBlock;
+            newMsgBlock->_data = new fs::FS_Stream(256);
+            newMsgBlock->_data->SerializeFrom(newMsg);
+            msgBlocks->push_back(newMsgBlock);
 
             g_testMsgQueue.PushLock(_queueId);
             if(g_testMsgQueue.IsWorking())
@@ -175,8 +172,7 @@ public:
                 fs::STLUtil::DelListContainer(*msgBlocks);
             }
             g_testMsgQueue.PushUnlock(_queueId);
-            // Sleep(100);
-
+            //fs::SocketUtil::Sleep(0, 0);
         }
 
         if(!msgBlocks->empty())

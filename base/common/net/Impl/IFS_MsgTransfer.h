@@ -42,6 +42,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IFS_Session;
 struct BASE_EXPORT NetMsg_DataHeader;
+class BASE_EXPORT ConcurrentMessageQueue;
 
 class BASE_EXPORT IFS_MsgTransfer
 {
@@ -64,7 +65,6 @@ public:
     // msg内存池创建
     virtual void AsynSend(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
 
-
     // 会话个数
     virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback) = 0;
     virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback) = 0;
@@ -72,6 +72,9 @@ public:
     virtual void RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback) = 0;
     virtual void RegisterHeatBeatTimeOutCallback(IDelegate<void, IFS_Session *> *callback) = 0;
     virtual Int32 GetSessionCnt() = 0;
+
+    // 消息队列
+    virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue) = 0;
 };
 
 FS_NAMESPACE_END

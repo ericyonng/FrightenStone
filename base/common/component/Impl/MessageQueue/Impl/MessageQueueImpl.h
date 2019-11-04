@@ -93,6 +93,11 @@ inline bool ConcurrentMessageQueue::IsWorking() const
     return _isWorking;
 }
 
+inline bool ConcurrentMessageQueue::IsConsumerInHandling(UInt32 consumerQueueId) const
+{
+    return HasMsgToConsume(consumerQueueId) || IsWorking();
+}
+
 inline void ConcurrentMessageQueue::PushLock(UInt32 generatorQueueId)
 {
     _genoratorGuards[generatorQueueId]->Lock();
