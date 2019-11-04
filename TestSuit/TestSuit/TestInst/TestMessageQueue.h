@@ -26,8 +26,9 @@
  * @date  : 2019/11/03
  * @brief :
  * 
- *  结论：消息队列在8生产者1消费者的情况下达到，消费每秒百万数据包（每个包256字节）
+ *  结论：消息队列在8生产者1消费者的情况下达到，消费每秒百万数据包（每个包256字节）2Gb/s消费能力
           支持每个生产者每秒17万数据包压力
+
  * 
  */
 #ifndef __Test_TestMessageQueue_H__
@@ -64,7 +65,7 @@ public:
         fs::Time start, end;
         start.FlushTime();
         bool isFirst = true;
-        while(pool->IsPoolWorking() || g_testMsgQueue.HasMsgToConsume(0) || !msgBlocks->empty())
+        while(g_testMsgQueue.IsWorking() || g_testMsgQueue.HasMsgToConsume(0) || !msgBlocks->empty())
         {
             g_testMsgQueue.PopLock(0);
             g_testMsgQueue.WaitForPoping(0, msgBlocks);
@@ -131,6 +132,7 @@ public:
     
 };
 
+#define TEST_SESSION_CNT    25000
 class GeneratorTask :fs::ITask
 {
 private:
@@ -152,14 +154,17 @@ public:
         start.FlushTime();
         while(_pool->IsPoolWorking())
         {
-            TestMessage newMsg;
-            sprintf(newMsg._buffer, "queueId[%u] ni hao messagequeue %lld", _queueId, count);
-            ++count;
+            for(Int32 i = 0; i < TEST_SESSION_CNT; ++i)
+            {
+                TestMessage newMsg;
+                sprintf(newMsg._buffer, "queueId[%u] ni hao messagequeue %lld", _queueId, count);
+                ++count;
 
-            fs::FS_MessageBlock *newMsgBlock = new fs::FS_MessageBlock;
-            newMsgBlock->_data = new fs::FS_Stream(256);
-            newMsgBlock->_data->SerializeFrom(newMsg);
-            msgBlocks->push_back(newMsgBlock);
+                fs::FS_MessageBlock *newMsgBlock = new fs::FS_MessageBlock;
+                newMsgBlock->_data = new fs::FS_Stream(256);
+                newMsgBlock->_data->SerializeFrom(newMsg);
+                msgBlocks->push_back(newMsgBlock);
+            }
 
             g_testMsgQueue.PushLock(_queueId);
             if(g_testMsgQueue.IsWorking())
@@ -170,6 +175,8 @@ public:
                 fs::STLUtil::DelListContainer(*msgBlocks);
             }
             g_testMsgQueue.PushUnlock(_queueId);
+            // Sleep(100);
+
         }
 
         if(!msgBlocks->empty())
