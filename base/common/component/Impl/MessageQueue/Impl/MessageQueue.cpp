@@ -343,9 +343,9 @@ void ConcurrentMessageQueue::_Generator2ConsumerQueueTask(ITask *task, FS_Thread
         _consumerGuards[consumerId]->Unlock();
     }
 
-    _consumerGuards[consumerId]->Lock();
-    _consumerGuards[consumerId]->ResetSinal();
-    _consumerGuards[consumerId]->Unlock();
+//     _consumerGuards[consumerId]->Lock();
+//     _consumerGuards[consumerId]->ResetSinal();
+//     _consumerGuards[consumerId]->Unlock();
 
     _isWorking = false;
 }
