@@ -44,6 +44,7 @@
 #include "base/common/crashhandle/CrashHandle.h"
 #include "base/common/socket/socket.h"
 #include "base/common/net/Impl/FS_Addr.h"
+#include "base/common/component/Impl/MessageQueue/MessageQueue.h"
 
 FS_NAMESPACE_BEGIN
 FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
@@ -59,6 +60,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     ,_hasNewSessionLinkin(false)
     ,_isSendCacheDirtied(false)
     ,_id(id)
+    ,_messageQueue(NULL)
 {
 }
 
@@ -194,11 +196,6 @@ void FS_IocpMsgTransfer::RegisterHeatBeatTimeOutCallback(IDelegate<void, IFS_Ses
 {
     Fs_SafeFree(_serverCoreHeartBeatTimeOutCallback);
     _serverCoreHeartBeatTimeOutCallback = callback;
-}
-
-Int32 FS_IocpMsgTransfer::GetSessionCnt()
-{
-    return _sessionCnt;
 }
 
 void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)

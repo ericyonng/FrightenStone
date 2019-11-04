@@ -105,6 +105,7 @@ public:
     void BeforeClose();
     void Close();
     bool IsWorking() const;
+    bool IsConsumerInHandling(UInt32 consumerQueueId) const;
 
 public:
     // Ñ¹ÈëÄ©½Úµã

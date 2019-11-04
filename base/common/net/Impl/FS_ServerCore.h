@@ -52,6 +52,7 @@ class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT TimeSlice;
 class BASE_EXPORT Time;
 class BASE_EXPORT IFS_BusinessLogic;
+class BASE_EXPORT ConcurrentMessageQueue;
 
 class BASE_EXPORT FS_ServerCore
 {
@@ -122,6 +123,8 @@ private:
     Locker _locker;
     IFS_Connector * _connector;                     // 连接器
     std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息收发器
+    ConcurrentMessageQueue *_messageQueue;          // 消息队列
+
     IFS_MsgDispatcher *_msgDispatcher;                 // 消息处理器 业务线程处理
     IFS_BusinessLogic *_logic;                      // 业务逻辑入口
     std::vector<IFS_BusinessLogic *> _logics;

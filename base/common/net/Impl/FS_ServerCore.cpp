@@ -396,10 +396,11 @@ Int32 FS_ServerCore::_CreateNetModules()
     _connector = FS_ConnectorFactory::Create();
 
     //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
-    const Int32 cpuCnt = g_SvrCfg->GetTransferCnt();
-    _msgTransfers.resize(cpuCnt);
-    _logics.resize(cpuCnt);
-    for(Int32 i = 0; i < cpuCnt; ++i)
+    const Int32 transferCnt = g_SvrCfg->GetTransferCnt();
+    _msgTransfers.resize(transferCnt);
+    _logics.resize(transferCnt);
+    _messageQueue = new ConcurrentMessageQueue(transferCnt, 1);
+    for(Int32 i = 0; i < transferCnt; ++i)
     {
         _logics[i] = new BusinessExample;
         _msgTransfers[i] = FS_MsgTransferFactory::Create(i);

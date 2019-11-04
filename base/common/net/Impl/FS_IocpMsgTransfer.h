@@ -75,6 +75,9 @@ public:
     virtual void RegisterHeatBeatTimeOutCallback(IDelegate<void, IFS_Session *> *callback);
     virtual Int32 GetSessionCnt();
 
+    // 消息队列
+    virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue);
+
 private:
     void _OnMoniterMsg(FS_ThreadPool *pool);
     Int32 _DoEvents();
@@ -115,6 +118,7 @@ private:
     FS_ThreadPool *_threadPool;
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;
+    ConcurrentMessageQueue *_messageQueue;
 
     // 缓冲区
     Locker _connectorGuard;
