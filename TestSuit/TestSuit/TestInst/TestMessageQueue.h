@@ -26,7 +26,8 @@
  * @date  : 2019/11/03
  * @brief :
  * 
- *
+ *  结论：消息队列在8生产者1消费者的情况下达到，消费每秒百万数据包（每个包256字节）
+          支持每个生产者每秒17万数据包压力
  * 
  */
 #ifndef __Test_TestMessageQueue_H__
@@ -39,7 +40,7 @@
 // 8个生产者线程 1个消费者线程
 #undef TEST_GENERATOR_QUANTITY
 #define TEST_GENERATOR_QUANTITY 8
-fs::ConcurrentMessageQueue g_testMsgQueue(TEST_GENERATOR_QUANTITY, 2);
+fs::ConcurrentMessageQueue g_testMsgQueue(TEST_GENERATOR_QUANTITY, 1);
 
 struct TestMessage
 {
@@ -218,11 +219,11 @@ public:
         g_testMsgQueue.BeforeStart();
         g_testMsgQueue.Start();
 
-        fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, 10);
+        fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, 9);
         auto comsumerTask = fs::DelegatePlusFactory::Create(&ComsumerTask::Handler);
         pool->AddTask(comsumerTask, true);
-        auto comsumerTask2 = fs::DelegatePlusFactory::Create(&ComsumerTask::Handler2);
-        pool->AddTask(comsumerTask2, true);
+//         auto comsumerTask2 = fs::DelegatePlusFactory::Create(&ComsumerTask::Handler2);
+//         pool->AddTask(comsumerTask2, true);
         
         for(UInt32 i = 0; i < TEST_GENERATOR_QUANTITY; ++i)
         {

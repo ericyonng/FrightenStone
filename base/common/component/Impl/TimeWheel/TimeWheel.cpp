@@ -42,7 +42,7 @@ fs::TimeWheel *g_BusinessTimeWheel = NULL;
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_IMPL(TimeWheel, _objPoolHelper, 2)
+OBJ_POOL_CREATE_IMPL(TimeWheel, _objPoolHelper, 2, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 
 TimeWheel::TimeWheel(const TimeSlice &resolutionSlice)
     :_resolutionSlice(resolutionSlice)

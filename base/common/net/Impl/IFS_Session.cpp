@@ -40,7 +40,7 @@
 #include "base/common/assist/utils/Impl/STLUtil.h"
 #include "base/common/socket/socket.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
+OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 
 FS_NAMESPACE_BEGIN
 

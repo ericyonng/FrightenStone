@@ -1056,6 +1056,12 @@
     <ClInclude Include="..\common\component\Impl\MessageQueue\Defs\MessageQueueTaskImpl.h">
       <Filter>common\component\Impl\MessageQueue\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjBlock.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\objpool\Defs\ObjBlockImpl.h">
+      <Filter>common\objpool\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

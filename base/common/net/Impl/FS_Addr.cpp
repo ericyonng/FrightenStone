@@ -38,7 +38,7 @@
 #include "base/common/crashhandle/CrashHandle.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_Addr, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(FS_Addr, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__);
 
 FS_Addr::FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo)
     :_addrInfo{}

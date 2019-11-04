@@ -24,7 +24,7 @@ private:
     Int64 _int64obj;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10)
+OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 
 
 class TestObjPoolObj2
@@ -56,14 +56,32 @@ public:
 //         g_MemleakMonitor->PrintMemleakInfo();
 //         getchar();
          fs::Time timeNow1, timeNow2;
-//         timeNow1.FlushTime();
-//         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-//         {
-//              new TestObjPoolObj2;
-//         }
-//         timeNow2.FlushTime();
-//         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
-// 
+        std::vector<TestObjPoolObj *> *vecObj = new std::vector<TestObjPoolObj *>;
+        vecObj->resize(TEST_OBJ_NUM);
+        timeNow1.FlushTime();
+        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
+        {
+            (*vecObj)[i] = new TestObjPoolObj;
+        }
+        timeNow2.FlushTime();
+        std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+
+        timeNow1.FlushTime();
+        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
+        {
+            new TestObjPoolObj2;
+        }
+        timeNow2.FlushTime();
+        std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+
+        timeNow1.FlushTime();
+        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
+        {
+            delete (*vecObj)[i];
+        }
+        timeNow2.FlushTime();
+         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+//  std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
         timeNow1.FlushTime();
 //         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
 //         {            
