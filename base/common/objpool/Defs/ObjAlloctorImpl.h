@@ -36,11 +36,11 @@ FS_NAMESPACE_BEGIN
 
 // objtype的blocksize必须是void *尺寸的整数倍
 template<typename ObjType>
-const size_t IObjAlloctor<ObjType>::_objBlockSize = sizeof(ObjType) / __OBJPOOL_ALIGN_BYTES__ * __OBJPOOL_ALIGN_BYTES__ +
-(sizeof(ObjType) % (__OBJPOOL_ALIGN_BYTES__) ? (__OBJPOOL_ALIGN_BYTES__) : 0);
+const size_t IObjAlloctor<ObjType>::_objBlockSize = (sizeof(ObjType) + sizeof(ObjBlock<ObjType>)) / __OBJPOOL_ALIGN_BYTES__ * __OBJPOOL_ALIGN_BYTES__ +
+((sizeof(ObjType) + sizeof(ObjBlock<ObjType>)) % (__OBJPOOL_ALIGN_BYTES__) ? (__OBJPOOL_ALIGN_BYTES__) : 0);
 
 template<typename ObjType>
-inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
+inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount, size_t maxAllowOccupiedBytes)
     :_curNodeObjs(NULL)
     ,_alloctedInCurNode(0)
     ,_nodeCapacity(blockAmount)
@@ -50,6 +50,7 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     ,_bytesOccupied(0)
     ,_objInUse(0)
     ,_lastDeleted(NULL)
+    ,_maxAllowOccupiedBytes(maxAllowOccupiedBytes)
 {
     // 初始化节点
     _header = new AlloctorNode<ObjType>(_nodeCapacity);
@@ -83,6 +84,8 @@ inline void *IObjAlloctor<ObjType>::Alloc()
 {
     _locker.Lock();
     auto ptr = AllocNoLocker();
+    if(!ptr)
+        ptr = _AllocFromSys();
     _locker.Unlock();
     return ptr;
 }
@@ -91,6 +94,14 @@ template<typename ObjType>
 inline void IObjAlloctor<ObjType>::Free(void *ptr)
 {
     _locker.Lock();
+    char *realBegin = (reinterpret_cast<char *>(ptr) - sizeof(ObjBlock<ObjType>));
+    if(reinterpret_cast<ObjBlock<ObjType> *>(realBegin)->_isNotInPool)
+    {
+        ::free(realBegin);
+        _locker.Unlock();
+        return;
+    }
+
     // free的对象构成链表用于下次分配
     *((ObjType **)ptr) = _lastDeleted;
     _lastDeleted = reinterpret_cast<ObjType *>(ptr);
@@ -107,19 +118,25 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
         _lastDeleted = *((ObjType **)(_lastDeleted));
         ++_objInUse;
 
+        char *basePtr = reinterpret_cast<char *>(ptr) - sizeof(ObjBlock<ObjType>);
+        reinterpret_cast<ObjBlock<ObjType> *>(basePtr)->_isNotInPool = false;
         return ptr;
     }
 
     // 分配新节点
     if(_alloctedInCurNode >= _nodeCapacity)
-        _NewNode();
+    {
+        if(!_NewNode())
+            return NULL;
+    }
 
     // 内存池中分配对象
     auto ptr = reinterpret_cast<char *>(_curNodeObjs) + _alloctedInCurNode * _objBlockSize;
+    reinterpret_cast<ObjBlock<ObjType> *>(ptr)->_isNotInPool = false;
     ++_alloctedInCurNode;
     ++_objInUse;
 
-    return ptr;
+    return ptr + sizeof(ObjBlock<ObjType>);
 }
 
 template<typename ObjType>
@@ -135,13 +152,20 @@ template<typename ObjType>
 template<typename... Args>
 inline ObjType *IObjAlloctor<ObjType>::New(Args &&... args)
 {
-    return ::new(AllocNoLocker())ObjType(std::forward<Args>(args)...);
+    auto ptr = AllocNoLocker();
+    if(!ptr)
+        ptr = _AllocFromSys();
+
+    return ::new(ptr)ObjType(std::forward<Args>(args)...);
 }
 
 template<typename ObjType>
 inline ObjType *IObjAlloctor<ObjType>::NewWithoutConstruct()
 {
-    return (ObjType *)AllocNoLocker();
+    auto ptr = AllocNoLocker();
+    if(!ptr)
+        ptr = _AllocFromSys();
+    return (ObjType *)(ptr);
 }
 
 template<typename ObjType>
@@ -156,12 +180,26 @@ inline void IObjAlloctor<ObjType>::Delete(ObjType *ptr)
 {
     // 先析构后释放
     ptr->~ObjType();
+    char *realBegin = (reinterpret_cast<char *>(ptr) - sizeof(ObjBlock<ObjType>));
+    if(reinterpret_cast<ObjBlock<ObjType> *>(realBegin)->_isNotInPool)
+    {
+        ::free(realBegin);
+        return;
+    }
+
     FreeNoLocker(ptr);
 }
 
 template<typename ObjType>
 inline void IObjAlloctor<ObjType>::DeleteWithoutDestructor(ObjType *ptr)
 {
+    char *realBegin = (reinterpret_cast<char *>(ptr) - sizeof(ObjBlock<ObjType>));
+    if(reinterpret_cast<ObjBlock<ObjType> *>(realBegin)->_isNotInPool)
+    {
+        ::free(realBegin);
+        return;
+    }
+
     FreeNoLocker(ptr);
 }
 
@@ -240,8 +278,11 @@ inline void IObjAlloctor<ObjType>::UnLock()
 }
 
 template<typename ObjType>
-inline void IObjAlloctor<ObjType>::_NewNode()
+inline bool IObjAlloctor<ObjType>::_NewNode()
 {
+    if(_bytesOccupied >= _maxAllowOccupiedBytes)
+        return false;
+
     // 构成链表
     auto *newNode = new AlloctorNode<ObjType>(_nodeCapacity);
 
@@ -252,6 +293,16 @@ inline void IObjAlloctor<ObjType>::_NewNode()
     _alloctedInCurNode = 0;
     ++_nodeCnt;
     _bytesOccupied += _nodeCapacity * _objBlockSize;
+
+    return true;
+}
+
+template<typename ObjType>
+inline void * IObjAlloctor<ObjType>::_AllocFromSys()
+{
+    char *ptr = reinterpret_cast<char *>(::malloc(sizeof(ObjBlock<ObjType>) + sizeof(ObjType)));
+    reinterpret_cast<ObjBlock<ObjType> *>(ptr)->_isNotInPool = true;
+    return ptr + sizeof(ObjBlock<ObjType>);
 }
 
 FS_NAMESPACE_END

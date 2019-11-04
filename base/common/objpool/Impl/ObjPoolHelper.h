@@ -48,7 +48,7 @@ template<typename ObjType>
 class ObjPoolHelper
 {
 public:
-    ObjPoolHelper(size_t objAmount);
+    ObjPoolHelper(size_t objAmount, size_t maxAllowOccupiedBytes);
     virtual ~ObjPoolHelper();
 
 public:
@@ -111,8 +111,8 @@ public:                                                                         
 
 // 在实现文件中需要添加
 #undef OBJ_POOL_CREATE_IMPL
-#define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                                   \
-fs::ObjPoolHelper<ObjType> *ObjType::_objpool_helper = fs::Singleton<fs::ObjPoolHelper<ObjType>, fs::AssistObjsDefs::NoDel>::GetInstance(objAmount);       \
+#define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount, maxAllowBytes)                                                   \
+fs::ObjPoolHelper<ObjType> *ObjType::_objpool_helper = fs::Singleton<fs::ObjPoolHelper<ObjType>, fs::AssistObjsDefs::NoDel>::GetInstance(objAmount, maxAllowBytes);       \
 size_t ObjType::GetMemleakNum()                                                                                     \
 {                                                                                                                   \
     return _objpool_helper->GetMemleakObjNum();                                                                     \
@@ -124,6 +124,6 @@ size_t ObjType::GetMemleakNum()                                                 
 
 // 默认以_objPoolHelper命名对象池变量名
 #undef OBJ_POOL_CREATE_DEF_IMPL
-#define OBJ_POOL_CREATE_DEF_IMPL(ObjType, objAmount) OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)
+#define OBJ_POOL_CREATE_DEF_IMPL(ObjType, objAmount, maxAllowBytes) OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount, maxAllowBytes)
 
 #endif

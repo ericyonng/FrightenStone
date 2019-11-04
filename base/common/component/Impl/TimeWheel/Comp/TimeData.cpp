@@ -62,7 +62,7 @@ bool TimeDataLess::operator ()(const TimeData *l, const TimeData *r) const
     return l->_expiredTime < r->_expiredTime;
 }
 
-OBJ_POOL_CREATE_DEF_IMPL(TimeData, __DEF_OBJ_POOL_OBJ_NUM__)
+OBJ_POOL_CREATE_DEF_IMPL(TimeData, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 TimeData::TimeData(FS_Timer *timer)
     :_isCancel(false)
     ,_isRotatingWheel(false)
@@ -89,7 +89,7 @@ FS_String TimeData::ToString() const
     return info;
 }
 
-OBJ_POOL_CREATE_DEF_IMPL(AsynTimeData, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(AsynTimeData, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__);
 
 AsynTimeData::AsynTimeData()
     :_opType(AsynOpType::Op_None)

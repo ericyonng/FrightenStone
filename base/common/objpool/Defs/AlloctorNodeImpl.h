@@ -35,8 +35,8 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
-const size_t AlloctorNode<ObjType>::_objBlockSize = sizeof(ObjType) / __OBJPOOL_ALIGN_BYTES__ * __OBJPOOL_ALIGN_BYTES__ +
-(sizeof(ObjType) % __OBJPOOL_ALIGN_BYTES__ ? __OBJPOOL_ALIGN_BYTES__ : 0);
+const size_t AlloctorNode<ObjType>::_objBlockSize = (sizeof(ObjType) + sizeof(ObjBlock<ObjType>)) / __OBJPOOL_ALIGN_BYTES__ * __OBJPOOL_ALIGN_BYTES__ +
+((sizeof(ObjType) + sizeof(ObjBlock<ObjType>)) % __OBJPOOL_ALIGN_BYTES__ ? __OBJPOOL_ALIGN_BYTES__ : 0);
 
 
 template<typename ObjType>

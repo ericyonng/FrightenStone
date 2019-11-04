@@ -21,17 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_MsgWriteStream.cpp
+ * @file  : ObjBlock.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/08/10
+ * @date  : 2019/11/4
  * @brief :
  * 
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/net/Impl/FS_MsgWriteStream.h"
+#ifndef __Base_Common_ObjPool_Defs_ObjBlock_H__
+#define __Base_Common_ObjPool_Defs_ObjBlock_H__
+#pragma once
+
+#include "base/exportbase.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_MsgWriteStream, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+
+template<typename ObjType>
+class ObjBlock
+{
+public:
+    ObjBlock();
+    ~ObjBlock();
+
+public:
+    bool _isNotInPool;
+};
+
 FS_NAMESPACE_END
+
+#include "base/common/objpool/Defs/ObjBlockImpl.h"
+
+#endif

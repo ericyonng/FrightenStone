@@ -35,6 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/objpool/Defs/ObjBlock.h"
 
 FS_NAMESPACE_BEGIN
 

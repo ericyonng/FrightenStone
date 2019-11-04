@@ -400,6 +400,8 @@
     <ClInclude Include="..\common\objpool\Defs\FS_ObjPoolDefs.h" />
     <ClInclude Include="..\common\objpool\Defs\ObjAlloctor.h" />
     <ClInclude Include="..\common\objpool\Defs\ObjAlloctorImpl.h" />
+    <ClInclude Include="..\common\objpool\Defs\ObjBlock.h" />
+    <ClInclude Include="..\common\objpool\Defs\ObjBlockImpl.h" />
     <ClInclude Include="..\common\objpool\Defs\ObjPoolDefs.h" />
     <ClInclude Include="..\common\objpool\Impl\ObjPoolHelper.h" />
     <ClInclude Include="..\common\objpool\Impl\ObjPoolHelperImpl.h" />
