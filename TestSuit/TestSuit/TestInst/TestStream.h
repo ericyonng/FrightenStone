@@ -82,7 +82,10 @@ public:
         cache.DeserializeFrom(str);
         TestStreamMessage messageCache;
         cache.DeserializeTo(messageCache);
-        g_Log->any<TestStream>("deserialize message cache %s", messageCache._buffer);
+        fs::FS_String md5str;
+        str = "ni hao test tream!";
+        fs::StringUtil::MakeMd5(str, md5str);
+        g_Log->any<TestStream>("deserialize message cache %s md5:%s", messageCache._buffer, md5str.ToHexString().c_str());
         getchar();
     }
 };

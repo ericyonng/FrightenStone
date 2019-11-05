@@ -35,6 +35,7 @@
 
 FS_NAMESPACE_BEGIN
 OBJ_POOL_CREATE_IMPL(FS_Stream, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+
 FS_Stream::FS_Stream(int size)
 {
     _size = size;
@@ -47,21 +48,7 @@ FS_Stream::FS_Stream(int size)
 
 FS_Stream::~FS_Stream()
 {
-    if(_needDelete && _buff)
-    {
-        if(_isPoolCreate)
-        {
-            g_MemoryPool->Lock();
-            g_MemoryPool->Free(_buff);
-            g_MemoryPool->Unlock();
-            _buff = NULL;
-        }
-        else
-        {
-            delete []_buff;
-            _buff = NULL;
-        }
-    }
+    _Clear();
 }
 
 void FS_Stream::Release()
@@ -98,6 +85,8 @@ bool FS_Stream::DeserializeFrom(const FS_String &str)
 {
     if(str.empty())
         return false;
+
+    _Clear();
 
     const Int32 sizeBytes = sizeof(_size);
     const Int32 wrPosBytes = sizeof(_writePos);
@@ -168,4 +157,22 @@ bool FS_Stream::DeserializeFrom(const FS_String &str)
     return true;
 }
 
+void FS_Stream::_Clear()
+{
+    if(_needDelete && _buff)
+    {
+        if(_isPoolCreate)
+        {
+            g_MemoryPool->Lock();
+            g_MemoryPool->Free(_buff);
+            g_MemoryPool->Unlock();
+            _buff = NULL;
+        }
+        else
+        {
+            delete[]_buff;
+            _buff = NULL;
+        }
+    }
+}
 FS_NAMESPACE_END
