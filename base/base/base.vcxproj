@@ -346,6 +346,8 @@
     <ClInclude Include="..\common\memorypool\Interface\IMemoryPool.h" />
     <ClInclude Include="..\common\memorypool\Interface\IMemoryPoolMgr.h" />
     <ClInclude Include="..\common\memorypool\memorypool.h" />
+    <ClInclude Include="..\common\net\Defs\BriefSessionInfo.h" />
+    <ClInclude Include="..\common\net\Defs\BriefSessionInfoImpl.h" />
     <ClInclude Include="..\common\net\Defs\FS_BufferFactory.h" />
     <ClInclude Include="..\common\net\Defs\FS_IocpBuffer.h" />
     <ClInclude Include="..\common\net\Defs\FS_IocpBufferImpl.h" />

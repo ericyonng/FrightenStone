@@ -94,4 +94,78 @@ bool FS_Stream::ReadString(std::string &str)
     return false;
 }
 
+bool FS_Stream::DeserializeFrom(const FS_String &str)
+{
+    if(str.empty())
+        return false;
+
+    const Int32 sizeBytes = sizeof(_size);
+    const Int32 wrPosBytes = sizeof(_writePos);
+    const Int32 rdPosBytes = sizeof(_readPos);
+    const Int32 ndDelBytes = sizeof(_needDelete);
+    const Int32 isPoolCreateBytes = sizeof(_isPoolCreate);
+
+    Int32 leftBytes = static_cast<Int32>(str.size());
+    if(leftBytes < sizeBytes)
+        return false;
+    Int32 offsetPos = 0;
+    Int32 resSize = static_cast<Int32>(str.CopyTo(reinterpret_cast<char *>(&_size), sizeBytes, sizeBytes, offsetPos));
+    if(resSize != sizeBytes)
+        return false;
+    leftBytes -= resSize;
+
+    if(leftBytes < wrPosBytes)
+        return false;
+    offsetPos += resSize;
+    Int32 resWr = static_cast<Int32>(str.CopyTo(reinterpret_cast<char *>(&_writePos), wrPosBytes, wrPosBytes, offsetPos));
+    if(resWr != wrPosBytes)
+        return false;
+    leftBytes -= resWr;
+
+    if(leftBytes < rdPosBytes)
+        return false;
+    offsetPos += resWr;
+    Int32 resRd = static_cast<Int32>(str.CopyTo(reinterpret_cast<char *>(&_readPos), rdPosBytes, rdPosBytes, offsetPos));
+    if(resRd != rdPosBytes)
+        return false;
+    leftBytes -= resRd;
+
+    if(leftBytes < ndDelBytes)
+        return false;
+    offsetPos += resRd;
+    Int32 resNdDel = static_cast<Int32>(str.CopyTo(reinterpret_cast<char *>(&_needDelete), ndDelBytes, ndDelBytes, offsetPos));
+    if(resNdDel != ndDelBytes)
+        return false;
+    leftBytes -= resNdDel;
+
+    if(leftBytes < isPoolCreateBytes)
+        return false;
+    offsetPos += resNdDel;
+    Int32 resIsPoolCreate = static_cast<Int32>(str.CopyTo(reinterpret_cast<char *>(&_isPoolCreate), isPoolCreateBytes, isPoolCreateBytes, offsetPos));
+    if(resIsPoolCreate != isPoolCreateBytes)
+        return false;
+    leftBytes -= resIsPoolCreate;
+
+    auto validSize = _writePos > _readPos ? _writePos : _readPos;
+    if(validSize)
+    {
+        if(_isPoolCreate)
+        {
+            g_MemoryPool->Lock();
+            _buff = reinterpret_cast<char *>(g_MemoryPool->Alloc(_size));
+            g_MemoryPool->Unlock();
+        }
+        else
+        {
+            _buff = new char[_size];
+        }
+        offsetPos += resIsPoolCreate;
+        Int32 resBuff = static_cast<Int32>(str.CopyTo(_buff, _size, validSize, offsetPos));
+        if(resBuff != validSize)
+            return false;
+    }
+
+    return true;
+}
+
 FS_NAMESPACE_END

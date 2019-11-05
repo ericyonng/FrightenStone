@@ -33,6 +33,15 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
+inline FS_Stream::FS_Stream()
+    :_buff(NULL)
+    ,_size(0)
+    ,_writePos(0)
+    ,_readPos(0)
+    ,_needDelete(false)
+    ,_isPoolCreate(false)
+{
+}
 
 inline FS_Stream::FS_Stream(Byte8 *data, Int32 size, bool needDelete, bool isPoolCreate)
     :_buff(data)
@@ -84,6 +93,12 @@ inline StreamObjType *FS_Stream::CastTo()
     return reinterpret_cast<StreamObjType *>(this);
 }
 
+template<typename StreamObjType>
+inline const StreamObjType *FS_Stream::CastTo() const
+{
+    return reinterpret_cast<StreamObjType *>(this);
+}
+
 template<typename ObjType>
 inline bool FS_Stream::SerializeFrom(const ObjType &obj)
 {
@@ -95,6 +110,27 @@ inline bool FS_Stream::DeserializeTo(ObjType &obj)
 {
     return obj.DeserializeFrom(this);
 }
+
+inline bool FS_Stream::SerializeTo(FS_String &str) const
+{
+    // 先写入数据占用空间
+    str.AppendBitData(reinterpret_cast<const char *>(&_size), sizeof(_size));
+    str.AppendBitData(reinterpret_cast<const char *>(&_writePos), sizeof(_writePos));
+    str.AppendBitData(reinterpret_cast<const char *>(&_readPos), sizeof(_readPos));
+    str.AppendBitData(reinterpret_cast<const char *>(&_needDelete), sizeof(_needDelete));
+    str.AppendBitData(reinterpret_cast<const char *>(&_isPoolCreate), sizeof(_isPoolCreate));
+
+    // 将有效数据拷入str
+    if(_buff)
+    {
+        auto validSize = _writePos > _readPos ? _writePos : _readPos;
+        if(validSize)
+            str.AppendBitData(_buff, validSize);
+    }
+
+    return !str.empty();
+}
+
 
 #pragma endregion
 

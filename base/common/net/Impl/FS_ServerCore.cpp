@@ -402,7 +402,6 @@ Int32 FS_ServerCore::_CreateNetModules()
     _messageQueue = new ConcurrentMessageQueue(transferCnt, 1);
     for(Int32 i = 0; i < transferCnt; ++i)
     {
-        _logics[i] = new BusinessExample;
         _msgTransfers[i] = FS_MsgTransferFactory::Create(i);
     }
 
