@@ -61,8 +61,10 @@ inline void IFS_Buffer::PopFront(size_t bytesLen)
     // TODO:如果考虑性能清零可不执行
     // ::memset(_buff, 0, bytesLen);
 
+//     if(n > 0)
+//         ::memmove(_buff, _buff + bytesLen, n);
     if(n > 0)
-        ::memmove(_buff, _buff + bytesLen, n);
+        ::memcpy(_buff, _buff + bytesLen, n);
 
     _curPos = n;
 }

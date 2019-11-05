@@ -61,6 +61,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     ,_isSendCacheDirtied(false)
     ,_id(id)
     ,_messageQueue(NULL)
+    ,_generatorId(0)
 {
 }
 

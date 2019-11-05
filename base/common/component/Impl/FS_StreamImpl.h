@@ -123,7 +123,7 @@ inline bool FS_Stream::SerializeTo(FS_String &str) const
     // 将有效数据拷入str
     if(_buff)
     {
-        auto validSize = _writePos > _readPos ? _writePos : _readPos;
+        auto validSize = _writePos > 0 ? _writePos : _size;
         if(validSize)
             str.AppendBitData(_buff, validSize);
     }

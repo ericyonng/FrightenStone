@@ -64,13 +64,18 @@ public:
 public:
     // 压入末节点
     void PushLock();
-    bool Push(std::list<FS_MessageBlock *> &msgs);
+    // msgs堆创建
+    bool Push(std::list<FS_MessageBlock *> *&msgs);
     void PushUnlock();
 
     // 其他线程等待消息到来并从前节点弹出
     void PopLock();
-    // 成功返回超时WaitEventTimeOut或者成功Success
-    Int32 WaitForPoping(std::list<FS_MessageBlock *> &exportMsgsOut, ULong timeoutMilisec = INFINITE);
+    // 成功返回超时WaitEventTimeOut或者成功Success exportMsgsOut 必须是堆创建
+    Int32 WaitForPoping(std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec = INFINITE);
+    void PopImmediately(std::list<FS_MessageBlock *> *&exportMsgsOut);
+    bool IsConsumerInHandling();
+    bool HasMsgToConsume();
+    bool IsWorking() const;
     void PopUnlock();
 
 private:
@@ -79,19 +84,20 @@ private:
 private:
     ConditionLocker _msgGeneratorGuard;
     std::atomic_bool _msgGeneratorChange;
-    std::list<FS_MessageBlock *> _msgGeneratorQueue;
-    std::list<FS_MessageBlock *> _msgSwitchQueue;
+    std::list<FS_MessageBlock *> *_msgGeneratorQueue;
+    std::list<FS_MessageBlock *> *_msgSwitchQueue;
 
     ConditionLocker _msgConsumerGuard;
     std::atomic_bool _msgConsumerQueueChange;
-    std::list<FS_MessageBlock *> _msgConsumerQueue;
+    std::list<FS_MessageBlock *> *_msgConsumerQueue;
 
     std::atomic_bool _isWorking;
     FS_ThreadPool *_pool;
+    std::atomic_bool _isStart;
 };
 
 // 建议使用多生产者单一消费者模型
-// 多生产者对多消费者并发型消息队列 生产者与消费者数量必须呈倍数关系，以便均衡的分配消息
+// 多生产者对多消费者并发型消息队列 生产者与消费者数量必须呈倍数关系，以便均衡的分配消息 生产者需大于消费者
 class BASE_EXPORT ConcurrentMessageQueue
 {
     OBJ_POOL_CREATE_DEF(ConcurrentMessageQueue);
@@ -117,6 +123,7 @@ public:
     void PopLock(UInt32 consumerQueueId);
     // 成功返回超时WaitEventTimeOut或者成功Success  exportMsgsOut 必须是堆创建
     Int32 WaitForPoping(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec = INFINITE);
+    void PopImmediately(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut);
     void PopUnlock(UInt32 consumerQueueId);
     bool HasMsgToConsume(UInt32 consumerQueueId) const;
 

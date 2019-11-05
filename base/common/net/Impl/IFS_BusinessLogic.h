@@ -72,7 +72,6 @@ public:
     virtual void OnSessionDisconnected(UInt64 sessionId) = 0;
 
     void SetDispatcher(IFS_MsgDispatcher *dispatcher);
-    void AttachMsgQueue(ConcurrentMessageQueue *messageQueue);
 
 protected:
     IFS_MsgDispatcher *_dispatcher;

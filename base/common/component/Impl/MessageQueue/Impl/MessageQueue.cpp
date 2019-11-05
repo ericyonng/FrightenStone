@@ -49,6 +49,10 @@ MessageQueue::MessageQueue()
     ,_msgConsumerQueueChange(false)
     ,_pool(NULL)
     ,_isWorking{false}
+    ,_msgGeneratorQueue(NULL)
+    ,_msgSwitchQueue(NULL)
+    ,_msgConsumerQueue(NULL)
+    ,_isStart(false)
 {
 }
 
@@ -65,12 +69,21 @@ MessageQueue::~MessageQueue()
 
 Int32 MessageQueue::BeforeStart()
 {
+    if(_isStart)
+        return StatusDefs::Success;
+
+    _msgGeneratorQueue = new std::list<FS_MessageBlock *>;
+    _msgSwitchQueue = new std::list<FS_MessageBlock *>;
+    _msgConsumerQueue = new std::list<FS_MessageBlock *>;
     _pool = new FS_ThreadPool(0, 1);
     return StatusDefs::Success;
 }
 
 Int32 MessageQueue::Start()
 {
+    if(_isStart)
+        return StatusDefs::Success;
+
     auto task = DelegatePlusFactory::Create(this, &MessageQueue::_MsgQueueWaiterThread);
     if(!_pool->AddTask(task, true))
     {
@@ -79,11 +92,15 @@ Int32 MessageQueue::Start()
         return StatusDefs::Error;
     }
 
+    _isStart = true;
     return StatusDefs::Success;
 }
 
 void MessageQueue::BeforeClose()
 {
+    if(!_isStart)
+        return;
+
     // 唤醒消费者线程
     _msgGeneratorGuard.Lock();
     _isWorking = false;
@@ -98,7 +115,17 @@ void MessageQueue::BeforeClose()
 
 void MessageQueue::Close()
 {
+    if(!_isStart)
+        return;
 
+    STLUtil::DelListContainer(*_msgGeneratorQueue);
+    STLUtil::DelListContainer(*_msgSwitchQueue);
+    STLUtil::DelListContainer(*_msgConsumerQueue);
+    Fs_SafeFree(_msgGeneratorQueue);
+    Fs_SafeFree(_msgSwitchQueue);
+    Fs_SafeFree(_msgConsumerQueue);
+
+    _isStart = false;
 }
 
 void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
@@ -115,28 +142,26 @@ void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
 
         // 生产者消息转移到缓存
         _msgGeneratorGuard.Lock();
-        for(auto iterMsgBlock = _msgGeneratorQueue.begin(); iterMsgBlock != _msgGeneratorQueue.end();)
-        {
-            _msgSwitchQueue.push_back(*iterMsgBlock);
-            iterMsgBlock = _msgGeneratorQueue.erase(iterMsgBlock);
-        }
+        auto genTemp = _msgGeneratorQueue;
+        _msgGeneratorQueue = _msgSwitchQueue;
+        _msgSwitchQueue = genTemp;
         _msgGeneratorChange = false;
         _msgGeneratorGuard.Unlock();
 
         _msgConsumerGuard.Lock();
-        for(auto iterMsgBlock = _msgSwitchQueue.begin(); iterMsgBlock != _msgSwitchQueue.end();)
+        for(auto iterMsgBlock = _msgSwitchQueue->begin(); iterMsgBlock != _msgSwitchQueue->end();)
         {
-            _msgConsumerQueue.push_back(*iterMsgBlock);
-            iterMsgBlock = _msgSwitchQueue.erase(iterMsgBlock);
+            _msgConsumerQueue->push_back(*iterMsgBlock);
+            iterMsgBlock = _msgSwitchQueue->erase(iterMsgBlock);
         }
         _msgConsumerQueueChange = true;
         _msgConsumerGuard.Sinal();
         _msgConsumerGuard.Unlock();
     }
 
-    _msgConsumerGuard.Lock();
-    _msgConsumerGuard.ResetSinal();
-    _msgConsumerGuard.Unlock();
+//     _msgConsumerGuard.Lock();
+//     _msgConsumerGuard.ResetSinal();
+//     _msgConsumerGuard.Unlock();
 
     _isWorking = false;
 }
@@ -308,39 +333,48 @@ void ConcurrentMessageQueue::_Generator2ConsumerQueueTask(ITask *task, FS_Thread
     MessageQueueTask *messageQueueTask = reinterpret_cast<MessageQueueTask *>(task);
     const UInt32 generatorQueueId = messageQueueTask->GetQueueId();
 
+    // 参数
     _isWorking = true;
+    const UInt32 consumerId = generatorQueueId % _consumerQuantity;
+    ConditionLocker *localGenGuard = _genoratorGuards[generatorQueueId];
+    auto &genChange = *_generatorChange[generatorQueueId];
+    ConditionLocker *localConsumerGuard = _consumerGuards[consumerId];
+    auto &consumerChange = *_msgConsumerQueueChanges[consumerId];
+
     std::list<FS_MessageBlock *> *genTemp = NULL;
+    auto &consumerMsgQueue = _consumerMsgQueues[consumerId];
 
     // 均匀分配
-    const UInt32 consumerId = generatorQueueId % _consumerQuantity;
     while(pool->IsPoolWorking() || *_generatorChange[generatorQueueId])
     {
         if(_isWorking)
         {
-            _genoratorGuards[generatorQueueId]->Lock();
-            _genoratorGuards[generatorQueueId]->Wait();
-            _genoratorGuards[generatorQueueId]->Unlock();
+            localGenGuard->Lock();
+            localGenGuard->Wait();
+            localGenGuard->Unlock();
         }
 
         // 生产者消息转移到缓存
-        _genoratorGuards[generatorQueueId]->Lock();
-        genTemp = _generatorMsgQueues[generatorQueueId];
-        _generatorMsgQueues[generatorQueueId] = _msgSwitchQueues[generatorQueueId];
-        _msgSwitchQueues[generatorQueueId] = genTemp;
-        *_generatorChange[generatorQueueId] = false;
-        _genoratorGuards[generatorQueueId]->Unlock();
+        localGenGuard->Lock();
+        auto &localGenMsgQueue = _generatorMsgQueues[generatorQueueId];
+        auto &localSwitchQueue = _msgSwitchQueues[generatorQueueId];
+        genTemp = localGenMsgQueue;
+        localGenMsgQueue = localSwitchQueue;
+        localSwitchQueue = genTemp;
+        genChange = false;
+        localGenGuard->Unlock();
 
-        _consumerGuards[consumerId]->Lock();
-        for(auto iterMsgBlock = _msgSwitchQueues[generatorQueueId]->begin(); 
-            iterMsgBlock != _msgSwitchQueues[generatorQueueId]->end();)
+        localConsumerGuard->Lock();
+        for(auto iterMsgBlock = localSwitchQueue->begin(); 
+            iterMsgBlock != localSwitchQueue->end();)
         {
-            _consumerMsgQueues[consumerId]->push_back(*iterMsgBlock);
-            iterMsgBlock = _msgSwitchQueues[generatorQueueId]->erase(iterMsgBlock);
+            consumerMsgQueue->push_back(*iterMsgBlock);
+            iterMsgBlock = localSwitchQueue->erase(iterMsgBlock);
         }
 
-        *_msgConsumerQueueChanges[consumerId] = true;
-        _consumerGuards[consumerId]->Sinal();
-        _consumerGuards[consumerId]->Unlock();
+        consumerChange = true;
+        localConsumerGuard->Sinal();
+        localConsumerGuard->Unlock();
     }
 
 //     _consumerGuards[consumerId]->Lock();
