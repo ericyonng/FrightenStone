@@ -49,8 +49,9 @@ class BASE_EXPORT FS_Stream
 {
     OBJ_POOL_CREATE(FS_Stream, _objPoolHelper);
 public:
+    FS_Stream();
     FS_Stream(Byte8 *data, Int32 size, bool needDelete = false, bool isPoolCreate = false);
-    FS_Stream(Int32 size = 1024);
+    FS_Stream(Int32 size);
     virtual ~FS_Stream();
     virtual void Release();
 
@@ -76,12 +77,18 @@ public:
     void SetWritePos(Int32 n);
     template<typename StreamObjType>
     StreamObjType *CastTo();
+    template<typename StreamObjType>
+    const StreamObjType *CastTo() const;
 
-    // 序列化反序列化（ObjType 必须有SerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)接口）
+    // 序列化反序列化（ObjType 必须有bool SerializeTo(FS_Stream *) const, bool DeserializeFrom(FS_Stream *)接口）
     template<typename ObjType>
     bool SerializeFrom(const ObjType &obj);
     template<typename ObjType>
     bool DeserializeTo(ObjType &obj);
+
+    // 字节流序列化反序列化
+    bool SerializeTo(FS_String &str) const;
+    bool DeserializeFrom(const FS_String &str);
     #pragma endregion
 
     /* 读字节流 */
@@ -125,8 +132,6 @@ public:
     #pragma endregion
 
 private:
-    // 数据缓冲区
-    char *_buff = NULL;
     // 缓冲区总的空间大小，字节长度
     Int32 _size = 0;
     // 已写入数据的尾部位置，已写入数据长度
@@ -136,6 +141,8 @@ private:
     // _buff是外部传入的数据块时是否应该被释放
     bool _needDelete = true;
     bool _isPoolCreate = false;
+    // 数据缓冲区
+    char *_buff = NULL;
 };
 
 FS_NAMESPACE_END

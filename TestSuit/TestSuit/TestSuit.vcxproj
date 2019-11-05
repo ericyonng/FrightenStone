@@ -175,6 +175,7 @@
     <ClInclude Include="TestInst\TestRtti.h" />
     <ClInclude Include="TestInst\TestServer.h" />
     <ClInclude Include="TestInst\TestSingleton.h" />
+    <ClInclude Include="TestInst\TestStream.h" />
     <ClInclude Include="TestInst\TestString.h" />
     <ClInclude Include="TestInst\TestSystemUtil.h" />
     <ClInclude Include="TestInst\TestThreadPool.h" />

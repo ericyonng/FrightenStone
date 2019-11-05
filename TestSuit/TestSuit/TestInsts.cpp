@@ -64,6 +64,7 @@
 #include "TestSuit/TestSuit/TestInst/TestRtti.h"
 #include "TestSuit/TestSuit/TestInst/TestInterfaceComps.h"
 #include "TestSuit/TestSuit/TestInst/TestMessageQueue.h"
+#include "TestSuit/TestSuit/TestInst/TestStream.h"
 
 void TestInsts::Run()
 {
@@ -77,7 +78,7 @@ void TestInsts::Run()
 //     pool->AddTask(deleg);
 //     getchar();
 //     pool->Clear();
-    TestMessageQueue::Run();
+    TestStream::Run();
     getchar();
     // TestJson::Run();
 }

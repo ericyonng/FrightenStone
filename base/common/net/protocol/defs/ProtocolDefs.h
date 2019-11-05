@@ -81,6 +81,11 @@ struct BASE_EXPORT NetMsg_DataHeader
     OBJ_POOL_CREATE(NetMsg_DataHeader, _objPoolHelper);
 
     NetMsg_DataHeader();
+    
+    // 提供序列化反序列化接口
+    // 序列化反序列化（ObjType 必须有SerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)接口）
+    // 序列化反序列化（ObjType 必须有bool SerializeTo(FS_Stream *) const, bool DeserializeFrom(FS_Stream *)接口）
+    // bool SerializeTo(FS_Stream *str);
     UInt16 _packetLength;           // 包长度
     UInt16 _cmd;                    // 命令
 };

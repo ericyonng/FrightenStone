@@ -65,7 +65,7 @@ public:
         fs::Time start, end;
         start.FlushTime();
         bool isFirst = true;
-        while(g_testMsgQueue.InHandling(0) || !msgBlocks->empty())
+        while(g_testMsgQueue.IsConsumerInHandling(0) || !msgBlocks->empty())
         {
             g_testMsgQueue.PopLock(0);
             g_testMsgQueue.WaitForPoping(0, msgBlocks);
@@ -101,7 +101,7 @@ public:
         fs::Time start, end;
         start.FlushTime();
         bool isFirst = true;
-        while(g_testMsgQueue.InHandling(1) || !msgBlocks->empty())
+        while(g_testMsgQueue.IsConsumerInHandling(1) || !msgBlocks->empty())
         {
             g_testMsgQueue.PopLock(1);
             g_testMsgQueue.WaitForPoping(1, msgBlocks);

@@ -1062,6 +1062,12 @@
     <ClInclude Include="..\common\objpool\Defs\ObjBlockImpl.h">
       <Filter>common\objpool\Defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Defs\BriefSessionInfo.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\Defs\BriefSessionInfoImpl.h">
+      <Filter>common\net\Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
