@@ -76,7 +76,7 @@ public:
     virtual Int32 GetSessionCnt();
 
     // 消息队列
-    virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue);
+    virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue, Int32 generatorId);
 
 private:
     void _OnMoniterMsg(FS_ThreadPool *pool);
@@ -119,6 +119,7 @@ private:
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;
     ConcurrentMessageQueue *_messageQueue;
+    Int32 _generatorId;
 
     // 缓冲区
     Locker _connectorGuard;

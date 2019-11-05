@@ -52,6 +52,7 @@ struct BASE_EXPORT FS_MessageBlock
     FS_Stream *_data;                            // 序列化的数据字节流
 };
 
+
 FS_NAMESPACE_END
 
 #include "base/common/component/Impl/MessageQueue/Defs/FS_MessageBlockImpl.h"

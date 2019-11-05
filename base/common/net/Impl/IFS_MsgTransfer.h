@@ -74,7 +74,7 @@ public:
     virtual Int32 GetSessionCnt() = 0;
 
     // 消息队列
-    virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue) = 0;
+    virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue, Int32 generatorId) = 0;
 };
 
 FS_NAMESPACE_END
