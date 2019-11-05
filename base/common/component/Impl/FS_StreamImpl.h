@@ -371,6 +371,7 @@ inline bool FS_Stream::WriteDouble(Double n)
 {
     return Write(n);
 }
+
 #pragma endregion
 
 FS_NAMESPACE_END

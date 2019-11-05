@@ -132,6 +132,9 @@ public:
     #pragma endregion
 
 private:
+    void _Clear();
+
+private:
     // 缓冲区总的空间大小，字节长度
     Int32 _size = 0;
     // 已写入数据的尾部位置，已写入数据长度
