@@ -99,6 +99,8 @@ private:
     TimeSlice _resolutionInterval;      // 时钟轮盘时间间隔
     TimeWheel *_timeWheel;
     IFS_BusinessLogic *_logic;
+
+    // TODO:订阅网络协议的facade开发，使用委托方式，各个系统关注各自的协议，注册到本系统
 };
 
 FS_NAMESPACE_END

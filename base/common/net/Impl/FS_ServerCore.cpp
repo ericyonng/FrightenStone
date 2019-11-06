@@ -61,6 +61,7 @@ fs::FS_ServerCore *g_ServerCore = NULL;
 fs::IFS_ServerConfigMgr *g_SvrCfg = NULL;
 fs::IFS_MsgDispatcher *g_Dispatcher = NULL;
 fs::IFS_BusinessLogic *g_Logic = NULL;
+fs::ConcurrentMessageQueue *g_net2LogicMessageQueue = NULL;
 
 FS_NAMESPACE_BEGIN
 FS_ServerCore::FS_ServerCore()
@@ -399,6 +400,7 @@ Int32 FS_ServerCore::_CreateNetModules()
     const Int32 transferCnt = g_SvrCfg->GetTransferCnt();
     _msgTransfers.resize(transferCnt);
     _messageQueue = new ConcurrentMessageQueue(transferCnt, 1);
+    g_net2LogicMessageQueue = _messageQueue;
     for(Int32 i = 0; i < transferCnt; ++i)
     {
         _msgTransfers[i] = FS_MsgTransferFactory::Create(i);
@@ -406,6 +408,7 @@ Int32 FS_ServerCore::_CreateNetModules()
     }
 
     _msgDispatcher = FS_MsgDispatcherFactory::Create();
+    _msgDispatcher->
     return StatusDefs::Success;
 }
 
