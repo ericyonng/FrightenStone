@@ -127,7 +127,6 @@ private:
 
     IFS_MsgDispatcher *_msgDispatcher;                 // 消息处理器 业务线程处理
     IFS_BusinessLogic *_logic;                      // 业务逻辑入口
-    std::vector<IFS_BusinessLogic *> _logics;
 
     // TODO:sessionmgr可能需要移除避免锁冲突
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
@@ -149,9 +148,10 @@ FS_NAMESPACE_END
 
 #include "base/common/net/Impl/FS_ServerCoreImpl.h"
 
-extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;
-extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;
-extern BASE_EXPORT fs::IFS_MsgDispatcher *g_Dispatcher;
-extern BASE_EXPORT fs::IFS_BusinessLogic *g_Logic;
+extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;                         // 服务核心
+extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;                       // 服务器配置
+extern BASE_EXPORT fs::IFS_MsgDispatcher *g_Dispatcher;                     // 网络包分发器
+extern BASE_EXPORT fs::IFS_BusinessLogic *g_Logic;                          // 业务逻辑层
+extern BASE_EXPORT fs::ConcurrentMessageQueue *g_net2LogicMessageQueue;     // 网络层到业务层的消息队列
 
 #endif

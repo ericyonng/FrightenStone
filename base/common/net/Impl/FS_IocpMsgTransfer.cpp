@@ -55,7 +55,6 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     ,_serverCoreRecvSucCallback(NULL)
     ,_serverCoreRecvAmountCallback(NULL)
     ,_serverCoreSendSucCallback(NULL)
-    ,_serverCoreHeartBeatTimeOutCallback(NULL)
     ,_sessionCnt{0}
     ,_hasNewSessionLinkin(false)
     ,_isSendCacheDirtied(false)
@@ -71,7 +70,6 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
     Fs_SafeFree(_serverCoreSendSucCallback);
     Fs_SafeFree(_serverCoreRecvSucCallback);
     Fs_SafeFree(_serverCoreDisconnectedCallback);
-    Fs_SafeFree(_serverCoreHeartBeatTimeOutCallback);
     Fs_SafeFree(_threadPool);
     Fs_SafeFree(_iocp);
     Fs_SafeFree(_ioEvent);
@@ -143,8 +141,8 @@ void FS_IocpMsgTransfer::OnConnect(IFS_Session *session)
     _connectorGuard.Lock();
     _linkSessionCache.push_back(session);
     _hasNewSessionLinkin = true;
-    _connectorGuard.Unlock();
     ++_sessionCnt;
+    _connectorGuard.Unlock();
 }
 
 void FS_IocpMsgTransfer::OnDestroy()
@@ -193,11 +191,6 @@ void FS_IocpMsgTransfer::RegisterSendSucCallback(IDelegate<void, IFS_Session *, 
     _serverCoreSendSucCallback = callback;
 }
 
-void FS_IocpMsgTransfer::RegisterHeatBeatTimeOutCallback(IDelegate<void, IFS_Session *> *callback)
-{
-    Fs_SafeFree(_serverCoreHeartBeatTimeOutCallback);
-    _serverCoreHeartBeatTimeOutCallback = callback;
-}
 
 void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 {// iocp 在closesocket后会马上返回所有投递的事件，所以不可立即在post未结束时候释放session对象
@@ -220,7 +213,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
         _CheckSessionHeartbeat();
 
         // 5.post session to iocp
-        // _PostEventsToIocp();
+        _PostEventsToIocp();
 
         // 6.donetevent 将断开的客户端放入toremove队列,将sessions放入torecv与tosend队列
         ret = _DoEvents();
@@ -242,70 +235,6 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 
     // 销毁sessions 此时要保证handler要还没关闭
     _ClearSessionsWhenClose();
-}
-
-Int32 FS_IocpMsgTransfer::_DoEvents()
-{
-    Int32 ret = StatusDefs::Success;
-    FS_IocpSession *session = NULL;
-    for(auto iter = _sessions.begin(); iter != _sessions.end(); )
-    {
-        session = iter->second->CastTo<FS_IocpSession>();
-        //需要写数据的客户端,才postSend
-        if(session->HasMsgToSend())
-        {
-            auto ioData = session->MakeSendIoData();
-            if(ioData)
-            {
-                if(_iocp->PostSend(session->GetSocket(), ioData) != StatusDefs::Success)
-                {
-                    _OnDisconnected(session);
-                    iter = _sessions.erase(iter);
-                    continue;
-                }
-            }
-
-            //--
-            ioData = session->MakeRecvIoData();
-            if(ioData)
-            {
-                if(_iocp->PostRecv(session->GetSocket(), ioData) != StatusDefs::Success)
-                {
-                    _OnDisconnected(session);
-                    iter = _sessions.erase(iter);
-                    continue;
-                }
-            }
-        }
-        else {
-            auto ioData = session->MakeRecvIoData();
-            if(ioData)
-            {
-                if(_iocp->PostRecv(session->GetSocket(), ioData) != StatusDefs::Success)
-                {
-                    _OnDisconnected(session);
-                    iter = _sessions.erase(iter);
-                    continue;
-                }
-            }
-        }
-        iter++;
-    }
-
-    while(true)
-    {
-        ret = _HandleNetEvent();
-        if(ret == StatusDefs::IOCP_WaitTimeOut)
-        {
-            return StatusDefs::Success;
-        }
-        else if(ret != StatusDefs::Success)
-        {
-            return ret;
-        }
-    }
-
-    return ret;
 }
 
 Int32 FS_IocpMsgTransfer::_HandleNetEvent()
@@ -409,12 +338,6 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
     g_ServerCore->_OnRecvMsgAmount(_msgArriviedSessions, _toPostSend, _id);
 }
 
-void FS_IocpMsgTransfer::_RemoveSession(IFS_Session *session)
-{
-    _sessions.erase(session->GetSessionId());
-    _OnDisconnected(session);
-}
-
 void FS_IocpMsgTransfer::_OnDelayDisconnected(IFS_Session *session)
 {
     session->MaskClose();
@@ -423,32 +346,31 @@ void FS_IocpMsgTransfer::_OnDelayDisconnected(IFS_Session *session)
 //         session->Close();
 }
 
-void FS_IocpMsgTransfer::_OnDisconnected(IFS_Session *session)
+void FS_IocpMsgTransfer::_OnDisconnected(FS_IocpSession *session)
 {
-//     g_Log->any<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] disconnected"
-//                                    , session->GetSessionId()
-//                                    , session->GetSocket());
+    const auto sessionId = session->GetSessionId();
     g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] disconnected address<%s>"
-                                   , session->GetSessionId()
+                                   , sessionId
                                    , session->GetSocket(), session->GetAddr()->ToString().c_str());
 
-    // 取消所有未决的io请求
-    //CancelIoEx(HANDLE(session->GetSocket()), NULL);
-    session->Close();
-    _sessionHeartbeatQueue.erase(session);
-
     // servercore收到断开回调 不要回调到本模块线程安全的接口避免死锁
+    _sessionHeartbeatQueue.erase(session);
     _serverCoreDisconnectedCallback->Invoke(session);
 
+    // 移除会话
+     _sessions.erase(sessionId);
+    _toPostRecv.erase(session);
+    _toPostSend.erase(session);
+    _DestroySession(session);
+    --_sessionCnt;
+}
+
+void FS_IocpMsgTransfer::_DestroySession(FS_IocpSession *session)
+{
+    session->Close();
     session->OnDisconnect();
     session->OnDestroy();
-
-    // 移除会话
-//     _sessions.erase(session->GetSessionId());
-//     _toPostRecv.erase(session);
-//     _toPostSend.erase(session);
     Fs_SafeFree(session);
-    --_sessionCnt;
 }
 
 bool FS_IocpMsgTransfer::_DoPostSend(FS_IocpSession *session, bool removeIfFail)
@@ -460,6 +382,7 @@ bool FS_IocpMsgTransfer::_DoPostSend(FS_IocpSession *session, bool removeIfFail)
         if(st != StatusDefs::Success)
         {
             session->ResetPostSendMask();
+            session->MaskClose();
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
@@ -484,6 +407,7 @@ bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session, bool removeIfFail)
         if(st != StatusDefs::Success)
         {
             session->ResetPostRecvMask();
+            session->MaskClose();
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
@@ -499,7 +423,7 @@ bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session, bool removeIfFail)
     return true;
 }
 
-IFS_Session *FS_IocpMsgTransfer::_GetSession(UInt64 sessionId)
+FS_IocpSession *FS_IocpMsgTransfer::_GetSession(UInt64 sessionId)
 {
     auto iterSession = _sessions.find(sessionId);
     if(iterSession == _sessions.end())
@@ -514,7 +438,7 @@ void FS_IocpMsgTransfer::_ClearSessionsWhenClose()
     {
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] not destroy when thread ending")
                                      , iterSession.first);
-        _OnDisconnected(iterSession.second);
+        _DestroySession(iterSession.second);
     }
 }
 
@@ -536,16 +460,10 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
         if(session->GetHeartBeatExpiredTime() > _curTime)
             break;
 
-        _serverCoreHeartBeatTimeOutCallback->Invoke(session);
+        g_ServerCore->_OnHeartBeatTimeOut(session);
         iterSession = _sessionHeartbeatQueue.erase(iterSession);
-        if(session->IsPostIoChange())
-        {
-            session->Close();
-        }
-        else
-        {
-            _RemoveSession(session);
-        }
+        session->MaskClose();
+        _toRemove.insert(session);
 //        g_Log->any<FS_IocpMsgTransfer>("nowTime[%lld][%s] sessionId[%llu] expiredtime[%llu][%s] heartbeat time out."
 //                                       , _curTime.GetMicroTimestamp(), _curTime.ToStringOfMillSecondPrecision().c_str()
 //                                       ,session->GetSessionId()
@@ -562,22 +480,15 @@ void FS_IocpMsgTransfer::_PostEventsToIocp()
     FS_IocpSession *session = NULL;
     for(auto iterRecv = _toPostRecv.begin(); iterRecv != _toPostRecv.end();)
     {
-        session = (*iterRecv)->CastTo<FS_IocpSession>();
+        session = *iterRecv;
         if(!session->CanPost())
         {
-            session->MaskClose();
-            session->Close();
-            session->ResetAllIoMask();
-            _toRemove.insert(session);
             iterRecv = _toPostRecv.erase(iterRecv);
             continue;
         }
 
         if(!_DoPostRecv(session, false))
         {
-            session->MaskClose();
-            session->Close();
-            session->ResetAllIoMask();
             _toRemove.insert(session);
             g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu]"), session->GetSessionId());
         }
@@ -587,22 +498,15 @@ void FS_IocpMsgTransfer::_PostEventsToIocp()
 
     for(auto iterSend = _toPostSend.begin(); iterSend != _toPostSend.end();)
     {
-        session = (*iterSend)->CastTo<FS_IocpSession>();
+        session = *iterSend;
         if(!session->CanPost())
         {
-            session->MaskClose();
-            session->Close();
-            session->ResetAllIoMask();
-            _toRemove.insert(session);
             iterSend = _toPostSend.erase(iterSend);
             continue;
         }
 
         if(!_DoPostSend(session, false))
         {
-            session->MaskClose();
-            session->Close();
-            session->ResetAllIoMask();
             _toRemove.insert(session);
             g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post send fail sessionId[%llu]"), session->GetSessionId());
         }
@@ -686,12 +590,11 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
         _connectorGuard.Lock();
         for(auto iterSession = _linkSessionCache.begin(); iterSession != _linkSessionCache.end();)
         {
-            auto session = *iterSession;
+            auto session = (*iterSession)->CastTo<FS_IocpSession>();
             _sessions.insert(std::make_pair(session->GetSessionId(), session));
-            auto iocpSession = session->CastTo<FS_IocpSession>();
 
             // 绑定iocp
-            auto st = _iocp->Reg(iocpSession->GetSocket(), iocpSession->GetSessionId());
+            auto st = _iocp->Reg(session->GetSocket(), session->GetSessionId());
             if(st != StatusDefs::Success)
             {
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("reg socket[%llu] sessionId[%llu] fail st[%d]")
@@ -699,10 +602,10 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
             }
 
             // 投递接收数据
-            if(!_DoPostRecv(iocpSession))
+            if(!_DoPostRecv(session))
             {
                 g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu] serverId[%d]"), session->GetSessionId(), _id);
-                _RemoveSession(session);
+                _toRemove.insert(session);
             }
             else
             {

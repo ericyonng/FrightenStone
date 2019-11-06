@@ -72,7 +72,6 @@ public:
     virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
     virtual void RegisterRecvAmountCallback(IDelegate<void, std::list<IFS_Session *> &> *callback);
     virtual void RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
-    virtual void RegisterHeatBeatTimeOutCallback(IDelegate<void, IFS_Session *> *callback);
     virtual Int32 GetSessionCnt();
 
     // 消息队列
@@ -84,20 +83,20 @@ private:
     Int32 _HandleNetEvent();
     void _OnMsgArrived();
     void _RemoveSessions();
-    void _RemoveSession(IFS_Session *session);
 
     // 网络事件 线程不安全
 private:
     void _OnGracefullyDisconnect(IFS_Session *session);
     void _OnDelayDisconnected(IFS_Session *session);
     // 需要判断是否可断开
-    void _OnDisconnected(IFS_Session *session);
+    void _OnDisconnected(FS_IocpSession *session);
+    void _DestroySession(FS_IocpSession *session);
     bool _DoPostSend(FS_IocpSession *session, bool removeIfFail = true);
     bool _DoPostRecv(FS_IocpSession *session, bool removeIfFail = true);
 
     // 辅助
 private:
-    IFS_Session *_GetSession(UInt64 sessionId);
+    FS_IocpSession *_GetSession(UInt64 sessionId);
     void _ClearSessionsWhenClose();
 
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
@@ -112,7 +111,7 @@ private:
 private:
     Int32 _id;
     std::atomic<Int32> _sessionCnt;             // 会话个数
-    std::map<UInt64, IFS_Session *> _sessions;  // key:sessionId
+    std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;
     std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列
     FS_ThreadPool *_threadPool;
@@ -133,15 +132,14 @@ private:
     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueueCache; // key:sessionId
     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueue;  // key:sessionId
 
-    std::set<IFS_Session *> _toPostRecv;
-    std::set<IFS_Session *> _toPostSend;
-    std::set<IFS_Session *> _toRemove;
+    std::set<FS_IocpSession *> _toPostRecv;
+    std::set<FS_IocpSession *> _toPostSend;
+    std::set<FS_IocpSession *> _toRemove;
 
     IDelegate<void, IFS_Session *> *_serverCoreDisconnectedCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreRecvSucCallback;
     IDelegate<void, std::list<IFS_Session *> &> *_serverCoreRecvAmountCallback;
     IDelegate<void, IFS_Session *, Int64> *_serverCoreSendSucCallback;
-    IDelegate<void, IFS_Session *> *_serverCoreHeartBeatTimeOutCallback;
 };
 
 FS_NAMESPACE_END

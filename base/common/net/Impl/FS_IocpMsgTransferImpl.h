@@ -45,6 +45,38 @@ inline void FS_IocpMsgTransfer::AttachMsgQueue(ConcurrentMessageQueue *messageQu
     _generatorId = generatorId;
 }
 
+inline Int32 FS_IocpMsgTransfer::_DoEvents()
+{
+    Int32 ret = StatusDefs::Success;
+    while(true)
+    {
+        ret = _HandleNetEvent();
+        if(ret == StatusDefs::IOCP_WaitTimeOut)
+        {
+            return StatusDefs::Success;
+        }
+        else if(ret != StatusDefs::Success)
+        {
+            return ret;
+        }
+    }
+
+    return ret;
+}
+
+inline void FS_IocpMsgTransfer::_RemoveSessions()
+{
+    IFS_Session *session = NULL;
+    for(auto iterSsession = _toRemove.begin(); iterSsession != _toRemove.end();)
+    {
+        session = *iterSsession;
+        _OnGracefullyDisconnect(session);
+        //_OnDisconnected(session);
+        iterSsession = _toRemove.erase(iterSsession);
+        // _OnGracefullyDisconnect(session);
+    }
+}
+
 inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
 {
     if(!session->CanDisconnect())
@@ -56,18 +88,6 @@ inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
     _OnDisconnected(session);
 }
 
-inline void FS_IocpMsgTransfer::_RemoveSessions()
-{
-    IFS_Session *session = NULL;
-    for(auto iterSsession = _toRemove.begin(); iterSsession!=_toRemove.end();)
-    {
-        session = *iterSsession;
-        _OnGracefullyDisconnect(session);
-        //_OnDisconnected(session);
-        iterSsession = _toRemove.erase(iterSsession);
-        // _OnGracefullyDisconnect(session);
-    }
-}
 
 FS_NAMESPACE_END
 #endif
