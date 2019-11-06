@@ -66,18 +66,20 @@ inline Int32 FS_IocpMsgTransfer::_DoEvents()
 
 inline void FS_IocpMsgTransfer::_RemoveSessions()
 {
-    IFS_Session *session = NULL;
+    FS_IocpSession *session = NULL;
     for(auto iterSsession = _toRemove.begin(); iterSsession != _toRemove.end();)
     {
         session = *iterSsession;
         _OnGracefullyDisconnect(session);
         //_OnDisconnected(session);
+        _toPostRecv.erase(session);
+        _toPostSend.erase(session);
         iterSsession = _toRemove.erase(iterSsession);
         // _OnGracefullyDisconnect(session);
     }
 }
 
-inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(IFS_Session *session)
+inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(FS_IocpSession *session)
 {
     if(!session->CanDisconnect())
     {
