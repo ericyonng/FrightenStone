@@ -239,7 +239,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 
 Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 {
-    auto ret = _iocp->WaitForCompletion(*_ioEvent, 20);
+    auto ret = _iocp->WaitForCompletion(*_ioEvent, 1);
     if(ret != StatusDefs::Success)
         return ret;
 
@@ -254,7 +254,6 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
     }
 
     // 2.处理接收与发送
-    auto iocpSession = session->CastTo<FS_IocpSession>();
     if(IocpDefs::IO_RECV == _ioEvent->_ioData->_ioType)
     {
         if(_ioEvent->_bytesTrans <= 0)
@@ -264,12 +263,13 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , iocpSession->GetSocket(),
                                            _ioEvent->_bytesTrans);
 
+            iocpSession->MaskClose();
             iocpSession->ResetPostRecvMask();
-            _OnGracefullyDisconnect(session);
+            _toRemove.insert(session);
             return StatusDefs::Success;
         }
 
-        iocpSession->OnRecvSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
+        session->OnRecvSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
 
         // 消息接收回调
         _serverCoreRecvSucCallback->Invoke(session, _ioEvent->_bytesTrans);
@@ -295,12 +295,13 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSessionId()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
-            iocpSession->ResetPostSendMask();
-            _OnGracefullyDisconnect(session);
+            session->ResetPostSendMask();
+            session->MaskClose();
+            _toRemove.insert(session);
             return StatusDefs::Success;
         }
 
-        iocpSession->OnSendSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
+        session->OnSendSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
 //        g_Log->any<FS_IocpMsgTransfer>("send suc sessionId[%llu] transfer[%lu] ", sessionId, _ioEvent->_bytesTrans);
         // 消息发送回调
         _serverCoreSendSucCallback->Invoke(session, _ioEvent->_bytesTrans);
@@ -315,13 +316,13 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
     }
     else
     {
-        iocpSession->EnableDisconnect();
+        session->EnableDisconnect();
         _toRemove.insert(session);
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
     }
 
     // 客户端已经断开连接
-    if(iocpSession->IsClose())
+    if(session->IsClose())
     {
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("session is closed sessionId[%llu]."), sessionId);
         // iocpSession->EnableDisconnect();
@@ -338,7 +339,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
     g_ServerCore->_OnRecvMsgAmount(_msgArriviedSessions, _toPostSend, _id);
 }
 
-void FS_IocpMsgTransfer::_OnDelayDisconnected(IFS_Session *session)
+void FS_IocpMsgTransfer::_OnDelayDisconnected(FS_IocpSession *session)
 {
     session->MaskClose();
     CancelIoEx(HANDLE(session->GetSocket()), NULL);
