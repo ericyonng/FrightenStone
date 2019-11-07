@@ -150,6 +150,14 @@ private:
     FS_ThreadPool *_pool;
 };
 
+// 任意组合多对多
+// 每个通过订阅主题方式产生generatorId与consumerid映射
+// 通过消息类型推算出所在的generatorId与consumerId这样
+class RapidMq
+{
+public:
+};
+
 FS_NAMESPACE_END
 
 #include "base/common/component/Impl/MessageQueue/Impl/MessageQueueImpl.h"

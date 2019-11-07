@@ -44,6 +44,16 @@ inline FS_MessageBlock::~FS_MessageBlock()
     FS_Release(_data);
 }
 
+inline FS_NetMsgBlock::FS_NetMsgBlock()
+    :_msgData(NULL)
+{
+}
+
+inline FS_NetMsgBlock::~FS_NetMsgBlock()
+{
+    Fs_SafeFree(_msgData);
+}
+
 FS_NAMESPACE_END
 
 #endif
