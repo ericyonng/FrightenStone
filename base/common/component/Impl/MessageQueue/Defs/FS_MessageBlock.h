@@ -39,6 +39,7 @@
 #include "base/common/objpool/objpool.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/component/Impl/FS_Stream.h"
+#include "base/common/net/protocol/protocol.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,9 +48,19 @@ struct BASE_EXPORT FS_MessageBlock
     OBJ_POOL_CREATE_DEF(FS_MessageBlock);
 
     FS_MessageBlock();
-    ~FS_MessageBlock();
+    virtual ~FS_MessageBlock();
 
     FS_Stream *_data;                            // 序列化的数据字节流
+};
+
+struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
+{
+    OBJ_POOL_CREATE_DEF(FS_NetMsgBlock);
+
+    FS_NetMsgBlock();
+    ~FS_NetMsgBlock();
+
+    NetMsg_DataHeader *_msgData;
 };
 
 
