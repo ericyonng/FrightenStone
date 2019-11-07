@@ -86,8 +86,8 @@ private:
 
     // 网络事件 线程不安全
 private:
-    void _OnGracefullyDisconnect(IFS_Session *session);
-    void _OnDelayDisconnected(IFS_Session *session);
+    void _OnGracefullyDisconnect(FS_IocpSession *session);
+    void _OnDelayDisconnected(FS_IocpSession *session);
     // 需要判断是否可断开
     void _OnDisconnected(FS_IocpSession *session);
     void _DestroySession(FS_IocpSession *session);
@@ -124,7 +124,7 @@ private:
     Locker _connectorGuard;
     std::atomic<bool> _hasNewSessionLinkin;         // 
     std::list<IFS_Session *> _linkSessionCache;     // 连入的会话缓冲区
-    std::list<IFS_Session *> _msgArriviedSessions;  // 消息到达的会话
+    std::list<FS_IocpSession *> *_msgArriviedSessions;  // 消息到达的会话
 
     // 待发送的会话缓冲区
     Locker _asynSendGuard;
