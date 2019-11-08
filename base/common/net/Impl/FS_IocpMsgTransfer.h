@@ -124,7 +124,7 @@ private:
     Locker _connectorGuard;
     std::atomic<bool> _hasNewSessionLinkin;         // 
     std::list<IFS_Session *> _linkSessionCache;     // 连入的会话缓冲区
-    std::list<FS_IocpSession *> *_msgArriviedSessions;  // 消息到达的会话
+    std::list<IFS_Session *> _msgArriviedSessions;  // 消息到达的会话
 
     // 待发送的会话缓冲区
     Locker _asynSendGuard;

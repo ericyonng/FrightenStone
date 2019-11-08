@@ -296,7 +296,7 @@ void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
     // _recvMsgCountPerSecond += incPackets;
 }
 
-void FS_ServerCore::_OnRecvMsgAmount(std::list<IFS_Session *> &sessions, std::set<IFS_Session *> &toPostSend, Int32 transferId)
+void FS_ServerCore::_OnRecvMsgAmount(std::list<IFS_Session *> &sessions, Int32 generatorId)
 {
 //     auto iocpSession = session->CastTo<FS_IocpSession>();
 //     auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
