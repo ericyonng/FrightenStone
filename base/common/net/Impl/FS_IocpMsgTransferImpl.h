@@ -45,6 +45,11 @@ inline void FS_IocpMsgTransfer::AttachMsgQueue(ConcurrentMessageQueue *messageQu
     _generatorId = generatorId;
 }
 
+inline void FS_IocpMsgTransfer::AttachSenderMsgQueue(MessageQueue *messageQueue)
+{
+    _senderMessageQueue = messageQueue;
+}
+
 inline Int32 FS_IocpMsgTransfer::_DoEvents()
 {
     Int32 ret = StatusDefs::Success;
@@ -64,16 +69,26 @@ inline Int32 FS_IocpMsgTransfer::_DoEvents()
     return ret;
 }
 
-inline void FS_IocpMsgTransfer::_RemoveSessions()
+inline void FS_IocpMsgTransfer::_RemoveSessions(bool forceDisconnect)
 {
     FS_IocpSession *session = NULL;
     for(auto iterSsession = _toRemove.begin(); iterSsession != _toRemove.end();)
     {
         session = *iterSsession;
-        _OnGracefullyDisconnect(session);
-        //_OnDisconnected(session);
         _toPostRecv.erase(session);
         _toPostSend.erase(session);
+        if(!forceDisconnect)
+        {
+            _OnGracefullyDisconnect(session);
+        }
+        else
+        {
+            session->MaskClose();
+            session->ResetAllIoMask();
+            _OnDisconnected(session);
+        }
+        //_OnDisconnected(session);
+
         iterSsession = _toRemove.erase(iterSsession);
         // _OnGracefullyDisconnect(session);
     }
@@ -90,6 +105,21 @@ inline void FS_IocpMsgTransfer::_OnGracefullyDisconnect(FS_IocpSession *session)
     _OnDisconnected(session);
 }
 
+inline FS_IocpSession *FS_IocpMsgTransfer::_GetSession(UInt64 sessionId)
+{
+    auto iterSession = _sessions.find(sessionId);
+    if(iterSession == _sessions.end())
+        return NULL;
+
+    return iterSession->second;
+}
+
+inline void FS_IocpMsgTransfer::_UpdateSessionHeartbeat(IFS_Session *session)
+{
+    _sessionHeartbeatQueue.erase(session);
+    session->UpdateHeartBeatExpiredTime();
+    _sessionHeartbeatQueue.insert(session);
+}
 
 FS_NAMESPACE_END
 #endif

@@ -50,12 +50,7 @@ IFS_ServerConfigMgr::IFS_ServerConfigMgr()
 
 IFS_ServerConfigMgr::~IFS_ServerConfigMgr()
 {
-
-}
-
-Int32 IFS_ServerConfigMgr::GetConnectorCntNeeded()
-{
-    return _connectorCntNeeded;
+    Fs_SafeFree(_ini);
 }
 
 Int32 IFS_ServerConfigMgr::Init()
@@ -70,14 +65,13 @@ Int32 IFS_ServerConfigMgr::Init()
         _InitDefCfgs();
     }
 
-    FS_CpuInfo cpuInfo;
-    if(!cpuInfo.Initialize())
-    {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("cpuInfo.Initialize fail"));
-        return StatusDefs::Failed;
-    }
+//     FS_CpuInfo cpuInfo;
+//     if(!cpuInfo.Initialize())
+//     {
+//         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("cpuInfo.Initialize fail"));
+//         return StatusDefs::Failed;
+//     }
 
-    _connectorCntNeeded = cpuInfo.GetCpuCoreCnt();
     return StatusDefs::Success;
 }
 
@@ -94,19 +88,37 @@ UInt16 IFS_ServerConfigMgr::GetListenPort() const
     return static_cast<UInt16>(_ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_PORT_KEY, 0));
 }
 
+Int32 IFS_ServerConfigMgr::GetMaxConnectQuantityLimit() const
+{
+    return static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_LISTENER_CLN_LIMIT_KEY, 0));
+}
+
 Int32 IFS_ServerConfigMgr::GetTransferCnt() const
 {
     return static_cast<Int32>(_ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, 0));
 }
 
+Int32 IFS_ServerConfigMgr::GetHeartbeatDeadTimeInterval() const
+{
+    return static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0));
+}
+
 Int32 IFS_ServerConfigMgr::_InitDefCfgs()
 {
+    #pragma region listener
     // ip
     _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_IP_KEY, SVR_CFG_LISTENER_IP);
     // port
     _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_PORT_KEY, SVR_CFG_LISTENER_PORT);
+    // 最大连接数
+    _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_CLN_LIMIT_KEY, SVR_CFG_LISTENER_CLN_LIMIT);
+    #pragma endregion
+
+    #pragma region transfer
     // 数据传输线程数
-    _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, SVR_CFG_TRANSFER_SEG_CNT);
+    _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, SVR_CFG_TRANSFER_SEG_CNT);
+    _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL);
+    #pragma endregion
 
     // 检查是否写入正确
     BUFFER256 buffer = {};
@@ -125,10 +137,25 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
         return StatusDefs::IocpConnector_InitDefIniFail;
     }
 
-    UInt32 cnt = _ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, 0);
+    UInt32 maxConnectQuantity = _ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_CLN_LIMIT_KEY, 0);
+    if(maxConnectQuantity != atoi(SVR_CFG_LISTENER_CLN_LIMIT))
+    {
+        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail maxConnectQuantity not match"));
+        return StatusDefs::IocpConnector_InitDefIniFail;
+    }
+
+    UInt32 cnt = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, 0);
     if(cnt != atoi(SVR_CFG_TRANSFER_SEG_CNT))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail transfer cnt not match"));
+        return StatusDefs::IocpConnector_InitDefIniFail;
+    }
+
+    UInt32 heartbeatTime = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0);
+    if(heartbeatTime != atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL))
+    {
+        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] not match SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] default")
+                                      , heartbeatTime, static_cast<UInt32>(atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL)));
         return StatusDefs::IocpConnector_InitDefIniFail;
     }
 

@@ -67,8 +67,7 @@ public:
     virtual void AfterClose() {}
 
 public:
-    virtual void OnMsgDispatch(UInt64 sessionId, NetMsg_DataHeader *msgData) = 0;
-    virtual void OnMsgDispatch(IFS_Session *session, NetMsg_DataHeader *msgData) = 0;
+    virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData) = 0;
     virtual void OnSessionDisconnected(UInt64 sessionId) = 0;
 
     void SetDispatcher(IFS_MsgDispatcher *dispatcher);
@@ -91,11 +90,16 @@ public:
     {
     }
 
-    void SendData(IFS_Session *session, NetMsg_DataHeader *msgData)
+    // NetMsg_DataHeader 必须是堆区创建的
+    void SendData(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
     {
-        session->Send(msgData);
+        _dispatcher->SendData(sessionId, generatorId, msgData);
     }
 
+    void OnDisconnect()
+    {
+        g_Log->net<User>(" session id[%llu] user disconnect", _sessionId);
+    }
     UInt64 _sessionId;
     // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
     Int32 _recvMsgId = 1;
@@ -131,6 +135,15 @@ public:
         return iterUser->second;
     }
 
+    void OnDisconnect(UInt64 sessionId)
+    {
+        auto iterUser = _users.find(sessionId);
+        if(iterUser == _users.end())
+            return;
+
+        iterUser->second->OnDisconnect();
+    }
+
     void RemoveUser(UInt64 sessionId)
     {
         auto iterUser = _users.find(sessionId);
@@ -162,9 +175,8 @@ public:
     {
     }
 
-    virtual void OnMsgDispatch(fs::IFS_Session *session, NetMsg_DataHeader *msgData)
+    virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
     {
-        auto sessionId = session->GetSessionId();
         auto user = GetUser(sessionId);
         if(!user)
             user = NewUser(sessionId);
@@ -190,7 +202,7 @@ public:
                 ++user->_recvMsgId;
                 fs::LoginRes ret;
                 ret._msgId = user->_sendMsgId;
-                user->SendData(session, &ret);
+                user->SendData(sessionId, generatorId, &ret);
                 ++user->_sendMsgId;
                 return;
             }//接收 消息---处理 发送   生产者 数据缓冲区  消费者 

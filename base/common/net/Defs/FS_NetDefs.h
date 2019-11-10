@@ -66,24 +66,33 @@
 
 
 // 客户端心跳检测死亡计时时间(单位ms)
-#define CLIENT_HREAT_DEAD_TIME 30000    // 30s心跳
 // 在间隔指定时间后才允许发送(单位ms)
 #define CLIENT_SEND_BUFF_TIME 200
 // connector的缓冲大小
 #define IOCP_CONNECTOR_BUFFER 1024
 // 统计服务器负载的时间间隔
 #define IOCP_STATISTIC_INTERVAL     1000    // 时间间隔单位ms
-#define CLIENT_QUANTITY_LIMIT   10000
 #define SVR_CONFIG_PATH_NAME    "./ServerCfg.ini"   // 服务器配置
 
 #pragma region Listener default config
 #define SVR_CFG_LISTENER_SEG                "Listener"
-#define SVR_CFG_TRANSFER_SEG_CNT_KEY        "TransferCnt"
-#define SVR_CFG_TRANSFER_SEG_CNT            "8"             // 数据传输支持8线程
+
 #define SVR_CFG_LISTENER_IP_KEY             "ip"
 #define SVR_CFG_LISTENER_IP                 "127.0.0.1"
 #define SVR_CFG_LISTENER_PORT_KEY           "port"
 #define SVR_CFG_LISTENER_PORT               "4567"
+#define SVR_CFG_LISTENER_CLN_LIMIT_KEY      "MaxConnectQuantity"        // 最大连接数
+#define SVR_CFG_LISTENER_CLN_LIMIT          "100064"                    // 默认的最大连接数
+
+#pragma endregion
+
+#pragma region Transfer default config
+#define SVR_CFG_TRANSFER_SEG                            "Transfer"                      // 数据传输配置
+
+#define SVR_CFG_TRANSFER_SEG_CNT_KEY                    "TransferCnt"
+#define SVR_CFG_TRANSFER_SEG_CNT                        "8"                             // 数据传输支持8线程
+#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY        "HeartbeatDeadTimeInterval"     // 心跳死亡时间间隔
+#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "300000"                        // 默认30s心跳
 #pragma endregion
 
 // 心跳队列排序

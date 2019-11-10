@@ -41,10 +41,10 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
 struct BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT IFS_MsgTransfer;
 class BASE_EXPORT IFS_BusinessLogic;
+class BASE_EXPORT MessageQueue;
 
 class BASE_EXPORT IFS_MsgDispatcher
 {
@@ -61,14 +61,15 @@ public:
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    virtual void OnRecv(std::list<IFS_Session *> &sessions, Int64 &incPacketsCnt) = 0;
-    virtual void OnDisconnected(IFS_Session *session) = 0;
     virtual void OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer) = 0;
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut() = 0;
 
-    virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
+    // consumerId 网络消息消费者id
+    virtual void SendData(UInt64 sessionId, UInt64 consumerId, NetMsg_DataHeader *msg) = 0;
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic) = 0;
+
+    virtual void AttachRecvMessageQueue(ConcurrentMessageQueue *messageQueue) = 0;
 };
 
 FS_NAMESPACE_END

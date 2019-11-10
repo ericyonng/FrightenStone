@@ -53,10 +53,15 @@ class BASE_EXPORT TimeSlice;
 class BASE_EXPORT Time;
 class BASE_EXPORT IFS_BusinessLogic;
 class BASE_EXPORT ConcurrentMessageQueue;
+struct BASE_EXPORT NetMsg_DataHeader;
+class BASE_EXPORT MessageQueue;
 
 class BASE_EXPORT FS_ServerCore
 {
     friend class FS_IocpMsgTransfer;
+    friend class FS_IocpConnector;
+    friend class FS_IocpMsgDispatcher;
+
 public:
     FS_ServerCore();
     virtual ~FS_ServerCore();
@@ -87,7 +92,7 @@ protected:
     void _OnHeartBeatTimeOut(IFS_Session *session);
     // 每接收一个完整包调用一次
     void _OnRecvMsg(IFS_Session *session, Int64 transferBytes);
-    void _OnRecvMsgAmount(std::list<IFS_Session *> &sessions, Int32 transferId);
+    void _OnRecvMsgAmount(NetMsg_DataHeader *msgArrived);
     // 发送只能统计字节数，包数无法支持统计
     void _OnSendMsg(IFS_Session *session, Int64 transferBytes);
 
@@ -114,6 +119,8 @@ private:
 
     // 将监听的接口注册到模块中
     void _RegisterToModule();
+
+    std::vector<MessageQueue *> &_GetSenderMq();
     #pragma endregion
 
 private:
@@ -121,9 +128,10 @@ private:
     IFS_ServerConfigMgr *_serverConfigMgr;          // 服务器配置
 
     Locker _locker;
-    IFS_Connector * _connector;                     // 连接器
-    std::vector<IFS_MsgTransfer *> _msgTransfers;   // 多线程消息收发器
-    ConcurrentMessageQueue *_messageQueue;          // 消息队列
+    IFS_Connector * _connector;                         // 连接器
+    std::vector<IFS_MsgTransfer *> _msgTransfers;       // 多线程消息收发器
+    ConcurrentMessageQueue *_messageQueue;              // 消息队列
+    std::vector<MessageQueue *> _senderMessageQueue;    // 发送消息队列
 
     IFS_MsgDispatcher *_msgDispatcher;                 // 消息处理器 业务线程处理
     IFS_BusinessLogic *_logic;                      // 业务逻辑入口

@@ -59,7 +59,6 @@ public:
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
-    virtual void RegisterConnected(IDelegate<void, IFS_Session *> *callback);
     virtual void OnDisconnected(IFS_Session *session);
     /* TCP 常规操作 */
     #pragma region tcp normal operate
@@ -70,8 +69,6 @@ public:
     *       3. - Listen 监听端口号
     */
 private:
-    Int32 _ReadConfig();
-    Int32 _InitDefCfgs();
     SOCKET _InitSocket();
     Int32 _Bind(const Byte8 *ip, UInt16 port);
     Int32 _Listen(Int32 unconnectQueueLen = SOMAXCONN);
@@ -105,7 +102,6 @@ private:
     SOCKET _sock;
 
     // 网络事件回调
-    IDelegate<void, IFS_Session *> *_onConnected;
     IDelegate<void> *_closeIocpDelegate;
 
     // 客户端连接上限
@@ -114,12 +110,6 @@ private:
     Int32 _maxSessionQuantityLimit;
     UInt64 _curMaxSessionId;
     const UInt64 _maxSessionIdLimit;
-
-    FS_String _segmentName;
-    FS_String _ipKey;
-    FS_String _portKey;
-    FS_String _listenerFileName;
-    FS_IniFile *_linkConfig;
 #pragma endregion
 };
 

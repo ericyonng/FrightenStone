@@ -37,6 +37,7 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/component/Impl/FS_Stream.h"
 #include "base/common/net/protocol/protocol.h"
@@ -50,7 +51,22 @@ struct BASE_EXPORT FS_MessageBlock
     FS_MessageBlock();
     virtual ~FS_MessageBlock();
 
+    template<typename DerivedObjType>
+    DerivedObjType *CastTo();
+
     FS_Stream *_data;                            // 序列化的数据字节流
+};
+
+class BASE_EXPORT MessageBlockType
+{
+public:
+    enum
+    {
+        MB_None = 0,                    // 无效
+        MB_NetMsgArrived = 1,           // 收到网络包
+        MB_NetMsgSended = 2,            // 发送网络包
+        MB_NetSessionDisconnect = 3,    // 会话断开
+    };
 };
 
 struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
@@ -63,6 +79,22 @@ struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
     NetMsg_DataHeader *_msgData;
 };
 
+struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
+{
+    OBJ_POOL_CREATE_DEF(FS_NetMsgBufferBlock);
+
+    FS_NetMsgBufferBlock();
+    ~FS_NetMsgBufferBlock();
+
+    template<typename NetMsgObjType>
+    NetMsgObjType *CastBufferTo();
+
+    // 内存池创建
+    Int32 _mbType;
+    Byte8 *_buffer; // NetMsg_DataHeader *
+    Int32 _generatorId; // 生产者id
+    UInt64 _sessionId;
+};
 
 FS_NAMESPACE_END
 

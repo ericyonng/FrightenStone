@@ -357,6 +357,7 @@
     <ClInclude Include="..\common\net\Defs\IFS_Buffer.h" />
     <ClInclude Include="..\common\net\Defs\IFS_BufferImpl.h" />
     <ClInclude Include="..\common\net\Defs\IocpDefs.h" />
+    <ClInclude Include="..\common\net\Defs\ProtocolDefsImpl.h" />
     <ClInclude Include="..\common\net\Defs\ServerCompsDef.h" />
     <ClInclude Include="..\common\net\Impl\FS_Addr.h" />
     <ClInclude Include="..\common\net\Impl\FS_AddrImpl.h" />

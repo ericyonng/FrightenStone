@@ -21,68 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_MessageBlockImpl.h
+ * @file  : ProtocolDefsImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/11/03
+ * @date  : 2019/11/10
  * @brief :
  * 
  *
  * 
  */
 
-#ifdef __Base_Common_Component_Impl_MessageQueue_Defs_FS_MessageBlock_H__
+#ifdef __Base_Common_Net_Protocol_Defs_ProtocolDefsImpl_H__
+
 #pragma once
 
 FS_NAMESPACE_BEGIN
-inline FS_MessageBlock::FS_MessageBlock()
-    :_data(NULL)
-{
-}
-
-inline FS_MessageBlock::~FS_MessageBlock()
-{
-    FS_Release(_data);
-}
-
-template<typename DerivedObjType>
-inline DerivedObjType *FS_MessageBlock::CastTo()
-{
-    return static_cast<DerivedObjType *>(this);
-}
-
-inline FS_NetMsgBlock::FS_NetMsgBlock()
-    :_msgData(NULL)
-{
-}
-
-inline FS_NetMsgBlock::~FS_NetMsgBlock()
-{
-    ProtocoalAssist::DelNetMsg(_msgData);
-}
-
-inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
-    :_buffer(NULL)
-    ,_generatorId(-1)
-    ,_sessionId(0)
-    ,_mbType(MessageBlockType::MB_None)
-{
-}
-
-inline FS_NetMsgBufferBlock::~FS_NetMsgBufferBlock()
-{
-    if(_buffer)
-    {
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(_buffer);
-        g_MemoryPool->Unlock();
-    }
-}
-
-template<typename NetMsgObjType>
-inline NetMsgObjType *FS_NetMsgBufferBlock::CastBufferTo()
-{
-    return reinterpret_cast<NetMsgObjType *>(_buffer);
-}
 
 FS_NAMESPACE_END
 
