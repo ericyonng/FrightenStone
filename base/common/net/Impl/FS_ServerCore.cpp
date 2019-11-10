@@ -257,6 +257,9 @@ void FS_ServerCore::Close()
 
     // STLUtil::DelVectorContainer(_logics);
     SocketUtil::ClearSocketEnv();
+
+    // 当前日志全部着盘
+    g_Log->FlushAllFile();
 }
 
 #pragma endregion
