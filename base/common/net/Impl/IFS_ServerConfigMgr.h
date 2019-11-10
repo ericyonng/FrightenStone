@@ -46,21 +46,24 @@ public:
     IFS_ServerConfigMgr();
     virtual ~IFS_ServerConfigMgr();
 
-    Int32 GetConnectorCntNeeded();
 public:
     Int32 Init();
 
     // ∂¡≈‰÷√
 public:
+    /* listener */
     FS_String GetListenIp() const;
     UInt16 GetListenPort() const;
+    Int32 GetMaxConnectQuantityLimit() const;
+
+    /* transfer */
     Int32 GetTransferCnt() const;
+    Int32 GetHeartbeatDeadTimeInterval() const;
 
 private:
     Int32 _InitDefCfgs();
 
 private:
-    Int32 _connectorCntNeeded;
     FS_IniFile *_ini;
 };
 

@@ -43,6 +43,8 @@
 
 FS_NAMESPACE_BEGIN
 
+class BASE_EXPORT FS_IocpBuffer;
+
 class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
     OBJ_POOL_CREATE_DEF(FS_IocpSession);
@@ -61,6 +63,8 @@ public:
     void ResetPostSendMask();
     void ResetAllIoMask();
     void EnableDisconnect();
+
+    FS_IocpBuffer *CastToRecvBuffer();
 
     // ״̬
 public:

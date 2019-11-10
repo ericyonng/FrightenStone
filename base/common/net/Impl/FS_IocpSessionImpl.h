@@ -63,6 +63,11 @@ inline void FS_IocpSession::EnableDisconnect()
     ResetAllIoMask();
 }
 
+inline FS_IocpBuffer *FS_IocpSession::CastToRecvBuffer()
+{
+    return reinterpret_cast<FS_IocpBuffer *>(_recvBuffer);
+}
+
 inline bool FS_IocpSession::IsPostIoChange() const
 {
     return _isPostRecv || _isPostSend;

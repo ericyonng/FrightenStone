@@ -66,6 +66,8 @@ public:
     void PushLock();
     // msgs堆创建
     bool Push(std::list<FS_MessageBlock *> *&msgs);
+    bool Push(FS_MessageBlock *msg);    // 需要额外调用notify
+    void Notify();
     void PushUnlock();
 
     // 其他线程等待消息到来并从前节点弹出
@@ -117,6 +119,8 @@ public:
     // 压入末节点
     void PushLock(UInt32 generatorQueueId);
     bool Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs);
+    bool Push(UInt32 generatorQueueId, FS_MessageBlock *messageBlock);
+    void Notify(UInt32 generatorQueueId);
     void PushUnlock(UInt32 generatorQueueId);
 
     // 其他线程等待消息到来并从前节点弹出

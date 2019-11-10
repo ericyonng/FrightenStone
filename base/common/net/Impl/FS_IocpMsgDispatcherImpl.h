@@ -40,6 +40,16 @@ inline void FS_IocpMsgDispatcher::BindBusinessLogic(IFS_BusinessLogic *businessL
     _logic = businessLogic;
 }
 
+inline void FS_IocpMsgDispatcher::AttachRecvMessageQueue(ConcurrentMessageQueue *messageQueue)
+{
+    _messgeQueue = messageQueue;
+}
+
+inline void FS_IocpMsgDispatcher::AttachSenderMessageQueue(MessageQueue *messageQueue)
+{
+    _senderMessageQueue = messageQueue;
+}
+
 FS_NAMESPACE_END
 
 #endif

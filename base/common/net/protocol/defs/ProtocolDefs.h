@@ -58,7 +58,7 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT ProtocolCmd
 {
 public:
-    enum
+    enum CmdEnums:UInt16
     {
         CMD_Begin = 0,              // 
         LoginReq = 10,               // 
@@ -74,11 +74,13 @@ public:
         CheckHeartRes = 16,         // 心跳包反馈，按理不用反馈给客户端减少服务端压力
         CMD_End,
     };
+
+    static const char *GetStr(UInt16 cmd);
 };
 
 struct BASE_EXPORT NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE(NetMsg_DataHeader, _objPoolHelper);
+    OBJ_POOL_CREATE_DEF(NetMsg_DataHeader);
 
     NetMsg_DataHeader();
     
@@ -90,9 +92,17 @@ struct BASE_EXPORT NetMsg_DataHeader
     UInt16 _cmd;                    // 命令
 };
 
+// struct BASE_EXPORT NetMsg_Buffer : public NetMsg_DataHeader
+// {
+//     OBJ_POOL_CREATE_DEF(NetMsg_Buffer);
+//     NetMsg_Buffer();
+// 
+//     char _buffer[0];
+// };
+
 struct BASE_EXPORT LoginReq : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE(LoginReq, _objPoolHelper);
+    OBJ_POOL_CREATE_DEF(LoginReq);
     LoginReq();
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
@@ -102,7 +112,7 @@ struct BASE_EXPORT LoginReq : public NetMsg_DataHeader
 
 struct BASE_EXPORT LoginRes : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE(LoginRes, _objPoolHelper);
+    OBJ_POOL_CREATE_DEF(LoginRes);
     LoginRes();
 
     Int32 _result;
@@ -112,7 +122,7 @@ struct BASE_EXPORT LoginRes : public NetMsg_DataHeader
 
 struct BASE_EXPORT LoginNty : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE(LoginNty, _objPoolHelper);
+    OBJ_POOL_CREATE_DEF(LoginNty);
     LoginNty();
     
     char _userName[MAX_NAME_LEN];
@@ -121,23 +131,29 @@ struct BASE_EXPORT LoginNty : public NetMsg_DataHeader
 
 struct BASE_EXPORT CreatePlayerNty : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE(CreatePlayerNty, _objPoolHelper);
+    OBJ_POOL_CREATE_DEF(CreatePlayerNty);
     CreatePlayerNty();
     Int32 _socket;
 };
 
 struct BASE_EXPORT CheckHeartReq : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE(CheckHeartReq, _objPoolHelper);
+    OBJ_POOL_CREATE_DEF(CheckHeartReq);
 
     CheckHeartReq();
 };
 
 struct BASE_EXPORT CheckHeartRes : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE(CheckHeartRes, _objPoolHelper);
+    OBJ_POOL_CREATE_DEF(CheckHeartRes);
 
     CheckHeartRes();
+};
+
+class BASE_EXPORT ProtocoalAssist
+{
+public:
+    static void DelNetMsg(NetMsg_DataHeader *header);
 };
 
 FS_NAMESPACE_END

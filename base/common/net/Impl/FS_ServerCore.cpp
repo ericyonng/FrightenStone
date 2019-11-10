@@ -234,6 +234,17 @@ void FS_ServerCore::Close()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->Close();
     _msgDispatcher->Close();
+
+    _messageQueue->BeforeClose();
+    const Int32 senderMqSize = static_cast<Int32>(_senderMessageQueue.size());
+    for(Int32 i = 0; i < senderMqSize; ++i)
+        _senderMessageQueue[i]->BeforeClose();
+
+    _messageQueue->Close();
+    const Int32 senderMqSize = static_cast<Int32>(_senderMessageQueue.size());
+    for(Int32 i = 0; i < senderMqSize; ++i)
+        _senderMessageQueue[i]->Close();
+
     _pool->Close();
 
     // 最后一刻扫描
@@ -244,7 +255,7 @@ void FS_ServerCore::Close()
     // 最后处理
     _AfterClose();
 
-    STLUtil::DelVectorContainer(_logics);
+    // STLUtil::DelVectorContainer(_logics);
     SocketUtil::ClearSocketEnv();
 }
 
@@ -262,13 +273,6 @@ void FS_ServerCore::_OnConnected(IFS_Session *session)
     // 统计session数量
     ++_curSessionConnecting;
     ++_sessionConnectedBefore;
-
-    // auto sessionAddr = session->GetAddr();
-    //     g_Log->any<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected "
-    //                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
-
-//     g_Log->net<FS_ServerCore>("sessionId<%llu>, sock<%llu> session address<%s> connnected"
-//                               , session->GetSessionId(), session->GetSocket(), sessionAddr->ToString().c_str());
 
     minTransfer->OnConnect(session);
     _msgDispatcher->OnConnect(session->GetSessionId(), minTransfer);
@@ -294,46 +298,6 @@ void FS_ServerCore::_OnRecvMsg(IFS_Session *session, Int64 transferBytes)
     // Int64 incPackets = 0;
     // _msgDispatcher->OnRecv(session, incPackets);
     // _recvMsgCountPerSecond += incPackets;
-}
-
-void FS_ServerCore::_OnRecvMsgAmount(std::list<IFS_Session *> &sessions, Int32 generatorId)
-{
-//     auto iocpSession = session->CastTo<FS_IocpSession>();
-//     auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
-//     while(recvBuffer->HasMsg())
-//     {
-//         auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
-//         _logic->OnMsgDispatch(session->GetSessionId(), frontMsg);
-//         recvBuffer->PopFront(frontMsg->_packetLength);
-//         ++_recvMsgCountPerSecond;
-//     }
-
-    IFS_Session *session = NULL;
-    FS_IocpSession *iocpSession = NULL;
-    UInt64 sessionId = 0;
-    for(auto iterSession = sessions.begin(); iterSession != sessions.end();)
-    {
-        session = *iterSession;
-        sessionId = session->GetSessionId();
-        iocpSession = session->CastTo<FS_IocpSession>();
-        auto recvBuffer = session->CastTo<FS_IocpSession>()->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
-        while(recvBuffer->HasMsg())
-        {
-            auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
-            _logics[transferId]->OnMsgDispatch(session, frontMsg);
-            recvBuffer->PopFront(frontMsg->_packetLength);
-            ++_recvMsgCountPerSecond;
-        }
-
-        if(iocpSession->CanPost() && iocpSession->HasMsgToSend())
-            toPostSend.insert(session);
-
-        iterSession = sessions.erase(iterSession);
-    }
-
-//     Int64 incPackets = 0;
-//     //_msgDispatcher->OnRecv(sessions, incPackets);
-//     _recvMsgCountPerSecond += incPackets;
 }
 
 void FS_ServerCore::_OnSvrRuning(FS_ThreadPool *threadPool)
@@ -400,11 +364,14 @@ Int32 FS_ServerCore::_CreateNetModules()
     const Int32 transferCnt = g_SvrCfg->GetTransferCnt();
     _msgTransfers.resize(transferCnt);
     _messageQueue = new ConcurrentMessageQueue(transferCnt, 1);
+    _senderMessageQueue.resize(transferCnt);
     g_net2LogicMessageQueue = _messageQueue;
     for(Int32 i = 0; i < transferCnt; ++i)
     {
+        _senderMessageQueue[i] = new MessageQueue();
         _msgTransfers[i] = FS_MsgTransferFactory::Create(i);
         _msgTransfers[i]->AttachMsgQueue(_messageQueue, i);
+        _msgTransfers[i]->AttachSenderMsgQueue(_senderMessageQueue[i]);
     }
 
     _msgDispatcher = FS_MsgDispatcherFactory::Create();
@@ -415,6 +382,24 @@ Int32 FS_ServerCore::_CreateNetModules()
 Int32 FS_ServerCore::_StartModules()
 {
     Int32 ret = StatusDefs::Success;
+    ret = _messageQueue->Start();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("messageQueue start fail ret[%d]"), ret);
+        return ret;
+    }
+
+    const Int32 senderMqSize = static_cast<Int32>(_senderMessageQueue.size());
+    for(Int32 i = 0; i < senderMqSize; ++i)
+    {
+        ret = _senderMessageQueue[i]->Start();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("senderMessageQueue start fail i[%d] ret[%d]"), i, ret);
+            return ret;
+        }
+    }
+
     ret = _connector->Start();
     if(ret != StatusDefs::Success)
     {
@@ -445,6 +430,24 @@ Int32 FS_ServerCore::_StartModules()
 Int32 FS_ServerCore::_BeforeStart()
 {
     Int32 ret = StatusDefs::Success;
+    ret = _messageQueue->BeforeStart();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<FS_ServerCore>(_LOGFMT_("messageQueue BeforeStart fail ret[%d]"), ret);
+        return ret;
+    }
+
+    const Int32 senderMqSize = static_cast<Int32>(_senderMessageQueue.size());
+    for(Int32 i=0;i<senderMqSize;++i)
+    {
+        ret = _senderMessageQueue[i]->BeforeStart();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("senderMessageQueue BeforeStart fail i[%d] ret[%d]"), i, ret);
+            return ret;
+        }
+    }
+
     ret = _connector->BeforeStart();
     if(ret != StatusDefs::Success)
     {
@@ -454,16 +457,6 @@ Int32 FS_ServerCore::_BeforeStart()
 
     for(auto &msgTransfer : _msgTransfers)
     {
-        // 注册接口
-        auto onDisconnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnDisconnected);
-        auto onRecvSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsg);
-        auto onSendSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSendMsg);
-        auto onHeartBeatTimeOutRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnHeartBeatTimeOut);
-        msgTransfer->RegisterDisconnected(onDisconnectedRes);
-        msgTransfer->RegisterRecvSucCallback(onRecvSucRes);
-        msgTransfer->RegisterSendSucCallback(onSendSucRes);
-        msgTransfer->RegisterHeatBeatTimeOutCallback(onHeartBeatTimeOutRes);
-
         ret = msgTransfer->BeforeStart();
         if(ret != StatusDefs::Success)
         {
@@ -530,7 +523,6 @@ void FS_ServerCore::_WillClose()
 void FS_ServerCore::_BeforeClose()
 {
     _connector->BeforeClose();
-
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->BeforeClose();
 
@@ -550,21 +542,6 @@ void FS_ServerCore::_AfterClose()
 void FS_ServerCore::_RegisterToModule()
 {
     auto onConnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnConnected);
-    _connector->RegisterConnected(onConnectedRes);
-    
-    for(auto &msgTransfer : _msgTransfers)
-    {
-        // 注册接口
-        auto onDisconnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnDisconnected);
-        auto onRecvSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsg);
-        // auto onRecvAmountRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnRecvMsgAmount);
-        auto onSendSucRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSendMsg);
-        msgTransfer->RegisterDisconnected(onDisconnectedRes);
-        msgTransfer->RegisterRecvSucCallback(onRecvSucRes);
-        msgTransfer->RegisterSendSucCallback(onSendSucRes);
-        // msgTransfer->RegisterRecvAmountCallback(onRecvAmountRes);
-    }
-
     // _logic->SetDispatcher(_msgDispatcher);
     _msgDispatcher->BindBusinessLogic(_logic);
 }

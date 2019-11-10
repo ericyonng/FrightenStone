@@ -120,12 +120,6 @@ inline void IFS_Session::Unlock()
     _lock.Unlock();
 }
 
-inline void IFS_Session::UpdateHeartBeatExpiredTime()
-{
-    _heartBeatExpiredTime.FlushAppendTime(CLIENT_HREAT_DEAD_TIME*Time::_microSecondPerMilliSecond);
-}
-
-
 FS_NAMESPACE_END
 
 #endif

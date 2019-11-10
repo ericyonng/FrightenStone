@@ -60,7 +60,6 @@ public:
     virtual void AfterClose() {}
 
     // 回调接口
-    virtual void RegisterConnected(IDelegate<void, IFS_Session *> *callback);
     virtual void OnDisconnected(IFS_Session *session) = 0;
 };
 

@@ -32,16 +32,91 @@
 #include "stdafx.h"
 #include "base/common/net/protocol/defs/ProtocolDefs.h"
 
-FS_NAMESPACE_BEGIN
+#include "base/common/log/Log.h"
 
-OBJ_POOL_CREATE_IMPL(NetMsg_DataHeader, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+FS_NAMESPACE_BEGIN
+const char * ProtocolCmd::GetStr(UInt16 cmd)
+{
+    switch(cmd)
+    {
+        case ProtocolCmd::LoginReq:
+        {
+            return "LoginReq";
+        }
+        break;
+        case ProtocolCmd::LoginNty:
+        {
+            return "LoginNty";
+        }
+        break;
+        case ProtocolCmd::LoginRes:
+        {
+            return "LoginRes";
+        }
+        break;
+        case ProtocolCmd::LogoutReq:
+        {
+            return "LogoutReq";
+        }
+        break;
+        case ProtocolCmd::LogoutNty:
+        {
+            return "LogoutNty";
+        }
+        break;
+        case ProtocolCmd::LogoutRes:
+        {
+            return "LogoutRes";
+        }
+        break;
+        case ProtocolCmd::CreatePlayerReq:
+        {
+            return "CreatePlayerReq";
+        }
+        break;
+        case ProtocolCmd::CreatePlayerRes:
+        {
+            return "CreatePlayerRes";
+        }
+        break;
+        case ProtocolCmd::CreatePlayerNty:
+        {
+            return "CreatePlayerNty";
+        }
+        break;
+        case ProtocolCmd::CheckHeartReq:
+        {
+            return "CheckHeartReq";
+        }
+        break;
+        case ProtocolCmd::CheckHeartRes:
+        {
+            return "CheckHeartRes";
+        }
+        break;
+        default:
+        {
+            g_Log->w<ProtocolCmd>(_LOGFMT_("unknown net msg cmd[%hu]"), cmd);
+        }
+        break;
+    }
+
+    return "";
+}
+
+OBJ_POOL_CREATE_DEF_IMPL(NetMsg_DataHeader, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 NetMsg_DataHeader::NetMsg_DataHeader()
 {
     _packetLength = 0;
     _cmd = ProtocolCmd::CMD_Begin;
 }
 
-OBJ_POOL_CREATE_IMPL(LoginReq, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+// OBJ_POOL_CREATE_DEF_IMPL(NetMsg_Buffer, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+// NetMsg_DataHeader::NetMsg_DataHeader()
+// {
+// }
+
+OBJ_POOL_CREATE_DEF_IMPL(LoginReq, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 LoginReq::LoginReq()
 {
     _packetLength = sizeof(LoginReq);
@@ -50,7 +125,7 @@ LoginReq::LoginReq()
     memset(_pwd, 0, sizeof(_pwd));
 }
 
-OBJ_POOL_CREATE_IMPL(LoginRes, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+OBJ_POOL_CREATE_DEF_IMPL(LoginRes, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 LoginRes::LoginRes()
 {
     _packetLength = sizeof(LoginRes);
@@ -58,7 +133,7 @@ LoginRes::LoginRes()
     _result = 0;
 }
 
-OBJ_POOL_CREATE_IMPL(LoginNty, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+OBJ_POOL_CREATE_DEF_IMPL(LoginNty, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 LoginNty::LoginNty()
 {
     _packetLength = sizeof(LoginNty);
@@ -68,7 +143,7 @@ LoginNty::LoginNty()
     memset(_pwd, 0, sizeof(_pwd));
 }
 
-OBJ_POOL_CREATE_IMPL(CreatePlayerNty, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+OBJ_POOL_CREATE_DEF_IMPL(CreatePlayerNty, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 CreatePlayerNty::CreatePlayerNty()
 {
     _packetLength = sizeof(CreatePlayerNty);
@@ -76,18 +151,67 @@ CreatePlayerNty::CreatePlayerNty()
     _socket = 0;
 }
 
-OBJ_POOL_CREATE_IMPL(CheckHeartReq, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+OBJ_POOL_CREATE_DEF_IMPL(CheckHeartReq, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 CheckHeartReq::CheckHeartReq()
 {
     _packetLength = sizeof(CheckHeartReq);
     _cmd = ProtocolCmd::CheckHeartReq;
 }
 
-OBJ_POOL_CREATE_IMPL(CheckHeartRes, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__,__DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+OBJ_POOL_CREATE_DEF_IMPL(CheckHeartRes, __DEF_OBJ_POOL_OBJ_NUM__,__DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
 CheckHeartRes::CheckHeartRes()
 {
     _packetLength = sizeof(CheckHeartRes);
     _cmd = ProtocolCmd::CheckHeartRes;
 }
+
+void ProtocoalAssist::DelNetMsg(NetMsg_DataHeader *header)
+{
+    switch(header->_cmd)
+    {
+        case ProtocolCmd::LoginReq:
+        {
+            delete static_cast<LoginReq *>(header);
+            header = NULL;
+        }
+        break;
+        case ProtocolCmd::LoginNty:
+        {
+            delete static_cast<LoginNty *>(header);
+            header = NULL;
+        }
+        break;
+        case ProtocolCmd::LoginRes:
+        {
+            delete static_cast<LoginRes *>(header);
+            header = NULL;
+        }
+        break;
+        case ProtocolCmd::CreatePlayerNty:
+        {
+            delete static_cast<CreatePlayerNty *>(header);
+            header = NULL;
+        }
+        break;
+        case ProtocolCmd::CheckHeartReq:
+        {
+            delete static_cast<CheckHeartReq *>(header);
+            header = NULL;
+        }
+        break;
+        case ProtocolCmd::CheckHeartRes:
+        {
+            delete static_cast<CheckHeartRes *>(header);
+            header = NULL;
+        }
+        break;
+        default:
+        {
+            g_Log->e<ProtocoalAssist>(_LOGFMT_("unknown net msg cmd[%hu] data size[%hu]"), header->_cmd, header->_packetLength);
+        }
+        break;
+    }
+}
+
 
 FS_NAMESPACE_END

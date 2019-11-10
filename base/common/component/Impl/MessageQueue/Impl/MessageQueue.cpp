@@ -109,7 +109,7 @@ void MessageQueue::BeforeClose()
 
     if(_pool)
         _pool->Close();
-
+    
     _msgConsumerGuard.Broadcast();
 }
 

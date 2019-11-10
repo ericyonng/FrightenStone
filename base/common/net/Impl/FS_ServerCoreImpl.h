@@ -39,6 +39,15 @@ inline void FS_ServerCore::_OnSendMsg(IFS_Session *session, Int64 transferBytes)
     _sendMsgBytesPerSecond += transferBytes;
 }
 
+inline void FS_ServerCore::_OnRecvMsgAmount(NetMsg_DataHeader *msgArrived)
+{
+    ++_recvMsgCountPerSecond;
+}
+
+inline std::vector<MessageQueue *> &FS_ServerCore::_GetSenderMq()
+{
+    return _senderMessageQueue;
+}
 
 FS_NAMESPACE_END
 

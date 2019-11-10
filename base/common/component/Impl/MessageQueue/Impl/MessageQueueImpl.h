@@ -65,6 +65,24 @@ inline bool MessageQueue::Push(std::list<FS_MessageBlock *> *&msgs)
     return true;
 }
 
+inline bool MessageQueue::Push(FS_MessageBlock *msg)
+{
+    if(UNLIKELY(!_isWorking))
+        return false;
+
+    _msgGeneratorQueue->push_back(msg);
+    return true;
+}
+
+inline void MessageQueue::Notify()
+{
+    if(UNLIKELY(!_isWorking))
+        return;
+
+    _msgGeneratorChange = true;
+     _msgGeneratorGuard.Sinal();
+}
+
 inline void MessageQueue::PushUnlock()
 {
     _msgGeneratorGuard.Unlock();
@@ -160,9 +178,25 @@ inline bool ConcurrentMessageQueue::Push(UInt32 generatorQueueId, std::list<FS_M
         }
     }
 
+    return true;
+}
+
+inline bool ConcurrentMessageQueue::Push(UInt32 generatorQueueId, FS_MessageBlock *messageBlock)
+{
+    if(!_isWorking)
+        return false;
+
+    _generatorMsgQueues[generatorQueueId]->push_back(messageBlock);
+    return true;
+}
+
+inline void ConcurrentMessageQueue::Notify(UInt32 generatorQueueId)
+{
+    if(!_isWorking)
+        return;
+
     *_generatorChange[generatorQueueId] = true;
     _genoratorGuards[generatorQueueId]->Sinal();
-    return true;
 }
 
 inline void ConcurrentMessageQueue::PushUnlock(UInt32 generatorQueueId)

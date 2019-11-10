@@ -39,6 +39,7 @@
 #include "base/common/asyn/asyn.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/net/Impl/IFS_Session.h"
+#include "base/common/net/Impl/FS_IocpSession.h"
 #include "base/common/net/Defs/HeartBeatComp.h"
 
 FS_NAMESPACE_BEGIN
@@ -47,9 +48,12 @@ class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT FS_Iocp;
 struct BASE_EXPORT IO_EVENT;
 class BASE_EXPORT FS_IocpSession;
+struct BASE_EXPORT NetMsg_DataHeader;
+struct BASE_EXPORT FS_MessageBlock;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
+
 public:
     FS_IocpMsgTransfer(Int32 id);
     virtual ~FS_IocpMsgTransfer();
@@ -65,24 +69,19 @@ public:
     virtual void OnConnect(IFS_Session *session);
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut(IFS_Session *session);
-    // msg内存池创建 其他线程调用本接口，send需要加锁
-    virtual void AsynSend(UInt64 sessionId, NetMsg_DataHeader *msg);
 
-    virtual void RegisterDisconnected(IDelegate<void, IFS_Session *> *callback);
-    virtual void RegisterRecvSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
-    virtual void RegisterRecvAmountCallback(IDelegate<void, std::list<IFS_Session *> &> *callback);
-    virtual void RegisterSendSucCallback(IDelegate<void, IFS_Session *, Int64> *callback);
     virtual Int32 GetSessionCnt();
 
     // 消息队列
     virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue, Int32 generatorId);
+    virtual void AttachSenderMsgQueue(MessageQueue *messageQueue);
 
 private:
     void _OnMoniterMsg(FS_ThreadPool *pool);
     Int32 _DoEvents();
     Int32 _HandleNetEvent();
     void _OnMsgArrived();
-    void _RemoveSessions();
+    void _RemoveSessions(bool forceDisconnect = false);
 
     // 网络事件 线程不安全
 private:
@@ -91,8 +90,8 @@ private:
     // 需要判断是否可断开
     void _OnDisconnected(FS_IocpSession *session);
     void _DestroySession(FS_IocpSession *session);
-    bool _DoPostSend(FS_IocpSession *session, bool removeIfFail = true);
-    bool _DoPostRecv(FS_IocpSession *session, bool removeIfFail = true);
+    bool _DoPostSend(FS_IocpSession *session);
+    bool _DoPostRecv(FS_IocpSession *session);
 
     // 辅助
 private:
@@ -104,7 +103,7 @@ private:
 
     void _PostEventsToIocp();
 
-    void _AsynSendFromDispatcher(std::set<IFS_Session *> &toRemove);
+    void _AsynSendFromDispatcher();
     void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
     void _LinkCacheToSessions();
 
@@ -118,28 +117,25 @@ private:
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;
     ConcurrentMessageQueue *_messageQueue;
+    std::list<FS_MessageBlock *> *_senderMsgs;
+    MessageQueue *_senderMessageQueue;
     Int32 _generatorId;
 
     // 缓冲区
     Locker _connectorGuard;
     std::atomic<bool> _hasNewSessionLinkin;         // 
     std::list<IFS_Session *> _linkSessionCache;     // 连入的会话缓冲区
-    std::list<IFS_Session *> _msgArriviedSessions;  // 消息到达的会话
+    std::list<FS_IocpSession *> _msgArriviedSessions;  // 消息到达的会话
 
     // 待发送的会话缓冲区
-    Locker _asynSendGuard;
-    std::atomic<bool> _isSendCacheDirtied;
-    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueueCache; // key:sessionId
-    std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueue;  // key:sessionId
+//     Locker _asynSendGuard;
+//     std::atomic<bool> _isSendCacheDirtied;
+//     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueueCache; // key:sessionId
+//     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueue;  // key:sessionId
 
     std::set<FS_IocpSession *> _toPostRecv;
     std::set<FS_IocpSession *> _toPostSend;
     std::set<FS_IocpSession *> _toRemove;
-
-    IDelegate<void, IFS_Session *> *_serverCoreDisconnectedCallback;
-    IDelegate<void, IFS_Session *, Int64> *_serverCoreRecvSucCallback;
-    IDelegate<void, std::list<IFS_Session *> &> *_serverCoreRecvAmountCallback;
-    IDelegate<void, IFS_Session *, Int64> *_serverCoreSendSucCallback;
 };
 
 FS_NAMESPACE_END

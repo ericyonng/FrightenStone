@@ -36,6 +36,8 @@
 #include "base/common/net/Defs/FS_IocpBuffer.h"
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/net/Defs/FS_BufferFactory.h"
+#include "base/common/net/Impl/IFS_ServerConfigMgr.h"
+#include "base/common/net/Impl/FS_ServerCore.h"
 
 #include "base/common/assist/utils/Impl/STLUtil.h"
 #include "base/common/socket/socket.h"
@@ -78,6 +80,11 @@ void IFS_Session::Close()
 {
     if(_sock != INVALID_SOCKET)
         SocketUtil::DestroySocket(_sock);
+}
+
+void IFS_Session::UpdateHeartBeatExpiredTime()
+{
+    _heartBeatExpiredTime.FlushAppendTime(g_SvrCfg->GetHeartbeatDeadTimeInterval()*Time::_microSecondPerMilliSecond);
 }
 
 bool IFS_Session::Send(NetMsg_DataHeader *header)

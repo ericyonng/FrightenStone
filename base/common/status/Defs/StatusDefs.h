@@ -156,6 +156,7 @@ public:
 
         #pragma region IocpMsgTransfer[1800, 1899]
         IocpMsgTransfer_StartFailOfMoniterMsgFailure = 1800,    // iocpmsgtransfer 添加monitor任务时候失败
+        IocpMsgTransfer_IocpQuit = 1801,                        // iocp退出
         #pragma endregion
 
         #pragma region FS_IocpMsgHandler[1900, 1999]

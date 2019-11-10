@@ -37,6 +37,7 @@
 #include "base/common/net/Impl/FS_Addr.h"
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/net/Defs/FS_IocpBuffer.h"
+#include "base/common/net/Impl/IFS_ServerConfigMgr.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -50,37 +51,26 @@ FS_NAMESPACE_BEGIN
 FS_IocpConnector::FS_IocpConnector()
     :_threadPool(NULL)
     ,_sock(INVALID_SOCKET)
-    , _onConnected(NULL)
     ,_closeIocpDelegate(NULL)
     ,_curSessionCnt(0)
     , _maxSessionQuantityLimit(0)
     ,_curMaxSessionId(0)
     ,_maxSessionIdLimit((std::numeric_limits<UInt64>::max)())
-    ,_linkConfig(NULL)
 {
-    // TODO:读取配置
-     _maxSessionQuantityLimit = CLIENT_QUANTITY_LIMIT;
 }
 
 FS_IocpConnector::~FS_IocpConnector()
 {
     Fs_SafeFree(_closeIocpDelegate);
-    Fs_SafeFree(_onConnected);
     Fs_SafeFree(_threadPool);
-    Fs_SafeFree(_linkConfig);
 }
 
 Int32 FS_IocpConnector::BeforeStart()
 {
-    // TODO:读取配置初始化变量
-    auto st = _ReadConfig();
-    if(st != StatusDefs::Success)
-    {
-        g_Log->e<FS_IocpConnector>(_LOGFMT_("_ReadConfig fail st[%d]"), st);
-        return st;
-    }
-
     _threadPool = new FS_ThreadPool(0, 1);
+    _maxSessionQuantityLimit = g_SvrCfg->GetMaxConnectQuantityLimit();
+    const auto &ip = g_SvrCfg->GetListenIp();
+    UInt16 port = g_SvrCfg->GetListenPort();
 
     // 初始化
     auto sock = _InitSocket();
@@ -90,16 +80,11 @@ Int32 FS_IocpConnector::BeforeStart()
         return StatusDefs::IocpConnector_InitListenSocketFail;
     }
 
-    BUFFER256 buffer = {};
-    char *ptr = buffer;
-    _linkConfig->ReadStr(_segmentName.c_str(), _ipKey.c_str(), "", ptr, sizeof(buffer));
-    UInt16 port = static_cast<UInt32>(_linkConfig->ReadInt(_segmentName.c_str(), _portKey.c_str(), 0));
-
-    st = _Bind(buffer, port);
+    Int32 st = _Bind(ip.c_str(), port);
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpConnector>(_LOGFMT_("listen sock[%llu] bind ip[%s:%hu] fail st[%d]")
-                                   , _sock, buffer, port, st);
+                                   , _sock, ip.c_str(),  port, st);
         return st;
     }
 
@@ -107,7 +92,7 @@ Int32 FS_IocpConnector::BeforeStart()
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpConnector>(_LOGFMT_("listen sock[%llu] listen ip[%s:%hu] fail st[%d]")
-                                   , _sock, buffer, port, st);
+                                   , _sock, ip.c_str(), port, st);
         return st;
     }
 
@@ -137,75 +122,11 @@ void FS_IocpConnector::Close()
 {
 }
 
-void FS_IocpConnector::RegisterConnected(IDelegate<void, IFS_Session *> *callback)
-{
-    Fs_SafeFree(_onConnected);
-    _onConnected = callback;
-}
-
 void FS_IocpConnector::OnDisconnected(IFS_Session *session)
 {
     _locker.Lock();
     --_curSessionCnt;
     _locker.Unlock();
-}
-
-Int32 FS_IocpConnector::_ReadConfig()
-{
-    _segmentName = SVR_CFG_LISTENER_SEG;
-    _listenerFileName = SVR_CONFIG_PATH_NAME;
-    _ipKey = "ip";
-    _portKey = "port";
-
-    if(!_linkConfig)
-    {
-        _linkConfig = new FS_IniFile();
-        if(!_linkConfig->SetPath(_listenerFileName.c_str()))
-        {
-            g_Log->e<FS_IocpConnector>(_LOGFMT_("create cfg ini fail"));
-            return StatusDefs::IocpConnector_CreateCfgIniFail;
-        }
-
-        BUFFER512 buffer = {};
-        char *ptr = buffer;
-        if(_linkConfig->ReadAllKeyValueOfSection(_segmentName.c_str(), ptr, sizeof(buffer)))
-            return StatusDefs::Success;
-
-        // 初始化配置文件
-        auto st = _InitDefCfgs();
-        if(st != StatusDefs::Success)
-        {
-            g_Log->e<FS_IocpConnector>(_LOGFMT_("_InitDefCfgs fail st[%d]"), st);
-            return st;
-        }
-    }
-
-    return StatusDefs::Success;
-}
-
-Int32 FS_IocpConnector::_InitDefCfgs()
-{
-    _linkConfig->WriteStr(_segmentName.c_str(), _ipKey.c_str(), "127.0.0.1");
-    _linkConfig->WriteStr(_segmentName.c_str(), _portKey.c_str(), "4567");
-
-    // 检查是否写入正确
-    BUFFER256 buffer = {};
-    char *ptr = buffer;
-    _linkConfig->ReadStr(_segmentName.c_str(), _ipKey.c_str(), "", ptr, sizeof(buffer));
-    if(strcmp(buffer, "127.0.0.1") != 0)
-    {
-        g_Log->e<FS_IocpConnector>(_LOGFMT_("_InitDefCfgs fail ip not match"));
-        return StatusDefs::IocpConnector_InitDefIniFail;
-    }
-
-    UInt32 port = _linkConfig->ReadInt(_segmentName.c_str(), _portKey.c_str(), 0);
-    if(port != 4567)
-    {
-        g_Log->e<FS_IocpConnector>(_LOGFMT_("_InitDefCfgs fail port not match"));
-        return StatusDefs::IocpConnector_InitDefIniFail;
-    }
-
-    return StatusDefs::Success;
 }
 
 SOCKET FS_IocpConnector::_InitSocket()
@@ -311,14 +232,7 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
                                      , newSession->GetSocket()
                                      , sessionAddr->GetAddr().c_str()
                                      , sessionAddr->GetPort());
-
-//        g_Log->any<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
-//                                     , newSession->GetSessionId()
-//                                     , newSession->GetSocket()
-//                                     , sessionAddr->GetAddr().c_str()
-//                                     , sessionAddr->GetPort());
-
-        _onConnected->Invoke(newSession);
+        g_ServerCore->_OnConnected(newSession);
     }
     else {
         _locker.Unlock();
@@ -413,10 +327,10 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
 {
     // 预先创建n个缓冲加速连接过程
     g_MemoryPool->Lock();
-    bufArray = g_MemoryPool->Alloc<char *>(CLIENT_QUANTITY_LIMIT * sizeof(char *));
+    bufArray = g_MemoryPool->Alloc<char *>(_maxSessionQuantityLimit * sizeof(char *));
     g_MemoryPool->Unlock();
 
-    for(Int32 i = 0; i < CLIENT_QUANTITY_LIMIT; ++i)
+    for(Int32 i = 0; i < _maxSessionQuantityLimit; ++i)
     {
         g_MemoryPool->Lock();
         bufArray[i] = g_MemoryPool->Alloc<char>(IOCP_CONNECTOR_BUFFER);
@@ -425,11 +339,11 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
 
     // 预先创建n个iodata
     g_MemoryPool->Lock();
-    ioDataArray = g_MemoryPool->Alloc<IoDataBase *>(sizeof(IoDataBase *)*CLIENT_QUANTITY_LIMIT);
+    ioDataArray = g_MemoryPool->Alloc<IoDataBase *>(sizeof(IoDataBase *)* _maxSessionQuantityLimit);
     g_MemoryPool->Unlock();
 
     Int32 st = StatusDefs::Success;
-    for(Int32 i = 0; i < CLIENT_QUANTITY_LIMIT; ++i)
+    for(Int32 i = 0; i < _maxSessionQuantityLimit; ++i)
     {
         g_MemoryPool->Lock();
         ioDataArray[i] = g_MemoryPool->Alloc<IoDataBase>(sizeof(IoDataBase));
@@ -452,7 +366,7 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
 void FS_IocpConnector::_FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray)
 {
     g_MemoryPool->Lock();
-    for(Int32 i = 0; i < CLIENT_QUANTITY_LIMIT; ++i)
+    for(Int32 i = 0; i < _maxSessionQuantityLimit; ++i)
     {
         g_MemoryPool->Free(bufArray[i]);
         g_MemoryPool->Free(ioDataArray[i]);
