@@ -60,6 +60,9 @@ public:
     Int32 GetTransferCnt() const;
     Int32 GetHeartbeatDeadTimeInterval() const;
 
+    /* dispatcher */
+    Int32 GetDispatcherCnt() const;
+
 private:
     Int32 _InitDefCfgs();
 

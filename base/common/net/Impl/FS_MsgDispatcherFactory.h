@@ -44,7 +44,7 @@ class BASE_EXPORT IFS_MsgDispatcher;
 class BASE_EXPORT FS_MsgDispatcherFactory
 {
 public:
-    static IFS_MsgDispatcher *Create();
+    static IFS_MsgDispatcher *Create(UInt32 id);
 };
 
 FS_NAMESPACE_END

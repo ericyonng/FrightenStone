@@ -224,6 +224,11 @@ inline Int32 ConcurrentMessageQueue::WaitForPoping(UInt32 consumerQueueId, std::
     return st;
 }
 
+inline void ConcurrentMessageQueue::NotifyPop(UInt32 consumerQueueId)
+{
+    _consumerGuards[consumerQueueId]->Sinal();
+}
+
 inline void ConcurrentMessageQueue::PopImmediately(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut)
 {
     if(*_msgConsumerQueueChanges[consumerQueueId])

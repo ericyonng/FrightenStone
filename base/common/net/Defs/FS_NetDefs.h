@@ -95,6 +95,13 @@
 #define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "300000"                        // 默认30s心跳
 #pragma endregion
 
+#pragma region Dispatcher default config
+#define SVR_CFG_DISPATCHER_SEG                          "Dispatcher"                      // 消息分发配置
+
+#define SVR_CFG_DISPATCHER_CNT_KEY                      "DispatcherCnt"                   // 消息分发器数量
+#define SVR_CFG_DISPATCHER_CNT                          "1"                               // 消息分发器数量
+#pragma endregion
+
 // 心跳队列排序
 // class FS_ClientComp
 // {

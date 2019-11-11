@@ -241,7 +241,6 @@ void FS_ServerCore::Close()
         _senderMessageQueue[i]->BeforeClose();
 
     _messageQueue->Close();
-    const Int32 senderMqSize = static_cast<Int32>(_senderMessageQueue.size());
     for(Int32 i = 0; i < senderMqSize; ++i)
         _senderMessageQueue[i]->Close();
 
@@ -278,7 +277,6 @@ void FS_ServerCore::_OnConnected(IFS_Session *session)
     ++_sessionConnectedBefore;
 
     minTransfer->OnConnect(session);
-    _msgDispatcher->OnConnect(session->GetSessionId(), minTransfer);
 }
 
 void FS_ServerCore::_OnDisconnected(IFS_Session *session)
@@ -377,8 +375,10 @@ Int32 FS_ServerCore::_CreateNetModules()
         _msgTransfers[i]->AttachSenderMsgQueue(_senderMessageQueue[i]);
     }
 
-    _msgDispatcher = FS_MsgDispatcherFactory::Create();
-    _msgDispatcher->
+    const UInt32 dispatcherCnt = static_cast<UInt32>(g_SvrCfg->GetDispatcherCnt());
+    for(UInt32 i = 0; i < dispatcherCnt; ++i)
+        _msgDispatcher = FS_MsgDispatcherFactory::Create(i);
+
     return StatusDefs::Success;
 }
 
