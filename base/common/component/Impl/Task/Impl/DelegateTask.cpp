@@ -33,7 +33,7 @@
 #include "base/common/component/Impl/Task/Impl/DelegateTask.h"
 #include "base/common/component/Impl/FS_ThreadPool.h"
 
-// OBJ_POOL_CREATE_IMPL(fs::DelegateTask, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+// OBJ_POOL_CREATE_IMPL(fs::DelegateTask, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 

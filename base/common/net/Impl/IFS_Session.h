@@ -111,6 +111,7 @@ protected:
     std::atomic<Int32> _lastErrorReason;
     bool _isListen;
     Time _heartBeatExpiredTime; // 心跳过期时间
+    Int64 _heartbeatInterval;   // ms
     IFS_Buffer *_recvBuffer;
     std::list<IFS_Buffer *> _toSend;
 

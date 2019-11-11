@@ -38,7 +38,6 @@
 #include <set>
 #include "base/common/objpool/Defs/ObjPoolDefs.h"
 #include "base/common/asyn/asyn.h"
-#include "base/common/objpool/Defs/ObjBlock.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -55,7 +54,7 @@ class IObjAlloctor
     template<typename ObjType>
     friend class ObjPoolHelper;
 public:
-    IObjAlloctor(size_t blockAmountPerNode, size_t maxAllowOccupiedBytes);
+    IObjAlloctor(size_t blockAmountPerNode);
     virtual ~IObjAlloctor();
 
 public:
@@ -86,7 +85,7 @@ public:
 
 private:
     // 线程不安全接口，多线程时接口外面请加锁
-    bool _NewNode();
+    void _NewNode();
     void *_AllocFromSys();
 
 protected:
@@ -103,7 +102,6 @@ protected:
     size_t          _nodeCnt;               // 节点个数
     size_t          _bytesOccupied;         // 对象池占用内存大小 = _objBlockSize * _nodeCnt * node._capacity
     size_t          _objInUse;              // 正在使用的对象
-    size_t          _maxAllowOccupiedBytes; // 最大允许占用内存
     Locker          _locker;                // 线程安全
 };
 

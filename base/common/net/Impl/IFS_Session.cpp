@@ -42,7 +42,7 @@
 #include "base/common/assist/utils/Impl/STLUtil.h"
 #include "base/common/socket/socket.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 
@@ -57,7 +57,9 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
     ,_sendMsgId(1)
     ,_lastErrorReason{StatusDefs::Success}
     ,_maskClose(false)
+    ,_heartbeatInterval(0)
 {
+    _heartbeatInterval = static_cast<Int64>(g_SvrCfg->GetHeartbeatDeadTimeInterval());
     _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
     _recvBuffer->CastToBuffer<FS_IocpBuffer>()->BindTo(_sessionId, sock);
     UpdateHeartBeatExpiredTime();
@@ -84,7 +86,7 @@ void IFS_Session::Close()
 
 void IFS_Session::UpdateHeartBeatExpiredTime()
 {
-    _heartBeatExpiredTime.FlushAppendTime(g_SvrCfg->GetHeartbeatDeadTimeInterval()*Time::_microSecondPerMilliSecond);
+    _heartBeatExpiredTime.FlushAppendTime(_heartbeatInterval*Time::_microSecondPerMilliSecond);
 }
 
 bool IFS_Session::Send(NetMsg_DataHeader *header)

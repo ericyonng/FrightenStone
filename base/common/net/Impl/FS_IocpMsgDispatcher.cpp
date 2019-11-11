@@ -91,12 +91,12 @@ Int32 FS_IocpMsgDispatcher::BeforeStart()
 
 Int32 FS_IocpMsgDispatcher::Start()
 {
-//     auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_OnBusinessProcessThread);
-//     if(!_pool->AddTask(task, true))
-//     {
-//         g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("add task fail"));
-//         return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
-//     }
+    auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_OnBusinessProcessThread);
+    if(!_pool->AddTask(task, true))
+    {
+        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("add task fail"));
+        return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
+    }
 
     if(_logic)
     {

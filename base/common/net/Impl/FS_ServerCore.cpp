@@ -377,7 +377,10 @@ Int32 FS_ServerCore::_CreateNetModules()
 
     const UInt32 dispatcherCnt = static_cast<UInt32>(g_SvrCfg->GetDispatcherCnt());
     for(UInt32 i = 0; i < dispatcherCnt; ++i)
+    {
         _msgDispatcher = FS_MsgDispatcherFactory::Create(i);
+        _msgDispatcher->AttachRecvMessageQueue(_messageQueue);
+    }
 
     return StatusDefs::Success;
 }
@@ -545,7 +548,7 @@ void FS_ServerCore::_AfterClose()
 void FS_ServerCore::_RegisterToModule()
 {
     auto onConnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnConnected);
-    // _logic->SetDispatcher(_msgDispatcher);
+    _logic->SetDispatcher(_msgDispatcher);
     _msgDispatcher->BindBusinessLogic(_logic);
 }
 
