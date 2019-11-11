@@ -90,12 +90,12 @@ UInt16 IFS_ServerConfigMgr::GetListenPort() const
 
 Int32 IFS_ServerConfigMgr::GetMaxConnectQuantityLimit() const
 {
-    return static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_LISTENER_CLN_LIMIT_KEY, 0));
+    return static_cast<Int32>(_ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_CLN_LIMIT_KEY, 0));
 }
 
 Int32 IFS_ServerConfigMgr::GetTransferCnt() const
 {
-    return static_cast<Int32>(_ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, 0));
+    return static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, 0));
 }
 
 Int32 IFS_ServerConfigMgr::GetHeartbeatDeadTimeInterval() const
