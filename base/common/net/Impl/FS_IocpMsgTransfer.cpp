@@ -218,7 +218,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 
 Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 {
-    auto ret = _iocp->WaitForCompletion(*_ioEvent, 1);
+    auto ret = _iocp->WaitForCompletion(*_ioEvent, 20);
     if(ret != StatusDefs::Success)
         return ret;
 
@@ -250,9 +250,11 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
 
-            session->MaskClose();
-            session->ResetPostRecvMask();
+            session->ResetAllIoMask();
+            session->Close();
             _toRemove.insert(session);
+            _toPostRecv.erase(session);
+            _toPostSend.erase(session);
             return StatusDefs::Success;
         }
 
@@ -277,9 +279,11 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSessionId()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
-            session->ResetPostSendMask();
-            session->MaskClose();
+            session->ResetAllIoMask();
+            session->Close();
             _toRemove.insert(session);
+            _toPostRecv.erase(session);
+            _toPostSend.erase(session);
             return StatusDefs::Success;
         }
 
@@ -298,16 +302,18 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
     {
         session->EnableDisconnect();
         _toRemove.insert(session);
+        _toPostRecv.erase(session);
+        _toPostSend.erase(session);
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
     }
 
     // 客户端已经断开连接
-    if(session->IsClose())
-    {
-        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("session is closed sessionId[%llu]."), sessionId);
-        // iocpSession->EnableDisconnect();
-        _toRemove.insert(session);
-    }
+//     if(session->IsClose())
+//     {
+//         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("session is closed sessionId[%llu]."), sessionId);
+//         // iocpSession->EnableDisconnect();
+//         _toRemove.insert(session);
+//     }
 
     return StatusDefs::Success;
 }
@@ -350,7 +356,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
 
     _messageQueue->PushLock(_generatorId);
     _messageQueue->Push(_generatorId, recvMsgList);
-    _messageQueue->PushLock(_generatorId);
+    _messageQueue->PushUnlock(_generatorId);
 }
 
 void FS_IocpMsgTransfer::_OnDelayDisconnected(FS_IocpSession *session)
@@ -495,12 +501,7 @@ void FS_IocpMsgTransfer::_PostEventsToIocp()
             continue;
         }
 
-        if(!_DoPostRecv(session))
-        {
-            // _toRemove.insert(session);
-            g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu]"), session->GetSessionId());
-        }
-
+        _DoPostRecv(session);
         iterRecv = _toPostRecv.erase(iterRecv);
     }
 
@@ -513,10 +514,7 @@ void FS_IocpMsgTransfer::_PostEventsToIocp()
             continue;
         }
 
-        if(!_DoPostSend(session))
-        {
-            g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post send fail sessionId[%llu]"), session->GetSessionId());
-        }
+        _DoPostSend(session);
         iterSend = _toPostSend.erase(iterSend);
     }
 }
@@ -548,10 +546,11 @@ void FS_IocpMsgTransfer::_AsynSendFromDispatcher()
                 {
                     g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg fail"), sendMsgBufferBlock->_sessionId);
                 }
-            }
 
-            if(!session->IsPostSend())
-                _toPostSend.insert(session);
+
+                if(!session->IsPostSend())
+                    _toPostSend.insert(session);
+            }
         }
 
         Fs_SafeFree(sendMsgBufferBlock);

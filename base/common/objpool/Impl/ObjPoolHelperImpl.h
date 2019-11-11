@@ -35,8 +35,8 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
-inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount, size_t maxAllowOccupiedBytes)
-    :_alloctor(new IObjAlloctor<ObjType>(objAmount, maxAllowOccupiedBytes))
+inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
+    :_alloctor(new IObjAlloctor<ObjType>(objAmount))
 {
     // ´´½¨Î¯ÍÐ
    ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()

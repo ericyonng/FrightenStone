@@ -178,6 +178,9 @@ inline bool ConcurrentMessageQueue::Push(UInt32 generatorQueueId, std::list<FS_M
         }
     }
 
+    *_generatorChange[generatorQueueId] = true;
+    _genoratorGuards[generatorQueueId]->Sinal();
+
     return true;
 }
 

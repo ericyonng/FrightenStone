@@ -234,12 +234,6 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS
                                      , sessionAddr->GetAddr().c_str()
                                      , sessionAddr->GetPort());
 
-        auto ioData = newSession->CastTo<FS_IocpSession>()->MakeRecvIoData();
-        if(ioData)
-        {
-            const auto st = iocpListener->PostRecv(ioData->_sock, ioData);
-            st;
-        }
         g_ServerCore->_OnConnected(newSession);
     }
     else {

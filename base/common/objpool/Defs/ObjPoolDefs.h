@@ -40,9 +40,6 @@
 #pragma region macro
 #undef __DEF_OBJ_POOL_OBJ_NUM__
 #define __DEF_OBJ_POOL_OBJ_NUM__        1024
-#undef __DEF_OBJ_POOL_MAX_ALLOW_BYTES__
-#define __DEF_OBJ_POOL_MAX_ALLOW_BYTES__  (2147483648)   // 2GB默认最大可分配的对象池字节数
-// #define __DEF_OBJ_POOL_MAX_ALLOW_BYTES__  (1024)   // 2GB默认最大可分配的对象池字节数
 #undef __OBJPOOL_ALIGN_BYTES__
 #define __OBJPOOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
 #pragma endregion

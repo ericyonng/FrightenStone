@@ -34,9 +34,9 @@
 #include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(Tls_Rtti, 2, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__);
-OBJ_POOL_CREATE_DEF_IMPL(Tls_TestTls, 10, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__);
-OBJ_POOL_CREATE_DEF_IMPL(Tls_MemoryPool, 1, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__);
+OBJ_POOL_CREATE_DEF_IMPL(Tls_Rtti, 2);
+OBJ_POOL_CREATE_DEF_IMPL(Tls_TestTls, 10);
+OBJ_POOL_CREATE_DEF_IMPL(Tls_MemoryPool, 1);
 
 Tls_MemoryPool::Tls_MemoryPool()
 {

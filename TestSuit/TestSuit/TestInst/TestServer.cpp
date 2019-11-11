@@ -577,6 +577,10 @@ public:
     }
     virtual void OnSessionDisconnected(UInt64 sessionId)
     {
+        auto user = GetUser(sessionId);
+        if(user)
+            user->OnDisconnect();
+
         RemoveUser(sessionId);
         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }

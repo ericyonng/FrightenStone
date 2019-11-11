@@ -33,7 +33,7 @@
 #pragma once
 
 template<typename ObjType>
-fs::ObjPoolHelper<fs::ListNode<ObjType>> *fs::ListNode<ObjType>::_objPoolHelper = new fs::ObjPoolHelper<fs::ListNode<ObjType>> (__DEF_OBJ_POOL_OBJ_NUM__, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__);
+fs::ObjPoolHelper<fs::ListNode<ObjType>> *fs::ListNode<ObjType>::_objPoolHelper = new fs::ObjPoolHelper<fs::ListNode<ObjType>> (__DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_NAMESPACE_BEGIN
 
