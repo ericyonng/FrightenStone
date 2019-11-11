@@ -15,109 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestInst\TestDelegate.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestString.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestTime.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestTrigger.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestThreadPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestFSDirectory.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestCpuUtil.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestFSFileUtil.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestFile.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestJson.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestLogFile.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestRandom.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestAes.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestUtf8.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TerstSmartVar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestTimeWheel.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestSystemUtil.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestLogModule.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestXor.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestCrashHandle.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestMemoryPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestObjPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestMathUtil.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestIocpExample.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TestInsts.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TestInst\TestServer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestFS_List.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestSingleton.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestFSTlsTable.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestRtti.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestInterfaceComps.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestMessageQueue.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TestInst\TestStream.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

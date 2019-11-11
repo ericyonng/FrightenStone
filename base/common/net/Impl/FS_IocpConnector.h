@@ -86,7 +86,7 @@ private:
     *       6. OnNetRecv 接收到数据 线程不安全
     */
 private:
-    void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo);
+    void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS_Iocp *iocpListener);
     void _OnDisconnected(IFS_Session *session);
     void _OnIocpMonitorTask(FS_ThreadPool *threadPool);
     void _PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, IoDataBase **&ioDataArray);

@@ -49,7 +49,7 @@ struct BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT IFS_MsgTransfer;
 class BASE_EXPORT IFS_BusinessLogic;
 class BASE_EXPORT ConcurrentMessageQueue;
-class BASE_EXPORT FS_MessageBlock;
+struct BASE_EXPORT FS_MessageBlock;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {

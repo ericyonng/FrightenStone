@@ -38,6 +38,7 @@
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/net/Defs/FS_IocpBuffer.h"
 #include "base/common/net/Impl/IFS_ServerConfigMgr.h"
+#include "base/common/net/Impl/FS_IocpSession.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -80,7 +81,7 @@ Int32 FS_IocpConnector::BeforeStart()
         return StatusDefs::IocpConnector_InitListenSocketFail;
     }
 
-    Int32 st = _Bind(ip.c_str(), port);
+    Int32 st = _Bind(ip.GetLength() == 0 ? NULL : ip.c_str(), port);
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpConnector>(_LOGFMT_("listen sock[%llu] bind ip[%s:%hu] fail st[%d]")
@@ -206,7 +207,7 @@ Int32 FS_IocpConnector::_Listen(Int32 unconnectQueueLen)
     return StatusDefs::Success;
 }
 
-void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
+void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS_Iocp *iocpListener)
 {
     if(INVALID_SOCKET == sock)
     {
@@ -232,6 +233,13 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo)
                                      , newSession->GetSocket()
                                      , sessionAddr->GetAddr().c_str()
                                      , sessionAddr->GetPort());
+
+        auto ioData = newSession->CastTo<FS_IocpSession>()->MakeRecvIoData();
+        if(ioData)
+        {
+            const auto st = iocpListener->PostRecv(ioData->_sock, ioData);
+            st;
+        }
         g_ServerCore->_OnConnected(newSession);
     }
     else {
@@ -306,7 +314,7 @@ void FS_IocpConnector::_OnIocpMonitorTask(FS_ThreadPool *threadPool)
             // TODO:在getacceptAddrInfo时候需要考虑线程是否安全
             sockaddr_in *clientAddrInfo = NULL;
             listenIocp->GetClientAddrInfo(ioEvent._ioData->_wsaBuff.buf, clientAddrInfo);
-            _OnConnected(ioEvent._ioData->_sock, clientAddrInfo);
+            _OnConnected(ioEvent._ioData->_sock, clientAddrInfo, listenIocp);
 
             // 继续向IOCP投递接受连接任务
             const auto st = listenIocp->PostAccept(_sock, ioEvent._ioData);
