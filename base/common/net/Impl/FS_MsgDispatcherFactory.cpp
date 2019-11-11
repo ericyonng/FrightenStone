@@ -35,10 +35,10 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_MsgDispatcher *FS_MsgDispatcherFactory::Create()
+IFS_MsgDispatcher *FS_MsgDispatcherFactory::Create(UInt32 id)
 {
 #ifdef _WIN32
-    return new FS_IocpMsgDispatcher();
+    return new FS_IocpMsgDispatcher(id);
 #else
 #endif
 }

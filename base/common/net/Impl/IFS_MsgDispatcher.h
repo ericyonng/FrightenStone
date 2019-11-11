@@ -45,6 +45,7 @@ struct BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT IFS_MsgTransfer;
 class BASE_EXPORT IFS_BusinessLogic;
 class BASE_EXPORT MessageQueue;
+class BASE_EXPORT ConcurrentMessageQueue;
 
 class BASE_EXPORT IFS_MsgDispatcher
 {
@@ -61,7 +62,6 @@ public:
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    virtual void OnConnect(UInt64 sessionId, IFS_MsgTransfer *transfer) = 0;
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut() = 0;
 

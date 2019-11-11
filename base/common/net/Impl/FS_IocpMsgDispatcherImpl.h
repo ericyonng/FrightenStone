@@ -45,11 +45,6 @@ inline void FS_IocpMsgDispatcher::AttachRecvMessageQueue(ConcurrentMessageQueue 
     _messgeQueue = messageQueue;
 }
 
-inline void FS_IocpMsgDispatcher::AttachSenderMessageQueue(MessageQueue *messageQueue)
-{
-    _senderMessageQueue = messageQueue;
-}
-
 FS_NAMESPACE_END
 
 #endif

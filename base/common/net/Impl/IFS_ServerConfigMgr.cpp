@@ -103,6 +103,11 @@ Int32 IFS_ServerConfigMgr::GetHeartbeatDeadTimeInterval() const
     return static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0));
 }
 
+Int32 IFS_ServerConfigMgr::GetDispatcherCnt() const
+{
+    return static_cast<Int32>(_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_CNT_KEY, 0));
+}
+
 Int32 IFS_ServerConfigMgr::_InitDefCfgs()
 {
     #pragma region listener
@@ -118,6 +123,10 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     // 数据传输线程数
     _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, SVR_CFG_TRANSFER_SEG_CNT);
     _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL);
+    #pragma endregion
+
+    #pragma region dispatcher
+    _ini->WriteStr(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_CNT_KEY, SVR_CFG_DISPATCHER_CNT);
     #pragma endregion
 
     // 检查是否写入正确
@@ -156,6 +165,14 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] not match SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] default")
                                       , heartbeatTime, static_cast<UInt32>(atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL)));
+        return StatusDefs::IocpConnector_InitDefIniFail;
+    }
+
+    UInt32 dispatcherCnt = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_CNT_KEY, 0);
+    if(dispatcherCnt != atoi(SVR_CFG_DISPATCHER_CNT))
+    {
+        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_DISPATCHER_CNT[%u] not match SVR_CFG_DISPATCHER_CNT[%u] default")
+                                      , dispatcherCnt, static_cast<UInt32>(atoi(SVR_CFG_DISPATCHER_CNT)));
         return StatusDefs::IocpConnector_InitDefIniFail;
     }
 

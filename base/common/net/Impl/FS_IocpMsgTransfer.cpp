@@ -161,18 +161,6 @@ void FS_IocpMsgTransfer::OnHeartBeatTimeOut(IFS_Session *session)
 
 }
 
-void FS_IocpMsgTransfer::AsynSend(UInt64 sessionId, NetMsg_DataHeader *msg)
-{
-//     _asynSendGuard.Lock();
-//     auto iterQueue = _asynSendMsgQueueCache.find(sessionId);
-//     if(iterQueue == _asynSendMsgQueueCache.end())
-//         iterQueue = _asynSendMsgQueueCache.insert(std::make_pair(sessionId, new std::list<NetMsg_DataHeader *>)).first;
-//     auto queueList = iterQueue->second;
-//     queueList->push_back(msg);
-//     _isSendCacheDirtied = true;
-//     _asynSendGuard.Unlock();
-}
-
 void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 {// iocp 在closesocket后会马上返回所有投递的事件，所以不可立即在post未结束时候释放session对象
 

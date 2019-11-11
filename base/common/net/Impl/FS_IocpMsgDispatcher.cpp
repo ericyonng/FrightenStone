@@ -54,11 +54,9 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id)
     , _isClose{false}
     ,_timeWheel(NULL)
     ,_logic(NULL)
-    ,_isDataDirtied{false}
     ,_messgeQueue(NULL)
     ,_id(id)
     ,_recvMsgBlocks(NULL)
-    ,_senderMessageQueue(NULL)
 {
     g_Dispatcher = this;
 }
@@ -115,10 +113,12 @@ Int32 FS_IocpMsgDispatcher::Start()
 
 void FS_IocpMsgDispatcher::BeforeClose()
 {
-    _senderMessageQueue->BeforeClose();
-    _connectLocker.Lock();
-    _sessionIdRefTransfer.clear();
-    _connectLocker.Unlock();
+    if(_isClose)
+        return;
+
+    _messgeQueue->PopLock(_id);
+    _messgeQueue->NotifyPop(_id);
+    _messgeQueue->PopUnlock(_id);
 
     if(_logic)
         _logic->BeforeClose();
@@ -126,36 +126,15 @@ void FS_IocpMsgDispatcher::BeforeClose()
 
 void FS_IocpMsgDispatcher::Close()
 {
+    if(_isClose)
+        return;
+
     _isClose = true;
 
     // 线程退出
     _pool->Close();
-    _senderMessageQueue->Close();
 
     g_BusinessTimeWheel = NULL;
-
-    // 清理数据
-    for(auto &msgList : _sessionIdRefMsgs)
-    {
-        for(auto &msg : *msgList.second)
-        {
-            g_MemoryPool->Lock();
-            g_MemoryPool->Free(msg);
-            g_MemoryPool->Unlock();
-        }
-    }
-    STLUtil::DelMapContainer(_sessionIdRefMsgs);
-
-    for(auto &msgList : _sessionIdRefMsgCache)
-    {
-        for(auto &msg : *msgList.second)
-        {
-            g_MemoryPool->Lock();
-            g_MemoryPool->Free(msg);
-            g_MemoryPool->Unlock();
-        }
-    }
-    STLUtil::DelMapContainer(_sessionIdRefMsgCache);
 
     if(_logic)
         _logic->Close();
@@ -227,6 +206,9 @@ void FS_IocpMsgDispatcher::OnHeartBeatTimeOut()
 
 void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMsg_DataHeader *msg)
 {
+    if(_isClose)
+        return;
+
     auto &senderMq = g_ServerCore->_GetSenderMq();
 
     // 新的待发送的消息
@@ -287,7 +269,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
         else if(netMsgBlock->_mbType == MessageBlockType::MB_NetMsgArrived)
         {// 收到网络包
             auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
-            _DoBusinessProcess(netMsgBlock->_sessionId, netMsg);
+            _DoBusinessProcess(netMsgBlock->_sessionId, netMsgBlock->_generatorId, netMsg);
         }
 
         Fs_SafeFree(netMsgBlock);

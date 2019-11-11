@@ -127,6 +127,7 @@ public:
     void PopLock(UInt32 consumerQueueId);
     // 成功返回超时WaitEventTimeOut或者成功Success  exportMsgsOut 必须是堆创建
     Int32 WaitForPoping(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec = INFINITE);
+    void NotifyPop(UInt32 consumerQueueId);
     void PopImmediately(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut);
     void PopUnlock(UInt32 consumerQueueId);
     bool HasMsgToConsume(UInt32 consumerQueueId) const;
