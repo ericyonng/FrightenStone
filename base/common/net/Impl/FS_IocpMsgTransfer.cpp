@@ -218,7 +218,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 
 Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 {
-    auto ret = _iocp->WaitForCompletion(*_ioEvent, 20);
+    auto ret = _iocp->WaitForCompletion(*_ioEvent, 1);
     if(ret != StatusDefs::Success)
         return ret;
 
