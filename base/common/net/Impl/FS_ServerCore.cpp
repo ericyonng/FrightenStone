@@ -68,7 +68,6 @@ FS_ServerCore::FS_ServerCore()
     :_serverConfigMgr(NULL)
     ,_cpuInfo(new FS_CpuInfo)
     ,_connector(NULL)
-    ,_msgDispatcher(NULL)
     ,_pool(NULL)
     ,_curSessionConnecting{0}
     ,_sessionConnectedBefore{0}
@@ -77,16 +76,17 @@ FS_ServerCore::FS_ServerCore()
     ,_recvMsgBytesPerSecond{0}
     ,_sendMsgBytesPerSecond{0}
     ,_heartbeatTimeOutDisconnected{0}
+    ,_isInit(false)
 {
     g_ServerCore = this;
 }
 
 FS_ServerCore::~FS_ServerCore()
 {
-    FS_Release(_logic);
+    STLUtil::DelVectorContainer<decltype(_logics), AssistObjsDefs::SelfRelease>(_logics);
     Fs_SafeFree(_pool);
     Fs_SafeFree(_connector);
-    Fs_SafeFree(_msgDispatcher);
+    STLUtil::DelVectorContainer(_msgDispatchers);
     STLUtil::DelVectorContainer(_msgTransfers);
     Fs_SafeFree(_cpuInfo);
     Fs_SafeFree(_serverConfigMgr);
@@ -94,8 +94,11 @@ FS_ServerCore::~FS_ServerCore()
 }
 
 #pragma region api
-Int32 FS_ServerCore::Start(IFS_BusinessLogic *businessLogic)
+Int32 FS_ServerCore::Init()
 {
+    if(_isInit)
+        return StatusDefs::Success;
+
     // 1.时区
     TimeUtil::SetTimeZone();
 
@@ -103,7 +106,7 @@ Int32 FS_ServerCore::Start(IFS_BusinessLogic *businessLogic)
     SmartVarRtti::InitRttiTypeNames();
 
     // 3.初始化线程局部存储句柄
-    Int32 ret = FS_TlsUtil::CreateUtilTlsHandle(); 
+    Int32 ret = FS_TlsUtil::CreateUtilTlsHandle();
     if(ret != StatusDefs::Success)
     {
         FS_String str;
@@ -153,6 +156,16 @@ Int32 FS_ServerCore::Start(IFS_BusinessLogic *businessLogic)
         return ret;
     }
 
+    _isInit = true;
+
+    return StatusDefs::Success;
+}
+
+Int32 FS_ServerCore::Start(std::vector<IFS_BusinessLogic *> &businessLogic)
+{
+    if(!_isInit)
+        return StatusDefs::NotInit;
+
     // 8.内存监控
     g_MemleakMonitor->Start();
 
@@ -166,10 +179,10 @@ Int32 FS_ServerCore::Start(IFS_BusinessLogic *businessLogic)
     }
     
     // 10.业务逻辑
-    _logic = businessLogic;
+    _logics = businessLogic;
 
     // 11.创建服务器模块
-    ret = _CreateNetModules();
+    Int32 ret = _CreateNetModules();
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_ServerCore>(_LOGFMT_("_CreateNetModules fail ret[%d]"), ret);
@@ -223,6 +236,11 @@ void FS_ServerCore::Wait()
 
 void FS_ServerCore::Close()
 {
+    if(!_isInit)
+        return;
+
+    _isInit = false;
+
     // 断开所有依赖
     _WillClose();
 
@@ -233,7 +251,9 @@ void FS_ServerCore::Close()
     _connector->Close();
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->Close();
-    _msgDispatcher->Close();
+
+    for(auto &dispatcher : _msgDispatchers)
+        dispatcher->Close();
 
     _messageQueue->BeforeClose();
     const Int32 senderMqSize = static_cast<Int32>(_senderMessageQueue.size());
@@ -328,10 +348,10 @@ void FS_ServerCore::_PrintSvrLoadInfo(const TimeSlice &dis)
 {
     const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond);
     const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond);
-    g_Log->custom("<%lld ms> transfercnt<%d>, "
+    g_Log->custom("<%lld ms> transfercnt<%d>, dispatcher<%d>, "
                   "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
                   "Recv[%lld pps], RecvSpeed<%s>, SendSpeed<%s>"
-                  , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size())
+                  , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size()), (Int32)(_msgDispatchers.size())
                   , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore)
                   ,(Int64)(_heartbeatTimeOutDisconnected), (Int64)(_sessionDisconnectedCnt)
                   , Int64(_recvMsgCountPerSecond), recvSpeed.c_str()
@@ -363,8 +383,16 @@ Int32 FS_ServerCore::_CreateNetModules()
 
     //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
     const Int32 transferCnt = g_SvrCfg->GetTransferCnt();
+    const UInt32 dispatcherCnt = static_cast<UInt32>(_logics.size());
+
+    if((transferCnt % dispatcherCnt) != 0)
+    {
+        g_Log->w<FS_ServerCore>(_LOGFMT_("transfer cnt[%d] cant divide by dispatcher cnt[%u], it will break balance!")
+                                , transferCnt, dispatcherCnt);
+    }
+
     _msgTransfers.resize(transferCnt);
-    _messageQueue = new ConcurrentMessageQueue(transferCnt, 1);
+    _messageQueue = new ConcurrentMessageQueue(transferCnt, dispatcherCnt);
     _senderMessageQueue.resize(transferCnt);
     g_net2LogicMessageQueue = _messageQueue;
     for(Int32 i = 0; i < transferCnt; ++i)
@@ -375,11 +403,11 @@ Int32 FS_ServerCore::_CreateNetModules()
         _msgTransfers[i]->AttachSenderMsgQueue(_senderMessageQueue[i]);
     }
 
-    const UInt32 dispatcherCnt = static_cast<UInt32>(g_SvrCfg->GetDispatcherCnt());
+    _msgDispatchers.resize(dispatcherCnt);
     for(UInt32 i = 0; i < dispatcherCnt; ++i)
     {
-        _msgDispatcher = FS_MsgDispatcherFactory::Create(i);
-        _msgDispatcher->AttachRecvMessageQueue(_messageQueue);
+        _msgDispatchers[i] = FS_MsgDispatcherFactory::Create(i);
+        _msgDispatchers[i]->AttachRecvMessageQueue(_messageQueue);
     }
 
     return StatusDefs::Success;
@@ -423,11 +451,15 @@ Int32 FS_ServerCore::_StartModules()
         }
     }
 
-    ret = _msgDispatcher->Start();
-    if(ret != StatusDefs::Success)
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
     {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler start fail ret[%d]"), ret);
-        return ret;
+        ret = _msgDispatchers[i]->Start();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler start fail ret[%d] i[%d]"), ret, i);
+            return ret;
+        }
     }
 
     return StatusDefs::Success;
@@ -471,11 +503,15 @@ Int32 FS_ServerCore::_BeforeStart()
         }
     }
 
-    ret = _msgDispatcher->BeforeStart();
-    if(ret != StatusDefs::Success)
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
     {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler BeforeStart fail ret[%d]"), ret);
-        return ret;
+        ret = _msgDispatchers[i]->BeforeStart();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler BeforeStart fail ret[%d] i[%d]"), ret, i);
+            return ret;
+        }
     }
 
     return StatusDefs::Success;
@@ -506,11 +542,15 @@ Int32 FS_ServerCore::_AfterStart()
         }
     }
 
-    ret = _msgDispatcher->AfterStart();
-    if(ret != StatusDefs::Success)
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
     {
-        g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler AfterStart fail ret[%d]"), ret);
-        return ret;
+        ret = _msgDispatchers[i]->AfterStart();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerCore>(_LOGFMT_("msgHandler AfterStart fail ret[%d] i[%d]"), ret, i);
+            return ret;
+        }
     }
 
     return StatusDefs::Success;
@@ -523,7 +563,9 @@ void FS_ServerCore::_WillClose()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->WillClose();
 
-    _msgDispatcher->WillClose();
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+        _msgDispatchers[i]->WillClose();
 }
 
 void FS_ServerCore::_BeforeClose()
@@ -532,7 +574,9 @@ void FS_ServerCore::_BeforeClose()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->BeforeClose();
 
-    _msgDispatcher->BeforeClose();
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+        _msgDispatchers[i]->BeforeClose();
 }
 
 void FS_ServerCore::_AfterClose()
@@ -542,14 +586,19 @@ void FS_ServerCore::_AfterClose()
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->AfterClose();
 
-    _msgDispatcher->AfterClose();
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+        _msgDispatchers[i]->AfterClose();
 }
 
 void FS_ServerCore::_RegisterToModule()
 {
-    auto onConnectedRes = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnConnected);
-    _logic->SetDispatcher(_msgDispatcher);
-    _msgDispatcher->BindBusinessLogic(_logic);
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+    {
+        _logics[i]->SetDispatcher(_msgDispatchers[i]);
+        _msgDispatchers[i]->BindBusinessLogic(_logics[i]);
+    }
 }
 
 #pragma endregion

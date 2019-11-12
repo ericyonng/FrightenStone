@@ -72,7 +72,7 @@ Int32 FS_IocpMsgDispatcher::BeforeStart()
 {
     _resolutionInterval = 100 * Time::_microSecondPerMilliSecond;
     _timeWheel = new TimeWheel(_resolutionInterval);
-    g_BusinessTimeWheel = _timeWheel;
+    // g_BusinessTimeWheel = _timeWheel;
     _pool = new FS_ThreadPool(0, 1);
     _recvMsgBlocks = new std::list<FS_MessageBlock *>;
 
@@ -209,6 +209,7 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
     if(_isClose)
         return;
 
+    // sender是一对一的需要找到对应的收到网络包的那个transfer 的id
     auto &senderMq = g_ServerCore->_GetSenderMq();
 
     // 新的待发送的消息

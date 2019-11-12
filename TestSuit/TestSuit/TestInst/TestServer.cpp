@@ -508,6 +508,8 @@ public:
             {
                 fs::LoginReq *login = static_cast<fs::LoginReq *>(msgData);
 
+//                 g_Log->custom("user[%s] pwd[%s] login. at dispatcher[%d]"
+//                               , login->_userName, login->_pwd, _dispatcher->GetId());
                 //     g_Log->any<MyLogic>("sessionid[%llu] login username[%s], pwd[%s] msgId[%d] user recvmsgid"
                 //                         , sessionId, login->_userName, login->_pwd, login->_msgId, user->_recvMsgId);
                      // 检查消息ID
@@ -611,18 +613,33 @@ void TestServer::Run()
     {
         printf("little endian\n");
     }
-    
-    fs::MyLogic *newLogic = new fs::MyLogic;
+
     fs::FS_ServerCore *serverCore = new fs::FS_ServerCore();
-    auto st = serverCore->Start(newLogic);
+    auto st = serverCore->Init();
+
     if(st == StatusDefs::Success)
     {
-        getchar();
+        // 并发业务逻辑
+        auto dispatcherCnt = g_SvrCfg->GetDispatcherCnt();
+        std::vector<fs::IFS_BusinessLogic *> logics;
+        logics.resize(dispatcherCnt);
+        for(Int32 i = 0; i < dispatcherCnt; ++i)
+            logics[i] = new fs::MyLogic;
+        auto st = serverCore->Start(logics);
+        if(st == StatusDefs::Success)
+        {
+            getchar();
+        }
+        else
+        {
+            g_Log->e<TestServer>(_LOGFMT_("Start server fail st[%d] server will close now. please check! "));
+        }
     }
     else
     {
-        g_Log->e<TestServer>(_LOGFMT_("Start server fail st[%d] server will close now. please check! "));
+        std::cout << "server core init fail." << std::endl;
     }
+
     //serverCore->Wait();
     serverCore->Close();
     Fs_SafeFree(serverCore);

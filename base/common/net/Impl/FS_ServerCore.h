@@ -69,7 +69,8 @@ public:
     /* 对外接口 */
     #pragma region api
 public:
-    virtual Int32 Start(IFS_BusinessLogic *businessLogic);
+    virtual Int32 Init();
+    virtual Int32 Start(std::vector<IFS_BusinessLogic *> &businessLogic);
     virtual void Wait();
     virtual void Close();
     #pragma endregion
@@ -124,6 +125,7 @@ private:
     #pragma endregion
 
 private:
+    std::atomic_bool _isInit;
     FS_CpuInfo *_cpuInfo;                            // cpu信息
     IFS_ServerConfigMgr *_serverConfigMgr;          // 服务器配置
 
@@ -133,8 +135,8 @@ private:
     ConcurrentMessageQueue *_messageQueue;              // 消息队列
     std::vector<MessageQueue *> _senderMessageQueue;    // 发送消息队列
 
-    IFS_MsgDispatcher *_msgDispatcher;                 // 消息处理器 业务线程处理
-    IFS_BusinessLogic *_logic;                      // 业务逻辑入口
+    std::vector<IFS_MsgDispatcher *> _msgDispatchers;  // 消息处理器 业务线程处理
+    std::vector<IFS_BusinessLogic *> _logics;          // 多业务逻辑并发
 
     // TODO:sessionmgr可能需要移除避免锁冲突
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束

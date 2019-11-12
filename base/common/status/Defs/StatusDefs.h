@@ -52,6 +52,7 @@ public:
         AppInitFail = 6,                                        // 初始化失败
         Unknown = 7,                                            // 未知错误
         NotWorking = 8,                                         // 没有工作
+        NotInit = 9,                                            // 未初始化
         #pragma endregion
 
         #pragma region SOCKET[500, 599]
