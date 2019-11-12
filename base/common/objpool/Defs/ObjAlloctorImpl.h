@@ -257,9 +257,7 @@ inline void IObjAlloctor<ObjType>::_NewNode()
 template<typename ObjType>
 inline void * IObjAlloctor<ObjType>::_AllocFromSys()
 {
-    char *ptr = reinterpret_cast<char *>(::malloc(sizeof(ObjBlock<ObjType>) + sizeof(ObjType)));
-    reinterpret_cast<ObjBlock<ObjType> *>(ptr)->_isNotInPool = true;
-    return ptr + sizeof(ObjBlock<ObjType>);
+    return ::malloc(sizeof(ObjType));
 }
 
 FS_NAMESPACE_END

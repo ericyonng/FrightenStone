@@ -485,6 +485,16 @@ public:
     {
     }
 
+    virtual void OnSessionDisconnected(UInt64 sessionId)
+    {
+        auto user = GetUser(sessionId);
+        if(user)
+            user->OnDisconnect();
+
+        RemoveUser(sessionId);
+        // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
+    }
+
     virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
     {
         auto user = GetUser(sessionId);
@@ -510,10 +520,15 @@ public:
 
                 // 返回包
                 ++user->_recvMsgId;
-                fs::LoginRes ret;
-                ret._msgId = user->_sendMsgId;
-                user->SendData(sessionId, generatorId, &ret);
-                ++user->_sendMsgId;
+
+                for(Int32 i = 0; i < 1; ++i)
+                {
+                    fs::LoginRes ret;
+                    ret._msgId = user->_sendMsgId;
+                    user->SendData(sessionId, generatorId, &ret);
+                    ++user->_sendMsgId;
+                }
+
                 return;
             }//接收 消息---处理 发送   生产者 数据缓冲区  消费者 
             break;
@@ -574,15 +589,6 @@ public:
         }
 
         return;
-    }
-    virtual void OnSessionDisconnected(UInt64 sessionId)
-    {
-        auto user = GetUser(sessionId);
-        if(user)
-            user->OnDisconnect();
-
-        RemoveUser(sessionId);
-        // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }
 };
 
