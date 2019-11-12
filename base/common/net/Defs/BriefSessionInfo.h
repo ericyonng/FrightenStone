@@ -46,6 +46,7 @@ struct BASE_EXPORT BriefSessionInfo
 
     Int32 _transferId;
     UInt64 _sessionId;
+    FS_Addr _addr;
 };
 
 FS_NAMESPACE_END

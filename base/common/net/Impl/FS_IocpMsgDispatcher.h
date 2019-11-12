@@ -69,6 +69,7 @@ public:
     virtual void SendData(UInt64 sessionId,  UInt64 consumerId, NetMsg_DataHeader *msg);
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
     virtual void AttachRecvMessageQueue(ConcurrentMessageQueue *messageQueue);
+    virtual Int32 GetId() const;
 
 private:
     // msgData会拷贝到内存池创建的缓冲区中 线程不安全，外部需要加锁

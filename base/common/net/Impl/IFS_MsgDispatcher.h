@@ -68,8 +68,9 @@ public:
     // consumerId 网络消息消费者id
     virtual void SendData(UInt64 sessionId, UInt64 consumerId, NetMsg_DataHeader *msg) = 0;
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic) = 0;
-
     virtual void AttachRecvMessageQueue(ConcurrentMessageQueue *messageQueue) = 0;
+
+    virtual Int32 GetId() const = 0;
 };
 
 FS_NAMESPACE_END
