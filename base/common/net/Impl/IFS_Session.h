@@ -84,7 +84,7 @@ public:
     void UpdateHeartBeatExpiredTime();
 
     // 一个session只投递一个send，发完再继续发下一个，务必从队列头开始投递
-    bool Send(NetMsg_DataHeader *header);   // 请外部调用的时候务必加锁
+    bool PushMsgToSend(NetMsg_DataHeader *header);   // 请外部调用的时候务必加锁
 
     /* 事件 */
 public:

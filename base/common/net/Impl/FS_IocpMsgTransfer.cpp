@@ -542,7 +542,7 @@ void FS_IocpMsgTransfer::_AsynSendFromDispatcher()
         {
             if(session->CanPost())
             {
-                if(!session->Send(header))
+                if(!session->PushMsgToSend(header))
                 {
                     g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg fail"), sendMsgBufferBlock->_sessionId);
                 }

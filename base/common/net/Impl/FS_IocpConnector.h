@@ -91,6 +91,8 @@ private:
     void _OnIocpMonitorTask(FS_ThreadPool *threadPool);
     void _PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, IoDataBase **&ioDataArray);
     void _FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray);
+    void _AddToUsedIoDataBaseQueue(IoDataBase *used);
+    void _PostAcceptFromUsedDataBaseQuue(FS_Iocp *listenIocp);
 
     #pragma endregion
 
@@ -110,8 +112,17 @@ private:
     Int32 _maxSessionQuantityLimit;
     UInt64 _curMaxSessionId;
     const UInt64 _maxSessionIdLimit;
+
+    std::list<IoDataBase *> _usedIoQueue;
 #pragma endregion
 };
+
+#pragma region inline
+inline void FS_IocpConnector::_AddToUsedIoDataBaseQueue(IoDataBase *used)
+{
+    _usedIoQueue.push_back(used);
+}
+#pragma endregion
 
 FS_NAMESPACE_END
 
