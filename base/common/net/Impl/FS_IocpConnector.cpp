@@ -310,7 +310,8 @@ void FS_IocpConnector::_OnIocpMonitorTask(FS_ThreadPool *threadPool)
             listenIocp->GetClientAddrInfo(ioEvent._ioData->_wsaBuff.buf, clientAddrInfo);
             _OnConnected(ioEvent._ioData->_sock, clientAddrInfo, listenIocp);
 
-            // 继续向IOCP投递接受连接任务
+            // 继续向IOCP投递接受连接任务 已经预先post 10万个sock资源不用再post浪费套接字资源
+            // 添加到已使用队列
             const auto st = listenIocp->PostAccept(_sock, ioEvent._ioData);
             if(st != StatusDefs::Success)
             {
@@ -376,6 +377,19 @@ void FS_IocpConnector::_FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **
     g_MemoryPool->Free(bufArray);
     g_MemoryPool->Free(ioDataArray);
     g_MemoryPool->Unlock();
+}
+
+void FS_IocpConnector::_PostAcceptFromUsedDataBaseQuue(FS_Iocp *listenIocp)
+{
+    auto ioDataBase = _usedIoQueue.front();
+    _usedIoQueue.pop_front();
+
+    auto st = listenIocp->PostAccept(_sock, ioDataBase);
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("prepare post accept fail sock[%llu] st[%d]")
+                                   , _sock, st);
+    }
 }
 
 FS_NAMESPACE_END

@@ -89,7 +89,7 @@ void IFS_Session::UpdateHeartBeatExpiredTime()
     _heartBeatExpiredTime.FlushAppendTime(_heartbeatInterval*Time::_microSecondPerMilliSecond);
 }
 
-bool IFS_Session::Send(NetMsg_DataHeader *header)
+bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
 {
     if(_isDestroy)
         return false;
