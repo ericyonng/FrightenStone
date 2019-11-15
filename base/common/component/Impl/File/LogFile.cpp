@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_IMPL(LogFile, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+MEM_POOL_CREATE_IMPL_DEF(LogFile);
 
 LogFile::LogFile()
     :_partNo(0)

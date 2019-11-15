@@ -35,7 +35,8 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/memorypool/memorypool.h"
 
 #pragma region IOCP macro
 #define IO_DATA_BUFF_SIZE 1024          // io数据缓冲大小
@@ -65,7 +66,7 @@ public:
 class BASE_EXPORT IFS_Buffer;
 struct BASE_EXPORT BufferQueueNode
 {
-    OBJ_POOL_CREATE_DEF(BufferQueueNode);
+    MEM_POOL_CREATE_DEF();
     BufferQueueNode();
     ~BufferQueueNode();
 
@@ -75,7 +76,7 @@ struct BASE_EXPORT BufferQueueNode
 
 struct BASE_EXPORT IoDataBase
 {
-    OBJ_POOL_CREATE(IoDataBase, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 
 public:
     IoDataBase():_node(NULL){}
@@ -102,7 +103,7 @@ public:
 
 struct BASE_EXPORT IO_EVENT
 {
-    OBJ_POOL_CREATE(IO_EVENT, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 
     IO_EVENT();
     union

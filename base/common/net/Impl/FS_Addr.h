@@ -35,7 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 #include "base/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
@@ -44,7 +44,7 @@ class BASE_EXPORT IFS_Session;
 
 class BASE_EXPORT FS_Addr
 {
-    OBJ_POOL_CREATE_DEF(FS_Addr);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo);
     ~FS_Addr();

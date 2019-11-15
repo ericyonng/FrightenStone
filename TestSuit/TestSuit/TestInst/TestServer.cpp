@@ -495,11 +495,16 @@ public:
         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }
 
+    virtual void OnSessionConnected(UInt64 sessionId)
+    {
+        NewUser(sessionId);
+    }
+
     virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
     {
         auto user = GetUser(sessionId);
         if(!user)
-            user = NewUser(sessionId);
+            return;
 
         // g_Log->any<MyLogic>("sessionid[%llu] handle a msg", sessionId);
         switch(msgData->_cmd)

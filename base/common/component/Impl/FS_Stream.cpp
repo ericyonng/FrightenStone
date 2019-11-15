@@ -34,13 +34,13 @@
 #include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_IMPL(FS_Stream, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+MEM_POOL_CREATE_IMPL_DEF(FS_Stream);
 
 FS_Stream::FS_Stream(int size)
 {
     _size = size;
     g_MemoryPool->Lock();
-    _buff = reinterpret_cast<char *>(g_MemoryPool->Alloc(_size));
+    _buff = reinterpret_cast<char *>(g_MemoryPool->Alloc<char>(_size));
     g_MemoryPool->Unlock();
     _isPoolCreate = true;
     _needDelete = true;
@@ -141,7 +141,7 @@ bool FS_Stream::DeserializeFrom(const FS_String &str)
         if(_isPoolCreate)
         {
             g_MemoryPool->Lock();
-            _buff = reinterpret_cast<char *>(g_MemoryPool->Alloc(_size));
+            _buff = reinterpret_cast<char *>(g_MemoryPool->Alloc<char>(_size));
             g_MemoryPool->Unlock();
         }
         else

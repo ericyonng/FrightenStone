@@ -33,5 +33,5 @@
 #include "base/common/net/Impl/FS_MsgReadStream.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_IMPL(FS_MsgReadStream, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
+MEM_POOL_CREATE_IMPL_DEF(FS_MsgReadStream);
 FS_NAMESPACE_END

@@ -43,6 +43,7 @@ LogDataCache::LogDataCache()
 
 fs::LogDataCache::~LogDataCache()
 {
+    STLUtil::DelListContainer(*_cache);
     Fs_SafeFree(_cache);
 }
 

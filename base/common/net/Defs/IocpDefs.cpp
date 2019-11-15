@@ -34,9 +34,9 @@
 #include "base/common/net/Defs/IFS_Buffer.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_IMPL(IoDataBase, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
-OBJ_POOL_CREATE_IMPL(IO_EVENT, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__);
-OBJ_POOL_CREATE_DEF_IMPL(BufferQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
+MEM_POOL_CREATE_IMPL_DEF(IoDataBase);
+MEM_POOL_CREATE_IMPL_DEF(IO_EVENT);
+MEM_POOL_CREATE_IMPL_DEF(BufferQueueNode);
 
 BufferQueueNode::~BufferQueueNode()
 {

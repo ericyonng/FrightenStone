@@ -35,7 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 #include<MSWSock.h>
 
 FS_NAMESPACE_BEGIN
@@ -45,7 +45,7 @@ struct BASE_EXPORT IO_EVENT;
 
 class BASE_EXPORT FS_Iocp
 {
-    OBJ_POOL_CREATE(FS_Iocp, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_Iocp();
     virtual ~FS_Iocp();

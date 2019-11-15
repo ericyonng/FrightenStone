@@ -40,7 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_IMPL(FS_IniFile, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+MEM_POOL_CREATE_IMPL_DEF(FS_IniFile);
 
 FS_IniFile::FS_IniFile()
 {

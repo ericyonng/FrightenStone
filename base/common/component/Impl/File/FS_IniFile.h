@@ -36,7 +36,7 @@
 #include <base/exportbase.h>
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -44,7 +44,7 @@ class FS_String;
 class Locker;
 class BASE_EXPORT FS_IniFile
 {
-    OBJ_POOL_CREATE(FS_IniFile, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_IniFile();
     virtual ~FS_IniFile();

@@ -45,7 +45,7 @@ FS_NAMESPACE_BEGIN
 class FS_String;
 class BASE_EXPORT FS_Aes
 {
-    OBJ_POOL_CREATE(FS_Aes, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_Aes();
     virtual ~FS_Aes();
