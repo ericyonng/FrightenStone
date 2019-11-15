@@ -46,7 +46,7 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT FS_MessageBlock
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_MessageBlock);
 
     FS_MessageBlock();
     virtual ~FS_MessageBlock();
@@ -72,7 +72,7 @@ public:
 
 struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_NetMsgBlock);
 
     FS_NetMsgBlock();
     ~FS_NetMsgBlock();
@@ -82,7 +82,7 @@ struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
 
 struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_NetMsgBufferBlock);
 
     FS_NetMsgBufferBlock();
     ~FS_NetMsgBufferBlock();

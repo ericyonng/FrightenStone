@@ -80,7 +80,7 @@ public:
 
 struct BASE_EXPORT NetMsg_DataHeader
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(NetMsg_DataHeader);
 
     NetMsg_DataHeader();
     
@@ -102,7 +102,7 @@ struct BASE_EXPORT NetMsg_DataHeader
 
 struct BASE_EXPORT LoginReq : public NetMsg_DataHeader
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(LoginReq);
     LoginReq();
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
@@ -112,7 +112,7 @@ struct BASE_EXPORT LoginReq : public NetMsg_DataHeader
 
 struct BASE_EXPORT LoginRes : public NetMsg_DataHeader
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(LoginRes);
     LoginRes();
 
     Int32 _result;
@@ -122,7 +122,7 @@ struct BASE_EXPORT LoginRes : public NetMsg_DataHeader
 
 struct BASE_EXPORT LoginNty : public NetMsg_DataHeader
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(LoginNty);
     LoginNty();
     
     char _userName[MAX_NAME_LEN];
@@ -131,21 +131,21 @@ struct BASE_EXPORT LoginNty : public NetMsg_DataHeader
 
 struct BASE_EXPORT CreatePlayerNty : public NetMsg_DataHeader
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(CreatePlayerNty);
     CreatePlayerNty();
     Int32 _socket;
 };
 
 struct BASE_EXPORT CheckHeartReq : public NetMsg_DataHeader
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(CheckHeartReq);
 
     CheckHeartReq();
 };
 
 struct BASE_EXPORT CheckHeartRes : public NetMsg_DataHeader
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(CheckHeartRes);
 
     CheckHeartRes();
 };

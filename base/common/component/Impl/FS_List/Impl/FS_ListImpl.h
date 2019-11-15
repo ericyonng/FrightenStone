@@ -33,7 +33,13 @@
 #pragma once
 
 template<typename ObjType>
-MEM_POOL_CREATE_IMPL_DEF(fs::FS_List<ObjType>);
+fs::ObjPoolHelper<fs:: FS_List<ObjType>> *fs:: FS_List<ObjType>::_objPoolHelper = fs::Singleton<fs::ObjPoolHelper<fs:: FS_List<ObjType>>, fs::AssistObjsDefs::NoDel>::GetInstance(__DEF_OBJ_POOL_OBJ_NUM__);
+
+template<typename ObjType>
+inline size_t fs:: FS_List<ObjType>::GetMemleakNum()
+{
+    return _objPoolHelper->GetMemleakObjNum();
+}
 
 FS_NAMESPACE_BEGIN
 

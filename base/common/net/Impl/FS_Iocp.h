@@ -45,7 +45,7 @@ struct BASE_EXPORT IO_EVENT;
 
 class BASE_EXPORT FS_Iocp
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_Iocp);
 public:
     FS_Iocp();
     virtual ~FS_Iocp();

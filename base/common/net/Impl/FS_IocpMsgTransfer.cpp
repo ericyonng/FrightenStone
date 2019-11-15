@@ -272,6 +272,8 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 //         // 重新投递接收
         if(session->CanPost())
             _toPostRecv.insert(session);
+
+        // _OnMsgArrived();
     }
     else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
     {

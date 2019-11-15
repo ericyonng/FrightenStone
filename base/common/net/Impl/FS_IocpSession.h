@@ -48,7 +48,7 @@ class BASE_EXPORT FS_IocpBuffer;
 
 class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_IocpSession);
 public:
     FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
     virtual ~FS_IocpSession();

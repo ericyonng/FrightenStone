@@ -123,7 +123,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT SmartVar
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(SmartVar);
 public:
     typedef std::map<SmartVar, SmartVar> Dict;
     typedef FS_String Str;

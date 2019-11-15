@@ -50,7 +50,7 @@ class BASE_EXPORT IFS_Buffer;
 
 class BASE_EXPORT IFS_Session
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(IFS_Session);
 public:
     explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
     virtual ~IFS_Session();

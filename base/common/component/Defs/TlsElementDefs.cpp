@@ -33,9 +33,9 @@
 #include "base/common/component/Defs/TlsElementDefs.h"
 
 FS_NAMESPACE_BEGIN
-MEM_POOL_CREATE_IMPL_DEF(Tls_Rtti);
-MEM_POOL_CREATE_IMPL_DEF(Tls_TestTls);
-MEM_POOL_CREATE_IMPL_DEF(Tls_MemoryPool);
+OBJ_POOL_CREATE_DEF_IMPL(Tls_Rtti, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(Tls_TestTls, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(Tls_MemoryPool, __DEF_OBJ_POOL_OBJ_NUM__);
 
 Tls_MemoryPool::Tls_MemoryPool()
 {

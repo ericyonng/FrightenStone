@@ -42,7 +42,7 @@
 #include "base/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
-MEM_POOL_CREATE_IMPL_DEF(MessageQueue);
+OBJ_POOL_CREATE_DEF_IMPL(MessageQueue, __DEF_OBJ_POOL_OBJ_NUM__);
 
 MessageQueue::MessageQueue()
     :_msgGeneratorChange{false}
@@ -162,14 +162,14 @@ void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
 //     _msgConsumerGuard.Lock();
 //     _msgConsumerGuard.ResetSinal();
 //     _msgConsumerGuard.Unlock();
-    g_Log->sys<MessageQueue>(_LOGFMT_("_MsgQueueWaiterThread quit threadId[%lu]"), SystemUtil::GetCurrentThreadId()));
+    g_Log->sys<MessageQueue>(_LOGFMT_("_MsgQueueWaiterThread quit threadId[%lu]"), SystemUtil::GetCurrentThreadId());
 
     _isWorking = false;
 }
 
 /////// 多生产者多消费者
 
-MEM_POOL_CREATE_IMPL_DEF(ConcurrentMessageQueue);
+OBJ_POOL_CREATE_DEF_IMPL(ConcurrentMessageQueue, __DEF_OBJ_POOL_OBJ_NUM__);
 
 ConcurrentMessageQueue::ConcurrentMessageQueue(UInt32 generatorQuantity, UInt32 consumerQuantity)
     :_generatorQuantity{generatorQuantity}

@@ -42,7 +42,7 @@
 #include "base/common/assist/utils/Impl/STLUtil.h"
 #include "base/common/socket/socket.h"
 
-MEM_POOL_CREATE_IMPL_DEF(fs::IFS_Session)
+OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 

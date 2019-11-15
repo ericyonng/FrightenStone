@@ -50,7 +50,7 @@ class FS_String;
 
 class BASE_EXPORT FS_File
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_File);
 public:
     FS_File();
     virtual ~FS_File();

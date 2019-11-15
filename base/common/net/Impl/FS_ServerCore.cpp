@@ -277,8 +277,20 @@ void FS_ServerCore::Close()
     // STLUtil::DelVectorContainer(_logics);
     SocketUtil::ClearSocketEnv();
 
+    STLUtil::DelVectorContainer<decltype(_logics), AssistObjsDefs::SelfRelease>(_logics);
+    Fs_SafeFree(_pool);
+    Fs_SafeFree(_connector);
+    STLUtil::DelVectorContainer(_msgDispatchers);
+    STLUtil::DelVectorContainer(_msgTransfers);
+    Fs_SafeFree(_cpuInfo);
+    Fs_SafeFree(_serverConfigMgr);
+    g_ServerCore = NULL;
+
     // 当前日志全部着盘
+    g_MemleakMonitor->Finish();
     g_Log->FlushAllFile();
+    g_Log->FinishModule();
+    g_MemoryPool->FinishPool();
 }
 
 #pragma endregion

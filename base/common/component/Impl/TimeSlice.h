@@ -45,7 +45,7 @@ class FS_String;
 
 class BASE_EXPORT TimeSlice
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(TimeSlice);
 public:
     /**
 

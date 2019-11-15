@@ -46,7 +46,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_IocpBuffer : public IFS_Buffer
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_IocpBuffer);
 public:
     explicit FS_IocpBuffer(size_t bufferSize);
     virtual ~FS_IocpBuffer();
