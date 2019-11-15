@@ -38,7 +38,7 @@
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/component/Impl/FS_String.h"
 #include <map>
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -123,7 +123,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT SmartVar
 {
-    OBJ_POOL_CREATE(SmartVar, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     typedef std::map<SmartVar, SmartVar> Dict;
     typedef FS_String Str;

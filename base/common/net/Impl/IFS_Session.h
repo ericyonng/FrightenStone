@@ -34,7 +34,7 @@
 #pragma once
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 #include "base/common/component/Impl/Time.h"
 #include "base/common/net/Defs/FS_NetDefs.h"
 
@@ -50,7 +50,7 @@ class BASE_EXPORT IFS_Buffer;
 
 class BASE_EXPORT IFS_Session
 {
-    OBJ_POOL_CREATE_DEF(IFS_Session);
+    MEM_POOL_CREATE_DEF();
 public:
     explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
     virtual ~IFS_Session();

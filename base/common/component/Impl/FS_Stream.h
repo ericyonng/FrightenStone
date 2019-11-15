@@ -47,7 +47,7 @@ FS_NAMESPACE_BEGIN
 // 若是由内存池创建的缓冲区，在写入时支持缓冲区自增长
 class BASE_EXPORT FS_Stream
 {
-    OBJ_POOL_CREATE(FS_Stream, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_Stream();
     FS_Stream(Byte8 *data, Int32 size, bool needDelete = false, bool isPoolCreate = false);

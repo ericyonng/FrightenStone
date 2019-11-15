@@ -69,6 +69,7 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
     Fs_SafeFree(_iocp);
     Fs_SafeFree(_ioEvent);
     STLUtil::DelListContainer(*_senderMsgs);
+    Fs_SafeFree(_senderMsgs);
 }
 
 Int32 FS_IocpMsgTransfer::BeforeStart()
@@ -174,6 +175,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
         // 3.判断是否有session
         if(_sessions.empty())
         {
+            _AsynSendFromDispatcher();
             SocketUtil::Sleep(1);
             continue;
         }
@@ -235,8 +237,8 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
     auto session = _GetSession(sessionId);
     if(!session)
     {// 数据丢失,最大可能是已经断开链接了！！！！
-        g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] is removed before.\n stack trace back:\n%s"
-                                     , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+//         g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] is removed before.\n stack trace back:\n%s"
+//                                      , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
         return StatusDefs::Success;
     }
 
@@ -357,6 +359,10 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
     _messageQueue->PushLock(_generatorId);
     _messageQueue->Push(_generatorId, recvMsgList);
     _messageQueue->PushUnlock(_generatorId);
+    if(!recvMsgList->empty())
+        g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", recvMsgList->size());
+    STLUtil::DelListContainer(*recvMsgList);
+    Fs_SafeFree(recvMsgList);
 }
 
 void FS_IocpMsgTransfer::_OnDelayDisconnected(FS_IocpSession *session)
@@ -453,6 +459,18 @@ bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session)
     return true;
 }
 
+void FS_IocpMsgTransfer::_NtySessionConnectedMsg(UInt64 sessionId)
+{
+    FS_NetMsgBufferBlock *newMsgBlock = new FS_NetMsgBufferBlock;
+    newMsgBlock->_generatorId = _id;
+    newMsgBlock->_mbType = MessageBlockType::MB_NetSessionConnected;
+    newMsgBlock->_sessionId = sessionId;
+    _messageQueue->PushLock(_id);
+    _messageQueue->Push(_id, newMsgBlock);
+    _messageQueue->Notify(_id);
+    _messageQueue->PushUnlock(_id);
+}
+
 void FS_IocpMsgTransfer::_ClearSessionsWhenClose()
 {
     for(auto &iterSession : _sessions)
@@ -532,11 +550,11 @@ void FS_IocpMsgTransfer::_AsynSendFromDispatcher()
         auto session = _GetSession(sendMsgBufferBlock->_sessionId);
         if(!session)
         {
-            g_Log->net<FS_IocpMsgTransfer>("sessionid[%llu] destroyed net cmd[%s:%hu] datalen[%hu]"
-                                           , sendMsgBufferBlock->_sessionId
-                                           , ProtocolCmd::GetStr(header->_cmd)
-                                           , header->_cmd
-                                           , header->_packetLength);
+//             g_Log->net<FS_IocpMsgTransfer>("sessionid[%llu] destroyed net cmd[%s:%hu] datalen[%hu]"
+//                                            , sendMsgBufferBlock->_sessionId
+//                                            , ProtocolCmd::GetStr(header->_cmd)
+//                                            , header->_cmd
+//                                            , header->_packetLength);
         }
         else
         {
@@ -645,6 +663,9 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("reg socket[%llu] sessionId[%llu] fail st[%d]")
                                              , session->GetSocket(), session->GetSessionId(), st);
             }
+
+            // 推送会话连入消息
+            _NtySessionConnectedMsg(session->GetSessionId());
 
             // 投递接收数据
             if(!_DoPostRecv(session))

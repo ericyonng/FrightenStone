@@ -40,13 +40,13 @@
 #include "base/common/component/Impl/TimeSlice.h"
 #include "base/common/component/Impl/TimeWheel/Comp/TimeData.h"
 #include <set>
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT TimeWheel
 {
-    OBJ_POOL_CREATE(fs::TimeWheel, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     explicit TimeWheel(const TimeSlice &resolutionSlice);
     virtual ~TimeWheel();

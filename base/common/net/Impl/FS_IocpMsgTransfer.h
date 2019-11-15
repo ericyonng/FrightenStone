@@ -93,6 +93,9 @@ private:
     bool _DoPostSend(FS_IocpSession *session);
     bool _DoPostRecv(FS_IocpSession *session);
 
+private:
+    void _NtySessionConnectedMsg(UInt64 sessionId);
+
     // ¸¨Öú
 private:
     FS_IocpSession *_GetSession(UInt64 sessionId);

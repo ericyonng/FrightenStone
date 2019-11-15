@@ -40,11 +40,11 @@
 #define __MEMORY_POOL_MINIMUM_BLOCK__        64          // 最小内存块64字节
 
 #undef __MEMORY_POOL_MAXIMUM_BLOCK__
-#define __MEMORY_POOL_MAXIMUM_BLOCK__        65536       // 最大内存块64K 只支持64的倍数
+#define __MEMORY_POOL_MAXIMUM_BLOCK__        131072       // 最大内存块128K 只支持64的倍数
 
 #define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // 能够支持的最大内存块范围
 
-#define __MEMORY_POOL_MAX_EXPAND_BYTES__    2147483648llu      // 内存池最大只支持到2GB，其他情况使用系统分配
+#define __MEMORY_POOL_MAX_EXPAND_BYTES__    4294967296llu      // 内存池最大只支持到4GB，其他情况使用系统分配
 
 #ifndef BLOCK_AMOUNT_DEF
 #define BLOCK_AMOUNT_DEF    128    // 默认内存块数量

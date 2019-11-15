@@ -46,7 +46,7 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT FS_MessageBlock
 {
-    OBJ_POOL_CREATE_DEF(FS_MessageBlock);
+    MEM_POOL_CREATE_DEF();
 
     FS_MessageBlock();
     virtual ~FS_MessageBlock();
@@ -66,12 +66,13 @@ public:
         MB_NetMsgArrived = 1,           // 收到网络包
         MB_NetMsgSended = 2,            // 发送网络包
         MB_NetSessionDisconnect = 3,    // 会话断开
+        MB_NetSessionConnected = 4,     // 会话连入
     };
 };
 
 struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
 {
-    OBJ_POOL_CREATE_DEF(FS_NetMsgBlock);
+    MEM_POOL_CREATE_DEF();
 
     FS_NetMsgBlock();
     ~FS_NetMsgBlock();
@@ -81,7 +82,7 @@ struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
 
 struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
 {
-    OBJ_POOL_CREATE_DEF(FS_NetMsgBufferBlock);
+    MEM_POOL_CREATE_DEF();
 
     FS_NetMsgBufferBlock();
     ~FS_NetMsgBufferBlock();

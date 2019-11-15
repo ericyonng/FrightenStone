@@ -41,7 +41,7 @@
 //#include "base/common/component/Impl/FS_String.h"
 #include "base/common/asyn/Lock/Lock.h"
 // #include <string>
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -50,7 +50,7 @@ class FS_String;
 
 class BASE_EXPORT FS_File
 {
-    OBJ_POOL_CREATE(fs::FS_File, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_File();
     virtual ~FS_File();

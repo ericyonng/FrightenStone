@@ -40,6 +40,7 @@
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/net/Defs/IFS_Buffer.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,7 +48,7 @@ class BASE_EXPORT FS_IocpBuffer;
 
 class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
-    OBJ_POOL_CREATE_DEF(FS_IocpSession);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
     virtual ~FS_IocpSession();

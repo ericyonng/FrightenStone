@@ -40,13 +40,13 @@
 #include "base/common/net/Defs/IocpDefs.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 #include "base/common/net/protocol/protocol.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_IocpBuffer : public IFS_Buffer
 {
-    OBJ_POOL_CREATE_DEF(FS_IocpBuffer);
+    MEM_POOL_CREATE_DEF();
 public:
     explicit FS_IocpBuffer(size_t bufferSize);
     virtual ~FS_IocpBuffer();

@@ -38,14 +38,14 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/component/Impl/FS_Stream.h"
 #include "base/common/net/protocol/protocol.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
 // 消息数据字节流
 class BASE_EXPORT FS_MsgReadStream :public FS_Stream
 {
-    OBJ_POOL_CREATE(FS_MsgReadStream, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_MsgReadStream(NetMsg_DataHeader *header);
     FS_MsgReadStream(char *data, Int32 size, bool isDelete = false, bool isPoolCreate = false);

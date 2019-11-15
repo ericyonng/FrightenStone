@@ -87,7 +87,7 @@ std::ostream &operator <<(std::ostream &o, const FS_NS SmartVar &smartVar)
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_IMPL(SmartVar, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
+MEM_POOL_CREATE_IMPL_DEF(SmartVar);
 
 static void BecomeAndAllocDict(SmartVar &var, SmartVar::Raw &raw)
 {

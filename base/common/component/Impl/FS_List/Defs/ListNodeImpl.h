@@ -33,15 +33,15 @@
 #pragma once
 
 template<typename ObjType>
-fs::ObjPoolHelper<fs::ListNode<ObjType>> *fs::ListNode<ObjType>::_objPoolHelper = new fs::ObjPoolHelper<fs::ListNode<ObjType>> (__DEF_OBJ_POOL_OBJ_NUM__);
+MEM_POOL_CREATE_IMPL_DEF(fs::ListNode<ObjType>);
 
 FS_NAMESPACE_BEGIN
 
-template<typename ObjType>
-inline size_t ListNode<ObjType>::GetMemleakNum()
-{
-    return _objPoolHelper.GetMemleakObjNum();
-}
+// template<typename ObjType>
+// inline size_t ListNode<ObjType>::GetMemleakNum()
+// {
+//     return _objPoolHelper.GetMemleakObjNum();
+// }
 
 template<typename ObjType>
 inline ListNode<ObjType>::ListNode(ObjType obj)

@@ -35,7 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 #include "base/common/component/Impl/FS_List/Defs/ListNode.h"
 
 FS_NAMESPACE_BEGIN
@@ -43,7 +43,7 @@ FS_NAMESPACE_BEGIN
 template<typename ObjType>
 class FS_List
 {
-    OBJ_POOL_CREATE(FS_List<ObjType>, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     FS_List();
     ~FS_List();

@@ -56,6 +56,7 @@ inline bool FS_Log::_IsAllowToConsole(Int32 level) const
 {
     if(level == LogLevel::Net ||
        level == LogLevel::MemPool ||
+       level == LogLevel::Memleak ||
        level == LogLevel::ObjPool)
         return false;
 

@@ -39,7 +39,7 @@
 #include "base/common/component/Impl/FS_String.h"
 #include "base/common/assist/utils/Impl/TimeUtil.h"
 #include <chrono>
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,7 +47,7 @@ class TimeSlice;
 
 class BASE_EXPORT Time 
 {
-    OBJ_POOL_CREATE(Time, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
     #pragma region 
 public:
     static const Int64 _hourPerDay;

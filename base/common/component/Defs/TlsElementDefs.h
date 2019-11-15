@@ -37,7 +37,7 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/component/Defs/ITlsBase.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 // 类型识别缓冲大小
 #ifndef __FS_RTTI_BUF_SIZE__
@@ -66,7 +66,7 @@ public:
 // 类型识别线程局部存储
 struct BASE_EXPORT Tls_Rtti : public ITlsBase
 {
-    OBJ_POOL_CREATE_DEF(Tls_Rtti);
+    MEM_POOL_CREATE_DEF();
 
     Tls_Rtti();
     virtual ~Tls_Rtti();
@@ -78,7 +78,7 @@ struct BASE_EXPORT Tls_Rtti : public ITlsBase
 // 测试线程局部存储
 struct BASE_EXPORT Tls_TestTls : public ITlsBase
 {
-    OBJ_POOL_CREATE_DEF(Tls_TestTls);
+    MEM_POOL_CREATE_DEF();
 
     Tls_TestTls();
     virtual ~Tls_TestTls();
@@ -89,7 +89,7 @@ struct BASE_EXPORT Tls_TestTls : public ITlsBase
 // 线程局部内存池，仅限于线程生命周期内使用，其他情况会出现未定义
 struct BASE_EXPORT Tls_MemoryPool : public ITlsBase
 {
-    OBJ_POOL_CREATE_DEF(Tls_MemoryPool);
+    MEM_POOL_CREATE_DEF();
 
     Tls_MemoryPool();
     virtual ~Tls_MemoryPool();

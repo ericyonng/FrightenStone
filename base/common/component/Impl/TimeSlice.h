@@ -36,7 +36,7 @@
 
 #include "base/common/basedefs/DataType/DataType.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -45,7 +45,7 @@ class FS_String;
 
 class BASE_EXPORT TimeSlice
 {
-    OBJ_POOL_CREATE(fs::TimeSlice, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 public:
     /**
 

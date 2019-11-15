@@ -31,12 +31,11 @@
  */
 #include "stdafx.h"
 #include "base/common/component/Defs/TlsElementDefs.h"
-#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(Tls_Rtti, 2);
-OBJ_POOL_CREATE_DEF_IMPL(Tls_TestTls, 10);
-OBJ_POOL_CREATE_DEF_IMPL(Tls_MemoryPool, 1);
+MEM_POOL_CREATE_IMPL_DEF(Tls_Rtti);
+MEM_POOL_CREATE_IMPL_DEF(Tls_TestTls);
+MEM_POOL_CREATE_IMPL_DEF(Tls_MemoryPool);
 
 Tls_MemoryPool::Tls_MemoryPool()
 {

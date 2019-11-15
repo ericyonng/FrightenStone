@@ -272,6 +272,10 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
             auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
             _DoBusinessProcess(netMsgBlock->_sessionId, netMsgBlock->_generatorId, netMsg);
         }
+        else if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionConnected)
+        {
+            _logic->OnSessionConnected(netMsgBlock->_sessionId);
+        }
 
         Fs_SafeFree(netMsgBlock);
         iterBlock = _recvMsgBlocks->erase(iterBlock);

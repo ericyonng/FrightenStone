@@ -37,7 +37,7 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/component/Impl/TimeSlice.h"
 #include <list>
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -54,7 +54,7 @@ public:
 
 class BASE_EXPORT TimeData
 {
-    OBJ_POOL_CREATE_DEF(TimeData);
+    MEM_POOL_CREATE_DEF();
 public:
     explicit TimeData(FS_Timer *timer);
     virtual ~TimeData();
@@ -88,7 +88,7 @@ public:
 
 class BASE_EXPORT AsynTimeData
 {
-    OBJ_POOL_CREATE_DEF(AsynTimeData);
+    MEM_POOL_CREATE_DEF();
 public:
     AsynTimeData();
     Int32 _opType;                      // AsynOpType

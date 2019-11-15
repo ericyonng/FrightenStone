@@ -35,14 +35,14 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
-#include "base/common/objpool/objpool.h"
+#include "base/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
 struct ListNode
 {
-    OBJ_POOL_CREATE(ListNode<ObjType>, _objPoolHelper);
+    MEM_POOL_CREATE_DEF();
 
 public:
     ListNode(ObjType obj);
