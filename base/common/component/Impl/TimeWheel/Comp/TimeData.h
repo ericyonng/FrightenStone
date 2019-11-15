@@ -54,7 +54,7 @@ public:
 
 class BASE_EXPORT TimeData
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(TimeData);
 public:
     explicit TimeData(FS_Timer *timer);
     virtual ~TimeData();
@@ -88,7 +88,7 @@ public:
 
 class BASE_EXPORT AsynTimeData
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(AsynTimeData);
 public:
     AsynTimeData();
     Int32 _opType;                      // AsynOpType

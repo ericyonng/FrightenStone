@@ -44,7 +44,7 @@ class FS_String;
 class Locker;
 class BASE_EXPORT FS_IniFile
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_IniFile);
 public:
     FS_IniFile();
     virtual ~FS_IniFile();

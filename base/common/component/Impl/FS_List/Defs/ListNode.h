@@ -42,7 +42,7 @@ FS_NAMESPACE_BEGIN
 template<typename ObjType>
 struct ListNode
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(ListNode<ObjType>);
 
 public:
     ListNode(ObjType obj);

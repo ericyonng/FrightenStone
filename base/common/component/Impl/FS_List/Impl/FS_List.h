@@ -43,7 +43,7 @@ FS_NAMESPACE_BEGIN
 template<typename ObjType>
 class FS_List
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_List<ObjType>);
 public:
     FS_List();
     ~FS_List();

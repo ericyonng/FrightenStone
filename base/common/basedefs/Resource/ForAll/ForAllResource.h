@@ -45,5 +45,10 @@
 #include <set>
 #pragma endregion
 
+#pragma region base lib
+#include "base/common/memorypool/memorypool.h"
+#include "base/common/objpool/objpool.h"
+#pragma endregion
+
 
 #endif // !__Base_Common_BaseDefs_Resource_ForAll_ForAllResource_H__

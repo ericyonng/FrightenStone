@@ -71,6 +71,14 @@ void MemleakMonitor::Start()
     _printInfoPool->AddTask(DelegatePlusFactory::Create(this, &MemleakMonitor::_PrintInfoPerSeconds));
 }
 
+void MemleakMonitor::Finish()
+{
+    _printInfoPool->Close();
+    Fs_SafeFree(_printInfoPool);
+    STLUtil::DelMapContainer(_objNameRefPrintCallback);
+    _threadIdRefMemPoolPrintCallback.clear();
+}
+
 void MemleakMonitor::RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback)
 {
     _locker.Lock();

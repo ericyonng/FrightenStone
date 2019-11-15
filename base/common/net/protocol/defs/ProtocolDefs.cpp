@@ -104,7 +104,7 @@ const char * ProtocolCmd::GetStr(UInt16 cmd)
     return "";
 }
 
-MEM_POOL_CREATE_IMPL_DEF(NetMsg_DataHeader)
+OBJ_POOL_CREATE_DEF_IMPL(NetMsg_DataHeader, __DEF_OBJ_POOL_OBJ_NUM__)
 NetMsg_DataHeader::NetMsg_DataHeader()
 {
     _packetLength = 0;
@@ -116,7 +116,7 @@ NetMsg_DataHeader::NetMsg_DataHeader()
 // {
 // }
 
-MEM_POOL_CREATE_IMPL_DEF(LoginReq)
+OBJ_POOL_CREATE_DEF_IMPL(LoginReq, __DEF_OBJ_POOL_OBJ_NUM__)
 LoginReq::LoginReq()
 {
     _packetLength = sizeof(LoginReq);
@@ -125,7 +125,7 @@ LoginReq::LoginReq()
     memset(_pwd, 0, sizeof(_pwd));
 }
 
-MEM_POOL_CREATE_IMPL_DEF(LoginRes)
+OBJ_POOL_CREATE_DEF_IMPL(LoginRes, __DEF_OBJ_POOL_OBJ_NUM__)
 LoginRes::LoginRes()
 {
     _packetLength = sizeof(LoginRes);
@@ -133,7 +133,7 @@ LoginRes::LoginRes()
     _result = 0;
 }
 
-MEM_POOL_CREATE_IMPL_DEF(LoginNty)
+OBJ_POOL_CREATE_DEF_IMPL(LoginNty, __DEF_OBJ_POOL_OBJ_NUM__)
 LoginNty::LoginNty()
 {
     _packetLength = sizeof(LoginNty);
@@ -143,7 +143,7 @@ LoginNty::LoginNty()
     memset(_pwd, 0, sizeof(_pwd));
 }
 
-MEM_POOL_CREATE_IMPL_DEF(CreatePlayerNty)
+OBJ_POOL_CREATE_DEF_IMPL(CreatePlayerNty, __DEF_OBJ_POOL_OBJ_NUM__)
 CreatePlayerNty::CreatePlayerNty()
 {
     _packetLength = sizeof(CreatePlayerNty);
@@ -151,14 +151,14 @@ CreatePlayerNty::CreatePlayerNty()
     _socket = 0;
 }
 
-MEM_POOL_CREATE_IMPL_DEF(CheckHeartReq)
+OBJ_POOL_CREATE_DEF_IMPL(CheckHeartReq, __DEF_OBJ_POOL_OBJ_NUM__)
 CheckHeartReq::CheckHeartReq()
 {
     _packetLength = sizeof(CheckHeartReq);
     _cmd = ProtocolCmd::CheckHeartReq;
 }
 
-MEM_POOL_CREATE_IMPL_DEF(CheckHeartRes)
+OBJ_POOL_CREATE_DEF_IMPL(CheckHeartRes, __DEF_OBJ_POOL_OBJ_NUM__)
 CheckHeartRes::CheckHeartRes()
 {
     _packetLength = sizeof(CheckHeartRes);

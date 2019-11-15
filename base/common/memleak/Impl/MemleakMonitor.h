@@ -51,6 +51,7 @@ public:
 
     static MemleakMonitor *GetInstance();
     void Start();
+    void Finish();
 
     void RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback);
     void UnRegisterObjPool(const char *name);

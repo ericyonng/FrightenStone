@@ -44,7 +44,7 @@ class BASE_EXPORT IFS_Session;
 
 class BASE_EXPORT FS_Addr
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(FS_Addr);
 public:
     FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo);
     ~FS_Addr();

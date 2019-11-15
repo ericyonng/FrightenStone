@@ -202,8 +202,8 @@ void IMemoryAlloctor::FinishMemory()
     }
 
     // ÄÚ´æÐ¹Â©´òÓ¡
-    if(_memBlockInUse)
-        g_Log->memleak("memory pool memleak info: amount[%lld] size[%lld];", (Int64)_memBlockInUse, _memBlockInUse*_blockSize);
+//     if(_memBlockInUse)
+//         g_Log->memleak("memory pool memleak info: amount[%lld] size[%lld];", (Int64)_memBlockInUse, _memBlockInUse*_blockSize);
 }
 
 void IMemoryAlloctor::_NewNode()

@@ -66,7 +66,7 @@ public:
 class BASE_EXPORT IFS_Buffer;
 struct BASE_EXPORT BufferQueueNode
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(BufferQueueNode);
     BufferQueueNode();
     ~BufferQueueNode();
 
@@ -76,7 +76,7 @@ struct BASE_EXPORT BufferQueueNode
 
 struct BASE_EXPORT IoDataBase
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(IoDataBase);
 
 public:
     IoDataBase():_node(NULL){}
@@ -103,7 +103,7 @@ public:
 
 struct BASE_EXPORT IO_EVENT
 {
-    MEM_POOL_CREATE_DEF();
+    OBJ_POOL_CREATE_DEF(IO_EVENT);
 
     IO_EVENT();
     union
