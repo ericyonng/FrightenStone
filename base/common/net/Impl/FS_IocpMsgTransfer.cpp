@@ -252,8 +252,8 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
 
-            session->ResetAllIoMask();
-            session->Close();
+            session->ResetPostRecvMask();
+            session->MaskClose();
             _toRemove.insert(session);
             _toPostRecv.erase(session);
             _toPostSend.erase(session);
@@ -283,8 +283,8 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSessionId()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
-            session->ResetAllIoMask();
-            session->Close();
+            session->ResetPostSendMask();
+            session->MaskClose();
             _toRemove.insert(session);
             _toPostRecv.erase(session);
             _toPostSend.erase(session);
