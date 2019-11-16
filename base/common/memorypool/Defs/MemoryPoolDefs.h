@@ -42,8 +42,10 @@
 #undef __MEMORY_POOL_MAXIMUM_BLOCK__
 #define __MEMORY_POOL_MAXIMUM_BLOCK__        131072       // 最大内存块128K 只支持64的倍数
 
+#undef __MEMORY_POOL_MAXBLOCK_LIMIT__
 #define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // 能够支持的最大内存块范围
 
+#undef __MEMORY_POOL_MAX_EXPAND_BYTES__
 #define __MEMORY_POOL_MAX_EXPAND_BYTES__    4294967296llu      // 内存池最大只支持到4GB，其他情况使用系统分配
 
 #ifndef BLOCK_AMOUNT_DEF

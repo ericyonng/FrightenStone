@@ -105,6 +105,7 @@ private:
     void _ClearSessionsWhenClose();
 
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
+    void _UpdateCanCreateNewNodeForAlloctor();
     void _CheckSessionHeartbeat();  // 线程不安全
 
     void _PostEventsToIocp();
@@ -119,6 +120,7 @@ private:
 private:
     Int32 _id;
     IMemoryAlloctor *_sessionBufferAlloctor;
+    std::atomic_bool _canCreateNewNodeForAlloctor;
     std::atomic<Int32> _sessionCnt;             // 会话个数
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;

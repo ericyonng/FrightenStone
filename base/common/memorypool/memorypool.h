@@ -35,9 +35,11 @@
 #pragma once
 
 // defs...
-// interface...
+#include "base/common/memorypool/Defs/MemoryPoolDefs.h"
 #include "base/common/memorypool/Defs/MemoryAlloctor.h"
 #include "base/common/memorypool/Defs/MemoryPoolCreateDefs.h"
+
+// interface...
 #include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 
 #endif

@@ -120,6 +120,15 @@ inline void FS_IocpMsgTransfer::_UpdateSessionHeartbeat(IFS_Session *session)
     _sessionHeartbeatQueue.insert(session);
 }
 
+inline void FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor()
+{
+    if(!_canCreateNewNodeForAlloctor)
+        return;
+
+    if(_sessionBufferAlloctor->GetOccupiedBytes() >= __MEMORY_POOL_MAX_EXPAND_BYTES__)
+        _canCreateNewNodeForAlloctor = false;
+}
+
 inline void FS_IocpMsgTransfer::_CancelSessionWhenTransferZero(FS_IocpSession *session)
 {
     _toRemove.insert(session);
