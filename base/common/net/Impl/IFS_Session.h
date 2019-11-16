@@ -47,12 +47,12 @@ struct BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT IFS_Buffer;
 
 // TODO: IFS_Session, FS_IocpSession, FS_EpollSession
-
+// 只支持单线程
 class BASE_EXPORT IFS_Session
 {
     OBJ_POOL_CREATE_DEF(IFS_Session);
 public:
-    explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
+    explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor);
     virtual ~IFS_Session();
 
     // 获取属性与状态
@@ -79,8 +79,6 @@ public:
     // 操作
 public:
     void Close();
-    void Lock();
-    void Unlock();
     void UpdateHeartBeatExpiredTime();
 
     // 一个session只投递一个send，发完再继续发下一个，务必从队列头开始投递
@@ -104,7 +102,7 @@ private:
 protected:
     bool _isDestroy;
     bool _maskClose;
-    Locker _lock;
+    // Locker _lock;
     UInt64 _sessionId;
     FS_Addr *_addr;
     SOCKET _sock;
@@ -114,6 +112,7 @@ protected:
     Int64 _heartbeatInterval;   // ms
     IFS_Buffer *_recvBuffer;
     std::list<IFS_Buffer *> _toSend;
+    IMemoryAlloctor *_alloctor;
 
     // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
     Int32 _recvMsgId;

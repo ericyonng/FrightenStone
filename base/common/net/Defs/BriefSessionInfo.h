@@ -44,9 +44,9 @@ struct BASE_EXPORT BriefSessionInfo
 {
     BriefSessionInfo();
 
-    Int32 _transferId;
     UInt64 _sessionId;
-    FS_Addr _addr;
+    SOCKET _sock;
+    sockaddr_in _addrInfo;
 };
 
 FS_NAMESPACE_END

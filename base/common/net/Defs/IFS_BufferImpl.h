@@ -34,12 +34,13 @@
 
 FS_NAMESPACE_BEGIN
 
-inline IFS_Buffer::IFS_Buffer(size_t bufferSize)
+inline IFS_Buffer::IFS_Buffer(size_t bufferSize, IMemoryAlloctor *memAlloctor)
     :_bufferSize(bufferSize)
     ,_buff(NULL)
     ,_curPos(0)
     , _sessionId(0)
     , _socket(INVALID_SOCKET)
+    ,_alloctor(memAlloctor)
 {
     _Init();
 }
@@ -199,9 +200,7 @@ inline void IFS_Buffer::_Init()
         return;
     }
 
-    g_MemoryPool->Lock();
-    _buff = g_MemoryPool->Alloc<char>(_bufferSize);
-    g_MemoryPool->Unlock();
+    _buff = _alloctor->AllocMemory<char>(_bufferSize);
     _curPos = 0;
 }
 
@@ -209,9 +208,7 @@ inline void IFS_Buffer::_Destroy()
 {
     if(_buff)
     {
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(_buff);
-        g_MemoryPool->Unlock();
+        _alloctor->FreeMemory(_buff);
         _buff = NULL;
         _bufferSize = 0;
         _curPos = 0;

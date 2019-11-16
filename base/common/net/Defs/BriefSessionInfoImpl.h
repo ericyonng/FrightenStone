@@ -36,8 +36,9 @@
 FS_NAMESPACE_BEGIN
 
 inline BriefSessionInfo::BriefSessionInfo()
-    :_transferId(0)
-    ,_sessionId(0)
+    :_sessionId(0)
+    ,_sock(INVALID_SOCKET)
+    ,_addrInfo{0}
 {
 }
 

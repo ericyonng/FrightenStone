@@ -33,15 +33,26 @@
 #include "base/common/net/Impl/FS_SessionFactory.h"
 #include "base/common/net/Impl/FS_IocpSession.h"
 #include "base/common/net/Impl/FS_SessionMgr.h"
+#include "base/common/net/Defs/BriefSessionInfo.h"
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
+IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor)
 {
 #ifdef _WIN32
-    return new FS_IocpSession(sessionId, sock, addrInfo);
+    return new FS_IocpSession(sessionId, sock, addrInfo, memAlloctor);
+#else
+#endif
+}
+
+
+IFS_Session *FS_SessionFactory::Create(const BriefSessionInfo &sessionInfo, IMemoryAlloctor *memAlloctor)
+{
+#ifdef _WIN32
+    return new FS_IocpSession(sessionInfo._sessionId, sessionInfo._sock, &(sessionInfo._addrInfo), memAlloctor);
 #else
 #endif
 }
 
 FS_NAMESPACE_END
+

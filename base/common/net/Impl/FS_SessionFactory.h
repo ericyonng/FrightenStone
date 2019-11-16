@@ -42,11 +42,13 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IFS_Session;
 class BASE_EXPORT FS_SessionMgr;
+struct BASE_EXPORT BriefSessionInfo;
 
 class BASE_EXPORT FS_SessionFactory
 {
 public:
-    static IFS_Session *Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
+    static IFS_Session *Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor);
+    static IFS_Session *Create(const BriefSessionInfo &sessionInfo, IMemoryAlloctor *memAlloctor);
 };
 
 FS_NAMESPACE_END

@@ -49,6 +49,7 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include <set>
 #include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -61,17 +62,23 @@ class BASE_EXPORT IMemoryAlloctor
 {
     friend class MemoryPoolMgr;
 public:
-    IMemoryAlloctor(std::atomic<bool> &canCreateNewNode);
+    IMemoryAlloctor(std::atomic<bool> *canCreateNewNode = NULL);
     virtual ~IMemoryAlloctor();
 
 public:
     void *AllocMemory(size_t bytesCnt);
+    template<typename ObjType>
+    ObjType *AllocMemory(size_t bytesCnt);
     void  FreeMemory(void *ptr);
     size_t GetBlockSize() const;
     size_t GetEffectiveBlockSize() const;
     size_t GetOccupiedBytes() const;
     size_t GetInUsedBytes() const;
     void PrintMemInfo() const;
+
+    // 单线程可不用，非必要接口
+    void Lock();
+    void Unlock();
 
 public:
     void InitMemory();
@@ -98,14 +105,16 @@ protected:
     size_t          _blockSize;             // 内存块大小
     size_t          _effectiveBlockSize;    // 有效内存块大小（扣除MemoryBlock的内存大小）
 
+    // 额外非必要参数
     IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
-    std::atomic<bool> &_canCreateNewNode;
+    std::atomic<bool> *_canCreateNewNode;
+    Locker _locker;
 };
 
 class MemoryAlloctor : public IMemoryAlloctor
 {
 public:
-    MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied, std::atomic<bool> &canCreateNewNode);
+    MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied = NULL, std::atomic<bool> *canCreateNewNode = NULL);
     virtual ~MemoryAlloctor();
 };
 

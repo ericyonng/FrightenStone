@@ -110,16 +110,6 @@ inline IFS_Buffer *IFS_Session::GetRecvBuffer()
     return _recvBuffer;
 }
 
-inline void IFS_Session::Lock()
-{
-    _lock.Lock();
-}
-
-inline void IFS_Session::Unlock()
-{
-    _lock.Unlock();
-}
-
 FS_NAMESPACE_END
 
 #endif

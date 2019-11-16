@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-IMemoryAlloctor::IMemoryAlloctor(std::atomic<bool>  &canCreateNewNode)
+IMemoryAlloctor::IMemoryAlloctor(std::atomic<bool>  *canCreateNewNode)
     :_isFinish(false)
     ,_curBuf(NULL)
     ,_blockAmount(BLOCK_AMOUNT_DEF)
@@ -78,7 +78,7 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
         // 没有可用内存开辟新节点
         if(!_usableBlockHeader)
         {
-            if(!_canCreateNewNode)
+            if(_canCreateNewNode && !(*_canCreateNewNode))
                 return NULL;
             _NewNode();
         }
@@ -215,10 +215,11 @@ void IMemoryAlloctor::_NewNode()
     ++_curNodeCnt;
 
     _InitNode(newNode);
-    _updateMemPoolOccupied->Invoke(newNode->_nodeSize);
+    if(_updateMemPoolOccupied)
+        _updateMemPoolOccupied->Invoke(newNode->_nodeSize);
 }
 
-MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied, std::atomic<bool>  &canCreateNewNode)
+MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied, std::atomic<bool>  *canCreateNewNode)
     :IMemoryAlloctor(canCreateNewNode)
 {
     _blockAmount = blockAmount;

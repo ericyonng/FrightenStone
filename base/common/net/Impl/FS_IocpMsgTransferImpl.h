@@ -87,7 +87,6 @@ inline void FS_IocpMsgTransfer::_RemoveSessions(bool forceDisconnect)
             session->ResetAllIoMask();
             _OnDisconnected(session);
         }
-        //_OnDisconnected(session);
 
         iterSsession = _toRemove.erase(iterSsession);
         // _OnGracefullyDisconnect(session);
@@ -119,6 +118,13 @@ inline void FS_IocpMsgTransfer::_UpdateSessionHeartbeat(IFS_Session *session)
     _sessionHeartbeatQueue.erase(session);
     session->UpdateHeartBeatExpiredTime();
     _sessionHeartbeatQueue.insert(session);
+}
+
+inline void FS_IocpMsgTransfer::_CancelSessionWhenTransferZero(FS_IocpSession *session)
+{
+    _toRemove.insert(session);
+    _toPostRecv.erase(session);
+    _toPostSend.erase(session);
 }
 
 FS_NAMESPACE_END

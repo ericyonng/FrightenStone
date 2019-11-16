@@ -35,8 +35,8 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_IocpBuffer::FS_IocpBuffer(size_t bufferSize)
-    :IFS_Buffer(bufferSize)
+inline FS_IocpBuffer::FS_IocpBuffer(size_t bufferSize, IMemoryAlloctor *memAlloctor)
+    :IFS_Buffer(bufferSize, memAlloctor)
     ,_ioData{}
 {
 }
