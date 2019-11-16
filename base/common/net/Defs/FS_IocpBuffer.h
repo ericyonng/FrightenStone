@@ -52,21 +52,16 @@ public:
     virtual ~FS_IocpBuffer();
 
 public:
-    bool BindTo(UInt64 sessionId, SOCKET sock);
     IoDataBase *MakeRecvIoData();
     IoDataBase *MakeSendIoData();
     bool HasMsg() const;
     bool NeedWrite() const;
-    UInt64 GetSessionId() const;
-    SOCKET GetSocket() const;
 
 private:
     void _OnSendSucCallback(size_t transferBytes);
     void _OnRecvSucCallback(size_t transferBytes);
 
 private:
-    UInt64 _sessionId;      // FS_Packet生命周期内不变更
-    SOCKET _socket;         // FS_Packet生命周期内不变更
     IoDataBase _ioData;
 };
 

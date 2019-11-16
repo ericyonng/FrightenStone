@@ -48,8 +48,13 @@ public:
     virtual ~IFS_Buffer();
 
 public:
+    bool BindTo(UInt64 sessionId, SOCKET sock);
+    UInt64 GetSessionId() const;
+    SOCKET GetSocket() const;
+
     void PopFront(size_t bytesLen);
     bool PushBack(const Byte8 *data, size_t len);
+    bool CanPush(size_t len);
     void Clear();
     bool IsEmpty() const;
     bool IsFull() const;
@@ -58,6 +63,7 @@ public:
     size_t GetRest() const;
     char *GetData();
     const char *GetData() const;
+
     template<typename ObjType>
     ObjType *CastToData();
     template<typename ObjType>
@@ -73,6 +79,10 @@ protected:
 private:
     void _Init();
     void _Destroy();
+
+protected:
+    UInt64 _sessionId;      // FS_Packet生命周期内不变更
+    SOCKET _socket;         // FS_Packet生命周期内不变更
 
 private:
     size_t _bufferSize;

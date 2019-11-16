@@ -38,6 +38,8 @@ inline IFS_Buffer::IFS_Buffer(size_t bufferSize)
     :_bufferSize(bufferSize)
     ,_buff(NULL)
     ,_curPos(0)
+    , _sessionId(0)
+    , _socket(INVALID_SOCKET)
 {
     _Init();
 }
@@ -45,6 +47,29 @@ inline IFS_Buffer::IFS_Buffer(size_t bufferSize)
 inline IFS_Buffer::~IFS_Buffer()
 {
     _Destroy();
+}
+
+inline bool IFS_Buffer::BindTo(UInt64 sessionId, SOCKET sock)
+{
+    if(_sessionId)
+    {
+        g_Log->w<IFS_Buffer>(_LOGFMT_("this buffer has owner sessionId[%llu] socket[%llu] cant bind to new sessionId[%llu] new socket[%llu]")
+                                , _sessionId, _socket, sessionId, sock);
+        return false;
+    }
+    _sessionId = sessionId;
+    _socket = sock;
+    return true;
+}
+
+inline UInt64 IFS_Buffer::GetSessionId() const
+{
+    return _sessionId;
+}
+
+inline SOCKET IFS_Buffer::GetSocket() const
+{
+    return _socket;
 }
 
 inline void IFS_Buffer::PopFront(size_t bytesLen)
@@ -84,6 +109,15 @@ inline bool IFS_Buffer::PushBack(const Byte8 *data, size_t len)
 
     // 3.变更当前位置
     _curPos += len;
+    return true;
+}
+
+inline bool IFS_Buffer::CanPush(size_t len)
+{
+    size_t rest = _bufferSize - _curPos;
+    if(rest < len)
+        return false;
+
     return true;
 }
 
