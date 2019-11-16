@@ -121,6 +121,7 @@ private:
     IO_EVENT *_ioEvent;
     ConcurrentMessageQueue *_messageQueue;
     std::list<FS_MessageBlock *> *_senderMsgs;
+    std::list<FS_MessageBlock *> *_recvMsgList;
     MessageQueue *_senderMessageQueue;
     Int32 _generatorId;
 

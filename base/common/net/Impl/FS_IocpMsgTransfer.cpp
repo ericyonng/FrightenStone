@@ -60,6 +60,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     ,_senderMsgs(NULL)
     ,_senderMessageQueue(NULL)
     ,_generatorId(0)
+    ,_recvMsgList(NULL)
 {
 }
 
@@ -69,7 +70,9 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
     Fs_SafeFree(_iocp);
     Fs_SafeFree(_ioEvent);
     STLUtil::DelListContainer(*_senderMsgs);
+    STLUtil::DelListContainer(*_recvMsgList);
     Fs_SafeFree(_senderMsgs);
+    Fs_SafeFree(_recvMsgList);
 }
 
 Int32 FS_IocpMsgTransfer::BeforeStart()
@@ -78,6 +81,7 @@ Int32 FS_IocpMsgTransfer::BeforeStart()
     _iocp = new FS_Iocp;
     _ioEvent = new IO_EVENT;
     _senderMsgs = new std::list<FS_MessageBlock *>;
+    _recvMsgList = new std::list<FS_MessageBlock *>;
     const Int32 st = _iocp->Create();
     if(st != StatusDefs::Success)
     {
@@ -253,7 +257,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            _ioEvent->_bytesTrans);
 
             session->ResetPostRecvMask();
-            session->MaskClose();
+            session->Close();
             _toRemove.insert(session);
             _toPostRecv.erase(session);
             _toPostSend.erase(session);
@@ -284,7 +288,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
             session->ResetPostSendMask();
-            session->MaskClose();
+            session->Close();
             _toRemove.insert(session);
             _toPostRecv.erase(session);
             _toPostSend.erase(session);
@@ -305,6 +309,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
     else
     {
         session->EnableDisconnect();
+        session->Close();
         _toRemove.insert(session);
         _toPostRecv.erase(session);
         _toPostSend.erase(session);
@@ -330,7 +335,6 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
     // 处理消息到达
     FS_IocpSession *session = NULL;
     UInt64 sessionId = 0;
-    std::list<FS_MessageBlock *> *recvMsgList = new std::list<FS_MessageBlock *>;
     for(auto iterSession = _msgArriviedSessions.begin(); iterSession != _msgArriviedSessions.end();)
     {
         session = *iterSession;
@@ -350,7 +354,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
             g_MemoryPool->Unlock();
             ::memcpy(newBlock->_buffer, frontMsg, frontMsg->_packetLength);
 
-            recvMsgList->push_back(newBlock);
+            _recvMsgList->push_back(newBlock);
             g_ServerCore->_OnRecvMsgAmount(frontMsg);
             recvBuffer->PopFront(frontMsg->_packetLength);
         }
@@ -359,12 +363,10 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
     }
 
     _messageQueue->PushLock(_generatorId);
-    _messageQueue->Push(_generatorId, recvMsgList);
+    _messageQueue->Push(_generatorId, _recvMsgList);
     _messageQueue->PushUnlock(_generatorId);
-    if(!recvMsgList->empty())
-        g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", recvMsgList->size());
-    STLUtil::DelListContainer(*recvMsgList);
-    Fs_SafeFree(recvMsgList);
+    if(!_recvMsgList->empty())
+        g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", _recvMsgList->size());
 }
 
 void FS_IocpMsgTransfer::_OnDelayDisconnected(FS_IocpSession *session)
@@ -420,6 +422,7 @@ bool FS_IocpMsgTransfer::_DoPostSend(FS_IocpSession *session)
         {
             session->ResetPostSendMask();
             session->MaskClose();
+            session->Close();
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
@@ -446,6 +449,7 @@ bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session)
         {
             session->ResetPostRecvMask();
             session->MaskClose();
+            session->Close();
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
@@ -545,10 +549,11 @@ void FS_IocpMsgTransfer::_AsynSendFromDispatcher()
     _senderMessageQueue->PopImmediately(_senderMsgs);
     _senderMessageQueue->PopUnlock();
 
+    // TODO:消息过多时候会死在循环中，严重拖慢速度（需要先按sessionId分类组成一个包队列）（需要在消息队列中定制分类方法回调（使用组合方式））
+    // 返回：std::map<UInt64, std::list<FS_NetMsgBufferBlock *>> *队列
     for(auto iterBlock = _senderMsgs->begin(); iterBlock != _senderMsgs->end();)
     {
         FS_NetMsgBufferBlock *sendMsgBufferBlock = static_cast<FS_NetMsgBufferBlock *>(*iterBlock);
-        NetMsg_DataHeader *header = reinterpret_cast<NetMsg_DataHeader *>(sendMsgBufferBlock->_buffer);
         auto session = _GetSession(sendMsgBufferBlock->_sessionId);
         if(!session)
         {
@@ -562,14 +567,14 @@ void FS_IocpMsgTransfer::_AsynSendFromDispatcher()
         {
             if(session->CanPost())
             {
+                NetMsg_DataHeader *header = reinterpret_cast<NetMsg_DataHeader *>(sendMsgBufferBlock->_buffer);
                 if(!session->PushMsgToSend(header))
                 {
                     g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg fail"), sendMsgBufferBlock->_sessionId);
                 }
-
-
-                if(!session->IsPostSend())
-                    _toPostSend.insert(session);
+                
+                if(!session->IsPostSend() && session->HasMsgToSend())
+                    _DoPostSend(session);
             }
         }
 
