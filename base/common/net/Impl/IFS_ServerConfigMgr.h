@@ -59,6 +59,7 @@ public:
     /* transfer */
     Int32 GetTransferCnt() const;
     Int32 GetHeartbeatDeadTimeInterval() const;
+    Int32 GetPrepareBufferPoolCnt() const;
 
     /* dispatcher */
     Int32 GetDispatcherCnt() const;

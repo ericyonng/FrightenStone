@@ -48,7 +48,7 @@ class BASE_EXPORT FS_IocpBuffer : public IFS_Buffer
 {
     OBJ_POOL_CREATE_DEF(FS_IocpBuffer);
 public:
-    explicit FS_IocpBuffer(size_t bufferSize);
+    explicit FS_IocpBuffer(size_t bufferSize, IMemoryAlloctor *memAlloctor);
     virtual ~FS_IocpBuffer();
 
 public:

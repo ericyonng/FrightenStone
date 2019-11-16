@@ -47,6 +47,7 @@
 #include "base/common/net/protocol/protocol.h"
 #include "base/common/net/Impl/FS_IocpSession.h"
 #include "base/common/net/Defs/FS_IocpBuffer.h"
+#include "base/common/net/Defs/BriefSessionInfo.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -297,18 +298,18 @@ void FS_ServerCore::Close()
 
 /* 网络事件 */
 #pragma region
-void FS_ServerCore::_OnConnected(IFS_Session *session)
+void FS_ServerCore::_OnConnected(const BriefSessionInfo &sessionInfo)
 {// 只有connector调用接口
 
     // 求余法，将session分配到各个消息处理模块
-    const auto sessionHash = session->GetSessionId() % _msgTransfers.size();
+    const auto sessionHash = sessionInfo._sessionId % _msgTransfers.size();
     auto minTransfer = _msgTransfers[sessionHash];
 
     // 统计session数量
     ++_curSessionConnecting;
     ++_sessionConnectedBefore;
 
-    minTransfer->OnConnect(session);
+    minTransfer->OnConnect(sessionInfo);
 }
 
 void FS_ServerCore::_OnDisconnected(IFS_Session *session)

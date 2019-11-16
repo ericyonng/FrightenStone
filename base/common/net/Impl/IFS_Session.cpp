@@ -46,7 +46,7 @@ OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
+IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor)
     :_isDestroy(false)
     ,_sessionId(sessionId)
     ,_addr(new FS_Addr(this, addrInfo))
@@ -58,15 +58,14 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
     ,_lastErrorReason{StatusDefs::Success}
     ,_maskClose(false)
     ,_heartbeatInterval(0)
+    ,_alloctor(memAlloctor)
 {
     _heartbeatInterval = static_cast<Int64>(g_SvrCfg->GetHeartbeatDeadTimeInterval());
-    _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
-    auto newSendBuff = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
-#ifdef _WIN32
-    _recvBuffer->CastToBuffer<FS_IocpBuffer>()->BindTo(_sessionId, sock);
-    newSendBuff->CastToBuffer<FS_IocpBuffer>()->BindTo(_sessionId, sock);
-#else
-#endif
+    _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF, _alloctor);
+    _recvBuffer->BindTo(_sessionId, sock);
+
+    auto newSendBuff = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF, _alloctor);
+    newSendBuff->BindTo(_sessionId, sock);
     _toSend.push_back(newSendBuff);
 
     UpdateHeartBeatExpiredTime();
@@ -103,7 +102,7 @@ bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
 
     if(_toSend.empty())
     {
-        auto newBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
+        auto newBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF, _alloctor);
         _toSend.push_back(newBuffer);
         newBuffer->BindTo(_sessionId, _sock);
     }
@@ -112,7 +111,7 @@ bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
     IFS_Buffer *buffer = _toSend.front();
     if(!buffer->CanPush(header->_packetLength))
     {
-        buffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
+        buffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF, _alloctor);
         buffer->BindTo(_sessionId, _sock);
         _toSend.push_back(buffer);
     }
@@ -155,10 +154,8 @@ void IFS_Session::OnMsgArrived()
 
 void IFS_Session::_Destroy()
 {
-    _lock.Lock();
     if(_isDestroy)
     {
-        _lock.Unlock();
         return;
     }
     _isDestroy = true;
@@ -172,7 +169,6 @@ void IFS_Session::_Destroy()
 
     Fs_SafeFree(_recvBuffer);
     STLUtil::DelListContainer(_toSend);
-    _lock.Unlock();
 }
 
 FS_NAMESPACE_END

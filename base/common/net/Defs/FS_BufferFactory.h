@@ -45,7 +45,7 @@ class BASE_EXPORT IFS_Buffer;
 class BASE_EXPORT FS_BufferFactory
 {
 public:
-    static IFS_Buffer *Create(size_t bufferSize);
+    static IFS_Buffer *Create(size_t bufferSize, IMemoryAlloctor *memAlloctor);
 };
 
 FS_NAMESPACE_END

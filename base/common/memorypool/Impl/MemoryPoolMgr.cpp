@@ -74,7 +74,7 @@ Int32 MemoryPoolMgr::InitPool()
     Int32 multi = __MEMORY_POOL_MINIMUM_BLOCK__;
     for(Int32 i = 0; i < __MEMORY_POOL_MAXBLOCK_LIMIT__; )
     {
-        _Init(i, i + multi, new MemoryAlloctor(i + multi, BLOCK_AMOUNT_DEF, _updateMemPoolOccupied, _canCreateNewNode));
+        _Init(i, i + multi, new MemoryAlloctor(i + multi, BLOCK_AMOUNT_DEF, _updateMemPoolOccupied, &_canCreateNewNode));
         _UpdateMemPoolOccupied(i + multi * BLOCK_AMOUNT_DEF);
 
         // 下一次分配的是原来的2倍的内存 64-128-256-512-...

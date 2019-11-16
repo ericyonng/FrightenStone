@@ -39,6 +39,7 @@
 #include "base/common/net/Defs/FS_IocpBuffer.h"
 #include "base/common/net/Impl/IFS_ServerConfigMgr.h"
 #include "base/common/net/Impl/FS_IocpSession.h"
+#include "base/common/net/Defs/BriefSessionInfo.h"
 
 #include "base/common/status/status.h"
 #include "base/common/log/Log.h"
@@ -225,16 +226,11 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS
         SocketUtil::MakeReUseAddr(sock);
 
         // TODO:连接回调 
-        IFS_Session *newSession = FS_SessionFactory::Create(_curMaxSessionId, sock, addrInfo);
-        newSession->OnConnect();
-        auto sessionAddr = newSession->GetAddr();
-        g_Log->net<FS_IocpConnector>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
-                                     , newSession->GetSessionId()
-                                     , newSession->GetSocket()
-                                     , sessionAddr->GetAddr().c_str()
-                                     , sessionAddr->GetPort());
-
-        g_ServerCore->_OnConnected(newSession);
+        BriefSessionInfo newSessionInfo;
+        newSessionInfo._sessionId = _curMaxSessionId;
+        newSessionInfo._sock = sock;
+        newSessionInfo._addrInfo = *addrInfo;
+        g_ServerCore->_OnConnected(newSessionInfo);
     }
     else {
         _locker.Unlock();

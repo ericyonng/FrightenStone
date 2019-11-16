@@ -44,6 +44,7 @@ class BASE_EXPORT IFS_Session;
 struct BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT ConcurrentMessageQueue;
 class BASE_EXPORT MessageQueue;
+struct BASE_EXPORT BriefSessionInfo;
 
 class BASE_EXPORT IFS_MsgTransfer
 {
@@ -60,7 +61,7 @@ public:
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    virtual void OnConnect(IFS_Session *session) = 0;
+    virtual void OnConnect(const BriefSessionInfo  &sessionInfo) = 0;
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
 

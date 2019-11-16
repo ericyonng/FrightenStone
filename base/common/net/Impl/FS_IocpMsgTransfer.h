@@ -50,6 +50,7 @@ struct BASE_EXPORT IO_EVENT;
 class BASE_EXPORT FS_IocpSession;
 struct BASE_EXPORT NetMsg_DataHeader;
 struct BASE_EXPORT FS_MessageBlock;
+struct BASE_EXPORT BriefSessionInfo;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
@@ -66,7 +67,7 @@ public:
     virtual void AfterClose();
 
     // 网络
-    virtual void OnConnect(IFS_Session *session);
+    virtual void OnConnect(const BriefSessionInfo  &sessionInfo);
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut(IFS_Session *session);
 
@@ -81,6 +82,7 @@ private:
     Int32 _DoEvents();
     Int32 _HandleNetEvent();
     void _OnMsgArrived();
+    void _OnMsgArrived(FS_IocpSession *session);
     void _RemoveSessions(bool forceDisconnect = false);
 
     // 网络事件 线程不安全
@@ -95,6 +97,7 @@ private:
 
 private:
     void _NtySessionConnectedMsg(UInt64 sessionId);
+    void _NtySessionDisConnectMsg(UInt64 sessionId);
 
     // 辅助
 private:
@@ -107,11 +110,15 @@ private:
     void _PostEventsToIocp();
 
     void _AsynSendFromDispatcher();
+    void _ClearSenderMessageQueue();
     void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
     void _LinkCacheToSessions();
 
+    void _CancelSessionWhenTransferZero(FS_IocpSession *session);
+
 private:
     Int32 _id;
+    IMemoryAlloctor *_sessionBufferAlloctor;
     std::atomic<Int32> _sessionCnt;             // 会话个数
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;
@@ -128,8 +135,7 @@ private:
     // 缓冲区
     Locker _connectorGuard;
     std::atomic<bool> _hasNewSessionLinkin;         // 
-    std::list<IFS_Session *> _linkSessionCache;     // 连入的会话缓冲区
-    std::list<FS_IocpSession *> _msgArriviedSessions;  // 消息到达的会话
+    std::list<BriefSessionInfo> _pendingNewSessionInfos;     // 连入的会话缓冲区
 
     // 待发送的会话缓冲区
 //     Locker _asynSendGuard;
@@ -137,6 +143,7 @@ private:
 //     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueueCache; // key:sessionId
 //     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueue;  // key:sessionId
 
+    std::list<FS_IocpSession *> _msgArriviedSessions;  // 消息到达的会话
     std::set<FS_IocpSession *> _toPostRecv;
     std::set<FS_IocpSession *> _toPostSend;
     std::set<FS_IocpSession *> _toRemove;

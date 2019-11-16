@@ -36,6 +36,7 @@
 
 // defs...
 // interface...
+#include "base/common/memorypool/Defs/MemoryAlloctor.h"
 #include "base/common/memorypool/Defs/MemoryPoolCreateDefs.h"
 #include "base/common/memorypool/Interface/IMemoryPoolMgr.h"
 

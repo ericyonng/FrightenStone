@@ -33,6 +33,11 @@
 #pragma once
 
 FS_NAMESPACE_BEGIN
+template<typename ObjType>
+inline ObjType *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
+{
+    return reinterpret_cast<ObjType *>(AllocMemory(bytesCnt));
+}
 
 inline size_t IMemoryAlloctor::GetBlockSize() const
 {
@@ -52,6 +57,16 @@ inline size_t IMemoryAlloctor::GetOccupiedBytes() const
 inline size_t IMemoryAlloctor::GetInUsedBytes() const
 {
     return _memBlockInUse * _blockSize;
+}
+
+inline void IMemoryAlloctor::Lock()
+{
+    _locker.Lock();
+}
+
+inline void IMemoryAlloctor::Unlock()
+{
+    _locker.Unlock();
 }
 
 FS_NAMESPACE_END

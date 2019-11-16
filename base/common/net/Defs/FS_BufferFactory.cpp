@@ -36,10 +36,10 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_Buffer *FS_BufferFactory::Create(size_t bufferSize)
+IFS_Buffer *FS_BufferFactory::Create(size_t bufferSize, IMemoryAlloctor *memAlloctor)
 {
 #ifdef _WIN32
-    return new FS_IocpBuffer(bufferSize);
+    return new FS_IocpBuffer(bufferSize, memAlloctor);
 #else
 
 #endif
