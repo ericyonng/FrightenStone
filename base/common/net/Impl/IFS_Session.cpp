@@ -61,7 +61,14 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
 {
     _heartbeatInterval = static_cast<Int64>(g_SvrCfg->GetHeartbeatDeadTimeInterval());
     _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
+    auto newSendBuff = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
+#ifdef _WIN32
     _recvBuffer->CastToBuffer<FS_IocpBuffer>()->BindTo(_sessionId, sock);
+    newSendBuff->CastToBuffer<FS_IocpBuffer>()->BindTo(_sessionId, sock);
+#else
+#endif
+    _toSend.push_back(newSendBuff);
+
     UpdateHeartBeatExpiredTime();
 }
 
@@ -94,26 +101,31 @@ bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
     if(_isDestroy)
         return false;
 
-    auto newBuffer = FS_BufferFactory::Create(static_cast<size_t>(header->_packetLength));
-#ifdef _WIN32
-    if(!newBuffer->CastToBuffer<FS_IocpBuffer>()->BindTo(_sessionId, _sock))
+    if(_toSend.empty())
     {
-        g_Log->e<IFS_Session>(_LOGFMT_("has bind to sessionId[%llu] sock[%llu]"), _sessionId, _sock);
+        auto newBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
+        _toSend.push_back(newBuffer);
+        newBuffer->BindTo(_sessionId, _sock);
     }
 
-#else
-#endif
-
-    if(!newBuffer->PushBack(reinterpret_cast<const char *>(header), header->_packetLength))
+    // »º³å¿Õ¼ä²»×ã
+    IFS_Buffer *buffer = _toSend.front();
+    if(!buffer->CanPush(header->_packetLength))
     {
-        g_Log->e<IFS_Session>(_LOGFMT_("newBuffer push back data fail"));
+        buffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF);
+        buffer->BindTo(_sessionId, _sock);
+        _toSend.push_back(buffer);
+    }
+
+    if(!buffer->PushBack(reinterpret_cast<const char *>(header), header->_packetLength))
+    {
+        g_Log->e<IFS_Session>(_LOGFMT_("push back data fail cmd[%s:%hu] len[%hu]")
+                              , ProtocolCmd::GetStr(header->_cmd)
+                              , header->_cmd
+                              , header->_packetLength);
         return false;
     }
 
-//    g_Log->any<IFS_Session>("sessionId[%llu] will send msg"
-//                            , _sessionId);
-
-    _toSend.push_back(newBuffer);
     return true;
 }
 

@@ -37,27 +37,12 @@ FS_NAMESPACE_BEGIN
 
 inline FS_IocpBuffer::FS_IocpBuffer(size_t bufferSize)
     :IFS_Buffer(bufferSize)
-    ,_sessionId(0)
-    ,_socket(INVALID_SOCKET)
     ,_ioData{}
 {
 }
 
 inline FS_IocpBuffer::~FS_IocpBuffer()
 {
-}
-
-inline bool FS_IocpBuffer::BindTo(UInt64 sessionId, SOCKET sock)
-{
-    if(_sessionId)
-    {
-        g_Log->w<FS_IocpBuffer>(_LOGFMT_("this buffer has owner sessionId[%llu] socket[%llu] cant bind to new sessionId[%llu] new socket[%llu]")
-                                , _sessionId, _socket, sessionId, sock);
-        return false;
-    }
-    _sessionId = sessionId;
-    _socket = sock;
-    return true;
 }
 
 inline IoDataBase *FS_IocpBuffer::MakeRecvIoData()
@@ -123,16 +108,6 @@ inline bool FS_IocpBuffer::HasMsg() const
 inline bool FS_IocpBuffer::NeedWrite() const
 {
     return GetLength() > 0;
-}
-
-inline UInt64 FS_IocpBuffer::GetSessionId() const
-{
-    return _sessionId;
-}
-
-inline SOCKET FS_IocpBuffer::GetSocket() const
-{
-    return _socket;
 }
 
 inline void FS_IocpBuffer::_OnSendSucCallback(size_t transferBytes)
