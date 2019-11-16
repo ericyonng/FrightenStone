@@ -64,6 +64,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     ,_generatorId(0)
     ,_recvMsgList(NULL)
     ,_sessionBufferAlloctor(NULL)
+    ,_canCreateNewNodeForAlloctor(true)
 {
 }
 
@@ -87,7 +88,7 @@ Int32 FS_IocpMsgTransfer::BeforeStart()
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("prepare buffer pool block amount is zero."));
         return StatusDefs::IocpMsgTransfer_CfgError;
     }
-    _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount);
+    _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, NULL, &_canCreateNewNodeForAlloctor);
     _sessionBufferAlloctor->InitMemory();
 
     _threadPool = new FS_ThreadPool(0, 1);
@@ -222,8 +223,11 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
             break;
         }
 
+        // 刷新内存分配器分配尺度避免分配器耗尽系统内存
+        _UpdateCanCreateNewNodeForAlloctor();
+
         // 6.domsg 消耗比较大，在高并发情况下可能会导致超时
-        // _OnMsgArrived();
+        _OnMsgArrived();
 
         // 7.removesessions
         _RemoveSessions();
@@ -270,7 +274,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
 
-            session->ResetPostRecvMask();
+             session->ResetPostRecvMask();
             session->Close();
             _CancelSessionWhenTransferZero(session);
             return StatusDefs::Success;
@@ -280,9 +284,9 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 
         // 消息接收回调
         g_ServerCore->_OnRecvMsg(session, _ioEvent->_bytesTrans);
-        _OnMsgArrived(session);
+        // _OnMsgArrived(session);
 
-        // _msgArriviedSessions.push_back(session);
+        _msgArriviedSessions.push_back(session);
         _UpdateSessionHeartbeat(session);
 
         // 重新接收数据
@@ -297,7 +301,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSessionId()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
-            session->ResetPostSendMask();
+             session->ResetPostSendMask();
             session->Close();
             _CancelSessionWhenTransferZero(session);
             return StatusDefs::Success;
@@ -461,7 +465,6 @@ bool FS_IocpMsgTransfer::_DoPostSend(FS_IocpSession *session)
         if(st != StatusDefs::Success)
         {
             session->ResetPostSendMask();
-            session->MaskClose();
             session->Close();
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
@@ -486,7 +489,6 @@ bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session)
         if(st != StatusDefs::Success)
         {
             session->ResetPostRecvMask();
-            session->MaskClose();
             session->Close();
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
@@ -550,8 +552,8 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
 
         g_ServerCore->_OnHeartBeatTimeOut(session);
         iterSession = _sessionHeartbeatQueue.erase(iterSession);
-        session->MaskClose();
         session->Close();
+        session->ResetAllIoMask();
         _toRemove.insert(session);
 //        g_Log->any<FS_IocpMsgTransfer>("nowTime[%lld][%s] sessionId[%llu] expiredtime[%llu][%s] heartbeat time out."
 //                                       , _curTime.GetMicroTimestamp(), _curTime.ToStringOfMillSecondPrecision().c_str()

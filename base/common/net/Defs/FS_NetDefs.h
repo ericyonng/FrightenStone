@@ -92,7 +92,7 @@
 #define SVR_CFG_TRANSFER_SEG_CNT_KEY                    "TransferCnt"
 #define SVR_CFG_TRANSFER_SEG_CNT                        "8"                             // 数据传输支持8线程
 #define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY        "HeartbeatDeadTimeInterval"     // 心跳死亡时间间隔
-#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "300000"                        // 默认30s心跳
+#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "30000"                         // 默认30s心跳
 #define SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY             "PreparePoolBufferCnt"          // 预先准备的网络buffer缓冲池的buffer个数
 #define SVR_CFG_PREPARE_POOL_BUFFER_CNT                 "10000"                         // 默认30s心跳
 #pragma endregion
