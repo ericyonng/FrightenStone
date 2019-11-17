@@ -33,6 +33,13 @@
 #define __FRIGHTEN_STONE_BASE_EXPORT_BASE_H__
 
 #pragma once
+#ifdef _WIN32
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // _WIN32
+
+
 
 // 默认开启线程安全
 #undef __FS_THREAD_SAFE__

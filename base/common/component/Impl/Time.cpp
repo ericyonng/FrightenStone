@@ -87,6 +87,7 @@ Time::Time(const Time &other)
 Time::~Time()
 {
     Fs_SafeFree(_cache2);
+
     Fs_SafeFree(_cache);
 }
 

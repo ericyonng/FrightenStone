@@ -1071,6 +1071,9 @@
     <ClInclude Include="..\common\net\Defs\ProtocolDefsImpl.h">
       <Filter>common\net\protocol\defs</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\net\Impl\IFS_ServerConfigMgrImpl.h">
+      <Filter>common\net\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1375,6 +1378,9 @@
     </ClCompile>
     <ClCompile Include="..\common\component\Impl\MessageQueue\Defs\MessageQueueTask.cpp">
       <Filter>common\component\Impl\MessageQueue\Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\objpool\Defs\FS_ObjPoolDefs.cpp">
+      <Filter>common\objpool\Defs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

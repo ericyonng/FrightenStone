@@ -391,6 +391,7 @@
     <ClInclude Include="..\common\net\Impl\IFS_MsgTransfer.h" />
     <ClInclude Include="..\common\net\Impl\IFS_MsgTransferImpl.h" />
     <ClInclude Include="..\common\net\Impl\IFS_ServerConfigMgr.h" />
+    <ClInclude Include="..\common\net\Impl\IFS_ServerConfigMgrImpl.h" />
     <ClInclude Include="..\common\net\Impl\Iocp\Example.h" />
     <ClInclude Include="..\common\net\Impl\IFS_Session.h" />
     <ClInclude Include="..\common\net\Impl\IFS_SessionImpl.h" />
@@ -514,6 +515,7 @@
     <ClCompile Include="..\common\net\Impl\Iocp\Example.cpp" />
     <ClCompile Include="..\common\net\Impl\IFS_Session.cpp" />
     <ClCompile Include="..\common\net\protocol\defs\ProtocolDefs.cpp" />
+    <ClCompile Include="..\common\objpool\Defs\FS_ObjPoolDefs.cpp" />
     <ClCompile Include="..\common\objpool\Defs\ObjPoolDefs.cpp" />
     <ClCompile Include="..\common\objpool\Impl\ObjPoolHelper.cpp" />
     <ClCompile Include="..\common\socket\Impl\SocketUtil.cpp" />

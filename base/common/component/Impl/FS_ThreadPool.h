@@ -51,7 +51,6 @@ class BASE_EXPORT IMemoryPoolMgr;
 // 不可使用包含线程池对象的对象包装
 class BASE_EXPORT FS_ThreadPool
 {
-    //OBJ_POOL_CREATE(fs::FS_ThreadPool, _objPoolHelper);
 public:
     explicit FS_ThreadPool();
     explicit FS_ThreadPool(Int32 minNum, Int32 maxNum);    // 

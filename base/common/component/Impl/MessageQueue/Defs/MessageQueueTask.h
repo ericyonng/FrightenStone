@@ -43,7 +43,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_ThreadPool;
 
-class BASE_EXPORT MessageQueueTask : ITask 
+class BASE_EXPORT MessageQueueTask : public ITask 
 {
 public:
     MessageQueueTask(UInt32 messageQueueId, FS_ThreadPool *pool, IDelegate<void, ITask *, FS_ThreadPool *> *callback);

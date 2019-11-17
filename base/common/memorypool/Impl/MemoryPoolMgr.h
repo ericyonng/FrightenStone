@@ -64,6 +64,7 @@ public:
     virtual void Lock();
     virtual void Unlock();
     virtual void PrintMemPoolInfo() const;
+    virtual void SetMaxAllowOccupiedBytes(UInt64 maxAllowBytes);
 
 private:
     void  _Init(size_t begin, size_t end, IMemoryAlloctor *alloctor);
@@ -78,8 +79,9 @@ private:
     Locker _locker;
     IDelegate<void> *_printCallback;
     std::atomic<size_t> _curTotalOccupiedBytes = 0;      // 当前内存池占用的总字节数
+    std::atomic<size_t> _maxAllowOccupiedBytes;         // 内存池最大允许占用
     std::atomic<bool> _canCreateNewNode = true;
-    const size_t _maxCanAllocMemLimit;
+    const size_t _maxCanAllocMemLimit;      // 最大的块大小
     IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
     std::atomic<Int32> _curThreadId;
 };
@@ -94,13 +96,18 @@ inline void MemoryPoolMgr::Unlock()
     _locker.Unlock();
 }
 
+inline void MemoryPoolMgr::SetMaxAllowOccupiedBytes(UInt64 maxAllowBytes)
+{
+    _maxAllowOccupiedBytes = maxAllowBytes;
+}
+
 inline void MemoryPoolMgr::_UpdateMemPoolOccupied(size_t newOccupiedBytes)
 {
     _curTotalOccupiedBytes += newOccupiedBytes;
     if(!_canCreateNewNode)
         return;
 
-    if(_curTotalOccupiedBytes >= __MEMORY_POOL_MAX_EXPAND_BYTES__)
+    if(_curTotalOccupiedBytes >= _maxAllowOccupiedBytes)
         _canCreateNewNode = false;
 }
 

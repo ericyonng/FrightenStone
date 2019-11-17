@@ -39,14 +39,17 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
-class ObjBlock
+class BASE_EXPORT ObjBlock
 {
 public:
     ObjBlock();
     ~ObjBlock();
 
 public:
-    bool _isNotInPool;
+    bool _isInPool;
+    char _reserver1;     // 保留位，用于内存对齐
+    char _reserver2;     // 保留位，用于内存对齐
+    char _reserver3;     // 保留位，用于内存对齐
 };
 
 FS_NAMESPACE_END

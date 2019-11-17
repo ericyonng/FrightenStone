@@ -35,6 +35,8 @@
 #include "base/common/component/Impl/FS_ThreadPool.h"
 #include "base/common/assist/utils/utils.h"
 
+#include "base/common/net/net.h"
+
 fs::MemleakMonitor *g_MemleakMonitor = fs::MemleakMonitor::GetInstance();
 
 
@@ -68,6 +70,11 @@ MemleakMonitor *MemleakMonitor::GetInstance()
 
 void MemleakMonitor::Start()
 {
+    auto maxBytes = g_SvrCfg->GetMaxAllowObjPoolBytesOccupied();
+    for(auto &setInvoke : _objPoolSetMaxAllowOccupiedBytes)
+        setInvoke->Invoke(maxBytes);
+
+    g_MemoryPool->SetMaxAllowOccupiedBytes(g_SvrCfg->GetMaxAllowMemoryPoolBytesOccupied());
     _printInfoPool->AddTask(DelegatePlusFactory::Create(this, &MemleakMonitor::_PrintInfoPerSeconds));
 }
 
@@ -76,6 +83,7 @@ void MemleakMonitor::Finish()
     _printInfoPool->Close();
     Fs_SafeFree(_printInfoPool);
     STLUtil::DelMapContainer(_objNameRefPrintCallback);
+    STLUtil::DelListContainer(_objPoolSetMaxAllowOccupiedBytes);
     _threadIdRefMemPoolPrintCallback.clear();
 }
 
@@ -121,6 +129,13 @@ void MemleakMonitor::UnRegisterMemPoolPrintCallback(Int32 threadId)
     _locker.Unlock();
 }
 
+void MemleakMonitor::RegisterObjPoolModifyMaxAllowBytesCallback(IDelegate<void, UInt64> *callback)
+{
+    _locker.Lock();
+    _objPoolSetMaxAllowOccupiedBytes.push_back(callback);
+    _locker.Unlock();
+}
+
 void MemleakMonitor::PrintObjPoolInfo() const
 {
     size_t totalPoolInUsedBytes = 0;
@@ -139,9 +154,12 @@ void MemleakMonitor::PrintObjPoolInfo() const
         }
     }
 
+    if(g_curObjPoolOccupiedBytes != totalOccupiedBytes)
+        g_curObjPoolOccupiedBytes = totalOccupiedBytes;
+
     // 打印内存泄漏
-    g_Log->objpool("objpool: total total pool in used bytes[%llu] totalObjInUsedCnt[%lld] total pool occupied bytes[%lld]"
-                   , totalPoolInUsedBytes, totalObjInUsedCnt, totalOccupiedBytes);
+    g_Log->objpool("objpool[curObjPoolOccupiedBytes[%llu]]: total total pool in used bytes[%llu] totalObjInUsedCnt[%lld] total pool occupied bytes[%lld]"
+                   ,(UInt64)(g_curObjPoolOccupiedBytes),  totalPoolInUsedBytes, totalObjInUsedCnt, totalOccupiedBytes);
     g_Log->objpool("=========================================================");
 
     // 打印系统信息

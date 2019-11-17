@@ -35,22 +35,25 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
-const size_t AlloctorNode<ObjType>::_objBlockSize = sizeof(ObjType) / __OBJPOOL_ALIGN_BYTES__ * __OBJPOOL_ALIGN_BYTES__ +
-(sizeof(ObjType) % __OBJPOOL_ALIGN_BYTES__ ? __OBJPOOL_ALIGN_BYTES__ : 0);
-
+const size_t AlloctorNode<ObjType>::_objBlockSize = __FS_MEMORY_ALIGN__(sizeof(ObjType)) + sizeof(ObjBlock<ObjType>);
 
 template<typename ObjType>
 inline AlloctorNode<ObjType>::AlloctorNode(size_t capacity)
     : _objs(::malloc(capacity*_objBlockSize))
+    ,_nodeSize(capacity*_objBlockSize)
     ,_nextNode(NULL)
 {
+    g_curObjPoolOccupiedBytes += _nodeSize;
 }
 
 template<typename ObjType>
 inline AlloctorNode<ObjType>::~AlloctorNode()
 {
     if(_objs)
+    {
+        g_curObjPoolOccupiedBytes -= _nodeSize;
         ::free(_objs);
+    }
 }
 
 FS_NAMESPACE_END

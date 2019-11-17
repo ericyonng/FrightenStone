@@ -36,6 +36,10 @@
 #undef __MEMORY_POOL_ALIGN_BYTES__
 #define __MEMORY_POOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
 
+#undef __FS_MEMORY_ALIGN__
+#define __FS_MEMORY_ALIGN__(BYTES)  \
+(BYTES) / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + ((BYTES)%__MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0)
+
 #undef __MEMORY_POOL_MINIMUM_BLOCK__
 #define __MEMORY_POOL_MINIMUM_BLOCK__        64          // 最小内存块64字节
 

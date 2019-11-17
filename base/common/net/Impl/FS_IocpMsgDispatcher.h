@@ -96,6 +96,10 @@ private:
     ConcurrentMessageQueue *_messgeQueue;
 
     // TODO:订阅网络协议的facade开发，使用委托方式，各个系统关注各自的协议，注册到本系统
+
+//     _CrtMemState s1;
+//     _CrtMemState s2;
+//     _CrtMemState s3;
 };
 
 FS_NAMESPACE_END

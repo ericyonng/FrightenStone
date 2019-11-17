@@ -114,6 +114,10 @@ private:
     const UInt64 _maxSessionIdLimit;
 
     std::list<IoDataBase *> _usedIoQueue;
+
+//     _CrtMemState s1;
+//     _CrtMemState s2;
+//     _CrtMemState s3;
 #pragma endregion
 };
 

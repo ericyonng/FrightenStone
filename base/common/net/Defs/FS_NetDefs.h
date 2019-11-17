@@ -94,7 +94,9 @@
 #define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY        "HeartbeatDeadTimeInterval"     // 心跳死亡时间间隔
 #define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "30000"                         // 默认30s心跳
 #define SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY             "PreparePoolBufferCnt"          // 预先准备的网络buffer缓冲池的buffer个数
-#define SVR_CFG_PREPARE_POOL_BUFFER_CNT                 "10000"                         // 默认30s心跳
+#define SVR_CFG_PREPARE_POOL_BUFFER_CNT                 "1024"                          // 预先准备的网络buffer缓冲池的buffer个数
+#define SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY         "MaxMemPoolMBPerTransfer"       // 每个数据传输器内存池大小
+#define SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER             "1024"                          // MB为单位
 #pragma endregion
 
 #pragma region Dispatcher default config
@@ -102,6 +104,20 @@
 
 #define SVR_CFG_DISPATCHER_CNT_KEY                      "DispatcherCnt"                   // 消息分发器数量
 #define SVR_CFG_DISPATCHER_CNT                          "1"                               // 消息分发器数量
+#pragma endregion
+
+#pragma region objpool default config
+#define SVR_CFG_OBJPOOL_SEG                             "ObjPool"                         // 对象池配置
+
+#define SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED_KEY       "MaxAllowMBOccupied"              // 最大允许占用内存大小
+#define SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED           "2048"                            // 默认大小2GB
+#pragma endregion
+
+#pragma region memorypool default config
+#define SVR_CFG_MEMORY_POOL_SEG                         "MemoryPool"                      // 内存池配置
+
+#define SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY       "MaxAllowMBOccupied"              // 最大允许占用内存大小
+#define SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED            "2048"                           // 默认大小2GB
 #pragma endregion
 
 // 心跳队列排序

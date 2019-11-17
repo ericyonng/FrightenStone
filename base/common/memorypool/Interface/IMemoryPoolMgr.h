@@ -64,6 +64,7 @@ public:
     virtual void Lock() = 0;
     virtual void Unlock() = 0;
     virtual void PrintMemPoolInfo() const = 0;
+    virtual void SetMaxAllowOccupiedBytes(UInt64 maxAllowBytes) = 0;
 };
 
 template<typename ObjType>

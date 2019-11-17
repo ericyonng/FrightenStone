@@ -270,7 +270,7 @@ Int32 CrashHandleUtil::InitSymbol()
 {
 #ifdef _WIN32
     // ³õÊ¼»¯pdb·ûºÅ
-    if(::SymInitialize(::GetCurrentProcess(), NULL, TRUE) != TRUE)
+    if(!::SymInitialize(::GetCurrentProcess(), NULL, TRUE))
     {
         const Int32 err = GetLastError();
         g_Log->e<CrashHandleUtil>(_LOGFMT_("SymInitialize fail error[%d]"), err);
@@ -319,7 +319,7 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
     {
         ::SymFromAddr(curProc, (DWORD64)stack[frame], 0, symbol);
         IMAGEHLP_LINE64 &imgHelpLine64 = win32ImgHelpLine64;
-        if(::SymGetLineFromAddr64(curProc, symbol->Address, &displacement, &imgHelpLine64) == TRUE)
+        if(::SymGetLineFromAddr64(curProc, symbol->Address, &displacement, &imgHelpLine64))
         {
             backTrace.AppendFormat("#%d 0x%x in %s at %s:%d", frames - frame - 1, (void *)symbol->Address,
                                     symbol->Name, imgHelpLine64.FileName, imgHelpLine64.LineNumber);

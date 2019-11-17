@@ -165,6 +165,7 @@ bool SmartVarTraits::eq(const SmartVar &left, const SmartVar &right)
         if((left.IsDouble() || left.IsFloat()) ||
             (right.IsDouble() || right.IsFloat()))
         {
+            // TODO:浮点数精度问题
             return left.AsDouble() == right.AsDouble();
         }
 

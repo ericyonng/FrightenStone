@@ -79,10 +79,12 @@ IoDataBase *FS_IocpSession::MakeSendIoData()
     auto buffer = _toSend.front()->CastToBuffer<FS_IocpBuffer>();
     auto ioData = buffer->MakeSendIoData();
     
-    auto newNode = new BufferQueueNode;
-    ioData->_node = newNode;
-    newNode->_isPost = true;
-    newNode->_iterNode = _toSend.begin();
+    if(!ioData->_node)
+        ioData->_node = new BufferQueueNode;
+
+    auto node = ioData->_node;
+    node->_isPost = true;
+    node->_iterNode = _toSend.begin();
     return ioData;
 }
 
