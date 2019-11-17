@@ -41,6 +41,8 @@ inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
     // ´´½¨Î¯ÍÐ
    ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
                                             , DelegatePlusFactory::Create(this, &ObjPoolHelper<ObjType>::PrintObjPool));
+
+   ObjPoolMethods::RegisterModifyAllowMaxBytes(DelegatePlusFactory::Create(_alloctor, &IObjAlloctor<ObjType>::SetAllowMaxOccupiedBytes));
 //     ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
 //                                              , DelegatePlusFactory::Create<size_t, size_t &>(obj, &fs::ObjPoolHelper<ObjType>::PrintMemleak));
 }

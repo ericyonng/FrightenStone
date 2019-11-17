@@ -35,6 +35,10 @@
 
 #pragma once
 
+// #define _CRTDBG_MAP_ALLOC
+// #include <stdlib.h>
+// #include <crtdbg.h>
+
 // defs...
 #include "base/common/basedefs/Resource/Resource.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"

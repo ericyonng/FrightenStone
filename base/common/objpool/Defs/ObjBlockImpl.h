@@ -36,7 +36,7 @@ FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
 inline ObjBlock<ObjType>::ObjBlock()
-    :_isNotInPool(false)
+    :_isInPool(false)
 {
 }
 

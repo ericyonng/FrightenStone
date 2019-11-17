@@ -51,6 +51,7 @@ MemoryPoolMgr::MemoryPoolMgr()
     ,_isInit(false)
     ,_printCallback(NULL)
     ,_maxCanAllocMemLimit(__MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_POOL_ALIGN_BYTES__*__MEMORY_POOL_ALIGN_BYTES__)
+    ,_maxAllowOccupiedBytes(__MEMORY_POOL_MAX_EXPAND_BYTES__)
 {
     InitPool();
 }
@@ -116,8 +117,9 @@ void *MemoryPoolMgr::Alloc(size_t bytes)
     }
 
     // ·ÇÄÚ´æ³Ø
-    auto alignBytes = bytes / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (bytes%__MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
-    alignBytes = bytes + sizeof(MemoryBlock);
+    
+    auto alignBytes = __FS_MEMORY_ALIGN__(bytes);
+    alignBytes += sizeof(MemoryBlock);
 
     char *cache = reinterpret_cast<char *>(::malloc(alignBytes));
     MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
@@ -125,6 +127,7 @@ void *MemoryPoolMgr::Alloc(size_t bytes)
     block->_ref = 1;
     block->_alloctor = 0;
     block->_nextBlock = 0;
+    block->_objSize = bytes;
     return  cache + sizeof(MemoryBlock);
 }
 
@@ -134,8 +137,8 @@ void *MemoryPoolMgr::Realloc(void *ptr, size_t bytes)
     MemoryBlock *block = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptr) - sizeof(MemoryBlock));
     if(!block->_isInPool)
     {
-        auto alignBytes = bytes / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (bytes%__MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
-        alignBytes = bytes + sizeof(MemoryBlock);
+        auto alignBytes = __FS_MEMORY_ALIGN__(bytes);
+        alignBytes += sizeof(MemoryBlock);
 
         char *newCache = reinterpret_cast<char *>(::realloc(block, alignBytes));
         block = reinterpret_cast<MemoryBlock *>(newCache);
@@ -143,6 +146,7 @@ void *MemoryPoolMgr::Realloc(void *ptr, size_t bytes)
         block->_ref = 1;
         block->_alloctor = 0;
         block->_nextBlock = 0;
+        block->_objSize = bytes;
         return  newCache + sizeof(MemoryBlock);
     }
 
@@ -188,7 +192,8 @@ void MemoryPoolMgr::PrintMemPoolInfo() const
         totalOccupiedBytes += alloctor->GetOccupiedBytes();
         bytesInUsed += alloctor->GetInUsedBytes();
     }
-    g_Log->mempool("mem pool total occupied bytes[%llu],in used bytes[%llu]", totalOccupiedBytes, bytesInUsed);
+    g_Log->mempool("mem pool total occupied bytes[%llu] maxAllowBytes[%llu],in used bytes[%llu]"
+                   , totalOccupiedBytes, (UInt64)(_maxAllowOccupiedBytes), bytesInUsed);
     g_Log->mempool("=========================================================");
 }
 

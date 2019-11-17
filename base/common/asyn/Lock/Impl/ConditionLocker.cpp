@@ -36,10 +36,10 @@
 #include <process.h>
 #include "base/common/basedefs/BaseDefs.h"
 
-#undef FS_IS_EVENT_WAKE_UP
+#undef FS_IS_EVENT_SINAL_WAKE_UP
 #define FS_IS_EVENT_SINAL_WAKE_UP(waitRet)   \
-(static_cast<long long>(WAIT_OBJECT_0) <= waitRet) &&\
-(waitRet <= static_cast<long long>(MAXIMUM_WAIT_OBJECTS + WAIT_OBJECT_0))
+(static_cast<long long>(WAIT_OBJECT_0) <= (waitRet)) &&\
+((waitRet) <= static_cast<long long>(MAXIMUM_WAIT_OBJECTS + WAIT_OBJECT_0))
 
 FS_NAMESPACE_BEGIN
 

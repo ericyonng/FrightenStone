@@ -151,7 +151,40 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TestInsts.h" />
+    <ClInclude Include="TestInst\TerstSmartVar.h" />
+    <ClInclude Include="TestInst\TestAes.h" />
+    <ClInclude Include="TestInst\TestCpuUtil.h" />
+    <ClInclude Include="TestInst\TestCrashHandle.h" />
+    <ClInclude Include="TestInst\TestDelegate.h" />
+    <ClInclude Include="TestInst\TestEvent.h" />
+    <ClInclude Include="TestInst\TestFile.h" />
+    <ClInclude Include="TestInst\TestFSDirectory.h" />
+    <ClInclude Include="TestInst\TestFSFileUtil.h" />
+    <ClInclude Include="TestInst\TestFSTlsTable.h" />
+    <ClInclude Include="TestInst\TestFS_List.h" />
+    <ClInclude Include="TestInst\TestInterfaceComps.h" />
+    <ClInclude Include="TestInst\TestIocpExample.h" />
+    <ClInclude Include="TestInst\TestJson.h" />
+    <ClInclude Include="TestInst\TestLogFile.h" />
+    <ClInclude Include="TestInst\TestLogModule.h" />
+    <ClInclude Include="TestInst\TestMathUtil.h" />
+    <ClInclude Include="TestInst\TestMemAlign.h" />
+    <ClInclude Include="TestInst\TestMemoryPool.h" />
+    <ClInclude Include="TestInst\TestMessageQueue.h" />
+    <ClInclude Include="TestInst\TestObjPool.h" />
+    <ClInclude Include="TestInst\TestRandom.h" />
+    <ClInclude Include="TestInst\TestRtti.h" />
     <ClInclude Include="TestInst\TestServer.h" />
+    <ClInclude Include="TestInst\TestSingleton.h" />
+    <ClInclude Include="TestInst\TestStream.h" />
+    <ClInclude Include="TestInst\TestString.h" />
+    <ClInclude Include="TestInst\TestSystemUtil.h" />
+    <ClInclude Include="TestInst\TestThreadPool.h" />
+    <ClInclude Include="TestInst\TestTime.h" />
+    <ClInclude Include="TestInst\TestTimeWheel.h" />
+    <ClInclude Include="TestInst\TestTrigger.h" />
+    <ClInclude Include="TestInst\TestUtf8.h" />
+    <ClInclude Include="TestInst\TestXor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

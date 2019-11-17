@@ -39,6 +39,9 @@
 #include "base/common/objpool/Defs/ObjPoolDefs.h"
 #include "base/common/asyn/asyn.h"
 
+#include "base/common/objpool/Defs/FS_ObjPoolDefs.h"
+#include <iostream>
+
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
@@ -63,6 +66,8 @@ public:
     void  Free(void *ptr);
 
     // 线程不安全
+    void *MixAllocNoLocker();
+    void MixFreeNoLocker(void *ptr);
     void *AllocNoLocker();
     void FreeNoLocker(void *ptr);
 
@@ -82,10 +87,12 @@ public:
     size_t GetObjBlockSize();
     void Lock();
     void UnLock();
+    void SetAllowMaxOccupiedBytes(UInt64 maxBytes);
 
 private:
     // 线程不安全接口，多线程时接口外面请加锁
     void _NewNode();
+    void _InitNode(AlloctorNode<ObjType> *newNode);
     void *_AllocFromSys();
 
 protected:
@@ -97,6 +104,7 @@ protected:
     AlloctorNode<ObjType> *_header;         // 头节点
     AlloctorNode<ObjType> *_lastNode;       // 最新的节点
     static const size_t _objBlockSize;      // 对象块大小
+    size_t _objpoolAllowedMaxOccupiedBytes; // 对象池允许的最大占用
 
     // 内存泄漏相关
     size_t          _nodeCnt;               // 节点个数

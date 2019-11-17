@@ -24,7 +24,8 @@ void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_
     }
     
     // 打印内存占用信息
-    g_Log->objpool("[objpool memory info]: obj name[%s], extStr[%s], pool node cnt[%llu] totalObjBlockCnt[%llu] objBlockSize[%llu] pool memory bytes occupiedBytes[%llu]"
+    g_Log->objpool("[objpool memory info cur total occupied bytes[%llu]]: obj name[%s], extStr[%s], pool node cnt[%llu] totalObjBlockCnt[%llu] objBlockSize[%llu] pool memory bytes occupiedBytes[%llu]"
+               , (UInt64)(g_curObjPoolOccupiedBytes)
                , objName
                , extStr
                , nodeCnt
@@ -48,6 +49,15 @@ void ObjPoolMethods::UnRegisterMemleakDelegate(const char *objName)
         fs::MemleakMonitor::GetInstance();
 
     g_MemleakMonitor->UnRegisterObjPool(objName);
+}
+
+void ObjPoolMethods::RegisterModifyAllowMaxBytes(IDelegate<void, UInt64> *callback)
+{
+    // TODO
+    if(!g_MemleakMonitor)
+        fs::MemleakMonitor::GetInstance();
+
+    g_MemleakMonitor->RegisterObjPoolModifyMaxAllowBytesCallback(callback);
 }
 
 FS_NAMESPACE_END

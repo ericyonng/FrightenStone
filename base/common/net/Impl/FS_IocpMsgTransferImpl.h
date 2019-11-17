@@ -120,15 +120,6 @@ inline void FS_IocpMsgTransfer::_UpdateSessionHeartbeat(IFS_Session *session)
     _sessionHeartbeatQueue.insert(session);
 }
 
-inline void FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor()
-{
-    if(!_canCreateNewNodeForAlloctor)
-        return;
-
-    if(_sessionBufferAlloctor->GetOccupiedBytes() >= __MEMORY_POOL_MAX_EXPAND_BYTES__)
-        _canCreateNewNodeForAlloctor = false;
-}
-
 inline void FS_IocpMsgTransfer::_CancelSessionWhenTransferZero(FS_IocpSession *session)
 {
     _toRemove.insert(session);
@@ -136,6 +127,29 @@ inline void FS_IocpMsgTransfer::_CancelSessionWhenTransferZero(FS_IocpSession *s
     _toPostSend.erase(session);
 }
 
+inline void FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor(size_t addOccupiedBytes)
+{
+    if(!_canCreateNewNodeForAlloctor)
+        return;
+
+    _curAlloctorOccupiedBytes += addOccupiedBytes;
+    if(_curAlloctorOccupiedBytes >= _maxAlloctorBytes)
+        _canCreateNewNodeForAlloctor = false;
+}
+
+inline void FS_IocpMsgTransfer::_PrintAlloctorOccupiedInfo()
+{
+    FS_String memInfo;
+    memInfo.AppendFormat("\n¡¾iocp transfer alloctor occupied info¡¿\n");
+    memInfo.AppendFormat("transfer id[%d] threadId[%lu] alloctor occupied info:[", _id, _transferThreadId);
+    _sessionBufferAlloctor->MemInfoToString(memInfo);
+    memInfo.AppendFormat("total occupied bytes[%llu], in used bytes[%llu]."
+                         , _sessionBufferAlloctor->GetOccupiedBytes()
+                         , _sessionBufferAlloctor->GetInUsedBytes());
+    memInfo.AppendFormat(" ]");
+    memInfo.AppendFormat("\n¡¾+++++++++++++++++++++++++ End ++++++++++++++++++++++++++¡¿\n");
+    g_Log->mempool("%s", memInfo.c_str());
+}
 FS_NAMESPACE_END
 #endif
 

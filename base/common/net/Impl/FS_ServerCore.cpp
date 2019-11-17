@@ -92,6 +92,9 @@ FS_ServerCore::~FS_ServerCore()
     Fs_SafeFree(_cpuInfo);
     Fs_SafeFree(_serverConfigMgr);
     g_ServerCore = NULL;
+
+    STLUtil::DelVectorContainer(_senderMessageQueue);
+    Fs_SafeFree(_messageQueue);
 }
 
 #pragma region api
@@ -265,6 +268,9 @@ void FS_ServerCore::Close()
     for(Int32 i = 0; i < senderMqSize; ++i)
         _senderMessageQueue[i]->Close();
 
+    STLUtil::DelVectorContainer(_senderMessageQueue);
+    Fs_SafeFree(_messageQueue);
+
     _pool->Close();
 
     // 最后一刻扫描
@@ -302,8 +308,16 @@ void FS_ServerCore::_OnConnected(const BriefSessionInfo &sessionInfo)
 {// 只有connector调用接口
 
     // 求余法，将session分配到各个消息处理模块
-    const auto sessionHash = sessionInfo._sessionId % _msgTransfers.size();
-    auto minTransfer = _msgTransfers[sessionHash];
+//     const auto sessionHash = sessionInfo._sessionId % _msgTransfers.size();
+//     auto minTransfer = _msgTransfers[sessionHash];
+
+    const Int32 transferQuantity = static_cast<Int32>(_msgTransfers.size());
+    IFS_MsgTransfer *minTransfer = _msgTransfers[0];
+    for(Int32 i = 0; i < transferQuantity; ++i)
+    {
+        if(minTransfer->GetSessionCnt() > _msgTransfers[i]->GetSessionCnt())
+            minTransfer = _msgTransfers[i];
+    }
 
     // 统计session数量
     ++_curSessionConnecting;

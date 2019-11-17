@@ -48,6 +48,7 @@
 #include "base/common/socket/socket.h"
 #include "base/common/net/Impl/FS_Addr.h"
 #include "base/common/component/Impl/MessageQueue/MessageQueue.h"
+#include "base/common/memleak/memleak.h"
 
 FS_NAMESPACE_BEGIN
 FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
@@ -65,7 +66,13 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     ,_recvMsgList(NULL)
     ,_sessionBufferAlloctor(NULL)
     ,_canCreateNewNodeForAlloctor(true)
+    ,_maxAlloctorBytes(0)
+    ,_curAlloctorOccupiedBytes(0)
+    ,_updateAlloctorOccupied(NULL)
+    ,_transferThreadId(0)
+    ,_printAlloctorOccupiedInfo(NULL)
 {
+/*        _CrtMemCheckpoint(&s1);*/
 }
 
 FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
@@ -78,6 +85,12 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
     Fs_SafeFree(_senderMsgs);
     Fs_SafeFree(_recvMsgList);
     Fs_SafeFree(_sessionBufferAlloctor);
+    Fs_SafeFree(_updateAlloctorOccupied);
+    Fs_SafeFree(_printAlloctorOccupiedInfo);
+
+//     _CrtMemCheckpoint(&s2);
+//     if(_CrtMemDifference(&s3, &s1, &s2))
+//         _CrtMemDumpStatistics(&s3);
 }
 
 Int32 FS_IocpMsgTransfer::BeforeStart()
@@ -88,8 +101,11 @@ Int32 FS_IocpMsgTransfer::BeforeStart()
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("prepare buffer pool block amount is zero."));
         return StatusDefs::IocpMsgTransfer_CfgError;
     }
-    _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, NULL, &_canCreateNewNodeForAlloctor);
+    _maxAlloctorBytes = g_SvrCfg->GetMaxMemPoolBytesPerTransfer();
+    _updateAlloctorOccupied = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor);
+    _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, _updateAlloctorOccupied, &_canCreateNewNodeForAlloctor);
     _sessionBufferAlloctor->InitMemory();
+    _printAlloctorOccupiedInfo = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_PrintAlloctorOccupiedInfo);
 
     _threadPool = new FS_ThreadPool(0, 1);
     _iocp = new FS_Iocp;
@@ -158,8 +174,13 @@ void FS_IocpMsgTransfer::Close()
 
 void FS_IocpMsgTransfer::AfterClose()
 {
+    // 内存分配器占用情况打印结束
+    g_MemleakMonitor->UnRegisterMemPoolPrintCallback(_transferThreadId);
+
     if(_sessionBufferAlloctor)
         _sessionBufferAlloctor->FinishMemory();
+
+    Fs_SafeFree(_updateAlloctorOccupied);
 }
 
 void FS_IocpMsgTransfer::OnConnect(const BriefSessionInfo  &sessionInfo)
@@ -183,6 +204,10 @@ void FS_IocpMsgTransfer::OnHeartBeatTimeOut(IFS_Session *session)
 
 void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 {// iocp 在closesocket后会马上返回所有投递的事件，所以不可立即在post未结束时候释放session对象
+
+    // 初始化配置
+    _transferThreadId = SystemUtil::GetCurrentThreadId();
+    g_MemleakMonitor->RegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
 
     ULong waitTime = 1;   // TODO可以调节（主要用于心跳检测）
     Int32 ret = StatusDefs::Success;
@@ -222,9 +247,6 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
             _RemoveSessions(true);
             break;
         }
-
-        // 刷新内存分配器分配尺度避免分配器耗尽系统内存
-        _UpdateCanCreateNewNodeForAlloctor();
 
         // 6.domsg 消耗比较大，在高并发情况下可能会导致超时
         _OnMsgArrived();
@@ -378,10 +400,14 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
     }
 
     _messageQueue->PushLock(_generatorId);
-    _messageQueue->Push(_generatorId, _recvMsgList);
+    if(!_messageQueue->Push(_generatorId, _recvMsgList))
+    {
+        if(!_recvMsgList->empty())
+            g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", _recvMsgList->size());
+        STLUtil::DelListContainer(*_recvMsgList);
+    }
     _messageQueue->PushUnlock(_generatorId);
-    if(!_recvMsgList->empty())
-        g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", _recvMsgList->size());
+
 }
 
 void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
@@ -414,10 +440,14 @@ void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
     }
 
     _messageQueue->PushLock(_generatorId);
-    _messageQueue->Push(_generatorId, _recvMsgList);
+    if(!_messageQueue->Push(_generatorId, _recvMsgList))
+    {
+        if(!_recvMsgList->empty())
+            g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", _recvMsgList->size());
+        STLUtil::DelListContainer(*_recvMsgList);
+    }
     _messageQueue->PushUnlock(_generatorId);
-    if(!_recvMsgList->empty())
-        g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", _recvMsgList->size());
+
 }
 
 void FS_IocpMsgTransfer::_OnDelayDisconnected(FS_IocpSession *session)
@@ -512,7 +542,9 @@ void FS_IocpMsgTransfer::_NtySessionConnectedMsg(UInt64 sessionId)
     newMsgBlock->_mbType = MessageBlockType::MB_NetSessionConnected;
     newMsgBlock->_sessionId = sessionId;
     _messageQueue->PushLock(_id);
-    _messageQueue->Push(_id, newMsgBlock);
+    if(!_messageQueue->Push(_id, newMsgBlock))
+        Fs_SafeFree(newMsgBlock);
+
     _messageQueue->Notify(_id);
     _messageQueue->PushUnlock(_id);
 }
@@ -524,7 +556,8 @@ void FS_IocpMsgTransfer::_NtySessionDisConnectMsg(UInt64 sessionId)
     newMsgBlock->_mbType = MessageBlockType::MB_NetSessionDisconnect;
     newMsgBlock->_sessionId = sessionId;
     _messageQueue->PushLock(_id);
-    _messageQueue->Push(_id, newMsgBlock);
+    if(!_messageQueue->Push(_id, newMsgBlock))
+        Fs_SafeFree(newMsgBlock);
     _messageQueue->Notify(_id);
     _messageQueue->PushUnlock(_id);
 }
@@ -698,6 +731,7 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
         _connectorGuard.Unlock();
     }
 }
+
 
 FS_NAMESPACE_END
 

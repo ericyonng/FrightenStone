@@ -105,22 +105,27 @@ private:
     void _ClearSessionsWhenClose();
 
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
-    void _UpdateCanCreateNewNodeForAlloctor();
     void _CheckSessionHeartbeat();  // 线程不安全
-
     void _PostEventsToIocp();
-
     void _AsynSendFromDispatcher();
     void _ClearSenderMessageQueue();
     void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
     void _LinkCacheToSessions();
-
     void _CancelSessionWhenTransferZero(FS_IocpSession *session);
+
+    void _UpdateCanCreateNewNodeForAlloctor(size_t addOccupiedBytes);
+    void _PrintAlloctorOccupiedInfo();
 
 private:
     Int32 _id;
+    ULong _transferThreadId;
     IMemoryAlloctor *_sessionBufferAlloctor;
+    UInt64 _maxAlloctorBytes;
+    std::atomic<size_t> _curAlloctorOccupiedBytes;
     std::atomic_bool _canCreateNewNodeForAlloctor;
+    IDelegate<void, size_t> *_updateAlloctorOccupied;
+    IDelegate<void> *_printAlloctorOccupiedInfo;
+
     std::atomic<Int32> _sessionCnt;             // 会话个数
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;
@@ -149,6 +154,10 @@ private:
     std::set<FS_IocpSession *> _toPostRecv;
     std::set<FS_IocpSession *> _toPostSend;
     std::set<FS_IocpSession *> _toRemove;
+
+//     _CrtMemState s1;
+//     _CrtMemState s2;
+//     _CrtMemState s3;
 };
 
 FS_NAMESPACE_END

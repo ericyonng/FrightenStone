@@ -58,6 +58,7 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id)
     ,_id(id)
     ,_recvMsgBlocks(NULL)
 {
+/*    _CrtMemCheckpoint(&s1);*/
     g_Dispatcher = this;
 }
 
@@ -66,6 +67,10 @@ FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
     Fs_SafeFree(_pool);
     Fs_SafeFree(_timeWheel);
     g_BusinessTimeWheel = NULL;
+
+//     _CrtMemCheckpoint(&s2);
+//     if(_CrtMemDifference(&s3, &s1, &s2))
+//         _CrtMemDumpStatistics(&s3);
 }
 
 Int32 FS_IocpMsgDispatcher::BeforeStart()
@@ -154,9 +159,10 @@ void FS_IocpMsgDispatcher::Close()
                                              , netMsg->_sessionId);
         }
 
-        STLUtil::DelListContainer(*_recvMsgBlocks);
-        Fs_SafeFree(_recvMsgBlocks);
     }
+
+    STLUtil::DelListContainer(*_recvMsgBlocks);
+    Fs_SafeFree(_recvMsgBlocks);
 }
 // 
 // void FS_IocpMsgDispatcher::OnRecv(std::list<IFS_Session *> &sessions, Int64 &incPacketsCnt)
@@ -224,7 +230,8 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
 
     // 送入消息队列
     senderMq[consumerId]->PushLock();
-    senderMq[consumerId]->Push(newMsgBlock);
+    if(!senderMq[consumerId]->Push(newMsgBlock))
+        Fs_SafeFree(newMsgBlock);
     senderMq[consumerId]->Notify();
     senderMq[consumerId]->PushUnlock();
 }
@@ -232,7 +239,7 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
 void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 {// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
 
-    _timeWheel->GetModifiedResolution(_resolutionInterval);
+    // _timeWheel->GetModifiedResolution(_resolutionInterval);
     while(pool->IsPoolWorking())
     {
         _messgeQueue->PopLock(_id);

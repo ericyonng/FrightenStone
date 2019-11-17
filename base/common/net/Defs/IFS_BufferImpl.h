@@ -200,7 +200,7 @@ inline void IFS_Buffer::_Init()
         return;
     }
 
-    _buff = _alloctor->AllocMemory<char>(_bufferSize);
+    _buff = _alloctor->MixAlloc<char>(_bufferSize);
     _curPos = 0;
 }
 
@@ -208,7 +208,7 @@ inline void IFS_Buffer::_Destroy()
 {
     if(_buff)
     {
-        _alloctor->FreeMemory(_buff);
+        _alloctor->MixFree(_buff);
         _buff = NULL;
         _bufferSize = 0;
         _curPos = 0;

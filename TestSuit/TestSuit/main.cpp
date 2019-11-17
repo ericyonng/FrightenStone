@@ -29,6 +29,12 @@
  *
  * 
  */
+#ifdef _WIN32
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // _WIN32
+
 #include "TestSuit/TestSuit/TestInsts.h"
 #include "stdio.h"
 #include "iostream"
@@ -51,11 +57,15 @@ public:
         *obj = 55;
     }
 };
+
 int main()
 {
+    _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+
     TestInsts inst;
     inst.Run();
     std::cout << "main end" << std::endl;
+    _CrtDumpMemoryLeaks();
     getchar();
     return 0;
 }

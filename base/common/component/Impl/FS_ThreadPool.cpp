@@ -44,8 +44,6 @@
 
 FS_NAMESPACE_BEGIN
 
-// OBJ_POOL_CREATE_IMPL(FS_ThreadPool, _objPoolHelper, __DEF_OBJ_POOL_OBJ_NUM__)
-
 FS_ThreadPool::FS_ThreadPool()
 {
 
@@ -222,13 +220,12 @@ void FS_ThreadPool::SetThreadLimit(Int32 minNum, Int32 maxNum)
 IMemoryPoolMgr *FS_ThreadPool::NewCurThreadMemPool()
 {
     // ´´½¨ÄÚ´æ³Ø
-    IMemoryPoolMgr *memPool = NULL;
     auto tlsTable = FS_TlsUtil::GetUtilTlsTable();
     auto tlsMemPool = tlsTable->GetElement<Tls_MemoryPool>(TlsElemType::Tls_MemoryPool);
     if(!tlsMemPool)
         tlsMemPool = tlsTable->AllocElement<Tls_MemoryPool>(TlsElemType::Tls_MemoryPool);
 
-    memPool = tlsMemPool->_pool;
+    IMemoryPoolMgr *memPool = tlsMemPool->_pool;
     if(memPool)
         ASSERT(memPool->InitPool() != StatusDefs::Success);
 

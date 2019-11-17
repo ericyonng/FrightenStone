@@ -66,6 +66,12 @@ public:
     virtual ~IMemoryAlloctor();
 
 public:
+    // 达到分配器所能达到的最大分配容量时使用系统分配
+    void *MixAlloc(size_t bytes);
+    template<typename ObjType>
+    ObjType *MixAlloc(size_t bytes);
+    void MixFree(void *ptr);
+
     void *AllocMemory(size_t bytesCnt);
     template<typename ObjType>
     ObjType *AllocMemory(size_t bytesCnt);
@@ -75,6 +81,7 @@ public:
     size_t GetOccupiedBytes() const;
     size_t GetInUsedBytes() const;
     void PrintMemInfo() const;
+    void MemInfoToString(FS_String &outStr) const;
 
     // 单线程可不用，非必要接口
     void Lock();
@@ -111,7 +118,7 @@ protected:
     Locker _locker;
 };
 
-class MemoryAlloctor : public IMemoryAlloctor
+class BASE_EXPORT MemoryAlloctor : public IMemoryAlloctor
 {
 public:
     MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied = NULL, std::atomic<bool> *canCreateNewNode = NULL);

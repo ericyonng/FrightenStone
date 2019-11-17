@@ -59,12 +59,17 @@ FS_IocpConnector::FS_IocpConnector()
     ,_curMaxSessionId(0)
     ,_maxSessionIdLimit((std::numeric_limits<UInt64>::max)())
 {
+/*     _CrtMemCheckpoint(&s1);*/
 }
 
 FS_IocpConnector::~FS_IocpConnector()
 {
     Fs_SafeFree(_closeIocpDelegate);
     Fs_SafeFree(_threadPool);
+
+//     _CrtMemCheckpoint(&s2);
+//     if(_CrtMemDifference(&s3, &s1, &s2))
+//         _CrtMemDumpStatistics(&s3);
 }
 
 Int32 FS_IocpConnector::BeforeStart()
@@ -348,6 +353,7 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
         ioDataArray[i] = g_MemoryPool->Alloc<IoDataBase>(sizeof(IoDataBase));
         g_MemoryPool->Unlock();
 
+        memset(ioDataArray[i], 0, sizeof(IoDataBase));
         ioDataArray[i]->_wsaBuff.buf = bufArray[i];
         ioDataArray[i]->_wsaBuff.len = IOCP_CONNECTOR_BUFFER;
 

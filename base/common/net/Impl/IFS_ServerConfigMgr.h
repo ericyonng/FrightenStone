@@ -60,17 +60,41 @@ public:
     Int32 GetTransferCnt() const;
     Int32 GetHeartbeatDeadTimeInterval() const;
     Int32 GetPrepareBufferPoolCnt() const;
+    UInt64 GetMaxMemPoolBytesPerTransfer() const;
 
     /* dispatcher */
     Int32 GetDispatcherCnt() const;
 
+    /* 对象池 */
+    UInt64 GetMaxAllowObjPoolBytesOccupied() const;
+
+    /* 内存池最大占用大小 */
+    UInt64 GetMaxAllowMemoryPoolBytesOccupied() const;
+
 private:
     Int32 _InitDefCfgs();
+    void _ReadCfgs();
 
 private:
     FS_IniFile *_ini;
+
+    FS_String _ip;
+    UInt16 _port;
+    Int32 _maxConnectQuantityLimit;
+    
+    Int32 _transferCnt;
+    Int32 _heartbeatDeadTimeInterval;
+    Int32 _prepareBufferPoolCnt;
+    UInt64 _maxMemPoolBytesPerTransfer;
+
+    Int32 _dispatcherCnt;
+
+    UInt64 _maxAllowObjPoolBytesOccupied;
+    UInt64 _maxAllowMemPoolBytesOccupied;
 };
 
 FS_NAMESPACE_END
+
+#include "base/common/net/Impl/IFS_ServerConfigMgrImpl.h"
 
 #endif

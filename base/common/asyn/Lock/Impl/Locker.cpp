@@ -52,6 +52,8 @@ Locker::~Locker()
         delete obj;
         obj = NULL;
     }
+
+  // Fs_SafeFree(_metaLocker);
 }
 
 void Locker::Lock()

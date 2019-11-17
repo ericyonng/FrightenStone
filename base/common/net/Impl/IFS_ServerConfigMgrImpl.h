@@ -21,41 +21,69 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : MemoryBlock.h
+ * @file  : IFS_ServerConfigMgrImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/5
+ * @date  : 2019/11/17
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Base_Common_MemoryPool_Defs_MemoryBlock_H__
-#define __Base_Common_MemoryPool_Defs_MemoryBlock_H__
+#ifdef __Base_Common_Net_Impl_IFS_ServerConfigMgr_H__
 
 #pragma once
 
-#include "base/exportbase.h"
-#include "base/common/basedefs/BaseDefs.h"
-#include "base/common/component/Impl/FS_String.h"
-
 FS_NAMESPACE_BEGIN
 
-class IMemoryAlloctor;
-
-class BASE_EXPORT MemoryBlock
+inline FS_String IFS_ServerConfigMgr::GetListenIp() const
 {
-public:
-    MemoryBlock(IMemoryAlloctor *alloctor);
+    return _ip;
+}
 
-    size_t           _objSize;
-    IMemoryAlloctor  *_alloctor;
-    MemoryBlock     *_nextBlock;
-    Int32           _ref;           // 引用计数
-    bool            _isInPool;
-    char            _reserver1;     // 保留位，用于内存对齐
-    char            _reserver2;     // 保留位，用于内存对齐
-    char            _reserver3;     // 保留位，用于内存对齐
-};
+inline UInt16 IFS_ServerConfigMgr::GetListenPort() const
+{
+    return _port;
+}
+
+inline Int32 IFS_ServerConfigMgr::GetMaxConnectQuantityLimit() const
+{
+    return _maxConnectQuantityLimit;
+}
+
+inline Int32 IFS_ServerConfigMgr::GetTransferCnt() const
+{
+    return _transferCnt;
+}
+
+inline Int32 IFS_ServerConfigMgr::GetHeartbeatDeadTimeInterval() const
+{
+    return _heartbeatDeadTimeInterval;
+}
+
+inline Int32 IFS_ServerConfigMgr::GetPrepareBufferPoolCnt() const
+{
+    return _prepareBufferPoolCnt;
+}
+
+inline UInt64 IFS_ServerConfigMgr::GetMaxMemPoolBytesPerTransfer() const
+{
+    return _maxMemPoolBytesPerTransfer;
+}
+
+inline Int32 IFS_ServerConfigMgr::GetDispatcherCnt() const
+{
+    return _dispatcherCnt;
+}
+
+inline UInt64 IFS_ServerConfigMgr::GetMaxAllowObjPoolBytesOccupied() const
+{
+    return _maxAllowObjPoolBytesOccupied;
+}
+
+inline UInt64 IFS_ServerConfigMgr::GetMaxAllowMemoryPoolBytesOccupied() const
+{
+    return _maxAllowMemPoolBytesOccupied;
+}
 
 FS_NAMESPACE_END
 

@@ -49,6 +49,7 @@ public:
 public:
     static const size_t _objBlockSize;
     void *_objs;
+    size_t _nodeSize;
     AlloctorNode<ObjType> *_nextNode;
 };
 

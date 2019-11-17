@@ -34,6 +34,12 @@
 
 FS_NAMESPACE_BEGIN
 template<typename ObjType>
+inline ObjType *IMemoryAlloctor::MixAlloc(size_t bytes)
+{
+    return reinterpret_cast<ObjType *>(MixAlloc(bytes));
+}
+
+template<typename ObjType>
 inline ObjType *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
 {
     return reinterpret_cast<ObjType *>(AllocMemory(bytesCnt));

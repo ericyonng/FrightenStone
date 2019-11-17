@@ -61,6 +61,39 @@ IMemoryAlloctor::~IMemoryAlloctor()
     FinishMemory();
 }
 
+void *IMemoryAlloctor::MixAlloc(size_t bytes)
+{
+    auto ptr = AllocMemory(bytes);
+    if(ptr)
+        return ptr;
+
+    char *cache = reinterpret_cast<char *>(::malloc(_blockSize));
+    MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
+    block->_isInPool = false;
+    block->_ref = 1;
+    block->_alloctor = NULL;
+    block->_nextBlock = 0;
+    block->_objSize = bytes;
+
+    return  cache + sizeof(MemoryBlock);
+}
+
+void IMemoryAlloctor::MixFree(void *ptr)
+{
+    // 内存块头
+    char *ptrToFree = reinterpret_cast<char*>(ptr);
+    MemoryBlock *blockHeader = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptrToFree - sizeof(MemoryBlock)));
+
+    if(blockHeader->_isInPool)
+    {
+        FreeMemory(ptr);
+        return;
+    }
+
+    if(--blockHeader->_ref == 0)
+        ::free(blockHeader);
+}
+
 void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
 {
     // 判断free链表
@@ -91,7 +124,7 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
         newBlock->_ref = 1;
     }
     
-    newBlock->_objSize = static_cast<Int64>(bytesCnt);
+    newBlock->_objSize = bytesCnt;
     ++_memBlockInUse;
 
     return ((char*)newBlock) + sizeof(MemoryBlock);   // 从block的下一个地址开始才是真正的申请到的内存
@@ -159,6 +192,12 @@ void IMemoryAlloctor::PrintMemInfo() const
                    ,_blockSize, (Int64)_curNodeCnt, _curNodeCnt*_blockAmount*_blockSize, _memBlockInUse*_blockSize);
 }
 
+void IMemoryAlloctor::MemInfoToString(FS_String &outStr) const
+{
+    outStr.AppendFormat("blockSize[%llu] nodecnt[%lld],total bytes occupied[%lld],memblock in used bytes[%lld]"
+                        , _blockSize, (Int64)_curNodeCnt, _curNodeCnt*_blockAmount*_blockSize, _memBlockInUse*_blockSize);
+}
+
 void IMemoryAlloctor::InitMemory()
 {
     // 初始化头节点
@@ -167,6 +206,9 @@ void IMemoryAlloctor::InitMemory()
     ++_curNodeCnt;
 
     _InitNode(_header);
+
+    if(_updateMemPoolOccupied)
+        _updateMemPoolOccupied->Invoke(_lastNode->_nodeSize);
 }
 
 void IMemoryAlloctor::FinishMemory()
@@ -223,8 +265,8 @@ MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<v
     :IMemoryAlloctor(canCreateNewNode)
 {
     _blockAmount = blockAmount;
-    _blockSize = blockSize / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + (blockSize % __MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0);
-    _blockSize = _blockSize + sizeof(MemoryBlock);
+    _blockSize = __FS_MEMORY_ALIGN__(blockSize);
+    _blockSize += sizeof(MemoryBlock);
     _effectiveBlockSize = _blockSize - sizeof(MemoryBlock);
     _updateMemPoolOccupied = updateMemPoolOccupied;
 }

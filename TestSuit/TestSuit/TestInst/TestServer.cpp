@@ -648,7 +648,7 @@ void TestServer::Run()
     //serverCore->Wait();
     serverCore->Close();
     Fs_SafeFree(serverCore);
-
+    g_Log->FinishModule();
     std::cout << "free server core" << std::endl;
     getchar();
 }

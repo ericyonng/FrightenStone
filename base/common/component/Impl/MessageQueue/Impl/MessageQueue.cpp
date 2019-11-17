@@ -322,6 +322,14 @@ void ConcurrentMessageQueue::Close()
         Fs_SafeFree(_consumerGuards[i]);
     }
 
+    _genoratorGuards.clear();
+    _generatorChange.clear();
+    _generatorMsgQueues.clear();
+    _msgSwitchQueues.clear();
+    _consumerGuards.clear();
+    _msgConsumerQueueChanges.clear();
+    _consumerMsgQueues.clear();
+
     // 打印未处理的消费者消息队列id
     for(auto queueId : hasMsgQueueId)
         g_Log->w<ConcurrentMessageQueue>(_LOGFMT_("consumer queueId[%u] has msgs unhandled"), queueId);
