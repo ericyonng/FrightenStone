@@ -111,7 +111,6 @@ private:
     void _ClearSenderMessageQueue();
     void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
     void _LinkCacheToSessions();
-    void _CancelSessionWhenTransferZero(FS_IocpSession *session);
 
     void _UpdateCanCreateNewNodeForAlloctor(size_t addOccupiedBytes);
     void _PrintAlloctorOccupiedInfo();
