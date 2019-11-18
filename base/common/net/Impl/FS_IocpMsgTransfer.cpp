@@ -297,7 +297,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            _ioEvent->_bytesTrans);
 
              session->ResetPostRecvMask();
-            session->Close();
+             _OnDelayDisconnected(session);
             _CancelSessionWhenTransferZero(session);
             return StatusDefs::Success;
         }
@@ -324,7 +324,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
              session->ResetPostSendMask();
-            session->Close();
+             _OnDelayDisconnected(session);
             _CancelSessionWhenTransferZero(session);
             return StatusDefs::Success;
         }
@@ -372,28 +372,25 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
     for(auto iterSession = _msgArriviedSessions.begin(); iterSession != _msgArriviedSessions.end();)
     {
         session = *iterSession;
-        if(_toRemove.find(session) == _toRemove.end())
-        {// TODO:断开了但同时收到消息处理不？目前暂时不处理
-            sessionId = session->GetSessionId();
-            auto recvBuffer = session->CastToRecvBuffer();
-            while(recvBuffer->HasMsg())
-            {
-                auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
+        sessionId = session->GetSessionId();
+        auto recvBuffer = session->CastToRecvBuffer();
+        while(recvBuffer->HasMsg())
+        {
+            auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
 
-                // 创建消息
-                FS_NetMsgBufferBlock *newBlock = new FS_NetMsgBufferBlock;
-                newBlock->_generatorId = _id;
-                newBlock->_sessionId = sessionId;
-                newBlock->_mbType = MessageBlockType::MB_NetMsgArrived;
-                g_MemoryPool->Lock();
-                newBlock->_buffer = g_MemoryPool->Alloc<Byte8>(frontMsg->_packetLength);
-                g_MemoryPool->Unlock();
-                ::memcpy(newBlock->_buffer, frontMsg, frontMsg->_packetLength);
+            // 创建消息
+            FS_NetMsgBufferBlock *newBlock = new FS_NetMsgBufferBlock;
+            newBlock->_generatorId = _id;
+            newBlock->_sessionId = sessionId;
+            newBlock->_mbType = MessageBlockType::MB_NetMsgArrived;
+            g_MemoryPool->Lock();
+            newBlock->_buffer = g_MemoryPool->Alloc<Byte8>(frontMsg->_packetLength);
+            g_MemoryPool->Unlock();
+            ::memcpy(newBlock->_buffer, frontMsg, frontMsg->_packetLength);
 
-                _recvMsgList->push_back(newBlock);
-                g_ServerCore->_OnRecvMsgAmount(frontMsg);
-                recvBuffer->PopFront(frontMsg->_packetLength);
-            }
+            _recvMsgList->push_back(newBlock);
+            g_ServerCore->_OnRecvMsgAmount(frontMsg);
+            recvBuffer->PopFront(frontMsg->_packetLength);
         }
 
         iterSession = _msgArriviedSessions.erase(iterSession);
@@ -495,7 +492,7 @@ bool FS_IocpMsgTransfer::_DoPostSend(FS_IocpSession *session)
         if(st != StatusDefs::Success)
         {
             session->ResetPostSendMask();
-            session->Close();
+            _OnDelayDisconnected(session);
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
@@ -519,7 +516,7 @@ bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session)
         if(st != StatusDefs::Success)
         {
             session->ResetPostRecvMask();
-            session->Close();
+            _OnDelayDisconnected(session);
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
@@ -585,8 +582,7 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
 
         g_ServerCore->_OnHeartBeatTimeOut(session);
         iterSession = _sessionHeartbeatQueue.erase(iterSession);
-        session->Close();
-        session->ResetAllIoMask();
+        session->MaskClose();
         _toRemove.insert(session);
 //        g_Log->any<FS_IocpMsgTransfer>("nowTime[%lld][%s] sessionId[%llu] expiredtime[%llu][%s] heartbeat time out."
 //                                       , _curTime.GetMicroTimestamp(), _curTime.ToStringOfMillSecondPrecision().c_str()
@@ -619,10 +615,8 @@ void FS_IocpMsgTransfer::_PostEventsToIocp()
             iterSend = _toPostSend.erase(iterSend);
             continue;
         }
-
-        if(session->CanPost() && !session->IsPostSend())
-            _DoPostSend(session);
         
+        _DoPostSend(session);
         iterSend = _toPostSend.erase(iterSend);
     }
 }

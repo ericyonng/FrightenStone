@@ -77,19 +77,16 @@ inline void FS_IocpMsgTransfer::_RemoveSessions(bool forceDisconnect)
         session = *iterSsession;
         _toPostRecv.erase(session);
         _toPostSend.erase(session);
-        session->MaskClose();
-        session->ResetAllIoMask();
-        _OnDisconnected(session);
-//         if(!forceDisconnect)
-//         {
-//             _OnGracefullyDisconnect(session);
-//         }
-//         else
-//         {
-//             session->MaskClose();
-//             session->ResetAllIoMask();
-//             _OnDisconnected(session);
-//         }
+        if(!forceDisconnect)
+        {
+            _OnGracefullyDisconnect(session);
+        }
+        else
+        {
+            session->MaskClose();
+            session->ResetAllIoMask();
+            _OnDisconnected(session);
+        }
 
         iterSsession = _toRemove.erase(iterSsession);
         // _OnGracefullyDisconnect(session);

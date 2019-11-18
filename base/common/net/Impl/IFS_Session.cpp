@@ -108,7 +108,7 @@ bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
     }
 
     // »º³å¿Õ¼ä²»×ã
-    IFS_Buffer *buffer = _toSend.front();
+    IFS_Buffer *buffer = _toSend.back();
     if(!buffer->CanPush(header->_packetLength))
     {
         buffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF, _alloctor);
