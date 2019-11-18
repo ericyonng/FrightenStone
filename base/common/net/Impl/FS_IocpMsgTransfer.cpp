@@ -298,7 +298,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 
              session->ResetPostRecvMask();
              _OnDelayDisconnected(session);
-            _CancelSessionWhenTransferZero(session);
+             _toRemove.insert(session);
             return StatusDefs::Success;
         }
 
@@ -325,7 +325,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            _ioEvent->_bytesTrans);
              session->ResetPostSendMask();
              _OnDelayDisconnected(session);
-            _CancelSessionWhenTransferZero(session);
+             _toRemove.insert(session);
             return StatusDefs::Success;
         }
 
@@ -346,7 +346,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
     {
         session->EnableDisconnect();
         session->Close();
-        _CancelSessionWhenTransferZero(session);
+        _toRemove.insert(session);
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
     }
 
