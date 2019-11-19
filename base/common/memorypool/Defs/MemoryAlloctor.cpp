@@ -42,7 +42,7 @@ FS_NAMESPACE_BEGIN
 IMemoryAlloctor::IMemoryAlloctor(std::atomic<bool>  *canCreateNewNode)
     :_isFinish(false)
     ,_curBuf(NULL)
-    ,_blockAmount(BLOCK_AMOUNT_DEF)
+    ,_curBlockAmount(BLOCK_AMOUNT_DEF)
     ,_usableBlockHeader(NULL)
     ,_blockSize(0)
     ,_effectiveBlockSize(0)
@@ -52,8 +52,9 @@ IMemoryAlloctor::IMemoryAlloctor(std::atomic<bool>  *canCreateNewNode)
     ,_lastNode(NULL)
     ,_curNodeCnt(0)
     ,_canCreateNewNode(canCreateNewNode)
+    ,_totalOccupiedSize(0)
+    ,_totalBlockAmount(0)
 {
-    
 }
 
 IMemoryAlloctor::~IMemoryAlloctor()
@@ -154,12 +155,13 @@ void IMemoryAlloctor::_InitNode(MemBlocksNode *newNode)
     /**
     *   计算需要申请的内存大小，其中包含内存头数据大小
     */
-    size_t  bufSize = _blockSize * _blockAmount;
+    //size_t  bufSize = newNode->_nodeSize;
+    size_t blockCnt = newNode->_blockCnt;
 
     /**
     *   申请内存
     */
-    memset(_curBuf, 0, bufSize);
+    // memset(_curBuf, 0, bufSize);
 
     /**
     *   链表头和尾部指向同一位置
@@ -172,7 +174,7 @@ void IMemoryAlloctor::_InitNode(MemBlocksNode *newNode)
     MemoryBlock *temp = _usableBlockHeader;
 
     // 构建内存块链表
-    for(size_t i = 1; i < _blockAmount; ++i)
+    for(size_t i = 1; i < blockCnt; ++i)
     {
         char *cache = (_curBuf + _blockSize * i);
         MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
@@ -188,22 +190,24 @@ void IMemoryAlloctor::_InitNode(MemBlocksNode *newNode)
 void IMemoryAlloctor::PrintMemInfo() const
 {
     // 单独的内存池日志 [当前内存池占用内存情况,内存池使用情况]
-    g_Log->mempool("blockSize[%llu] nodecnt[%lld],total bytes occupied[%lld],memblock in used bytes[%lld]"
-                   ,_blockSize, (Int64)_curNodeCnt, _curNodeCnt*_blockAmount*_blockSize, _memBlockInUse*_blockSize);
+    g_Log->mempool("blockSize[%llu] _curNodeCnt[%lld],total block amount[%llu] total bytes occupied[%llu],memblock in used bytes[%lld]"
+                   ,_blockSize, (Int64)_curNodeCnt, _totalBlockAmount, _totalOccupiedSize, (Int64)_memBlockInUse*_blockSize);
 }
 
 void IMemoryAlloctor::MemInfoToString(FS_String &outStr) const
 {
-    outStr.AppendFormat("blockSize[%llu] nodecnt[%lld],total bytes occupied[%lld],memblock in used bytes[%lld]"
-                        , _blockSize, (Int64)_curNodeCnt, _curNodeCnt*_blockAmount*_blockSize, _memBlockInUse*_blockSize);
+    outStr.AppendFormat("blockSize[%llu] _curNodeCnt[%lld],total bytes occupied[%lld],memblock in used bytes[%lld]"
+                        , _blockSize, (Int64)_curNodeCnt, _totalOccupiedSize, (Int64)_memBlockInUse*_blockSize);
 }
 
 void IMemoryAlloctor::InitMemory()
 {
     // 初始化头节点
-    _header = new MemBlocksNode(_blockSize * _blockAmount);
+    _header = new MemBlocksNode(_blockSize, _curBlockAmount);
     _lastNode = _header;
     ++_curNodeCnt;
+    _totalBlockAmount += _header->_blockCnt;
+    _totalOccupiedSize += _header->_nodeSize;
 
     _InitNode(_header);
 
@@ -251,10 +255,12 @@ void IMemoryAlloctor::FinishMemory()
 void IMemoryAlloctor::_NewNode()
 {
     // 构成链表
-    auto *newNode = new MemBlocksNode(_blockSize * _blockAmount);
+    auto *newNode = new MemBlocksNode(_blockSize, _curBlockAmount *= 2);
     _lastNode->_next = newNode;
     _lastNode = newNode;
     ++_curNodeCnt;
+    _totalOccupiedSize += newNode->_nodeSize;
+    _totalBlockAmount += newNode->_blockCnt;
 
     _InitNode(newNode);
     if(_updateMemPoolOccupied)
@@ -264,7 +270,7 @@ void IMemoryAlloctor::_NewNode()
 MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<void, size_t> *updateMemPoolOccupied, std::atomic<bool>  *canCreateNewNode)
     :IMemoryAlloctor(canCreateNewNode)
 {
-    _blockAmount = blockAmount;
+    _curBlockAmount = blockAmount;
     _blockSize = __FS_MEMORY_ALIGN__(blockSize);
     _blockSize += sizeof(MemoryBlock);
     _effectiveBlockSize = _blockSize - sizeof(MemoryBlock);

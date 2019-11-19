@@ -34,5 +34,5 @@
 #include "base/common/assist/utils/utils.h"
 
 FS_NAMESPACE_BEGIN
-
+OBJ_POOL_CREATE_DEF_IMPL(IFS_Buffer, __DEF_OBJ_POOL_OBJ_NUM__)
 FS_NAMESPACE_END

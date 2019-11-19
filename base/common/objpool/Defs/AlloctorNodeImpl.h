@@ -41,6 +41,7 @@ template<typename ObjType>
 inline AlloctorNode<ObjType>::AlloctorNode(size_t capacity)
     : _objs(::malloc(capacity*_objBlockSize))
     ,_nodeSize(capacity*_objBlockSize)
+    ,_blockCnt(capacity)
     ,_nextNode(NULL)
 {
     g_curObjPoolOccupiedBytes += _nodeSize;
