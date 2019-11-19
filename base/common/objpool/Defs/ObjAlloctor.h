@@ -100,7 +100,7 @@ protected:
     //std::list<ObjType *> _lastDeleted;      // free对象构成的链表指针指向的内存存储的是上一次释放的对象的地址
     ObjType *_lastDeleted;
     size_t _alloctedInCurNode;              // 当前节点已分配的对象个数
-    const size_t _nodeCapacity;             // 每个节点对象个数
+    size_t _nodeCapacity;                   // 当前节点分配的数量
     AlloctorNode<ObjType> *_header;         // 头节点
     AlloctorNode<ObjType> *_lastNode;       // 最新的节点
     static const size_t _objBlockSize;      // 对象块大小
@@ -110,6 +110,7 @@ protected:
     size_t          _nodeCnt;               // 节点个数
     size_t          _bytesOccupied;         // 对象池占用内存大小 = _objBlockSize * _nodeCnt * node._capacity
     size_t          _objInUse;              // 正在使用的对象
+    size_t          _totalBlockCnt;         // 总的块数量
     Locker          _locker;                // 线程安全
 };
 

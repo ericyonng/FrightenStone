@@ -50,6 +50,7 @@ public:
     static const size_t _objBlockSize;
     void *_objs;
     size_t _nodeSize;
+    size_t _blockCnt;
     AlloctorNode<ObjType> *_nextNode;
 };
 

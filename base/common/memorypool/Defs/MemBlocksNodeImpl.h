@@ -3,10 +3,11 @@
 
 FS_NAMESPACE_BEGIN
 
-inline MemBlocksNode::MemBlocksNode(size_t nodeSize)
-    :_memBuff(::malloc(nodeSize))
-    ,_nodeSize(nodeSize)
+inline MemBlocksNode::MemBlocksNode(size_t blockSize, size_t blockCnt)
+    :_memBuff(::malloc(blockSize*blockCnt))
+    ,_nodeSize(blockSize*blockCnt)
     ,_next(NULL)
+    ,_blockCnt(blockCnt)
 {
 }
 

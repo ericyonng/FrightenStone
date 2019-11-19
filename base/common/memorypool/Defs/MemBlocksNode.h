@@ -41,11 +41,12 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT MemBlocksNode
 {
-    MemBlocksNode(size_t nodeSize);
+    MemBlocksNode(size_t nodeSize, size_t blockCnt);
     ~MemBlocksNode();
 
     void *_memBuff;
     size_t _nodeSize;
+    size_t _blockCnt;
     MemBlocksNode *_next;
 };
 

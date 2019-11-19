@@ -108,9 +108,11 @@ protected:
     std::atomic<Int64> _curNodeCnt;                      // 节点个数
 
     // 最新的节点
-    size_t          _blockAmount;           // 内存块总数量
+    size_t          _curBlockAmount;           // 当前块总数量
     size_t          _blockSize;             // 内存块大小
     size_t          _effectiveBlockSize;    // 有效内存块大小（扣除MemoryBlock的内存大小）
+    size_t          _totalOccupiedSize;     // 总的占用内存字节数
+    size_t          _totalBlockAmount;      // 总的块总量
 
     // 额外非必要参数
     IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;

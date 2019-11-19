@@ -50,6 +50,7 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     ,_objInUse(0)
     ,_lastDeleted(NULL)
     ,_objpoolAllowedMaxOccupiedBytes(__OBJ_POOL_MAX_ALLOW_BYTES_DEF__)
+    ,_totalBlockCnt(0)
 {
     // 初始化节点
     _header = new AlloctorNode<ObjType>(_nodeCapacity);
@@ -59,7 +60,8 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     _curNodeObjs = _lastNode->_objs;
     _alloctedInCurNode = 0;
     ++_nodeCnt;
-    _bytesOccupied += _nodeCapacity * _objBlockSize;
+    _totalBlockCnt += _lastNode->_blockCnt;
+    _bytesOccupied += _lastNode->_nodeSize;
 
     _InitNode(_lastNode);
 }
@@ -138,7 +140,7 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
     }
 
     // 分配新节点
-    if(_alloctedInCurNode >= _nodeCapacity)
+    if(_alloctedInCurNode >= _lastNode->_blockCnt)
     {
         if(g_curObjPoolOccupiedBytes > _objpoolAllowedMaxOccupiedBytes)
             return NULL;
@@ -218,7 +220,7 @@ inline size_t IObjAlloctor<ObjType>::GetTotalObjBlocks()
 {
 #if __FS_THREAD_SAFE__
     _locker.Lock();
-    auto cnt = _nodeCnt * _nodeCapacity;
+    auto cnt = _totalBlockCnt;
     _locker.Unlock();
 
     return cnt;
@@ -283,7 +285,7 @@ template<typename ObjType>
 inline void IObjAlloctor<ObjType>::_NewNode()
 {
     // 构成链表
-    auto *newNode = new AlloctorNode<ObjType>(_nodeCapacity);
+    auto *newNode = new AlloctorNode<ObjType>(_nodeCapacity *= 2);
 
     // lastnode在构造中初始化
     _lastNode->_nextNode = newNode;
@@ -291,8 +293,8 @@ inline void IObjAlloctor<ObjType>::_NewNode()
     _curNodeObjs = newNode->_objs;
     _alloctedInCurNode = 0;
     ++_nodeCnt;
-    _bytesOccupied += _nodeCapacity * _objBlockSize;
-
+    _bytesOccupied += newNode->_nodeSize;
+    _totalBlockCnt += newNode->_blockCnt;
     _InitNode(newNode);
 }
 
@@ -307,7 +309,7 @@ inline void IObjAlloctor<ObjType>::_InitNode(AlloctorNode<ObjType> *newNode)
     // memset(_curBuf, 0, newNode->_nodeSize);
 
     // 构建内存块链表
-    for(size_t i = 0; i < _nodeCapacity; ++i)
+    for(size_t i = 0; i < newNode->_blockCnt; ++i)
     {
         char *cache = (curBuff + _objBlockSize * i);
         ObjBlock<ObjType> *block = reinterpret_cast<ObjBlock<ObjType> *>(cache);
