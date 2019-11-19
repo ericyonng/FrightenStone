@@ -233,7 +233,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
         // 5.post session to iocp
         _PostEventsToIocp();
 
-        // 6.donetevent 将断开的客户端放入toremove队列,将sessions放入torecv与tosend队列
+        // 6.donetevent 将断开的客户端放入toremove队列,将sessions放入torecv与tosend队列 到超时也有可能部分的post没完成！！！
         ret = _DoEvents();
         if(ret != StatusDefs::Success)
         {
@@ -449,6 +449,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
 
 void FS_IocpMsgTransfer::_OnDelayDisconnected(FS_IocpSession *session)
 {
+    // 这个时候也有可能post刚好完成，所以不宜用closesocket，而是cacelio，使得已完成的不会被取消，且到此session即将关闭
     session->MaskClose();
     CancelIoEx(HANDLE(session->GetSocket()), NULL);
 }
