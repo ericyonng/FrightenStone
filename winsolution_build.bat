@@ -14,7 +14,7 @@ echo    vs2015
 echo    vs2017
 set /p choose=Please input:
 
-cd tools\premake && premake5_windows.exe %choose%
+cd tools\premake && win_premake5.exe %choose%
 
 if errorlevel 1 (
     echo Failed to generate Visual Studio solution and project files, error: %errorlevel%
