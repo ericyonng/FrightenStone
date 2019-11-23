@@ -39,7 +39,7 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
-class BASE_EXPORT ObjBlock
+class ObjBlock
 {
 public:
     ObjBlock();
