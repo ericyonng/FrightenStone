@@ -54,10 +54,10 @@ public:
             Sleep(1000);
         }
 
-        // ÊÍ·Å±¾Ïß³Ì×ÊÔ´
+        // é‡Šæ”¾æœ¬çº¿ç¨‹èµ„æº
         g_ThreadTlsTableMgr->FreeThisThreadTable();
 
-        // Ïß³Ì½áÊø
+        // çº¿ç¨‹ç»“æŸ
         g_Log->i<TestTlsTableTask>(_LOGFMT_("TestTlsTableTask end"));
     }
 };
@@ -79,10 +79,10 @@ public:
             ++tlsCount;
         }
 
-        // ÊÍ·Å±¾Ïß³Ì×ÊÔ´
+        // é‡Šæ”¾æœ¬çº¿ç¨‹èµ„æº
         fs::FS_TlsUtil::FreeUtilTlsTable();
 
-        // Ïß³Ì½áÊø
+        // çº¿ç¨‹ç»“æŸ
         g_Log->i<TestSystemTlsTableTask>(_LOGFMT_("TestSystemTlsTableTask end"));
     }
 };

@@ -113,14 +113,14 @@ inline bool FS_Stream::DeserializeTo(ObjType &obj)
 
 inline bool FS_Stream::SerializeTo(FS_String &str) const
 {
-    // ÏÈĞ´ÈëÊı¾İÕ¼ÓÃ¿Õ¼ä
+    // å…ˆå†™å…¥æ•°æ®å ç”¨ç©ºé—´
     str.AppendBitData(reinterpret_cast<const char *>(&_size), sizeof(_size));
     str.AppendBitData(reinterpret_cast<const char *>(&_writePos), sizeof(_writePos));
     str.AppendBitData(reinterpret_cast<const char *>(&_readPos), sizeof(_readPos));
     str.AppendBitData(reinterpret_cast<const char *>(&_needDelete), sizeof(_needDelete));
     str.AppendBitData(reinterpret_cast<const char *>(&_isPoolCreate), sizeof(_isPoolCreate));
 
-    // ½«ÓĞĞ§Êı¾İ¿½Èëstr
+    // å°†æœ‰æ•ˆæ•°æ®æ‹·å…¥str
     if(_buff)
     {
         auto validSize = _writePos > 0 ? _writePos : _size;
@@ -138,16 +138,16 @@ inline bool FS_Stream::SerializeTo(FS_String &str) const
 template<typename ObjType>
 inline bool FS_Stream::Read(ObjType &n, bool isOffset)
 {
-    // ¼ÆËãÒª¶ÁÈ¡Êı¾İµÄ×Ö½Ú³¤¶È
+    // è®¡ç®—è¦è¯»å–æ•°æ®çš„å­—èŠ‚é•¿åº¦
     Int32 objSize = static_cast<Int32>(sizeof(ObjType));
 
-    // ÅĞ¶ÏÄÜ²»ÄÜ¶Á
+    // åˆ¤æ–­èƒ½ä¸èƒ½è¯»
     if(CanRead(objSize))
     {
-        // ½«Òª¶ÁÈ¡µÄÊı¾İ ¿½±´³öÀ´
+        // å°†è¦è¯»å–çš„æ•°æ® æ‹·è´å‡ºæ¥
         memcpy(&n, _buff + _readPos, objSize);
 
-        // Æ«ÒÆÒÑ¶ÁÊı¾İÎ»ÖÃ
+        // åç§»å·²è¯»æ•°æ®ä½ç½®
         if(isOffset)
             OffsetOnReadChange(objSize);
 
@@ -163,25 +163,25 @@ inline UInt32 FS_Stream::ReadArray(ObjType *arr, UInt32 len)
 {
     UInt32 elementCnt = 0;
 
-    // ¶ÁÈ¡Êı×éÔªËØ¸öÊı,µ«²»Æ«ÒÆ¶ÁÈ¡Î»ÖÃ
+    // è¯»å–æ•°ç»„å…ƒç´ ä¸ªæ•°,ä½†ä¸åç§»è¯»å–ä½ç½®
     Read(elementCnt, false);
 
-    // ÅĞ¶Ï»º´æÊı×éÄÜ·ñ·ÅµÃÏÂ
+    // åˆ¤æ–­ç¼“å­˜æ•°ç»„èƒ½å¦æ”¾å¾—ä¸‹
     if(elementCnt <= len)
     {
-        // ¼ÆËãÊı×éµÄ×Ö½Ú³¤¶È
+        // è®¡ç®—æ•°ç»„çš„å­—èŠ‚é•¿åº¦
         Int32 bytes = static_cast<Int32>(elementCnt * sizeof(ObjType));
 
-        // ÅĞ¶ÏÄÜ²»ÄÜ¶Á³ö
+        // åˆ¤æ–­èƒ½ä¸èƒ½è¯»å‡º
         if( CanRead(static_cast<Int32>(bytes + sizeof(UInt32))) )
         {
-            // ¼ÆËãÒÑ¶ÁÎ»ÖÃ+Êı×é³¤¶ÈËùÕ¼ÓĞ¿Õ¼ä
+            // è®¡ç®—å·²è¯»ä½ç½®+æ•°ç»„é•¿åº¦æ‰€å æœ‰ç©ºé—´
             OffsetOnReadChange(static_cast<Int32>(sizeof(UInt32)));
 
-            // ½«Òª¶ÁÈ¡µÄÊı¾İ ¿½±´³öÀ´
+            // å°†è¦è¯»å–çš„æ•°æ® æ‹·è´å‡ºæ¥
             memcpy(arr, _buff + _readPos, static_cast<size_t>(bytes));
 
-            // ¼ÆËãÒÑ¶ÁÊı¾İÎ»ÖÃ
+            // è®¡ç®—å·²è¯»æ•°æ®ä½ç½®
             OffsetOnReadChange(static_cast<Int32>(bytes));
             return elementCnt;
         }
@@ -280,27 +280,27 @@ inline bool FS_Stream::ReadString(FS_String &str)
 template<typename ObjType>
 inline bool FS_Stream::Write(const ObjType &n)
 {
-    // ¼ÆËãÒªĞ´ÈëÊı¾İµÄ×Ö½Ú³¤¶È
+    // è®¡ç®—è¦å†™å…¥æ•°æ®çš„å­—èŠ‚é•¿åº¦
     Int32 len = static_cast<Int32>(sizeof(ObjType));
 
     bool canWrite = CanWrite(len);
     if(!canWrite && !_isPoolCreate)
-    {// ²»ÄÜĞ´ÈëÇÒ²»ÊÇÄÚ´æ³Ø´´½¨µÄ»º³åÇø
+    {// ä¸èƒ½å†™å…¥ä¸”ä¸æ˜¯å†…å­˜æ± åˆ›å»ºçš„ç¼“å†²åŒº
         g_Log->e<FS_Stream>(_LOGFMT_("Write failed. obj name[%s]"), typeid(ObjType).name());
         return false;
     }
     else if(!canWrite)
-    {// ²»ÄÜĞ´ÇÒÊÇÓÉÄÚ´æ³Ø´´½¨µÄ»º³åÇøÔò×ÔÔö³¤Îª2±¶
+    {// ä¸èƒ½å†™ä¸”æ˜¯ç”±å†…å­˜æ± åˆ›å»ºçš„ç¼“å†²åŒºåˆ™è‡ªå¢é•¿ä¸º2å€
         g_MemoryPool->Lock();
         _buff = reinterpret_cast<char *>(g_MemoryPool->Realloc(_buff, 2 * _size));
         g_MemoryPool->Unlock();
         _size *= 2;
     }
 
-    // ½«ÒªĞ´ÈëµÄÊı¾İ ¿½±´µ½»º³åÇøÎ²²¿
+    // å°†è¦å†™å…¥çš„æ•°æ® æ‹·è´åˆ°ç¼“å†²åŒºå°¾éƒ¨
     memcpy(_buff + _writePos, &n, static_cast<size_t>(len));
 
-    // ¼ÆËãÒÑĞ´ÈëÊı¾İÎ²²¿Î»ÖÃ
+    // è®¡ç®—å·²å†™å…¥æ•°æ®å°¾éƒ¨ä½ç½®
     OffsetWrLenOnWrChange(len);
     return true;
 }
@@ -308,31 +308,31 @@ inline bool FS_Stream::Write(const ObjType &n)
 template<typename ObjType>
 inline bool FS_Stream::WriteArray(ObjType *data, UInt32 len)
 {
-    // ¼ÆËãÒªĞ´ÈëÊı×éµÄ×Ö½Ú³¤¶È
+    // è®¡ç®—è¦å†™å…¥æ•°ç»„çš„å­—èŠ‚é•¿åº¦
     auto bytes = sizeof(ObjType)*len;
 
-    // ÅĞ¶ÏÄÜ²»ÄÜĞ´Èë
+    // åˆ¤æ–­èƒ½ä¸èƒ½å†™å…¥
     bool canWrite = CanWrite(static_cast<Int32>(bytes + sizeof(UInt32)));
     if(!canWrite && !_isPoolCreate)
-    {// ²»ÄÜĞ´ÈëÇÒ²»ÊÇÄÚ´æ³Ø´´½¨µÄ»º³åÇø
+    {// ä¸èƒ½å†™å…¥ä¸”ä¸æ˜¯å†…å­˜æ± åˆ›å»ºçš„ç¼“å†²åŒº
         g_Log->e<FS_Stream>(_LOGFMT_("WriteArray failed. obj name[%s]"), typeid(ObjType).name());
         return false;
     }
     else if(!canWrite)
-    {// ²»ÄÜĞ´ÇÒÊÇÓÉÄÚ´æ³Ø´´½¨µÄ»º³åÇøÔò×ÔÔö³¤Îª2±¶
+    {// ä¸èƒ½å†™ä¸”æ˜¯ç”±å†…å­˜æ± åˆ›å»ºçš„ç¼“å†²åŒºåˆ™è‡ªå¢é•¿ä¸º2å€
         g_MemoryPool->Lock();
         _buff = reinterpret_cast<char *>(g_MemoryPool->Realloc(_buff, 2 * _size));
         g_MemoryPool->Unlock();
         _size *= 2;
     }
 
-    // ÏÈĞ´ÈëÊı×éµÄÔªËØ³¤¶È
+    // å…ˆå†™å…¥æ•°ç»„çš„å…ƒç´ é•¿åº¦
     Write(len);
 
-    // ½«ÒªĞ´ÈëµÄÊı¾İ ¿½±´µ½»º³åÇøÎ²²¿
+    // å°†è¦å†™å…¥çš„æ•°æ® æ‹·è´åˆ°ç¼“å†²åŒºå°¾éƒ¨
     memcpy(_buff + _writePos, data, bytes);
 
-    // ¼ÆËãÊı¾İÎ²²¿Î»ÖÃ
+    // è®¡ç®—æ•°æ®å°¾éƒ¨ä½ç½®
     OffsetWrLenOnWrChange(static_cast<Int32>(bytes));
     return true;
 }

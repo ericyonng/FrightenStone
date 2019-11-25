@@ -64,7 +64,7 @@ FS_ListenerStub EventManager::AddListener(int id, IDelegate<void, FS_Event *> *l
     op._listener._listenCallBack = listener;
     op._listener._stub = stub;
 
-    // Èô¼àÌıÊ±ºòÕıÔÚfire×´Ì¬Ôò·ÅÈëÑÓ³Ù¶ÓÁĞ£¨ÑÓ³Ùµ½after fire£©,ÇÒµ±Ç°µÄ¼àÌı»áÊ§Ğ§
+    // è‹¥ç›‘å¬æ—¶å€™æ­£åœ¨fireçŠ¶æ€åˆ™æ”¾å…¥å»¶è¿Ÿé˜Ÿåˆ—ï¼ˆå»¶è¿Ÿåˆ°after fireï¼‰,ä¸”å½“å‰çš„ç›‘å¬ä¼šå¤±æ•ˆ
     if(IsFiring())
     {
         _delayedOps.push_back(op);
@@ -89,7 +89,7 @@ int EventManager::RemoveListener(int id)
     op._addOp = false;
     op._listener._evId = id;
 
-    // ÕıÔÚfireÔò·ÅÈëÑÓ³Ù¶ÓÁĞ£¬ÑÓ³ÙÖ´ĞĞ
+    // æ­£åœ¨fireåˆ™æ”¾å…¥å»¶è¿Ÿé˜Ÿåˆ—ï¼Œå»¶è¿Ÿæ‰§è¡Œ
     if(IsFiring())
     {
         _delayedOps.push_back(op);
@@ -105,7 +105,7 @@ int EventManager::RemoveListener(const FS_ListenerStub &stub)
     op._addOp = false;
     op._listener._stub = stub;
 
-    // ÕıÔÚfireÔò·ÅÈëÑÓ³Ù¶ÓÁĞ£¬ÑÓ³ÙÖ´ĞĞ
+    // æ­£åœ¨fireåˆ™æ”¾å…¥å»¶è¿Ÿé˜Ÿåˆ—ï¼Œå»¶è¿Ÿæ‰§è¡Œ
     if(IsFiring())
     {
         _delayedOps.push_back(op);
@@ -153,7 +153,7 @@ int EventManager::ProcessEventOperation(EventManager::_Op &op)
 {
     _Listener &listener = op._listener;
     if(op._addOp)
-    {// ¼ÓÈëÊÂ¼ş²Ù×÷
+    {// åŠ å…¥äº‹ä»¶æ“ä½œ
         _ListenersMap::iterator mIt = _listeners.find(listener._evId);
         if(mIt == _listeners.end())
             mIt = _listeners.insert(std::make_pair(listener._evId, std::vector<_Listener>())).first;
@@ -164,14 +164,14 @@ int EventManager::ProcessEventOperation(EventManager::_Op &op)
         _stubListeners.insert(std::make_pair(listener._stub, listener));
     }
     else
-    {// ÒÆ³ıÊÂ¼ş
+    {// ç§»é™¤äº‹ä»¶
         if(listener._evId > 0)
         {
             _ListenersMap::iterator mIt = _listeners.find(listener._evId);
             if(mIt == _listeners.end())
                 return StatusDefs::Error;
 
-            // ÒÆ³ı
+            // ç§»é™¤
             _Listeners &listeners = mIt->second;
             for(_Listeners::iterator lIt = listeners.begin();
                 lIt != listeners.end();
@@ -220,7 +220,7 @@ int EventManager::ProcessEventOperation(EventManager::_Op &op)
 
 void EventManager::AfterFireEvent()
 {
-    // after fire Ö´ĞĞÑÓ³ÙÖ´ĞĞÊÂ¼ş
+    // after fire æ‰§è¡Œå»¶è¿Ÿæ‰§è¡Œäº‹ä»¶
     if(--_firing == 0)
     {
         for(size_t i = 0; i < _delayedOps.size(); ++i)

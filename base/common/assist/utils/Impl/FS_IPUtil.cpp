@@ -50,12 +50,12 @@ FS_NAMESPACE_BEGIN
 
 Int32 FS_IPUtil::GetLocalIP(FS_String &ip, Int32 netCardNo, bool isToBind, bool isStreamSock, bool isIpv4)
 {
-    // »ñµÃ±¾»úÖ÷»úÃû+
+    // è·å¾—æœ¬æœºä¸»æœºå+
     char hostname[MAX_PATH] = {0};
     if(gethostname(hostname, MAX_PATH) != 0)
         return false;
 
-    //»ñÈ¡ip
+    //è·å–ip
     auto ret = GetIPByDomain(hostname, NULL
                              , ip
                              , netCardNo
@@ -72,21 +72,21 @@ Int32 FS_IPUtil::GetLocalIP(FS_String &ip, Int32 netCardNo, bool isToBind, bool 
 }
 
 Int32 FS_IPUtil::GetIPByDomain(
-    const char *domain         // ÓòÃû»òÖ÷»úÃû
-    , const char *service      /* ¶Ë¿ÚºÅ¡°80¡±µÈ¡¢·şÎñÃû Èç"ftp", "http"µÈ */
-    , FS_String &ipAddrString       // Êä³öip
-    , Int32 netCardNo           // Íø¿¨ĞòºÅÈô»ñÈ¡µÄÊÇ±¾µØµÄµØÖ·£¬ÎªÑ¡ÔñÍøÖ·ÁĞ±íµÄÄ³Ò»¸öÍøÖ·
-    , Int32 eFlags                  /* = FS_IPUtilDefs::AI_FLAGS_TYPE ¸÷¸öÎ»µÄ×éºÏ
-                                       Ä¬ÈÏAI_PASSIVE ¼´ÓÃÓÚbind°ó¶¨ ²»ÉèÖÃÔòÓÃÓÚconnect */
-    , FS_IPUtilDefs::SOCK_TYPE eSockType /*= FS_IPUtilDefs::SOCK_TYPE_SOCK_STREAM /* Ä¬ÈÏÁ÷Êı¾İ */
-    , FS_IPUtilDefs::FAMILY_TYPE eFamily /*= FS_IPUtilDefs::FAMILY_TYPE_AF_INET /* Ä¬ÈÏipv4 */
-    , FS_IPUtilDefs::PROTOCOL_TYPE eProtocol /*= FS_IPUtilDefs::PROTOCOL_TYPE_IPPROTO_IP /* Ä¬ÈÏÈÎÒâĞ­Òé ¼´ipĞ­Òé */)
+    const char *domain         // åŸŸåæˆ–ä¸»æœºå
+    , const char *service      /* ç«¯å£å·â€œ80â€ç­‰ã€æœåŠ¡å å¦‚"ftp", "http"ç­‰ */
+    , FS_String &ipAddrString       // è¾“å‡ºip
+    , Int32 netCardNo           // ç½‘å¡åºå·è‹¥è·å–çš„æ˜¯æœ¬åœ°çš„åœ°å€ï¼Œä¸ºé€‰æ‹©ç½‘å€åˆ—è¡¨çš„æŸä¸€ä¸ªç½‘å€
+    , Int32 eFlags                  /* = FS_IPUtilDefs::AI_FLAGS_TYPE å„ä¸ªä½çš„ç»„åˆ
+                                       é»˜è®¤AI_PASSIVE å³ç”¨äºbindç»‘å®š ä¸è®¾ç½®åˆ™ç”¨äºconnect */
+    , FS_IPUtilDefs::SOCK_TYPE eSockType /*= FS_IPUtilDefs::SOCK_TYPE_SOCK_STREAM /* é»˜è®¤æµæ•°æ® */
+    , FS_IPUtilDefs::FAMILY_TYPE eFamily /*= FS_IPUtilDefs::FAMILY_TYPE_AF_INET /* é»˜è®¤ipv4 */
+    , FS_IPUtilDefs::PROTOCOL_TYPE eProtocol /*= FS_IPUtilDefs::PROTOCOL_TYPE_IPPROTO_IP /* é»˜è®¤ä»»æ„åè®® å³ipåè®® */)
 {
-    // ²»¿ÉÍ¬Ê±ÎªNULL
+    // ä¸å¯åŒæ—¶ä¸ºNULL
     if(UNLIKELY(!domain && !service))
         return StatusDefs::FS_IPUtil_ParamError;
     
-    // »ñÈ¡µØÖ·µÄ²ÎÊıÉèÖÃ
+    // è·å–åœ°å€çš„å‚æ•°è®¾ç½®
     struct addrinfo hints = {0};
     hints.ai_family = eFamily;
     hints.ai_flags = eFlags;
@@ -99,7 +99,7 @@ Int32 FS_IPUtil::GetIPByDomain(
         return StatusDefs::FS_IPUtil_GetAddrInfoFailed;
     }
 
-    // ±éÀúÍø¿¨
+    // éå†ç½‘å¡
     Int32 cnt = 0;
     struct sockaddr_in *addr = NULL;
     struct addrinfo *cur = NULL;
@@ -124,7 +124,7 @@ Int32 FS_IPUtil::GetIPByDomain(
         return StatusDefs::Success;
     }
 
-    //ÊÍ·Å×ÊÔ´
+    //é‡Šæ”¾èµ„æº
     freeaddrinfo(netCardRes);
     return StatusDefs::FS_IPUtil_NotFound;
 }

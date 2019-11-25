@@ -3,10 +3,10 @@
 
 #pragma once
 
-//1.一系列必要的初始化
-//app启动
-//app等待
-//app结束（一系列的释放）
+//1.涓�绯诲垪蹇呰鐨勫垵濮嬪寲
+//app鍚姩
+//app绛夊緟
+//app缁撴潫锛堜竴绯诲垪鐨勯噴鏀撅級
 
 //BusinessLogic api
 typedef bool(*pfnInitBusinessLogicModule)();
@@ -22,7 +22,7 @@ public:
 	bool Init();
 	bool Fini(bool bShowInWindow = true);
 
-	//配置
+	//閰嶇疆
 protected:
 	bool ConfigSvrAddr();
 	bool InitLogModule();
@@ -33,7 +33,7 @@ private:
 
 };
 
-//单例模式
+//鍗曚緥妯″紡
 typedef gtool::CSingleton<CAppRoot> AppRootInstance;
 #define AppRootObj (*AppRootInstance::GetInstance())
 

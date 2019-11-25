@@ -47,7 +47,7 @@ FS_NAMESPACE_BEGIN
 
 class FS_String;
 
-// TODO ³éÏóÒ»¸öIMemoryPoolMgr Ìá¹©¸øÍâ²¿Ê¹ÓÃ ×î´óÖ§³Ö__MEMORY_POOL_MAX_EXPAND_BYTES__ ÄÚ´æ³Ø´óĞ¡
+// TODO æŠ½è±¡ä¸€ä¸ªIMemoryPoolMgr æä¾›ç»™å¤–éƒ¨ä½¿ç”¨ æœ€å¤§æ”¯æŒ__MEMORY_POOL_MAX_EXPAND_BYTES__ å†…å­˜æ± å¤§å°
 class BASE_EXPORT MemoryPoolMgr : public IMemoryPoolMgr
 {
 public:
@@ -73,15 +73,15 @@ private:
     void _UpdateMemPoolOccupied(size_t newOccupiedBytes);
 
 private:
-    IMemoryAlloctor *_alloctors[__MEMORY_POOL_MAXBLOCK_LIMIT__];  // ÄÚ´æ·ÖÅäÆ÷O(1)¸´ÔÓ¶È£¬×î´óÖ§³Ö__MEMORY_POOL_MAXBLOCK_LIMIT__µÄÄÚ´æ·ÖÅäÆäËûÄÚ´æÓÉÏµÍ³·ÖÅä
-    std::vector<IMemoryAlloctor *> _allAlloctors;                   // ÓÃÓÚÊÍ·Å
+    IMemoryAlloctor *_alloctors[__MEMORY_POOL_MAXBLOCK_LIMIT__];  // å†…å­˜åˆ†é…å™¨O(1)å¤æ‚åº¦ï¼Œæœ€å¤§æ”¯æŒ__MEMORY_POOL_MAXBLOCK_LIMIT__çš„å†…å­˜åˆ†é…å…¶ä»–å†…å­˜ç”±ç³»ç»Ÿåˆ†é…
+    std::vector<IMemoryAlloctor *> _allAlloctors;                   // ç”¨äºé‡Šæ”¾
     std::atomic<bool> _isInit;
     Locker _locker;
     IDelegate<void> *_printCallback;
-    std::atomic<size_t> _curTotalOccupiedBytes = 0;      // µ±Ç°ÄÚ´æ³ØÕ¼ÓÃµÄ×Ü×Ö½ÚÊı
-    std::atomic<size_t> _maxAllowOccupiedBytes;         // ÄÚ´æ³Ø×î´óÔÊĞíÕ¼ÓÃ
+    std::atomic<size_t> _curTotalOccupiedBytes = 0;      // å½“å‰å†…å­˜æ± å ç”¨çš„æ€»å­—èŠ‚æ•°
+    std::atomic<size_t> _maxAllowOccupiedBytes;         // å†…å­˜æ± æœ€å¤§å…è®¸å ç”¨
     std::atomic<bool> _canCreateNewNode = true;
-    const size_t _maxCanAllocMemLimit;      // ×î´óµÄ¿é´óĞ¡
+    const size_t _maxCanAllocMemLimit;      // æœ€å¤§çš„å—å¤§å°
     IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
     std::atomic<Int32> _curThreadId;
 };
@@ -114,7 +114,7 @@ inline void MemoryPoolMgr::_UpdateMemPoolOccupied(size_t newOccupiedBytes)
 FS_NAMESPACE_END
 
 // #define g_MemoryPoolMgr fs::Singleton<fs::MemoryPoolMgr>::GetInstance()
-// Ç¿ÁÒ½¨Òøget³öpoolµÄÕæÊµÖ¸Õë±ÜÃâÖ±½ÓÊ¹ÓÃ±¾ºê£¬ÏûºÄºÜ´ó
+// å¼ºçƒˆå»ºé“¶getå‡ºpoolçš„çœŸå®æŒ‡é’ˆé¿å…ç›´æ¥ä½¿ç”¨æœ¬å®ï¼Œæ¶ˆè€—å¾ˆå¤§
 // extern BASE_EXPORT fs::SingletonAgency<fs::MemoryPoolMgr> g_MemoryPoolAgency;
 
 // #define g_MemoryPool g_MemoryPoolAgency

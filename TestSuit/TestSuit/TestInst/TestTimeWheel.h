@@ -98,7 +98,7 @@ public:
         g_Log->InitModule("TestTimeWheel");
         g_MemleakMonitor->Start();
 
-        // ÉèÖÃÊ±¼äÂÖÅÌ²ÎÊı
+        // è®¾ç½®æ—¶é—´è½®ç›˜å‚æ•°
 //         fs::TimeSlice resolution(0, 100);
 //         fs::TimeWheel timeWheel(resolution);
         fs::FS_Timer timer;
@@ -106,7 +106,7 @@ public:
         fs::FS_Timer timer3;
 
 
-        // ÉèÖÃ³¬Ê±Ö´ĞĞº¯Êı
+        // è®¾ç½®è¶…æ—¶æ‰§è¡Œå‡½æ•°
         TestWheel1 test1;
         timer.SetTimeOutHandler(&test1, &TestWheel1::TimeOut);
         // timer.Schedule(fs::Time::FromFmtString(fs::FS_String("2019-06-09 16:02:59.000000")), 4000);
@@ -124,10 +124,10 @@ public:
         {
             Sleep(static_cast<DWORD>(waitMilliSec.GetTotalMilliSeconds()));
 
-            // ×ª¶¯Ê±¼äÂÖÅÌ
+            // è½¬åŠ¨æ—¶é—´è½®ç›˜
             fs::g_TimeWheel.RotateWheel();
 
-            // ĞŞÕıÏÂÒ»Ö¡Ê±¼ä
+            // ä¿®æ­£ä¸‹ä¸€å¸§æ—¶é—´
             fs::g_TimeWheel.GetModifiedResolution(waitMilliSec);
             if(!pool->IsPoolWorking())
                 break;

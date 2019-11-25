@@ -50,14 +50,14 @@ public:
     FS_Aes();
     virtual ~FS_Aes();
 
-    // ²úÉúÃÜÔ¿
+    // äº§ç”Ÿå¯†é’¥
     static Int32 GenerateKey(Int32 mode, FS_String &key);
-    // ¼ÓÃÜ ĞèÒªÊÇ128bit 16×Ö½ÚµÄ±¶Êı
+    // åŠ å¯† éœ€è¦æ˜¯128bit 16å­—èŠ‚çš„å€æ•°
     Int32 Encrypt_Data(Int32 mode, const FS_String &key, const FS_String &plaintext, FS_String &cyphertext);
-    // ½âÃÜ ĞèÒªÊÇ128bit 16×Ö½ÚµÄ±¶Êı
+    // è§£å¯† éœ€è¦æ˜¯128bit 16å­—èŠ‚çš„å€æ•°
     Int32 Decrypt_Data(Int32 mode, const FS_String &key,  const FS_String &cyphertext, FS_String &plaintext);
 
-    // openssl¼ÓÃÜËã·¨Ïß³Ì²»°²È«ĞèÒª¼ÓËø
+    // opensslåŠ å¯†ç®—æ³•çº¿ç¨‹ä¸å®‰å…¨éœ€è¦åŠ é”
     void Lock();
     void Unlock();
 

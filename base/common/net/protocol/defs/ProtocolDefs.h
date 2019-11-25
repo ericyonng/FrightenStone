@@ -26,7 +26,7 @@
  * @date  : 2019/5/24
  * @brief :
  * 
- *      !!!!×¢Òâ·¢ËÍÊı¾İµ½¿Í»§¶ËÊ±ºòiocpÍøÂç²ãÊ¹ÓÃµÄÊÇÄÚ´æ³Ø£¬ËùÒÔÇëÔÚÍøÂç²ã×¢ÒâÏÂ£¬ÒµÎñ²ã¿ÉÈÎÒâ£¬ÒµÎñ²ã²»ÊÊÓÃÄÚ´æ³Ø
+ *      !!!!æ³¨æ„å‘é€æ•°æ®åˆ°å®¢æˆ·ç«¯æ—¶å€™iocpç½‘ç»œå±‚ä½¿ç”¨çš„æ˜¯å†…å­˜æ± ï¼Œæ‰€ä»¥è¯·åœ¨ç½‘ç»œå±‚æ³¨æ„ä¸‹ï¼Œä¸šåŠ¡å±‚å¯ä»»æ„ï¼Œä¸šåŠ¡å±‚ä¸é€‚ç”¨å†…å­˜æ± 
  * 
  */
 #ifndef __Base_Common_Net_Protocol_Defs_ProtocolDefs_H__
@@ -54,7 +54,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// Ğ­ÒéºÅ
+// åè®®å·
 class BASE_EXPORT ProtocolCmd
 {
 public:
@@ -70,8 +70,8 @@ public:
         CreatePlayerReq = 7,        // 
         CreatePlayerRes = 8,        // 
         CreatePlayerNty = 9,        // 
-        CheckHeartReq = 15,         // ¿Í»§¶ËĞÄÌø°ü
-        CheckHeartRes = 16,         // ĞÄÌø°ü·´À¡£¬°´Àí²»ÓÃ·´À¡¸ø¿Í»§¶Ë¼õÉÙ·şÎñ¶ËÑ¹Á¦
+        CheckHeartReq = 15,         // å®¢æˆ·ç«¯å¿ƒè·³åŒ…
+        CheckHeartRes = 16,         // å¿ƒè·³åŒ…åé¦ˆï¼ŒæŒ‰ç†ä¸ç”¨åé¦ˆç»™å®¢æˆ·ç«¯å‡å°‘æœåŠ¡ç«¯å‹åŠ›
         CMD_End,
     };
 
@@ -84,12 +84,12 @@ struct BASE_EXPORT NetMsg_DataHeader
 
     NetMsg_DataHeader();
     
-    // Ìá¹©ĞòÁĞ»¯·´ĞòÁĞ»¯½Ó¿Ú
-    // ĞòÁĞ»¯·´ĞòÁĞ»¯£¨ObjType ±ØĞëÓĞSerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)½Ó¿Ú£©
-    // ĞòÁĞ»¯·´ĞòÁĞ»¯£¨ObjType ±ØĞëÓĞbool SerializeTo(FS_Stream *) const, bool DeserializeFrom(FS_Stream *)½Ó¿Ú£©
+    // æä¾›åºåˆ—åŒ–ååºåˆ—åŒ–æ¥å£
+    // åºåˆ—åŒ–ååºåˆ—åŒ–ï¼ˆObjType å¿…é¡»æœ‰SerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)æ¥å£ï¼‰
+    // åºåˆ—åŒ–ååºåˆ—åŒ–ï¼ˆObjType å¿…é¡»æœ‰bool SerializeTo(FS_Stream *) const, bool DeserializeFrom(FS_Stream *)æ¥å£ï¼‰
     // bool SerializeTo(FS_Stream *str);
-    UInt16 _packetLength;           // °ü³¤¶È
-    UInt16 _cmd;                    // ÃüÁî
+    UInt16 _packetLength;           // åŒ…é•¿åº¦
+    UInt16 _cmd;                    // å‘½ä»¤
 };
 
 // struct BASE_EXPORT NetMsg_Buffer : public NetMsg_DataHeader

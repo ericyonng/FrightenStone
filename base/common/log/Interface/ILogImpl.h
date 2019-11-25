@@ -44,7 +44,7 @@ inline ILog::~ILog()
 template<typename ObjType, typename... Args>
 inline void ILog::i(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
@@ -61,7 +61,7 @@ inline void ILog::i(const char *funcName, Int32 codeLine, const char *fmt, const
 template<typename ObjType, typename... Args>
 inline void ILog::d(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
@@ -78,7 +78,7 @@ inline void ILog::d(const char *funcName, Int32 codeLine, const char *fmt, const
 template<typename ObjType, typename... Args>
 inline void ILog::w(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
@@ -95,7 +95,7 @@ inline void ILog::w(const char *funcName, Int32 codeLine, const char *fmt, const
 template<typename ObjType, typename... Args>
 inline void ILog::e(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
@@ -113,7 +113,7 @@ inline void ILog::e(const char *funcName, Int32 codeLine, const char *fmt, const
 template<typename... Args>
 inline void ILog::crash(const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>: "
@@ -127,7 +127,7 @@ inline void ILog::crash(const char *fmt, const Args&... args)
 template<typename ObjType, typename... Args>
 inline void ILog::net(const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s]: "
@@ -142,7 +142,7 @@ inline void ILog::net(const char *fmt, const Args&... args)
 template<typename... Args>
 inline void ILog::memleak(const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>: "
@@ -156,7 +156,7 @@ inline void ILog::memleak(const char *fmt, const Args&... args)
 template<typename... Args>
 inline void ILog::mempool(const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>: "
@@ -170,7 +170,7 @@ inline void ILog::mempool(const char *fmt, const Args&... args)
 template<typename... Args>
 inline void ILog::objpool(const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>: "
@@ -183,7 +183,7 @@ inline void ILog::objpool(const char *fmt, const Args&... args)
 template<typename ObjType, typename... Args>
 inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
@@ -200,7 +200,7 @@ inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, con
 template<typename ObjType, typename... Args>
 inline void ILog::any(const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s]: "
@@ -215,7 +215,7 @@ inline void ILog::any(const char *fmt, const Args&... args)
 template<typename... Args>
 inline void ILog::custom(const char *fmt, const Args&... args)
 {
-    // ¹¹½¨ÈÕÖ¾Êý¾Ý
+    // æž„å»ºæ—¥å¿—æ•°æ®
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat(fmt, args...) << FS_String::endl;
@@ -236,7 +236,7 @@ inline const IDelegate<void, const LogData *> * ILog::InstallLogHookFunc(Int32 l
     return _InstallLogHookFunc(level, newDelegate);
 }
 
-// hookÓë¾ßÌåÀàÐÍÓÐ¹Ø
+// hookä¸Žå…·ä½“ç±»åž‹æœ‰å…³
 template<typename ObjType>
 inline const IDelegate<void, LogData *> * ILog::InstallBeforeLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(LogData *logData))
 {

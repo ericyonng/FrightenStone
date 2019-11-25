@@ -38,11 +38,11 @@
 
 FS_NAMESPACE_BEGIN
 
-// opensslÈ«¾ÖËø
+// opensslå…¨å±€é”
 class BASE_EXPORT Locker;
 extern BASE_EXPORT Locker g_OpenSSL_Locker;
 
-// Ä¬ÈÏµÄÊ±¼äÂÖÅÌ¶ÔÏó
+// é»˜è®¤çš„æ—¶é—´è½®ç›˜å¯¹è±¡
 class BASE_EXPORT TimeWheel;
 extern BASE_EXPORT TimeWheel g_TimeWheel;
 

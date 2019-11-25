@@ -1,4 +1,4 @@
-﻿#ifndef __Test_TestUtf8_H__
+#ifndef __Test_TestUtf8_H__
 #define __Test_TestUtf8_H__
 
 #pragma once

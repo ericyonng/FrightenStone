@@ -46,7 +46,7 @@ struct BASE_EXPORT FS_MessageBlock;
 class BASE_EXPORT FS_ThreadPool;
 class BASE_EXPORT ITask;
 
-// ÏûÏ¢¶ÓÁĞ×ñÑ­FIFOÔ­Ôò£¬µ¥Ò»Éú²úÕß¶Ôµ¥Ò»Ïû·ÑÕß
+// æ¶ˆæ¯é˜Ÿåˆ—éµå¾ªFIFOåŸåˆ™ï¼Œå•ä¸€ç”Ÿäº§è€…å¯¹å•ä¸€æ¶ˆè´¹è€…
 class BASE_EXPORT MessageQueue
 {
     OBJ_POOL_CREATE_DEF(MessageQueue);
@@ -62,17 +62,17 @@ public:
     void Close();
 
 public:
-    // Ñ¹ÈëÄ©½Úµã
+    // å‹å…¥æœ«èŠ‚ç‚¹
     void PushLock();
-    // msgs¶Ñ´´½¨
+    // msgså †åˆ›å»º
     bool Push(std::list<FS_MessageBlock *> *&msgs);
-    bool Push(FS_MessageBlock *msg);    // ĞèÒª¶îÍâµ÷ÓÃnotify
+    bool Push(FS_MessageBlock *msg);    // éœ€è¦é¢å¤–è°ƒç”¨notify
     void Notify();
     void PushUnlock();
 
-    // ÆäËûÏß³ÌµÈ´ıÏûÏ¢µ½À´²¢´ÓÇ°½Úµãµ¯³ö
+    // å…¶ä»–çº¿ç¨‹ç­‰å¾…æ¶ˆæ¯åˆ°æ¥å¹¶ä»å‰èŠ‚ç‚¹å¼¹å‡º
     void PopLock();
-    // ³É¹¦·µ»Ø³¬Ê±WaitEventTimeOut»òÕß³É¹¦Success exportMsgsOut ±ØĞëÊÇ¶Ñ´´½¨
+    // æˆåŠŸè¿”å›è¶…æ—¶WaitEventTimeOutæˆ–è€…æˆåŠŸSuccess exportMsgsOut å¿…é¡»æ˜¯å †åˆ›å»º
     Int32 WaitForPoping(std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec = INFINITE);
     void PopImmediately(std::list<FS_MessageBlock *> *&exportMsgsOut);
     bool IsConsumerInHandling();
@@ -98,8 +98,8 @@ private:
     std::atomic_bool _isStart;
 };
 
-// ½¨ÒéÊ¹ÓÃ¶àÉú²úÕßµ¥Ò»Ïû·ÑÕßÄ£ĞÍ
-// ¶àÉú²úÕß¶Ô¶àÏû·ÑÕß²¢·¢ĞÍÏûÏ¢¶ÓÁĞ Éú²úÕßÓëÏû·ÑÕßÊıÁ¿±ØĞë³Ê±¶Êı¹ØÏµ£¬ÒÔ±ã¾ùºâµÄ·ÖÅäÏûÏ¢ Éú²úÕßĞè´óÓÚÏû·ÑÕß
+// å»ºè®®ä½¿ç”¨å¤šç”Ÿäº§è€…å•ä¸€æ¶ˆè´¹è€…æ¨¡å‹
+// å¤šç”Ÿäº§è€…å¯¹å¤šæ¶ˆè´¹è€…å¹¶å‘å‹æ¶ˆæ¯é˜Ÿåˆ— ç”Ÿäº§è€…ä¸æ¶ˆè´¹è€…æ•°é‡å¿…é¡»å‘ˆå€æ•°å…³ç³»ï¼Œä»¥ä¾¿å‡è¡¡çš„åˆ†é…æ¶ˆæ¯ ç”Ÿäº§è€…éœ€å¤§äºæ¶ˆè´¹è€…
 class BASE_EXPORT ConcurrentMessageQueue
 {
     OBJ_POOL_CREATE_DEF(ConcurrentMessageQueue);
@@ -116,16 +116,16 @@ public:
     bool IsConsumerInHandling(UInt32 consumerQueueId) const;
 
 public:
-    // Ñ¹ÈëÄ©½Úµã
+    // å‹å…¥æœ«èŠ‚ç‚¹
     void PushLock(UInt32 generatorQueueId);
     bool Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs);
     bool Push(UInt32 generatorQueueId, FS_MessageBlock *messageBlock);
     void Notify(UInt32 generatorQueueId);
     void PushUnlock(UInt32 generatorQueueId);
 
-    // ÆäËûÏß³ÌµÈ´ıÏûÏ¢µ½À´²¢´ÓÇ°½Úµãµ¯³ö
+    // å…¶ä»–çº¿ç¨‹ç­‰å¾…æ¶ˆæ¯åˆ°æ¥å¹¶ä»å‰èŠ‚ç‚¹å¼¹å‡º
     void PopLock(UInt32 consumerQueueId);
-    // ³É¹¦·µ»Ø³¬Ê±WaitEventTimeOut»òÕß³É¹¦Success  exportMsgsOut ±ØĞëÊÇ¶Ñ´´½¨
+    // æˆåŠŸè¿”å›è¶…æ—¶WaitEventTimeOutæˆ–è€…æˆåŠŸSuccess  exportMsgsOut å¿…é¡»æ˜¯å †åˆ›å»º
     Int32 WaitForPoping(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec = INFINITE);
     void NotifyPop(UInt32 consumerQueueId);
     void PopImmediately(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut);
@@ -136,18 +136,18 @@ private:
     void _Generator2ConsumerQueueTask(ITask *task, FS_ThreadPool *pool);
 
 private:
-    /* Éú²úÕß */
+    /* ç”Ÿäº§è€… */
     std::vector<ConditionLocker *> _genoratorGuards;
     std::vector<std::atomic_bool *> _generatorChange;
     std::vector<std::list<FS_MessageBlock *> *> _generatorMsgQueues;
     std::vector<std::list<FS_MessageBlock *> *> _msgSwitchQueues;
 
-    /* Ïû·ÑÕß²ÎÊı */
+    /* æ¶ˆè´¹è€…å‚æ•° */
     std::vector<ConditionLocker *>  _consumerGuards;
     std::vector<std::atomic_bool *> _msgConsumerQueueChanges;
     std::vector<std::list<FS_MessageBlock *> *> _consumerMsgQueues;
 
-    /* ÏµÍ³²ÎÊı */
+    /* ç³»ç»Ÿå‚æ•° */
     std::atomic<UInt32> _generatorQuantity;
     std::atomic<UInt32> _consumerQuantity;
     std::atomic_bool _isWorking;
@@ -155,9 +155,9 @@ private:
     FS_ThreadPool *_pool;
 };
 
-// ÈÎÒâ×éºÏ¶à¶Ô¶à
-// Ã¿¸öÍ¨¹ı¶©ÔÄÖ÷Ìâ·½Ê½²úÉúgeneratorIdÓëconsumeridÓ³Éä
-// Í¨¹ıÏûÏ¢ÀàĞÍÍÆËã³öËùÔÚµÄgeneratorIdÓëconsumerIdÕâÑù
+// ä»»æ„ç»„åˆå¤šå¯¹å¤š
+// æ¯ä¸ªé€šè¿‡è®¢é˜…ä¸»é¢˜æ–¹å¼äº§ç”ŸgeneratorIdä¸consumeridæ˜ å°„
+// é€šè¿‡æ¶ˆæ¯ç±»å‹æ¨ç®—å‡ºæ‰€åœ¨çš„generatorIdä¸consumerIdè¿™æ ·
 class RapidMq
 {
 public:

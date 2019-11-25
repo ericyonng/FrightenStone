@@ -47,7 +47,7 @@ class BASE_EXPORT LogLevel
 public:
     enum LevelEnums
     {
-        Begin = 0,          // ¿ªÊ¼
+        Begin = 0,          // å¼€å§‹
         Warning = Begin,
         Debug,
         Info,
@@ -73,8 +73,8 @@ struct BASE_EXPORT LogData
     OBJ_POOL_CREATE_DEF(LogData);
 
 public:
-    Time _logTime;                  // Ê±¼ä generate inside
-    FS_String _logToWrite;          // ¸ñÊ½»¯µÄÈÕÖ¾×Ö·û´® %s<%s>[%s][%s]line:%d %s
+    Time _logTime;                  // æ—¶é—´ generate inside
+    FS_String _logToWrite;          // æ ¼å¼åŒ–çš„æ—¥å¿—å­—ç¬¦ä¸² %s<%s>[%s][%s]line:%d %s
 };
 
 FS_NAMESPACE_END

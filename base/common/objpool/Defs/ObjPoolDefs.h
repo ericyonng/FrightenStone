@@ -41,9 +41,9 @@
 #undef __DEF_OBJ_POOL_OBJ_NUM__
 #define __DEF_OBJ_POOL_OBJ_NUM__            512
 // #undef __OBJPOOL_ALIGN_BYTES__
-// #define __OBJPOOL_ALIGN_BYTES__             (sizeof(void *)<<1)    // Ä¬ÈÏ16×Ö½Ú¶ÔÆë Éæ¼°µ½¿çcache line¿ªÏú
+// #define __OBJPOOL_ALIGN_BYTES__             (sizeof(void *)<<1)    // é»˜è®¤16å­—èŠ‚å¯¹é½ æ¶‰åŠåˆ°è·¨cache lineå¼€é”€
 #undef __OBJ_POOL_MAX_ALLOW_BYTES_DEF__
-#define __OBJ_POOL_MAX_ALLOW_BYTES_DEF__       2147483648llu              // Ä¬ÈÏ×î´óÔÊÐíÕ¼ÓÃµÄ¶ÔÏó³Ø´óÐ¡£¨2GB£©
+#define __OBJ_POOL_MAX_ALLOW_BYTES_DEF__       2147483648llu              // é»˜è®¤æœ€å¤§å…è®¸å ç”¨çš„å¯¹è±¡æ± å¤§å°ï¼ˆ2GBï¼‰
 #pragma endregion
 
 FS_NAMESPACE_BEGIN
@@ -53,7 +53,7 @@ class BASE_EXPORT FS_String;
 class BASE_EXPORT ObjPoolDefs
 {
 public:
-    static const Int32 __g_FreeRate;      // ¶ÔÏó³Ø¿ÕÏÐÂÊ
+    static const Int32 __g_FreeRate;      // å¯¹è±¡æ± ç©ºé—²çŽ‡
 };
 
 class BASE_EXPORT ObjPoolMethods

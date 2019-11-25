@@ -42,7 +42,7 @@
 
 #define THREAD_POOL_WAIT_FOR_COMPLETED_TIME 5     // 5ms
 
-// 100²ã¿ìÕÕ
+// 100å±‚å¿«ç…§
 #define SYMBOL_MAX_CAPTURE_FRAMES 100
 #define SYMBOL_MAX_SYMBOL_NAME  63
 

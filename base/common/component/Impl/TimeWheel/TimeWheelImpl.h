@@ -63,14 +63,14 @@ inline const TimeSlice &TimeWheel::GetTimeWheelResolution() const
     return _resolutionSlice;
 }
 
-// ÏÂÒ»Ö¡ÂÖÅÌÉ¨ÃèÊ±¼äÐÞÕýÖµ
+// ä¸‹ä¸€å¸§è½®ç›˜æ‰«ææ—¶é—´ä¿®æ­£å€¼
 inline void TimeWheel::GetModifiedResolution(TimeSlice &modifiedResolution) const
 {
     const TimeData *firstTimeData = NULL;
     if(!_timeDatas.empty())
         firstTimeData = *_timeDatas.begin();
 
-    // ÈôÂÖÅÌÈÝÆ÷ÖÐÓÐ´ý¹ýÆÚµÄ¶¨Ê±Êý¾ÝÔòÊ¹ÓÃ¶¨Ê±Êý¾Ý×÷ÎªÐÞÕýÒÀ¾Ý£¬ÆäËûÇé¿öÊ¹ÓÃ_curTime×÷ÎªÐÞÕýÒÀ¾Ý
+    // è‹¥è½®ç›˜å®¹å™¨ä¸­æœ‰å¾…è¿‡æœŸçš„å®šæ—¶æ•°æ®åˆ™ä½¿ç”¨å®šæ—¶æ•°æ®ä½œä¸ºä¿®æ­£ä¾æ®ï¼Œå…¶ä»–æƒ…å†µä½¿ç”¨_curTimeä½œä¸ºä¿®æ­£ä¾æ®
     const auto &nowTimeToModify = firstTimeData ? (firstTimeData->_expiredTime - firstTimeData->_period) : _curTime;
     const auto &modifyResolution = fs::Time::Now() - nowTimeToModify;
     

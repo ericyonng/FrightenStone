@@ -103,13 +103,13 @@ Int32 FS_ServerCore::Init()
     if(_isInit)
         return StatusDefs::Success;
 
-    // 1.Ê±Çø
+    // 1.æ—¶åŒº
     TimeUtil::SetTimeZone();
 
-    // 2.ÀàĞÍÊ¶±ğ
+    // 2.ç±»å‹è¯†åˆ«
     SmartVarRtti::InitRttiTypeNames();
 
-    // 3.³õÊ¼»¯Ïß³Ì¾Ö²¿´æ´¢¾ä±ú
+    // 3.åˆå§‹åŒ–çº¿ç¨‹å±€éƒ¨å­˜å‚¨å¥æŸ„
     Int32 ret = FS_TlsUtil::CreateUtilTlsHandle();
     if(ret != StatusDefs::Success)
     {
@@ -119,7 +119,7 @@ Int32 FS_ServerCore::Init()
         return ret;
     }
 
-    // 4.log³õÊ¼»¯
+    // 4.logåˆå§‹åŒ–
     ret = g_Log->InitModule(NULL);
     if(ret != StatusDefs::Success)
     {
@@ -137,14 +137,14 @@ Int32 FS_ServerCore::Init()
         return ret;
     }
 
-    // cpuĞÅÏ¢³õÊ¼»¯
+    // cpuä¿¡æ¯åˆå§‹åŒ–
     if(!_cpuInfo->Initialize())
     {
         g_Log->e<FS_ServerCore>(_LOGFMT_("Initialize cpuinfo fail"));
         return StatusDefs::Failed;
     }
 
-    // 6.Socket»·¾³
+    // 6.Socketç¯å¢ƒ
     ret = SocketUtil::InitSocketEnv();
     if(ret != StatusDefs::Success)
     {
@@ -152,7 +152,7 @@ Int32 FS_ServerCore::Init()
         return ret;
     }
 
-    // 7. ¶ÁÈ¡ÅäÖÃ
+    // 7. è¯»å–é…ç½®
     ret = _ReadConfig();
     if(ret != StatusDefs::Success)
     {
@@ -170,10 +170,10 @@ Int32 FS_ServerCore::Start(std::vector<IFS_BusinessLogic *> &businessLogic)
     if(!_isInit)
         return StatusDefs::NotInit;
 
-    // 8.ÄÚ´æ¼à¿Ø
+    // 8.å†…å­˜ç›‘æ§
     g_MemleakMonitor->Start();
 
-    // 9.Æô¶¯¼à¿ØÆ÷
+    // 9.å¯åŠ¨ç›‘æ§å™¨
     _pool = new FS_ThreadPool(0, 1);
     auto task = DelegatePlusFactory::Create(this, &FS_ServerCore::_OnSvrRuning);
     if(!_pool->AddTask(task, true))
@@ -182,10 +182,10 @@ Int32 FS_ServerCore::Start(std::vector<IFS_BusinessLogic *> &businessLogic)
         return StatusDefs::FS_ServerCore_StartFailOfSvrRuningTaskFailure;
     }
     
-    // 10.ÒµÎñÂß¼­
+    // 10.ä¸šåŠ¡é€»è¾‘
     _logics = businessLogic;
 
-    // 11.´´½¨·şÎñÆ÷Ä£¿é
+    // 11.åˆ›å»ºæœåŠ¡å™¨æ¨¡å—
     Int32 ret = _CreateNetModules();
     if(ret != StatusDefs::Success)
     {
@@ -193,10 +193,10 @@ Int32 FS_ServerCore::Start(std::vector<IFS_BusinessLogic *> &businessLogic)
         return ret;
     }
 
-    // 12.×¢²á½Ó¿Ú
+    // 12.æ³¨å†Œæ¥å£
     _RegisterToModule();
 
-    // 13.Æô¶¯Ç°...
+    // 13.å¯åŠ¨å‰...
     ret = _BeforeStart();
     if(ret != StatusDefs::Success)
     {
@@ -204,7 +204,7 @@ Int32 FS_ServerCore::Start(std::vector<IFS_BusinessLogic *> &businessLogic)
         return ret;
     }
 
-    // 14.start Ä£¿é
+    // 14.start æ¨¡å—
     ret = _StartModules();
     if(ret != StatusDefs::Success)
     {
@@ -245,13 +245,13 @@ void FS_ServerCore::Close()
 
     _isInit = false;
 
-    // ¶Ï¿ªËùÓĞÒÀÀµ
+    // æ–­å¼€æ‰€æœ‰ä¾èµ–
     _WillClose();
 
-    // ¸÷×Ô×Ô¸öÄ£¿éÒÆ³ı×ÊÔ´
+    // å„è‡ªè‡ªä¸ªæ¨¡å—ç§»é™¤èµ„æº
     _BeforeClose();
 
-    // ÒÆ³ı·şÎñÆ÷ºËĞÄÄ£¿é
+    // ç§»é™¤æœåŠ¡å™¨æ ¸å¿ƒæ¨¡å—
     _connector->Close();
     for(auto &msgTransfer : _msgTransfers)
         msgTransfer->Close();
@@ -273,12 +273,12 @@ void FS_ServerCore::Close()
 
     _pool->Close();
 
-    // ×îºóÒ»¿ÌÉ¨Ãè
+    // æœ€åä¸€åˆ»æ‰«æ
     TimeSlice timeSlice;
     timeSlice = Time::_microSecondPerSecond;
     _PrintSvrLoadInfo(timeSlice);
 
-    // ×îºó´¦Àí
+    // æœ€åå¤„ç†
     _AfterClose();
 
     // STLUtil::DelVectorContainer(_logics);
@@ -293,7 +293,7 @@ void FS_ServerCore::Close()
     Fs_SafeFree(_serverConfigMgr);
     g_ServerCore = NULL;
 
-    // µ±Ç°ÈÕÖ¾È«²¿×ÅÅÌ
+    // å½“å‰æ—¥å¿—å…¨éƒ¨ç€ç›˜
     g_MemleakMonitor->Finish();
     g_Log->FlushAllFile();
     g_Log->FinishModule();
@@ -302,12 +302,12 @@ void FS_ServerCore::Close()
 
 #pragma endregion
 
-/* ÍøÂçÊÂ¼ş */
+/* ç½‘ç»œäº‹ä»¶ */
 #pragma region
 void FS_ServerCore::_OnConnected(const BriefSessionInfo &sessionInfo)
-{// Ö»ÓĞconnectorµ÷ÓÃ½Ó¿Ú
+{// åªæœ‰connectorè°ƒç”¨æ¥å£
 
-    // ÇóÓà·¨£¬½«session·ÖÅäµ½¸÷¸öÏûÏ¢´¦ÀíÄ£¿é
+    // æ±‚ä½™æ³•ï¼Œå°†sessionåˆ†é…åˆ°å„ä¸ªæ¶ˆæ¯å¤„ç†æ¨¡å—
 //     const auto sessionHash = sessionInfo._sessionId % _msgTransfers.size();
 //     auto minTransfer = _msgTransfers[sessionHash];
 
@@ -319,7 +319,7 @@ void FS_ServerCore::_OnConnected(const BriefSessionInfo &sessionInfo)
             minTransfer = _msgTransfers[i];
     }
 
-    // Í³¼ÆsessionÊıÁ¿
+    // ç»Ÿè®¡sessionæ•°é‡
     ++_curSessionConnecting;
     ++_sessionConnectedBefore;
 
@@ -354,7 +354,7 @@ void FS_ServerCore::_OnSvrRuning(FS_ThreadPool *threadPool)
     _lastStatisticsTime.FlushTime();
     while(threadPool->IsPoolWorking())
     {
-        // Ã¿¸ô100ºÁÃëÉ¨ÃèÒ»´Î
+        // æ¯éš”100æ¯«ç§’æ‰«æä¸€æ¬¡
         Sleep(100);
         nowTime.FlushTime();
         const auto &timeSlice = nowTime - _lastStatisticsTime;
@@ -363,7 +363,7 @@ void FS_ServerCore::_OnSvrRuning(FS_ThreadPool *threadPool)
             _lastStatisticsTime = nowTime;
             _PrintSvrLoadInfo(timeSlice);
 
-            // ÖØÖÃ²ÎÊı
+            // é‡ç½®å‚æ•°
             _recvMsgCountPerSecond = 0;
             _recvMsgBytesPerSecond = 0;
             _sendMsgBytesPerSecond = 0;
@@ -405,7 +405,7 @@ Int32 FS_ServerCore::_ReadConfig()
 
 Int32 FS_ServerCore::_CreateNetModules()
 {
-    // TODO:Óë¿Í»§¶ËµÄÁ¬½ÓµãÖ»ÄÜÊÇÒ»¸ö£¬ÒòÎª¶Ë¿ÚÖ»ÓĞÒ»¸ö
+    // TODO:ä¸å®¢æˆ·ç«¯çš„è¿æ¥ç‚¹åªèƒ½æ˜¯ä¸€ä¸ªï¼Œå› ä¸ºç«¯å£åªæœ‰ä¸€ä¸ª
     _connector = FS_ConnectorFactory::Create();
 
     //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();

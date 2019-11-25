@@ -38,7 +38,7 @@ template<typename ObjType>
 inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
     :_alloctor(new IObjAlloctor<ObjType>(objAmount))
 {
-    // ´´½¨Î¯ÍÐ
+    // åˆ›å»ºå§”æ‰˜
    ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
                                             , DelegatePlusFactory::Create(this, &ObjPoolHelper<ObjType>::PrintObjPool));
 
@@ -52,9 +52,7 @@ inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
 {
     ObjPoolMethods::UnRegisterMemleakDelegate(typeid(ObjType).name());
 
-#if __FS_THREAD_SAFE__
     _locker.Lock();
-#endif
 
 //     Int64 poolOccupiedBytes = 0;
 //     Int64 objInUsed = 0;
@@ -62,9 +60,7 @@ inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
 //     PrintObjPool(poolOccupiedBytes, objInUsed, extStr);
     // Fs_SafeFree(_alloctor);
 
-#if __FS_THREAD_SAFE__
     _locker.Unlock();
-#endif
 }
 
 template<typename ObjType>

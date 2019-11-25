@@ -99,7 +99,7 @@ inline bool FS_IocpSession::CanDisconnect() const
 }
 
 inline void FS_IocpSession::OnSendSuc(size_t transferBytes, IoDataBase *ioData)
-{// ×¢Òâ _node ÊôÓÚioData£¬¶øioDataÊÇbufferµÄÊý¾Ý³ÉÔ±£¬¹ÊÈôÏÈÊÍ·Åbuffer¾Í»áÖ±½ÓÊÍ·ÅioData£¬ node¾Í»á±»Ö±½ÓÊÍ·Å£¬ËùÒÔÓ¦¸ÃÏÈÒÆ³ýlistÖÐµÄ½ÚµãÔÙÊÍ·Åbuffer
+{// æ³¨æ„ _node å±žäºŽioDataï¼Œè€ŒioDataæ˜¯bufferçš„æ•°æ®æˆå‘˜ï¼Œæ•…è‹¥å…ˆé‡Šæ”¾bufferå°±ä¼šç›´æŽ¥é‡Šæ”¾ioDataï¼Œ nodeå°±ä¼šè¢«ç›´æŽ¥é‡Šæ”¾ï¼Œæ‰€ä»¥åº”è¯¥å…ˆç§»é™¤listä¸­çš„èŠ‚ç‚¹å†é‡Šæ”¾buffer
     _isPostSend = false;
     ioData->_callback->Invoke(transferBytes);
     auto bufferNode = ioData->_node;

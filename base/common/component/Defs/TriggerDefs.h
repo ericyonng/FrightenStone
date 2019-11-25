@@ -57,7 +57,7 @@ public:
 
     enum
     {
-        Trig_Infinite = -1,               // 无限触发次数
+        Trig_Infinite = -1,               // 鏃犻檺瑙﹀彂娆℃暟
     };
 };
 
@@ -102,9 +102,9 @@ class BASE_EXPORT TriggerOpType
 public:
     enum
     {
-        Invalid = 0,    // 无效
-        Reg = 1,        // 注册
-        Erase = 2,      // 移除
+        Invalid = 0,    // 鏃犳晥
+        Reg = 1,        // 娉ㄥ唽
+        Erase = 2,      // 绉婚櫎
     };
 };
 

@@ -383,7 +383,7 @@ Time Time::AddMicroSeconds(int microSeconds) const
 
 Time Time::GetZeroTime() const
 {
-    // ×ª»»³É±¾µØÊ±¼ä
+    // è½¬æ¢æˆæœ¬åœ°æ—¶é—´
     Int64 zoneTime = static_cast<Int64>(TimeUtil::GetTimeZone()*Time::_microSecondPerSecond);
     Int64 localTime = _rawTime - zoneTime;
     Int64 zeroTime = localTime / _microSecondPerDay * _microSecondPerDay;

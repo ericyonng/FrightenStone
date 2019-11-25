@@ -89,7 +89,7 @@ public:
 
     /**
      * Get days/hours/minutes/seconds/milli-seconds/micro-seconds.
-     * @return int - the time slice parts value. slice 的一部分
+     * @return int - the time slice parts value. slice 鐨勪竴閮ㄥ垎
      */
     int GetDays() const;
     int GetHours() const;

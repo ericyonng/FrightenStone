@@ -66,14 +66,14 @@ public:
     virtual void Close();
     virtual void AfterClose();
 
-    // ÍøÂç
+    // ç½‘ç»œ
     virtual void OnConnect(const BriefSessionInfo  &sessionInfo);
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut(IFS_Session *session);
 
     virtual Int32 GetSessionCnt();
 
-    // ÏûÏ¢¶ÓÁĞ
+    // æ¶ˆæ¯é˜Ÿåˆ—
     virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue, Int32 generatorId);
     virtual void AttachSenderMsgQueue(MessageQueue *messageQueue);
 
@@ -85,11 +85,11 @@ private:
     void _OnMsgArrived(FS_IocpSession *session);
     void _RemoveSessions(bool forceDisconnect = false);
 
-    // ÍøÂçÊÂ¼ş Ïß³Ì²»°²È«
+    // ç½‘ç»œäº‹ä»¶ çº¿ç¨‹ä¸å®‰å…¨
 private:
     void _OnGracefullyDisconnect(FS_IocpSession *session);
     void _OnDelayDisconnected(FS_IocpSession *session);
-    // ĞèÒªÅĞ¶ÏÊÇ·ñ¿É¶Ï¿ª
+    // éœ€è¦åˆ¤æ–­æ˜¯å¦å¯æ–­å¼€
     void _OnDisconnected(FS_IocpSession *session);
     void _DestroySession(FS_IocpSession *session);
     bool _DoPostSend(FS_IocpSession *session);
@@ -99,13 +99,13 @@ private:
     void _NtySessionConnectedMsg(UInt64 sessionId);
     void _NtySessionDisConnectMsg(UInt64 sessionId);
 
-    // ¸¨Öú
+    // è¾…åŠ©
 private:
     FS_IocpSession *_GetSession(UInt64 sessionId);
     void _ClearSessionsWhenClose();
 
-    void _UpdateSessionHeartbeat(IFS_Session *session); // Ïß³Ì²»°²È«
-    void _CheckSessionHeartbeat();  // Ïß³Ì²»°²È«
+    void _UpdateSessionHeartbeat(IFS_Session *session); // çº¿ç¨‹ä¸å®‰å…¨
+    void _CheckSessionHeartbeat();  // çº¿ç¨‹ä¸å®‰å…¨
     void _PostEventsToIocp();
     void _AsynSendFromDispatcher();
     void _ClearSenderMessageQueue();
@@ -125,10 +125,10 @@ private:
     IDelegate<void, size_t> *_updateAlloctorOccupied;
     IDelegate<void> *_printAlloctorOccupiedInfo;
 
-    std::atomic<Int32> _sessionCnt;             // »á»°¸öÊı
+    std::atomic<Int32> _sessionCnt;             // ä¼šè¯ä¸ªæ•°
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;
-    std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // ĞÄÌø¶ÓÁĞ
+    std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // å¿ƒè·³é˜Ÿåˆ—
     FS_ThreadPool *_threadPool;
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;
@@ -138,18 +138,18 @@ private:
     MessageQueue *_senderMessageQueue;
     Int32 _generatorId;
 
-    // »º³åÇø
+    // ç¼“å†²åŒº
     Locker _connectorGuard;
     std::atomic<bool> _hasNewSessionLinkin;         // 
-    std::list<BriefSessionInfo> _pendingNewSessionInfos;     // Á¬ÈëµÄ»á»°»º³åÇø
+    std::list<BriefSessionInfo> _pendingNewSessionInfos;     // è¿å…¥çš„ä¼šè¯ç¼“å†²åŒº
 
-    // ´ı·¢ËÍµÄ»á»°»º³åÇø
+    // å¾…å‘é€çš„ä¼šè¯ç¼“å†²åŒº
 //     Locker _asynSendGuard;
 //     std::atomic<bool> _isSendCacheDirtied;
 //     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueueCache; // key:sessionId
 //     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueue;  // key:sessionId
 
-    std::list<FS_IocpSession *> _msgArriviedSessions;  // ÏûÏ¢µ½´ïµÄ»á»°
+    std::list<FS_IocpSession *> _msgArriviedSessions;  // æ¶ˆæ¯åˆ°è¾¾çš„ä¼šè¯
     std::set<FS_IocpSession *> _toPostRecv;
     std::set<FS_IocpSession *> _toPostSend;
     std::set<FS_IocpSession *> _toRemove;

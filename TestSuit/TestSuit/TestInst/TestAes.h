@@ -41,7 +41,7 @@ public:
     static void Run()
     {
         fs::FS_String plaintext, cyphertext, key;
-        plaintext = "ÎÒ°¦ni";
+        plaintext = "æˆ‘å”‰ni";
         plaintext.GetRaw().resize(16, 0);
         cyphertext = plaintext;
         std::cout << fs::FS_Aes::GenerateKey(fs::FS_AesDefs::AES_CYPHER_192, key) << std::endl;

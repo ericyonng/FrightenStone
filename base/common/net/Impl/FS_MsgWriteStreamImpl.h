@@ -36,14 +36,14 @@ FS_NAMESPACE_BEGIN
 inline FS_MsgWriteStream::FS_MsgWriteStream(char *data, int size, bool isDelete, bool isPoolCreate)
     :FS_Stream(data, size, isDelete, isPoolCreate)
 {
-    // Ô¤ÏÈÕ¼ÁìÏûÏ¢³¤¶ÈËùĞè¿Õ¼ä ±ÜÃâĞ´Èë×Ö½ÚÁ÷Ê±¸²¸ÇÁË³¤¶ÈÎ»ÖÃ
+    // é¢„å…ˆå é¢†æ¶ˆæ¯é•¿åº¦æ‰€éœ€ç©ºé—´ é¿å…å†™å…¥å­—èŠ‚æµæ—¶è¦†ç›–äº†é•¿åº¦ä½ç½®
     Write<UInt16>(0);
 }
 
 inline FS_MsgWriteStream::FS_MsgWriteStream(int size)
     :FS_Stream(size)
 {
-    // Ô¤ÏÈÕ¼ÁìÏûÏ¢³¤¶ÈËùĞè¿Õ¼ä ±ÜÃâĞ´Èë×Ö½ÚÁ÷Ê±¸²¸ÇÁË³¤¶ÈÎ»ÖÃ
+    // é¢„å…ˆå é¢†æ¶ˆæ¯é•¿åº¦æ‰€éœ€ç©ºé—´ é¿å…å†™å…¥å­—èŠ‚æµæ—¶è¦†ç›–äº†é•¿åº¦ä½ç½®
     Write<UInt16>(0);
 }
 
@@ -64,16 +64,16 @@ inline bool FS_MsgWriteStream::WriteString(const char *str)
 }
 
 inline void FS_MsgWriteStream::Finish()
-{// ×Ö½ÚÁ÷½áÊøºó£¬ÒªË¢ĞÂÔÚ¿ªÍ·µÄ×Ö½ÚÁ÷³¤¶È
+{// å­—èŠ‚æµç»“æŸåï¼Œè¦åˆ·æ–°åœ¨å¼€å¤´çš„å­—èŠ‚æµé•¿åº¦
 
-    // ¶¨Î»µ½×Ö½ÚÁ÷Í·²¿
+    // å®šä½åˆ°å­—èŠ‚æµå¤´éƒ¨
     Int32 pos = GetWrLength();
     SetWritePos(0);
 
-    // Ğ´Èë×Ö½ÚÁ÷³¤¶È
+    // å†™å…¥å­—èŠ‚æµé•¿åº¦
     Write<UInt16>(pos);
 
-    // ÖØĞÂ»¹Ô­µ±Ç°Ğ´ÈëÎ»ÖÃ
+    // é‡æ–°è¿˜åŸå½“å‰å†™å…¥ä½ç½®
     SetWritePos(pos);
 }
 #pragma endregion

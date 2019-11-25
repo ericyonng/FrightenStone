@@ -80,7 +80,7 @@ inline ObjType *IMemoryPoolMgr::Realloc(void *ptr, size_t bytes)
 }
 FS_NAMESPACE_END
 
-// 不建议适用全局内存池建议使用线程局部内存池
+// 涓嶅缓璁�傜敤鍏ㄥ眬鍐呭瓨姹犲缓璁娇鐢ㄧ嚎绋嬪眬閮ㄥ唴瀛樻睜
 extern BASE_EXPORT fs::IMemoryPoolMgr *g_MemoryPool;
 // #define g_MemoryPool  fs::IMemoryPoolMgr::GetInstance()
 

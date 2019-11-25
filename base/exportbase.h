@@ -1,4 +1,4 @@
-﻿/*!
+/*!
  * MIT License
  *
  * Copyright (c) 2019 ericyonng<120453674@qq.com>
@@ -40,11 +40,6 @@
 #endif // _WIN32
 
 
-
-// 默认开启线程安全
-#undef __FS_THREAD_SAFE__
-#define __FS_THREAD_SAFE__ 1
-
 // 导出定义
 #ifndef BASE_EXPORT
     #ifdef  FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
@@ -52,13 +47,6 @@
     #else
         #define BASE_EXPORT _declspec(dllimport)
     #endif
-#endif
-
-// 定义文件名
-#ifdef _DEBUG
-    #define FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL_NAME                "baseD.dll"    //
-#else
-    #define FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL_NAME                "base.dll"    //
 #endif
 
 #pragma region Warning Disable
@@ -70,12 +58,5 @@
 #pragma endregion
 
 #include <base/common/common.h>
-#ifndef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-//     #ifdef _DEBUG
-//         #pragma comment(lib, "baseD.lib")
-//     #else
-//         #pragma comment(lib, "base.lib")
-//     #endif
-#endif
 
 #endif

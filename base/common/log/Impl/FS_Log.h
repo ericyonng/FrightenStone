@@ -25,13 +25,13 @@
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/6/12
  * @brief :
- *          1.Ìá¹©Ğ´ÈÕÖ¾½Ó¿Ú£¨´«ÈëÈÎÒâ²ÎÊı£©
- *          2.·ÖÄ¿Â¼ÈÕÖ¾ crash, system, netlayerlog£¨Ğ­ÒéĞÅÏ¢£©ÒµÎñ²ãÈÕÖ¾µÈ
- *          3.°´ÕÕÎÄ¼ş´óĞ¡·ÖÎÄ¼ş
- *          4.°´ÕÕÎÊÌâµÄÓÅÏÈ¼¶·Ö:warning,error,debug,infoµÈ
- *          5.Ö§³Öjson log ·ç¸ñ£º
+ *          1.æä¾›å†™æ—¥å¿—æ¥å£ï¼ˆä¼ å…¥ä»»æ„å‚æ•°ï¼‰
+ *          2.åˆ†ç›®å½•æ—¥å¿— crash, system, netlayerlogï¼ˆåè®®ä¿¡æ¯ï¼‰ä¸šåŠ¡å±‚æ—¥å¿—ç­‰
+ *          3.æŒ‰ç…§æ–‡ä»¶å¤§å°åˆ†æ–‡ä»¶
+ *          4.æŒ‰ç…§é—®é¢˜çš„ä¼˜å…ˆçº§åˆ†:warning,error,debug,infoç­‰
+ *          5.æ”¯æŒjson log é£æ ¼ï¼š
  *                              {
-                                    time:(¾«È·µ½Î¢Ãî)fmt:1970-01-01 00:00:00.123456
+                                    time:(ç²¾ç¡®åˆ°å¾®å¦™)fmt:1970-01-01 00:00:00.123456
                                     class name:
                                     function:
                                     line:
@@ -44,7 +44,7 @@
                                         stackinfo:
                                     }
                                 }
-            6.ÈÕÖ¾ÊÇµ¥Ïß³ÌÈÕÖ¾
+            6.æ—¥å¿—æ˜¯å•çº¿ç¨‹æ—¥å¿—
  */
 #ifndef __Base_Common_Log_Impl_Log_H__
 #define __Base_Common_Log_Impl_Log_H__
@@ -68,7 +68,7 @@ public:
     FS_Log();
     virtual ~FS_Log();
 
-    /* ¹¦ÄÜº¯Êı */
+    /* åŠŸèƒ½å‡½æ•° */
     virtual void UnInstallLogHookFunc(Int32 level, const IDelegate<void, const LogData *> *delegate);
     virtual void UnInstallBeforeLogHookFunc(Int32 level, const IDelegate<void, LogData *> *delegate);
     virtual Int32 InitModule(const Byte8 *rootDirName = NULL);
@@ -77,21 +77,21 @@ public:
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName);
     
 protected:
-    /* ÈÕÖ¾hook */
-    virtual IDelegate<void, const LogData *> * _InstallLogHookFunc(Int32 level, IDelegate<void, const LogData *> *delegate);    // ³éÏóµÄdelegate
+    /* æ—¥å¿—hook */
+    virtual IDelegate<void, const LogData *> * _InstallLogHookFunc(Int32 level, IDelegate<void, const LogData *> *delegate);    // æŠ½è±¡çš„delegate
     virtual const IDelegate<void, LogData *> *_InstallBeforeLogHookFunc(Int32 level, IDelegate<void, LogData *> *delegate);
-    // ÈÕÖ¾Ïà¹Ø
+    // æ—¥å¿—ç›¸å…³
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData);
 
-    // ¿ØÖÆÌ¨Ïà¹Ø
+    // æ§åˆ¶å°ç›¸å…³
     void _OutputToConsole(Int32 level, const FS_String &logStr);
     bool _IsAllowToConsole(Int32 level) const;
     void _SetConsoleColor(Int32 level);
 
-    // ÔÓÏî
+    // æ‚é¡¹
     void _ReadConfig();
 
-    // Ïß³Ì²Ù×÷
+    // çº¿ç¨‹æ“ä½œ
 private:
     void _OnThreadWriteLog(Int32 logFileIndex);
 
@@ -99,21 +99,21 @@ private:
     std::atomic_bool _isInit{false};
     std::atomic_bool _isFinish{false};
 
-    FS_ThreadPool *_threadPool;                                                 // Ïß³Ì³Ø
-    FS_String _rootDirName;                                                     // ½ø³ÌÃû
-    std::list<IDelegate<void, const LogData *> *> *_levelRefHook[LogLevel::End];         // ÈÕÖ¾¼¶±ğ¶ÔÓ¦µÄhook
-    std::list<IDelegate<void, LogData *> *> *_levelRefBeforeLogHook[LogLevel::End];         // Ğ´ÈÕÖ¾Ç°ÈÕÖ¾¼¶±ğ¶ÔÓ¦µÄhook ÓÃÓÚĞŞ¸ÄÈÕÖ¾ÄÚÈİµÈ
-    Int32 _threadWorkIntervalMsTime;                                            // ÈÕÖ¾Ïß³Ì¹¤×÷¼ä¸ôÊ±¼ä
+    FS_ThreadPool *_threadPool;                                                 // çº¿ç¨‹æ± 
+    FS_String _rootDirName;                                                     // è¿›ç¨‹å
+    std::list<IDelegate<void, const LogData *> *> *_levelRefHook[LogLevel::End];         // æ—¥å¿—çº§åˆ«å¯¹åº”çš„hook
+    std::list<IDelegate<void, LogData *> *> *_levelRefBeforeLogHook[LogLevel::End];         // å†™æ—¥å¿—å‰æ—¥å¿—çº§åˆ«å¯¹åº”çš„hook ç”¨äºä¿®æ”¹æ—¥å¿—å†…å®¹ç­‰
+    Int32 _threadWorkIntervalMsTime;                                            // æ—¥å¿—çº¿ç¨‹å·¥ä½œé—´éš”æ—¶é—´
 
-    /* ÈÕÖ¾ÎÄ¼şÄÚÈİ */
-    ConditionLocker *_flielocker[LogDefs::LOG_QUANTITY];                    // ÈÕÖ¾ÎÄ¼şËø
-    ConditionLocker *_wakeupToWriteLog[LogDefs::LOG_QUANTITY];              // »½ĞÑÈÕÖ¾Ïß³ÌÈ¥Ğ´ÈÕÖ¾
-    ConditionLocker _locker;                                                // ÏµÍ³Ëø
+    /* æ—¥å¿—æ–‡ä»¶å†…å®¹ */
+    ConditionLocker *_flielocker[LogDefs::LOG_QUANTITY];                    // æ—¥å¿—æ–‡ä»¶é”
+    ConditionLocker *_wakeupToWriteLog[LogDefs::LOG_QUANTITY];              // å”¤é†’æ—¥å¿—çº¿ç¨‹å»å†™æ—¥å¿—
+    ConditionLocker _locker;                                                // ç³»ç»Ÿé”
 
-    LogFile *_logFiles[LogDefs::LOG_QUANTITY];                              // ÈÕÖ¾idÈÕÖ¾ÎÄ¼ş ´´½¨ºóÎÄ¼şÖ»ÔÊĞí¶Á²»ÔÊĞíÔöÉ¾¸Ä
-    std::list<LogData *> *_logDatas[LogDefs::LOG_QUANTITY];                 // ÈÕÖ¾idÈÕÖ¾ÄÚÈİ
-    IDelegate<void, Int32> *_threadWriteLogDelegate;                    // ÈÕÖ¾Ïß³ÌĞ´ÈÕÖ¾Î¯ÍĞ
-    std::list<LogData *> *_logCaches[LogDefs::LOG_QUANTITY];                // »º³å±äÁ¿£¬Ìá¸ßĞÔÄÜ
+    LogFile *_logFiles[LogDefs::LOG_QUANTITY];                              // æ—¥å¿—idæ—¥å¿—æ–‡ä»¶ åˆ›å»ºåæ–‡ä»¶åªå…è®¸è¯»ä¸å…è®¸å¢åˆ æ”¹
+    std::list<LogData *> *_logDatas[LogDefs::LOG_QUANTITY];                 // æ—¥å¿—idæ—¥å¿—å†…å®¹
+    IDelegate<void, Int32> *_threadWriteLogDelegate;                    // æ—¥å¿—çº¿ç¨‹å†™æ—¥å¿—å§”æ‰˜
+    std::list<LogData *> *_logCaches[LogDefs::LOG_QUANTITY];                // ç¼“å†²å˜é‡ï¼Œæé«˜æ€§èƒ½
 };
 
 FS_NAMESPACE_END

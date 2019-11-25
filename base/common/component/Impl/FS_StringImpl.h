@@ -402,19 +402,19 @@ inline FS_String &FS_String::FormatCompatibilityNoFmt(const std::string &fmt, co
 {
     UInt64 firstIndex = 0, nextIndex = 0;
 
-    // ³õÊ¼»¯¸ñÊ½×Ö·û´®
+    // åˆå§‹åŒ–æ ¼å¼å­—ç¬¦ä¸²
     firstIndex = InitFmtToOutStrFirst(fmt, _buffer);
     NextPlaceHolderPos(fmt, firstIndex, nextIndex);
 
-    // ÅĞ¶ÏĞè²»ĞèÒª½âÎö
+    // åˆ¤æ–­éœ€ä¸éœ€è¦è§£æ
     if(firstIndex != std::string::npos)
     {
-        //½âÎö
+        //è§£æ
         _AppendFormat(fmt, firstIndex, nextIndex, *this, rest...);
         return *this;
     }
 
-    // ²»ÓÃ½âÎö¿ØÖÆ×Ö·û
+    // ä¸ç”¨è§£ææ§åˆ¶å­—ç¬¦
     return Append(rest...);
 }
 

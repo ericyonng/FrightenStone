@@ -81,7 +81,7 @@ void *IMemoryAlloctor::MixAlloc(size_t bytes)
 
 void IMemoryAlloctor::MixFree(void *ptr)
 {
-    // ÄÚ´æ¿éÍ·
+    // å†…å­˜å—å¤´
     char *ptrToFree = reinterpret_cast<char*>(ptr);
     MemoryBlock *blockHeader = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptrToFree - sizeof(MemoryBlock)));
 
@@ -97,7 +97,7 @@ void IMemoryAlloctor::MixFree(void *ptr)
 
 void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
 {
-    // ÅĞ¶ÏfreeÁ´±í
+    // åˆ¤æ–­freeé“¾è¡¨
     MemoryBlock *newBlock = NULL;
     if(_lastDeleted)
     {
@@ -109,7 +109,7 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
     }
     else
     {
-        // Ã»ÓĞ¿ÉÓÃÄÚ´æ¿ª±ÙĞÂ½Úµã
+        // æ²¡æœ‰å¯ç”¨å†…å­˜å¼€è¾Ÿæ–°èŠ‚ç‚¹
         if(!_usableBlockHeader)
         {
             if(_canCreateNewNode && !(*_canCreateNewNode))
@@ -128,20 +128,20 @@ void *IMemoryAlloctor::AllocMemory(size_t bytesCnt)
     newBlock->_objSize = bytesCnt;
     ++_memBlockInUse;
 
-    return ((char*)newBlock) + sizeof(MemoryBlock);   // ´ÓblockµÄÏÂÒ»¸öµØÖ·¿ªÊ¼²ÅÊÇÕæÕıµÄÉêÇëµ½µÄÄÚ´æ
+    return ((char*)newBlock) + sizeof(MemoryBlock);   // ä»blockçš„ä¸‹ä¸€ä¸ªåœ°å€å¼€å§‹æ‰æ˜¯çœŸæ­£çš„ç”³è¯·åˆ°çš„å†…å­˜
 }
 
 void IMemoryAlloctor::FreeMemory(void *ptr)
 {
-    // ÄÚ´æ¿éÍ·
+    // å†…å­˜å—å¤´
     char *ptrToFree = reinterpret_cast<char*>(ptr);
     MemoryBlock *blockHeader = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptrToFree - sizeof(MemoryBlock)));
 
-    // ÒıÓÃ¼ÆÊı
+    // å¼•ç”¨è®¡æ•°
     if(--blockHeader->_ref != 0)
         return;
 
-    // ±»ÊÍ·ÅµÄ½Úµã²åµ½freeÁ´±íÍ·
+    // è¢«é‡Šæ”¾çš„èŠ‚ç‚¹æ’åˆ°freeé“¾è¡¨å¤´
     blockHeader->_nextBlock = _lastDeleted;
     _lastDeleted = blockHeader;
     --_memBlockInUse;
@@ -153,18 +153,18 @@ void IMemoryAlloctor::_InitNode(MemBlocksNode *newNode)
     ASSERT(_curBuf != 0);
 
     /**
-    *   ¼ÆËãĞèÒªÉêÇëµÄÄÚ´æ´óĞ¡£¬ÆäÖĞ°üº¬ÄÚ´æÍ·Êı¾İ´óĞ¡
+    *   è®¡ç®—éœ€è¦ç”³è¯·çš„å†…å­˜å¤§å°ï¼Œå…¶ä¸­åŒ…å«å†…å­˜å¤´æ•°æ®å¤§å°
     */
     //size_t  bufSize = newNode->_nodeSize;
     size_t blockCnt = newNode->_blockCnt;
 
     /**
-    *   ÉêÇëÄÚ´æ
+    *   ç”³è¯·å†…å­˜
     */
     // memset(_curBuf, 0, bufSize);
 
     /**
-    *   Á´±íÍ·ºÍÎ²²¿Ö¸ÏòÍ¬Ò»Î»ÖÃ
+    *   é“¾è¡¨å¤´å’Œå°¾éƒ¨æŒ‡å‘åŒä¸€ä½ç½®
     */
     _usableBlockHeader = reinterpret_cast<MemoryBlock*>(_curBuf);
     _usableBlockHeader->_ref = 0;
@@ -173,7 +173,7 @@ void IMemoryAlloctor::_InitNode(MemBlocksNode *newNode)
     _usableBlockHeader->_isInPool = true;
     MemoryBlock *temp = _usableBlockHeader;
 
-    // ¹¹½¨ÄÚ´æ¿éÁ´±í
+    // æ„å»ºå†…å­˜å—é“¾è¡¨
     for(size_t i = 1; i < blockCnt; ++i)
     {
         char *cache = (_curBuf + _blockSize * i);
@@ -189,7 +189,7 @@ void IMemoryAlloctor::_InitNode(MemBlocksNode *newNode)
 
 void IMemoryAlloctor::PrintMemInfo() const
 {
-    // µ¥¶ÀµÄÄÚ´æ³ØÈÕÖ¾ [µ±Ç°ÄÚ´æ³ØÕ¼ÓÃÄÚ´æÇé¿ö,ÄÚ´æ³ØÊ¹ÓÃÇé¿ö]
+    // å•ç‹¬çš„å†…å­˜æ± æ—¥å¿— [å½“å‰å†…å­˜æ± å ç”¨å†…å­˜æƒ…å†µ,å†…å­˜æ± ä½¿ç”¨æƒ…å†µ]
     g_Log->mempool("blockSize[%llu] _curNodeCnt[%lld],total block amount[%llu] total bytes occupied[%llu],memblock in used bytes[%lld]"
                    ,_blockSize, (Int64)_curNodeCnt, _totalBlockAmount, _totalOccupiedSize, (Int64)_memBlockInUse*_blockSize);
 }
@@ -202,7 +202,7 @@ void IMemoryAlloctor::MemInfoToString(FS_String &outStr) const
 
 void IMemoryAlloctor::InitMemory()
 {
-    // ³õÊ¼»¯Í·½Úµã
+    // åˆå§‹åŒ–å¤´èŠ‚ç‚¹
     _header = new MemBlocksNode(_blockSize, _curBlockAmount);
     _lastNode = _header;
     ++_curNodeCnt;
@@ -222,7 +222,7 @@ void IMemoryAlloctor::FinishMemory()
 
     _isFinish = true;
 
-    // freeÁ´±íÖĞ·ÇÄÚ´æ³Ø·ÖÅäµÄÄÚ´æ
+    // freeé“¾è¡¨ä¸­éå†…å­˜æ± åˆ†é…çš„å†…å­˜
     if(_lastDeleted)
     {
         auto node = _lastDeleted;
@@ -247,14 +247,14 @@ void IMemoryAlloctor::FinishMemory()
         _header = NULL;
     }
 
-    // ÄÚ´æĞ¹Â©´òÓ¡
+    // å†…å­˜æ³„æ¼æ‰“å°
 //     if(_memBlockInUse)
 //         g_Log->memleak("memory pool memleak info: amount[%lld] size[%lld];", (Int64)_memBlockInUse, _memBlockInUse*_blockSize);
 }
 
 void IMemoryAlloctor::_NewNode()
 {
-    // ¹¹³ÉÁ´±í
+    // æ„æˆé“¾è¡¨
     auto *newNode = new MemBlocksNode(_blockSize, _curBlockAmount *= 2);
     _lastNode->_next = newNode;
     _lastNode = newNode;

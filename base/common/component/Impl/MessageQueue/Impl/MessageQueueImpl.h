@@ -212,7 +212,7 @@ inline void ConcurrentMessageQueue::PopLock(UInt32 consumerQueueId)
     _consumerGuards[consumerQueueId]->Lock();
 }
 
-// 成功返回超时WaitEventTimeOut或者成功Success
+// 鎴愬姛杩斿洖瓒呮椂WaitEventTimeOut鎴栬�呮垚鍔烻uccess
 inline Int32 ConcurrentMessageQueue::WaitForPoping(UInt32 consumerQueueId, std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec)
 {
     Int32 st = _consumerGuards[consumerQueueId]->Wait(timeoutMilisec);

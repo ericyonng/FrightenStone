@@ -43,7 +43,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// Ö§³ÖÏß³Ì°²È« ¾¡Á¿ÉèÖÃÏß³Ì²»°²È«±ÜÃâ¼ÓËø¿ªÏú,²»Ö§³ÖstlÈİÆ÷µÈ×Ô´ø·ÖÅäÆ÷µÄ¶ÔÏó
+// æ”¯æŒçº¿ç¨‹å®‰å…¨ å°½é‡è®¾ç½®çº¿ç¨‹ä¸å®‰å…¨é¿å…åŠ é”å¼€é”€,ä¸æ”¯æŒstlå®¹å™¨ç­‰è‡ªå¸¦åˆ†é…å™¨çš„å¯¹è±¡
 template<typename ObjType>
 class ObjPoolHelper
 {
@@ -58,7 +58,7 @@ public:
     size_t GetPoolBytesOccupied() const;
     size_t PrintObjPool(Int64 &poolOccupiedBytes, Int64 &objInUsed, const char *extStr);
 
-    // ·ÖÅäÆ÷ĞĞÎª½Ó¿Ú
+    // åˆ†é…å™¨è¡Œä¸ºæ¥å£
     IObjAlloctor<ObjType> *operator->();
     const IObjAlloctor<ObjType> *operator->() const;
 
@@ -71,8 +71,8 @@ FS_NAMESPACE_END
 
 #include "base/common/objpool/Impl/ObjPoolHelperImpl.h"
 
-/// ÄÚ´æ³Ø´´½¨¶ÔÏó±ãÀûºê
-// ÉùÃ÷ÖĞĞèÒªÌí¼Ó ±ãÀûºê²»Ö§³Ö»ù±¾Êı¾İÀàĞÍ »ù±¾Êı¾İÀàĞÍÇëÖ±½Ó¶¨ÒåÒ»¸öhelper¶ÔÏó
+/// å†…å­˜æ± åˆ›å»ºå¯¹è±¡ä¾¿åˆ©å®
+// å£°æ˜ä¸­éœ€è¦æ·»åŠ  ä¾¿åˆ©å®ä¸æ”¯æŒåŸºæœ¬æ•°æ®ç±»å‹ åŸºæœ¬æ•°æ®ç±»å‹è¯·ç›´æ¥å®šä¹‰ä¸€ä¸ªhelperå¯¹è±¡
 #undef  OBJ_POOL_CREATE
 #define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                                                   \
 public:                                                                                                             \
@@ -109,7 +109,7 @@ public:                                                                         
                                                                                                                     \
         static fs::ObjPoolHelper<ObjType> *_objpool_helper
 
-// ÔÚÊµÏÖÎÄ¼şÖĞĞèÒªÌí¼Ó
+// åœ¨å®ç°æ–‡ä»¶ä¸­éœ€è¦æ·»åŠ 
 #undef OBJ_POOL_CREATE_IMPL
 #define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                                   \
 fs::ObjPoolHelper<ObjType> *ObjType::_objpool_helper = fs::Singleton<fs::ObjPoolHelper<ObjType>, fs::AssistObjsDefs::NoDel>::GetInstance(objAmount);       \
@@ -118,11 +118,11 @@ size_t ObjType::GetMemleakNum()                                                 
     return _objpool_helper->GetMemleakObjNum();                                                                     \
 }
 
-// Ä¬ÈÏÒÔ_objPoolHelperÃüÃû¶ÔÏó³Ø±äÁ¿Ãû
+// é»˜è®¤ä»¥_objPoolHelperå‘½åå¯¹è±¡æ± å˜é‡å
 #undef OBJ_POOL_CREATE_DEF
 #define OBJ_POOL_CREATE_DEF(ObjType)    OBJ_POOL_CREATE(ObjType, _objPoolHelper)
 
-// Ä¬ÈÏÒÔ_objPoolHelperÃüÃû¶ÔÏó³Ø±äÁ¿Ãû
+// é»˜è®¤ä»¥_objPoolHelperå‘½åå¯¹è±¡æ± å˜é‡å
 #undef OBJ_POOL_CREATE_DEF_IMPL
 #define OBJ_POOL_CREATE_DEF_IMPL(ObjType, objAmount) OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)
 

@@ -25,13 +25,13 @@
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/7/9
  * @brief :
- *          1. log×é¼þ
- *          2. ÄÚ´æ³Ø×é¼þ
- *          3. crashhandle×é¼þ
- *          4. Ïß³Ì³Ø×é¼þ
- *          5. ¸ß¾«¶È¶¨Ê±Æ÷×é¼þ
- *          6. ÊÂ¼þÏµÍ³
- *          7. ÍøÂçÏµÍ³
+ *          1. logç»„ä»¶
+ *          2. å†…å­˜æ± ç»„ä»¶
+ *          3. crashhandleç»„ä»¶
+ *          4. çº¿ç¨‹æ± ç»„ä»¶
+ *          5. é«˜ç²¾åº¦å®šæ—¶å™¨ç»„ä»¶
+ *          6. äº‹ä»¶ç³»ç»Ÿ
+ *          7. ç½‘ç»œç³»ç»Ÿ
  */
 #ifndef __Base_Common_Application_Interface_IApplication_H__
 #define __Base_Common_Application_Interface_IApplication_H__

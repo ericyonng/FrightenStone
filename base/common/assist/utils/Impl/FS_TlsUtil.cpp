@@ -37,7 +37,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// 定义全局的tlshandle
+// 瀹氫箟鍏ㄥ眬鐨則lshandle
 static FS_TlsHandle g_FsUtilTlsHandle = FS_INVALID_TLS_HANDLE;
 
 FS_TlsHandle &FS_TlsUtil::GetUtileTlsHandle()

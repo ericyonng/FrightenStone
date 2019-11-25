@@ -103,7 +103,7 @@ bool FS_ThreadPool::AddTask(ITask &task, bool forceNewThread /*= false*/, Int32 
 
 bool FS_ThreadPool::AddTask(IDelegate<void, FS_ThreadPool *> *callback, bool forceNewThread /*= false*/, Int32 numOfThreadToCreateIfNeed /*= 1*/)
 {
-    // ´´½¨Ò»¸ödelegate task
+    // åˆ›å»ºä¸€ä¸ªdelegate task
     DelegateTask *newTask = new DelegateTask(this, callback);
     return AddTask(*newTask, forceNewThread, numOfThreadToCreateIfNeed);
 }
@@ -116,7 +116,7 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
     bool needInitMemPool = pool->_initThreadMemPoolWhenThreadStart;
     auto &threadIdRefMemPool = pool->_threadIdRefMemPool;
 
-    // ´´½¨Ïß³Ì¾Ö²¿ÄÚ´æ³Ø
+    // åˆ›å»ºçº¿ç¨‹å±€éƒ¨å†…å­˜æ± 
     if(needInitMemPool)
         ASSERT(pool->NewCurThreadMemPool());
 
@@ -157,7 +157,7 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
         std::cout << "hello crash" << std::endl;
     }
 
-    // ÊÍ·ÅÏß³Ì¾Ö²¿´æ´¢×ÊÔ´
+    // é‡Šæ”¾çº¿ç¨‹å±€éƒ¨å­˜å‚¨èµ„æº
     FS_TlsUtil::FreeUtilTlsTable();
 
     std::cout << "_endthreadex end" << std::endl;
@@ -219,7 +219,7 @@ void FS_ThreadPool::SetThreadLimit(Int32 minNum, Int32 maxNum)
 
 IMemoryPoolMgr *FS_ThreadPool::NewCurThreadMemPool()
 {
-    // ´´½¨ÄÚ´æ³Ø
+    // åˆ›å»ºå†…å­˜æ± 
     auto tlsTable = FS_TlsUtil::GetUtilTlsTable();
     auto tlsMemPool = tlsTable->GetElement<Tls_MemoryPool>(TlsElemType::Tls_MemoryPool);
     if(!tlsMemPool)

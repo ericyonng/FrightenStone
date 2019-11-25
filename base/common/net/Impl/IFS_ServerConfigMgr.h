@@ -49,7 +49,7 @@ public:
 public:
     Int32 Init();
 
-    // ¶ÁÅäÖÃ
+    // è¯»é…ç½®
 public:
     /* listener */
     FS_String GetListenIp() const;
@@ -65,10 +65,10 @@ public:
     /* dispatcher */
     Int32 GetDispatcherCnt() const;
 
-    /* ¶ÔÏó³Ø */
+    /* å¯¹è±¡æ±  */
     UInt64 GetMaxAllowObjPoolBytesOccupied() const;
 
-    /* ÄÚ´æ³Ø×î´óÕ¼ÓÃ´óĞ¡ */
+    /* å†…å­˜æ± æœ€å¤§å ç”¨å¤§å° */
     UInt64 GetMaxAllowMemoryPoolBytesOccupied() const;
 
 private:

@@ -24,7 +24,7 @@
  * @file  : MemleakMonitor.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/07/31
- * @brief : ÄÚ´æĞ¹Â©¼àÊÓÆ÷£¬Ö§³Ö¶ÔÏó³ØÖĞ´´½¨µÄ¶ÔÏó
+ * @brief : å†…å­˜æ³„æ¼ç›‘è§†å™¨ï¼Œæ”¯æŒå¯¹è±¡æ± ä¸­åˆ›å»ºçš„å¯¹è±¡
  * 
  *
  * 
@@ -61,9 +61,9 @@ public:
     void RegisterObjPoolModifyMaxAllowBytesCallback(IDelegate<void, UInt64> *callback);
 
     void PrintObjPoolInfo() const;
-    // ÇëÊ¹ÓÃtypeid×÷ÎªobjName
+    // è¯·ä½¿ç”¨typeidä½œä¸ºobjName
     void PrintObjPoolInfo(const char *objName) const;
-    // ´òÓ¡ÏµÍ³Õ¼ÓÃÄÚ´æĞÅÏ¢
+    // æ‰“å°ç³»ç»Ÿå ç”¨å†…å­˜ä¿¡æ¯
     void PrintSysMemoryInfo() const;
 
     // print objpool/mempool

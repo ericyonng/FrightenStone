@@ -47,7 +47,7 @@ public:
     static const char *GetByTypeName(const char *rawTypeName);
 
 #ifndef _WIN32
-    // 非windows平台下的类型识别
+    // 闈瀢indows骞冲彴涓嬬殑绫诲瀷璇嗗埆
     static const char *GetCxxDemangle(const char *name);
 #endif
 };

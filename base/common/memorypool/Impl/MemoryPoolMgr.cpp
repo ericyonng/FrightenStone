@@ -40,7 +40,7 @@
 
 #pragma region macro
 // #ifndef BLOCK_AMOUNT_DEF
-// #define BLOCK_AMOUNT_DEF 128       // Ä¬ÈÏÄÚ´æ¿éÊıÁ¿
+// #define BLOCK_AMOUNT_DEF 128       // é»˜è®¤å†…å­˜å—æ•°é‡
 // #endif
 #pragma endregion
 
@@ -78,7 +78,7 @@ Int32 MemoryPoolMgr::InitPool()
         _Init(i, i + multi, new MemoryAlloctor(i + multi, BLOCK_AMOUNT_DEF, _updateMemPoolOccupied, &_canCreateNewNode));
         _UpdateMemPoolOccupied(i + multi * BLOCK_AMOUNT_DEF);
 
-        // ÏÂÒ»´Î·ÖÅäµÄÊÇÔ­À´µÄ2±¶µÄÄÚ´æ 64-128-256-512-...
+        // ä¸‹ä¸€æ¬¡åˆ†é…çš„æ˜¯åŸæ¥çš„2å€çš„å†…å­˜ 64-128-256-512-...
         i += multi;
         multi = i;
     }
@@ -108,7 +108,7 @@ void MemoryPoolMgr::FinishPool()
 
 void *MemoryPoolMgr::Alloc(size_t bytes)
 {
-    // ÅĞ¶ÏÊÇ·ñÄÚ´æ³Ø¿É·ÖÅä
+    // åˆ¤æ–­æ˜¯å¦å†…å­˜æ± å¯åˆ†é…
     if(bytes < _maxCanAllocMemLimit)
     {
         auto ptr = _alloctors[bytes]->AllocMemory(bytes);
@@ -116,7 +116,7 @@ void *MemoryPoolMgr::Alloc(size_t bytes)
             return ptr;
     }
 
-    // ·ÇÄÚ´æ³Ø
+    // éå†…å­˜æ± 
     
     auto alignBytes = __FS_MEMORY_ALIGN__(bytes);
     alignBytes += sizeof(MemoryBlock);
@@ -133,7 +133,7 @@ void *MemoryPoolMgr::Alloc(size_t bytes)
 
 void *MemoryPoolMgr::Realloc(void *ptr, size_t bytes)
 {
-    // 1.ÅĞ¶ÏÊÇ·ñÔÚÄÚ´æ³ØÖĞ
+    // 1.åˆ¤æ–­æ˜¯å¦åœ¨å†…å­˜æ± ä¸­
     MemoryBlock *block = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptr) - sizeof(MemoryBlock));
     if(!block->_isInPool)
     {
@@ -150,11 +150,11 @@ void *MemoryPoolMgr::Realloc(void *ptr, size_t bytes)
         return  newCache + sizeof(MemoryBlock);
     }
 
-    // 2.Ô­À´ÄÚ´æ¿é¹»ÓÃÔòÖØ¸´ÀûÓÃ
+    // 2.åŸæ¥å†…å­˜å—å¤Ÿç”¨åˆ™é‡å¤åˆ©ç”¨
     if(block->_alloctor->GetEffectiveBlockSize() >= bytes)
         return ptr;
 
-    // 3.²»¹»ÓÃÔòÏÈ·ÖÅäºÏÊÊµÄÄÚ´æ¿é´óĞ¡ ÔÙ½«Êı¾İ¿½±´µ½ĞÂµÄ£¬È»ºóÊÍ·ÅÔ­À´µÄ
+    // 3.ä¸å¤Ÿç”¨åˆ™å…ˆåˆ†é…åˆé€‚çš„å†…å­˜å—å¤§å° å†å°†æ•°æ®æ‹·è´åˆ°æ–°çš„ï¼Œç„¶åé‡Šæ”¾åŸæ¥çš„
     auto newCache = Alloc(bytes);
     ::memcpy(newCache, ptr, block->_alloctor->GetEffectiveBlockSize());
     Free(ptr);

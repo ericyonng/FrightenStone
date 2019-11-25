@@ -69,16 +69,16 @@ int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
         Lock();
         --_waitCnt;
 
-        // ²»ÂÛÊÇ·ñ±»»½ĞÑ¶¼ÖØÖÃÊÂ¼ş±ÜÃâÏûºÄ
+        // ä¸è®ºæ˜¯å¦è¢«å”¤é†’éƒ½é‡ç½®äº‹ä»¶é¿å…æ¶ˆè€—
         ResetEvent(_event.load());
 
         if(waitRet == WAIT_TIMEOUT)
-        {// ÎŞÂÛÊÇ·ñ±»»½ĞÑ£¨ÒòÎª»½ĞÑµÄÊ±»úÇ¡ºÃÊÇ³¬Ê±£©³¬Ê±±»»½ĞÑ
+        {// æ— è®ºæ˜¯å¦è¢«å”¤é†’ï¼ˆå› ä¸ºå”¤é†’çš„æ—¶æœºæ°å¥½æ˜¯è¶…æ—¶ï¼‰è¶…æ—¶è¢«å”¤é†’
             _isSinal = false;
             return StatusDefs::WaitEventTimeOut;
         }
 
-        // ³öÏÖ´íÎóÔòÖ±½Óreturn
+        // å‡ºç°é”™è¯¯åˆ™ç›´æ¥return
         if(!FS_IS_EVENT_SINAL_WAKE_UP(waitRet))
         {
             _isSinal = false;
@@ -94,11 +94,11 @@ int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
 // 
 //     if((static_cast<long long>(WAIT_OBJECT_0) <= waitRet) &&
 //         (waitRet <= static_cast<long long>(MAXIMUM_WAIT_OBJECTS + WAIT_OBJECT_0)))
-//     {// µÈ´ıÊÇÔÚºÏ·¨µÄ·µ»ØÖµ£¨64¸öÄÚºË¶ÔÏó£©
+//     {// ç­‰å¾…æ˜¯åœ¨åˆæ³•çš„è¿”å›å€¼ï¼ˆ64ä¸ªå†…æ ¸å¯¹è±¡ï¼‰
 //         return StatusDefs::Success;
 //     }
 //     else if(waitRet == WAIT_TIMEOUT)
-//     {// ³¬Ê±µÈ´ı
+//     {// è¶…æ—¶ç­‰å¾…
 //         return StatusDefs::WaitEventTimeOut;
 //     }
 // 

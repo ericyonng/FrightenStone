@@ -41,12 +41,12 @@
 
 FS_NAMESPACE_BEGIN
 
-// buffer���ɸ������߳�ʹ�ã�ֻ���ڵ��߳��� ����IMemoryAlloctorδ������� IMemoryAlloctor ���ⲿ���룬�ⲿ�ͷ�
+// buffer不可给其他线程使用，只能在单线程中 避免IMemoryAlloctor未定义出错 IMemoryAlloctor 是外部传入，外部释放
 class BASE_EXPORT IFS_Buffer
 {
     OBJ_POOL_CREATE_DEF(IFS_Buffer);
 public:
-    // ֧���ڴ������
+    // 支持内存分配器
     IFS_Buffer(size_t bufferSize, IMemoryAlloctor *memAlloctor);
     virtual ~IFS_Buffer();
 
@@ -84,14 +84,14 @@ private:
     void _Destroy();
 
 protected:
-    UInt64 _sessionId;      // FS_Packet���������ڲ����
-    SOCKET _socket;         // FS_Packet���������ڲ����
+    UInt64 _sessionId;      // FS_Packet生命周期内不变更
+    SOCKET _socket;         // FS_Packet生命周期内不变更
 
 private:
     IMemoryAlloctor *_alloctor;
     size_t _bufferSize;
     char *_buff;
-    size_t _curPos;     // ��ǰ����ĩβλ��
+    size_t _curPos;     // 当前数据末尾位置
 };
 
 FS_NAMESPACE_END

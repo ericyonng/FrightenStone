@@ -63,16 +63,16 @@ bool FS_Stream::ReadString(std::string &str)
 
     if(len > 0)
     {
-        // ÅĞ¶ÏÄÜ²»ÄÜ¶Á³ö
+        // åˆ¤æ–­èƒ½ä¸èƒ½è¯»å‡º
         if(CanRead(len + sizeof(UInt32)))
         {
-            // ¼ÆËãÒÑ¶ÁÎ»ÖÃ+Êı×é³¤¶ÈËùÕ¼ÓĞ¿Õ¼ä
+            // è®¡ç®—å·²è¯»ä½ç½®+æ•°ç»„é•¿åº¦æ‰€å æœ‰ç©ºé—´
             OffsetOnReadChange(sizeof(UInt32));
 
-            // ½«Òª¶ÁÈ¡µÄÊı¾İ ¿½±´³öÀ´
+            // å°†è¦è¯»å–çš„æ•°æ® æ‹·è´å‡ºæ¥
             str.insert(0, _buff + _readPos, len);
 
-            // ¼ÆËãÒÑ¶ÁÊı¾İÎ»ÖÃ
+            // è®¡ç®—å·²è¯»æ•°æ®ä½ç½®
             OffsetOnReadChange(len);
             return true;
         }

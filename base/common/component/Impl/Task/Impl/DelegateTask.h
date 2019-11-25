@@ -55,8 +55,8 @@ public:
     virtual Int32 Release();
 
 private:
-    FS_ThreadPool *_pool;                             // Ïß³Ì³Ø¶ÔÏó
-    IDelegate<void, FS_ThreadPool *> *_callback;    // ĞèÒªÊÍ·Å
+    FS_ThreadPool *_pool;                             // çº¿ç¨‹æ± å¯¹è±¡
+    IDelegate<void, FS_ThreadPool *> *_callback;    // éœ€è¦é‡Šæ”¾
 };
 
 FS_NAMESPACE_END

@@ -43,24 +43,24 @@ class BASE_EXPORT FS_Client;
 class BASE_EXPORT FS_Server;
 struct BASE_EXPORT NetMsg_DataHeader;
 
-// ËùÓĞÍøÂçÊÂ¼şÈë¿Ú
-// ÍøÂçÊÂ¼ş½Ó¿Ú
-// TODO:ºóÆÚÖ§³ÖprotobufĞ­Òé
+// æ‰€æœ‰ç½‘ç»œäº‹ä»¶å…¥å£
+// ç½‘ç»œäº‹ä»¶æ¥å£
+// TODO:åæœŸæ”¯æŒprotobufåè®®
 class BASE_EXPORT INetEvent
 {
 public:
-    // ´¿Ğéº¯Êı
-    // ¿Í»§¶Ë¼ÓÈëÊÂ¼ş
+    // çº¯è™šå‡½æ•°
+    // å®¢æˆ·ç«¯åŠ å…¥äº‹ä»¶
     virtual void OnNetJoin(FS_Client *client) = 0;
-    // ¿Í»§¶ËÀë¿ªÊÂ¼ş
+    // å®¢æˆ·ç«¯ç¦»å¼€äº‹ä»¶
     virtual void OnNetLeave(FS_Client *client) = 0;
-    // ¿Í»§¶ËÏûÏ¢ÊÂ¼ş
+    // å®¢æˆ·ç«¯æ¶ˆæ¯äº‹ä»¶
     virtual Int32 OnNetMsg(FS_Server *server, FS_Client *client, NetMsg_DataHeader *header) = 0;
-    // recvÊÂ¼ş
+    // recväº‹ä»¶
     virtual void OnPrepareNetRecv(FS_Client *client) = 0;
-    // ÊÍ·Å½Ó¿Ú
+    // é‡Šæ”¾æ¥å£
     virtual void Release() = 0;
-    // Ïß³Ì°²È«
+    // çº¿ç¨‹å®‰å…¨
     virtual void Lock() = 0;
     virtual void Unlock() = 0;
 private:

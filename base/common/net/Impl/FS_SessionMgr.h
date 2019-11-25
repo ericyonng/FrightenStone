@@ -50,7 +50,7 @@ public:
     Int32 BeforeStart();
     Int32 Start();
     Int32 AfterStart();
-    virtual void WillClose() {} // 断开与模块之间的依赖
+    virtual void WillClose() {} // 鏂紑涓庢ā鍧椾箣闂寸殑渚濊禆
     void BeforeClose();
     void Close();
     void AfterClose();

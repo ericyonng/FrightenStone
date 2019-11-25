@@ -199,7 +199,7 @@ obj = NULL
 #define __FS_BuildFormatStr_   __Fs_FmtArgs_NoWIN32
 #endif
 
-//½ûÓÃ¿½±´¹¹Ôì
+//ç¦ç”¨æ‹·è´æ„é€ 
 #undef  NO_COPY
 #define NO_COPY(x)\
 private:\
@@ -214,26 +214,26 @@ private:\
 #undef MAX_I64_NUM
 #define MAX_I64_NUM 0x7FFFFFFFFFFFFFFF
 
-// Ê±¼äÂÖÅÌÄ¬ÈÏ¾«¶È
+// æ—¶é—´è½®ç›˜é»˜è®¤ç²¾åº¦
 #undef TIME_WHEEL_RESOLUTION_DEF
-#define TIME_WHEEL_RESOLUTION_DEF 100LL    // ºÁÃë
+#define TIME_WHEEL_RESOLUTION_DEF 100LL    // æ¯«ç§’
 
-// ÄÚ´æ¶ÔÆë
+// å†…å­˜å¯¹é½
 #define MEM_ALIGN_BEGIN(n)  pack(push, n)
 #define MEM_ALIGN_END(n)    pack(pop)
 
-//²ÎÊıµÄÊäÈëÊä³ö±êÊ¶
+//å‚æ•°çš„è¾“å…¥è¾“å‡ºæ ‡è¯†
 #undef  P_OUT
-#define  P_OUT  /* Êä³ö */
+#define  P_OUT  /* è¾“å‡º */
 
 #undef P_OUTSIZE
-#define P_OUTSIZE /* Êä³öÄ¿±ê³ß´ç */
+#define P_OUTSIZE /* è¾“å‡ºç›®æ ‡å°ºå¯¸ */
 
 #undef	P_IN
-#define  P_IN   /*ÊäÈë*/
+#define  P_IN   /*è¾“å…¥*/
 
 #undef P_INSIZE
-#define P_INSIZE    /*ÊäÈëÄ¿±ê³ß´ç*/
+#define P_INSIZE    /*è¾“å…¥ç›®æ ‡å°ºå¯¸*/
 
 #if defined(_WIN32) && defined(_DEBUG)
 #define ASSERT(x)   (x)?true:(::MessageBox(fs::SystemUtil::GetWindowHwndByPID(fs::SystemUtil::GetCurProcessId()), #x, fs::SystemUtil::GetCurProgramName().c_str(), MB_ABORTRETRYIGNORE))

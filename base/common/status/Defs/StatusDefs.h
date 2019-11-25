@@ -42,69 +42,69 @@ public:
     enum StatusEnum :int
     {
         #pragma region [-1, 499]
-        Error = -1,                                             // ´íÎó
-        Success = 0,                                            // ³É¹¦
-        WaitEventFailure = 1,                                   // µÈ´ı´íÎó
-        WaitEventTimeOut = 2,                                   // µÈ´ı³¬Ê±
-        Repeat = 3,                                             // ÖØ¸´
-        ParamError = 4,                                         // ²ÎÊı´íÎó
-        Failed = 5,                                             // Ê§°Ü
-        AppInitFail = 6,                                        // ³õÊ¼»¯Ê§°Ü
-        Unknown = 7,                                            // Î´Öª´íÎó
-        NotWorking = 8,                                         // Ã»ÓĞ¹¤×÷
-        NotInit = 9,                                            // Î´³õÊ¼»¯
+        Error = -1,                                             // é”™è¯¯
+        Success = 0,                                            // æˆåŠŸ
+        WaitEventFailure = 1,                                   // ç­‰å¾…é”™è¯¯
+        WaitEventTimeOut = 2,                                   // ç­‰å¾…è¶…æ—¶
+        Repeat = 3,                                             // é‡å¤
+        ParamError = 4,                                         // å‚æ•°é”™è¯¯
+        Failed = 5,                                             // å¤±è´¥
+        AppInitFail = 6,                                        // åˆå§‹åŒ–å¤±è´¥
+        Unknown = 7,                                            // æœªçŸ¥é”™è¯¯
+        NotWorking = 8,                                         // æ²¡æœ‰å·¥ä½œ
+        NotInit = 9,                                            // æœªåˆå§‹åŒ–
         #pragma endregion
 
         #pragma region SOCKET[500, 599]
-        Socket_CreateFailure = 500,                             // Ì×½Ó×Ö´´½¨Ê§°Ü
-        Socket_NotInit = 501,                                   // Ì×½Ó×ÖÎ´³õÊ¼»¯
-        Socket_ParamError = 502,                                // Ì×½Ó×Ö²ÎÊı´íÎó
-        Socket_InvalidSocket = 503,                             // ÎŞĞ§Ì×½Ó×Ö
-        Socket_SetSockOptFailed = 504,                          // ÉèÖÃÌ×½Ó×Ö²ÎÊıÊ§°Ü
-        Socket_GetsockoptFailed = 505,                          // »ñÈ¡Ì×½Ó×Ö²ÎÊıÊ±³ö´í
-        Socket_Unknown = 506,                                   // Î´Öª
-        Socket_SetBlockParamError = 507,                        // ÉèÖÃÌ×½Ó×Ö×èÈû²ÎÊıÊ§°Ü
-        Socket_Error = 508,                                     // Ì×½Ó×Ö²Ù×÷´íÎó
+        Socket_CreateFailure = 500,                             // å¥—æ¥å­—åˆ›å»ºå¤±è´¥
+        Socket_NotInit = 501,                                   // å¥—æ¥å­—æœªåˆå§‹åŒ–
+        Socket_ParamError = 502,                                // å¥—æ¥å­—å‚æ•°é”™è¯¯
+        Socket_InvalidSocket = 503,                             // æ— æ•ˆå¥—æ¥å­—
+        Socket_SetSockOptFailed = 504,                          // è®¾ç½®å¥—æ¥å­—å‚æ•°å¤±è´¥
+        Socket_GetsockoptFailed = 505,                          // è·å–å¥—æ¥å­—å‚æ•°æ—¶å‡ºé”™
+        Socket_Unknown = 506,                                   // æœªçŸ¥
+        Socket_SetBlockParamError = 507,                        // è®¾ç½®å¥—æ¥å­—é˜»å¡å‚æ•°å¤±è´¥
+        Socket_Error = 508,                                     // å¥—æ¥å­—æ“ä½œé”™è¯¯
         #pragma endregion
 
         #pragma region Trigger[600, 699]
-        Trigger_InvalidOccasion = 600,                          // ÎŞĞ§µÄÊ±»ú
-        Trigger_InvalidTriggerType = 601,                       // ÎŞĞ§µÄ´¥·¢ÀàĞÍ
-        Trigger_UnkownAddType = 602,                            // Î´ÖªµÄÌí¼Ó·½Ê½
-        Trigger_TriggerTypeRepeatInOccasion = 603,              // ´¥·¢ÀàĞÍÒÑ´æÔÚ£¬Çë²»ÒªÖØ¸´Ìí¼Ó
+        Trigger_InvalidOccasion = 600,                          // æ— æ•ˆçš„æ—¶æœº
+        Trigger_InvalidTriggerType = 601,                       // æ— æ•ˆçš„è§¦å‘ç±»å‹
+        Trigger_UnkownAddType = 602,                            // æœªçŸ¥çš„æ·»åŠ æ–¹å¼
+        Trigger_TriggerTypeRepeatInOccasion = 603,              // è§¦å‘ç±»å‹å·²å­˜åœ¨ï¼Œè¯·ä¸è¦é‡å¤æ·»åŠ 
         #pragma endregion 
 
         #pragma region Aes[700-799]
-        Aes_TextLengthNotEnough = 700,                          // ³¤¶È²»×ã
-        Aes_Not16BytesMultiple = 701,                           // ²»ÊÇ16×Ö½Ú±¶Êı
-        Aes_CyphertextIsEmpty = 702,                            // ÃÜÎÄ²»ÄÜÎª¿Õ
-        Aes_PlaintextIsEmpty = 703,                             // Ã÷ÎÄ²»ÄÜÎª¿Õ
+        Aes_TextLengthNotEnough = 700,                          // é•¿åº¦ä¸è¶³
+        Aes_Not16BytesMultiple = 701,                           // ä¸æ˜¯16å­—èŠ‚å€æ•°
+        Aes_CyphertextIsEmpty = 702,                            // å¯†æ–‡ä¸èƒ½ä¸ºç©º
+        Aes_PlaintextIsEmpty = 703,                             // æ˜æ–‡ä¸èƒ½ä¸ºç©º
         #pragma endregion
 
         #pragma region TimeWheel[800-899]
-        TimeWheel_ExpiredTimeIsNull = 800,                      // ¹ıÆÚÊ±¼äÎª¿Õ
-        TimeWheel_RegisterAExistsTimeData = 801,                // ÖØ¸´×¢²á
-        TimeWheel_CantRegisterWhenRotatingWheel = 802,          // ×ª¶¯ÂÖÅÌÊ±²»¿ÉÔÚ·Ç×ª¶¯×ªÅÌµÄÆäËûµØ·½×¢²á¶¨Ê±Æ÷
+        TimeWheel_ExpiredTimeIsNull = 800,                      // è¿‡æœŸæ—¶é—´ä¸ºç©º
+        TimeWheel_RegisterAExistsTimeData = 801,                // é‡å¤æ³¨å†Œ
+        TimeWheel_CantRegisterWhenRotatingWheel = 802,          // è½¬åŠ¨è½®ç›˜æ—¶ä¸å¯åœ¨éè½¬åŠ¨è½¬ç›˜çš„å…¶ä»–åœ°æ–¹æ³¨å†Œå®šæ—¶å™¨
         #pragma endregion
 
         #pragma region SystemUtil[900, 999]
-        SystemUtil_GetKernel32HandleFailed = 900,               // »ñÈ¡kernel32¾ä±úÊ§°Ü
-        SystemUtil_GetGlobalMemoryStatusExFuncFailed = 901,     // »ñÈ¡globalmemorystatusexº¯ÊıÊ§°Ü
-        SystemUtil_GetGlobalMemoryStatusExFailed = 902,         // »ñÈ¡ÄÚ´æĞÅÏ¢Ê§°Ü
-        SystemUtil_GetModuleFileNameFailed = 903,               // »ñÈ¡Ä£¿éÃûÊ§°Ü
-        SystemUtil_OpenProcessQueryInfomationFailed = 904,      // ²éÑ¯½ø³ÌĞÅÏ¢Ê§°Ü
-        SystemUtil_LoadKernel32LibraryFailed = 905,             // ¼ÓÔØkernel32.dllÊ§°Ü
-        SystemUtil_QueryFullProcessImageNameFailed = 906,       // ²éÑ¯È«½ø³Ì¾µÏñÃûÊ§°Ü
-        SystemUtil_GetProcessImageFileNameFailed = 907,         // »ñÈ¡½ø³Ì¾µÏñÎÄ¼şÃûÊ§°Ü
-        SystemUtil_QueryDosDeviceError = 908,                   // ²éÑ¯Çı¶¯Æ÷´íÎó
-        SystemUtil_GetDriveError = 909,                         // »ñÈ¡ÅÌ·ûÊ§°Ü
+        SystemUtil_GetKernel32HandleFailed = 900,               // è·å–kernel32å¥æŸ„å¤±è´¥
+        SystemUtil_GetGlobalMemoryStatusExFuncFailed = 901,     // è·å–globalmemorystatusexå‡½æ•°å¤±è´¥
+        SystemUtil_GetGlobalMemoryStatusExFailed = 902,         // è·å–å†…å­˜ä¿¡æ¯å¤±è´¥
+        SystemUtil_GetModuleFileNameFailed = 903,               // è·å–æ¨¡å—åå¤±è´¥
+        SystemUtil_OpenProcessQueryInfomationFailed = 904,      // æŸ¥è¯¢è¿›ç¨‹ä¿¡æ¯å¤±è´¥
+        SystemUtil_LoadKernel32LibraryFailed = 905,             // åŠ è½½kernel32.dllå¤±è´¥
+        SystemUtil_QueryFullProcessImageNameFailed = 906,       // æŸ¥è¯¢å…¨è¿›ç¨‹é•œåƒåå¤±è´¥
+        SystemUtil_GetProcessImageFileNameFailed = 907,         // è·å–è¿›ç¨‹é•œåƒæ–‡ä»¶åå¤±è´¥
+        SystemUtil_QueryDosDeviceError = 908,                   // æŸ¥è¯¢é©±åŠ¨å™¨é”™è¯¯
+        SystemUtil_GetDriveError = 909,                         // è·å–ç›˜ç¬¦å¤±è´¥
         #pragma endregion
 
         #pragma region FS_IPUtil[1000, 1099]
-        FS_IPUtil_ParamError = 1000,                            // ²ÎÊı´íÎó
-        FS_IPUtil_NotFound = 1001,                              // Î´ÕÒµ½
-        FS_IPUtil_GetAddrInfoFailed = 1002,                     // »ñÈ¡µØÖ·ĞÅÏ¢³ö´í
-        FS_IPUtil_GetPeerNameFailed = 1003,                     // »ñÈ¡¶Ô·½µØÖ·ĞÅÏ¢Ê§°Ü
+        FS_IPUtil_ParamError = 1000,                            // å‚æ•°é”™è¯¯
+        FS_IPUtil_NotFound = 1001,                              // æœªæ‰¾åˆ°
+        FS_IPUtil_GetAddrInfoFailed = 1002,                     // è·å–åœ°å€ä¿¡æ¯å‡ºé”™
+        FS_IPUtil_GetPeerNameFailed = 1003,                     // è·å–å¯¹æ–¹åœ°å€ä¿¡æ¯å¤±è´¥
         #pragma endregion
 
         #pragma region Socket[1100, 1199]
@@ -112,61 +112,61 @@ public:
         #pragma endregion
 
         #pragma region Log[1200, 1299]
-        Log_CreateDirFail = 1200,                               // ´´½¨Ä¿Â¼Ê§°Ü
-        Log_CreateLogFileFail = 1201,                           // ´´½¨ÈÕÖ¾ÎÄ¼şÊ§°Ü
+        Log_CreateDirFail = 1200,                               // åˆ›å»ºç›®å½•å¤±è´¥
+        Log_CreateLogFileFail = 1201,                           // åˆ›å»ºæ—¥å¿—æ–‡ä»¶å¤±è´¥
         #pragma endregion
 
         #pragma region XorEncrypt[1300, 1399]
-        XorEncrypt_PlainTextLenNotEnough = 1300,                // Ã÷ÎÄÊı¾İ¿é³¤¶È²»¹»
-        XorEncrypt_CypherTextSizeNotEnough = 1301,              // ÃÜÎÄ¿Õ¼ä²»×ã
-        XorEncrypt_CypherTextLenNotEnough = 1302,               // ÃÜÎÄÊı¾İ¿é³¤¶È²»¹»
-        XorEncrypt_PlainTextSizeNotEnough = 1303,               // Ã÷ÎÄ¿Õ¼ä²»×ã
+        XorEncrypt_PlainTextLenNotEnough = 1300,                // æ˜æ–‡æ•°æ®å—é•¿åº¦ä¸å¤Ÿ
+        XorEncrypt_CypherTextSizeNotEnough = 1301,              // å¯†æ–‡ç©ºé—´ä¸è¶³
+        XorEncrypt_CypherTextLenNotEnough = 1302,               // å¯†æ–‡æ•°æ®å—é•¿åº¦ä¸å¤Ÿ
+        XorEncrypt_PlainTextSizeNotEnough = 1303,               // æ˜æ–‡ç©ºé—´ä¸è¶³
         #pragma endregion
 
         #pragma region CrashHandleUtil[1400, 1499]
-        CrashHandleUtil_SymInitializeFail = 1400,               // ·ûºÅpdb³õÊ¼»¯Ê§°Ü
+        CrashHandleUtil_SymInitializeFail = 1400,               // ç¬¦å·pdbåˆå§‹åŒ–å¤±è´¥
         #pragma endregion
 
         #pragma region IOCP[1500, 1599]
-        IOCP_CreateCompletionPortFail = 1500,                   // ´´½¨Íê³É¶Ë¿ÚÊ§°Ü
-        IOCP_LoadAcceptExError = 1501,                          // ¼ÓÔØAcceptExº¯ÊıÊ§°Ü
-        IOCP_RegSocketToCompletionPortFail = 1502,              // Ì×½Ó×Ö¹ØÁªµ½Íê³É¶Ë¿ÚÊ§°Ü
-        IOCP_PostAcceptFail = 1503,                             // ÏòÍê³É¶Ë¿ÚÍ¶µİioÁ¬½ÓÇëÇóÊ§°Ü
-        IOCP_PostRecvFail = 1504,                               // ÏòÍê³É¶Ë¿ÚÍ¶µİio½ÓÊÕÇëÇóÊ§°Ü
-        IOCP_PostSendFail = 1504,                               // ÏòÍê³É¶Ë¿ÚÍ¶µİio·¢ËÍÇëÇóÊ§°Ü
-        IOCP_LoadAcceptExFailForListenSocketIsInvalid = 1505,   // ¼ÓÔØacceptexÊ§°Ü£¬¼àÌı¶Ë¿ÚÎŞĞ§
-        IOCP_WaitTimeOut = 1506,                                // ³¬Ê±µÈ´ı
-        IOCP_IODisconnect = 1507,                               // ioÁ¬½Ó¶Ï¿ª
-        IOCP_WaitOtherError = 1508,                             // ÆäËû´íÎó
-        IOCP_ClientForciblyClosed = 1509,                       // Ô¶³Ì¿Í»§¶Ë±»Ç¿ĞĞ¹Ø±Õ
-        IOCP_PostQuitFail = 1510,                               // ÏòÍê³É¶Ë¿ÚÍ¶µİquitÊ§°Ü
-        IOCP_Quit = 1511,                                       // iocpÍË³ö
-        IOCP_LoadGetAcceptExSockAddrFunFail = 1512,             // ¼ÓÔØ»ñÈ¡¿Í»§¶ËµØÖ·º¯ÊıÖ¸Õë³ö´í
+        IOCP_CreateCompletionPortFail = 1500,                   // åˆ›å»ºå®Œæˆç«¯å£å¤±è´¥
+        IOCP_LoadAcceptExError = 1501,                          // åŠ è½½AcceptExå‡½æ•°å¤±è´¥
+        IOCP_RegSocketToCompletionPortFail = 1502,              // å¥—æ¥å­—å…³è”åˆ°å®Œæˆç«¯å£å¤±è´¥
+        IOCP_PostAcceptFail = 1503,                             // å‘å®Œæˆç«¯å£æŠ•é€’ioè¿æ¥è¯·æ±‚å¤±è´¥
+        IOCP_PostRecvFail = 1504,                               // å‘å®Œæˆç«¯å£æŠ•é€’ioæ¥æ”¶è¯·æ±‚å¤±è´¥
+        IOCP_PostSendFail = 1504,                               // å‘å®Œæˆç«¯å£æŠ•é€’ioå‘é€è¯·æ±‚å¤±è´¥
+        IOCP_LoadAcceptExFailForListenSocketIsInvalid = 1505,   // åŠ è½½acceptexå¤±è´¥ï¼Œç›‘å¬ç«¯å£æ— æ•ˆ
+        IOCP_WaitTimeOut = 1506,                                // è¶…æ—¶ç­‰å¾…
+        IOCP_IODisconnect = 1507,                               // ioè¿æ¥æ–­å¼€
+        IOCP_WaitOtherError = 1508,                             // å…¶ä»–é”™è¯¯
+        IOCP_ClientForciblyClosed = 1509,                       // è¿œç¨‹å®¢æˆ·ç«¯è¢«å¼ºè¡Œå…³é—­
+        IOCP_PostQuitFail = 1510,                               // å‘å®Œæˆç«¯å£æŠ•é€’quitå¤±è´¥
+        IOCP_Quit = 1511,                                       // iocpé€€å‡º
+        IOCP_LoadGetAcceptExSockAddrFunFail = 1512,             // åŠ è½½è·å–å®¢æˆ·ç«¯åœ°å€å‡½æ•°æŒ‡é’ˆå‡ºé”™
         #pragma endregion
 
         #pragma region Tls[1600, 1699]
-        Tls_CreateHandleFail = 1600,                            // tlshandle´´½¨Ê§°Ü
+        Tls_CreateHandleFail = 1600,                            // tlshandleåˆ›å»ºå¤±è´¥
         #pragma endregion
 
         #pragma region IocpConnector[1700, 1799]
-        IocpConnector_StartFailOfMonitorTaskFailure = 1700,     // iocpconnector Ìí¼Ómonitor taskÊ§°Ü
-        IocpConnector_CreateCfgIniFail = 1701,                  // ´´½¨ÅäÖÃÎÄ¼şÊ§°Ü
-        IocpConnector_InitDefIniFail = 1702,                    // ³õÊ¼»¯Ğ´ÈëÄ¬ÈÏÅäÖÃÊ§°Ü
-        IocpConnector_InitListenSocketFail = 1703,              // ³õÊ¼»¯¼àÌıÌ×½Ó×ÖÊ§°Ü
+        IocpConnector_StartFailOfMonitorTaskFailure = 1700,     // iocpconnector æ·»åŠ monitor taskå¤±è´¥
+        IocpConnector_CreateCfgIniFail = 1701,                  // åˆ›å»ºé…ç½®æ–‡ä»¶å¤±è´¥
+        IocpConnector_InitDefIniFail = 1702,                    // åˆå§‹åŒ–å†™å…¥é»˜è®¤é…ç½®å¤±è´¥
+        IocpConnector_InitListenSocketFail = 1703,              // åˆå§‹åŒ–ç›‘å¬å¥—æ¥å­—å¤±è´¥
         #pragma endregion
 
         #pragma region IocpMsgTransfer[1800, 1899]
-        IocpMsgTransfer_StartFailOfMoniterMsgFailure = 1800,    // iocpmsgtransfer Ìí¼ÓmonitorÈÎÎñÊ±ºòÊ§°Ü
-        IocpMsgTransfer_IocpQuit = 1801,                        // iocpÍË³ö
-        IocpMsgTransfer_CfgError = 1802,                        // ÅäÖÃ´íÎó
+        IocpMsgTransfer_StartFailOfMoniterMsgFailure = 1800,    // iocpmsgtransfer æ·»åŠ monitorä»»åŠ¡æ—¶å€™å¤±è´¥
+        IocpMsgTransfer_IocpQuit = 1801,                        // iocpé€€å‡º
+        IocpMsgTransfer_CfgError = 1802,                        // é…ç½®é”™è¯¯
         #pragma endregion
 
         #pragma region FS_IocpMsgHandler[1900, 1999]
-        FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure = 1901,   // FS_IocpMsgHandler Ìí¼ÓÏß³ÌÈÎÎñÊ§°Ü
+        FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure = 1901,   // FS_IocpMsgHandler æ·»åŠ çº¿ç¨‹ä»»åŠ¡å¤±è´¥
         #pragma endregion
 
         #pragma region FS_ServerCore[2000, 2099]
-        FS_ServerCore_StartFailOfSvrRuningTaskFailure = 2000,       // Ìí¼ÓsvrruingÏß³ÌÈÎÎñÊ±ºòÊ§°Ü
+        FS_ServerCore_StartFailOfSvrRuningTaskFailure = 2000,       // æ·»åŠ svrruingçº¿ç¨‹ä»»åŠ¡æ—¶å€™å¤±è´¥
         #pragma endregion
     };
 };

@@ -37,7 +37,7 @@
 #include "base/common/component/Impl/Task/Task.h"
 #include "base/common/component/Impl/FS_Delegate.h"
 
-// ÈÕÖ¾ÈÎÎñ
+// æ—¥å¿—ä»»åŠ¡
 FS_NAMESPACE_BEGIN
 class FS_ThreadPool;
 
@@ -47,15 +47,15 @@ public:
     LogTask(FS_ThreadPool *pool, IDelegate<void, Int32> *taskDelegate, Int32 workIntervalMsTime, Int32 logFileIndex, ConditionLocker &locker);
     virtual ~LogTask();
 
-    // ÈÎÎñÖ´ĞĞÌå
+    // ä»»åŠ¡æ‰§è¡Œä½“
     virtual Int32 Run();
 
 protected:
     IDelegate<void, Int32> *_taskDelegate;
     FS_ThreadPool *_pool;
-    Int32 _workIntervalMsTime;    // Ğ´ÈÕÖ¾Ê±¼ä¼ä¸ô
+    Int32 _workIntervalMsTime;    // å†™æ—¥å¿—æ—¶é—´é—´éš”
     Int32 _logFileIndex;
-    ConditionLocker &_lock;     // Íâ²¿Á¢¼´»½ĞÑÏß³ÌµÄ»úÖÆ
+    ConditionLocker &_lock;     // å¤–éƒ¨ç«‹å³å”¤é†’çº¿ç¨‹çš„æœºåˆ¶
 };
 
 

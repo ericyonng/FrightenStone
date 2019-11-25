@@ -3,7 +3,7 @@
 #pragma once
 #include "stdafx.h"
 
-// ∂®“Âglobal
+// ÂÆö‰πâglobal
 
 class EasyGloal : public fs::IEasyGlobal
 {
@@ -21,13 +21,13 @@ public:
     }
     virtual void Finish()
     {
-        //  Õ∑≈◊Èº˛
+        // ÈáäÊîæÁªÑ‰ª∂
          _log->FinishModule();
 //         Fs_SafeFree(_log);
     }
 #pragma endregion
 
-    // ªÒ»°◊ ‘¥
+    // Ëé∑ÂèñËµÑÊ∫ê
 public:
     virtual fs::ILog *GetLog()
     {
@@ -78,7 +78,7 @@ public:
 //         std::cout << "-----------------------------------------" << std::endl;
 //         fs::Time nowTime, nowTime2, nowTime3;
 //         fs::FS_String cache;
-//         // 1. log ”≈ªØΩ®“È£∫±‹√‚format tostring ¿‡À∆µƒ¥¶¿Ì,–‘ƒ‹œ˚∫ƒ∫‹¥Û
+//         // 1. log ‰ºòÂåñÂª∫ËÆÆÔºöÈÅøÂÖçformat tostring Á±ª‰ººÁöÑÂ§ÑÁêÜ,ÊÄßËÉΩÊ∂àËÄóÂæàÂ§ß
 //         // 
 //         fs::FS_String str = "2019-06-27 22:13:10.442468<Warn>[class TestLogModule][TestLogModule::Run][line:17]: hello world\n";
 //         auto fp = fs::FS_FileUtil::OpenFile(".\\test.log", true);

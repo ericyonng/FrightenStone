@@ -51,24 +51,24 @@ public:
     explicit TimeWheel(const TimeSlice &resolutionSlice);
     virtual ~TimeWheel();
 
-    // ×ª¶¯Ê±¼äÂÖÅÌ
+    // è½¬åŠ¨æ—¶é—´è½®ç›˜
     void RotateWheel();
 
-    // ÊÇ·ñ×¢²á
+    // æ˜¯å¦æ³¨å†Œ
     bool IsRegister(TimeData *timeData) const;
-    // ×¢²á³¬Ê±Êı¾İ
+    // æ³¨å†Œè¶…æ—¶æ•°æ®
     Int32 Register(TimeData *timeData);
-    // È¡Ïû×¢²á
+    // å–æ¶ˆæ³¨å†Œ
     void UnRegister(TimeData *timeData);
-    // µ±Ç°Ê±¼äÂÖÅÌ¾«¶È @return:·µ»ØÎ¢Ãî
+    // å½“å‰æ—¶é—´è½®ç›˜ç²¾åº¦ @return:è¿”å›å¾®å¦™
      const TimeSlice &GetTimeWheelResolution() const;
-     // ÏÂÒ»Ö¡ÂÖÅÌÉ¨ÃèÊ±¼äĞŞÕıÖµ
+     // ä¸‹ä¸€å¸§è½®ç›˜æ‰«ææ—¶é—´ä¿®æ­£å€¼
      void GetModifiedResolution(TimeSlice &modifiedResolution) const;
-     // µ±Ç°Ê±¼ä
+     // å½“å‰æ—¶é—´
      const Time &GetCurTime() const;
 
 private:
-    // ²úÉútimewheelÉúÃüÖÜÆÚÖĞÎ¨Ò»id
+    // äº§ç”Ÿtimewheelç”Ÿå‘½å‘¨æœŸä¸­å”¯ä¸€id
     Int64 _NewIncreasId();
     bool _IsRotating() const;
     void _BeforeRotateWheel();
@@ -76,15 +76,15 @@ private:
     AsynTimeData *_NewAsynTimeData(Int32 opType, TimeData *timeData);
 
 private:
-    Int64 _rotating;                        // ÊÇ·ñÕıÔÚ×ª¶¯
-    const TimeSlice _resolutionSlice;       // Ã¿Ò»ÂÖÊ±¼äÇĞÆ¬³¤¶È
-    // Time _nowTimeToJudgeWheelTimeOut;   // µ±Ç°Ê±¼äÓÃÓÚÅĞ¶ÏÊÇ·ñ´ïµ½ÂÖÅÌ´¦ÀíµÄ×îĞ¡É¨ÃèÊ±¼ä
-    Time _curTime;                  // µ±Ç°Ê±¼ä´Á
+    Int64 _rotating;                        // æ˜¯å¦æ­£åœ¨è½¬åŠ¨
+    const TimeSlice _resolutionSlice;       // æ¯ä¸€è½®æ—¶é—´åˆ‡ç‰‡é•¿åº¦
+    // Time _nowTimeToJudgeWheelTimeOut;   // å½“å‰æ—¶é—´ç”¨äºåˆ¤æ–­æ˜¯å¦è¾¾åˆ°è½®ç›˜å¤„ç†çš„æœ€å°æ‰«ææ—¶é—´
+    Time _curTime;                  // å½“å‰æ—¶é—´æˆ³
     std::set<TimeData *, TimeDataLess> _timeDatas;
-    std::vector<AsynTimeData *> _asynData;          // Òì²½Ö´ĞĞ
-    std::map<TimeData *, Int32> _asynRegisterFlag;  // ÎªÒì²½½¨Á¢Ë÷Òı,value:register+1,unrigister-1,
+    std::vector<AsynTimeData *> _asynData;          // å¼‚æ­¥æ‰§è¡Œ
+    std::map<TimeData *, Int32> _asynRegisterFlag;  // ä¸ºå¼‚æ­¥å»ºç«‹ç´¢å¼•,value:register+1,unrigister-1,
 
-    Int64 _increaseId;              // µİÔöid
+    Int64 _increaseId;              // é€’å¢id
 };
 
 FS_NAMESPACE_END

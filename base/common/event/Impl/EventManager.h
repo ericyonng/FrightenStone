@@ -55,9 +55,9 @@ public:
      * Add event listener.
      * @param[in] id         - event Id.
      * @param[in] listener   - event listener.
-     * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub. Ö¸¶¨µÄ´æ¸ùÈô´æÔÚÔòÏú»Ùµ±Ç°µÄdelegate
+     * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub. æŒ‡å®šçš„å­˜æ ¹è‹¥å­˜åœ¨åˆ™é”€æ¯å½“å‰çš„delegate
      * @return LLBC_ListenerStub - return FS_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
-     * delegateÓÉÄÚ²¿ÊÍ·Å£¬Íâ²¿²»ÊÍ·Å
+     * delegateç”±å†…éƒ¨é‡Šæ”¾ï¼Œå¤–éƒ¨ä¸é‡Šæ”¾
      */
     virtual FS_ListenerStub AddListener(int id,
                                           IDelegate<void, FS_Event *> *listener,
@@ -151,16 +151,16 @@ protected:
     int _firing;
     FS_ListenerStub _maxListenerStub;
 
-    // ÑÓ³Ùµ½aftereventÖ´ĞĞÏà¹ØÊÂ¼ş
+    // å»¶è¿Ÿåˆ°aftereventæ‰§è¡Œç›¸å…³äº‹ä»¶
     typedef std::vector<_Op> _DelayedOps;
     _DelayedOps _delayedOps;
 
-    // ÊÂ¼ş¶ÔÓ¦µÄ¼àÌı»Øµ÷
+    // äº‹ä»¶å¯¹åº”çš„ç›‘å¬å›è°ƒ
     typedef std::vector<_Listener> _Listeners;
     typedef std::map<int, _Listeners> _ListenersMap;
     _ListenersMap _listeners;
 
-    // ´æ¸ù¶ÔÓ¦µÄ¼àÌı»Øµ÷
+    // å­˜æ ¹å¯¹åº”çš„ç›‘å¬å›è°ƒ
     typedef std::map<FS_ListenerStub, _Listener> _StubIndexedListeners;
     _StubIndexedListeners _stubListeners;
 };

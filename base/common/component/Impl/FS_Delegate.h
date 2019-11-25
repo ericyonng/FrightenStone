@@ -40,15 +40,15 @@
 
 FS_NAMESPACE_BEGIN
 
-// R»Øµ÷·µ»ØÖµÀàĞÍ£¬Args»Øµ÷º¯Êı²ÎÊı°ü Î¯ÍĞ»ùÀà ÓÃÓÚ½âñî¾ßÌåÀàĞÍ£¬´´½¨ÀàĞÍÎŞ¹ØµÄÎ¯ÍĞ
+// Rå›è°ƒè¿”å›å€¼ç±»å‹ï¼ŒArgså›è°ƒå‡½æ•°å‚æ•°åŒ… å§”æ‰˜åŸºç±» ç”¨äºè§£è€¦å…·ä½“ç±»å‹ï¼Œåˆ›å»ºç±»å‹æ— å…³çš„å§”æ‰˜
 template <typename Rtn, typename... Args>
 class IDelegate
 {
 public:
     IDelegate();
     virtual ~IDelegate();
-    // ×óÖµ»á°ó¶¨³É×óÖµÒıÓÃ£¬ÓÒÖµ»á°ó¶¨³ÉÓÒÖµÒıÓÃ
-    // Çë×¢ÒâÒıÓÃÕÛµşÊÊµ±Ê¹ÓÃstd::forward¿ÉÒÔÍêÃÀµÄ½«²ÎÊı´«Èë£¬Ô­À´Ê²Ã´ÀàĞÍ´«Èëºó°ó¶¨µÄ¾ÍÊÇÊ²Ã´ÀàĞÍ
+    // å·¦å€¼ä¼šç»‘å®šæˆå·¦å€¼å¼•ç”¨ï¼Œå³å€¼ä¼šç»‘å®šæˆå³å€¼å¼•ç”¨
+    // è¯·æ³¨æ„å¼•ç”¨æŠ˜å é€‚å½“ä½¿ç”¨std::forwardå¯ä»¥å®Œç¾çš„å°†å‚æ•°ä¼ å…¥ï¼ŒåŸæ¥ä»€ä¹ˆç±»å‹ä¼ å…¥åç»‘å®šçš„å°±æ˜¯ä»€ä¹ˆç±»å‹
     virtual Rtn Invoke(Args... args) = 0;
     virtual Rtn Invoke(Args... args) const = 0;
     virtual IDelegate<Rtn, Args...> *CreateNewCopy() const = 0;
@@ -88,7 +88,7 @@ private:
     Rtn(*_f)(Args...);
 };
 
-// Ö§³Ölambda±í´ïÊ½,std::functionµÈ±Õ°ü
+// æ”¯æŒlambdaè¡¨è¾¾å¼,std::functionç­‰é—­åŒ…
 template <typename CustomFuncType, typename Rtn, typename... Args>
 class DelegateCustomFunc : public IDelegate<Rtn, Args...>
 {
@@ -116,11 +116,11 @@ public:
     template <typename Rtn, typename... Args>
     static IDelegate<Rtn, Args...> *Create(Rtn(*f)(Args...));
 
-    // °ó¶¨lambda,std::function,Èç£ºDelegatePlusFactory::Create<decltype(func), void, int>(func);
+    // ç»‘å®šlambda,std::function,å¦‚ï¼šDelegatePlusFactory::Create<decltype(func), void, int>(func);
     template <typename CustomFuncType /* = decltype(func) */, typename Rtn, typename... Args>
     static IDelegate<Rtn, Args...> *Create(CustomFuncType &&func);
 
-    // °ó¶¨lambda,std::function,Èç£ºDelegatePlusFactory::Create<decltype(func), void, int>(func);
+    // ç»‘å®šlambda,std::function,å¦‚ï¼šDelegatePlusFactory::Create<decltype(func), void, int>(func);
     template <typename CustomFuncType /* = decltype(func) */, typename Rtn, typename... Args>
     static IDelegate<Rtn, Args...> *Create(CustomFuncType const&func);
 };

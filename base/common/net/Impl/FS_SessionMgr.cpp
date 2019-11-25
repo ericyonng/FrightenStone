@@ -76,7 +76,7 @@ void FS_SessionMgr::Close()
 
 void FS_SessionMgr::AfterClose()
 {
-    // ÇåÀí
+    // æ¸…ç†
     STLUtil::DelMapContainer(_sessions);
 }
 

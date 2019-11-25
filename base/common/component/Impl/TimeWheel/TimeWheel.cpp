@@ -62,7 +62,7 @@ void TimeWheel::RotateWheel()
 {
     _BeforeRotateWheel();
 
-    // ¸üĞÂÊ±¼ä
+    // æ›´æ–°æ—¶é—´
     if(UNLIKELY(_curTime == 0))
     {
         _curTime.FlushTime(Time::NowMicroTimestamp());
@@ -72,35 +72,35 @@ void TimeWheel::RotateWheel()
         _curTime.FlushTime();
     }
 
-    // ÂÖÅÌ¹ö¶¯Ê±¼äĞèÒª´óÓÚµÈÓÚ×îĞ¡É¨ÃèÊ±¼ä¾«¶È²Å´¦Àí
+    // è½®ç›˜æ»šåŠ¨æ—¶é—´éœ€è¦å¤§äºç­‰äºæœ€å°æ‰«ææ—¶é—´ç²¾åº¦æ‰å¤„ç†
 //     _nowTimeToJudgeWheelTimeOut.FlushTime();
 //     if(UNLIKELY((_nowTimeToJudgeWheelTimeOut - _curTime) < _resolutionSlice))
 //         return;
 
-    // ±éÀú
+    // éå†
     std::set<TimeData *> timeDataToRefresh;
     for(auto iterUniqueRefTimeDatas = _timeDatas.begin(); iterUniqueRefTimeDatas != _timeDatas.end();)
     {
-        // ÅĞ¶ÏÊÇ·ñ¹ıÆÚ
+        // åˆ¤æ–­æ˜¯å¦è¿‡æœŸ
         auto timeData = *iterUniqueRefTimeDatas;
         if(timeData->_expiredTime > _curTime)
             break;
 
-        // Ö´ĞĞ³¬Ê±delegate
+        // æ‰§è¡Œè¶…æ—¶delegate
         timeData->_isRotatingWheel = true;
-        if(!timeData->_isCancel)// ±¾ÂÖÑ­»·ÖĞÈô±»cancelµôÒ²²»»áÖ´ĞĞtimeout
+        if(!timeData->_isCancel)// æœ¬è½®å¾ªç¯ä¸­è‹¥è¢«cancelæ‰ä¹Ÿä¸ä¼šæ‰§è¡Œtimeout
             timeData->_timer->OnTimeOut(_curTime);
         timeData->_isRotatingWheel = false;
 
-        // ÖØĞÂ¼ÓÈë
+        // é‡æ–°åŠ å…¥
         if(!timeData->_isCancel)
             timeDataToRefresh.insert(timeData);
 
-        // ÒÆ³ı
+        // ç§»é™¤
         iterUniqueRefTimeDatas = _timeDatas.erase(iterUniqueRefTimeDatas);
     }
 
-    // ¸üĞÂ³¬Ê±Ê±¼ä²¢ÖØĞÂ¼ÓÈë
+    // æ›´æ–°è¶…æ—¶æ—¶é—´å¹¶é‡æ–°åŠ å…¥
     for(auto iterToRefresh = timeDataToRefresh.begin(); iterToRefresh != timeDataToRefresh.end(); ++iterToRefresh)
     {
         auto timeData = *iterToRefresh;

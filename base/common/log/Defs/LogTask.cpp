@@ -57,17 +57,17 @@ Int32 LogTask::Run()
 {
     while(true)
     {
-        // ½áÊøÈÎÎñÅĞ¶Ï
+        // ç»“æŸä»»åŠ¡åˆ¤æ–­
         if(!_pool->IsPoolWorking())
         {
             _taskDelegate->Invoke(_logFileIndex);
             break;
         }
 
-        // Ğ´ÈÕÖ¾
+        // å†™æ—¥å¿—
         _taskDelegate->Invoke(_logFileIndex);
 
-        // ĞİÏ¢Ò»»á¶ù
+        // ä¼‘æ¯ä¸€ä¼šå„¿
         _lock.Lock();
         _lock.Wait(_workIntervalMsTime);
         _lock.Unlock();

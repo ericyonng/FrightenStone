@@ -15,7 +15,7 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT FS_AesDefs
 {
 public:     
-    // ÃÜÎÄÀàÐÍ
+    // å¯†æ–‡ç±»åž‹
     enum AES_CYPHER_T_TYPE
     {
         AES_CYPHER_128 = 0,

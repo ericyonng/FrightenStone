@@ -62,9 +62,9 @@ static Locker __g_SehLocker;
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, FS_String &backTrace)
 {
-#if defined(_M_IX86)    // 32Î»cpu
+#if defined(_M_IX86)    // 32ä½cpu
     DWORD machineType = IMAGE_FILE_MACHINE_I386;
-#elif defined(_M_X64)   // 64Î»cpu
+#elif defined(_M_X64)   // 64ä½cpu
     DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
 #else
     return;
@@ -249,7 +249,7 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
     if(initSymbolRet != StatusDefs::Success)
         return initSymbolRet;
 
-    // ÉèÖÃcrashlog hook
+    // è®¾ç½®crashlog hook
     g_Log->InstallBeforeLogHookFunc(LogLevel::Crash, &CrashHandleUtil::_OnBeforeCrashLogHook);
     auto afterDelegate = g_Log->InstallLogHookFunc(LogLevel::Crash, &CrashHandleUtil::_OnAfterCrashLogHook);
 
@@ -269,7 +269,7 @@ Int32 CrashHandleUtil::RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo)
 Int32 CrashHandleUtil::InitSymbol()
 {
 #ifdef _WIN32
-    // ³õÊ¼»¯pdb·ûºÅ
+    // åˆå§‹åŒ–pdbç¬¦å·
     if(!::SymInitialize(::GetCurrentProcess(), NULL, TRUE))
     {
         const Int32 err = GetLastError();
@@ -285,16 +285,16 @@ Int32 CrashHandleUtil::InitSymbol()
 
 FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, size_t captureFrames /*= FS_INFINITE*/)
 {
-    // ¿ìÕÕÖ¡Êı
+    // å¿«ç…§å¸§æ•°
     if(captureFrames == FS_INFINITE)
         captureFrames = SYMBOL_MAX_CAPTURE_FRAMES;
     else
         captureFrames = std::min<size_t>(captureFrames, SYMBOL_MAX_CAPTURE_FRAMES);
 
-    // ³õÊ¼»¯¶ÑÕ»½á¹¹
+    // åˆå§‹åŒ–å †æ ˆç»“æ„
     void *stackArray[SYMBOL_MAX_CAPTURE_FRAMES] = {0};
     void **stack = stackArray;
-    // nameÊÇ¸ö±ä³¤Êı×é
+    // nameæ˜¯ä¸ªå˜é•¿æ•°ç»„
     SYMBOL_INFO *win32Symboal = reinterpret_cast<SYMBOL_INFO *>(new char[sizeof(::SYMBOL_INFO) + (SYMBOL_MAX_SYMBOL_NAME + 1) * sizeof(char)]);
     memset(win32Symboal, 0, sizeof(SYMBOL_INFO));
     win32Symboal->SizeOfStruct = sizeof(::SYMBOL_INFO);
@@ -304,7 +304,7 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
     win32ImgHelpLine64.SizeOfStruct = sizeof(win32ImgHelpLine64);
 
 #ifdef _WIN32
-    // ×¥È¡¿ìÕÕ È¡µÃ¸÷¸öÕ¹¿ªµÄº¯ÊıµØÖ·
+    // æŠ“å–å¿«ç…§ å–å¾—å„ä¸ªå±•å¼€çš„å‡½æ•°åœ°å€
     DWORD displacement;
     HANDLE curProc = ::GetCurrentProcess();
     SYMBOL_INFO *symbol = win32Symboal;
@@ -313,7 +313,7 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
                                                 stack,
                                                 NULL);
 
-    // ¹¹½¨¿ìÕÕ×Ö·û´®ĞÅÏ¢
+    // æ„å»ºå¿«ç…§å­—ç¬¦ä¸²ä¿¡æ¯
     FS_String backTrace;
     for(WORD frame = 0; frame != frames; frame++)
     {
@@ -397,7 +397,7 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
 
 void CrashHandleUtil::_OnBeforeCrashLogHook(LogData *logData)
 {
-    // ´òÓ¡¶ÑÕ»ĞÅÏ¢
+    // æ‰“å°å †æ ˆä¿¡æ¯
 //     auto backStrace = FS_CaptureStackBackTrace();
 //     logData->_logToWrite.Format("\n[ ******* crash info ******* ]\n%s\n[ ******* End ******* ]\n"
 //                                 , backStrace.c_str());
@@ -405,21 +405,21 @@ void CrashHandleUtil::_OnBeforeCrashLogHook(LogData *logData)
 
 void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 {
-    // ÄÚ´æĞ¹Â©ĞÅÏ¢
+    // å†…å­˜æ³„æ¼ä¿¡æ¯
     g_MemleakMonitor->PrintObjPoolInfo();
 
-    // ÏµÍ³ÄÚ´æÇé¿ö
+    // ç³»ç»Ÿå†…å­˜æƒ…å†µ
     g_Log->sys<CrashHandleUtil>(_LOGFMT_("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]")
                , SystemUtil::GetTotalPhysMemSize(), SystemUtil::GetAvailPhysMemSize(), SystemUtil::GetMemoryLoad());
 
-    // µ¯´°¶ÑÕ»ĞÅÏ¢
+    // å¼¹çª—å †æ ˆä¿¡æ¯
     FS_String path;
     SystemUtil::GetProgramPath(true, path);
     auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);
     SystemUtil::MessageBoxPopup(fileName, logData->_logToWrite);
 
 // #ifdef _DEBUG
-//     // µ¯´°¶ÑÕ»ĞÅÏ¢
+//     // å¼¹çª—å †æ ˆä¿¡æ¯
 //     FS_String path;
 //     SystemUtil::GetProgramPath(true, path);
 //     auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);

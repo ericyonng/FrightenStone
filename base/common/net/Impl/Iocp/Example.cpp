@@ -61,8 +61,8 @@ FS_NAMESPACE_BEGIN
 // 
 // struct IO_DATA_BASE
 // {
-//     // ÖØµşÌå
-//     OVERLAPPED _overlapped;    // Ê¹ÓÃÖØµşÌå¿ÉÒÔ¹ØÁªµ½iodatabase
+//     // é‡å ä½“
+//     OVERLAPPED _overlapped;    // ä½¿ç”¨é‡å ä½“å¯ä»¥å…³è”åˆ°iodatabase
 //     SOCKET _sock;
 //     char _buff[IO_DATA_BUFF_SIZE];
 //     Int32 _length;
@@ -94,7 +94,7 @@ FS_NAMESPACE_BEGIN
 //                  , sizeof(sockaddr_in) + 16
 //                  , sizeof(sockaddr_in) + 16
 //                  , NULL
-//                  , &ioData->_overlapped)) // ¿ÉÒÔÊÇ×Ô¶¨ÒåµÄ½á¹¹Ìå
+//                  , &ioData->_overlapped)) // å¯ä»¥æ˜¯è‡ªå®šä¹‰çš„ç»“æ„ä½“
 //     {
 //         auto error = WSAGetLastError();
 //         if(error != ERROR_IO_PENDING)
@@ -105,7 +105,7 @@ FS_NAMESPACE_BEGIN
 //     }
 // }
 // 
-// // Í¶µİ½ÓÊÕÊı¾İ
+// // æŠ•é€’æ¥æ”¶æ•°æ®
 // bool PostRecv(IO_DATA_BASE *ioData)
 // {
 //     ioData->_ioType = IO_Defs::IO_RECV;
@@ -155,36 +155,36 @@ int Example::Run()
     WSADATA dat;
     WSAStartup(ver, &dat);
 
-    // 1. ´´½¨¼àÌısocket
-    SOCKET sockServer = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);   // Ä¬ÈÏÄÚ²¿ÉèÖÃÁËÖØµş±êÖ¾
+    // 1. åˆ›å»ºç›‘å¬socket
+    SOCKET sockServer = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);   // é»˜è®¤å†…éƒ¨è®¾ç½®äº†é‡å æ ‡å¿—
 
-    // 2.°ó¶¨¶Ë¿Ú
+    // 2.ç»‘å®šç«¯å£
     sockaddr_in _sin = {};
     _sin.sin_family = AF_INET;
-    _sin.sin_port = htons(4567);    // ×ª³ÉÍøÂç×Ö½ÚĞò
-    _sin.sin_addr.s_addr = INADDR_ANY;  // ÈÎÒâip
+    _sin.sin_port = htons(4567);    // è½¬æˆç½‘ç»œå­—èŠ‚åº
+    _sin.sin_addr.s_addr = INADDR_ANY;  // ä»»æ„ip
     if(SOCKET_ERROR == bind(sockServer, reinterpret_cast<sockaddr *>(&_sin), sizeof(_sin)))
     {
         const auto err = GetLastError();
-        printf("´íÎó£¬°ó¶¨ÍøÂç¶Ï¿ªÊ§°Üerror<%d>...\n", err);
+        printf("é”™è¯¯ï¼Œç»‘å®šç½‘ç»œæ–­å¼€å¤±è´¥error<%d>...\n", err);
         return err;
     }
     else
     {
-        printf("¼àÌıÍøÂç¶Ë¿Ú³É¹¦\n");
+        printf("ç›‘å¬ç½‘ç»œç«¯å£æˆåŠŸ\n");
     }
 
-    // 3.¼àÌı¶Ë¿Ú
+    // 3.ç›‘å¬ç«¯å£
     if(SOCKET_ERROR == listen(sockServer, 64))
-    {// ×î´ó64¸öµÈ´ı¼àÌıµÄ¶ÓÁĞ£¬
-        printf("´íÎó,¼àÌıÍøÂç¶Ë¿ÚÊ§°Ü...");
+    {// æœ€å¤§64ä¸ªç­‰å¾…ç›‘å¬çš„é˜Ÿåˆ—ï¼Œ
+        printf("é”™è¯¯,ç›‘å¬ç½‘ç»œç«¯å£å¤±è´¥...");
     }
     else
     {
-        printf("¼àÌıÍøÂç¶Ë¿Ú³É¹¦...\n");
+        printf("ç›‘å¬ç½‘ç»œç«¯å£æˆåŠŸ...\n");
     }
 
-    // ´´½¨Íê³É¶Ë¿ÚIOCP NumberOfConcurrentThreads=0±íÊ¾Ä¬ÈÏcpuºËÊı
+    // åˆ›å»ºå®Œæˆç«¯å£IOCP NumberOfConcurrentThreads=0è¡¨ç¤ºé»˜è®¤cpuæ ¸æ•°
     FS_Iocp iocp;
     iocp.Create();
 //     auto _completionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
@@ -195,10 +195,10 @@ int Example::Run()
 //         return err;
 //     }
 
-    // ¹ØÁªIOCP Óë ServerSocket
-    // completionKey´«ÈëµÄÒ»¸öÊıÖµ£¬Íê³ÉÊ±»áÔ­Ñù´«»ØÀ´; NumberOfConcurrentThreadsÕâ¸ö²ÎÊıÔÚ¹ØÁªÍê³É¶Ë¿ÚÊ±±»ºöÂÔ
+    // å…³è”IOCP ä¸ ServerSocket
+    // completionKeyä¼ å…¥çš„ä¸€ä¸ªæ•°å€¼ï¼Œå®Œæˆæ—¶ä¼šåŸæ ·ä¼ å›æ¥; NumberOfConcurrentThreadsè¿™ä¸ªå‚æ•°åœ¨å…³è”å®Œæˆç«¯å£æ—¶è¢«å¿½ç•¥
     iocp.Reg(sockServer);
-//     auto ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockServer), _completionPort, (ULONG_PTR)(sockServer), 0); // completekey¿ÉÒÔÊÇ×Ô¶¨ÒåµÄ½á¹¹ÌåÖ¸Õë»òÕßÆäËûÊı¾İµÄÖ¸Õë£¬±ãÓÚ»ñÈ¡Íê³É×´Ì¬Ê±ºòÊ¶±ğ
+//     auto ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockServer), _completionPort, (ULONG_PTR)(sockServer), 0); // completekeyå¯ä»¥æ˜¯è‡ªå®šä¹‰çš„ç»“æ„ä½“æŒ‡é’ˆæˆ–è€…å…¶ä»–æ•°æ®çš„æŒ‡é’ˆï¼Œä¾¿äºè·å–å®ŒæˆçŠ¶æ€æ—¶å€™è¯†åˆ«
 //     if(!ret)
 //     {
 //         auto err = GetLastError();
@@ -206,10 +206,10 @@ int Example::Run()
 //         return err;
 //     }
 
-    // ÏòIOCPÍ¶µİ½ÓÊÜ¿Í»§¶ËÁ¬½ÓµÄÈÎÎñ
-    // sAcceptSocketÔ¤ÏÈ´´½¨µÄsocket£¬´´½¨socket»áÏûºÄÏµÍ³×ÊÔ´£¬socket×ÊÔ´ÓĞÏŞ¹ÌĞèÒª´´½¨Ò»¸ösocket³Ø£¬±ÜÃâ×ÊÔ´¹ı¶ÈÏûºÄ
-    // dwReceiveDataLength ÓĞĞ§½ÓÊÜÊı¾İ³¤¶È£¬ÈôÎª0±íÊ¾Á¬½ÓÊ±²»±ØµÈ´ı¿Í»§¶Ë·¢ËÍÊı¾İacceptex¼´Íê³É£¬ÈôÓĞÖµ±íÊ¾ĞèÒªµÈ´ı¿Í»§¶Ë·¢ËÍÊı¾İ²ÅÍê³É
-    // lpdwBytesReceived·µ»Ø½ÓÊÜÊı¾İ³¤¶È£¬Èô²»ÏëµÈ´ı¿Í»§¶Ë·¢ËÍÊı¾İ£¬Õâ¸öµØ·½¿ÉÒÔÌî0
+    // å‘IOCPæŠ•é€’æ¥å—å®¢æˆ·ç«¯è¿æ¥çš„ä»»åŠ¡
+    // sAcceptSocketé¢„å…ˆåˆ›å»ºçš„socketï¼Œåˆ›å»ºsocketä¼šæ¶ˆè€—ç³»ç»Ÿèµ„æºï¼Œsocketèµ„æºæœ‰é™å›ºéœ€è¦åˆ›å»ºä¸€ä¸ªsocketæ± ï¼Œé¿å…èµ„æºè¿‡åº¦æ¶ˆè€—
+    // dwReceiveDataLength æœ‰æ•ˆæ¥å—æ•°æ®é•¿åº¦ï¼Œè‹¥ä¸º0è¡¨ç¤ºè¿æ¥æ—¶ä¸å¿…ç­‰å¾…å®¢æˆ·ç«¯å‘é€æ•°æ®acceptexå³å®Œæˆï¼Œè‹¥æœ‰å€¼è¡¨ç¤ºéœ€è¦ç­‰å¾…å®¢æˆ·ç«¯å‘é€æ•°æ®æ‰å®Œæˆ
+    // lpdwBytesReceivedè¿”å›æ¥å—æ•°æ®é•¿åº¦ï¼Œè‹¥ä¸æƒ³ç­‰å¾…å®¢æˆ·ç«¯å‘é€æ•°æ®ï¼Œè¿™ä¸ªåœ°æ–¹å¯ä»¥å¡«0
     iocp.LoadAcceptEx(sockServer);
     // LoadAcceptEx(sockServer);
     IoDataBase ioData[CLIENT_QUANTITY] = {};
@@ -220,32 +220,32 @@ int Example::Run()
     IO_EVENT ioEvent = {};
     while(true)
     {
-        // µÈ´ıioÍê³É
+        // ç­‰å¾…ioå®Œæˆ
         const Int32 st = iocp.WaitForCompletion(ioEvent);
         if(st != StatusDefs::Success)
         {
 //             if(st== StatusDefs::IOCP_IODisconnect)
-//                 g_Log->sys(_LOGFMT_("¿Í»§¶Ë¶Ï¿ªÁ´½Ó sockfd=%llu"), ioEvent._ioData->_sock);
+//                 g_Log->sys(_LOGFMT_("å®¢æˆ·ç«¯æ–­å¼€é“¾æ¥ sockfd=%llu"), ioEvent._ioData->_sock);
             continue;
         }
 
-        // ´¦ÀíiocpÍË³ö
+        // å¤„ç†iocpé€€å‡º
         if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys<Example>(_LOGFMT_("iocpÍË³ö code=%lld"), ioEvent._data._code);
+            g_Log->sys<Example>(_LOGFMT_("iocpé€€å‡º code=%lld"), ioEvent._data._code);
             break;
         }
 
-        // ÓĞÁ¬½ÓÁ¬Èë
+        // æœ‰è¿æ¥è¿å…¥
         if(ioEvent._ioData->_ioType == IocpDefs::IO_ACCEPT)
         {
-            g_Log->sys<Example>(_LOGFMT_("ĞÂ¿Í»§¶ËÁ¬Èë sockfd=%llu"), ioEvent._ioData->_sock);
+            g_Log->sys<Example>(_LOGFMT_("æ–°å®¢æˆ·ç«¯è¿å…¥ sockfd=%llu"), ioEvent._ioData->_sock);
 
-            // ĞÂ¿Í»§¶Ë¹ØÁªÍê³É¶Ë¿Ú
+            // æ–°å®¢æˆ·ç«¯å…³è”å®Œæˆç«¯å£
             if(StatusDefs::Success != iocp.Reg(ioEvent._ioData->_sock))
                 continue;
 
-            // Í¶µİ½ÓÊÕÊı¾İ
+            // æŠ•é€’æ¥æ”¶æ•°æ®
             if(StatusDefs::Success != iocp.PostRecv(ioEvent._ioData->_sock, ioEvent._ioData))
             {
                 g_Log->e<Example>(_LOGFMT_("post recv fail sock[%llu]"), ioEvent._ioData->_sock);
@@ -254,79 +254,79 @@ int Example::Run()
                 continue;
             }
 
-            // ¼ÌĞø½ÓÊÜÏÂÒ»¸öÁ¬½Ó ²¢ÅĞ¶ÏÒÑÍ¶µİµÄÁ¬½Ó²»¿É´óÓÚÏŞÖÆ
+            // ç»§ç»­æ¥å—ä¸‹ä¸€ä¸ªè¿æ¥ å¹¶åˆ¤æ–­å·²æŠ•é€’çš„è¿æ¥ä¸å¯å¤§äºé™åˆ¶
             // iocp.PostAccept(sockServer, )
         }
         else if(ioEvent._ioData->_ioType == IocpDefs::IO_RECV)
         {
             if(ioEvent._bytesTrans <= 0)
             {
-                // ¿Í»§¶Ë¶Ï¿ª
+                // å®¢æˆ·ç«¯æ–­å¼€
                 // g_Log->e<Example>(_LOGFMT_("recv error socket[%llu], bytesTrans[%d]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
-                g_Log->sys<Example>(_LOGFMT_("¿Í»§¶Ë¶Ï¿ªÁ´½Ó sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                g_Log->sys<Example>(_LOGFMT_("å®¢æˆ·ç«¯æ–­å¼€é“¾æ¥ sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
                 closesocket(ioEvent._ioData->_sock);
                 iocp.PostAccept(sockServer, ioEvent._ioData);
                 continue;
             }
 
-            // ´òÓ¡½ÓÊÕµ½µÄÊı¾İ
+            // æ‰“å°æ¥æ”¶åˆ°çš„æ•°æ®
             g_Log->sys<Example>(_LOGFMT_("recv data :socket[%llu], bytesTrans[%d] msgCount[%d]")
                        , ioEvent._ioData->_sock, ioEvent._bytesTrans, ++msgCount);
 
-            // ²»Í£µÄ½ÓÊÕÊı¾İ
+            // ä¸åœçš„æ¥æ”¶æ•°æ®
             ioEvent._ioData->_wsaBuff.len = ioEvent._bytesTrans;
             auto st = iocp.PostSend(ioEvent._ioData->_sock, ioEvent._ioData);
             if(st == StatusDefs::IOCP_ClientForciblyClosed)
-            {// Ô¶¶Ë¹Ø±Õ
+            {// è¿œç«¯å…³é—­
                 closesocket(ioEvent._ioData->_sock);
                 iocp.PostAccept(sockServer, ioEvent._ioData);
             }
         }
         else if(ioEvent._ioData->_ioType == IocpDefs::IO_SEND)
         {
-            // ¿Í»§¶Ë¶Ï¿ª´¦Àí
+            // å®¢æˆ·ç«¯æ–­å¼€å¤„ç†
             if(ioEvent._bytesTrans <= 0)
             {
-                g_Log->sys<Example>(_LOGFMT_("¿Í»§¶Ë¶Ï¿ªÁ´½Ó sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                g_Log->sys<Example>(_LOGFMT_("å®¢æˆ·ç«¯æ–­å¼€é“¾æ¥ sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
                 closesocket(ioEvent._ioData->_sock);
                 iocp.PostAccept(sockServer, ioEvent._ioData);
                 continue;
             }
 
-            // ´òÓ¡·¢ËÍµÄÊı¾İ
+            // æ‰“å°å‘é€çš„æ•°æ®
             g_Log->sys<Example>(_LOGFMT_("send data :socket[%llu], bytesTrans[%d] msgCount[%d]")
                        , ioEvent._ioData->_sock, ioEvent._bytesTrans, msgCount);
 
             // ioEvent._ioData->_wsaBuff.len = 
             auto st = iocp.PostRecv(ioEvent._ioData->_sock, ioEvent._ioData);
             if(st == StatusDefs::IOCP_ClientForciblyClosed)
-            {// Ô¶¶Ë¹Ø±Õ
+            {// è¿œç«¯å…³é—­
                 closesocket(ioEvent._ioData->_sock);
                 iocp.PostAccept(sockServer, ioEvent._ioData);
             }
         }
         else
         {
-            g_Log->e<Example>(_LOGFMT_("Î´¶¨ÒåĞĞÎª sockefd=%llu"), ioEvent._data._socket);
+            g_Log->e<Example>(_LOGFMT_("æœªå®šä¹‰è¡Œä¸º sockefd=%llu"), ioEvent._data._socket);
         }
-        // ¼ì²éÊÇ·ñÓĞÊÂ¼ş·¢Éú£¬ºÍselet,epoll_waitÀàËÆ
-        // ½ÓÊÜÁ¬½Ó Íê³É
-        // ½ÓÊÜÊı¾İ Íê³É completion
-        // ·¢ËÍÊı¾İ Íê³É
-        // ÏòIOCP Í¶µİ½ÓÊÕÊı¾İÈÎÎñ
+        // æ£€æŸ¥æ˜¯å¦æœ‰äº‹ä»¶å‘ç”Ÿï¼Œå’Œselet,epoll_waitç±»ä¼¼
+        // æ¥å—è¿æ¥ å®Œæˆ
+        // æ¥å—æ•°æ® å®Œæˆ completion
+        // å‘é€æ•°æ® å®Œæˆ
+        // å‘IOCP æŠ•é€’æ¥æ”¶æ•°æ®ä»»åŠ¡
     }
 
     // ------------ IOCP end ------------ //
-    // ¹Ø±Õclientsocket
+    // å…³é—­clientsocket
     for(Int32 i = 0; i < CLIENT_QUANTITY; ++i)
         closesocket(ioData[i]._sock);
-    // ¹Ø±Õserversocket
+    // å…³é—­serversocket
     closesocket(sockServer);
-    // ¹Ø±ÕÍê³É¶Ë¿Ú
+    // å…³é—­å®Œæˆç«¯å£
     iocp.Destroy();
     // CloseHandle(_completionPort);
 
-    // Çå³ıwindows socket»·¾³
+    // æ¸…é™¤windows socketç¯å¢ƒ
     WSACleanup();
     return 0;
 }

@@ -54,8 +54,8 @@ public:
 
 FS_NAMESPACE_END
 
-/// ÄÚ´æ³Ø´´½¨¶ÔÏó±ãÀûºê
-// ÉùÃ÷ÖĞĞèÒªÌí¼Ó
+/// å†…å­˜æ± åˆ›å»ºå¯¹è±¡ä¾¿åˆ©å®
+// å£°æ˜ä¸­éœ€è¦æ·»åŠ 
 #undef  MEM_POOL_CREATE
 #define MEM_POOL_CREATE(_mempool_helper)                                                            \
 public:                                                                                             \
@@ -66,7 +66,7 @@ public:                                                                         
 public:                                                                                             \
 static fs::MemoryPoolHelper *_mempool_helper
 
-// ÔÚÊµÏÖÎÄ¼şÖĞĞèÒªÌí¼Ó
+// åœ¨å®ç°æ–‡ä»¶ä¸­éœ€è¦æ·»åŠ 
 #undef MEM_POOL_CREATE_IMPL
 #define MEM_POOL_CREATE_IMPL(objType, _mempool_helper)                                           \
 fs::MemoryPoolHelper *objType::_mempool_helper = fs::Singleton<fs::MemoryPoolHelper, fs::AssistObjsDefs::NoDel>::GetInstance();

@@ -16,7 +16,7 @@ BEGIN_MESSAGE_MAP(CRichEditEx, CRichEditCtrl)
 	// NOTE - the ClassWizard will add and remove mapping macros here.
 	//}}AFX_MSG_MAP
 
-	ON_WM_CONTEXTMENU()	//²Ëµ¥ÏûÏ¢
+	ON_WM_CONTEXTMENU()	//èœå•æ¶ˆæ¯
 	ON_WM_CREATE()
 
 	ON_COMMAND(ID_RICH_COPY, OnCopy)
@@ -62,7 +62,7 @@ void CRichEditEx::SetEditDefFormat()
 	cf.dwEffects = 0;
 	cf.crTextColor = MSG_COLOR_YELLOW;
 	cf.bCharSet = GB2312_CHARSET;
-	lstrcpy(cf.szFaceName, TEXT("ËÎÌå"));
+	lstrcpy(cf.szFaceName, TEXT("å®‹ä½“"));
 	cf.yHeight = 180;
 	memset(&m_cfCurrentFont, 0, sizeof(m_cfCurrentFont));
 	memmove(&m_cfCurrentFont, &cf, sizeof(m_cfCurrentFont));
@@ -83,7 +83,7 @@ void CRichEditEx::InsertString(CString Msg, COLORREF fn_color, DWORD fn_effects)
 	cf.dwEffects = fn_effects;
 	cf.crTextColor = fn_color;
 	cf.bCharSet = GB2312_CHARSET;
-	lstrcpy(cf.szFaceName, TEXT("ËÎÌå"));
+	lstrcpy(cf.szFaceName, TEXT("å®‹ä½“"));
 	cf.yHeight = 180;
 	memset(&m_cfCurrentFont, 0, sizeof(m_cfCurrentFont));
 	memmove(&m_cfCurrentFont, &cf, sizeof(m_cfCurrentFont));
@@ -97,7 +97,7 @@ void CRichEditEx::InsertString(CString Msg, COLORREF fn_color, DWORD fn_effects)
 		if (TotalLines > m_lMaxLines)
 		{
 			//SetReadOnly(false);
-			nTextLength = LineIndex(TotalLines - m_lMaxLines);		//Çå³ıÇ°¼¸ĞĞ
+			nTextLength = LineIndex(TotalLines - m_lMaxLines);		//æ¸…é™¤å‰å‡ è¡Œ
 			SetSel(0, nTextLength);
 			Clear();
 			//SetReadOnly(true);
@@ -127,7 +127,7 @@ void CRichEditEx::InsertString(CString strText)
 	cf.dwEffects = 0;
 	cf.crTextColor = MSG_COLOR_BLACK;
 	cf.bCharSet = GB2312_CHARSET;
-	lstrcpy(cf.szFaceName, TEXT("ËÎÌå"));
+	lstrcpy(cf.szFaceName, TEXT("å®‹ä½“"));
 	cf.yHeight = 180;
 	memset(&m_cfCurrentFont, 0, sizeof(m_cfCurrentFont));
 	memmove(&m_cfCurrentFont, &cf, sizeof(m_cfCurrentFont));
@@ -158,7 +158,7 @@ void CRichEditEx::OnSelectfont()
 	LOGFONT lf;
 	memset(&cf, 0, sizeof(CHARFORMAT));
 	memset(&lf, 0, sizeof(LOGFONT));
-	//ÅĞ¶ÏÊÇ·ñÑ¡ÔñÁËÄÚÈİ
+	//åˆ¤æ–­æ˜¯å¦é€‰æ‹©äº†å†…å®¹
 	bool bSelect = (GetSelectionType() != SEL_EMPTY) ? true : false;
 	if (bSelect)
 	{
@@ -178,12 +178,12 @@ void CRichEditEx::OnSelectfont()
 		//cf = m_cfCurrentFont;
 		//GetDefaultCharFormat(cf);
 	}
-	//µÃµ½Ïà¹Ø×ÖÌåÊôĞÔ
+	//å¾—åˆ°ç›¸å…³å­—ä½“å±æ€§
 	bool bIsBold = cf.dwEffects & CFE_BOLD;
 	bool bIsItalic = cf.dwEffects & CFE_ITALIC;
 	bool bIsUnderline = cf.dwEffects & CFE_UNDERLINE;
 	bool bIsStrickout = cf.dwEffects & CFE_STRIKEOUT;
-	//ÉèÖÃÊôĞÔ
+	//è®¾ç½®å±æ€§
 	lf.lfCharSet = cf.bCharSet;
 	lf.lfHeight = cf.yHeight / 15;
 	lf.lfPitchAndFamily = cf.bPitchAndFamily;
@@ -198,12 +198,12 @@ void CRichEditEx::OnSelectfont()
 	dlg.m_cf.rgbColors = cf.crTextColor;
 	if (dlg.DoModal() == IDOK)
 	{
-		dlg.GetCharFormat(cf);               //»ñµÃËùÑ¡×ÖÌåµÄÊôĞÔ
+		dlg.GetCharFormat(cf);               //è·å¾—æ‰€é€‰å­—ä½“çš„å±æ€§
 		if (bSelect)
-			SetSelectionCharFormat(cf);  //ÎªÑ¡¶¨µÄÄÚÈİÉè¶¨ËùÑ¡×ÖÌå
+			SetSelectionCharFormat(cf);  //ä¸ºé€‰å®šçš„å†…å®¹è®¾å®šæ‰€é€‰å­—ä½“
 		else
 		{
-			SetWordCharFormat(cf);       //Îª½«ÒªÊäÈëµÄÄÚÈİÉè¶¨×ÖÌå
+			SetWordCharFormat(cf);       //ä¸ºå°†è¦è¾“å…¥çš„å†…å®¹è®¾å®šå­—ä½“
 			memset(&m_cfCurrentFont, 0, sizeof(m_cfCurrentFont));
 			memmove(&m_cfCurrentFont, &cf, sizeof(cf));
 		}
@@ -219,16 +219,16 @@ int CRichEditEx::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SetSel(-1, -1);
 
-	//×ÖÌåÉèÖÃ
+	//å­—ä½“è®¾ç½®
 	memset(&m_cfCurrentFont, 0, sizeof(m_cfCurrentFont));
 	m_cfCurrentFont.cbSize = sizeof(m_cfCurrentFont);
 	m_cfCurrentFont.dwMask = CFM_COLOR | CFM_BOLD | CFM_CHARSET | CFM_FACE | CFM_SIZE;
 	m_cfCurrentFont.dwEffects = 0;
 	m_cfCurrentFont.crTextColor = MSG_COLOR_YELLOW;
 	m_cfCurrentFont.bCharSet = GB2312_CHARSET;
-	lstrcpy(m_cfCurrentFont.szFaceName, TEXT("ËÎÌå"));
+	lstrcpy(m_cfCurrentFont.szFaceName, TEXT("å®‹ä½“"));
 	m_cfCurrentFont.yHeight = 180;
-	SetWordCharFormat(m_cfCurrentFont);       //Îª½«ÒªÊäÈëµÄÄÚÈİÉè¶¨×ÖÌå
+	SetWordCharFormat(m_cfCurrentFont);       //ä¸ºå°†è¦è¾“å…¥çš„å†…å®¹è®¾å®šå­—ä½“
 
 	return 0;
 }
@@ -244,28 +244,28 @@ void CRichEditEx::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-//ÏìÓ¦ÄÚÈİÏûÏ¢
+//å“åº”å†…å®¹æ¶ˆæ¯
 void CRichEditEx::OnContextMenu(CWnd* pWnd, CPoint pos)
 {
 	CRichEditCtrl::OnContextMenu(pWnd, pos);
 
-	//´´½¨Ò»¸öµ¯³öÊ½²Ëµ¥
+	//åˆ›å»ºä¸€ä¸ªå¼¹å‡ºå¼èœå•
 	CMenu popmenu;
 	popmenu.CreatePopupMenu();
 
-	//Ìí¼Ó²Ëµ¥ÏîÄ¿
-	popmenu.AppendMenu(0, ID_RICH_UNDO, TEXT("&³·Ïú"));
+	//æ·»åŠ èœå•é¡¹ç›®
+	popmenu.AppendMenu(0, ID_RICH_UNDO, TEXT("&æ’¤é”€"));
 	popmenu.AppendMenu(0, MF_SEPARATOR);
-	popmenu.AppendMenu(0, ID_RICH_CUT, TEXT("&¼ôÇĞ"));
-	popmenu.AppendMenu(0, ID_RICH_COPY, TEXT("&¸´ÖÆ"));
-	popmenu.AppendMenu(0, ID_RICH_PASTE, TEXT("&Õ³Ìù"));
-	popmenu.AppendMenu(0, ID_RICH_CLEAR, TEXT("&Çå³ı"));
+	popmenu.AppendMenu(0, ID_RICH_CUT, TEXT("&å‰ªåˆ‡"));
+	popmenu.AppendMenu(0, ID_RICH_COPY, TEXT("&å¤åˆ¶"));
+	popmenu.AppendMenu(0, ID_RICH_PASTE, TEXT("&ç²˜è´´"));
+	popmenu.AppendMenu(0, ID_RICH_CLEAR, TEXT("&æ¸…é™¤"));
 	popmenu.AppendMenu(0, MF_SEPARATOR);
-	popmenu.AppendMenu(0, ID_RICH_SELECTALL, TEXT("&Ñ¡ÔñÈ«²¿"));
+	popmenu.AppendMenu(0, ID_RICH_SELECTALL, TEXT("&é€‰æ‹©å…¨éƒ¨"));
 	popmenu.AppendMenu(0, MF_SEPARATOR);
-	popmenu.AppendMenu(0, ID_RICH_SETFONT, TEXT("&Ñ¡Ôñ×ÖÌå"));
+	popmenu.AppendMenu(0, ID_RICH_SETFONT, TEXT("&é€‰æ‹©å­—ä½“"));
 
-	//³õÊ¼»¯²Ëµ¥Ïî
+	//åˆå§‹åŒ–èœå•é¡¹
 	UINT nUndo = (CanUndo() ? 0 : MF_GRAYED);
 	popmenu.EnableMenuItem(ID_RICH_UNDO, MF_BYCOMMAND | nUndo);
 	UINT nSel = ((GetSelectionType() != SEL_EMPTY) ? 0 : MF_GRAYED);
@@ -275,7 +275,7 @@ void CRichEditEx::OnContextMenu(CWnd* pWnd, CPoint pos)
 	UINT nPaste = (CanPaste() ? 0 : MF_GRAYED);
 	popmenu.EnableMenuItem(ID_RICH_PASTE, MF_BYCOMMAND | nPaste);
 
-	//ÏÔÊ¾²Ëµ¥
+	//æ˜¾ç¤ºèœå•
 	CPoint pt;
 	GetCursorPos(&pt);
 	popmenu.TrackPopupMenu(TPM_RIGHTBUTTON, pt.x, pt.y, this);

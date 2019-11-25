@@ -38,7 +38,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// ´ÓrttiÖĞÌŞ³ıstr
+// ä»rttiä¸­å‰”é™¤str
 #define __FS_GET_TYPE_NAME_Trim(str, len)        \
     it = rtti;                                   \
     skipCopy = 0;                                \
@@ -110,7 +110,7 @@ const char *RTTIUtil::GetCxxDemangle(const char *name)
     int status = 0;
     size_t length = sizeof(tlsRtti->rtti);
 
-    // Ãû×ÖÖØÕû¼¼ÊõÓ¦ÓÃ
+    // åå­—é‡æ•´æŠ€æœ¯åº”ç”¨
     abi::__cxa_demangle(name, tlsRtti->rtti, &length, &status);
     if(status != 0)
         return "";

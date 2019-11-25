@@ -95,18 +95,18 @@ public:
     };
 };
 
-// ½ø³ÌÕ¼ÓÃµÄÄÚ´æĞÅÏ¢
+// è¿›ç¨‹å ç”¨çš„å†…å­˜ä¿¡æ¯
 struct BASE_EXPORT ProcessMemInfo
 {
-    size_t _maxHistorySetSize;              // Ê¹ÓÃ¹ıµÄ×î´ó¹¤×÷¼¯£¬·åÖµÄÚ´æÕ¼ÓÃ
-    size_t _curSetSize;                     // µ±Ç°¹¤×÷¼¯Õ¼ÓÃ´óĞ¡£¬µ±Ç°½ø³ÌÕ¼ÓÃµÄÄÚ´æ
-    size_t _maxHistoryPagedPoolUsage;       // Ê¹ÓÃ¹ıµÄ×î´ó·ÖÒ³³Ø´óĞ¡
-    size_t _pagedPoolUsage;                 // ·ÖÒ³³Ø´óĞ¡
-    size_t _maxHistoryNonPagedPoolUsage;    // Ê¹ÓÃ¹ıµÄ×î´ó·Ç·ÖÒ³³Ø´óĞ¡
-    size_t _curNonPagedPoolUsage;           // µ±Ç°·Ç·ÖÒ³³Ø´óĞ¡
-    size_t _curPageFileUsage;               // µ±Ç°Ò³½»»»ÎÄ¼şÊ¹ÓÃ´óĞ¡
-    size_t _maxHistoryPageFileUsage;        // ÀúÊ·×î´óÒ³½»»»ÎÄ¼şÊ¹ÓÃ´óĞ¡
-    size_t _processAllocMemoryUsage;        // ½ø³ÌÔËĞĞ¹ı³ÌÖĞÉêÇëµÄÄÚ´æ´óĞ¡
+    size_t _maxHistorySetSize;              // ä½¿ç”¨è¿‡çš„æœ€å¤§å·¥ä½œé›†ï¼Œå³°å€¼å†…å­˜å ç”¨
+    size_t _curSetSize;                     // å½“å‰å·¥ä½œé›†å ç”¨å¤§å°ï¼Œå½“å‰è¿›ç¨‹å ç”¨çš„å†…å­˜
+    size_t _maxHistoryPagedPoolUsage;       // ä½¿ç”¨è¿‡çš„æœ€å¤§åˆ†é¡µæ± å¤§å°
+    size_t _pagedPoolUsage;                 // åˆ†é¡µæ± å¤§å°
+    size_t _maxHistoryNonPagedPoolUsage;    // ä½¿ç”¨è¿‡çš„æœ€å¤§éåˆ†é¡µæ± å¤§å°
+    size_t _curNonPagedPoolUsage;           // å½“å‰éåˆ†é¡µæ± å¤§å°
+    size_t _curPageFileUsage;               // å½“å‰é¡µäº¤æ¢æ–‡ä»¶ä½¿ç”¨å¤§å°
+    size_t _maxHistoryPageFileUsage;        // å†å²æœ€å¤§é¡µäº¤æ¢æ–‡ä»¶ä½¿ç”¨å¤§å°
+    size_t _processAllocMemoryUsage;        // è¿›ç¨‹è¿è¡Œè¿‡ç¨‹ä¸­ç”³è¯·çš„å†…å­˜å¤§å°
 };
 
 extern BASE_EXPORT Locker __g_consoleLock;

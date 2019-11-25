@@ -72,7 +72,7 @@ public:
     virtual Int32 GetId() const;
 
 private:
-    // msgData»á¿½±´µ½ÄÚ´æ³Ø´´½¨µÄ»º³åÇøÖĞ Ïß³Ì²»°²È«£¬Íâ²¿ĞèÒª¼ÓËø
+    // msgDataä¼šæ‹·è´åˆ°å†…å­˜æ± åˆ›å»ºçš„ç¼“å†²åŒºä¸­ çº¿ç¨‹ä¸å®‰å…¨ï¼Œå¤–éƒ¨éœ€è¦åŠ é”
     void _OnBusinessProcessThread(FS_ThreadPool *pool);
     void _OnBusinessProcessing();
 
@@ -84,18 +84,18 @@ private:
     std::atomic<bool> _isClose;
     FS_ThreadPool *_pool;
 
-    // Êı¾İÔÚÏß³Ì½áÊøÊ±ÇåÀí
+    // æ•°æ®åœ¨çº¿ç¨‹ç»“æŸæ—¶æ¸…ç†
     std::set<UInt64> _delayDisconnectedSessions;
 
-    // ÒµÎñ²ã×ÊÔ´
-    TimeSlice _resolutionInterval;      // Ê±ÖÓÂÖÅÌÊ±¼ä¼ä¸ô
+    // ä¸šåŠ¡å±‚èµ„æº
+    TimeSlice _resolutionInterval;      // æ—¶é’Ÿè½®ç›˜æ—¶é—´é—´éš”
     TimeWheel *_timeWheel;
     IFS_BusinessLogic *_logic;
 
-    std::list<FS_MessageBlock *> *_recvMsgBlocks;       // ĞèÒª×ª»»³É FS_NetMsgBufferBlock
+    std::list<FS_MessageBlock *> *_recvMsgBlocks;       // éœ€è¦è½¬æ¢æˆ FS_NetMsgBufferBlock
     ConcurrentMessageQueue *_messgeQueue;
 
-    // TODO:¶©ÔÄÍøÂçĞ­ÒéµÄfacade¿ª·¢£¬Ê¹ÓÃÎ¯ÍĞ·½Ê½£¬¸÷¸öÏµÍ³¹Ø×¢¸÷×ÔµÄĞ­Òé£¬×¢²áµ½±¾ÏµÍ³
+    // TODO:è®¢é˜…ç½‘ç»œåè®®çš„facadeå¼€å‘ï¼Œä½¿ç”¨å§”æ‰˜æ–¹å¼ï¼Œå„ä¸ªç³»ç»Ÿå…³æ³¨å„è‡ªçš„åè®®ï¼Œæ³¨å†Œåˆ°æœ¬ç³»ç»Ÿ
 
 //     _CrtMemState s1;
 //     _CrtMemState s2;

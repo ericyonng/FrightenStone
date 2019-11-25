@@ -45,9 +45,9 @@ public:
     enum 
     {
         Begin = 0,
-        OnConnect = Begin,      // 连入
-        OnDisconnected,         // 断开连接
-        OnMsgArrived,           // 消息到达
+        OnConnect = Begin,      // 杩炲叆
+        OnDisconnected,         // 鏂紑杩炴帴
+        OnMsgArrived,           // 娑堟伅鍒拌揪
         End,
     };
 };

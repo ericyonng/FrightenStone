@@ -77,9 +77,9 @@ class FileCursorOffsetType
 public:
     enum FILE_CURSOR_POS
     {
-        FILE_CURSOR_POS_SET = 0,    // 起始位置
-        FILE_CURSOR_POS_CUR = 1,    // 当前位置
-        FILE_CURSOR_POS_END = 2,    // 文件末尾
+        FILE_CURSOR_POS_SET = 0,    // 璧峰浣嶇疆
+        FILE_CURSOR_POS_CUR = 1,    // 褰撳墠浣嶇疆
+        FILE_CURSOR_POS_END = 2,    // 鏂囦欢鏈熬
     };
 };
 

@@ -42,7 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// ÏûÏ¢Êı¾İ×Ö½ÚÁ÷
+// æ¶ˆæ¯æ•°æ®å­—èŠ‚æµ
 class BASE_EXPORT FS_MsgReadStream :public FS_Stream
 {
     OBJ_POOL_CREATE_DEF(FS_MsgReadStream);

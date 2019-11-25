@@ -60,13 +60,13 @@ public:
     virtual void BeforeClose();
     virtual void Close();
     virtual void OnDisconnected(IFS_Session *session);
-    /* TCP ³£¹æ²Ù×÷ */
+    /* TCP å¸¸è§„æ“ä½œ */
     #pragma region tcp normal operate
     /*
     * brief:
-    *       1. - InitSocket ³õÊ¼»¯SocketµÈ
-    *       2. - Bind °ó¶¨IPºÍ¶Ë¿ÚºÅ
-    *       3. - Listen ¼àÌı¶Ë¿ÚºÅ
+    *       1. - InitSocket åˆå§‹åŒ–Socketç­‰
+    *       2. - Bind ç»‘å®šIPå’Œç«¯å£å·
+    *       3. - Listen ç›‘å¬ç«¯å£å·
     */
 private:
     SOCKET _InitSocket();
@@ -74,16 +74,16 @@ private:
     Int32 _Listen(Int32 unconnectQueueLen = SOMAXCONN);
     #pragma endregion
 
-    /* ÍøÂçÊÂ¼ş */
+    /* ç½‘ç»œäº‹ä»¶ */
     #pragma region net event
     /*
     * brief: 
-    *       1. FS_Server 4 ¶à¸öÏß³Ì´¥·¢ ²»°²È« Èç¹ûÖ»¿ªÆô1¸öFS_Server¾ÍÊÇ°²È«µÄ
-    *       2. _OnNetMonitorTask ¼àÌıÍøÂçÈÎÎñ OnRun(¾É°æ) ½¨Òé¶àÌõÏß³ÌÈ¥×ömonitor¶ø²»ÊÇµ¥ÌõÏß³Ì£¬Íê³É¶Ë¿ÚµÄgetÊÇÏß³Ì°²È«µÄ
-    *       3. OnNetJoin Íæ¼Ò¼ÓÈë Ïß³Ì²»°²È«
-    *       4. OnNetLeave Íæ¼ÒµôÏß Ïß³Ì²»°²È«
-    *       5. OnNetMsg Íæ¼ÒÏûÏ¢µ½À´£¨ÏûÏ¢ÊÇ´ÓFS_ServerµÄ_HandleNetMsg´«Èë£©Ïß³Ì²»°²È« NetMsg_DataHeader ×ª·¢µ½ÆäËûÏß³ÌĞèÒª¿½±´±ÜÃâÏûÏ¢±»¸²¸Ç
-    *       6. OnNetRecv ½ÓÊÕµ½Êı¾İ Ïß³Ì²»°²È«
+    *       1. FS_Server 4 å¤šä¸ªçº¿ç¨‹è§¦å‘ ä¸å®‰å…¨ å¦‚æœåªå¼€å¯1ä¸ªFS_Serverå°±æ˜¯å®‰å…¨çš„
+    *       2. _OnNetMonitorTask ç›‘å¬ç½‘ç»œä»»åŠ¡ OnRun(æ—§ç‰ˆ) å»ºè®®å¤šæ¡çº¿ç¨‹å»åšmonitorè€Œä¸æ˜¯å•æ¡çº¿ç¨‹ï¼Œå®Œæˆç«¯å£çš„getæ˜¯çº¿ç¨‹å®‰å…¨çš„
+    *       3. OnNetJoin ç©å®¶åŠ å…¥ çº¿ç¨‹ä¸å®‰å…¨
+    *       4. OnNetLeave ç©å®¶æ‰çº¿ çº¿ç¨‹ä¸å®‰å…¨
+    *       5. OnNetMsg ç©å®¶æ¶ˆæ¯åˆ°æ¥ï¼ˆæ¶ˆæ¯æ˜¯ä»FS_Serverçš„_HandleNetMsgä¼ å…¥ï¼‰çº¿ç¨‹ä¸å®‰å…¨ NetMsg_DataHeader è½¬å‘åˆ°å…¶ä»–çº¿ç¨‹éœ€è¦æ‹·è´é¿å…æ¶ˆæ¯è¢«è¦†ç›–
+    *       6. OnNetRecv æ¥æ”¶åˆ°æ•°æ® çº¿ç¨‹ä¸å®‰å…¨
     */
 private:
     void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS_Iocp *iocpListener);
@@ -96,17 +96,17 @@ private:
 
     #pragma endregion
 
-    /* Êı¾İ³ÉÔ± */
+    /* æ•°æ®æˆå‘˜ */
     #pragma region data member
 private:
-    // Ïß³Ì 
+    // çº¿ç¨‹ 
     FS_ThreadPool *_threadPool;
     SOCKET _sock;
 
-    // ÍøÂçÊÂ¼ş»Øµ÷
+    // ç½‘ç»œäº‹ä»¶å›è°ƒ
     IDelegate<void> *_closeIocpDelegate;
 
-    // ¿Í»§¶ËÁ¬½ÓÉÏÏŞ
+    // å®¢æˆ·ç«¯è¿æ¥ä¸Šé™
     Locker _locker;
     Int32 _curSessionCnt;
     Int32 _maxSessionQuantityLimit;

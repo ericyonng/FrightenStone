@@ -38,10 +38,10 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
 
-// 事件存根
+// 浜嬩欢瀛樻牴
 typedef UInt64 BASE_EXPORT FS_ListenerStub;
 
-// 无效存根
+// 鏃犳晥瀛樻牴
 #define FS_INVALID_LISTENER_STUB 0
 
 #endif

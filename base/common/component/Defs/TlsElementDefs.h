@@ -39,7 +39,7 @@
 #include "base/common/component/Defs/ITlsBase.h"
 #include "base/common/memorypool/memorypool.h"
 
-// ÀàĞÍÊ¶±ğ»º³å´óĞ¡
+// ç±»å‹è¯†åˆ«ç¼“å†²å¤§å°
 #ifndef __FS_RTTI_BUF_SIZE__
 #define __FS_RTTI_BUF_SIZE__    512
 #endif
@@ -48,22 +48,22 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IMemoryPoolMgr;
 
-// ËùÓĞ¾Ö²¿´æ´¢¶ÔÏóÇëÅÉÉúÓÚITlsBase
-// Ïß³Ì¾Ö²¿´æ´¢ĞèÒª´æ´¢µÄ¶ÔÏóÀàĞÍ
+// æ‰€æœ‰å±€éƒ¨å­˜å‚¨å¯¹è±¡è¯·æ´¾ç”ŸäºITlsBase
+// çº¿ç¨‹å±€éƒ¨å­˜å‚¨éœ€è¦å­˜å‚¨çš„å¯¹è±¡ç±»å‹
 class BASE_EXPORT TlsElemType
 {
 public:
     enum
     {
         Begin = 0,
-        Tls_Rtti,           // ÀàĞÍÊ¶±ğ
-        Tls_TestTls,        // ²âÊÔtls
-        Tls_MemoryPool,     // ÄÚ´æ³Ø
+        Tls_Rtti,           // ç±»å‹è¯†åˆ«
+        Tls_TestTls,        // æµ‹è¯•tls
+        Tls_MemoryPool,     // å†…å­˜æ± 
         End,
     };
 };
 
-// ÀàĞÍÊ¶±ğÏß³Ì¾Ö²¿´æ´¢
+// ç±»å‹è¯†åˆ«çº¿ç¨‹å±€éƒ¨å­˜å‚¨
 struct BASE_EXPORT Tls_Rtti : public ITlsBase
 {
     OBJ_POOL_CREATE_DEF(Tls_Rtti);
@@ -75,7 +75,7 @@ struct BASE_EXPORT Tls_Rtti : public ITlsBase
     char rtti[__FS_RTTI_BUF_SIZE__];
 };
 
-// ²âÊÔÏß³Ì¾Ö²¿´æ´¢
+// æµ‹è¯•çº¿ç¨‹å±€éƒ¨å­˜å‚¨
 struct BASE_EXPORT Tls_TestTls : public ITlsBase
 {
     OBJ_POOL_CREATE_DEF(Tls_TestTls);
@@ -86,7 +86,7 @@ struct BASE_EXPORT Tls_TestTls : public ITlsBase
     Int32 count;
 };
 
-// Ïß³Ì¾Ö²¿ÄÚ´æ³Ø£¬½öÏŞÓÚÏß³ÌÉúÃüÖÜÆÚÄÚÊ¹ÓÃ£¬ÆäËûÇé¿ö»á³öÏÖÎ´¶¨Òå
+// çº¿ç¨‹å±€éƒ¨å†…å­˜æ± ï¼Œä»…é™äºçº¿ç¨‹ç”Ÿå‘½å‘¨æœŸå†…ä½¿ç”¨ï¼Œå…¶ä»–æƒ…å†µä¼šå‡ºç°æœªå®šä¹‰
 struct BASE_EXPORT Tls_MemoryPool : public ITlsBase
 {
     OBJ_POOL_CREATE_DEF(Tls_MemoryPool);

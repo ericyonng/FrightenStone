@@ -87,7 +87,7 @@ public:
     static Time FromSeconds(Int64 seconds);
     static Time FromMilliSeconds(Int64 milliSeconds);
     static Time FromMicroSeconds(Int64 microSeconds);
-    static Time FromFmtString(const fs::FS_String &fmt);    // fmt£º1970-07-01 12:12:12.000000055 
+    static Time FromFmtString(const fs::FS_String &fmt);    // fmtï¼š1970-07-01 12:12:12.000000055 
     static Time FromTimeMoment(int year, int month, int day, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
     static Time FromTimeStruct(const tm &timeStruct, int milliSecond = 0, int microSecond = 0);
     #pragma endregion
@@ -132,7 +132,7 @@ public:
      * @param[in] from        - from time.
      * @return TimeSlice - timeslice value.
      */
-    TimeSlice GetIntervalTo(const TimeSlice &slice) const;    // sliceÊÇµ±ÌìµÄÊ±¿ÌÈç£º10:10:10.100000µÄÎ¢ÃîÊý
+    TimeSlice GetIntervalTo(const TimeSlice &slice) const;    // sliceæ˜¯å½“å¤©çš„æ—¶åˆ»å¦‚ï¼š10:10:10.100000çš„å¾®å¦™æ•°
     TimeSlice GetIntervalTo(int hour, int minute, int second, int milliSecond = 0, int microSecond = 0) const;
     static TimeSlice GetIntervalTo(const Time &from, const TimeSlice &slice);
     static TimeSlice GetIntervalTo(const Time &from, int hour, int minute, int second, int milliSecond = 0, int microSecond = 0);
@@ -210,7 +210,7 @@ private:
     explicit Time(Int64 microSecTimestamp);
     explicit Time(const std::chrono::system_clock::time_point &now);
     void _UpdateTimeStructs();
-    // »º³å
+    // ç¼“å†²
     FS_String *_GetCache(bool isClear = false) const;
     FS_String *_GetCache2(bool isClear = false) const;
     #pragma endregion

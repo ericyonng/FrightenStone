@@ -34,26 +34,26 @@
 #pragma once
 
 #undef __MEMORY_POOL_ALIGN_BYTES__
-#define __MEMORY_POOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // Ä¬ÈÏ16×Ö½Ú¶ÔÆë Éæ¼°µ½¿çcache line¿ªÏú
+#define __MEMORY_POOL_ALIGN_BYTES__          (sizeof(void *)<<1)    // é»˜è®¤16å­—èŠ‚å¯¹é½ æ¶‰åŠåˆ°è·¨cache lineå¼€é”€
 
 #undef __FS_MEMORY_ALIGN__
 #define __FS_MEMORY_ALIGN__(BYTES)  \
 (BYTES) / __MEMORY_POOL_ALIGN_BYTES__ * __MEMORY_POOL_ALIGN_BYTES__ + ((BYTES)%__MEMORY_POOL_ALIGN_BYTES__ ? __MEMORY_POOL_ALIGN_BYTES__ : 0)
 
 #undef __MEMORY_POOL_MINIMUM_BLOCK__
-#define __MEMORY_POOL_MINIMUM_BLOCK__        64          // ×îÐ¡ÄÚ´æ¿é64×Ö½Ú
+#define __MEMORY_POOL_MINIMUM_BLOCK__        64          // æœ€å°å†…å­˜å—64å­—èŠ‚
 
 #undef __MEMORY_POOL_MAXIMUM_BLOCK__
-#define __MEMORY_POOL_MAXIMUM_BLOCK__        131072       // ×î´óÄÚ´æ¿é128K Ö»Ö§³Ö64µÄ±¶Êý
+#define __MEMORY_POOL_MAXIMUM_BLOCK__        131072       // æœ€å¤§å†…å­˜å—128K åªæ”¯æŒ64çš„å€æ•°
 
 #undef __MEMORY_POOL_MAXBLOCK_LIMIT__
-#define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // ÄÜ¹»Ö§³ÖµÄ×î´óÄÚ´æ¿é·¶Î§
+#define __MEMORY_POOL_MAXBLOCK_LIMIT__      __MEMORY_POOL_MAXIMUM_BLOCK__   // èƒ½å¤Ÿæ”¯æŒçš„æœ€å¤§å†…å­˜å—èŒƒå›´
 
 #undef __MEMORY_POOL_MAX_EXPAND_BYTES__
-#define __MEMORY_POOL_MAX_EXPAND_BYTES__    4294967296llu      // ÄÚ´æ³Ø×î´óÖ»Ö§³Öµ½4GB£¬ÆäËûÇé¿öÊ¹ÓÃÏµÍ³·ÖÅä
+#define __MEMORY_POOL_MAX_EXPAND_BYTES__    4294967296llu      // å†…å­˜æ± æœ€å¤§åªæ”¯æŒåˆ°4GBï¼Œå…¶ä»–æƒ…å†µä½¿ç”¨ç³»ç»Ÿåˆ†é…
 
 #ifndef BLOCK_AMOUNT_DEF
-#define BLOCK_AMOUNT_DEF    128    // Ä¬ÈÏÄÚ´æ¿éÊýÁ¿
+#define BLOCK_AMOUNT_DEF    128    // é»˜è®¤å†…å­˜å—æ•°é‡
 #endif
 
 #endif

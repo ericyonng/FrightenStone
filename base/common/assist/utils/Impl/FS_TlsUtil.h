@@ -25,7 +25,7 @@
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/10
  * @brief :
- *          线程局部存储工具类
+ *          绾跨▼灞�閮ㄥ瓨鍌ㄥ伐鍏风被
  *
  * 
  */
@@ -47,7 +47,7 @@ class BASE_EXPORT FS_TlsTable;
 class BASE_EXPORT FS_TlsUtil
 {
 public:
-    // 公用的util的handle
+    // 鍏敤鐨剈til鐨刪andle
     static FS_TlsHandle &GetUtileTlsHandle();
     static Int32 CreateUtilTlsHandle();
     static void DestroyUtilTlsHandle();
@@ -56,7 +56,7 @@ public:
     template<typename ObjType>
     static ObjType *UtilGetAndCreateWithDefBuilder(Int32 elemType);
 
-    // 指定tlshandle
+    // 鎸囧畾tlshandle
     static FS_TlsHandle CreateTlsHandle();
     static void DestroyTlsHandle(FS_TlsHandle &tlsHandle);
     static FS_TlsTable *GetTlsTable(FS_TlsHandle tlsHandle);

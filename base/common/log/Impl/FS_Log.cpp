@@ -40,10 +40,10 @@
 #include "base/common/log/Defs/LogCaches.h"
 
 #pragma region log config options
-#define LOG_THREAD_INTERVAL_MS_TIME 100         // ÈÕÖ¾Ïß³ÌĞ´ÈÕÖ¾¼ä¸ôÊ±¼äms
-#define LOG_SIZE_LIMIT  67108864                // ÈÕÖ¾³ß´çÏŞÖÆ64MB
-// #define LOG_SIZE_LIMIT  -1                   // ÎŞÏŞÖÆ
-#define ENABLE_OUTPUT_CONSOLE 1                 // ¿ªÆô¿ØÖÆÌ¨´òÓ¡
+#define LOG_THREAD_INTERVAL_MS_TIME 100         // æ—¥å¿—çº¿ç¨‹å†™æ—¥å¿—é—´éš”æ—¶é—´ms
+#define LOG_SIZE_LIMIT  67108864                // æ—¥å¿—å°ºå¯¸é™åˆ¶64MB
+// #define LOG_SIZE_LIMIT  -1                   // æ— é™åˆ¶
+#define ENABLE_OUTPUT_CONSOLE 1                 // å¼€å¯æ§åˆ¶å°æ‰“å°
 #pragma endregion
 
 FS_NAMESPACE_BEGIN
@@ -58,7 +58,7 @@ FS_Log::FS_Log()
     , _logDatas{NULL}
     , _logCaches{NULL}
 {
-    // log¸ùÄ¿Â¼ÃûÒÔ½ø³ÌÃû+Log
+    // logæ ¹ç›®å½•åä»¥è¿›ç¨‹å+Log
     auto programName = FS_FileUtil::ExtractFileWithoutExtension(SystemUtil::GetCurProgramName().RemoveZeroTail());
     programName.AppendFormat("%s", "Log");
     InitModule(programName.c_str());
@@ -114,7 +114,7 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
         return StatusDefs::Success;
     }
 
-    // ¸ùÄ¿Â¼
+    // æ ¹ç›®å½•
     if(!rootDirName)
     {
         auto programName = FS_FileUtil::ExtractFileWithoutExtension(SystemUtil::GetCurProgramName().RemoveZeroTail());
@@ -126,25 +126,25 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
         _rootDirName = rootDirName;
     }
 
-    // ³õÊ¼»¯ÎÄ¼şËø
+    // åˆå§‹åŒ–æ–‡ä»¶é”
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
         _flielocker[i] = new ConditionLocker();
 
-    // ³õÊ¼»¯ÓÃÓÚ»½ĞÑÈÕÖ¾Ïß³ÌËø
+    // åˆå§‹åŒ–ç”¨äºå”¤é†’æ—¥å¿—çº¿ç¨‹é”
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
         _wakeupToWriteLog[i] = new ConditionLocker();
 
-    // TODO:³õÊ¼»¯log config options
+    // TODO:åˆå§‹åŒ–log config options
     _ReadConfig();
 
-    // ³õÊ¼»¯ÈÕÖ¾ÎÄ¼ş
+    // åˆå§‹åŒ–æ—¥å¿—æ–‡ä»¶
     LogDefs::LogInitHelper<LogDefs::LOG_NUM_MAX>::InitLog(this);
 
-    // ³õÊ¼»¯»º³å
+    // åˆå§‹åŒ–ç¼“å†²
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
         _logCaches[i] = new std::list<LogData *>;
 
-    // ³õÊ¼»¯Ïß³Ì³Ø²¢Ìí¼ÓĞ´ÈÕÖ¾ÈÎÎñ,Ã¿¸öÈÕÖ¾ÎÄ¼şÒ»¸ö¶ÀÁ¢µÄÏß³Ì
+    // åˆå§‹åŒ–çº¿ç¨‹æ± å¹¶æ·»åŠ å†™æ—¥å¿—ä»»åŠ¡,æ¯ä¸ªæ—¥å¿—æ–‡ä»¶ä¸€ä¸ªç‹¬ç«‹çš„çº¿ç¨‹
     _threadPool = new FS_ThreadPool(0, LogDefs::LOG_QUANTITY);
     _threadWriteLogDelegate = DelegatePlusFactory::Create(this, &FS_Log::_OnThreadWriteLog);
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
@@ -165,18 +165,18 @@ void FS_Log::FinishModule()
 
     _isFinish = true;
 
-    // Çå¿ÕÈÕÖ¾
+    // æ¸…ç©ºæ—¥å¿—
     FlushAllFile();
 
-    // ¹Ø±ÕÏß³Ì³Ø
+    // å…³é—­çº¿ç¨‹æ± 
     _threadPool->Close();
 
-    // ÇåÀíÊı¾İ
+    // æ¸…ç†æ•°æ®
     Fs_SafeFree(_threadWriteLogDelegate);
     fs::STLUtil::DelArray(_logDatas);
     fs::STLUtil::DelArray(_logFiles);
 
-    // logºóhook
+    // logåhook
     for(Int32 i = 0; i < LogLevel::End; ++i)
     {
         if(!_levelRefHook[i])
@@ -188,7 +188,7 @@ void FS_Log::FinishModule()
         Fs_SafeFree(_levelRefHook[i]);
     }
 
-    // logÇ°hook
+    // logå‰hook
     for(Int32 i = 0; i < LogLevel::End; ++i)
     {
         if(!_levelRefBeforeLogHook[i])
@@ -222,12 +222,12 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
     _locker.Lock();
     do 
     {
-        // 1.ÊÇ·ñ´´½¨¹ı
+        // 1.æ˜¯å¦åˆ›å»ºè¿‡
         auto logFile = _logFiles[fileUnqueIndex];
         if(logFile)
             break;
 
-        // 2.´´½¨ÎÄ¼ş¼Ğ
+        // 2.åˆ›å»ºæ–‡ä»¶å¤¹
         FS_String logName = ".\\";
         logName += (_rootDirName + "\\" + logPath);
         if(!FS_DirectoryUtil::CreateDir(logName))
@@ -236,11 +236,11 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
             break;
         }
 
-        // 3.ÏµÍ³ÊÇ·ñµÚÒ»´Î´´½¨
+        // 3.ç³»ç»Ÿæ˜¯å¦ç¬¬ä¸€æ¬¡åˆ›å»º
         logName += fileName;
         bool isFirstCreate = !FS_FileUtil::IsFileExist(logName.c_str());
 
-        // 4.´´½¨ÎÄ¼ş
+        // 4.åˆ›å»ºæ–‡ä»¶
         logFile = new LogFile;
         if(!logFile->Open(logName.c_str(), true, "ab+", false))
         {
@@ -249,12 +249,12 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
             break;
         }
 
-        // ÏµÍ³Æô¶¯±¸·İ¾ÉÈÕÖ¾
+        // ç³»ç»Ÿå¯åŠ¨å¤‡ä»½æ—§æ—¥å¿—
         logFile->PartitionFile(isFirstCreate);
         logFile->UpdateLastTimestamp();
         _logFiles[fileUnqueIndex] = logFile;
 
-        // 4.´´½¨ÈÕÖ¾ÄÚÈİ
+        // 4.åˆ›å»ºæ—¥å¿—å†…å®¹
         _logDatas[fileUnqueIndex] = new std::list<LogData *>;
     } while(0);
     
@@ -265,7 +265,7 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
 
 void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
 {
-    // 1.¸ù¾İlevel²»Í¬µ÷ÓÃ²»Í¬µÄlogÇ°hook ²»¿É×öÓ°ÏìlogÖ´ĞĞµÄÆäËûÊÂÇé
+    // 1.æ ¹æ®levelä¸åŒè°ƒç”¨ä¸åŒçš„logå‰hook ä¸å¯åšå½±å“logæ‰§è¡Œçš„å…¶ä»–äº‹æƒ…
     if(_levelRefBeforeLogHook[level])
     {
         for(auto iterHook = _levelRefBeforeLogHook[level]->begin();
@@ -276,10 +276,10 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
         }
     }
 
-    // 2.¿½±´Ò»´ÎÊı¾İ
+    // 2.æ‹·è´ä¸€æ¬¡æ•°æ®
     LogData cache = *logData;
     
-    // 3.½«ÈÕÖ¾Êı¾İ·ÅÈë¶ÓÁĞ
+    // 3.å°†æ—¥å¿—æ•°æ®æ”¾å…¥é˜Ÿåˆ—
     _flielocker[fileUniqueIndex]->Lock();
     if(_isFinish)
     {
@@ -289,12 +289,12 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
     _logDatas[fileUniqueIndex]->push_back(logData);
     _flielocker[fileUniqueIndex]->Unlock();
 
-    // 4.´òÓ¡µ½¿ØÖÆÌ¨
+    // 4.æ‰“å°åˆ°æ§åˆ¶å°
 #if ENABLE_OUTPUT_CONSOLE
     _OutputToConsole(level, cache._logToWrite);
 #endif
     
-    // 5.¸ù¾İlevel²»Í¬µ÷ÓÃ²»Í¬µÄhook
+    // 5.æ ¹æ®levelä¸åŒè°ƒç”¨ä¸åŒçš„hook
     if(_levelRefHook[level])
     {
         for(auto iterHook = _levelRefHook[level]->begin();
@@ -352,12 +352,12 @@ void FS_Log::_SetConsoleColor(Int32 level)
 
 void FS_Log::_ReadConfig()
 {
-    // ÈÕÖ¾ÅäÖÃÏî
+    // æ—¥å¿—é…ç½®é¡¹
 }
 
 void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
 {
-    // 1.×ªÒÆµ½»º³åÇø£¨Ö»½»»»listÖ¸Õë£©
+    // 1.è½¬ç§»åˆ°ç¼“å†²åŒºï¼ˆåªäº¤æ¢listæŒ‡é’ˆï¼‰
     _flielocker[logFileIndex]->Lock();
     if(_logDatas[logFileIndex]->empty())
     {
@@ -365,8 +365,8 @@ void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
         return;
     }
 
-    // Ö»½»»»Êı¾İ¶ÓÁĞÖ¸Õë¿½±´×îÉÙ£¬×î¿ì£¬¶øÇÒ½»»»ºó_logDatas¶ÓÁĞÊÇ¿ÕµÄÏàµ±ÓÚÇå¿ÕÁËÊı¾İ ±£Ö¤»º³å¶ÓÁĞÇ°¼¸¸ö¶¼²»ÎªNULL, Åöµ½NULL±íÊ¾½áÊø
-    std::list<LogData *> *&swapCache = _logCaches[logFileIndex]; // ÓÉÓÚÖ÷Ïß³Ì²»»á¹²Ïí_logCachesËùÒÔÊÇÏß³Ì°²È«µÄ£¨Ã¿¸öÈÕÖ¾ÎÄ¼şÏß³ÌÖ»ÓĞÒ»¸öÏß³Ì£©,Çë±£Ö¤Íâ²¿ÆäËûÏß³Ì²»»áµ÷ÓÃ±¾½Ó¿Ú£¬ĞèÒªÁ¢¼´Ğ´ÈÕÖ¾Çëµ÷ÓÃflushall½Ó¿Ú
+    // åªäº¤æ¢æ•°æ®é˜Ÿåˆ—æŒ‡é’ˆæ‹·è´æœ€å°‘ï¼Œæœ€å¿«ï¼Œè€Œä¸”äº¤æ¢å_logDatasé˜Ÿåˆ—æ˜¯ç©ºçš„ç›¸å½“äºæ¸…ç©ºäº†æ•°æ® ä¿è¯ç¼“å†²é˜Ÿåˆ—å‰å‡ ä¸ªéƒ½ä¸ä¸ºNULL, ç¢°åˆ°NULLè¡¨ç¤ºç»“æŸ
+    std::list<LogData *> *&swapCache = _logCaches[logFileIndex]; // ç”±äºä¸»çº¿ç¨‹ä¸ä¼šå…±äº«_logCachesæ‰€ä»¥æ˜¯çº¿ç¨‹å®‰å…¨çš„ï¼ˆæ¯ä¸ªæ—¥å¿—æ–‡ä»¶çº¿ç¨‹åªæœ‰ä¸€ä¸ªçº¿ç¨‹ï¼‰,è¯·ä¿è¯å¤–éƒ¨å…¶ä»–çº¿ç¨‹ä¸ä¼šè°ƒç”¨æœ¬æ¥å£ï¼Œéœ€è¦ç«‹å³å†™æ—¥å¿—è¯·è°ƒç”¨flushallæ¥å£
     std::list<LogData *> *cache4RealLog = NULL;
     cache4RealLog = _logDatas[logFileIndex];
     _logDatas[logFileIndex] = swapCache;
@@ -376,15 +376,15 @@ void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
     if(swapCache->empty())
         return;
 
-    // 2.Ğ´ÈÕÖ¾
+    // 2.å†™æ—¥å¿—
     LogFile *logFile = _logFiles[logFileIndex];
     for(auto &iterLog : *swapCache)
     {
-        // ÎÄ¼ş¹ı´ó×ª´¢µ½·ÖÁ¢ÎÄ¼ş
+        // æ–‡ä»¶è¿‡å¤§è½¬å‚¨åˆ°åˆ†ç«‹æ–‡ä»¶
         if(logFile->IsTooLarge(LOG_SIZE_LIMIT))
             logFile->PartitionFile();
 
-        // Ğ´ÈëÎÄ¼ş
+        // å†™å…¥æ–‡ä»¶
         logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
         Fs_SafeFree(iterLog);
     }

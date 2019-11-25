@@ -61,18 +61,18 @@ public:
         enum { realvalue = 0 };
     };
 
-    // ¶¨ÒåÈÕÖ¾ÎÄ¼þ
+    // å®šä¹‰æ—¥å¿—æ–‡ä»¶
     DECLEAR_GENERAL_LOG_BEGIN()
-    GENERAL_ADDLOG(SYSLOG, crash)           // ±ÀÀ£
-    GENERAL_ADDLOG(SYSLOG, details)         // ¾ßÌåÈÕÖ¾
-    GENERAL_ADDLOG(SYSLOG, memleak)         // ÄÚ´æÐ¹Â¶
-    GENERAL_ADDLOG(SYSLOG, mempool)         // ÄÚ´æ³ØÇé¿öÈÕÖ¾
-    GENERAL_ADDLOG(SYSLOG, objpool)         // ¶ÔÏó³ØÇé¿öÈÕÖ¾
-    GENERAL_ADDLOG(SYSLOG, net)             // ÍøÂç²ã
-    GENERAL_ADDLOG(SYSLOG, sys)             // ÏµÍ³ÐÅÏ¢£¨ÓÃÓÚ·ÖÎö£©
-    GENERAL_ADDLOG(SYSLOG, Any)             // ÈÎÒâÄÚÈÝ
-    GENERAL_ADDLOG(SYSLOG, Custom)          // ×Ô¶¨ÒåµÄÈÕÖ¾¸ñÊ½ÄÚÈÝ
-    GENERAL_ADDLOG(TESTLOG, testcode)       // ´úÂë²âÊÔ
+    GENERAL_ADDLOG(SYSLOG, crash)           // å´©æºƒ
+    GENERAL_ADDLOG(SYSLOG, details)         // å…·ä½“æ—¥å¿—
+    GENERAL_ADDLOG(SYSLOG, memleak)         // å†…å­˜æ³„éœ²
+    GENERAL_ADDLOG(SYSLOG, mempool)         // å†…å­˜æ± æƒ…å†µæ—¥å¿—
+    GENERAL_ADDLOG(SYSLOG, objpool)         // å¯¹è±¡æ± æƒ…å†µæ—¥å¿—
+    GENERAL_ADDLOG(SYSLOG, net)             // ç½‘ç»œå±‚
+    GENERAL_ADDLOG(SYSLOG, sys)             // ç³»ç»Ÿä¿¡æ¯ï¼ˆç”¨äºŽåˆ†æžï¼‰
+    GENERAL_ADDLOG(SYSLOG, Any)             // ä»»æ„å†…å®¹
+    GENERAL_ADDLOG(SYSLOG, Custom)          // è‡ªå®šä¹‰çš„æ—¥å¿—æ ¼å¼å†…å®¹
+    GENERAL_ADDLOG(TESTLOG, testcode)       // ä»£ç æµ‹è¯•
     DECLEAR_GENERAL_LOG_END()
 };
  

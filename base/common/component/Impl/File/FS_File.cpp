@@ -80,7 +80,7 @@ bool FS_File::Open(const char *fileName, bool isCreate /*= false*/, const char *
     _fp = FS_FileUtil::OpenFile(fileNameCache.c_str(), isCreate, openMode);
     if(!_fp)
     {
-        // ´´½¨Ä¿Â¼
+        // åˆ›å»ºç›®å½•
         const auto &dir = FS_DirectoryUtil::GetFileDirInPath(fileName);
         if(FS_DirectoryUtil::CreateDir(dir))
             _fp = FS_FileUtil::OpenFile(fileNameCache.c_str(), isCreate, openMode);

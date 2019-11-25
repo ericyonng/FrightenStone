@@ -45,31 +45,31 @@ FS_NAMESPACE_BEGIN
 // RawData
 // RTTI
 
-// ÔËÐÐÊ±ÀàÐÍÊ¶±ð
+// è¿è¡Œæ—¶ç±»åž‹è¯†åˆ«
 class BASE_EXPORT SmartVarRtti
 {
 public:
-    // ÀàÐÍÊ¶±ðÐÅÏ¢32bit Ã¿¸öÊý¾ÝÀàÐÍ¶¼ÓÐ¶ÀÁ¢µÄmask »¥³â
+    // ç±»åž‹è¯†åˆ«ä¿¡æ¯32bit æ¯ä¸ªæ•°æ®ç±»åž‹éƒ½æœ‰ç‹¬ç«‹çš„mask äº’æ–¥
     // [high eight bits][middle 23 bits][first bit]
-    // [    ÀàÐÍÐÅÏ¢   ][ ¾ßÌåÀàÐÍÃ¶¾Ù ][  ·ûºÅÎ» ]
+    // [    ç±»åž‹ä¿¡æ¯   ][ å…·ä½“ç±»åž‹æžšä¸¾ ][  ç¬¦å·ä½ ]
     enum RttiType:unsigned int
     {
-        // ³õÊ¼»¯ÀàÐÍ
+        // åˆå§‹åŒ–ç±»åž‹
         SV_NIL = 0x0U,
 
-        // ·ûºÅ±ê¼Ç
-        SV_SIGHED           = 0x01U,             // ÓÐ·ûºÅ
-        SV_UNSIGHED         = 0x0U,              // ÎÞ·ûºÅ
+        // ç¬¦å·æ ‡è®°
+        SV_SIGHED           = 0x01U,             // æœ‰ç¬¦å·
+        SV_UNSIGHED         = 0x0U,              // æ— ç¬¦å·
 
-        // ÀàÐÍÐÅÏ¢
-        SV_BRIEF_DATA       = 0x01000000U,       // »ù±¾Êý¾ÝÀàÐÍ
-        SV_STRING           = 0x02000000U,       // ×Ö·û´®ÀàÐÍ
-        SV_DICTIONARY       = 0x04000000U,       // ×ÖµäÀàÐÍ
+        // ç±»åž‹ä¿¡æ¯
+        SV_BRIEF_DATA       = 0x01000000U,       // åŸºæœ¬æ•°æ®ç±»åž‹
+        SV_STRING           = 0x02000000U,       // å­—ç¬¦ä¸²ç±»åž‹
+        SV_DICTIONARY       = 0x04000000U,       // å­—å…¸ç±»åž‹
 
-        // ¼òµ¥ÀàÐÍµÄ¾ßÌåÀàÐÍÃ¶¾Ù
-        SV_BRIEF_SIGHED_DATA        = SV_BRIEF_DATA     | SV_SIGHED,                        // ÓÐ·ûºÅ¼òµ¥Êý¾ÝÀàÐÍ
-        SV_BRIEF_UNSIGHED_DATA      = SV_BRIEF_DATA     | SV_UNSIGHED,                      // ÎÞ·ûºÅ¼òµ¥Êý¾ÝÀàÐÍ
-        SV_BRIEF_BOOL       = SV_BRIEF_SIGHED_DATA      | (0x1U << 1),                     // boolÀàÐÍ
+        // ç®€å•ç±»åž‹çš„å…·ä½“ç±»åž‹æžšä¸¾
+        SV_BRIEF_SIGHED_DATA        = SV_BRIEF_DATA     | SV_SIGHED,                        // æœ‰ç¬¦å·ç®€å•æ•°æ®ç±»åž‹
+        SV_BRIEF_UNSIGHED_DATA      = SV_BRIEF_DATA     | SV_UNSIGHED,                      // æ— ç¬¦å·ç®€å•æ•°æ®ç±»åž‹
+        SV_BRIEF_BOOL       = SV_BRIEF_SIGHED_DATA      | (0x1U << 1),                     // boolç±»åž‹
         SV_BRIEF_BYTE8      = SV_BRIEF_SIGHED_DATA      | (0x1U << 2),                     // Byte8
         SV_BRIEF_UINT8      = SV_BRIEF_UNSIGHED_DATA    | (0x1U << 3),                     // U8
         SV_BRIEF_INT16      = SV_BRIEF_SIGHED_DATA      | (0x1U << 4),                     // INT16
@@ -84,22 +84,22 @@ public:
         SV_BRIEF_FLOAT      = SV_BRIEF_SIGHED_DATA      | (0x1U << 13),                    // float
         SV_BRIEF_DOUBLE     = SV_BRIEF_SIGHED_DATA      | (0x1U << 14),                    // double
 
-        // ×Ö·û´®ÀàÐÍ
-        SV_STRING_DEF       = SV_STRING | SV_SIGHED,        // Ä¬ÈÏµÄ×Ö·û´®ÀàÐÍ
+        // å­—ç¬¦ä¸²ç±»åž‹
+        SV_STRING_DEF       = SV_STRING | SV_SIGHED,        // é»˜è®¤çš„å­—ç¬¦ä¸²ç±»åž‹
 
-        // ×ÖµäÀàÐÍ
-        SV_DICTIONARY_DEF   = SV_DICTIONARY | SV_SIGHED,    // Ä¬ÈÏµÄ×ÖµäÀàÐÍ
+        // å­—å…¸ç±»åž‹
+        SV_DICTIONARY_DEF   = SV_DICTIONARY | SV_SIGHED,    // é»˜è®¤çš„å­—å…¸ç±»åž‹
 
-        // ÑÚÂë
-        SV_TYPEINFO_MASK    = 0xFFU << (32-8),                   // ¸ß8Î»ÎªÀàÐÍÐÅÏ¢ÑÚÂë
-        SV_SIGNED_MASK      = 0x01U,                                // ·ûºÅÎ»
+        // æŽ©ç 
+        SV_TYPEINFO_MASK    = 0xFFU << (32-8),                   // é«˜8ä½ä¸ºç±»åž‹ä¿¡æ¯æŽ©ç 
+        SV_SIGNED_MASK      = 0x01U,                                // ç¬¦å·ä½
     };
 
     static const FS_String &GetTypeName(unsigned int rttiType);
     static void InitRttiTypeNames();
 
 private:
-    static std::map<unsigned int, FS_String> _rttiTypeRefString;   // ÀàÐÍ×Ö·û´®
+    static std::map<unsigned int, FS_String> _rttiTypeRefString;   // ç±»åž‹å­—ç¬¦ä¸²
     static const FS_String _nullString;
 };
 FS_NAMESPACE_END

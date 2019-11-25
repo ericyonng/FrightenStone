@@ -91,14 +91,14 @@ inline IoDataBase *FS_IocpBuffer::MakeSendIoData()
 
 inline bool FS_IocpBuffer::HasMsg() const
 {
-    // 判断消息缓冲区的数据长度大于消息头NetMsg_DataHeader长度
+    // 鍒ゆ柇娑堟伅缂撳啿鍖虹殑鏁版嵁闀垮害澶т簬娑堟伅澶碞etMsg_DataHeader闀垮害
     auto len = GetLength();
     if(len >= sizeof(NetMsg_DataHeader))
     {
-        // 这时就可以知道当前消息的长度
+        // 杩欐椂灏卞彲浠ョ煡閬撳綋鍓嶆秷鎭殑闀垮害
         auto header = CastToData<NetMsg_DataHeader>();
 
-        // 判断消息缓冲区的数据长度大于消息长度
+        // 鍒ゆ柇娑堟伅缂撳啿鍖虹殑鏁版嵁闀垮害澶т簬娑堟伅闀垮害
         return len >= header->_packetLength;
     }
 
@@ -112,7 +112,7 @@ inline bool FS_IocpBuffer::NeedWrite() const
 
 inline void FS_IocpBuffer::_OnSendSucCallback(size_t transferBytes)
 {
-    // 写入iocp完成多少字节则buffer响应减少多少字节
+    // 鍐欏叆iocp瀹屾垚澶氬皯瀛楄妭鍒檅uffer鍝嶅簲鍑忓皯澶氬皯瀛楄妭
     auto curPos = GetLength();
     if(curPos < transferBytes)
     {
@@ -122,19 +122,19 @@ inline void FS_IocpBuffer::_OnSendSucCallback(size_t transferBytes)
     }
 
     if(curPos == transferBytes)
-    {// _lastPos=2000 实际发送sendBytes=2000
-     // 数据尾部位置清零
+    {// _lastPos=2000 瀹為檯鍙戦�乻endBytes=2000
+     // 鏁版嵁灏鹃儴浣嶇疆娓呴浂
         Clear();
     }
     else {
-        // _lastPos=2000 实际发送ret=1000
+        // _lastPos=2000 瀹為檯鍙戦�乺et=1000
         PopFront(transferBytes);
     }
 }
 
 inline void FS_IocpBuffer::_OnRecvSucCallback(size_t transferBytes)
 {
-    // 从iocp读入buffer则buffer数据增加相应字节
+    // 浠巌ocp璇诲叆buffer鍒檅uffer鏁版嵁澧炲姞鐩稿簲瀛楄妭
     if(transferBytes > 0 && GetRest() >= transferBytes)
     {
         _GetCurPos() += transferBytes;

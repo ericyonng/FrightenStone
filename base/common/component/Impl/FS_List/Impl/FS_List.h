@@ -48,7 +48,7 @@ public:
     FS_List();
     ~FS_List();
 
-    /* Öµ²Ù×÷ */
+    /* å€¼æ“ä½œ */
 public:
     ObjType &front();
     const ObjType &front() const;
@@ -59,7 +59,7 @@ public:
     void pop_front();
     void pop_back();
 
-    /* ½Úµãµü´úÆ÷²Ù×÷ */
+    /* èŠ‚ç‚¹è¿­ä»£å™¨æ“ä½œ */
 public:
     ListNode<ObjType> *begin();
     const ListNode<ObjType> *begin() const;
@@ -68,7 +68,7 @@ public:
     void erase(ListNode<ObjType> * node);
     void insert_before(ObjType newObj, ListNode<ObjType> *specifyPosNode);
 
-    /* ÔÓÏî */
+    /* æ‚é¡¹ */
 public:
     bool empty() const;
     size_t size() const;

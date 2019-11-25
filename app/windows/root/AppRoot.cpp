@@ -23,62 +23,62 @@ bool CAppRoot::Init()
 {	
 	SEH_TRY
 	{
-		//log≥ı ºªØ
-		//CHECKF_NL(LogInitHelper<LOG_NUM_MAX>::InitLog());	//log≥ı ºªØ
+		//logÂàùÂßãÂåñ
+		//CHECKF_NL(LogInitHelper<LOG_NUM_MAX>::InitLog());	//logÂàùÂßãÂåñ
 		IF_NOT_NL(InitLogModule())
 		{
-			TestDisPlay("Log Module ≥ı ºªØ ß∞‹.");
+			TestDisPlay("Log Module ÂàùÂßãÂåñÂ§±Ë¥•.");
 			return false;
 		}
-		TestDisPlay("Log Module ≥ı ºªØ≥…π¶.");
-		LOGSYS_FMT_C4096("Log Module ≥ı ºªØ≥…π¶.");
+		TestDisPlay("Log Module ÂàùÂßãÂåñÊàêÂäü.");
+		LOGSYS_FMT_C4096("Log Module ÂàùÂßãÂåñÊàêÂäü.");
 
-		IF_NOT(gtool::MemPoolInitModule())				//ƒ⁄¥Ê≥ÿ	
+		IF_NOT(gtool::MemPoolInitModule())				//ÂÜÖÂ≠òÊ±†	
 		{
-			TestDisPlay("MemPool Module ≥ı ºªØ ß∞‹.");
+			TestDisPlay("MemPool Module ÂàùÂßãÂåñÂ§±Ë¥•.");
 			return false;
 		}
-		TestDisPlay("MemPool Module ≥ı ºªØ≥…π¶.");
-		LOGSYS_FMT_C4096("MemPool Module ≥ı ºªØ≥…π¶.");
+		TestDisPlay("MemPool Module ÂàùÂßãÂåñÊàêÂäü.");
+		LOGSYS_FMT_C4096("MemPool Module ÂàùÂßãÂåñÊàêÂäü.");
 
 		IF_NOT_NL(THREAD_TRANSFER::InitThreadPostModule())
 		{
-			TestDisPlay("ThreadPost Module ≥ı ºªØ ß∞‹.");
+			TestDisPlay("ThreadPost Module ÂàùÂßãÂåñÂ§±Ë¥•.");
 			return false;
 		}
-		TestDisPlay("ThreadPost Module ≥ı ºªØ≥…π¶.");
-		LOGSYS_FMT_C4096("ThreadPost Module ≥ı ºªØ≥…π¶.");		
+		TestDisPlay("ThreadPost Module ÂàùÂßãÂåñÊàêÂäü.");
+		LOGSYS_FMT_C4096("ThreadPost Module ÂàùÂßãÂåñÊàêÂäü.");		
 
-		//∑˛ŒÒ∆˜µÿ÷∑≈‰÷√
+		//ÊúçÂä°Âô®Âú∞ÂùÄÈÖçÁΩÆ
 		IF_NOT(ConfigSvrAddr())
 		{
-			TestDisPlay("ConfigSvrAddr  ß∞‹.");
+			TestDisPlay("ConfigSvrAddr Â§±Ë¥•.");
 			return false;
 		}
-		TestDisPlay("ConfigSvrAddr ≥…π¶.");
-		LOGSYS_FMT_C4096("ConfigSvrAddr ≥…π¶.");
+		TestDisPlay("ConfigSvrAddr ÊàêÂäü.");
+		LOGSYS_FMT_C4096("ConfigSvrAddr ÊàêÂäü.");
 
-		IF_NOT(gtool::NetWorkInitModule())				//iocpÕ¯¬Áƒ£øÈ≥ı ºªØ
+		IF_NOT(gtool::NetWorkInitModule())				//iocpÁΩëÁªúÊ®°ÂùóÂàùÂßãÂåñ
 		{
-			TestDisPlay("NetWork Module ≥ı ºªØ ß∞‹.");
+			TestDisPlay("NetWork Module ÂàùÂßãÂåñÂ§±Ë¥•.");
 			return false;
 		}
-		TestDisPlay("NetWork Module ≥ı ºªØ≥…π¶.");
-		LOGSYS_FMT_C4096("NetWork Module ≥ı ºªØ≥…π¶.");
+		TestDisPlay("NetWork Module ÂàùÂßãÂåñÊàêÂäü.");
+		LOGSYS_FMT_C4096("NetWork Module ÂàùÂßãÂåñÊàêÂäü.");
 
 		IF_NOT(InitBusinessLogicModule())
 		{
-			TestDisPlay("BusinessLogic Module ≥ı ºªØ ß∞‹.");
+			TestDisPlay("BusinessLogic Module ÂàùÂßãÂåñÂ§±Ë¥•.");
 			return false;
 		}
-		TestDisPlay("BusinessLogic Module ≥ı ºªØ≥…π¶.");
-		LOGSYS_FMT_C4096("BusinessLogic Module ≥ı ºªØ≥…π¶.");
+		TestDisPlay("BusinessLogic Module ÂàùÂßãÂåñÊàêÂäü.");
+		LOGSYS_FMT_C4096("BusinessLogic Module ÂàùÂßãÂåñÊàêÂäü.");
 
-		//…Ë÷√“µŒÒ¬ﬂº≠œﬂ≥Ã µ¿˝
-//		ASSERTEX(THREAD_TRANSFER::SetDisplayFun(GetBusinessLogicMainThread(), POST_OBJ_TYPE_MAIN_THREAD, &DlgDisplay));	//ΩÁ√Êœ‘ æ
-//		ASSERTEX(THREAD_TRANSFER::SetDisplayFun(gtool::NetWorkModulGetSenderThread(), POST_OBJ_TYPE_NETWORK_SENDER, &DlgDisplay)); //ΩÁ√Êœ‘ æ
-		gtool::NetWorkModulSetGetBusinessLogicMainThread(GetBusinessLogicMainThread());	//Õ¯¬Áƒ£øÈΩ”»Î“µŒÒ¬ﬂº≠
-		BusinessLogicSetNetworkSenderThread(gtool::NetWorkModulGetSenderThread());	//“µŒÒ¬ﬂº≠ƒ£øÈΩ”»ÎÕ¯¬Áƒ£øÈ
+		//ËÆæÁΩÆ‰∏öÂä°ÈÄªËæëÁ∫øÁ®ãÂÆû‰æã
+//		ASSERTEX(THREAD_TRANSFER::SetDisplayFun(GetBusinessLogicMainThread(), POST_OBJ_TYPE_MAIN_THREAD, &DlgDisplay));	//ÁïåÈù¢ÊòæÁ§∫
+//		ASSERTEX(THREAD_TRANSFER::SetDisplayFun(gtool::NetWorkModulGetSenderThread(), POST_OBJ_TYPE_NETWORK_SENDER, &DlgDisplay)); //ÁïåÈù¢ÊòæÁ§∫
+		gtool::NetWorkModulSetGetBusinessLogicMainThread(GetBusinessLogicMainThread());	//ÁΩëÁªúÊ®°ÂùóÊé•ÂÖ•‰∏öÂä°ÈÄªËæë
+		BusinessLogicSetNetworkSenderThread(gtool::NetWorkModulGetSenderThread());	//‰∏öÂä°ÈÄªËæëÊ®°ÂùóÊé•ÂÖ•ÁΩëÁªúÊ®°Âùó
 
 		m_bInit = true;
 		m_bDestroy = false;
@@ -94,7 +94,7 @@ bool CAppRoot::Init()
 	return true;
 }
 
-//“ªœµ¡–µƒ Õ∑≈ ”Î≥ı ºªØœ‡∑¥£¨œ»≥ı ºªØµƒ∫Ûfinish
+//‰∏ÄÁ≥ªÂàóÁöÑÈáäÊîæ ‰∏éÂàùÂßãÂåñÁõ∏ÂèçÔºåÂÖàÂàùÂßãÂåñÁöÑÂêéfinish
 bool CAppRoot::Fini(bool bShowInWindow /*= true*/)
 {
 	SEH_TRY
@@ -104,7 +104,7 @@ bool CAppRoot::Fini(bool bShowInWindow /*= true*/)
 
 		m_bDestroy = true;
 		m_bInit = false;
-		ASSERTEX(FiniBusinessLogicModule());					//“µŒÒƒ£øÈ Õ∑≈
+		ASSERTEX(FiniBusinessLogicModule());					//‰∏öÂä°Ê®°ÂùóÈáäÊîæ
 		if(bShowInWindow)
 			TestDisPlay("BusinessLogic Module Fini.");
 
@@ -119,7 +119,7 @@ bool CAppRoot::Fini(bool bShowInWindow /*= true*/)
 	SEH_TRY
 	{
 		m_bInit = false;
-		gtool::NetWorkFinishModule();					//Õ¯¬Áƒ£øÈ Õ∑≈
+		gtool::NetWorkFinishModule();					//ÁΩëÁªúÊ®°ÂùóÈáäÊîæ
 		if (bShowInWindow)
 			TestDisPlay("NetWork Module Fini.");
 		LOGSYS_FMT_C4096("NetWork Module Fini.");
@@ -137,31 +137,31 @@ bool CAppRoot::ConfigSvrAddr()
 {
 	CHECKF_NL(gtool::IsLogModuleInit());
 
-	//≈‰÷√∑˛ŒÒ∆˜µÿ÷∑
+	//ÈÖçÁΩÆÊúçÂä°Âô®Âú∞ÂùÄ
 	gtool::NetWorkModulSetIp("");
 	BUFFER512 szConfigPath = { 0 };
 
-	//ªÒ»°≈‰÷√Œƒº˛æ¯∂‘¬∑æ∂
+	//Ëé∑ÂèñÈÖçÁΩÆÊñá‰ª∂ÁªùÂØπË∑ØÂæÑ
 	CHECKF(gtool::GetProcPath(true, _getpid(), szConfigPath, sizeof(szConfigPath)));
 	auto strConfig = gtool::CFileDirSys::GetFilePathInWholePath(szConfigPath);
 	strConfig += "SvrConfig.ini";
 
-	//≈‰÷√Œƒº˛≥ı ºªØ
+	//ÈÖçÁΩÆÊñá‰ª∂ÂàùÂßãÂåñ
 	CIniFileIO IniConfig;
 	CHECKF(IniConfig.SetFilePath(strConfig.c_str()));
 
-	//∂¡»°≈‰÷√
+	//ËØªÂèñÈÖçÁΩÆ
 	BUFFER128 szip = { 0 };
 	char *pip = szip;
 	U32 nPort = 0;
 	IniConfig.ReadString("AddrInfo", "ip", "", pip, sizeof(szip));
 	nPort = IniConfig.ReadInt("AddrInfo", "port", 0);
 
-	//…Ë÷√ip
+	//ËÆæÁΩÆip
 	if (strlen(pip) > 0)
 		gtool::NetWorkModulSetIp(pip);
 
-	//…Ë÷√∂Àø⁄
+	//ËÆæÁΩÆÁ´ØÂè£
 	if ((nPort > 0))
 		gtool::NetWorkModulSetSvrPort(nPort);
 

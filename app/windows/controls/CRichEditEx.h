@@ -47,50 +47,50 @@ public:
 	//{{AFX_VIRTUAL(CRichEditEx)
 	//}}AFX_VIRTUAL
 
-	//¹¦ÄÜº¯Êı
+	//åŠŸèƒ½å‡½æ•°
 public:
-	//±³¾°ÑÕÉ«
+	//èƒŒæ™¯é¢œè‰²
 	void SetBackColor(COLORREF bk_color);
-	//²åÈë×Ö·û´®
+	//æ’å…¥å­—ç¬¦ä¸²
 	void InsertString(CString strText);
-	//²åÈë×Ö·û´®
+	//æ’å…¥å­—ç¬¦ä¸²
 	void InsertString(CString strText, COLORREF fn_color, DWORD fn_effects);
-	//×î´óĞĞÊıÉèÖÃ
+	//æœ€å¤§è¡Œæ•°è®¾ç½®
 	void SetMaxLines(long maxlines);
-	//»ñÈ¡×î´óĞĞÊı
+	//è·å–æœ€å¤§è¡Œæ•°
 	long GetMaxLines(){ return m_lMaxLines; }
 	void SetEditDefFormat();
 
 	// Generated message map functions
 protected:
-	//°ó¶¨¿Ø¼ş
+	//ç»‘å®šæ§ä»¶
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	//{{AFX_MSG(CRichEditEx)
 	// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG
-	//¸´ÖÆ
+	//å¤åˆ¶
 	afx_msg void OnCopy() { Copy(); }		
-	//¼ôÇĞ
+	//å‰ªåˆ‡
 	afx_msg void OnCut() { Cut(); }	
-	//Õ³Ìù
+	//ç²˜è´´
 	afx_msg void OnPaste() { Paste(); }	
-	//È«Ñ¡
+	//å…¨é€‰
 	afx_msg void OnSelectall() { SetSel(0, -1); }	
-	//³·Ïú
+	//æ’¤é”€
 	afx_msg void OnUndo() { Undo(); }
-	//Çå³ı
+	//æ¸…é™¤
 	afx_msg void OnClear() { Clear(); }		
-	//¸Ä±ä×ÖÌå
+	//æ”¹å˜å­—ä½“
 	afx_msg void OnSelectfont();					
-	//´´½¨
+	//åˆ›å»º
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	//²Ëµ¥ÏìÓ¦
+	//èœå•å“åº”
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint pos);
 
-	//Êı¾İ³ÉÔ±
+	//æ•°æ®æˆå‘˜
 protected:
-	long		m_lMaxLines;		//×î´óĞĞÊı
-	CHARFORMAT	m_cfCurrentFont;	//µ±Ç°×ÖÌå
+	long		m_lMaxLines;		//æœ€å¤§è¡Œæ•°
+	CHARFORMAT	m_cfCurrentFont;	//å½“å‰å­—ä½“
 
 	DECLARE_MESSAGE_MAP()
 };
