@@ -6,8 +6,15 @@
 IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
 local PY = IS_WINDOWS and "$(ProjectDir)../../tools/py.exe" or "python"
 
+-- header directory
+FS_HEADER_DIR = "../../base/base/"
+
 -- All libraries output directory
 FS_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
+
+-- root directory
+FS_ROOT_DIR = "../../"
+
 if IS_WINDOWS then
     FS_OUTPUT_DIR = FS_OUTPUT_BASE_DIR .. "/$(Configuration)"
 else
@@ -18,7 +25,7 @@ end
 -- Enable multithread compile
 function enable_multithread_comp()
     filter { "system:windows" }
-        flags { "MultiProcessorCompile", "NoMinimalRebuild" }
+        flags { "MultiProcessorCompile", "NoMinimalRebuild", "C++14" }
     filter {}
 end
 
@@ -48,30 +55,33 @@ end
 -- local ZLIB_LIB = "../../FS/3rd_party/zlib"
 -- #########################################################################
 
-workspace ("FS_" .. _ACTION)
+workspace ("Frightenstone_" .. _ACTION)
     -- location define
     location ("../../build/" .. _ACTION)
     -- target directory define
     targetdir (FS_OUTPUT_DIR)
 
-    -- configurations
-    configurations { "release32", "debug32", "release64", "debug64" }
+    -- configurations 默认64位 不输出32位
+    configurations {"Debug", "Release"}
 
-    -- architecture
-    filter { "configurations:*32" }
-        architecture "x86"
-    filter {}
-    filter { "configurations:*64" }
+    -- architecture 全部配置都生成64位程序
+    filter { "configurations:*" }
         architecture "x86_64"
     filter {}
 
     -- defines
-    filter { "configurations:debug*" }
+    filter { "configurations:Debug*" }
         defines {
             "DEBUG"
         }
     filter {}
-
+	
+    filter { "configurations:Release*" }
+        defines {
+            "NDEBUG"
+        }
+    filter {}
+	
     -- control symbols
     filter { "system:macosx", "language:c++" }
         symbols("On")
@@ -94,6 +104,9 @@ project "fsbase"
     language "c++"
     kind "SharedLib"
 
+    pchheader("stdafx.h")
+	pchsource(FS_HEADER_DIR .. "stdafx.cpp")
+	
     -- symbols
     symbols "On"
 
@@ -102,17 +115,18 @@ project "fsbase"
         "../../base/**.h",
 		"../../base/**.c",
 		"../../base/**.cpp",
-        "../../base/base/**.h",
-		"../../base/base/**.c",
-		"../../base/base/**.cpp",
-		"../../base/common/**.h",
-		"../../base/common/**.c",
-		"../../base/common/**.cpp",
-		"../../3rd/**.h",
-		"../../3rd/**.c",
-		"../../3rd/**.cpp",
+		"../../3rd/*.h",
+		"../../3rd/tiny-utf8/lib/*.cpp",
     }
 
+	filter{ "system:windows"}
+		defines { "FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL" }
+		libdirs { 
+			FS_ROOT_DIR .. "3rd/openssL/",
+			FS_ROOT_DIR .. "3rd/"
+		}
+	filter{}
+	
 	-- macos需要额外添加
     filter { "system:macosx" }
     files {
@@ -128,7 +142,7 @@ project "fsbase"
      }
 
     -- target prefix 前缀
-    targetprefix "fs"
+    targetprefix ""
 
     -- links
     filter { "system:linux" }
@@ -161,7 +175,7 @@ project "fsbase"
     set_optimize_opts()
 
     -- debug target suffix define
-    filter { "configurations:debug*" }
+    filter { "configurations:Debug*" }
         targetsuffix "_debug"
     filter {}
 
@@ -175,6 +189,10 @@ project "TestSuit"
     language "c++"
     kind "ConsoleApp"
 
+	-- precompile header
+	pchheader("stdafx.h")
+	pchsource(FS_ROOT_DIR .. "TestSuit/TestSuit/stdafx.cpp")
+	
     -- symbols
     symbols "On"
 

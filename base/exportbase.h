@@ -71,11 +71,11 @@
 
 #include <base/common/common.h>
 #ifndef FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-    #ifdef _DEBUG
-        #pragma comment(lib, "baseD.lib")
-    #else
-        #pragma comment(lib, "base.lib")
-    #endif
+//     #ifdef _DEBUG
+//         #pragma comment(lib, "baseD.lib")
+//     #else
+//         #pragma comment(lib, "base.lib")
+//     #endif
 #endif
 
 #endif
