@@ -9,7 +9,7 @@ clone_folder: c:\projects\frightenstone
 install:
     - cmd: >-
         git submodule update --init --recursive
-        echo vs2017 | call winsolution_build.bat 0
+        echo vs2017 | call winsolution_build.bat 1
         
 image: Visual Studio 2017
 configuration: 
@@ -28,7 +28,7 @@ for:
 
 build:
     verbosity: normal
-    project: build\vs2017\Frightenstone_vs2017.sln
+    project: .\build\vs2017\Frightenstone_vs2017.sln
     
 notifications:
 - provider: Email
