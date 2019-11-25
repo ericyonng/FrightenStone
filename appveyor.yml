@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 1.0.7.{build}
 max_jobs: 8
 branches:
     only:
@@ -9,7 +9,8 @@ clone_folder: c:\projects\frightenstone
 install:
     - cmd: >-
         git submodule update --init --recursive
-        echo vs2017 | call winsolution_build.bat 1
+        
+        echo vs2017 | call winsolution_build.bat 0
         
 image: Visual Studio 2017
 configuration: 
