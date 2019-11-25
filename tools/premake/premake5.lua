@@ -15,17 +15,22 @@ FS_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
 -- root directory
 FS_ROOT_DIR = "../../"
 
+FS_BASE_PROJ_NAME = "fsbase"
+
+FS_BUILD_DIR = "../../build/"
+
 if IS_WINDOWS then
     FS_OUTPUT_DIR = FS_OUTPUT_BASE_DIR .. "/$(Configuration)"
 else
     FS_OUTPUT_DIR = FS_OUTPUT_BASE_DIR .. "/$(config)"
 end
+-----------------------------------------------------------------------------------------------------------
 
 -- Common functional functions define
 -- Enable multithread compile
-function enable_multithread_comp()
+function enable_multithread_comp(cppstdver)
     filter { "system:windows" }
-        flags { "MultiProcessorCompile", "NoMinimalRebuild", "C++14" }
+        flags { "MultiProcessorCompile", "NoMinimalRebuild", cppstdver }
     filter {}
 end
 
@@ -57,7 +62,7 @@ end
 
 workspace ("Frightenstone_" .. _ACTION)
     -- location define
-    location ("../../build/" .. _ACTION)
+    location (FS_BUILD_DIR .. _ACTION)
     -- target directory define
     targetdir (FS_OUTPUT_DIR)
 
@@ -180,7 +185,7 @@ project "fsbase"
     filter {}
 
     -- enable multithread compile
-    enable_multithread_comp()
+    enable_multithread_comp("C++14")
 
 -- ****************************************************************************
 -- core library testsuite compile setting
@@ -268,4 +273,5 @@ project "TestSuit"
 
     -- optimize
     set_optimize_opts()
+	
 

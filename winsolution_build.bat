@@ -18,6 +18,7 @@ if errorlevel 1 (
 ) else (
     echo Succcess to generate Visual Studio solution and project files
     echo Solution file path: build/%choose%/fs_%choose%.sln
+	win_premake5.exe --file=fixcpp17_forwin.lua %choose%
    if "%1"=="" (
         explorer ..\..\build\%choose%
     )
@@ -25,3 +26,5 @@ if errorlevel 1 (
         explorer ..\..\build\%choose%
     )
 )
+
+pause
