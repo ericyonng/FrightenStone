@@ -30,14 +30,9 @@ if IS_WINDOWS then
 
 -- 开启c++17
 local solutionPath = FS_BUILD_DIR .. _ACTION .. "/" .. FS_BASE_PROJ_NAME .. ".vcxproj";
-print(solutionPath)
 local solutionFile = io.open(solutionPath, "r")
-print("1")
 local str = solutionFile:read("a")
-print("2")
-print(str)
 local finalProj = string.gsub(str, "stdcpp14", "stdcpp17")
-print(finalProj)
 solutionFile:close()
 solutionFile = io.open(solutionPath, "w")
 solutionFile:write(finalProj)
