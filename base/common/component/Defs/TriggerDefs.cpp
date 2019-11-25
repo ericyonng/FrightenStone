@@ -51,6 +51,12 @@ TriggerExecuteBody::~TriggerExecuteBody()
     Fs_SafeFree(_exec);
 }
 
+FS_String TriggerExecuteBody::ToString() const
+{
+    return FS_String().AppendFormat("_triggerType[%d] _execTimes[%d]",
+                                       _triggerType, _execTimes);
+}
+
 TriggerOccasion::TriggerOccasion(Trigger *trigger, Int32 occasion)
     :_trigger(trigger)
     , _occasion(occasion)
@@ -74,6 +80,22 @@ Int32 TriggerOccasion::Reg(Int32 triggerType, const IDelegate<Int32, TriggerExec
 
     TriggerExecuteBody *newBody = new TriggerExecuteBody(triggerType, execTimes);
     newBody->_exec = exec.CreateNewCopy();
+    _triggerTypeRefBodys.insert(std::make_pair(triggerType, newBody));
+
+    return StatusDefs::Success;
+}
+
+Int32 TriggerOccasion::Reg(Int32 triggerType, IDelegate<Int32, TriggerExecuteBody *> *exec, Int32 execTimes /*= 1*/)
+{
+    if(UNLIKELY(execTimes != TriggerDefs::Trig_Infinite && execTimes < 0))
+        return StatusDefs::ParamError;
+
+    auto iterTrigger = _triggerTypeRefBodys.find(triggerType);
+    if(UNLIKELY(iterTrigger != _triggerTypeRefBodys.end()))
+        return StatusDefs::Trigger_TriggerTypeRepeatInOccasion;
+
+    TriggerExecuteBody *newBody = new TriggerExecuteBody(triggerType, execTimes);
+    newBody->_exec = exec;
     _triggerTypeRefBodys.insert(std::make_pair(triggerType, newBody));
 
     return StatusDefs::Success;
@@ -130,10 +152,47 @@ bool TriggerOccasion::IsExist(Int32 triggerType) const
     return iterTrigger != _triggerTypeRefBodys.end();
 }
 
+FS_String TriggerOccasion::ToString() const
+{
+    FS_String info;
+    info.AppendFormat("TriggerOccasion _execOccasion[%d] info:\n", _occasion);
+    for(auto iterBody = _triggerTypeRefBodys.begin(); iterBody != _triggerTypeRefBodys.end(); ++iterBody)
+        info.AppendFormat("%s\n", iterBody->second->ToString().c_str());
+
+    return info;
+}
+
 std::map<Int32, TriggerExecuteBody *>::iterator TriggerOccasion::_Erase(const std::map<Int32, TriggerExecuteBody *>::iterator &iter)
 {
     FsSafeDelete(iter->second);
     return _triggerTypeRefBodys.erase(iter);
+}
+
+ITriggerOpInfo::ITriggerOpInfo()
+    :_opType(TriggerOpType::Invalid)
+{
+
+}
+
+RegTriggerInfo::RegTriggerInfo()
+    :_occasionType(0)
+    ,_triggerType(0)
+    ,_callback(NULL)
+    ,_execTimes(1)
+    ,_addType(TriggerDefs::AddIfExist)
+{
+    _opType = TriggerOpType::Reg;
+}
+
+RegTriggerInfo::~RegTriggerInfo()
+{
+    _callback = NULL;
+}
+
+EraseTriggerTypeInfo::EraseTriggerTypeInfo()
+    :_triggerType(0)
+{
+    _opType = TriggerOpType::Erase;
 }
 
 FS_NAMESPACE_END

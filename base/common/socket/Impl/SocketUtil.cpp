@@ -234,8 +234,9 @@ bool SocketUtil::FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, soc
 
 bool SocketUtil::GetAddrInfoFromNetInfo(const sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port)
 {
-    if(inet_ntop(addrObj.sin_family, &addrObj.sin_addr.s_addr, ip, szip) == NULL)
+    if(inet_ntop(addrObj.sin_family, const_cast<ULong *>(&addrObj.sin_addr.s_addr), ip, szip) == NULL)
         return false;
+
     port = ntohs(addrObj.sin_port);
 
     return true;

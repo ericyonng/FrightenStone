@@ -36,9 +36,9 @@
 
 #include <base/exportbase.h>
 #include "base/common/component/Defs/TriggerDefs.h"
-#include "base/common/basedefs/Macro/MacroDefs.h"
 #include<functional>
 #include "base/common/component/Impl/FS_Delegate.h"
+#include "base/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -56,23 +56,53 @@ public:
                 , Int32 triggerType
                 , const IDelegate<Int32, TriggerExecuteBody *> &exec // 外部请释放delegate，内部会创建delegate的副本
                 , Int32 execTimes = 1
-                , Int32 addType = TriggerDefs::AddIfExist); // 
+                , Int32 addType = TriggerDefs::AddIfExist); 
 
     Int32 Exec(Int32 occasion);
 
     void EraseAllTrigger(Int32 triggerType); // 
     void Clear();
     bool IsExist(Int32 occasionType, Int32 triggerType);
+    FS_String ToString() const;
 
 private:
     void _CancelTriggerTypeOccasionsRelevance(const std::set<Int32> &triggerTypes, Int32 occasion);
+    bool _IsExecing();
+    void _BeforeExec();
+    void _AfterExec();
+
+    void _DelayReg(Int32 occasion
+                   , Int32 triggerType
+                   , IDelegate<Int32, TriggerExecuteBody *> *exec // 外部请释放delegate，内部会创建delegate的副本
+                   , Int32 execTimes = 1
+                   , Int32 addType = TriggerDefs::AddIfExist);
+    // 外部请释放delegate，内部会创建delegate的副本
+    Int32 _Reg(Int32 occasion
+              , Int32 triggerType
+              , IDelegate<Int32, TriggerExecuteBody *> *exec // 外部请释放delegate，内部会创建delegate的副本
+              , Int32 execTimes = 1
+              , Int32 addType = TriggerDefs::AddIfExist);
+    void _DelayEraseAllTrigger(Int32 triggerType);
 
 private:
     friend class TriggerOccasion;
     std::map<Int32, TriggerOccasion *> _occasions;     // key:occationtype
     std::map<Int32, std::set<Int32>> _triggerTypeRefOccasions;        // key:triggerType, val:set(occations) 
     IDelegate<bool, Int32> *_canInterrupt;  // bool:return,Int32:thisOccation
+
+    std::list<ITriggerOpInfo *> _delayOp;
+    Int32 _isExecing;
 };
+
+inline bool Trigger::_IsExecing()
+{
+    return _isExecing > 0;
+}
+
+inline void Trigger::_BeforeExec()
+{
+    ++_isExecing;
+}
 
 FS_NAMESPACE_END
 
