@@ -249,7 +249,7 @@ void Trigger::_AfterExec()
 
 void Trigger::_DelayReg(Int32 occasion
                         , Int32 triggerType
-                        , IDelegate<Int32, TriggerExecuteBody *> *exec // Íâ²¿ÇëÊÍ·Ådelegate£¬ÄÚ²¿»á´´½¨delegateµÄ¸±±¾
+                        , IDelegate<Int32, TriggerExecuteBody *> *exec // å¤–éƒ¨è¯·é‡Šæ”¾delegateï¼Œå†…éƒ¨ä¼šåˆ›å»ºdelegateçš„å‰¯æœ¬
                         , Int32 execTimes
                         , Int32 addType)
 {
@@ -265,7 +265,7 @@ void Trigger::_DelayReg(Int32 occasion
 
 Int32 Trigger::_Reg(Int32 occasion
                    , Int32 triggerType
-                   , IDelegate<Int32, TriggerExecuteBody *> *exec /* Íâ²¿ÇëÊÍ·Ådelegate£¬ÄÚ²¿»á´´½¨delegateµÄ¸±±¾ */
+                   , IDelegate<Int32, TriggerExecuteBody *> *exec /* å¤–éƒ¨è¯·é‡Šæ”¾delegateï¼Œå†…éƒ¨ä¼šåˆ›å»ºdelegateçš„å‰¯æœ¬ */
                    , Int32 execTimes /*= 1 */
                    , Int32 addType /*= TriggerDefs::AddIfExist*/)
 {

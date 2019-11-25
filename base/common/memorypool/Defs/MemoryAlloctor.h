@@ -24,8 +24,8 @@
  * @file  : MemoryAlloctor.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/7/5
- * @brief : ĞèÒªµ¼³öÄÚ´æĞ¹Â©ÈÕÖ¾
- *          alloctor½á¹¹£º             | - block
+ * @brief : éœ€è¦å¯¼å‡ºå†…å­˜æ³„æ¼æ—¥å¿—
+ *          alloctorç»“æ„ï¼š             | - block
  *                          node    -  | - block
  *                                     | - ...
  *
@@ -35,9 +35,9 @@
  *                          freeList - | - block
  *                                     | - ...
  *
- *          alloc ÓÅÏÈ´Ó_lastDeletedÁ´±íÈ¡£¬ÄÚ´æ²»×ã´´½¨Ò»¸ö½Úµã
+ *          alloc ä¼˜å…ˆä»_lastDeletedé“¾è¡¨å–ï¼Œå†…å­˜ä¸è¶³åˆ›å»ºä¸€ä¸ªèŠ‚ç‚¹
  *          
- *          free Ê±½«block´®³ÉÁ´±í
+ *          free æ—¶å°†blockä¸²æˆé“¾è¡¨
  * 
  */
 #ifndef __Base_Common_MemoryPool_Defs_MemoryAlloctor_H__
@@ -57,7 +57,7 @@ struct MemBlocksNode;
 class MemoryBlock;
 class FS_String;
 
-// ÄÚ´æ·ÖÅäÆ÷»ùÀà
+// å†…å­˜åˆ†é…å™¨åŸºç±»
 class BASE_EXPORT IMemoryAlloctor
 {
     friend class MemoryPoolMgr;
@@ -66,7 +66,7 @@ public:
     virtual ~IMemoryAlloctor();
 
 public:
-    // ´ïµ½·ÖÅäÆ÷ËùÄÜ´ïµ½µÄ×î´ó·ÖÅäÈİÁ¿Ê±Ê¹ÓÃÏµÍ³·ÖÅä
+    // è¾¾åˆ°åˆ†é…å™¨æ‰€èƒ½è¾¾åˆ°çš„æœ€å¤§åˆ†é…å®¹é‡æ—¶ä½¿ç”¨ç³»ç»Ÿåˆ†é…
     void *MixAlloc(size_t bytes);
     template<typename ObjType>
     ObjType *MixAlloc(size_t bytes);
@@ -83,7 +83,7 @@ public:
     void PrintMemInfo() const;
     void MemInfoToString(FS_String &outStr) const;
 
-    // µ¥Ïß³Ì¿É²»ÓÃ£¬·Ç±ØÒª½Ó¿Ú
+    // å•çº¿ç¨‹å¯ä¸ç”¨ï¼Œéå¿…è¦æ¥å£
     void Lock();
     void Unlock();
 
@@ -97,24 +97,24 @@ protected:
 
 protected:
     std::atomic<bool>   _isFinish;
-    char                *_curBuf;               // Õû¸öÒÑÉêÇëµÄÄÚ´æµØÖ·
-    MemoryBlock         *_usableBlockHeader;    // ½áµã next·½ÏòÊÇ¿ÉÓÃµÄÎ´·ÖÅäµÄÄÚ´æ¿é£¬·ÖÅäÊ±ºò¸ø_usableBlockHeader½Úµã£¬ÊÍ·ÅÊ±ºòÒªÊÍ·ÅµÄ½Úµã²åÔÚ_usableBlockHeaderÖ®Ç°µ±×÷¿ÉÓÃ½ÚµãÍ·
-    MemoryBlock         *_lastDeleted;          // freeÁ´±í
-    std::atomic<Int64>   _memBlockInUse;         // ÕıÔÚÊ¹ÓÃµÄÄÚ´æ¿é¸öÊı
+    char                *_curBuf;               // æ•´ä¸ªå·²ç”³è¯·çš„å†…å­˜åœ°å€
+    MemoryBlock         *_usableBlockHeader;    // ç»“ç‚¹ nextæ–¹å‘æ˜¯å¯ç”¨çš„æœªåˆ†é…çš„å†…å­˜å—ï¼Œåˆ†é…æ—¶å€™ç»™_usableBlockHeaderèŠ‚ç‚¹ï¼Œé‡Šæ”¾æ—¶å€™è¦é‡Šæ”¾çš„èŠ‚ç‚¹æ’åœ¨_usableBlockHeaderä¹‹å‰å½“ä½œå¯ç”¨èŠ‚ç‚¹å¤´
+    MemoryBlock         *_lastDeleted;          // freeé“¾è¡¨
+    std::atomic<Int64>   _memBlockInUse;         // æ­£åœ¨ä½¿ç”¨çš„å†…å­˜å—ä¸ªæ•°
 
-    /* ÄÚ´æ½Úµã */
-    MemBlocksNode *_header;                 // Í·½Úµã
-    MemBlocksNode *_lastNode;               // µ±Ç°×îĞÂ½Úµã
-    std::atomic<Int64> _curNodeCnt;                      // ½Úµã¸öÊı
+    /* å†…å­˜èŠ‚ç‚¹ */
+    MemBlocksNode *_header;                 // å¤´èŠ‚ç‚¹
+    MemBlocksNode *_lastNode;               // å½“å‰æœ€æ–°èŠ‚ç‚¹
+    std::atomic<Int64> _curNodeCnt;                      // èŠ‚ç‚¹ä¸ªæ•°
 
-    // ×îĞÂµÄ½Úµã
-    size_t          _curBlockAmount;           // µ±Ç°¿é×ÜÊıÁ¿
-    size_t          _blockSize;             // ÄÚ´æ¿é´óĞ¡
-    size_t          _effectiveBlockSize;    // ÓĞĞ§ÄÚ´æ¿é´óĞ¡£¨¿Û³ıMemoryBlockµÄÄÚ´æ´óĞ¡£©
-    size_t          _totalOccupiedSize;     // ×ÜµÄÕ¼ÓÃÄÚ´æ×Ö½ÚÊı
-    size_t          _totalBlockAmount;      // ×ÜµÄ¿é×ÜÁ¿
+    // æœ€æ–°çš„èŠ‚ç‚¹
+    size_t          _curBlockAmount;           // å½“å‰å—æ€»æ•°é‡
+    size_t          _blockSize;             // å†…å­˜å—å¤§å°
+    size_t          _effectiveBlockSize;    // æœ‰æ•ˆå†…å­˜å—å¤§å°ï¼ˆæ‰£é™¤MemoryBlockçš„å†…å­˜å¤§å°ï¼‰
+    size_t          _totalOccupiedSize;     // æ€»çš„å ç”¨å†…å­˜å­—èŠ‚æ•°
+    size_t          _totalBlockAmount;      // æ€»çš„å—æ€»é‡
 
-    // ¶îÍâ·Ç±ØÒª²ÎÊı
+    // é¢å¤–éå¿…è¦å‚æ•°
     IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
     std::atomic<bool> *_canCreateNewNode;
     Locker _locker;

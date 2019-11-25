@@ -64,7 +64,7 @@ Int32 FS_Iocp::Create()
     if(_completionPort)
         return StatusDefs::Success;
 
-    // ´´½¨Íê³É¶Ë¿ÚIOCP NumberOfConcurrentThreads=0±íÊ¾Ä¬ÈÏcpuºËÊı
+    // åˆ›å»ºå®Œæˆç«¯å£IOCP NumberOfConcurrentThreads=0è¡¨ç¤ºé»˜è®¤cpuæ ¸æ•°
     _completionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
     if(!_completionPort)
     {
@@ -79,7 +79,7 @@ Int32 FS_Iocp::Create()
 
 void FS_Iocp::Destroy()
 {
-    // ¹Ø±ÕÍê³É¶Ë¿Ú
+    // å…³é—­å®Œæˆç«¯å£
     if(LIKELY(_completionPort))
         CloseHandle(_completionPort);
     _completionPort = NULL;
@@ -87,9 +87,9 @@ void FS_Iocp::Destroy()
 
 Int32 FS_Iocp::Reg(SOCKET sockfd)
 {
-    // ¹ØÁªIOCP Óë sockfd
-    // completionKey´«ÈëµÄÒ»¸öÊıÖµ£¬Íê³ÉÊ±»áÔ­Ñù´«»ØÀ´; NumberOfConcurrentThreadsÕâ¸ö²ÎÊıÔÚ¹ØÁªÍê³É¶Ë¿ÚÊ±±»ºöÂÔ
-    // completekey¿ÉÒÔÊÇ×Ô¶¨ÒåµÄ½á¹¹ÌåÖ¸Õë»òÕßÆäËûÊı¾İµÄÖ¸Õë£¬±ãÓÚ»ñÈ¡Íê³É×´Ì¬Ê±ºòÊ¶±ğ µ±´¦ÓÚ¹ØÁªÊ±numofthread»á±»ºöÂÔ
+    // å…³è”IOCP ä¸ sockfd
+    // completionKeyä¼ å…¥çš„ä¸€ä¸ªæ•°å€¼ï¼Œå®Œæˆæ—¶ä¼šåŸæ ·ä¼ å›æ¥; NumberOfConcurrentThreadsè¿™ä¸ªå‚æ•°åœ¨å…³è”å®Œæˆç«¯å£æ—¶è¢«å¿½ç•¥
+    // completekeyå¯ä»¥æ˜¯è‡ªå®šä¹‰çš„ç»“æ„ä½“æŒ‡é’ˆæˆ–è€…å…¶ä»–æ•°æ®çš„æŒ‡é’ˆï¼Œä¾¿äºè·å–å®ŒæˆçŠ¶æ€æ—¶å€™è¯†åˆ« å½“å¤„äºå…³è”æ—¶numofthreadä¼šè¢«å¿½ç•¥
     HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, ULONG_PTR(sockfd), 0);
     if(!ret)
     {
@@ -104,9 +104,9 @@ Int32 FS_Iocp::Reg(SOCKET sockfd)
 
 Int32 FS_Iocp::Reg(SOCKET sockfd, void *ptr)
 {
-    // ¹ØÁªIOCP Óë sockfd
-    // completionKey´«ÈëµÄÒ»¸öÊıÖµ£¬Íê³ÉÊ±»áÔ­Ñù´«»ØÀ´; NumberOfConcurrentThreadsÕâ¸ö²ÎÊıÔÚ¹ØÁªÍê³É¶Ë¿ÚÊ±±»ºöÂÔ
-    // completekey¿ÉÒÔÊÇ×Ô¶¨ÒåµÄ½á¹¹ÌåÖ¸Õë»òÕßÆäËûÊı¾İµÄÖ¸Õë£¬±ãÓÚ»ñÈ¡Íê³É×´Ì¬Ê±ºòÊ¶±ğ µ±´¦ÓÚ¹ØÁªÊ±numofthread»á±»ºöÂÔ
+    // å…³è”IOCP ä¸ sockfd
+    // completionKeyä¼ å…¥çš„ä¸€ä¸ªæ•°å€¼ï¼Œå®Œæˆæ—¶ä¼šåŸæ ·ä¼ å›æ¥; NumberOfConcurrentThreadsè¿™ä¸ªå‚æ•°åœ¨å…³è”å®Œæˆç«¯å£æ—¶è¢«å¿½ç•¥
+    // completekeyå¯ä»¥æ˜¯è‡ªå®šä¹‰çš„ç»“æ„ä½“æŒ‡é’ˆæˆ–è€…å…¶ä»–æ•°æ®çš„æŒ‡é’ˆï¼Œä¾¿äºè·å–å®ŒæˆçŠ¶æ€æ—¶å€™è¯†åˆ« å½“å¤„äºå…³è”æ—¶numofthreadä¼šè¢«å¿½ç•¥
     HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, ULONG_PTR(ptr), 0);
     if(!ret)
     {
@@ -121,9 +121,9 @@ Int32 FS_Iocp::Reg(SOCKET sockfd, void *ptr)
 
 Int32 FS_Iocp::Reg(SOCKET sockfd, UInt64 sessionId)
 {
-    // ¹ØÁªIOCP Óë sockfd
-// completionKey´«ÈëµÄÒ»¸öÊıÖµ£¬Íê³ÉÊ±»áÔ­Ñù´«»ØÀ´; NumberOfConcurrentThreadsÕâ¸ö²ÎÊıÔÚ¹ØÁªÍê³É¶Ë¿ÚÊ±±»ºöÂÔ
-// completekey¿ÉÒÔÊÇ×Ô¶¨ÒåµÄ½á¹¹ÌåÖ¸Õë»òÕßÆäËûÊı¾İµÄÖ¸Õë£¬±ãÓÚ»ñÈ¡Íê³É×´Ì¬Ê±ºòÊ¶±ğ µ±´¦ÓÚ¹ØÁªÊ±numofthread»á±»ºöÂÔ
+    // å…³è”IOCP ä¸ sockfd
+// completionKeyä¼ å…¥çš„ä¸€ä¸ªæ•°å€¼ï¼Œå®Œæˆæ—¶ä¼šåŸæ ·ä¼ å›æ¥; NumberOfConcurrentThreadsè¿™ä¸ªå‚æ•°åœ¨å…³è”å®Œæˆç«¯å£æ—¶è¢«å¿½ç•¥
+// completekeyå¯ä»¥æ˜¯è‡ªå®šä¹‰çš„ç»“æ„ä½“æŒ‡é’ˆæˆ–è€…å…¶ä»–æ•°æ®çš„æŒ‡é’ˆï¼Œä¾¿äºè·å–å®ŒæˆçŠ¶æ€æ—¶å€™è¯†åˆ« å½“å¤„äºå…³è”æ—¶numofthreadä¼šè¢«å¿½ç•¥
     HANDLE ret = CreateIoCompletionPort(reinterpret_cast<HANDLE>(sockfd), _completionPort, ULONG_PTR(sessionId), 0);
     if(!ret)
     {
@@ -154,7 +154,7 @@ Int32 FS_Iocp::LoadAcceptEx(SOCKET listenSocket)
         return StatusDefs::IOCP_LoadAcceptExError;
     }
 
-    // »ñÈ¡GetAcceptExSockAddrsº¯ÊıÖ¸Õë
+    // è·å–GetAcceptExSockAddrså‡½æ•°æŒ‡é’ˆ
     GUID GuidGetAcceptExSockAddrs = WSAID_GETACCEPTEXSOCKADDRS;
     if(WSAIoctl(
         listenSocket,
@@ -186,10 +186,10 @@ Int32 FS_Iocp::PostAccept(SOCKET listenSocket, IoDataBase *ioData)
                     , ioData->_sock
                     , ioData->_wsaBuff.buf
                     , 0
-                    , sizeof(sockaddr_in) + 16     // msdnÖ¸¶¨²ÎÊı
-                    , sizeof(sockaddr_in) + 16     // msdnÖ¸¶¨²ÎÊı
+                    , sizeof(sockaddr_in) + 16     // msdnæŒ‡å®šå‚æ•°
+                    , sizeof(sockaddr_in) + 16     // msdnæŒ‡å®šå‚æ•°
                     , NULL
-                    , &ioData->_overlapped)) // ÖØµşÌåµÄµØÖ·±ØĞëÊÇ×Ô¶¨Òå½á¹¹ÌåµÄ³õÊ¼Î»ÖÃ£¬±ØĞëÊÇ×Ô¶¨Òå½á¹¹ÌåµÄµÚÒ»¸ö³ÉÔ±¿ÉÒÔÊÇ×Ô¶¨ÒåµÄ½á¹¹Ìå
+                    , &ioData->_overlapped)) // é‡å ä½“çš„åœ°å€å¿…é¡»æ˜¯è‡ªå®šä¹‰ç»“æ„ä½“çš„åˆå§‹ä½ç½®ï¼Œå¿…é¡»æ˜¯è‡ªå®šä¹‰ç»“æ„ä½“çš„ç¬¬ä¸€ä¸ªæˆå‘˜å¯ä»¥æ˜¯è‡ªå®šä¹‰çš„ç»“æ„ä½“
     {
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
@@ -213,7 +213,7 @@ Int32 FS_Iocp::PostRecv(SOCKET targetSock, IoDataBase *ioData)
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
         {
-            // ¶Ô¶Ë¹Ø±Õ
+            // å¯¹ç«¯å…³é—­
             if(error == WSAECONNRESET)
             {
                 g_Log->net<FS_Iocp>("targetSock[%llu]An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
@@ -240,7 +240,7 @@ Int32 FS_Iocp::PostSend(SOCKET targetSock, IoDataBase *ioData)
         auto error = WSAGetLastError();
         if(error != ERROR_IO_PENDING)
         {
-            // ¶Ô¶Ë¹Ø±Õ
+            // å¯¹ç«¯å…³é—­
             if(error == WSAECONNRESET)
             {
                 g_Log->net<FS_Iocp>("targetSock[%llu] An existing connection was forcibly closed by the remote host. win error<%d> status<%d>"
@@ -270,11 +270,11 @@ Int32 FS_Iocp::PostQuit()
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // clientIdÎªÍê³É¼ü
+Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // clientIdä¸ºå®Œæˆé”®
 {
-    // »ñÈ¡Íê³É¶Ë¿Ú×´Ì¬
-    // ¹Ø¼üÔÚÓÚ completekey(¹ØÁªiocp¶Ë¿ÚÊ±ºò´«ÈëµÄ×Ô¶¨ÒåÍê³É¼ü)»áÔ­Ñù·µ»Ø
-    // ÒÔ¼°ÖØµş½á¹¹ioDataPtr ÓÃÓÚ»ñÈ¡Êı¾İÖØµş½á¹¹»áÔ­Ñù·µ»Ø
+    // è·å–å®Œæˆç«¯å£çŠ¶æ€
+    // å…³é”®åœ¨äº completekey(å…³è”iocpç«¯å£æ—¶å€™ä¼ å…¥çš„è‡ªå®šä¹‰å®Œæˆé”®)ä¼šåŸæ ·è¿”å›
+    // ä»¥åŠé‡å ç»“æ„ioDataPtr ç”¨äºè·å–æ•°æ®é‡å ç»“æ„ä¼šåŸæ ·è¿”å›
     ioEvent._bytesTrans = 0;
     ioEvent._ioData = NULL;
     ioEvent._data._sessionId = 0;
@@ -300,21 +300,21 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
                        , ioEvent._data._sessionId,ioEvent._bytesTrans, error, StatusDefs::IOCP_IODisconnect);
 //             g_Log->any<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
 //                                 , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
-            // ´ËÊ±ioeventµÄÊı¾İ±»ÕıÈ·µÄÌî³ä£¬Ö»ÊÇioEvent._bytesTrans<=0Õâ¸öÊÂ¼ş¿ÉÒÔÔÚrecvÊÂ¼ş×ö´¦Àí
+            // æ­¤æ—¶ioeventçš„æ•°æ®è¢«æ­£ç¡®çš„å¡«å……ï¼Œåªæ˜¯ioEvent._bytesTrans<=0è¿™ä¸ªäº‹ä»¶å¯ä»¥åœ¨recväº‹ä»¶åšå¤„ç†
             // closesocket(ioEvent._ioData->_sock);
             // return StatusDefs::IOCP_IODisconnect;
             return StatusDefs::Success;
         }
 
         if(ERROR_CONNECTION_ABORTED == error)
-        {// TODO:Õâ¸ö´íÎóÂëÒª²»Òª´¦Àí ±¾ÏµÍ³ÖÕÖ¹ÍøÂçÁ¬½Ó
+        {// TODO:è¿™ä¸ªé”™è¯¯ç è¦ä¸è¦å¤„ç† æœ¬ç³»ç»Ÿç»ˆæ­¢ç½‘ç»œè¿æ¥
             g_Log->net<FS_Iocp>("local system closesocket sessionId[%llu] bytesTrans<%lu>. WaitForMessage invalid client socket error<%d> status<%d>"
                               , ioEvent._data._sessionId, ioEvent._bytesTrans, error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
 
         if(ERROR_SEM_TIMEOUT == error)
-        {// TODO:Õâ¸ö´íÎóÂëÒª²»Òª´¦Àí Ñ¹Á¦¹ı´ó¿ÉÒÔÖØĞÂÍ¶µİÏàÓ¦µÄÊı¾İ
+        {// TODO:è¿™ä¸ªé”™è¯¯ç è¦ä¸è¦å¤„ç† å‹åŠ›è¿‡å¤§å¯ä»¥é‡æ–°æŠ•é€’ç›¸åº”çš„æ•°æ®
             g_Log->w<FS_Iocp>(_LOGFMT_("pressure is too large for this machine."
                                        " please improve machine performance or "
                                        "expand net card bandwidth error<%d> status<%d>"
@@ -327,7 +327,7 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
         }
 
         if(ERROR_OPERATION_ABORTED == error)
-        {// ÓÉÓÚÆäËûÔ­Òò»òÕßµ÷ÓÃCancelIo£¬CancelIoExµÈµ¼ÖÂio±»È¡Ïû ´ËÊ±bytestransferÎª0 ¿ÉÒÔ¶Ï¿ªsessionÁ¬½Ó
+        {// ç”±äºå…¶ä»–åŸå› æˆ–è€…è°ƒç”¨CancelIoï¼ŒCancelIoExç­‰å¯¼è‡´ioè¢«å–æ¶ˆ æ­¤æ—¶bytestransferä¸º0 å¯ä»¥æ–­å¼€sessionè¿æ¥
             g_Log->net<FS_Iocp>("windows error<%d> sessionId[%llu] bytesTrans[%lu] io data has be abort. check if invoke CancelIo or CancelIoEx, or other reason."
                               , error, ioEvent._data._sessionId, ioEvent._bytesTrans);
             return StatusDefs::Success;
@@ -350,18 +350,18 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
 
 void FS_Iocp::GetClientAddrInfo(void *wsaBuff, sockaddr_in *&clientAddr)
 {
-    // todo ĞèÒª²âÊÔ·µ»ØµÄclientAddrÊÇ·ñÊÇÏµÍ³ÄÚºË¶ÔÓ¦µÄ sockaddr_inĞÅÏ¢£¬»¹ÊÇËµ¿ÉÒÔÍâ²¿Ìá¹©Ò»¸ösockaddr_in¶ÔÏó´«Èë£¬È»ºóÏµÍ³È¥Ìî³ä
-    // ²âÊÔ·½·¨£º¿ÉÒÔÏÈ´«Èësockaddr_inµÄÊµÌå¶ÔÏó£¬ÅĞ¶ÏÊµÌå¶ÔÏó×îÖÕÓĞÃ»±»Ìî³ä£¬ÔÙ´«ÈëÒ»¸öÖ¸Õë£¬ÅĞ¶Ï¸ÃÖ¸ÕëÊÇ·ñÊÇÏµÍ³¶ÔÓ¦µÄwsabuffµÄÖ¸Õë
+    // todo éœ€è¦æµ‹è¯•è¿”å›çš„clientAddræ˜¯å¦æ˜¯ç³»ç»Ÿå†…æ ¸å¯¹åº”çš„ sockaddr_inä¿¡æ¯ï¼Œè¿˜æ˜¯è¯´å¯ä»¥å¤–éƒ¨æä¾›ä¸€ä¸ªsockaddr_inå¯¹è±¡ä¼ å…¥ï¼Œç„¶åç³»ç»Ÿå»å¡«å……
+    // æµ‹è¯•æ–¹æ³•ï¼šå¯ä»¥å…ˆä¼ å…¥sockaddr_inçš„å®ä½“å¯¹è±¡ï¼Œåˆ¤æ–­å®ä½“å¯¹è±¡æœ€ç»ˆæœ‰æ²¡è¢«å¡«å……ï¼Œå†ä¼ å…¥ä¸€ä¸ªæŒ‡é’ˆï¼Œåˆ¤æ–­è¯¥æŒ‡é’ˆæ˜¯å¦æ˜¯ç³»ç»Ÿå¯¹åº”çš„wsabuffçš„æŒ‡é’ˆ
     sockaddr_in *localAddr = NULL;
     Int32 localLen = sizeof(sockaddr_in);
     Int32 remoteLen = sizeof(sockaddr_in);
     _fnGetAcceptClientAddrIn(wsaBuff
                              , 0
-                             , sizeof(sockaddr_in) + 16     // msdnÖ¸¶¨²ÎÊı
-                             , sizeof(sockaddr_in) + 16     // msdnÖ¸¶¨²ÎÊı
-                             , (LPSOCKADDR *)(&localAddr)    // »ñÈ¡±¾µØµØÖ·
+                             , sizeof(sockaddr_in) + 16     // msdnæŒ‡å®šå‚æ•°
+                             , sizeof(sockaddr_in) + 16     // msdnæŒ‡å®šå‚æ•°
+                             , (LPSOCKADDR *)(&localAddr)    // è·å–æœ¬åœ°åœ°å€
                              , &localLen
-                             , (LPSOCKADDR *)(&clientAddr)   // »ñÈ¡Ô¶³Ì¿Í»§¶ËµØÖ·
+                             , (LPSOCKADDR *)(&clientAddr)   // è·å–è¿œç¨‹å®¢æˆ·ç«¯åœ°å€
                              , &remoteLen);
 }
 

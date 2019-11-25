@@ -43,9 +43,9 @@ class BASE_EXPORT SocketDefs
 public:
     enum SOCKET_CACHE_TYPE
     {
-        SOCKET_CACHE_TYPE_NONE = 0, //ÎŞĞ§
-        SOCKET_CACHE_TYPE_RECV,     // recv»º³åÇø
-        SOCKET_CACHE_TYPE_SEND,     // send»º³åÇø
+        SOCKET_CACHE_TYPE_NONE = 0, //æ— æ•ˆ
+        SOCKET_CACHE_TYPE_RECV,     // recvç¼“å†²åŒº
+        SOCKET_CACHE_TYPE_SEND,     // sendç¼“å†²åŒº
         SOCKET_CACHE_TYPE_END,
     };
 };
@@ -53,11 +53,11 @@ public:
 FS_NAMESPACE_END
 
 #ifndef INVALID_SOCKET_IDD
-#define INVALID_SOCKET_IDD  ~0ULL       // ÎŞĞ§Ì×½Ó×Ö
+#define INVALID_SOCKET_IDD  ~0ULL       // æ— æ•ˆå¥—æ¥å­—
 #endif
 
 #ifndef IS_VALID_SOCKET_IDD
-#define IS_VALID_SOCKET_IDD(x)  (((x)!=INVALID_SOCKET_IDD)&&((x)!=0))   // ÊÇ·ñÓĞĞ§µÄsocketIDD
+#define IS_VALID_SOCKET_IDD(x)  (((x)!=INVALID_SOCKET_IDD)&&((x)!=0))   // æ˜¯å¦æœ‰æ•ˆçš„socketIDD
 #endif
 
 #ifndef __FS_DATA_1KB__

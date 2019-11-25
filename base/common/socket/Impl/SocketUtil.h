@@ -56,13 +56,13 @@ public:
     static Int32 DestroySocket(MYSOCKET &socket);
     static Int32 DestroySocket2(MYSOCKET socket);
 
-    // »ñÈ¡¶ÔÏóµØÖ·ĞÅÏ¢ 0±íÊ¾³É¹¦ÆäËûÖµÎª´íÎóĞÅÏ¢ »ñÈ¡Ô¶³Ì¿Í»§¶ËµØÖ·ĞÅÏ¢ ĞèÒªÔÚaccept³É¹¦Íê³Éºó²Å¿ÉÒÔµ÷ÓÃ
+    // è·å–å¯¹è±¡åœ°å€ä¿¡æ¯ 0è¡¨ç¤ºæˆåŠŸå…¶ä»–å€¼ä¸ºé”™è¯¯ä¿¡æ¯ è·å–è¿œç¨‹å®¢æˆ·ç«¯åœ°å€ä¿¡æ¯ éœ€è¦åœ¨acceptæˆåŠŸå®Œæˆåæ‰å¯ä»¥è°ƒç”¨
     static Int32 GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError);
-    // ×ª»»ÎªÍøÂç×Ö½ÚĞò
+    // è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åº
     static bool FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, sockaddr_in &addrObj);
-    // ×ª»»ÎªÖ÷»úĞÅÏ¢
+    // è½¬æ¢ä¸ºä¸»æœºä¿¡æ¯
     static bool GetAddrInfoFromNetInfo(const sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port);
-    // Ì×½Ó×ÖµÈ´ı³¬Ê±
+    // å¥—æ¥å­—ç­‰å¾…è¶…æ—¶
     static bool IsDetectTimeOut(
         SOCKET &socket
         , fd_set &readableSet
@@ -77,10 +77,10 @@ public:
 
     static void Sleep(UInt64 milliSec, UInt64 microSec = 0);
 
-    // ÉèÖÃsocket»º³åÇø´óĞ¡
+    // è®¾ç½®socketç¼“å†²åŒºå¤§å°
     static Int32 SetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 cacheSize);
 
-    // »ñÈ¡socket»º³åÇø´óĞ¡
+    // è·å–socketç¼“å†²åŒºå¤§å°
     static Int32 GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 &cacheSize);
 
     static FS_String ToFmtSpeedPerSec(Int64 bytesps);

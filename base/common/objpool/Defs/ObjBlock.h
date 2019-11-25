@@ -47,9 +47,9 @@ public:
 
 public:
     bool _isInPool;
-    char _reserver1;     // 保留位，用于内存对齐
-    char _reserver2;     // 保留位，用于内存对齐
-    char _reserver3;     // 保留位，用于内存对齐
+    char _reserver1;     // 淇濈暀浣嶏紝鐢ㄤ簬鍐呭瓨瀵归綈
+    char _reserver2;     // 淇濈暀浣嶏紝鐢ㄤ簬鍐呭瓨瀵归綈
+    char _reserver3;     // 淇濈暀浣嶏紝鐢ㄤ簬鍐呭瓨瀵归綈
 };
 
 FS_NAMESPACE_END

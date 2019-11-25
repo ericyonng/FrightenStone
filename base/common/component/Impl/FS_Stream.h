@@ -42,9 +42,9 @@
 
 FS_NAMESPACE_BEGIN
 
-// ×Ö½ÚÁ÷Ğ´Èë¹æÔò£ºÏÈĞ´Èëuint32µÄÊı¾İ³¤¶È£¬ÔÙĞ´ÈëÊı¾İ
-// ×Ö½ÚÁ÷¶ÁÈ¡¹æÔò£ºÏÈ¶ÁÈ¡uint32µÄÊı¾İ³¤¶È£¬ÔÙ¶ÁÈ¡Êı¾İ
-// ÈôÊÇÓÉÄÚ´æ³Ø´´½¨µÄ»º³åÇø£¬ÔÚĞ´ÈëÊ±Ö§³Ö»º³åÇø×ÔÔö³¤
+// å­—èŠ‚æµå†™å…¥è§„åˆ™ï¼šå…ˆå†™å…¥uint32çš„æ•°æ®é•¿åº¦ï¼Œå†å†™å…¥æ•°æ®
+// å­—èŠ‚æµè¯»å–è§„åˆ™ï¼šå…ˆè¯»å–uint32çš„æ•°æ®é•¿åº¦ï¼Œå†è¯»å–æ•°æ®
+// è‹¥æ˜¯ç”±å†…å­˜æ± åˆ›å»ºçš„ç¼“å†²åŒºï¼Œåœ¨å†™å…¥æ—¶æ”¯æŒç¼“å†²åŒºè‡ªå¢é•¿
 class BASE_EXPORT FS_Stream
 {
     OBJ_POOL_CREATE_DEF(FS_Stream);
@@ -55,17 +55,17 @@ public:
     virtual ~FS_Stream();
     virtual void Release();
 
-    /* ¸¨Öú */
+    /* è¾…åŠ© */
     #pragma region assist
     /*
     *   brief:
-    *       1. - GetDataAddr »ñÈ¡Êı¾İ»º³åÇø±äÁ¿µÄµØÖ·£¨ÓÉÓÚÊı¾İ»º³åÇø»á×Ô¶¯À©Õ¹¿Õ¼äËùÒÔĞèÒªÈ¡µÃ¿Õ¼äËùÔÚµØÖ·£©
-    *       2. - GetWrLength ÒÑĞ´ÈëÊı¾İ»º³åÇøµÄ³¤¶È
-    *       3. - CanRead »¹ÄÜ¶Á³ölen×Ö½ÚµÄÊı¾İÂğ?
-    *       4. - CanWrite »¹ÄÜĞ´Èëlen×Ö½ÚµÄÊı¾İÂğ?
-    *       5. - OffsetWrLenOnWrChange ÒÑĞ´ÈëÎ»ÖÃ£¬Ğ´ÈëÎ»ÖÃ_writePos Æ«ÒÆlen×Ö½Ú³¤¶È
-    *       6. - OffsetOnReadChange ÒÑ¶ÁÈ¡Î»ÖÃ£¬¶ÁÈ¡Î»ÖÃ _readPos Æ«ÒÆlen×Ö½Ú³¤¶È
-    *       7. - SetWritePos ÉèÖÃĞ´ÈëÎ»ÖÃ_writePos
+    *       1. - GetDataAddr è·å–æ•°æ®ç¼“å†²åŒºå˜é‡çš„åœ°å€ï¼ˆç”±äºæ•°æ®ç¼“å†²åŒºä¼šè‡ªåŠ¨æ‰©å±•ç©ºé—´æ‰€ä»¥éœ€è¦å–å¾—ç©ºé—´æ‰€åœ¨åœ°å€ï¼‰
+    *       2. - GetWrLength å·²å†™å…¥æ•°æ®ç¼“å†²åŒºçš„é•¿åº¦
+    *       3. - CanRead è¿˜èƒ½è¯»å‡ºlenå­—èŠ‚çš„æ•°æ®å—?
+    *       4. - CanWrite è¿˜èƒ½å†™å…¥lenå­—èŠ‚çš„æ•°æ®å—?
+    *       5. - OffsetWrLenOnWrChange å·²å†™å…¥ä½ç½®ï¼Œå†™å…¥ä½ç½®_writePos åç§»lenå­—èŠ‚é•¿åº¦
+    *       6. - OffsetOnReadChange å·²è¯»å–ä½ç½®ï¼Œè¯»å–ä½ç½® _readPos åç§»lenå­—èŠ‚é•¿åº¦
+    *       7. - SetWritePos è®¾ç½®å†™å…¥ä½ç½®_writePos
     */
 public:
     char **GetDataAddr();
@@ -80,18 +80,18 @@ public:
     template<typename StreamObjType>
     const StreamObjType *CastTo() const;
 
-    // ĞòÁĞ»¯·´ĞòÁĞ»¯£¨ObjType ±ØĞëÓĞbool SerializeTo(FS_Stream *) const, bool DeserializeFrom(FS_Stream *)½Ó¿Ú£©
+    // åºåˆ—åŒ–ååºåˆ—åŒ–ï¼ˆObjType å¿…é¡»æœ‰bool SerializeTo(FS_Stream *) const, bool DeserializeFrom(FS_Stream *)æ¥å£ï¼‰
     template<typename ObjType>
     bool SerializeFrom(const ObjType &obj);
     template<typename ObjType>
     bool DeserializeTo(ObjType &obj);
 
-    // ×Ö½ÚÁ÷ĞòÁĞ»¯·´ĞòÁĞ»¯
+    // å­—èŠ‚æµåºåˆ—åŒ–ååºåˆ—åŒ–
     bool SerializeTo(FS_String &str) const;
     bool DeserializeFrom(const FS_String &str);
     #pragma endregion
 
-    /* ¶Á×Ö½ÚÁ÷ */
+    /* è¯»å­—èŠ‚æµ */
     #pragma region Read
 public:
     template<typename ObjType>
@@ -115,7 +115,7 @@ public:
     bool ReadString(FS_String &str);
     #pragma endregion
 
-    /* Ğ´×Ö½ÚÁ÷ */
+    /* å†™å­—èŠ‚æµ */
     #pragma region Write
 public:
     template<typename ObjType>
@@ -135,16 +135,16 @@ private:
     void _Clear();
 
 private:
-    // »º³åÇø×ÜµÄ¿Õ¼ä´óĞ¡£¬×Ö½Ú³¤¶È
+    // ç¼“å†²åŒºæ€»çš„ç©ºé—´å¤§å°ï¼Œå­—èŠ‚é•¿åº¦
     Int32 _size = 0;
-    // ÒÑĞ´ÈëÊı¾İµÄÎ²²¿Î»ÖÃ£¬ÒÑĞ´ÈëÊı¾İ³¤¶È
+    // å·²å†™å…¥æ•°æ®çš„å°¾éƒ¨ä½ç½®ï¼Œå·²å†™å…¥æ•°æ®é•¿åº¦
     Int32 _writePos = 0;
-    // ÒÑ¶ÁÈ¡Êı¾İµÄÎ²²¿Î»ÖÃ
+    // å·²è¯»å–æ•°æ®çš„å°¾éƒ¨ä½ç½®
     Int32 _readPos = 0;
-    // _buffÊÇÍâ²¿´«ÈëµÄÊı¾İ¿éÊ±ÊÇ·ñÓ¦¸Ã±»ÊÍ·Å
+    // _buffæ˜¯å¤–éƒ¨ä¼ å…¥çš„æ•°æ®å—æ—¶æ˜¯å¦åº”è¯¥è¢«é‡Šæ”¾
     bool _needDelete = true;
     bool _isPoolCreate = false;
-    // Êı¾İ»º³åÇø
+    // æ•°æ®ç¼“å†²åŒº
     char *_buff = NULL;
 };
 

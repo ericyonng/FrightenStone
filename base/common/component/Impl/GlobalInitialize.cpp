@@ -57,10 +57,10 @@ Int32 GlobalInitialize::Init()
     // TODO:some init ...
     Int32 ret = StatusDefs::Success;
 
-    // ÖÇÄÜ±äÁ¿ÔËĞĞÆÚÀàĞÍÊ¶±ğ
+    // æ™ºèƒ½å˜é‡è¿è¡ŒæœŸç±»å‹è¯†åˆ«
     SmartVarRtti::InitRttiTypeNames();
 
-    // socket»·¾³ ½ø³ÌÖĞÎ¨Ò»
+    // socketç¯å¢ƒ è¿›ç¨‹ä¸­å”¯ä¸€
     ret = SocketUtil::InitSocketEnv();
     if(ret != StatusDefs::Success)
     {

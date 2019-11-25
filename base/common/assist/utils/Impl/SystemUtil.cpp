@@ -47,28 +47,28 @@
 #pragma endregion
 
 #pragma region defines
-// »ñÈ¡ÄÚ´æ×´Ì¬º¯Êıº¯ÊıÔ­ĞÍÖ¸Õë
+// è·å–å†…å­˜çŠ¶æ€å‡½æ•°å‡½æ•°åŸå‹æŒ‡é’ˆ
 // typedef   void(WINAPI *__GlobalMemoryStatusExFunc)(LPMEMORYSTATUSEX);
 
 static Int32 GetMemoryStatus(MEMORYSTATUSEX &status)
 {
-    // ÔØÈë¶¯Ì¬Á´½Ó¿âkernel32.dll£¬·µ»ØËüµÄ¾ä±ú
+    // è½½å…¥åŠ¨æ€é“¾æ¥åº“kernel32.dllï¼Œè¿”å›å®ƒçš„å¥æŸ„
 //     HMODULE hModule;
 //     hModule = LoadLibrary("kernel32.dll");
 //     if(UNLIKELY(!hModule))
 //         return StatusDefs::SystemUtil_GetKernel32HandleFailed;
 
-    // ÔÚkernel32.dll¾ä±úÀï²éÕÒGlobalMemoryStatusExº¯Êı£¬»ñÈ¡º¯ÊıÖ¸Õë
+    // åœ¨kernel32.dllå¥æŸ„é‡ŒæŸ¥æ‰¾GlobalMemoryStatusExå‡½æ•°ï¼Œè·å–å‡½æ•°æŒ‡é’ˆ
 //     __GlobalMemoryStatusExFunc globalMemoryStatusEx = (__GlobalMemoryStatusExFunc)GetProcAddress(hModule, "GlobalMemoryStatusEx");
 //     if(UNLIKELY(!globalMemoryStatusEx))
 //         return StatusDefs::SystemUtil_GetGlobalMemoryStatusExFuncFailed;
 
 //      globalMemoryStatusEx(&status);
 // 
-//     // ÊÍ·ÅÁ´½Ó¿â¾ä±ú
+//     // é‡Šæ”¾é“¾æ¥åº“å¥æŸ„
 //     FreeLibrary(hModule);
 
-    // µ÷ÓÃº¯ÊıÈ¡µÃÏµÍ³µÄÄÚ´æÇé¿ö
+    // è°ƒç”¨å‡½æ•°å–å¾—ç³»ç»Ÿçš„å†…å­˜æƒ…å†µ
     status.dwLength = sizeof(status);
     if(!GlobalMemoryStatusEx(&status))
         return StatusDefs::SystemUtil_GetGlobalMemoryStatusExFailed;
@@ -82,8 +82,8 @@ FS_NAMESPACE_BEGIN
 #pragma region windowsdefines
 typedef struct
 {
-    HWND    hwndWindow;     // ´°¿Ú¾ä±ú
-    DWORD   dwProcessID;    // ½ø³ÌID
+    HWND    hwndWindow;     // çª—å£å¥æŸ„
+    DWORD   dwProcessID;    // è¿›ç¨‹ID
 }EnumWindowsArg;
 #pragma endregion
 
@@ -116,7 +116,7 @@ ULong SystemUtil::GetMemoryLoad()
 
     return status.dwMemoryLoad;
 }
-// ½ø³ÌÕ¼ÓÃÄÚ´æĞÅÏ¢
+// è¿›ç¨‹å ç”¨å†…å­˜ä¿¡æ¯
 bool SystemUtil::GetProcessMemInfo(HANDLE processHandle, ProcessMemInfo &info)
 {
     PROCESS_MEMORY_COUNTERS_EX processInfo = {};
@@ -145,7 +145,7 @@ Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, 
         if(UNLIKELY(!isCurrentProcess && !pid))
             return StatusDefs::ParamError;
 
-        // ÈôÊÇµ±Ç°½ø³Ì
+        // è‹¥æ˜¯å½“å‰è¿›ç¨‹
         Byte8   pathName[MAX_PATH] = {0};
         if(isCurrentProcess)
         {
@@ -164,7 +164,7 @@ Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, 
         if(UNLIKELY(!hModule))
             return StatusDefs::SystemUtil_LoadKernel32LibraryFailed;
 
-        // »ñÈ¡QueryFullProcessImageNameAº¯Êı
+        // è·å–QueryFullProcessImageNameAå‡½æ•°
         if(GetProcAddress(hModule, "QueryFullProcessImageNameA"))
         {
             DWORD dwProcPathLen = MAX_PATH / sizeof(Byte8);
@@ -175,18 +175,18 @@ Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, 
             break;
         }
 
-        // »ñÈ¡½ø³Ì´øÇı¶¯Æ÷ÃûµÄÂ·¾¶£¨Çı¶¯Æ÷Ãû£º\\Device\\HardwareVolume1£©
+        // è·å–è¿›ç¨‹å¸¦é©±åŠ¨å™¨åçš„è·¯å¾„ï¼ˆé©±åŠ¨å™¨åï¼š\\Device\\HardwareVolume1ï¼‰
         if(!GetProcessImageFileName(hProc, pathName, MAX_PATH))
             return StatusDefs::SystemUtil_GetProcessImageFileNameFailed;
 
-        // ±éÀúÈ·ÈÏÇı¶¯Æ÷Ãû¶ÔÓ¦µÄÅÌ·ûÃû
+        // éå†ç¡®è®¤é©±åŠ¨å™¨åå¯¹åº”çš„ç›˜ç¬¦å
         Byte8   volNameDev[MAX_PATH] = {0};
         Byte8   volName[MAX_PATH] = {0};
         _tcscat_s(volName, MAX_PATH, TEXT("A:"));
         bool isFound = false;
         for(; *volName <= _T('Z'); (*volName)++)
         {
-            // »ñÈ¡ÅÌ·û
+            // è·å–ç›˜ç¬¦
             if(!QueryDosDevice(volName, volNameDev, MAX_PATH))
             {
                 auto lastError = GetLastError();
@@ -196,7 +196,7 @@ Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, 
                 return StatusDefs::SystemUtil_QueryDosDeviceError;
             }
 
-            // È·ÈÏÊÇ·ñÇı¶¯Æ÷ÃûÒ»Ñù
+            // ç¡®è®¤æ˜¯å¦é©±åŠ¨å™¨åä¸€æ ·
             if(_tcsncmp(pathName, volNameDev, _tcslen(volNameDev)) == 0)
             {
                 isFound = true;
@@ -249,17 +249,17 @@ static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     auto *pArg = (EnumWindowsArg *)lParam;
 
-    // Í¨¹ı´°¿Ú¾ä±úÈ¡µÃ½ø³ÌID
+    // é€šè¿‡çª—å£å¥æŸ„å–å¾—è¿›ç¨‹ID
     DWORD  dwProcessID = 0;
     ::GetWindowThreadProcessId(hwnd, &dwProcessID);
     if(dwProcessID == pArg->dwProcessID)
     {
         pArg->hwndWindow = hwnd;
-        // ÕÒµ½ÁË·µ»ØFALSE
+        // æ‰¾åˆ°äº†è¿”å›FALSE
         return false;
     }
 
-    // Ã»ÕÒµ½£¬¼ÌĞøÕÒ£¬·µ»ØTRUE
+    // æ²¡æ‰¾åˆ°ï¼Œç»§ç»­æ‰¾ï¼Œè¿”å›TRUE
     return true;
 }
 
@@ -285,7 +285,7 @@ void SystemUtil::BringWindowsToTop(HWND curWin)
 
 bool SystemUtil::IsProcessExist(const FS_String &processName)
 {
-    // ±éÀú½ø³Ì
+    // éå†è¿›ç¨‹
     auto hProcModule = CreateProcessSnapshot();
     auto pid = GetFirstProcessPid(hProcModule);
     bool isFirst = true;
@@ -305,7 +305,7 @@ bool SystemUtil::IsProcessExist(const FS_String &processName)
     return false;
 }
 
-// µ¯´°
+// å¼¹çª—
 void SystemUtil::MessageBoxPopup(const FS_String &title, const FS_String &content)
 {
 #ifdef _WIN32
@@ -376,7 +376,7 @@ Int32 SystemUtil::GetCurProcessId()
     return _getpid();
 }
 
-// »ñÈ¡½ø³Ì¾ä±ú
+// è·å–è¿›ç¨‹å¥æŸ„
 HANDLE SystemUtil::GetCurProcessHandle()
 {
     return ::GetCurrentProcess();

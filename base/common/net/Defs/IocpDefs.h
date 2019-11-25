@@ -39,16 +39,16 @@
 #include "base/common/memorypool/memorypool.h"
 
 #pragma region IOCP macro
-#define IO_DATA_BUFF_SIZE 1024          // ioÊı¾İ»º³å´óĞ¡
+#define IO_DATA_BUFF_SIZE 1024          // ioæ•°æ®ç¼“å†²å¤§å°
 #pragma endregion
 
 FS_NAMESPACE_BEGIN
 
-/* iocpÈô¸É¶¨ÒåÀàĞÍ */
+/* iocpè‹¥å¹²å®šä¹‰ç±»å‹ */
 class BASE_EXPORT IocpDefs
 {
 public:
-    /* IO²Ù×÷ÀàĞÍ */
+    /* IOæ“ä½œç±»å‹ */
     enum IO_TYPE:Int32
     {
         IO_ACCEPT = 10,
@@ -58,11 +58,11 @@ public:
 
     enum 
     {
-        IO_QUIT = -1,           // ÍË³öĞÅºÅ
+        IO_QUIT = -1,           // é€€å‡ºä¿¡å·
     };
 };
 
-/* packet½Úµã */
+/* packetèŠ‚ç‚¹ */
 class BASE_EXPORT IFS_Buffer;
 struct BASE_EXPORT BufferQueueNode
 {
@@ -82,21 +82,21 @@ public:
     IoDataBase():_node(NULL){}
     ~IoDataBase();
 
-    // ÖØµşÌå
-    OVERLAPPED _overlapped{0};          // Ê¹ÓÃÖØµşÌå¿ÉÒÔ¹ØÁªµ½iodatabase,ÔÚÍ¶µİacceptÊ±ºò´«Èë
+    // é‡å ä½“
+    OVERLAPPED _overlapped{0};          // ä½¿ç”¨é‡å ä½“å¯ä»¥å…³è”åˆ°iodatabase,åœ¨æŠ•é€’acceptæ—¶å€™ä¼ å…¥
     Int32 _ioType = 0;
-    UInt64 _sessionId = 0;                   // »á»°Î¨Ò»id
+    UInt64 _sessionId = 0;                   // ä¼šè¯å”¯ä¸€id
     SOCKET _sock = INVALID_SOCKET;
     union
     {
-        BufferQueueNode *_node;         // packetËùÔÚµÄ¶ÓÁĞ½Úµã
+        BufferQueueNode *_node;         // packetæ‰€åœ¨çš„é˜Ÿåˆ—èŠ‚ç‚¹
     };
-    IDelegate<void, size_t> *_callback = NULL; // Íê³ÉÊ±µÄ»Øµ÷
+    IDelegate<void, size_t> *_callback = NULL; // å®Œæˆæ—¶çš„å›è°ƒ
 
-    // Ã»±ØÒªÃ¿¸ö¿Í»§¶ËÖ¸¶¨Ò»¸ö»º³å£¬Ì«´óÁË£¬
-    // ÒòÎªiocpÈ¡Êı¾İ Ê±ºòÊı¾İÊÇ´Ó¶ÓÁĞÖĞÏÈ½øÏÈ³öµÄ·½Ê½±»¿½±´³öÀ´£¬
-    // Ã¿¸öiocpÖĞµÄÏß³ÌÊÇ»¥³âµÄÖ´ĞĞµÄ
-    WSABUF _wsaBuff{0};                 // Êı¾İ»º³å½á¹¹
+    // æ²¡å¿…è¦æ¯ä¸ªå®¢æˆ·ç«¯æŒ‡å®šä¸€ä¸ªç¼“å†²ï¼Œå¤ªå¤§äº†ï¼Œ
+    // å› ä¸ºiocpå–æ•°æ® æ—¶å€™æ•°æ®æ˜¯ä»é˜Ÿåˆ—ä¸­å…ˆè¿›å…ˆå‡ºçš„æ–¹å¼è¢«æ‹·è´å‡ºæ¥ï¼Œ
+    // æ¯ä¸ªiocpä¸­çš„çº¿ç¨‹æ˜¯äº’æ–¥çš„æ‰§è¡Œçš„
+    WSABUF _wsaBuff{0};                 // æ•°æ®ç¼“å†²ç»“æ„
     // char _buff[IO_DATA_BUFF_SIZE]{0};           
     // Int32 _length = 0;
 };
@@ -108,14 +108,14 @@ struct BASE_EXPORT IO_EVENT
     IO_EVENT();
     union
     {
-        void *_ptr;                             // ´«Èë×Ô¶¨ÒåÊı¾İ,°ó¶¨Íê³É¶Ë¿ÚÊ±
-        UInt64 _sessionId;                      // ´«ÈësessionÎ¨Ò»id
-        SOCKET _socket;                         // Ì×½Ó×Ö
-        Int64 _code;                            // ×´Ì¬Âë
-    }_data;   // °ó¶¨Íê³É¶Ë¿ÚÊ±£¬°ó¶¨µÄÍê³É¼ü£¬ÔÚÍê³ÉÊ±»á»Ø´«£¬½¨Òé»Ø´«sessionId,ÓÃÓÚÅĞ¶Ï¿Í»§¶ËÊÇ·ñ´æÔÚ
-    IoDataBase *_ioData = NULL;               // ÖØµşÌå×Ô¶¨ÒåµÄÊı¾İ
-    // SOCKET _socket = INVALID_SOCKET;            // completionkey·µ»ØµÄsocket socketÔÚ¿Í»§¶Ë¶Ï¿ªºó»á±»¸´ÓÃ
-    ULong _bytesTrans = 0;                      // ´«ÊäµÄ×Ö½ÚÊı
+        void *_ptr;                             // ä¼ å…¥è‡ªå®šä¹‰æ•°æ®,ç»‘å®šå®Œæˆç«¯å£æ—¶
+        UInt64 _sessionId;                      // ä¼ å…¥sessionå”¯ä¸€id
+        SOCKET _socket;                         // å¥—æ¥å­—
+        Int64 _code;                            // çŠ¶æ€ç 
+    }_data;   // ç»‘å®šå®Œæˆç«¯å£æ—¶ï¼Œç»‘å®šçš„å®Œæˆé”®ï¼Œåœ¨å®Œæˆæ—¶ä¼šå›ä¼ ï¼Œå»ºè®®å›ä¼ sessionId,ç”¨äºåˆ¤æ–­å®¢æˆ·ç«¯æ˜¯å¦å­˜åœ¨
+    IoDataBase *_ioData = NULL;               // é‡å ä½“è‡ªå®šä¹‰çš„æ•°æ®
+    // SOCKET _socket = INVALID_SOCKET;            // completionkeyè¿”å›çš„socket socketåœ¨å®¢æˆ·ç«¯æ–­å¼€åä¼šè¢«å¤ç”¨
+    ULong _bytesTrans = 0;                      // ä¼ è¾“çš„å­—èŠ‚æ•°
 };
 
 

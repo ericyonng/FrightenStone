@@ -24,9 +24,9 @@
  * @file  : FS_Timer.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/06/08
- * @brief : 1. ÏÈÉèÖÃÊ±¼äÂÖÅÌ
- *          2. ÉèÖÃ³¬Ê±»òÕßcancelÖ´ĞĞº¯Êı
- *          3. ÉèÖÃ³¬Ê±ÖÜÆÚ
+ * @brief : 1. å…ˆè®¾ç½®æ—¶é—´è½®ç›˜
+ *          2. è®¾ç½®è¶…æ—¶æˆ–è€…cancelæ‰§è¡Œå‡½æ•°
+ *          3. è®¾ç½®è¶…æ—¶å‘¨æœŸ
  * 
  */
 #ifndef __Base_Common_Component_Impl_TimeWheel_FS_Timer_H__
@@ -45,30 +45,30 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT FS_Timer
 {
 public:
-    // Ä¬ÈÏÊ¹ÓÃµÄÊ±¼äÂÖÅÌ¶ÔÏóÊÇg_BusinessTimeWheel Èôg_BusinessTimeWheelÎªNULL Ê¹ÓÃµÄÊÇg_TimeWheel
+    // é»˜è®¤ä½¿ç”¨çš„æ—¶é—´è½®ç›˜å¯¹è±¡æ˜¯g_BusinessTimeWheel è‹¥g_BusinessTimeWheelä¸ºNULL ä½¿ç”¨çš„æ˜¯g_TimeWheel
     FS_Timer(TimeWheel *timeWheel = g_BusinessTimeWheel);
     virtual ~FS_Timer();
 
 public:
-    // È¡Ïû
+    // å–æ¶ˆ
     void Cancel();
-    // ÉèÖÃÊ±¼äÂÖÅÌ
+    // è®¾ç½®æ—¶é—´è½®ç›˜
     // void SetTimeWheel(TimeWheel *timeWheel);
-    // ÒÔµ±Ç°Ê±¼äÎª»ù×¼£¬ÉèÖÃ³¬Ê±ÖÜÆÚ
+    // ä»¥å½“å‰æ—¶é—´ä¸ºåŸºå‡†ï¼Œè®¾ç½®è¶…æ—¶å‘¨æœŸ
     Int32 Schedule(Int64 milliSecPeriod);
     Int32 Schedule(const Time &startTime, Int64 milliSecPeriod);
     bool IsScheduling() const;
 
-    // ÉèÖÃ³¬Ê±Ö´ĞĞº¯Êı
+    // è®¾ç½®è¶…æ—¶æ‰§è¡Œå‡½æ•°
     template<typename ObjType>
     void SetTimeOutHandler(ObjType *objType, void (ObjType::*handler)(FS_Timer *, const Time &, const Time &));
     void SetTimeOutHandler(void(*handler)(FS_Timer *, const Time &, const Time &));
-    // ÉèÖÃcancelÖ´ĞĞº¯Êı
+    // è®¾ç½®cancelæ‰§è¡Œå‡½æ•°
     template<typename ObjType>
     void SetCancelHandler(ObjType *objType, void (ObjType::*handler)(FS_Timer *));
     void SetCancelHandler(void(*handler)(FS_Timer *));
 
-    // ÓÉtimewheelµ÷ÓÃ³¬Ê±
+    // ç”±timewheelè°ƒç”¨è¶…æ—¶
     void OnTimeOut(const Time &curWheelTIme);
 
     FS_String ToString() const;
@@ -77,10 +77,10 @@ private:
     Time _lastTimeOutTime;
     TimeWheel *_timeWheel;
     TimeData *_timeData;
-    TimeSlice _periodCache;     // scheduleÊ±Ê¹ÓÃµÄÖÜÆÚ»º³å
-    // ³¬Ê±Î¯ÍĞ param1:·µ»ØÖµ, param2:FS_Timer, param3:lastWheelTime, param4:curTime
+    TimeSlice _periodCache;     // scheduleæ—¶ä½¿ç”¨çš„å‘¨æœŸç¼“å†²
+    // è¶…æ—¶å§”æ‰˜ param1:è¿”å›å€¼, param2:FS_Timer, param3:lastWheelTime, param4:curTime
     IDelegate<void, FS_Timer *, const Time &, const Time &> *_timeOutDelegate;
-    // ×¢ÏúÎ¯ÍĞ
+    // æ³¨é”€å§”æ‰˜
     IDelegate<void, FS_Timer *> *_cancelTimerDelegate;
 };
 

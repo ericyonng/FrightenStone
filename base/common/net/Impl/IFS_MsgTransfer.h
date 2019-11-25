@@ -56,8 +56,8 @@ public:
     virtual Int32 BeforeStart() { return StatusDefs::Success; }
     virtual Int32 Start() = 0;
     virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}   // 处理未决数据，初步的清理
+    virtual void WillClose() {} // 鏂紑涓庢ā鍧椾箣闂寸殑渚濊禆
+    virtual void BeforeClose() {}   // 澶勭悊鏈喅鏁版嵁锛屽垵姝ョ殑娓呯悊
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
@@ -65,10 +65,10 @@ public:
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
 
-    // 会话个数
+    // 浼氳瘽涓暟
     virtual Int32 GetSessionCnt() = 0;
 
-    // 消息队列
+    // 娑堟伅闃熷垪
     virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue, Int32 generatorId) = 0;
     virtual void AttachSenderMsgQueue(MessageQueue *messageQueue) = 0;
 };

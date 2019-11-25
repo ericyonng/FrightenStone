@@ -93,14 +93,14 @@ void Locker::_Init()
 
     _metaLocker = new MetaLocker;
 
-    // 创建自旋锁，避免线程频繁挂起
+    // 鍒涘缓鑷棆閿侊紝閬垮厤绾跨▼棰戠箒鎸傝捣
     auto spinCnt = static_cast<DWORD>(1 << (WidthUtil::GetBinaryWidth<DWORD>() - 1)) | static_cast<DWORD>(SPINNING_COUNT);
     if(!InitializeCriticalSectionAndSpinCount(&(_metaLocker.load()->_handle), spinCnt))
         printf("MetaLocker create spinlock fail spinCnt[%lu]", spinCnt);
 //     auto spinCnt = static_cast<DWORD>(1 << (WidthUtil::GetBinaryWidth<DWORD>() - 1)) | static_cast<DWORD>(SPINNING_COUNT);
 //     if(!InitializeCriticalSectionAndSpinCount(&(_metaLocker.load()->_handle), spinCnt))
 //         printf("MetaLocker create spinlock fail spinCnt[%lu]", spinCnt);
-    // InitializeCriticalSection(&(_metaLocker.load()->_handle)); // 非自旋锁
+    // InitializeCriticalSection(&(_metaLocker.load()->_handle)); // 闈炶嚜鏃嬮攣
 
 }
 

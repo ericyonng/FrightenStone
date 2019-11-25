@@ -133,14 +133,14 @@ inline void FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor(size_t addOcc
 inline void FS_IocpMsgTransfer::_PrintAlloctorOccupiedInfo()
 {
     FS_String memInfo;
-    memInfo.AppendFormat("\n¡¾iocp transfer alloctor occupied info¡¿\n");
+    memInfo.AppendFormat("\nã€iocp transfer alloctor occupied infoã€‘\n");
     memInfo.AppendFormat("transfer id[%d] threadId[%lu] alloctor occupied info:[", _id, _transferThreadId);
     _sessionBufferAlloctor->MemInfoToString(memInfo);
     memInfo.AppendFormat("total occupied bytes[%llu], in used bytes[%llu]."
                          , _sessionBufferAlloctor->GetOccupiedBytes()
                          , _sessionBufferAlloctor->GetInUsedBytes());
     memInfo.AppendFormat(" ]");
-    memInfo.AppendFormat("\n¡¾+++++++++++++++++++++++++ End ++++++++++++++++++++++++++¡¿\n");
+    memInfo.AppendFormat("\nã€+++++++++++++++++++++++++ End ++++++++++++++++++++++++++ã€‘\n");
     g_Log->mempool("%s", memInfo.c_str());
 }
 FS_NAMESPACE_END

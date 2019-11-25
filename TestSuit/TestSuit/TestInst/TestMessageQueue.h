@@ -26,8 +26,8 @@
  * @date  : 2019/11/03
  * @brief :
  * 
- *  ½áÂÛ£ºÏûÏ¢¶ÓÁÐÔÚ8Éú²úÕß1Ïû·ÑÕßµÄÇé¿öÏÂ´ïµ½£¬Ïû·ÑÃ¿Ãë°ÙÍòÊý¾Ý°ü£¨Ã¿¸ö°ü256×Ö½Ú£©2Gb/sÏû·ÑÄÜÁ¦
-          Ö§³ÖÃ¿¸öÉú²úÕßÃ¿Ãë17ÍòÊý¾Ý°üÑ¹Á¦
+ *  ç»“è®ºï¼šæ¶ˆæ¯é˜Ÿåˆ—åœ¨8ç”Ÿäº§è€…1æ¶ˆè´¹è€…çš„æƒ…å†µä¸‹è¾¾åˆ°ï¼Œæ¶ˆè´¹æ¯ç§’ç™¾ä¸‡æ•°æ®åŒ…ï¼ˆæ¯ä¸ªåŒ…256å­—èŠ‚ï¼‰2Gb/sæ¶ˆè´¹èƒ½åŠ›
+          æ”¯æŒæ¯ä¸ªç”Ÿäº§è€…æ¯ç§’17ä¸‡æ•°æ®åŒ…åŽ‹åŠ›
 
  * 
  */
@@ -38,14 +38,14 @@
 
 #include "stdafx.h"
 
-// 8¸öÉú²úÕßÏß³Ì 1¸öÏû·ÑÕßÏß³Ì
+// 8ä¸ªç”Ÿäº§è€…çº¿ç¨‹ 1ä¸ªæ¶ˆè´¹è€…çº¿ç¨‹
 #undef TEST_GENERATOR_QUANTITY
 #define TEST_GENERATOR_QUANTITY 8
 fs::ConcurrentMessageQueue g_testMsgQueue(TEST_GENERATOR_QUANTITY, 1);
 
 struct TestMessage
 {
-    // ÐòÁÐ»¯·´ÐòÁÐ»¯£¨ObjType ±ØÐëÓÐSerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)½Ó¿Ú£©
+    // åºåˆ—åŒ–ååºåˆ—åŒ–ï¼ˆObjType å¿…é¡»æœ‰SerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)æŽ¥å£ï¼‰
 public:
     TestMessage();
     bool SerializeTo(fs::FS_Stream *stream) const;
@@ -211,7 +211,7 @@ class TestMessageQueue
 public:
     static void Run()
     {
-        // ´´½¨Ò»¸ö½ÓÊÕ²¢´¦ÀíÏûÏ¢µÄÏß³Ì
+        // åˆ›å»ºä¸€ä¸ªæŽ¥æ”¶å¹¶å¤„ç†æ¶ˆæ¯çš„çº¿ç¨‹
         fs::TimeUtil::SetTimeZone();
         fs::SmartVarRtti::InitRttiTypeNames();
         fs::FS_TlsUtil::CreateUtilTlsHandle();
@@ -240,7 +240,7 @@ public:
         pool->Close();
         g_testMsgQueue.Close();
 
-        // Ö÷Ïß³Ì·¢ËÍ¼ä¸ôÒ»ÃëÖÓ·¢ËÍÒ»¸öÏûÏ¢£¬Ïû·ÑÕßÏß³ÌÐèÒª´òÓ¡³öÏûÏ¢
+        // ä¸»çº¿ç¨‹å‘é€é—´éš”ä¸€ç§’é’Ÿå‘é€ä¸€ä¸ªæ¶ˆæ¯ï¼Œæ¶ˆè´¹è€…çº¿ç¨‹éœ€è¦æ‰“å°å‡ºæ¶ˆæ¯
     }
 };
 

@@ -80,7 +80,7 @@ Double FS_CpuInfo::GetUsage()
     if(diffKernelTime + diffUserTime == 0)
         return -1;
 
-    // cpu usage =£¨total-idle£©/total
+    // cpu usage =ï¼ˆtotal-idleï¼‰/total
     double usage = static_cast<Double>(diffKernelTime + diffUserTime - diffIdleTime) / (diffKernelTime + diffUserTime);
 
     _preidleTime = idleTime;

@@ -42,9 +42,9 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT ITlsBase;
 
-// �벻Ҫ�����������ֲ߳̾��洢
-// ����Ƶ������
-// �뱣֤�߳������ڶ������ͷ�,��������Ԫ�������ⲿ��װ��������ITlsBase����Ľṹ�壬�ٽ��д洢
+// 请不要过度依赖于线程局部存储
+// 请勿频繁创建
+// 请保证线程周期内都不会释放,数组类型元素请在外部包装成派生于ITlsBase基类的结构体，再进行存储
 class BASE_EXPORT FS_TlsTable
 {
 public:

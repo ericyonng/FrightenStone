@@ -51,17 +51,17 @@ struct LogData;
 class BASE_EXPORT CrashHandleUtil
 {
 public:
-    // ³õÊ¼»¯crashdumpĞÅÏ¢ isUseSehExceptionHandlerÊÇÍâ²¿ÊÖ¶¯¼ÓÁË__try __exceptµÄseh
+    // åˆå§‹åŒ–crashdumpä¿¡æ¯ isUseSehExceptionHandleræ˜¯å¤–éƒ¨æ‰‹åŠ¨åŠ äº†__try __exceptçš„seh
     static int InitCrashHandleParams(bool isUseSehExceptionHandler = false);
 
     #ifdef _WIN32
-    // ÅäºÏ__except¼û·¶Àı
+    // é…åˆ__exceptè§èŒƒä¾‹
     static Int32 RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo);
     #endif
 
-    // ³õÊ¼»¯pdbµÈ·ûºÅĞÅÏ¢ ÓÃÓÚ´òÓ¡¶ÑÕ»ĞÅÏ¢
+    // åˆå§‹åŒ–pdbç­‰ç¬¦å·ä¿¡æ¯ ç”¨äºæ‰“å°å †æ ˆä¿¡æ¯
     static Int32 InitSymbol();
-    // ×¥È¡¶ÑÕ»¿ìÕÕ Ö÷¶¯´òÓ¡¶ÑÕ»ĞÅÏ¢
+    // æŠ“å–å †æ ˆå¿«ç…§ ä¸»åŠ¨æ‰“å°å †æ ˆä¿¡æ¯
     static FS_String FS_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = FS_INFINITE);
 
 protected:

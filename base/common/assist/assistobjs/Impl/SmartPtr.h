@@ -44,7 +44,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// ÖÇÄÜ¶ÔÏó
+// æ™ºèƒ½å¯¹è±¡
 template<typename ObjType, AssistObjsDefs::DelMethods delMethod = AssistObjsDefs::Delete>
 class SmartPtr
 {

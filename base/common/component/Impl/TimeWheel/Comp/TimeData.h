@@ -61,17 +61,17 @@ public:
 
     FS_String ToString() const;
 
-    // ³¬Ê±Ê±¼ä
+    // è¶…æ—¶æ—¶é—´
     Time _expiredTime;
-    // ÊÇ·ñÈ¡Ïû
+    // æ˜¯å¦å–æ¶ˆ
     bool _isCancel;
-    // ÊÇ·ñÕıÔÚ×ª¶¯Ê±¼äÂÖÅÌ ×ª¶¯Ê±¼äÂÖÅÌÊ±ºòµÄ×¢²áÓë·´×¢²á²Ù×÷½«ÔÚafterrotatingwheelÖĞÖ´ĞĞ
+    // æ˜¯å¦æ­£åœ¨è½¬åŠ¨æ—¶é—´è½®ç›˜ è½¬åŠ¨æ—¶é—´è½®ç›˜æ—¶å€™çš„æ³¨å†Œä¸åæ³¨å†Œæ“ä½œå°†åœ¨afterrotatingwheelä¸­æ‰§è¡Œ
     bool _isRotatingWheel;
-    // timewheel¸øµÄÎ¨Ò»id£¬ÓÉtimewheel¸üĞÂ
+    // timewheelç»™çš„å”¯ä¸€idï¼Œç”±timewheelæ›´æ–°
     Int64 _timeWheelUniqueId;
     // timer
     FS_Timer *_timer;
-    // ³¬Ê±ÖÜÆÚ
+    // è¶…æ—¶å‘¨æœŸ
     TimeSlice _period;
 };
 
@@ -80,9 +80,9 @@ class BASE_EXPORT AsynOpType
 public:
     enum
     {
-        Op_None = 0,            // ÎŞĞ§
-        Op_Register = 1,        // ×¢²á
-        Op_UnRegister = 2,      // ·´×¢²á
+        Op_None = 0,            // æ— æ•ˆ
+        Op_Register = 1,        // æ³¨å†Œ
+        Op_UnRegister = 2,      // åæ³¨å†Œ
     };
 };
 
@@ -92,7 +92,7 @@ class BASE_EXPORT AsynTimeData
 public:
     AsynTimeData();
     Int32 _opType;                      // AsynOpType
-    TimeData * _timeData;               // ¶¨Ê±Êı¾İ
+    TimeData * _timeData;               // å®šæ—¶æ•°æ®
 };
 
 FS_NAMESPACE_END

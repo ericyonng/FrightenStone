@@ -67,7 +67,7 @@ public:
     FS_ServerCore();
     virtual ~FS_ServerCore();
 
-    /* ¶ÔÍâ½Ó¿Ú */
+    /* å¯¹å¤–æ¥å£ */
     #pragma region api
 public:
     virtual Int32 Init();
@@ -76,35 +76,35 @@ public:
     virtual void Close();
     #pragma endregion
     
-    /* ÍøÂçÊÂ¼ş */
+    /* ç½‘ç»œäº‹ä»¶ */
     #pragma region net event
     /*
     * brief: 
-    *       1. FS_Server 4 ¶à¸öÏß³Ì´¥·¢ ²»°²È« Èç¹ûÖ»¿ªÆô1¸öFS_Server¾ÍÊÇ°²È«µÄ
-    *       2. _OnNetMonitorTask ¼àÌıÍøÂçÈÎÎñ OnRun(¾É°æ) ½¨Òé¶àÌõÏß³ÌÈ¥×ömonitor¶ø²»ÊÇµ¥ÌõÏß³Ì£¬Íê³É¶Ë¿ÚµÄgetÊÇÏß³Ì°²È«µÄ
-    *       3. OnNetJoin Íæ¼Ò¼ÓÈë Ïß³Ì²»°²È«
-    *       4. OnNetLeave Íæ¼ÒµôÏß Ïß³Ì²»°²È«
-    *       5. OnNetMsg Íæ¼ÒÏûÏ¢µ½À´£¨ÏûÏ¢ÊÇ´ÓFS_ServerµÄ_HandleNetMsg´«Èë£©Ïß³Ì²»°²È« NetMsg_DataHeader ×ª·¢µ½ÆäËûÏß³ÌĞèÒª¿½±´±ÜÃâÏûÏ¢±»¸²¸Ç
-    *       6. OnNetRecv ½ÓÊÕµ½Êı¾İ Ïß³Ì²»°²È«
-            7. ½Ó¿ÚÖ»ÄÜÓÉmsgtransferµ÷¶È£¬±ÜÃâÏß³Ì²»°²È« msghandler²»ÄÜÓĞfs_session¶ÔÏó£¬Ö»ÄÜ´´½¨user¶ÔÏóÊ¹ÓÃuserIdÓësessionId¹ØÁª£¬ÇÒ²»´¦ÀísessionµÄÈÎÒâÄÚÈİ£¬Ö»³ÖÓĞsessionId,±ÜÃâµ¼ÖÂÏß³Ì²»°²È«
+    *       1. FS_Server 4 å¤šä¸ªçº¿ç¨‹è§¦å‘ ä¸å®‰å…¨ å¦‚æœåªå¼€å¯1ä¸ªFS_Serverå°±æ˜¯å®‰å…¨çš„
+    *       2. _OnNetMonitorTask ç›‘å¬ç½‘ç»œä»»åŠ¡ OnRun(æ—§ç‰ˆ) å»ºè®®å¤šæ¡çº¿ç¨‹å»åšmonitorè€Œä¸æ˜¯å•æ¡çº¿ç¨‹ï¼Œå®Œæˆç«¯å£çš„getæ˜¯çº¿ç¨‹å®‰å…¨çš„
+    *       3. OnNetJoin ç©å®¶åŠ å…¥ çº¿ç¨‹ä¸å®‰å…¨
+    *       4. OnNetLeave ç©å®¶æ‰çº¿ çº¿ç¨‹ä¸å®‰å…¨
+    *       5. OnNetMsg ç©å®¶æ¶ˆæ¯åˆ°æ¥ï¼ˆæ¶ˆæ¯æ˜¯ä»FS_Serverçš„_HandleNetMsgä¼ å…¥ï¼‰çº¿ç¨‹ä¸å®‰å…¨ NetMsg_DataHeader è½¬å‘åˆ°å…¶ä»–çº¿ç¨‹éœ€è¦æ‹·è´é¿å…æ¶ˆæ¯è¢«è¦†ç›–
+    *       6. OnNetRecv æ¥æ”¶åˆ°æ•°æ® çº¿ç¨‹ä¸å®‰å…¨
+            7. æ¥å£åªèƒ½ç”±msgtransferè°ƒåº¦ï¼Œé¿å…çº¿ç¨‹ä¸å®‰å…¨ msghandlerä¸èƒ½æœ‰fs_sessionå¯¹è±¡ï¼Œåªèƒ½åˆ›å»ºuserå¯¹è±¡ä½¿ç”¨userIdä¸sessionIdå…³è”ï¼Œä¸”ä¸å¤„ç†sessionçš„ä»»æ„å†…å®¹ï¼ŒåªæŒæœ‰sessionId,é¿å…å¯¼è‡´çº¿ç¨‹ä¸å®‰å…¨
     */
 protected:
     void _OnConnected(const BriefSessionInfo &sessionInfo);
     void _OnDisconnected(IFS_Session *session);
     void _OnHeartBeatTimeOut(IFS_Session *session);
-    // Ã¿½ÓÊÕÒ»¸öÍêÕû°üµ÷ÓÃÒ»´Î
+    // æ¯æ¥æ”¶ä¸€ä¸ªå®Œæ•´åŒ…è°ƒç”¨ä¸€æ¬¡
     void _OnRecvMsg(IFS_Session *session, Int64 transferBytes);
     void _OnRecvMsgAmount(NetMsg_DataHeader *msgArrived);
-    // ·¢ËÍÖ»ÄÜÍ³¼Æ×Ö½ÚÊı£¬°üÊıÎŞ·¨Ö§³ÖÍ³¼Æ
+    // å‘é€åªèƒ½ç»Ÿè®¡å­—èŠ‚æ•°ï¼ŒåŒ…æ•°æ— æ³•æ”¯æŒç»Ÿè®¡
     void _OnSendMsg(IFS_Session *session, Int64 transferBytes);
 
 protected:
-    // ·şÎñÆ÷¸ºÔØÇé¿ö
+    // æœåŠ¡å™¨è´Ÿè½½æƒ…å†µ
     virtual void _OnSvrRuning(FS_ThreadPool *threadPool);
     void _PrintSvrLoadInfo(const TimeSlice &dis);
     #pragma endregion
 
-    /* ÄÚ²¿·½·¨ */
+    /* å†…éƒ¨æ–¹æ³• */
     #pragma region inner api
 private:
     Int32 _ReadConfig();
@@ -119,7 +119,7 @@ private:
     void _BeforeClose();
     void _AfterClose();
 
-    // ½«¼àÌıµÄ½Ó¿Ú×¢²áµ½Ä£¿éÖĞ
+    // å°†ç›‘å¬çš„æ¥å£æ³¨å†Œåˆ°æ¨¡å—ä¸­
     void _RegisterToModule();
 
     std::vector<MessageQueue *> &_GetSenderMq();
@@ -127,42 +127,42 @@ private:
 
 private:
     std::atomic_bool _isInit;
-    FS_CpuInfo *_cpuInfo;                            // cpuĞÅÏ¢
-    IFS_ServerConfigMgr *_serverConfigMgr;          // ·şÎñÆ÷ÅäÖÃ
+    FS_CpuInfo *_cpuInfo;                            // cpuä¿¡æ¯
+    IFS_ServerConfigMgr *_serverConfigMgr;          // æœåŠ¡å™¨é…ç½®
 
     Locker _locker;
-    IFS_Connector * _connector;                         // Á¬½ÓÆ÷
-    std::vector<IFS_MsgTransfer *> _msgTransfers;       // ¶àÏß³ÌÏûÏ¢ÊÕ·¢Æ÷
-    ConcurrentMessageQueue *_messageQueue;              // ÏûÏ¢¶ÓÁĞ
-    std::vector<MessageQueue *> _senderMessageQueue;    // ·¢ËÍÏûÏ¢¶ÓÁĞ
+    IFS_Connector * _connector;                         // è¿æ¥å™¨
+    std::vector<IFS_MsgTransfer *> _msgTransfers;       // å¤šçº¿ç¨‹æ¶ˆæ¯æ”¶å‘å™¨
+    ConcurrentMessageQueue *_messageQueue;              // æ¶ˆæ¯é˜Ÿåˆ—
+    std::vector<MessageQueue *> _senderMessageQueue;    // å‘é€æ¶ˆæ¯é˜Ÿåˆ—
 
-    std::vector<IFS_MsgDispatcher *> _msgDispatchers;  // ÏûÏ¢´¦ÀíÆ÷ ÒµÎñÏß³Ì´¦Àí
-    std::vector<IFS_BusinessLogic *> _logics;          // ¶àÒµÎñÂß¼­²¢·¢
+    std::vector<IFS_MsgDispatcher *> _msgDispatchers;  // æ¶ˆæ¯å¤„ç†å™¨ ä¸šåŠ¡çº¿ç¨‹å¤„ç†
+    std::vector<IFS_BusinessLogic *> _logics;          // å¤šä¸šåŠ¡é€»è¾‘å¹¶å‘
 
-    // TODO:sessionmgr¿ÉÄÜĞèÒªÒÆ³ı±ÜÃâËø³åÍ»
-    ConditionLocker _waitForClose;                  // Ò»°ãÔÚÖ÷Ïß³Ì£¬ÓÃÓÚ×èÈûµÈ´ı³ÌĞò½áÊø
+    // TODO:sessionmgrå¯èƒ½éœ€è¦ç§»é™¤é¿å…é”å†²çª
+    ConditionLocker _waitForClose;                  // ä¸€èˆ¬åœ¨ä¸»çº¿ç¨‹ï¼Œç”¨äºé˜»å¡ç­‰å¾…ç¨‹åºç»“æŸ
     FS_ThreadPool *_pool;
 
-    // Í³¼ÆÇø
-    Time _lastStatisticsTime;                       // ×îºóÒ»´ÎÍ³¼ÆµÄÊ±¼ä
-    TimeSlice _statisticsInterval;                  // Í³¼ÆµÄÊ±¼ä¼ä¸ô
-    std::atomic<Int64> _curSessionConnecting;       // ÕıÁ¬½ÓµÄ»á»°ÊıÁ¿
-    std::atomic<Int64> _sessionConnectedBefore;     // Ôø¾­Á¬ÈëµÄ»á»°ÊıÁ¿
-    std::atomic<Int64> _sessionDisconnectedCnt;     // ¶Ï¿ªÁ´½ÓµÄ»á»°ÊıÁ¿
-    std::atomic<Int64> _recvMsgCountPerSecond;      // Ã¿ÃëÊÕµ½µÄ°ü¸öÊı
-    std::atomic<Int64> _recvMsgBytesPerSecond;      // Ã¿ÃëÊÕµ½µÄ°üµÄ×Ö½ÚÊı
-    std::atomic<Int64> _sendMsgBytesPerSecond;      // Ã¿Ãë·¢ËÍµÄ°ü×Ö½ÚÊı
-    std::atomic<Int64> _heartbeatTimeOutDisconnected;   // ĞÄÌø³¬Ê±¶Ï¿ª»á»°Êı
+    // ç»Ÿè®¡åŒº
+    Time _lastStatisticsTime;                       // æœ€åä¸€æ¬¡ç»Ÿè®¡çš„æ—¶é—´
+    TimeSlice _statisticsInterval;                  // ç»Ÿè®¡çš„æ—¶é—´é—´éš”
+    std::atomic<Int64> _curSessionConnecting;       // æ­£è¿æ¥çš„ä¼šè¯æ•°é‡
+    std::atomic<Int64> _sessionConnectedBefore;     // æ›¾ç»è¿å…¥çš„ä¼šè¯æ•°é‡
+    std::atomic<Int64> _sessionDisconnectedCnt;     // æ–­å¼€é“¾æ¥çš„ä¼šè¯æ•°é‡
+    std::atomic<Int64> _recvMsgCountPerSecond;      // æ¯ç§’æ”¶åˆ°çš„åŒ…ä¸ªæ•°
+    std::atomic<Int64> _recvMsgBytesPerSecond;      // æ¯ç§’æ”¶åˆ°çš„åŒ…çš„å­—èŠ‚æ•°
+    std::atomic<Int64> _sendMsgBytesPerSecond;      // æ¯ç§’å‘é€çš„åŒ…å­—èŠ‚æ•°
+    std::atomic<Int64> _heartbeatTimeOutDisconnected;   // å¿ƒè·³è¶…æ—¶æ–­å¼€ä¼šè¯æ•°
 };
 
 FS_NAMESPACE_END
 
 #include "base/common/net/Impl/FS_ServerCoreImpl.h"
 
-extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;                         // ·şÎñºËĞÄ
-extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;                       // ·şÎñÆ÷ÅäÖÃ
-extern BASE_EXPORT fs::IFS_MsgDispatcher *g_Dispatcher;                     // ÍøÂç°ü·Ö·¢Æ÷
-extern BASE_EXPORT fs::IFS_BusinessLogic *g_Logic;                          // ÒµÎñÂß¼­²ã
-extern BASE_EXPORT fs::ConcurrentMessageQueue *g_net2LogicMessageQueue;     // ÍøÂç²ãµ½ÒµÎñ²ãµÄÏûÏ¢¶ÓÁĞ
+extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;                         // æœåŠ¡æ ¸å¿ƒ
+extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;                       // æœåŠ¡å™¨é…ç½®
+extern BASE_EXPORT fs::IFS_MsgDispatcher *g_Dispatcher;                     // ç½‘ç»œåŒ…åˆ†å‘å™¨
+extern BASE_EXPORT fs::IFS_BusinessLogic *g_Logic;                          // ä¸šåŠ¡é€»è¾‘å±‚
+extern BASE_EXPORT fs::ConcurrentMessageQueue *g_net2LogicMessageQueue;     // ç½‘ç»œå±‚åˆ°ä¸šåŠ¡å±‚çš„æ¶ˆæ¯é˜Ÿåˆ—
 
 #endif

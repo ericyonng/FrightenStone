@@ -50,44 +50,44 @@ public:
     FS_Iocp();
     virtual ~FS_Iocp();
 
-    /* ³õÊ¼»¯Óë×¢²á */
+    /* åˆå§‹åŒ–ä¸æ³¨å†Œ */
     #pragma region init/reg
     /*
     *   brief:
-    *       1. - Create ´´½¨¶Ë¿Ú
-    *       2. - Destroy Ïú»Ù¶Ë¿Ú
-    *       3. - reg ¹ØÁª¶Ë¿Ú regÊ±ºò»á°Ñ×Ô¶¨ÒåµÄµØÖ·Êı¾İulong_ptr´«ÈëÔÚwaitÊ±ºò´«»Ø£¬
-    *                         ±ãÓÚÈ·ÈÏwait´«»ØµÄÊÇÄÄÒ»¸ö°ó¶¨ÔÚÍê³É¶Ë¿ÚµÄÊı¾İ
-    *       4. - reg ¹ØÁª¶Ë¿Ú£¬²¢´«Èë×Ô¶¨ÒåÊı¾İ×÷Îªulong_ptrµÄÊı¾İ
-    *       5. - LoadAcceptEx ¼ÓÔØacceptº¯Êı£¬
-    *                         ÒòÎª¿çdllµ÷ÓÃÊÇÓĞËğºÄµÄËùÒÔÒª×Ô¼ºÌáÇ°¼ÓÔØµ½ÄÚ´æÖĞ
+    *       1. - Create åˆ›å»ºç«¯å£
+    *       2. - Destroy é”€æ¯ç«¯å£
+    *       3. - reg å…³è”ç«¯å£ regæ—¶å€™ä¼šæŠŠè‡ªå®šä¹‰çš„åœ°å€æ•°æ®ulong_pträ¼ å…¥åœ¨waitæ—¶å€™ä¼ å›ï¼Œ
+    *                         ä¾¿äºç¡®è®¤waitä¼ å›çš„æ˜¯å“ªä¸€ä¸ªç»‘å®šåœ¨å®Œæˆç«¯å£çš„æ•°æ®
+    *       4. - reg å…³è”ç«¯å£ï¼Œå¹¶ä¼ å…¥è‡ªå®šä¹‰æ•°æ®ä½œä¸ºulong_ptrçš„æ•°æ®
+    *       5. - LoadAcceptEx åŠ è½½acceptå‡½æ•°ï¼Œ
+    *                         å› ä¸ºè·¨dllè°ƒç”¨æ˜¯æœ‰æŸè€—çš„æ‰€ä»¥è¦è‡ªå·±æå‰åŠ è½½åˆ°å†…å­˜ä¸­
     */
 public:
     Int32 Create();
     void Destroy();
     Int32 Reg(SOCKET sockfd);
-    Int32 Reg(SOCKET sockfd, void *ptr);    // µÚ¶ş¸ö²ÎÊıÊÇÍê³ÉÊ±»Ø´«µÄcompletekey
-    Int32 Reg(SOCKET sockfd, UInt64 sessionId); // µÚ¶ş¸ö²ÎÊıÊÇÍê³ÉÊ±»Ø´«µÄcompletekey
+    Int32 Reg(SOCKET sockfd, void *ptr);    // ç¬¬äºŒä¸ªå‚æ•°æ˜¯å®Œæˆæ—¶å›ä¼ çš„completekey
+    Int32 Reg(SOCKET sockfd, UInt64 sessionId); // ç¬¬äºŒä¸ªå‚æ•°æ˜¯å®Œæˆæ—¶å›ä¼ çš„completekey
     Int32 LoadAcceptEx(SOCKET listenSocket);
     #pragma endregion
 
-    /* iocpµÄ²Ù×÷ */
+    /* iocpçš„æ“ä½œ */
     #pragma region
     /*
     *   brief:
-    *       1. - PostAccept acceptÊ±ºò»á°ÑÖØµşÌå´«Èë£¬ÔÚwaitÊ±ºò´«»Ø
-    *                       ´«ÈëÖØµşÌå½á¹¹±ãÓÚÇø·Ö°ó¶¨ÔÚÍê³É¶Ë¿ÚÉÏµÄsocketÖĞµÄ×Ó²Ù×÷£¬
-    *                       ±ÈÈç°ó¶¨µÄÊÇ¼àÌısocketµ«ÊÇ¿ÉÄÜ±»¶à¸ö¿Í»§¶ËÁ¬½Ó£¬
-    *                       ÎªÁËÇø·ÖÊÇÄÄ¸ö¿Í»§¶ËĞèÒª¶à´«ÈëÒ»¸öÖØµşÌå½á¹¹ÒÔ±ãÇø·Ö
-    *       2. - PostRecv Í¶µİ½ÓÊÕÊı¾İ
-    *       3. - PostSend Í¶µİ·¢ËÍÊı¾İ
-    *       4. - PostQuit Í¶µİÍË³ö
-    *       5. - WaitForCompletion µÈ´ıÊı¾İio¶Ë¿ÚÍê³É£¬
-    *                              getqueueÊÇÏß³Ì°²È«£¬
-    *                              Ëü»áÒ»¸öÒ»¸öÏûÏ¢µÄ´ÓÍê³É¶ÓÁĞÖĞÈ¡³ö²»ĞèÒªµ£ĞÄÏß³Ì°²È«ÎÊÌâ
+    *       1. - PostAccept acceptæ—¶å€™ä¼šæŠŠé‡å ä½“ä¼ å…¥ï¼Œåœ¨waitæ—¶å€™ä¼ å›
+    *                       ä¼ å…¥é‡å ä½“ç»“æ„ä¾¿äºåŒºåˆ†ç»‘å®šåœ¨å®Œæˆç«¯å£ä¸Šçš„socketä¸­çš„å­æ“ä½œï¼Œ
+    *                       æ¯”å¦‚ç»‘å®šçš„æ˜¯ç›‘å¬socketä½†æ˜¯å¯èƒ½è¢«å¤šä¸ªå®¢æˆ·ç«¯è¿æ¥ï¼Œ
+    *                       ä¸ºäº†åŒºåˆ†æ˜¯å“ªä¸ªå®¢æˆ·ç«¯éœ€è¦å¤šä¼ å…¥ä¸€ä¸ªé‡å ä½“ç»“æ„ä»¥ä¾¿åŒºåˆ†
+    *       2. - PostRecv æŠ•é€’æ¥æ”¶æ•°æ®
+    *       3. - PostSend æŠ•é€’å‘é€æ•°æ®
+    *       4. - PostQuit æŠ•é€’é€€å‡º
+    *       5. - WaitForCompletion ç­‰å¾…æ•°æ®ioç«¯å£å®Œæˆï¼Œ
+    *                              getqueueæ˜¯çº¿ç¨‹å®‰å…¨ï¼Œ
+    *                              å®ƒä¼šä¸€ä¸ªä¸€ä¸ªæ¶ˆæ¯çš„ä»å®Œæˆé˜Ÿåˆ—ä¸­å–å‡ºä¸éœ€è¦æ‹…å¿ƒçº¿ç¨‹å®‰å…¨é—®é¢˜
     */
 public:
-    // postÏß³Ì°²È«
+    // postçº¿ç¨‹å®‰å…¨
     Int32 PostAccept(SOCKET listenSocket, IoDataBase *ioData);
     Int32 PostRecv(SOCKET targetSock, IoDataBase *ioData);
     Int32 PostSend(SOCKET targetSock, IoDataBase *ioData);

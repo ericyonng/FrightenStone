@@ -70,24 +70,24 @@ void FS_Timer::Cancel()
 
 Int32 FS_Timer::Schedule(const Time &startTime, Int64 milliSecPeriod)
 {
-    // ¾«¶ÈÓëÖÜÆÚ
+    // ç²¾åº¦ä¸Žå‘¨æœŸ
     _periodCache = milliSecPeriod * Time::_microSecondPerMilliSecond;
     // TimeSlice slice(0, milliSecPeriod, 0);
 
-    // ¹ýÆÚÊ±¼ä
+    // è¿‡æœŸæ—¶é—´
     _lastTimeOutTime = startTime;
     const auto &expiredTime = _timeData->_isRotatingWheel ? startTime : (startTime + _periodCache);
 
-    // ËÍÊ±¼äÂÖÅÌÖÐÒÆ³ý
+    // é€æ—¶é—´è½®ç›˜ä¸­ç§»é™¤
     if(_timeData->_timeWheelUniqueId)
         _timeWheel->UnRegister(_timeData);
 
-    // ¸üÐÂÊý¾Ý
+    // æ›´æ–°æ•°æ®
     _timeData->_isCancel = false;
     _timeData->_period = _periodCache;
     _timeData->_expiredTime = expiredTime;
 
-    // ×¢²áÊ±¼äÂÖÅÌ
+    // æ³¨å†Œæ—¶é—´è½®ç›˜
     return _timeWheel->Register(_timeData);
 }
 
@@ -99,7 +99,7 @@ void FS_Timer::OnTimeOut(const Time &curWheelTIme)
     if(_timeOutDelegate)
         _timeOutDelegate->Invoke(this, _lastTimeOutTime, curWheelTIme);
     
-    // ¸üÐÂÉÏ´Î³¬Ê±Ê±¼ä
+    // æ›´æ–°ä¸Šæ¬¡è¶…æ—¶æ—¶é—´
     _lastTimeOutTime = curWheelTIme;
 }
 

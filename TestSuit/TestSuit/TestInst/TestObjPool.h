@@ -1,8 +1,6 @@
 #ifndef __Test_TestObjPool_H__
 #define __Test_TestObjPool_H__
 #pragma once
-#undef __FS_THREAD_SAFE__
-#define __FS_THREAD_SAFE__ 1
 #include "stdafx.h"
 
 #undef TEST_OBJ_NUM
@@ -17,7 +15,7 @@ public:
     TestObjPoolObj() {}
     ~TestObjPoolObj() 
     {
-        //std::cout << "Îö¹¹" << std::endl;
+        //std::cout << "æžæž„" << std::endl;
     }
 
 private:

@@ -6,7 +6,7 @@
 #include "base/common/basedefs/BaseDefs.h"
 #include "base/common/assist/assistobjs/Impl/Singleton.h"
 
-// 控制对象池分配的内存
+// 鎺у埗瀵硅薄姹犲垎閰嶇殑鍐呭瓨
 FS_NAMESPACE_BEGIN
 extern BASE_EXPORT std::atomic<UInt64> g_curObjPoolOccupiedBytes;
 FS_NAMESPACE_END

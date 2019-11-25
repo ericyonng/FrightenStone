@@ -45,14 +45,14 @@ BOOL CDlgRoot::OnInitDialog()
 	m_Display.SetReadOnly(false);
 	m_Display.SetBackColor(MSG_COLOR_GRAY);
 	m_Display.SetEditDefFormat();
-	m_Display.SetMaxLines(1000000);	//100ÍòÌõ
+	m_Display.SetMaxLines(1000000);	//100ä¸‡æ¡
 	
-	m_TextFont.CreateFont(12, 0, 0, 0, 400, 0, 0, 0, GB2312_CHARSET, OUT_STROKE_PRECIS, CLIP_STROKE_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH, TEXT("ËÎÌå"));	
+	m_TextFont.CreateFont(12, 0, 0, 0, 400, 0, 0, 0, GB2312_CHARSET, OUT_STROKE_PRECIS, CLIP_STROKE_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH, TEXT("å®‹ä½“"));	
 	
 	IF_NOT(AppRootObj.Init())
 	{
 		ASSERT(AppRootObj.Fini());
-		MessageBox("·şÎñÆ÷Æô¶¯Ê§°Ü£¡");
+		MessageBox("æœåŠ¡å™¨å¯åŠ¨å¤±è´¥ï¼");
 		EndDialog(-1);
 		return true;
 	}
@@ -63,13 +63,13 @@ BOOL CDlgRoot::OnInitDialog()
 	BUFFER128 szAddr = { 0 };
 	gtool::NetWorkModulGetSvrBindAddr(szAddr, sizeof(szAddr));
 
-	//¹¤×÷Ä¿Â¼
+	//å·¥ä½œç›®å½•
 	char szDirectory[MAX_PATH] = TEXT("");
 	theApp.GetWorkDirectory(szDirectory, CountArray(szDirectory));
 	_sntprintf(szTitle, sizeof(szTitle) - 1, "Lab-WinApp@%s@%s", szAddr, szDirectory);
 	SetWindowText(TEXT(szTitle));
 
-	Display("·şÎñÆ÷Æô¶¯³É¹¦.");
+	Display("æœåŠ¡å™¨å¯åŠ¨æˆåŠŸ.");
 	
 
 	return true;  // return true  unless you set the focus to a control
@@ -103,7 +103,7 @@ void CDlgRoot::OnPaint()
 
 void CDlgRoot::OnBnClickedClose()
 {
-// 	auto bOk = MessageBox("È·¶¨¹Ø±Õ·şÎñÆ÷£¿", "ÏµÍ³ÌáÊ¾", MB_YESNO);
+// 	auto bOk = MessageBox("ç¡®å®šå…³é—­æœåŠ¡å™¨ï¼Ÿ", "ç³»ç»Ÿæç¤º", MB_YESNO);
 // 	if (IDYES == bOk || IDOK == bOk)
 // 	{
 // 		AppRootObj.Fini();
@@ -112,13 +112,13 @@ void CDlgRoot::OnBnClickedClose()
 	CDialog::OnCancel();
 }
 
-//Ä£Ì¬´°¿Ú
+//æ¨¡æ€çª—å£
 INT_PTR CDlgRoot::DoModal()
 {
 	return CDialog::DoModal();
 }
 
-//»æ»­½ø¶È
+//ç»˜ç”»è¿›åº¦
 void CDlgRoot::DrawProgress(long lCurrentCount, long lTotalNum)
 {
 	CClientDC dc(this);
@@ -136,13 +136,13 @@ void CDlgRoot::DrawProgress(long lCurrentCount, long lTotalNum)
 	pDC->SetTextColor(RGB(0, 0, 0));
 	pDC->FillSolidRect(&rcRange, RGB(0xf0, 0xf0, 0xf0));
 
-	//ÀàĞÍ
+	//ç±»å‹
 	TCHAR szString[1024] = { 0 };
 
-	//½ø¶È
+	//è¿›åº¦
 	memset(szString, 0, sizeof(szString));
 	double lfProgress = (double)lCurrentCount / ((double)lTotalNum);
-	_sntprintf(szString, CountArray(szString), TEXT("½ø¶È:%.3lf%% ×ÜÊı:%ld"), lfProgress * 100, lTotalNum);
+	_sntprintf(szString, CountArray(szString), TEXT("è¿›åº¦:%.3lf%% æ€»æ•°:%ld"), lfProgress * 100, lTotalNum);
 	rcProgress.SetRect(rcFileText.left, rcFileText.bottom, rcFileText.right, rcFileText.bottom + 20);
 	pDC->DrawText(szString, lstrlen(szString), &rcProgress, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_END_ELLIPSIS);
 	rcProgress.OffsetRect(0, 20);
@@ -192,7 +192,7 @@ void CDlgRoot::OnBnClickedBtBroadcast()
 	auto nByte = pEdit->GetWindowText(szBuffer, sizeof(szBuffer));
 	strData += szBuffer;
 	szBuffer[0] = 0;
-	sprintf(szBuffer, "×Ö½Ú£º[%d] Byte", nByte);
+	sprintf(szBuffer, "å­—èŠ‚ï¼š[%d] Byte", nByte);
 	strData += szBuffer;
 	TestDisPlay(strData);
 
@@ -206,17 +206,17 @@ void CDlgRoot::OnBnClickedBtBroadcast()
 		}
 	}
 
-	//Ïò¿Í»§¶Ë·¢ËÍÊı¾İ
+	//å‘å®¢æˆ·ç«¯å‘é€æ•°æ®
 	//BusinessLogicBroadcast(szBuffer, nByte);
 }
 
 class CFiniTask : public CTaskBase
 {
 public:
-	//ÈÎÎñÖ´ĞĞÌå
+	//ä»»åŠ¡æ‰§è¡Œä½“
 	int Run()
 	{
-		//ÊÍ·Å
+		//é‡Šæ”¾
 		CDlgRoot* pDlg = (CDlgRoot*)m_pArg;
 		CHECKF(pDlg);
 
@@ -232,7 +232,7 @@ public:
 
 void CDlgRoot::OnBnFiniSvr()
 {
-	auto bOk = MessageBox("È·¶¨¹Ø±Õ·şÎñÆ÷£¿", "ÏµÍ³ÌáÊ¾", MB_YESNO);
+	auto bOk = MessageBox("ç¡®å®šå…³é—­æœåŠ¡å™¨ï¼Ÿ", "ç³»ç»Ÿæç¤º", MB_YESNO);
 	if (IDYES == bOk || IDOK == bOk)
 	{
 		gtool::CSmartPtr<CTaskBase> pFiniTask = new CFiniTask;

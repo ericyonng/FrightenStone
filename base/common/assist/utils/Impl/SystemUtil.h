@@ -43,55 +43,55 @@ struct BASE_EXPORT ProcessMemInfo;
 class BASE_EXPORT SystemUtil
 {
 public:
-    // »ñÈ¡¿ÉÓÃµÄÄÚ´æ´óĞ¡
+    // è·å–å¯ç”¨çš„å†…å­˜å¤§å°
     static UInt64 GetAvailPhysMemSize();
-    // »ñÈ¡ÄÚ´æ´óĞ¡
+    // è·å–å†…å­˜å¤§å°
     static UInt64 GetTotalPhysMemSize();
-    // ÄÚ´æÊ¹ÓÃÂÊ
+    // å†…å­˜ä½¿ç”¨ç‡
     static ULong GetMemoryLoad();
-    // ½ø³ÌÕ¼ÓÃÄÚ´æĞÅÏ¢
+    // è¿›ç¨‹å ç”¨å†…å­˜ä¿¡æ¯
     static bool GetProcessMemInfo(HANDLE processHandle, ProcessMemInfo &info);
 
-    /* ½ø³ÌÏß³Ì */
-    // »ñÈ¡³ÌĞòÄ¿Â¼
+    /* è¿›ç¨‹çº¿ç¨‹ */
+    // è·å–ç¨‹åºç›®å½•
     static Int32 GetProgramPath(bool isCurrentProcess, FS_String &processPath, ULong pid = 0);
-    // »ñÈ¡µ±Ç°½ø³ÌÃû
+    // è·å–å½“å‰è¿›ç¨‹å
     static FS_String GetCurProgramName();
-    // ´´½¨½ø³Ì¿ìÕÕ£¨±éÀú½ø³ÌÏà¹Ø£©
+    // åˆ›å»ºè¿›ç¨‹å¿«ç…§ï¼ˆéå†è¿›ç¨‹ç›¸å…³ï¼‰
     static HANDLE CreateProcessSnapshot();
-    // »ñÈ¡µÚÒ»¸ö½ø³Ìid
+    // è·å–ç¬¬ä¸€ä¸ªè¿›ç¨‹id
     static ULong GetFirstProcessPid(HANDLE &hSnapshot);
-    // »ñÈ¡ÏÂÒ»¸ö½ø³Ìid
+    // è·å–ä¸‹ä¸€ä¸ªè¿›ç¨‹id
     static ULong GetNextProcessPid(HANDLE &hSnapshot);
-    // »ñÈ¡Ïß³Ìid
+    // è·å–çº¿ç¨‹id
     static ULong GetCurrentThreadId();
-    // »ñÈ¡½ø³Ìid
+    // è·å–è¿›ç¨‹id
     static Int32 GetCurProcessId();
-    // »ñÈ¡½ø³Ì¾ä±ú
+    // è·å–è¿›ç¨‹å¥æŸ„
     static HANDLE GetCurProcessHandle();
-    // ½áÊø½ø³Ì
+    // ç»“æŸè¿›ç¨‹
     static Int32 CloseProcess(ULong processId, ULong *lastError = NULL);
 
-    /* ÔÓÏî */
-    // »ñÈ¡µ±Ç°µ÷ÓÃÏß³ÌËùÔÚµÄcpu±àºÅĞÅÏ¢
+    /* æ‚é¡¹ */
+    // è·å–å½“å‰è°ƒç”¨çº¿ç¨‹æ‰€åœ¨çš„cpuç¼–å·ä¿¡æ¯
     static void GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber);
-    // Í¨¹ı½ø³ÌID»ñÈ¡´°¿Ú¾ä±ú
+    // é€šè¿‡è¿›ç¨‹IDè·å–çª—å£å¥æŸ„
     static HWND GetWindowHwndByPID(DWORD dwProcessID);
-    // ½«´°¿ÚÉèÖÃ¶¥²ã
+    // å°†çª—å£è®¾ç½®é¡¶å±‚
     static void BringWindowsToTop(HWND curWin);
-    // ±éÀú½ø³ÌÅĞ¶ÏÄ³½ø³ÌÊÇ·ñÔÚ½ø³ÌÁĞ±í
+    // éå†è¿›ç¨‹åˆ¤æ–­æŸè¿›ç¨‹æ˜¯å¦åœ¨è¿›ç¨‹åˆ—è¡¨
     static bool IsProcessExist(const FS_String &processName);
-    // µ¯´°
+    // å¼¹çª—
     static void MessageBoxPopup(const FS_String &title, const FS_String &content);
 
-    /* ¿ØÖÆÌ¨ */
+    /* æ§åˆ¶å° */
     static void LockConsole();
     static void UnlockConsole();
-    // ÉèÖÃ¿ØÖÆÌ¨ÑÕÉ«
+    // è®¾ç½®æ§åˆ¶å°é¢œè‰²
     static Int32 SetConsoleColor(Int32 color);
-    // »ñÈ¡¿ØÖÆÌ¨ÑÕÉ«
+    // è·å–æ§åˆ¶å°é¢œè‰²
     static Int32 GetConsoleColor();
-    // Êä³ö¸ø¿ØÖÆÌ¨
+    // è¾“å‡ºç»™æ§åˆ¶å°
     static void OutputToConsole(const FS_String &outStr);
 };
 

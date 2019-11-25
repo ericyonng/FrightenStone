@@ -136,7 +136,7 @@ Int32 FS_IocpMsgTransfer::Start()
 
 void FS_IocpMsgTransfer::BeforeClose()
 {
-    // closeËùÓĞ»á»°£¬Ê¹µÃÍ¶µİµÄÏûÏ¢ÂíÉÏ·µ»Ø
+    // closeæ‰€æœ‰ä¼šè¯ï¼Œä½¿å¾—æŠ•é€’çš„æ¶ˆæ¯é©¬ä¸Šè¿”å›
     for(auto &session : _sessions)
     {
         session.second->MaskClose();
@@ -146,7 +146,7 @@ void FS_IocpMsgTransfer::BeforeClose()
 
 void FS_IocpMsgTransfer::Close()
 {
-    // µÈ´ıËùÓĞ»á»°±»ÒÆ³ı
+    // ç­‰å¾…æ‰€æœ‰ä¼šè¯è¢«ç§»é™¤
     while(true)
     {
         if(_sessionCnt <= 0)
@@ -154,14 +154,14 @@ void FS_IocpMsgTransfer::Close()
         Sleep(1000);
     }
 
-    // Í¶µİiocpquitÊÂ¼ş
+    // æŠ•é€’iocpquitäº‹ä»¶
     const auto st = _iocp->PostQuit();
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("post quit error st[%d]"), st);
     }
 
-    // Ïß³ÌÍË³ö
+    // çº¿ç¨‹é€€å‡º
     _threadPool->Close();
 
     if(!_senderMsgs->empty())
@@ -174,7 +174,7 @@ void FS_IocpMsgTransfer::Close()
 
 void FS_IocpMsgTransfer::AfterClose()
 {
-    // ÄÚ´æ·ÖÅäÆ÷Õ¼ÓÃÇé¿ö´òÓ¡½áÊø
+    // å†…å­˜åˆ†é…å™¨å ç”¨æƒ…å†µæ‰“å°ç»“æŸ
     g_MemleakMonitor->UnRegisterMemPoolPrintCallback(_transferThreadId);
 
     if(_sessionBufferAlloctor)
@@ -203,20 +203,20 @@ void FS_IocpMsgTransfer::OnHeartBeatTimeOut(IFS_Session *session)
 }
 
 void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
-{// iocp ÔÚclosesocketºó»áÂíÉÏ·µ»ØËùÓĞÍ¶µİµÄÊÂ¼ş£¬ËùÒÔ²»¿ÉÁ¢¼´ÔÚpostÎ´½áÊøÊ±ºòÊÍ·Åsession¶ÔÏó
+{// iocp åœ¨closesocketåä¼šé©¬ä¸Šè¿”å›æ‰€æœ‰æŠ•é€’çš„äº‹ä»¶ï¼Œæ‰€ä»¥ä¸å¯ç«‹å³åœ¨postæœªç»“æŸæ—¶å€™é‡Šæ”¾sessionå¯¹è±¡
 
-    // ³õÊ¼»¯ÅäÖÃ
+    // åˆå§‹åŒ–é…ç½®
     _transferThreadId = SystemUtil::GetCurrentThreadId();
     g_MemleakMonitor->RegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
 
-    ULong waitTime = 1;   // TODO¿ÉÒÔµ÷½Ú£¨Ö÷ÒªÓÃÓÚĞÄÌø¼ì²â£©
+    ULong waitTime = 1;   // TODOå¯ä»¥è°ƒèŠ‚ï¼ˆä¸»è¦ç”¨äºå¿ƒè·³æ£€æµ‹ï¼‰
     Int32 ret = StatusDefs::Success;
     while(pool->IsPoolWorking() || _sessionCnt > 0)
     {
-        // 1.½«Á¬ÈëµÄsession¼ÓÈë
+        // 1.å°†è¿å…¥çš„sessionåŠ å…¥
         _LinkCacheToSessions();
 
-        // 3.ÅĞ¶ÏÊÇ·ñÓĞsession
+        // 3.åˆ¤æ–­æ˜¯å¦æœ‰session
         if(_sessions.empty())
         {
             _ClearSenderMessageQueue();
@@ -224,16 +224,16 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
             continue;
         }
 
-        // 4.ĞÄÌø³¬Ê±¼ì²â£¨¹ıÆÚµÄ·ÅÈëtoremove¶ÓÁĞ£©
+        // 4.å¿ƒè·³è¶…æ—¶æ£€æµ‹ï¼ˆè¿‡æœŸçš„æ”¾å…¥toremoveé˜Ÿåˆ—ï¼‰
         _CheckSessionHeartbeat();
 
-        // postsend ÏûºÄ±È½Ï´ó
+        // postsend æ¶ˆè€—æ¯”è¾ƒå¤§
         _AsynSendFromDispatcher();
 
         // 5.post session to iocp
         _PostEventsToIocp();
 
-        // 6.donetevent ½«¶Ï¿ªµÄ¿Í»§¶Ë·ÅÈëtoremove¶ÓÁĞ,½«sessions·ÅÈëtorecvÓëtosend¶ÓÁĞ µ½³¬Ê±Ò²ÓĞ¿ÉÄÜ²¿·ÖµÄpostÃ»Íê³É£¡£¡£¡
+        // 6.donetevent å°†æ–­å¼€çš„å®¢æˆ·ç«¯æ”¾å…¥toremoveé˜Ÿåˆ—,å°†sessionsæ”¾å…¥torecvä¸tosendé˜Ÿåˆ— åˆ°è¶…æ—¶ä¹Ÿæœ‰å¯èƒ½éƒ¨åˆ†çš„postæ²¡å®Œæˆï¼ï¼ï¼
         ret = _DoEvents();
         if(ret != StatusDefs::Success)
         {
@@ -248,7 +248,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
             break;
         }
 
-        // 6.domsg ÏûºÄ±È½Ï´ó£¬ÔÚ¸ß²¢·¢Çé¿öÏÂ¿ÉÄÜ»áµ¼ÖÂ³¬Ê±
+        // 6.domsg æ¶ˆè€—æ¯”è¾ƒå¤§ï¼Œåœ¨é«˜å¹¶å‘æƒ…å†µä¸‹å¯èƒ½ä¼šå¯¼è‡´è¶…æ—¶
         _OnMsgArrived();
 
         // 7.removesessions
@@ -257,7 +257,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
 
     g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("transfer id[%d] threadId[%lu] end"), _id, SystemUtil::GetCurrentThreadId());
 
-    // Ïú»Ùsessions ´ËÊ±Òª±£Ö¤handlerÒª»¹Ã»¹Ø±Õ
+    // é”€æ¯sessions æ­¤æ—¶è¦ä¿è¯handlerè¦è¿˜æ²¡å…³é—­
     _iocp->Destroy();
     _ClearSessionsWhenClose();
 }
@@ -268,29 +268,29 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
     if(ret != StatusDefs::Success)
         return ret;
 
-    // ´¦ÀíiocpÍË³ö
+    // å¤„ç†iocpé€€å‡º
     if(_ioEvent->_data._code == IocpDefs::IO_QUIT)
     {
-        g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("FS_IocpMsgTransfer iocpÍË³ö threadId<%lu> code=%lld")
+        g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("FS_IocpMsgTransfer iocpé€€å‡º threadId<%lu> code=%lld")
                                      , SystemUtil::GetCurrentThreadId(), _ioEvent->_data._code);
         return StatusDefs::IocpMsgTransfer_IocpQuit;
     }
 
-    // 1.ÅĞ¶Ï»á»°ÊÇ·ñ´æÔÚ
+    // 1.åˆ¤æ–­ä¼šè¯æ˜¯å¦å­˜åœ¨
     const UInt64 sessionId = _ioEvent->_data._sessionId;
     auto session = _GetSession(sessionId);
     if(!session)
-    {// Êı¾İ¶ªÊ§,×î´ó¿ÉÄÜÊÇÒÑ¾­¶Ï¿ªÁ´½ÓÁË£¡£¡£¡£¡
+    {// æ•°æ®ä¸¢å¤±,æœ€å¤§å¯èƒ½æ˜¯å·²ç»æ–­å¼€é“¾æ¥äº†ï¼ï¼ï¼ï¼
 //         g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] is removed before.\n stack trace back:\n%s"
 //                                      , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
         return StatusDefs::Success;
     }
 
-    // 2.´¦Àí½ÓÊÕÓë·¢ËÍ
+    // 2.å¤„ç†æ¥æ”¶ä¸å‘é€
     if(IocpDefs::IO_RECV == _ioEvent->_ioData->_ioType)
     {
         if(_ioEvent->_bytesTrans <= 0)
-        {// ¿Í»§¶Ë¶Ï¿ª´¦Àí
+        {// å®¢æˆ·ç«¯æ–­å¼€å¤„ç†
             g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lu] will disconnect"
                                            , session->GetSessionId()
                                            , session->GetSocket(),
@@ -304,21 +304,21 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 
         session->OnRecvSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
 
-        // ÏûÏ¢½ÓÊÕ»Øµ÷
+        // æ¶ˆæ¯æ¥æ”¶å›è°ƒ
         g_ServerCore->_OnRecvMsg(session, _ioEvent->_bytesTrans);
         // _OnMsgArrived(session);
 
         _msgArriviedSessions.push_back(session);
         _UpdateSessionHeartbeat(session);
 
-        // ÖØĞÂ½ÓÊÕÊı¾İ
+        // é‡æ–°æ¥æ”¶æ•°æ®
         if(session->CanPost())
             _toPostRecv.insert(session);
     }
     else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
     {
         if(_ioEvent->_bytesTrans <= 0)
-        {// ¿Í»§¶Ë¶Ï¿ª´¦Àí
+        {// å®¢æˆ·ç«¯æ–­å¼€å¤„ç†
             g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::IO_SEND bytesTrans[%lu] disconnected"
                                            , session->GetSessionId()
                                            , session->GetSocket(),
@@ -331,12 +331,12 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
 
         session->OnSendSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
 
-        // ÏûÏ¢·¢ËÍ»Øµ÷
+        // æ¶ˆæ¯å‘é€å›è°ƒ
         g_ServerCore->_OnSendMsg(session, _ioEvent->_bytesTrans);
 
         _UpdateSessionHeartbeat(session);
 
-        // ÖØĞÂÍ¶µİ½ÓÊÕ
+        // é‡æ–°æŠ•é€’æ¥æ”¶
         if(session->CanPost() &&
            !session->IsPostSend() &&
            session->HasMsgToSend())
@@ -350,7 +350,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
     }
 
-    // ¿Í»§¶ËÒÑ¾­¶Ï¿ªÁ¬½Ó
+    // å®¢æˆ·ç«¯å·²ç»æ–­å¼€è¿æ¥
 //     if(session->IsClose())
 //     {
 //         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("session is closed sessionId[%llu]."), sessionId);
@@ -366,7 +366,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
     if(_msgArriviedSessions.empty())
         return;
 
-    // ´¦ÀíÏûÏ¢µ½´ï
+    // å¤„ç†æ¶ˆæ¯åˆ°è¾¾
     FS_IocpSession *session = NULL;
     UInt64 sessionId = 0;
     for(auto iterSession = _msgArriviedSessions.begin(); iterSession != _msgArriviedSessions.end();)
@@ -378,7 +378,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
         {
             auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
 
-            // ´´½¨ÏûÏ¢
+            // åˆ›å»ºæ¶ˆæ¯
             FS_NetMsgBufferBlock *newBlock = new FS_NetMsgBufferBlock;
             newBlock->_generatorId = _id;
             newBlock->_sessionId = sessionId;
@@ -409,7 +409,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
 
 void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
 {
-    // TODO:¶Ï¿ªÁËµ«Í¬Ê±ÊÕµ½ÏûÏ¢´¦Àí²»£¿Ä¿Ç°ÔİÊ±²»´¦Àí
+    // TODO:æ–­å¼€äº†ä½†åŒæ—¶æ”¶åˆ°æ¶ˆæ¯å¤„ç†ä¸ï¼Ÿç›®å‰æš‚æ—¶ä¸å¤„ç†
     if(_toRemove.find(session) != _toRemove.end())
         return;
 
@@ -420,7 +420,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
         {
             auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
 
-            // ´´½¨ÏûÏ¢
+            // åˆ›å»ºæ¶ˆæ¯
             FS_NetMsgBufferBlock *newBlock = new FS_NetMsgBufferBlock;
             newBlock->_generatorId = _id;
             newBlock->_sessionId = sessionId;
@@ -449,7 +449,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
 
 void FS_IocpMsgTransfer::_OnDelayDisconnected(FS_IocpSession *session)
 {
-    // Õâ¸öÊ±ºòÒ²ÓĞ¿ÉÄÜpost¸ÕºÃÍê³É£¬ËùÒÔ²»ÒËÓÃclosesocket£¬¶øÊÇcacelio£¬Ê¹µÃÒÑÍê³ÉµÄ²»»á±»È¡Ïû£¬ÇÒµ½´Ësession¼´½«¹Ø±Õ
+    // è¿™ä¸ªæ—¶å€™ä¹Ÿæœ‰å¯èƒ½poståˆšå¥½å®Œæˆï¼Œæ‰€ä»¥ä¸å®œç”¨closesocketï¼Œè€Œæ˜¯cacelioï¼Œä½¿å¾—å·²å®Œæˆçš„ä¸ä¼šè¢«å–æ¶ˆï¼Œä¸”åˆ°æ­¤sessionå³å°†å…³é—­
     session->MaskClose();
     CancelIoEx(HANDLE(session->GetSocket()), NULL);
 }
@@ -461,14 +461,14 @@ void FS_IocpMsgTransfer::_OnDisconnected(FS_IocpSession *session)
                                    , sessionId
                                    , session->GetSocket(), session->GetAddr()->ToString().c_str());
 
-    // servercoreÊÕµ½¶Ï¿ª»Øµ÷ ²»Òª»Øµ÷µ½±¾Ä£¿éÏß³Ì°²È«µÄ½Ó¿Ú±ÜÃâËÀËø
+    // servercoreæ”¶åˆ°æ–­å¼€å›è°ƒ ä¸è¦å›è°ƒåˆ°æœ¬æ¨¡å—çº¿ç¨‹å®‰å…¨çš„æ¥å£é¿å…æ­»é”
     _sessionHeartbeatQueue.erase(session);
     g_ServerCore->_OnDisconnected(session);
 
-    // ÍÆËÍ»á»°¶Ï¿ªÏûÏ¢
+    // æ¨é€ä¼šè¯æ–­å¼€æ¶ˆæ¯
     _NtySessionDisConnectMsg(sessionId);
 
-    // ÒÆ³ı»á»°
+    // ç§»é™¤ä¼šè¯
      _sessions.erase(sessionId);
     _toPostRecv.erase(session);
     _toPostSend.erase(session);
@@ -591,7 +591,7 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
 //                                       , session->GetHeartBeatExpiredTime().GetMicroTimestamp()
 //                                       , session->GetHeartBeatExpiredTime().ToStringOfMillSecondPrecision().c_str());
 
-        // ĞÄÌø¹ıÆÚ µ½ondisconnected²ÅÕæÕıÒÆ³ı
+        // å¿ƒè·³è¿‡æœŸ åˆ°ondisconnectedæ‰çœŸæ­£ç§»é™¤
         // OnHeartBeatTimeOut(session);
     }
 }
@@ -628,8 +628,8 @@ void FS_IocpMsgTransfer::_AsynSendFromDispatcher()
     _senderMessageQueue->PopImmediately(_senderMsgs);
     _senderMessageQueue->PopUnlock();
 
-    // TODO:ÏûÏ¢¹ı¶àÊ±ºò»áËÀÔÚÑ­»·ÖĞ£¬ÑÏÖØÍÏÂıËÙ¶È£¨ĞèÒªÏÈ°´sessionId·ÖÀà×é³ÉÒ»¸ö°ü¶ÓÁĞ£©£¨ĞèÒªÔÚÏûÏ¢¶ÓÁĞÖĞ¶¨ÖÆ·ÖÀà·½·¨»Øµ÷£¨Ê¹ÓÃ×éºÏ·½Ê½£©£©
-    // ·µ»Ø£ºstd::map<UInt64, std::list<FS_NetMsgBufferBlock *>> *¶ÓÁĞ
+    // TODO:æ¶ˆæ¯è¿‡å¤šæ—¶å€™ä¼šæ­»åœ¨å¾ªç¯ä¸­ï¼Œä¸¥é‡æ‹–æ…¢é€Ÿåº¦ï¼ˆéœ€è¦å…ˆæŒ‰sessionIdåˆ†ç±»ç»„æˆä¸€ä¸ªåŒ…é˜Ÿåˆ—ï¼‰ï¼ˆéœ€è¦åœ¨æ¶ˆæ¯é˜Ÿåˆ—ä¸­å®šåˆ¶åˆ†ç±»æ–¹æ³•å›è°ƒï¼ˆä½¿ç”¨ç»„åˆæ–¹å¼ï¼‰ï¼‰
+    // è¿”å›ï¼šstd::map<UInt64, std::list<FS_NetMsgBufferBlock *>> *é˜Ÿåˆ—
     for(auto iterBlock = _senderMsgs->begin(); iterBlock != _senderMsgs->end();)
     {
         FS_NetMsgBufferBlock *sendMsgBufferBlock = static_cast<FS_NetMsgBufferBlock *>(*iterBlock);
@@ -662,7 +662,7 @@ void FS_IocpMsgTransfer::_ClearSenderMessageQueue()
     _senderMessageQueue->PopImmediately(_senderMsgs);
     _senderMessageQueue->PopUnlock();
 
-    // ÌáÊ¾ÓĞnÌõÏûÏ¢ÓÉÓÚ¶Ô¶Ë¹Ø±Õ¶øÎŞ·¨·¢³öÈ¥
+    // æç¤ºæœ‰næ¡æ¶ˆæ¯ç”±äºå¯¹ç«¯å…³é—­è€Œæ— æ³•å‘å‡ºå»
     if(!_senderMsgs->empty())
     {
         g_Log->net<FS_IocpMsgTransfer>("it has %llu messages unhandled which will send to remote session!", _senderMsgs->size());
@@ -698,7 +698,7 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
                                          , newSession->GetSocket()
                                          , addr->GetAddr().c_str()
                                          , addr->GetPort());
-            // °ó¶¨iocp
+            // ç»‘å®šiocp
             auto st = _iocp->Reg(newSessionInfo._sock, newSessionInfo._sessionId);
             if(st != StatusDefs::Success)
             {
@@ -706,10 +706,10 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
                                              , newSessionInfo._sock, newSessionInfo._sessionId, st);
             }
 
-            // ÍÆËÍ»á»°Á¬ÈëÏûÏ¢
+            // æ¨é€ä¼šè¯è¿å…¥æ¶ˆæ¯
             _NtySessionConnectedMsg(newSessionInfo._sessionId);
 
-            // Í¶µİ½ÓÊÕÊı¾İ
+            // æŠ•é€’æ¥æ”¶æ•°æ®
             if(!_DoPostRecv(newSession))
             {
                 g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu] serverId[%d]"), newSessionInfo._sessionId, _id);

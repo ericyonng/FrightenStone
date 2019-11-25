@@ -52,7 +52,7 @@ public:
     virtual void Finish() = 0;
     #pragma endregion
 
-    // »ñÈ¡×ÊÔ´
+    // è·å–èµ„æº
 public:
     virtual ILog *GetLog() = 0;
 };
@@ -67,7 +67,7 @@ inline IEasyGlobal::~IEasyGlobal()
 
 FS_NAMESPACE_END
 
-// È«¾ÖÀàÇëÃ¿¸ö½ø³Ì¶ÔÈ«¾Ö¶ÔÏó¸³Öµ
+// å…¨å±€ç±»è¯·æ¯ä¸ªè¿›ç¨‹å¯¹å…¨å±€å¯¹è±¡èµ‹å€¼
 // #define g_EasyGlobal fs::IEasyGlobal::GetInstance()
 
 #endif

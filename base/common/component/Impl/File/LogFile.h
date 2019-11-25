@@ -50,7 +50,7 @@ public:
     bool IsDayPass(const Time &lastModifyTime) const;
     void UpdateLastTimestamp();
 
-    // ·Ö¸îÎÄ¼þ
+    // åˆ†å‰²æ–‡ä»¶
     bool IsTooLarge(Int64 limitSize) const;
     void PartitionFile(bool isSysFirstCreate = false);
 

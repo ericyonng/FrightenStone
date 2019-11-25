@@ -39,7 +39,7 @@
 #include "base/common/log/Defs/LogData.h"
 #include "base/common/assist/utils/Impl/SystemUtil.h"
 
- // º¯ÊıÓëĞĞºÅ±ãÀûºê
+ // å‡½æ•°ä¸è¡Œå·ä¾¿åˆ©å®
 #undef _FUNC_LINE_ARGS_
 #define _FUNC_LINE_ARGS_ __FUNCTION__, __LINE__
 
@@ -59,45 +59,45 @@ public:
     virtual void FinishModule() = 0;
     virtual void FlushAllFile() = 0;
 
-    // jsonÈÕÖ¾
+    // jsonæ—¥å¿—
 
     // 
-    // ÏêÏ¸ÈÕÖ¾details.log
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_
+    // è¯¦ç»†æ—¥å¿—details.log
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_
     template<typename ObjType, typename... Args>
     void i(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_
     template<typename ObjType, typename... Args>
     void d(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_
     template<typename ObjType, typename... Args>
     void w(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_ »á´¥·¢¶ÏÑÔ
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_ ä¼šè§¦å‘æ–­è¨€
     template<typename ObjType, typename... Args>
     void e(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
 
-    // crashÈÕÖ¾
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_ »á´¥·¢¶ÏÑÔ
+    // crashæ—¥å¿—
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_ ä¼šè§¦å‘æ–­è¨€
     template<typename... Args>
     void crash(const char *fmt, const Args&... args);
-    // ÍøÂçÈÕÖ¾
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_ ²»Ö§³Ö¿ØÖÆÌ¨Êä³ö
+    // ç½‘ç»œæ—¥å¿—
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_ ä¸æ”¯æŒæ§åˆ¶å°è¾“å‡º
     template<typename ObjType, typename... Args>
     void net(const char *fmt, const Args&... args);
 
-    // ÄÚ´æĞ¹Â©ÈÕÖ¾
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_
+    // å†…å­˜æ³„æ¼æ—¥å¿—
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_
     template<typename... Args>
     void memleak(const char *fmt, const Args&... args);
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_
     template<typename... Args>
     void mempool(const char *fmt, const Args&... args);
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_
     template<typename... Args>
     void objpool(const char *fmt, const Args&... args);
 
-    // ÏµÍ³·ÖÎöÈÕÖ¾
-    // ÇëÊ¹ÓÃ±ãÀûºê_LOGFMT_
+    // ç³»ç»Ÿåˆ†ææ—¥å¿—
+    // è¯·ä½¿ç”¨ä¾¿åˆ©å®_LOGFMT_
     template<typename ObjType, typename... Args>
     void sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     template<typename ObjType, typename... Args>
@@ -105,23 +105,23 @@ public:
     template<typename... Args>
     void custom(const char *fmt, const Args&... args);
 
-    /* ¹¦ÄÜº¯Êı */
-    // hookÓë¾ßÌåÀàĞÍÓĞ¹Ø
+    /* åŠŸèƒ½å‡½æ•° */
+    // hookä¸å…·ä½“ç±»å‹æœ‰å…³
     template<typename ObjType>
     const IDelegate<void, const LogData *> * InstallLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(const LogData *logData));
     const IDelegate<void, const LogData *> * InstallLogHookFunc(Int32 level, void (*func)(const LogData *logData));
-    // hookÓë¾ßÌåÀàĞÍÓĞ¹Ø
+    // hookä¸å…·ä½“ç±»å‹æœ‰å…³
     template<typename ObjType>
     const IDelegate<void, LogData *> * InstallBeforeLogHookFunc(Int32 level, ObjType *obj, void (ObjType::*func)(LogData *logData));
     virtual void UnInstallLogHookFunc(Int32 level, const IDelegate<void, const LogData *> *delegate) = 0;
     const IDelegate<void, LogData *> * InstallBeforeLogHookFunc(Int32 level, void(*func)(LogData *logData));
     virtual void UnInstallBeforeLogHookFunc(Int32 level, const IDelegate<void, LogData *> *delegate) = 0;
 
-    // ´´½¨ÈÕÖ¾ÎÄ¼şµ÷ÓÃ £¡£¡£¡Íâ²¿²»¿Éµ÷ÓÃ£¬ÓÉÏµÍ³³õÊ¼»¯Ê±ºòµ÷ÓÃ
+    // åˆ›å»ºæ—¥å¿—æ–‡ä»¶è°ƒç”¨ ï¼ï¼ï¼å¤–éƒ¨ä¸å¯è°ƒç”¨ï¼Œç”±ç³»ç»Ÿåˆå§‹åŒ–æ—¶å€™è°ƒç”¨
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName) = 0;
 
 protected:
-    // Óë¾ßÌåÀàĞÍÎŞ¹Øhook
+    // ä¸å…·ä½“ç±»å‹æ— å…³hook
     virtual const IDelegate<void, const LogData *> *_InstallLogHookFunc(Int32 level, IDelegate<void, const LogData *> *delegate) = 0;
     virtual const IDelegate<void, LogData *> *_InstallBeforeLogHookFunc(Int32 level, IDelegate<void, LogData *> *delegate) = 0;
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData) = 0;
@@ -131,7 +131,7 @@ FS_NAMESPACE_END
 
 #include "base/common/log/Interface/ILogImpl.h"
 
-// ĞèÒªÑéÖ¤¶à½ø³ÌÏÂÊÇ·ñ¹«ÓÃÒ»¸ö¶ÔÏó
+// éœ€è¦éªŒè¯å¤šè¿›ç¨‹ä¸‹æ˜¯å¦å…¬ç”¨ä¸€ä¸ªå¯¹è±¡
 // extern BASE_EXPORT fs::ILog *g_LogObj;
 #define g_Log  (fs::ILog::GetInstance())
 

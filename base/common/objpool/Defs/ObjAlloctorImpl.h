@@ -34,7 +34,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// objtypeµÄblocksize±ØĞëÊÇvoid *³ß´çµÄÕûÊı±¶
+// objtypeçš„blocksizeå¿…é¡»æ˜¯void *å°ºå¯¸çš„æ•´æ•°å€
 template<typename ObjType>
 const size_t IObjAlloctor<ObjType>::_objBlockSize = __FS_MEMORY_ALIGN__(sizeof(ObjType)) + sizeof(ObjBlock<ObjType>);
 
@@ -52,11 +52,11 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     ,_objpoolAllowedMaxOccupiedBytes(__OBJ_POOL_MAX_ALLOW_BYTES_DEF__)
     ,_totalBlockCnt(0)
 {
-    // ³õÊ¼»¯½Úµã
+    // åˆå§‹åŒ–èŠ‚ç‚¹
     _header = new AlloctorNode<ObjType>(_nodeCapacity);
     _lastNode = _header;
 
-    // lastnodeÔÚ¹¹ÔìÖĞ³õÊ¼»¯
+    // lastnodeåœ¨æ„é€ ä¸­åˆå§‹åŒ–
     _curNodeObjs = _lastNode->_objs;
     _alloctedInCurNode = 0;
     ++_nodeCnt;
@@ -95,7 +95,7 @@ template<typename ObjType>
 inline void IObjAlloctor<ObjType>::Free(void *ptr)
 {
     _locker.Lock();
-    // freeµÄ¶ÔÏó¹¹³ÉÁ´±íÓÃÓÚÏÂ´Î·ÖÅä
+    // freeçš„å¯¹è±¡æ„æˆé“¾è¡¨ç”¨äºä¸‹æ¬¡åˆ†é…
     MixFreeNoLocker(ptr);
     _locker.Unlock();
 }
@@ -139,7 +139,7 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
         return ptr;
     }
 
-    // ·ÖÅäĞÂ½Úµã
+    // åˆ†é…æ–°èŠ‚ç‚¹
     if(_alloctedInCurNode >= _lastNode->_blockCnt)
     {
         if(g_curObjPoolOccupiedBytes > _objpoolAllowedMaxOccupiedBytes)
@@ -148,19 +148,19 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
         _NewNode();
     }
 
-    // ÄÚ´æ³ØÖĞ·ÖÅä¶ÔÏó
+    // å†…å­˜æ± ä¸­åˆ†é…å¯¹è±¡
     auto ptr = reinterpret_cast<char *>(_curNodeObjs) + _alloctedInCurNode * _objBlockSize;
     ++_alloctedInCurNode;
     ++_objInUse;
 
-    // ptrÊÇÍ·²¿¿ªÊ¼ĞÅÏ¢
+    // ptræ˜¯å¤´éƒ¨å¼€å§‹ä¿¡æ¯
     return ptr + sizeof(ObjBlock<ObjType>);
 }
 
 template<typename ObjType>
 inline void IObjAlloctor<ObjType>::FreeNoLocker(void *ptr)
 {
-    // freeµÄ¶ÔÏó¹¹³ÉÁ´±íÓÃÓÚÏÂ´Î·ÖÅä
+    // freeçš„å¯¹è±¡æ„æˆé“¾è¡¨ç”¨äºä¸‹æ¬¡åˆ†é…
     *((ObjType **)ptr) = _lastDeleted;
     _lastDeleted = reinterpret_cast<ObjType *>(ptr);
     --_objInUse;
@@ -189,7 +189,7 @@ inline ObjType *IObjAlloctor<ObjType>::NewByPtr(void *ptr, Args &&... args)
 template<typename ObjType>
 inline void IObjAlloctor<ObjType>::Delete(ObjType *ptr)
 {
-    // ÏÈÎö¹¹ºóÊÍ·Å
+    // å…ˆææ„åé‡Šæ”¾
     ptr->~ObjType();
 
     MixFreeNoLocker(ptr);
@@ -204,57 +204,39 @@ inline void IObjAlloctor<ObjType>::DeleteWithoutDestructor(ObjType *ptr)
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetObjInUse()
 {
-#if __FS_THREAD_SAFE__
     _locker.Lock();
     auto cnt = _objInUse;
     _locker.Unlock();
 
     return cnt;
-#else
-    return _objInUse;
-#endif
 }
 
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetTotalObjBlocks()
 {
-#if __FS_THREAD_SAFE__
     _locker.Lock();
     auto cnt = _totalBlockCnt;
     _locker.Unlock();
-
     return cnt;
-#else
-    return _nodeCnt * _nodeCapacity;
-#endif
 }
 
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetNodeCnt()
 {
-#if __FS_THREAD_SAFE__
     _locker.Lock();
     auto cnt = _nodeCnt;
     _locker.Unlock();
 
     return cnt;
-#else
-    return _nodeCnt;
-#endif
 }
 
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetBytesOccupied()
 {
-#if __FS_THREAD_SAFE__
     _locker.Lock();
     auto cnt = _bytesOccupied;
     _locker.Unlock();
-
     return cnt;
-#else
-    return _bytesOccupied;
-#endif
 }
 
 template<typename ObjType>
@@ -284,10 +266,10 @@ inline void IObjAlloctor<ObjType>::SetAllowMaxOccupiedBytes(UInt64 maxBytes)
 template<typename ObjType>
 inline void IObjAlloctor<ObjType>::_NewNode()
 {
-    // ¹¹³ÉÁ´±í
+    // æ„æˆé“¾è¡¨
     auto *newNode = new AlloctorNode<ObjType>(_nodeCapacity *= 2);
 
-    // lastnodeÔÚ¹¹ÔìÖĞ³õÊ¼»¯
+    // lastnodeåœ¨æ„é€ ä¸­åˆå§‹åŒ–
     _lastNode->_nextNode = newNode;
     _lastNode = newNode;
     _curNodeObjs = newNode->_objs;
@@ -304,11 +286,11 @@ inline void IObjAlloctor<ObjType>::_InitNode(AlloctorNode<ObjType> *newNode)
     auto curBuff = reinterpret_cast<char *>(newNode->_objs);
 
     /**
-    *   ÉêÇëÄÚ´æ
+    *   ç”³è¯·å†…å­˜
     */
     // memset(_curBuf, 0, newNode->_nodeSize);
 
-    // ¹¹½¨ÄÚ´æ¿éÁ´±í
+    // æ„å»ºå†…å­˜å—é“¾è¡¨
     for(size_t i = 0; i < newNode->_blockCnt; ++i)
     {
         char *cache = (curBuff + _objBlockSize * i);

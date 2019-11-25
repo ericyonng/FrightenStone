@@ -157,12 +157,12 @@ void MemleakMonitor::PrintObjPoolInfo() const
     if(g_curObjPoolOccupiedBytes != totalOccupiedBytes)
         g_curObjPoolOccupiedBytes = totalOccupiedBytes;
 
-    // ��ӡ�ڴ�й©
+    // 打印内存泄漏
     g_Log->objpool("objpool[curObjPoolOccupiedBytes[%llu]]: total total pool in used bytes[%llu] totalObjInUsedCnt[%lld] total pool occupied bytes[%lld]"
                    ,(UInt64)(g_curObjPoolOccupiedBytes),  totalPoolInUsedBytes, totalObjInUsedCnt, totalOccupiedBytes);
     g_Log->objpool("=========================================================");
 
-    // ��ӡϵͳ��Ϣ
+    // 打印系统信息
 //     g_Log->sys<MemleakMonitor>(_LOGFMT_("objpool: total total pool in used bytes[%llu] total pool occupied bytes[%lld]")
 //                , totalPoolInUsedBytes, totalOccupiedBytes);
 }
@@ -186,11 +186,11 @@ void MemleakMonitor::PrintObjPoolInfo(const char *objName) const
         totalObjInUsedCnt += objInUsed;
     }
 
-    // ��ӡ�ڴ�й©
+    // 打印内存泄漏
     g_Log->objpool("objpool objname[%s]:  total total pool in used bytes[%llu] totalObjInUsedCnt[%lld] total pool occupied bytes[%lld]"
                    ,objName, totalPoolInUsedBytes, totalObjInUsedCnt, totalOccupiedBytes);
 
-    // ��ӡϵͳ��Ϣ
+    // 打印系统信息
 //     g_Log->sys<MemleakMonitor>(_LOGFMT_("objpool objname[%s]:  total total pool in used bytes[%llu] total pool occupied bytes[%lld]")
 //                ,objName, totalPoolInUsedBytes, totalOccupiedBytes);
 }
@@ -198,7 +198,7 @@ void MemleakMonitor::PrintObjPoolInfo(const char *objName) const
 
 void MemleakMonitor::PrintSysMemoryInfo() const
 {
-    // ϵͳ�ڴ����
+    // 系统内存情况
     g_Log->mempool("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]"
                    , SystemUtil::GetTotalPhysMemSize()
                    , SystemUtil::GetAvailPhysMemSize()
@@ -227,16 +227,16 @@ void MemleakMonitor::PrintSysMemoryInfo() const
 
 void MemleakMonitor::PrintPoolAll() const
 {
-    // ϵͳ�ڴ���Ϣ
+    // 系统内存信息
     PrintSysMemoryInfo();
-    // �ڴ����Ϣ
+    // 内存池信息
     for(auto &iterCallback : _threadIdRefMemPoolPrintCallback)
     {
         auto callback = iterCallback.second;
         callback->Invoke();
     }
 
-    // ��ӡ�����
+    // 打印对象池
     PrintObjPoolInfo();
 }
 

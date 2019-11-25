@@ -48,7 +48,7 @@ public:
 
 #pragma region sinal
 public:
-    // Ö§³Ö¶àÏß³ÌµÈ´ısinalÒ»´ÎÖ»»½ĞÑÒ»¸öÏß³Ì
+    // æ”¯æŒå¤šçº¿ç¨‹ç­‰å¾…sinalä¸€æ¬¡åªå”¤é†’ä¸€ä¸ªçº¿ç¨‹
     int Wait(unsigned long milisec = INFINITE);
     bool Sinal();
     bool HasWaiter();

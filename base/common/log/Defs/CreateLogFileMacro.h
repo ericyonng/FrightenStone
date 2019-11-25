@@ -34,7 +34,7 @@
 
 #pragma once
 
-// log∆ º…˘√˜
+// logËµ∑ÂßãÂ£∞Êòé
 #define DECLEAR_LOG_BEGIN(LOG_BEGIN, line, logindexbase)                                        \
 enum {LOG_BEGIN = logindexbase};                                                                \
 template<>                                                                                      \
@@ -43,7 +43,7 @@ struct ExcludeCommentHelper<line>                                               
     enum {realvalue = logindexbase-1};                                                          \
 };                                                                                              \
 
-// ÃÌº”logŒƒº˛
+// Ê∑ªÂä†logÊñá‰ª∂
 #define ADD_LOG(log_path, log_name, base, line)                                                 \
 template<>                                                                                      \
 struct ExcludeCommentHelper<line>                                                               \
@@ -63,12 +63,12 @@ struct LogInitHelper<_##log_path##_##log_name##_>                               
     }                                                                                           \
 };
 
-// logŒƒº˛Ω· ¯
+// logÊñá‰ª∂ÁªìÊùü
 #define DECLEAR_LOG_END(LOG_NUMBER, line)                                                       \
 enum {LOG_NUMBER = ExcludeCommentHelper<line>::realvalue};\
 enum {LOG_QUANTITY = ExcludeCommentHelper<line>::realvalue + 1};
 
-// ±„¿˚∫Í
+// ‰æøÂà©ÂÆè
 #define DECLEAR_GENERAL_LOG_BEGIN() DECLEAR_LOG_BEGIN(LOG_NUM_BEGIN,  __LINE__, 0)
 #define GENERAL_ADDLOG(log_path, log_name) ADD_LOG(log_path, log_name, LOG_NUM_BEGIN, __LINE__)
 #define DECLEAR_GENERAL_LOG_END() DECLEAR_LOG_END(LOG_NUM_MAX, __LINE__)

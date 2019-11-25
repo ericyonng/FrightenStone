@@ -42,9 +42,9 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT MathUtil
 {
 public:
-    // 最大公约数（欧几里得算法）
+    // 鏈�澶у叕绾︽暟锛堟鍑犻噷寰楃畻娉曪級
     static Int64 GetGcd(Int64 a, Int64 b);
-    // 最小公倍数
+    // 鏈�灏忓叕鍊嶆暟
     static Int64 GetLcm(Int64 a, Int64 b);
 };
 

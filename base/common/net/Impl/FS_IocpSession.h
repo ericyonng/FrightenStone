@@ -53,7 +53,7 @@ public:
     FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor);
     virtual ~FS_IocpSession();
 
-    // ²Ù×÷
+    // æ“ä½œ
 public:
     NetMsg_DataHeader *FrontRecvMsg();
     void PopFrontRecvMsg();
@@ -67,17 +67,17 @@ public:
 
     FS_IocpBuffer *CastToRecvBuffer();
 
-    // ×´Ì¬
+    // çŠ¶æ€
 public:
     bool IsPostIoChange() const;
     bool IsPostSend() const;
     bool IsPostRecv() const;
     bool CanPost() const;
-    // ÈôÒªÏú»ÙsessionĞèÒª·Åµ½ÑÓ³Ù¶ÓÁĞÖĞ£¬ÇÒĞèÒªÏÈclosesocketÈ»ºóµÈµ½ËùÓĞioÍê³É
+    // è‹¥è¦é”€æ¯sessionéœ€è¦æ”¾åˆ°å»¶è¿Ÿé˜Ÿåˆ—ä¸­ï¼Œä¸”éœ€è¦å…ˆclosesocketç„¶åç­‰åˆ°æ‰€æœ‰ioå®Œæˆ
     virtual bool CanDestroy() const;
     virtual bool CanDisconnect() const;
 
-    // ÊÂ¼ş
+    // äº‹ä»¶
 public:
     void OnSendSuc(size_t transferBytes, IoDataBase *ioData);
     void OnRecvSuc(size_t transferBytes, IoDataBase *ioData);

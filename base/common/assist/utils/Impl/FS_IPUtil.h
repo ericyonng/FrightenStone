@@ -45,14 +45,14 @@ class BASE_EXPORT FS_IPUtil
 public:
     static Int32 GetLocalIP(FS_String &ip, Int32 netCardNo = 0, bool isToBind = true, bool isStreamSock = true, bool isIpv4 = true);
     static Int32 GetIPByDomain(
-        const char *domain                                                // ÓòÃû»òÖ÷»úÃû
-        , const char *service                                             /* ¶Ë¿ÚºÅ¡°80¡±µÈ¡¢·şÎñÃû Èç"ftp", "http"µÈ */
-        , FS_String &ipAddrString                                           // Êä³öip
-        , Int32 netCardNo = 0                                                // Íø¿¨ĞòºÅÈô»ñÈ¡µÄÊÇ±¾µØµÄµØÖ·£¬ÎªÑ¡ÔñÍøÖ·ÁĞ±íµÄÄ³Ò»¸öÍøÖ·
-        , Int32 eFlags = FS_IPUtilDefs::AI_FLAGS_TYPE_AI_PASSIVE                 // FS_IPUtilDefs::AI_FLAGS_TYPE ¸÷¸öÎ»µÄ×éºÏ Ä¬ÈÏAI_PASSIVE ¼´ÓÃÓÚbind°ó¶¨ ²»ÉèÖÃÔòÓÃÓÚconnect
-        , FS_IPUtilDefs::SOCK_TYPE eSockType = FS_IPUtilDefs::SOCK_TYPE_SOCK_STREAM	        // Ä¬ÈÏÁ÷Êı¾İ
-        , FS_IPUtilDefs::FAMILY_TYPE eFamily = FS_IPUtilDefs::FAMILY_TYPE_AF_INET           // Ä¬ÈÏipv4
-        , FS_IPUtilDefs::PROTOCOL_TYPE eProtocol = FS_IPUtilDefs::PROTOCOL_TYPE_IPPROTO_IP  // Ä¬ÈÏÈÎÒâĞ­Òé ¼´ipĞ­Òé
+        const char *domain                                                // åŸŸåæˆ–ä¸»æœºå
+        , const char *service                                             /* ç«¯å£å·â€œ80â€ç­‰ã€æœåŠ¡å å¦‚"ftp", "http"ç­‰ */
+        , FS_String &ipAddrString                                           // è¾“å‡ºip
+        , Int32 netCardNo = 0                                                // ç½‘å¡åºå·è‹¥è·å–çš„æ˜¯æœ¬åœ°çš„åœ°å€ï¼Œä¸ºé€‰æ‹©ç½‘å€åˆ—è¡¨çš„æŸä¸€ä¸ªç½‘å€
+        , Int32 eFlags = FS_IPUtilDefs::AI_FLAGS_TYPE_AI_PASSIVE                 // FS_IPUtilDefs::AI_FLAGS_TYPE å„ä¸ªä½çš„ç»„åˆ é»˜è®¤AI_PASSIVE å³ç”¨äºbindç»‘å®š ä¸è®¾ç½®åˆ™ç”¨äºconnect
+        , FS_IPUtilDefs::SOCK_TYPE eSockType = FS_IPUtilDefs::SOCK_TYPE_SOCK_STREAM	        // é»˜è®¤æµæ•°æ®
+        , FS_IPUtilDefs::FAMILY_TYPE eFamily = FS_IPUtilDefs::FAMILY_TYPE_AF_INET           // é»˜è®¤ipv4
+        , FS_IPUtilDefs::PROTOCOL_TYPE eProtocol = FS_IPUtilDefs::PROTOCOL_TYPE_IPPROTO_IP  // é»˜è®¤ä»»æ„åè®® å³ipåè®®
     );
 };
 

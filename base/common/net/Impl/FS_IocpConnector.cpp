@@ -79,7 +79,7 @@ Int32 FS_IocpConnector::BeforeStart()
     const auto &ip = g_SvrCfg->GetListenIp();
     UInt16 port = g_SvrCfg->GetListenPort();
 
-    // ³õÊ¼»¯
+    // åˆå§‹åŒ–
     auto sock = _InitSocket();
     if(sock == INVALID_SOCKET)
     {
@@ -120,7 +120,7 @@ Int32 FS_IocpConnector::Start()
 
 void FS_IocpConnector::BeforeClose()
 {
-    // Á¬½ÓÆ÷ĞèÒªÔÙ´ËÊ±¹Ø±ÕÈë¿Ú
+    // è¿æ¥å™¨éœ€è¦å†æ­¤æ—¶å…³é—­å…¥å£
     _closeIocpDelegate->Invoke();
     _threadPool->Close();
 }
@@ -144,7 +144,7 @@ SOCKET FS_IocpConnector::_InitSocket()
         return _sock;
     }
 
-    // ipv4 µÄÁ÷Êı¾İ
+    // ipv4 çš„æµæ•°æ®
     _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(INVALID_SOCKET == _sock)
     {
@@ -152,7 +152,7 @@ SOCKET FS_IocpConnector::_InitSocket()
         return _sock;
     }
 
-    // Ì×½Ó×ÖÖØÓÃ
+    // å¥—æ¥å­—é‡ç”¨
     auto st = SocketUtil::MakeReUseAddr(_sock);
     if(st != StatusDefs::Success)
     {
@@ -165,8 +165,8 @@ SOCKET FS_IocpConnector::_InitSocket()
 
 Int32 FS_IocpConnector::_Bind(const Byte8 *ip, UInt16 port)
 {
-    // TODO:¶ÁÈ¡ÅäÖÃ±í
-    // 1.bind °ó¶¨ÓÃÓÚ½ÓÊÜ¿Í»§¶ËÁ¬½ÓµÄÍøÂç¶Ë¿Ú
+    // TODO:è¯»å–é…ç½®è¡¨
+    // 1.bind ç»‘å®šç”¨äºæ¥å—å®¢æˆ·ç«¯è¿æ¥çš„ç½‘ç»œç«¯å£
     sockaddr_in sin = {};
     sin.sin_family = AF_INET;
     // host to net unsigned short
@@ -174,7 +174,7 @@ Int32 FS_IocpConnector::_Bind(const Byte8 *ip, UInt16 port)
 
 #ifdef _WIN32
     if(ip) {
-        inet_pton(sin.sin_family, ip, &(sin.sin_addr));// ±È½ÏĞÂµÄº¯Êı¶Ô±Èinet_addr
+        inet_pton(sin.sin_family, ip, &(sin.sin_addr));// æ¯”è¾ƒæ–°çš„å‡½æ•°å¯¹æ¯”inet_addr
     }
     else {
         sin.sin_addr.S_un.S_addr = INADDR_ANY;
@@ -201,7 +201,7 @@ Int32 FS_IocpConnector::_Bind(const Byte8 *ip, UInt16 port)
 
 Int32 FS_IocpConnector::_Listen(Int32 unconnectQueueLen)
 {
-    // 1.listen ¼àÌıÍøÂç¶Ë¿Ú
+    // 1.listen ç›‘å¬ç½‘ç»œç«¯å£
     int ret = listen(_sock, unconnectQueueLen);
     if(SOCKET_ERROR == ret)
     {
@@ -230,7 +230,7 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS
         ++_curMaxSessionId;
         SocketUtil::MakeReUseAddr(sock);
 
-        // TODO:Á¬½Ó»Øµ÷ 
+        // TODO:è¿æ¥å›è°ƒ 
         BriefSessionInfo newSessionInfo;
         newSessionInfo._sessionId = _curMaxSessionId;
         newSessionInfo._sock = sock;
@@ -240,7 +240,7 @@ void FS_IocpConnector::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS
     else {
         _locker.Unlock();
 
-        // »ñÈ¡IPµØÖ· inet_ntoa(clientAddr.sin_addr)
+        // è·å–IPåœ°å€ inet_ntoa(clientAddr.sin_addr)
         SocketUtil::DestroySocket(sock);
         g_Log->w<FS_IocpConnector>(_LOGFMT_("Accept to MaxClient[%d] or curMaxId[%llu] too large"), _maxSessionQuantityLimit, _curMaxSessionId);
     }
@@ -255,64 +255,64 @@ void FS_IocpConnector::_OnDisconnected(IFS_Session *session)
 
 void FS_IocpConnector::_OnIocpMonitorTask(FS_ThreadPool *threadPool)
 {
-    // 1.´´½¨²¢°ó¶¨¼àÌı¶Ë¿Ú
+    // 1.åˆ›å»ºå¹¶ç»‘å®šç›‘å¬ç«¯å£
     SmartPtr<FS_Iocp> listenIocp = new FS_Iocp;
     listenIocp->Create();
     listenIocp->Reg(_sock);
     listenIocp->LoadAcceptEx(_sock);
 
-    // 2.¶¨Òå¹Ø±Õiocp
+    // 2.å®šä¹‰å…³é—­iocp
     auto __quitIocpFunc = [this, &listenIocp]()->void {
-        // ÏÈ¹Ø±Õlistensocket
+        // å…ˆå…³é—­listensocket
         // SocketUtil::DestroySocket(_sock);
         listenIocp->PostQuit();
     };
 
-    // 3.°ó¶¨ÍË³öiocp
+    // 3.ç»‘å®šé€€å‡ºiocp
     _closeIocpDelegate = DelegatePlusFactory::Create<decltype(__quitIocpFunc), void>(__quitIocpFunc);
 
     // const int len = 2 * (sizeof(sockaddr_in) + 16);
-    // ²»ĞèÒª¿Í»§¶ËÔÙÁ¬½ÓºóÁ¢¼´·¢ËÍÊı¾İµÄÇé¿öÏÂ×îµÍ³¤¶Èlen
+    // ä¸éœ€è¦å®¢æˆ·ç«¯å†è¿æ¥åç«‹å³å‘é€æ•°æ®çš„æƒ…å†µä¸‹æœ€ä½é•¿åº¦len
 
-    // 4.Ô¤ÏÈÍ¶µİFD_SETSIZE¸öaccept ¿ìËÙÁ¬Èë
+    // 4.é¢„å…ˆæŠ•é€’FD_SETSIZEä¸ªaccept å¿«é€Ÿè¿å…¥
     char **bufArray = NULL;
     IoDataBase **ioDataArray = NULL;
     _PreparePostAccept(listenIocp, bufArray, ioDataArray);
 
-    // 5.¼àÌıÍøÂçÁ¬Èë
+    // 5.ç›‘å¬ç½‘ç»œè¿å…¥
     IO_EVENT ioEvent = {};
     while(threadPool->IsPoolWorking())
     {
-        // ¼àÌıiocp
+        // ç›‘å¬iocp
         auto ret = listenIocp->WaitForCompletion(ioEvent);
         if(ret == StatusDefs::IOCP_WaitTimeOut)
             continue;
 
-        // ³ö´í
+        // å‡ºé”™
         if(ret != StatusDefs::Success)
         {
             g_Log->e<FS_IocpConnector>(_LOGFMT_("_OnIocpMonitorTask.WaitForCompletion error ret[%d]"), ret);
             break;
         }
 
-        // ´¦ÀíiocpÍË³ö
+        // å¤„ç†iocpé€€å‡º
         if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys<FS_IocpConnector>(_LOGFMT_("connector iocpÍË³ö threadId<%lu> code=%lld")
+            g_Log->sys<FS_IocpConnector>(_LOGFMT_("connector iocpé€€å‡º threadId<%lu> code=%lld")
                                          , SystemUtil::GetCurrentThreadId(), ioEvent._data._code);
             break;
         }
 
-        // ½ÓÊÜÁ¬½Ó Íê³É
+        // æ¥å—è¿æ¥ å®Œæˆ
         if(IocpDefs::IO_ACCEPT == ioEvent._ioData->_ioType)
         {
-            // TODO:ÔÚgetacceptAddrInfoÊ±ºòĞèÒª¿¼ÂÇÏß³ÌÊÇ·ñ°²È«
+            // TODO:åœ¨getacceptAddrInfoæ—¶å€™éœ€è¦è€ƒè™‘çº¿ç¨‹æ˜¯å¦å®‰å…¨
             sockaddr_in *clientAddrInfo = NULL;
             listenIocp->GetClientAddrInfo(ioEvent._ioData->_wsaBuff.buf, clientAddrInfo);
             _OnConnected(ioEvent._ioData->_sock, clientAddrInfo, listenIocp);
 
-            // ¼ÌĞøÏòIOCPÍ¶µİ½ÓÊÜÁ¬½ÓÈÎÎñ ÒÑ¾­Ô¤ÏÈpost 10Íò¸ösock×ÊÔ´²»ÓÃÔÙpostÀË·ÑÌ×½Ó×Ö×ÊÔ´
-            // Ìí¼Óµ½ÒÑÊ¹ÓÃ¶ÓÁĞ
+            // ç»§ç»­å‘IOCPæŠ•é€’æ¥å—è¿æ¥ä»»åŠ¡ å·²ç»é¢„å…ˆpost 10ä¸‡ä¸ªsockèµ„æºä¸ç”¨å†postæµªè´¹å¥—æ¥å­—èµ„æº
+            // æ·»åŠ åˆ°å·²ä½¿ç”¨é˜Ÿåˆ—
             const auto st = listenIocp->PostAccept(_sock, ioEvent._ioData);
             if(st != StatusDefs::Success)
             {
@@ -329,7 +329,7 @@ void FS_IocpConnector::_OnIocpMonitorTask(FS_ThreadPool *threadPool)
 
 void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, IoDataBase **&ioDataArray)
 {
-    // Ô¤ÏÈ´´½¨n¸ö»º³å¼ÓËÙÁ¬½Ó¹ı³Ì
+    // é¢„å…ˆåˆ›å»ºnä¸ªç¼“å†²åŠ é€Ÿè¿æ¥è¿‡ç¨‹
     g_MemoryPool->Lock();
     bufArray = g_MemoryPool->Alloc<char *>(_maxSessionQuantityLimit * sizeof(char *));
     g_MemoryPool->Unlock();
@@ -341,7 +341,7 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
         g_MemoryPool->Unlock();
     }
 
-    // Ô¤ÏÈ´´½¨n¸öiodata
+    // é¢„å…ˆåˆ›å»ºnä¸ªiodata
     g_MemoryPool->Lock();
     ioDataArray = g_MemoryPool->Alloc<IoDataBase *>(sizeof(IoDataBase *)* _maxSessionQuantityLimit);
     g_MemoryPool->Unlock();
@@ -365,7 +365,7 @@ void FS_IocpConnector::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray,
         }
     }
 
-    // TODO:ÌáÉıÁ¬½ÓËÙ¶È£ºÒ»´ÎĞÔÍ¶µİ±¾»ú¿ÉÁ¬½ÓµÄ×î¸ßÁ¬½ÓÊı£¬ÓÃµôÒ»¸öÔÙ²¹³äÒ»¸ö
+    // TODO:æå‡è¿æ¥é€Ÿåº¦ï¼šä¸€æ¬¡æ€§æŠ•é€’æœ¬æœºå¯è¿æ¥çš„æœ€é«˜è¿æ¥æ•°ï¼Œç”¨æ‰ä¸€ä¸ªå†è¡¥å……ä¸€ä¸ª
 }
 
 void FS_IocpConnector::_FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray)

@@ -43,7 +43,7 @@ struct LogDataCache
     LogDataCache();
     ~LogDataCache();
 
-    std::list<LogData *> *_cache;    // 日志数据队列
+    std::list<LogData *> *_cache;    // 鏃ュ織鏁版嵁闃熷垪
 };
 
 struct LogData;

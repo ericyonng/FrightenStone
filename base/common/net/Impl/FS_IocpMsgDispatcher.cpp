@@ -136,7 +136,7 @@ void FS_IocpMsgDispatcher::Close()
 
     _isClose = true;
 
-    // Ïß³ÌÍË³ö
+    // çº¿ç¨‹é€€å‡º
     _pool->Close();
 
     g_BusinessTimeWheel = NULL;
@@ -215,10 +215,10 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
     if(_isClose)
         return;
 
-    // senderÊÇÒ»¶ÔÒ»µÄÐèÒªÕÒµ½¶ÔÓ¦µÄÊÕµ½ÍøÂç°üµÄÄÇ¸ötransfer µÄid
+    // senderæ˜¯ä¸€å¯¹ä¸€çš„éœ€è¦æ‰¾åˆ°å¯¹åº”çš„æ”¶åˆ°ç½‘ç»œåŒ…çš„é‚£ä¸ªtransfer çš„id
     auto &senderMq = g_ServerCore->_GetSenderMq();
 
-    // ÐÂµÄ´ý·¢ËÍµÄÏûÏ¢
+    // æ–°çš„å¾…å‘é€çš„æ¶ˆæ¯
     FS_NetMsgBufferBlock *newMsgBlock = new FS_NetMsgBufferBlock;
     newMsgBlock->_mbType = MessageBlockType::MB_NetMsgSended;
     g_MemoryPool->Lock();
@@ -228,7 +228,7 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
     newMsgBlock->_generatorId = 0;
     newMsgBlock->_sessionId = sessionId;
 
-    // ËÍÈëÏûÏ¢¶ÓÁÐ
+    // é€å…¥æ¶ˆæ¯é˜Ÿåˆ—
     senderMq[consumerId]->PushLock();
     if(!senderMq[consumerId]->Push(newMsgBlock))
         Fs_SafeFree(newMsgBlock);
@@ -237,7 +237,7 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
 }
 
 void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
-{// ÒµÎñ²ã¿ÉÒÔ²»ÓÃºÜÆµ·±»½ÐÑ£¬Ö»µÈ´ýÍøÂç²ãÍÆËÍÏûÏ¢¹ýÀ´
+{// ä¸šåŠ¡å±‚å¯ä»¥ä¸ç”¨å¾ˆé¢‘ç¹å”¤é†’ï¼Œåªç­‰å¾…ç½‘ç»œå±‚æŽ¨é€æ¶ˆæ¯è¿‡æ¥
 
     // _timeWheel->GetModifiedResolution(_resolutionInterval);
     while(pool->IsPoolWorking())
@@ -247,16 +247,16 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
         _messgeQueue->PopUnlock(_id);
 
         // Sleep(100);
-        // ÏÈÖ´ÐÐ¶¨Ê±Æ÷ÊÂ¼þ
+        // å…ˆæ‰§è¡Œå®šæ—¶å™¨äº‹ä»¶
         _timeWheel->RotateWheel();
 
-        // ´ÓÒì²½ÏûÏ¢¶ÓÁÐÈ¡µÃÒì²½´¦ÀíÍê³É·µ»ØÊÂ¼þ TODO: ÐèÒªÓÐÒì²½´¦Àí¶ÓÁÐ£¬ÆäËûÏß³ÌÈûÈë
-        // ÇåÀíÍê³ÉµÄÒì²½ÊÂ¼þ TODO:
+        // ä»Žå¼‚æ­¥æ¶ˆæ¯é˜Ÿåˆ—å–å¾—å¼‚æ­¥å¤„ç†å®Œæˆè¿”å›žäº‹ä»¶ TODO: éœ€è¦æœ‰å¼‚æ­¥å¤„ç†é˜Ÿåˆ—ï¼Œå…¶ä»–çº¿ç¨‹å¡žå…¥
+        // æ¸…ç†å®Œæˆçš„å¼‚æ­¥äº‹ä»¶ TODO:
 
-        // ÔÙÖ´ÐÐÒµÎñÊÂ¼þ
+        // å†æ‰§è¡Œä¸šåŠ¡äº‹ä»¶
         _OnBusinessProcessing();
 
-        // Í¶µÝÒµÎñ²úÉúµÄÒì²½´¦ÀíÊÂ¼þ TODO: ²»ºÏÊÊÐÞÕý£¬ÒòÎª¿ÉÄÜ»á´í¹ý¿çÌìµÈÖØÒª½Úµã
+        // æŠ•é€’ä¸šåŠ¡äº§ç”Ÿçš„å¼‚æ­¥å¤„ç†äº‹ä»¶ TODO: ä¸åˆé€‚ä¿®æ­£ï¼Œå› ä¸ºå¯èƒ½ä¼šé”™è¿‡è·¨å¤©ç­‰é‡è¦èŠ‚ç‚¹
         // _timeWheel->GetModifiedResolution(_resolutionInterval);
     }
 
@@ -265,17 +265,17 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 
 void FS_IocpMsgDispatcher::_OnBusinessProcessing()
 {
-    // ½«ÍøÂçÊý¾Ý×ªÒÆµ½»º³åÇø
+    // å°†ç½‘ç»œæ•°æ®è½¬ç§»åˆ°ç¼“å†²åŒº
     for(auto iterBlock = _recvMsgBlocks->begin(); iterBlock != _recvMsgBlocks->end();)
     {
         auto netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
 
         if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionDisconnect)
-        {// ¿Í»§¶Ë¶Ï¿ª
+        {// å®¢æˆ·ç«¯æ–­å¼€
             _delayDisconnectedSessions.insert(netMsgBlock->_sessionId);
         }
         else if(netMsgBlock->_mbType == MessageBlockType::MB_NetMsgArrived)
-        {// ÊÕµ½ÍøÂç°ü
+        {// æ”¶åˆ°ç½‘ç»œåŒ…
             auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
             _DoBusinessProcess(netMsgBlock->_sessionId, netMsgBlock->_generatorId, netMsg);
         }
@@ -288,7 +288,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
         iterBlock = _recvMsgBlocks->erase(iterBlock);
     }
 
-    // ÑÓ³Ù¶Ï¿ªÁ¬½Ó
+    // å»¶è¿Ÿæ–­å¼€è¿žæŽ¥
     for(auto &sessionId : _delayDisconnectedSessions)
         _OnDelaySessionDisconnect(sessionId);
     _delayDisconnectedSessions.clear();
@@ -296,14 +296,14 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
 
 void FS_IocpMsgDispatcher::_DoBusinessProcess(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
 {
-    // TODO:´¦Àíµ¥Ò»ÏûÏ¢ÒµÎñÂß¼­²¿·Ö
+    // TODO:å¤„ç†å•ä¸€æ¶ˆæ¯ä¸šåŠ¡é€»è¾‘éƒ¨åˆ†
     if(_logic)
         _logic->OnMsgDispatch(sessionId, generatorId, msgData);
 }
 
 void FS_IocpMsgDispatcher::_OnDelaySessionDisconnect(UInt64 sessionId)
 {
-    // TODO:ÕæÊµµÄsession¶Ï¿ª
+    // TODO:çœŸå®žçš„sessionæ–­å¼€
     if(_logic)
         _logic->OnSessionDisconnected(sessionId);
 }

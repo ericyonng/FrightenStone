@@ -54,12 +54,12 @@ public:
     virtual Int32 BeforeStart() { return StatusDefs::Success; }
     virtual Int32 Start() = 0;
     virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
+    virtual void WillClose() {} // 鏂紑涓庢ā鍧椾箣闂寸殑渚濊禆
     virtual void BeforeClose() {}
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    // 回调接口
+    // 鍥炶皟鎺ュ彛
     virtual void OnDisconnected(IFS_Session *session) = 0;
 };
 

@@ -107,7 +107,7 @@ bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
         newBuffer->BindTo(_sessionId, _sock);
     }
 
-    // »º³å¿Õ¼ä²»×ã
+    // ç¼“å†²ç©ºé—´ä¸è¶³
     IFS_Buffer *buffer = _toSend.back();
     if(!buffer->CanPush(header->_packetLength))
     {

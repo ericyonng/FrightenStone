@@ -63,7 +63,7 @@ FS_Addr::FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo)
             return;
         }
 
-        // todo 若要支持ipv6请修改为ipv6的family
+        // todo 鑻ヨ鏀寔ipv6璇蜂慨鏀逛负ipv6鐨刦amily
         if(!SocketUtil::FillTcpAddrInfo(_ipPtr, _port, AF_INET, _addrInfo))
         {
             g_Log->e<FS_Addr>(_LOGFMT_("SocketUtil::FillTcpAddrInfo fail, sessionId[%llu], socket[%llu]\n stack trace back:%s")

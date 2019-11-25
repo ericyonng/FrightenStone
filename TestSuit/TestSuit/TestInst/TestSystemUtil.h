@@ -39,16 +39,16 @@ class TestSysTemUtil
 public:
     static void Run()
     {
-        // 内存情况
+        // 鍐呭瓨鎯呭喌
         std::cout << "cur process avail mem size:" << fs::SystemUtil::GetAvailPhysMemSize() << std::endl;
         std::cout << "cur process total mem size: " << fs::SystemUtil::GetTotalPhysMemSize() << std::endl;
         std::cout << "cur process mem in used: " << fs::SystemUtil::GetMemoryLoad() << std::endl;
-        // 当前进程
+        // 褰撳墠杩涚▼
         fs::FS_String path;
         fs::SystemUtil::GetProgramPath(true,path);
         std::cout <<"current process id:"<<fs::SystemUtil::GetCurProcessId()<< " current process path:" << path << std::endl;
 
-//         // 遍历进程
+//         // 閬嶅巻杩涚▼
 //         auto hProcModule = fs::SystemUtil::CreateProcessSnapshot();
 //         auto nPid = fs::SystemUtil::GetFirstProcessPid(hProcModule);
 //         bool bFirst = true;

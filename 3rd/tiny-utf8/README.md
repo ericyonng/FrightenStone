@@ -59,7 +59,7 @@ using namespace std;
 
 int main()
 {
-    utf8_string str = u8"!🌍 olleH";
+    utf8_string str = u8"!馃實 olleH";
     for_each( str.rbegin() , str.rend() , []( char32_t codepoint ){
       cout << codepoint;
     } );

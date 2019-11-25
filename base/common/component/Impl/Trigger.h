@@ -51,10 +51,10 @@ public:
     virtual ~Trigger();
 
 public:
-    // Íâ²¿ÇëÊÍ·Ådelegate£¬ÄÚ²¿»á´´½¨delegateµÄ¸±±¾
+    // å¤–éƒ¨è¯·é‡Šæ”¾delegateï¼Œå†…éƒ¨ä¼šåˆ›å»ºdelegateçš„å‰¯æœ¬
     Int32 Reg(Int32 occasion
                 , Int32 triggerType
-                , const IDelegate<Int32, TriggerExecuteBody *> &exec // Íâ²¿ÇëÊÍ·Ådelegate£¬ÄÚ²¿»á´´½¨delegateµÄ¸±±¾
+                , const IDelegate<Int32, TriggerExecuteBody *> &exec // å¤–éƒ¨è¯·é‡Šæ”¾delegateï¼Œå†…éƒ¨ä¼šåˆ›å»ºdelegateçš„å‰¯æœ¬
                 , Int32 execTimes = 1
                 , Int32 addType = TriggerDefs::AddIfExist); 
 
@@ -73,13 +73,13 @@ private:
 
     void _DelayReg(Int32 occasion
                    , Int32 triggerType
-                   , IDelegate<Int32, TriggerExecuteBody *> *exec // Íâ²¿ÇëÊÍ·Ådelegate£¬ÄÚ²¿»á´´½¨delegateµÄ¸±±¾
+                   , IDelegate<Int32, TriggerExecuteBody *> *exec // å¤–éƒ¨è¯·é‡Šæ”¾delegateï¼Œå†…éƒ¨ä¼šåˆ›å»ºdelegateçš„å‰¯æœ¬
                    , Int32 execTimes = 1
                    , Int32 addType = TriggerDefs::AddIfExist);
-    // Íâ²¿ÇëÊÍ·Ådelegate£¬ÄÚ²¿»á´´½¨delegateµÄ¸±±¾
+    // å¤–éƒ¨è¯·é‡Šæ”¾delegateï¼Œå†…éƒ¨ä¼šåˆ›å»ºdelegateçš„å‰¯æœ¬
     Int32 _Reg(Int32 occasion
               , Int32 triggerType
-              , IDelegate<Int32, TriggerExecuteBody *> *exec // Íâ²¿ÇëÊÍ·Ådelegate£¬ÄÚ²¿»á´´½¨delegateµÄ¸±±¾
+              , IDelegate<Int32, TriggerExecuteBody *> *exec // å¤–éƒ¨è¯·é‡Šæ”¾delegateï¼Œå†…éƒ¨ä¼šåˆ›å»ºdelegateçš„å‰¯æœ¬
               , Int32 execTimes = 1
               , Int32 addType = TriggerDefs::AddIfExist);
     void _DelayEraseAllTrigger(Int32 triggerType);

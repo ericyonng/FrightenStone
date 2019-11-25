@@ -87,7 +87,7 @@ protected:
     bool _useTimestampTailer = false;
     FS_String _path;
     FS_String _fileName;
-    FS_String _extensionName;       // À©Õ¹Ãû
+    FS_String _extensionName;       // æ‰©å±•å
     FS_String _openMode = "ab+";
     Locker  _locker;
 };

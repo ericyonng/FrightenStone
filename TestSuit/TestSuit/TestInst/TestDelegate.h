@@ -108,7 +108,7 @@ public:
         delegate8->Invoke(1);
         delegate8->Invoke(1);
 
-        // 创建委托副本
+        // 鍒涘缓濮旀墭鍓湰
         auto delegate9 = delegate8->CreateNewCopy();
         delegate9->Invoke(9);
     }

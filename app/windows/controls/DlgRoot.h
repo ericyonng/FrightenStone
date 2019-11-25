@@ -13,26 +13,26 @@ public:
 	CDlgRoot(CWnd* pParent = NULL);
 	virtual ~CDlgRoot() {}
 	enum { IDD = IDD_DIALOG1 };
-	//Ä£Ì¬´°¿Ú
+	//æ¨¡æ€çª—å£
 	virtual INT_PTR DoModal();
 
-	//ÅäÖÃÎÄ¼ş
+	//é…ç½®æ–‡ä»¶
 public:
-	//»æ»­½ø¶È
+	//ç»˜ç”»è¿›åº¦
 	void DrawProgress(long lCurrentCount, long lTotalNum);
-	//¼ÇÂ¼
+	//è®°å½•
 	void Display(std::string str, bool bNeedPreSym=true);
-	//¼ÇÂ¼
+	//è®°å½•
 	void DisplayTitle(std::string strFun, std::string str);
-	//²âÊÔ°´Å¥
+	//æµ‹è¯•æŒ‰é’®
 	void SetTestButton(bool bEnable);
 
-	//¶ÔÏó
+	//å¯¹è±¡
 public:
-	//Ïß³Ì³Ø
+	//çº¿ç¨‹æ± 
 	void DestroyPool();
 
-	//ÏûÏ¢ÏàÓ¦
+	//æ¶ˆæ¯ç›¸åº”
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	virtual BOOL OnInitDialog();
@@ -63,11 +63,11 @@ public:
 #undef MainDlg2
 #define MainDlg2	(CDlgRoot::GetInstance())
 
-//´°¿Ú´òÓ¡×Ö·û´®
+//çª—å£æ‰“å°å­—ç¬¦ä¸²
 #undef TestDisPlay
 #define TestDisPlay(x)	(MainDlg2.Display(x))
 
-//´°¿Ú´òÓ¡×Ö·û´®´øº¯Êı
+//çª—å£æ‰“å°å­—ç¬¦ä¸²å¸¦å‡½æ•°
 #undef TestDisPlayTitle
 #define TestDisPlayTitle(x)	(MainDlg2.DisplayTitle(__FUNCTION__, x))
 

@@ -77,12 +77,12 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_IP_KEY, SVR_CFG_LISTENER_IP);
     // port
     _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_PORT_KEY, SVR_CFG_LISTENER_PORT);
-    // ×î´óÁ¬½ÓÊý
+    // æœ€å¤§è¿žæŽ¥æ•°
     _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_CLN_LIMIT_KEY, SVR_CFG_LISTENER_CLN_LIMIT);
     #pragma endregion
 
     #pragma region transfer
-    // Êý¾Ý´«ÊäÏß³ÌÊý
+    // æ•°æ®ä¼ è¾“çº¿ç¨‹æ•°
     _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, SVR_CFG_TRANSFER_SEG_CNT);
     _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL);
     _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, SVR_CFG_PREPARE_POOL_BUFFER_CNT);
@@ -101,7 +101,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     _ini->WriteStr(SVR_CFG_MEMORY_POOL_SEG, SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY, SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED);
     #pragma endregion
 
-    // ¼ì²éÊÇ·ñÐ´ÈëÕýÈ·
+    // æ£€æŸ¥æ˜¯å¦å†™å…¥æ­£ç¡®
     BUFFER256 buffer = {};
     char *ptr = buffer;
     _ini->ReadStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_IP_KEY, "", ptr, sizeof(buffer));

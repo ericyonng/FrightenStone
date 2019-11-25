@@ -47,7 +47,7 @@ struct BASE_EXPORT NetMsg_DataHeader;
 class BASE_EXPORT IFS_Buffer;
 
 // TODO: IFS_Session, FS_IocpSession, FS_EpollSession
-// Ö»Ö§³Öµ¥Ïß³Ì
+// åªæ”¯æŒå•çº¿ç¨‹
 class BASE_EXPORT IFS_Session
 {
     OBJ_POOL_CREATE_DEF(IFS_Session);
@@ -55,14 +55,14 @@ public:
     explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor);
     virtual ~IFS_Session();
 
-    // »ñÈ¡ÊôĞÔÓë×´Ì¬
+    // è·å–å±æ€§ä¸çŠ¶æ€
 public:
     UInt64 GetSessionId() const;
     SOCKET GetSocket() const;
     const FS_Addr *GetAddr() const;
-    bool HasMsgToRead() const;      // ÒªµÈ´ıÏûÏ¢½ÓÊÕÍê²ÅÄÜÏú»Ù
-    bool HasMsgToSend() const;      // ÒªµÈ´ıÏûÏ¢·¢ËÍÍê²ÅÄÜÏûºÄ
-    bool IsListen() const;          // ÊÇ·ñ¼àÌıÌ×½Ó×Ö
+    bool HasMsgToRead() const;      // è¦ç­‰å¾…æ¶ˆæ¯æ¥æ”¶å®Œæ‰èƒ½é”€æ¯
+    bool HasMsgToSend() const;      // è¦ç­‰å¾…æ¶ˆæ¯å‘é€å®Œæ‰èƒ½æ¶ˆè€—
+    bool IsListen() const;          // æ˜¯å¦ç›‘å¬å¥—æ¥å­—
     void SetListener(bool isListen);
     template<typename ObjType>
     ObjType *CastTo();
@@ -72,30 +72,30 @@ public:
     const Time &GetHeartBeatExpiredTime() const;
     virtual bool CanDestroy() const;
     virtual bool CanDisconnect() const;
-    void MaskClose(); // Èô»¹ÓĞpost²Ù×÷ÔòÏÈmaskdestroy£¬ÔÙÔÚ×îºóµÄÊ±ºòÕæÕıµÄdestroyµô
+    void MaskClose(); // è‹¥è¿˜æœ‰postæ“ä½œåˆ™å…ˆmaskdestroyï¼Œå†åœ¨æœ€åçš„æ—¶å€™çœŸæ­£çš„destroyæ‰
     bool IsDelayClose() const;
     IFS_Buffer *GetRecvBuffer();
 
-    // ²Ù×÷
+    // æ“ä½œ
 public:
     void Close();
     void UpdateHeartBeatExpiredTime();
 
-    // Ò»¸ösessionÖ»Í¶µİÒ»¸ösend£¬·¢ÍêÔÙ¼ÌĞø·¢ÏÂÒ»¸ö£¬Îñ±Ø´Ó¶ÓÁĞÍ·¿ªÊ¼Í¶µİ
-    bool PushMsgToSend(NetMsg_DataHeader *header);   // ÇëÍâ²¿µ÷ÓÃµÄÊ±ºòÎñ±Ø¼ÓËø
+    // ä¸€ä¸ªsessionåªæŠ•é€’ä¸€ä¸ªsendï¼Œå‘å®Œå†ç»§ç»­å‘ä¸‹ä¸€ä¸ªï¼ŒåŠ¡å¿…ä»é˜Ÿåˆ—å¤´å¼€å§‹æŠ•é€’
+    bool PushMsgToSend(NetMsg_DataHeader *header);   // è¯·å¤–éƒ¨è°ƒç”¨çš„æ—¶å€™åŠ¡å¿…åŠ é”
 
-    /* ÊÂ¼ş */
+    /* äº‹ä»¶ */
 public:
-    // ¿Í»§¶ËÏú»Ù
+    // å®¢æˆ·ç«¯é”€æ¯
     void OnDestroy();
-    // ¿Í»§¶ËÁ¬Èë
+    // å®¢æˆ·ç«¯è¿å…¥
     void OnConnect();
     void OnDisconnect();
-    // ĞÄÌøÁ¬½Ó³¬Ê±
+    // å¿ƒè·³è¿æ¥è¶…æ—¶
     void OnHeartBeatTimeOut();
     void OnMsgArrived();
 
-    // ÄÚ²¿
+    // å†…éƒ¨
 private:
     void _Destroy();
     
@@ -108,16 +108,16 @@ protected:
     SOCKET _sock;
     std::atomic<Int32> _lastErrorReason;
     bool _isListen;
-    Time _heartBeatExpiredTime; // ĞÄÌø¹ıÆÚÊ±¼ä
+    Time _heartBeatExpiredTime; // å¿ƒè·³è¿‡æœŸæ—¶é—´
     Int64 _heartbeatInterval;   // ms
     IFS_Buffer *_recvBuffer;
     std::list<IFS_Buffer *> _toSend;
     IMemoryAlloctor *_alloctor;
 
-    // ÓÃÓÚserver¼ì²â½ÓÊÕµ½µÄÏûÏ¢IDÊÇ·ñÁ¬Ğø Ã¿ÊÕµ½Ò»¸ö¿Í»§¶ËÏûÏ¢»á×ÔÔö1ÒÔ±ãÓë¿Í»§¶ËµÄmsgidĞ£Ñé£¬²»Æ¥ÅäÔò±¨´í´¦Àí£¨ËµÃ÷¶ª°üµÈ£©
+    // ç”¨äºserveræ£€æµ‹æ¥æ”¶åˆ°çš„æ¶ˆæ¯IDæ˜¯å¦è¿ç»­ æ¯æ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯æ¶ˆæ¯ä¼šè‡ªå¢1ä»¥ä¾¿ä¸å®¢æˆ·ç«¯çš„msgidæ ¡éªŒï¼Œä¸åŒ¹é…åˆ™æŠ¥é”™å¤„ç†ï¼ˆè¯´æ˜ä¸¢åŒ…ç­‰ï¼‰
     Int32 _recvMsgId;
-    // ²âÊÔ½ÓÊÕ·¢Âß¼­ÓÃ
-    // ÓÃÓÚclient¼ì²â½ÓÊÕµ½µÄÏûÏ¢IDÊÇ·ñÁ¬Ğø Ã¿·¢ËÍÒ»¸öÏûÏ¢»á×ÔÔö1ÒÔ±ãÓë¿Í»§¶ËµÄsendmsgidĞ£Ñé£¬²»Æ¥ÅäÔò¿Í»§¶Ë±¨´í£¨ËµÃ÷¶ª°üµÈ£©
+    // æµ‹è¯•æ¥æ”¶å‘é€»è¾‘ç”¨
+    // ç”¨äºclientæ£€æµ‹æ¥æ”¶åˆ°çš„æ¶ˆæ¯IDæ˜¯å¦è¿ç»­ æ¯å‘é€ä¸€ä¸ªæ¶ˆæ¯ä¼šè‡ªå¢1ä»¥ä¾¿ä¸å®¢æˆ·ç«¯çš„sendmsgidæ ¡éªŒï¼Œä¸åŒ¹é…åˆ™å®¢æˆ·ç«¯æŠ¥é”™ï¼ˆè¯´æ˜ä¸¢åŒ…ç­‰ï¼‰
     Int32 _sendMsgId;
 };
 

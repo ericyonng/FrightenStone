@@ -74,7 +74,7 @@ int SocketUtil::InitSocketEnv()
 #ifndef _WIN32
     // if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
     //  return (1);
-    // ºöÂÔÒì³£ĞÅºÅ£¬Ä¬ÈÏÇé¿ö»áµ¼ÖÂ½ø³ÌÖÕÖ¹
+    // å¿½ç•¥å¼‚å¸¸ä¿¡å·ï¼Œé»˜è®¤æƒ…å†µä¼šå¯¼è‡´è¿›ç¨‹ç»ˆæ­¢
     signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -197,12 +197,12 @@ Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &
     if(!sSocket || sSocket == INVALID_SOCKET)
         return StatusDefs::Socket_ParamError;
 
-    //¶¨Òå
+    //å®šä¹‰
     struct sockaddr_in dstadd_in;
     memset(&dstadd_in, 0, sizeof(dstadd_in));
     socklen_t  len = sizeof(dstadd_in);
 
-    // »ñÈ¡¿Í»§¶ËµØÖ·
+    // è·å–å®¢æˆ·ç«¯åœ°å€
     if(getpeername(sSocket, (struct sockaddr*)&dstadd_in, &len) != 0)
     {
         lastError = WSAGetLastError();
@@ -254,30 +254,30 @@ bool SocketUtil::IsDetectTimeOut(
     , bool setOneAtLeast
     , bool isInfiniteWaiting)
 {
-    //ÇåÀí
+    //æ¸…ç†
     FD_ZERO(&readableSet);
     FD_ZERO(&writableSet);
     FD_SET(socket, &readableSet);
     FD_SET(socket, &writableSet);
 
-    // ³¬Ê±¼à¿Ø²ÎÊı³õÊ¼»¯ Ãë/Î¢Ãî
+    // è¶…æ—¶ç›‘æ§å‚æ•°åˆå§‹åŒ– ç§’/å¾®å¦™
     timeval timeout;
     timeout.tv_sec = tv_sec;
     timeout.tv_usec = tv_usec;
 
     int ret = SOCKET_ERROR;
-    if(isInfiniteWaiting) { //ÓÀ¾Ã×èÈû
-        // 0±íÊ¾³¬Ê±£¬·ñÔò·µ»ØSOCKET_ERROR µ±·µ»ØÎª-1Ê±£¬ËùÓĞÃèÊö·û¼¯Çå0¡£ 
-        // µ±·µ»ØÎªÕıÊıÊ±£¬±íÊ¾ÒÑ¾­×¼±¸ºÃµÄÃèÊö·ûÊı¡£
+    if(isInfiniteWaiting) { //æ°¸ä¹…é˜»å¡
+        // 0è¡¨ç¤ºè¶…æ—¶ï¼Œå¦åˆ™è¿”å›SOCKET_ERROR å½“è¿”å›ä¸º-1æ—¶ï¼Œæ‰€æœ‰æè¿°ç¬¦é›†æ¸…0ã€‚ 
+        // å½“è¿”å›ä¸ºæ­£æ•°æ—¶ï¼Œè¡¨ç¤ºå·²ç»å‡†å¤‡å¥½çš„æè¿°ç¬¦æ•°ã€‚
         ret = select(static_cast<Int32>(socket + 1), &readableSet, &writableSet, NULL, NULL); 
     }
     else {
-        // 0±íÊ¾³¬Ê±£¬·ñÔò·µ»ØSOCKET_ERROR µ±·µ»ØÎª-1Ê±£¬ËùÓĞÃèÊö·û¼¯Çå0¡£
-        // µ±·µ»ØÎªÕıÊıÊ±£¬±íÊ¾ÒÑ¾­×¼±¸ºÃµÄÃèÊö·ûÊı¡£
+        // 0è¡¨ç¤ºè¶…æ—¶ï¼Œå¦åˆ™è¿”å›SOCKET_ERROR å½“è¿”å›ä¸º-1æ—¶ï¼Œæ‰€æœ‰æè¿°ç¬¦é›†æ¸…0ã€‚
+        // å½“è¿”å›ä¸ºæ­£æ•°æ—¶ï¼Œè¡¨ç¤ºå·²ç»å‡†å¤‡å¥½çš„æè¿°ç¬¦æ•°ã€‚
         ret = select(static_cast<Int32>(socket + 1), &readableSet, &writableSet, NULL, &timeout); 
     }
 
-    //³ö´í´ø³ö
+    //å‡ºé”™å¸¦å‡º
     if(errOut) 
         *errOut = ret;
 
@@ -287,7 +287,7 @@ bool SocketUtil::IsDetectTimeOut(
         return true;
     }
 
-    // ¼àÌı×´Ì¬µ¼³ö
+    // ç›‘å¬çŠ¶æ€å¯¼å‡º
     bool isTimeOut = false;
     if(setOneAtLeast) {
         isTimeOut = (!FD_ISSET(socket, &readableSet) || !FD_ISSET(socket, &writableSet));
@@ -381,13 +381,13 @@ Int32 SocketUtil::GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TY
 
 FS_String SocketUtil::ToFmtSpeedPerSec(Int64 bytesps)
 {
-    // Ğ¡ÓÚ1MB´óÓÚ1KBµÄÊ¹ÓÃKB/s
-    // ´óÓÚ1MBĞ¡ÓÚ1GBµÄÊ¹ÓÃMB/s
-    // ´óÓÚ1GBµÄÊ¹ÓÃGB/s 
-    // ¾«¶È±£Áô3Î»Ğ¡Êı
+    // å°äº1MBå¤§äº1KBçš„ä½¿ç”¨KB/s
+    // å¤§äº1MBå°äº1GBçš„ä½¿ç”¨MB/s
+    // å¤§äº1GBçš„ä½¿ç”¨GB/s 
+    // ç²¾åº¦ä¿ç•™3ä½å°æ•°
     FS_String info;
     if(bytesps < __FS_DATA_1KB__)
-    {// Ğ¡ÓÚ1KBµÄÊ¹ÓÃB/s
+    {// å°äº1KBçš„ä½¿ç”¨B/s
         info.AppendFormat("%lld B/s", bytesps);
         return info;
     }

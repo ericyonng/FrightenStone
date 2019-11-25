@@ -26,7 +26,7 @@ public:
 // 
 //         std::cout << std::endl;
 // 
-//         // ¼ÓÃÜ
+//         // åŠ å¯†
 //         for(Int32 i = 0; i < sizeof(plaintext); ++i)
 //         {
 //             plaintext[i] = plaintext[i] ^ pwd[i];
@@ -35,28 +35,28 @@ public:
 // 
 //         std::cout << std::endl;
 // 
-//         // »¹Ô­
+//         // è¿˜åŸ
 //         for(Int32 i = 0; i < sizeof(plaintext); ++i)
 //             plaintext[i] = plaintext[i] ^ pwd[i];
 // 
 //         std::cout << plaintext << std::endl;
 
-        // Éú³Ékey
+        // ç”Ÿæˆkey
         char key[KEY_128BIT] = {0};
         fs::KeyGeneratorUtil::GetKey_128Bit(key);
 
-        // Ã÷ÎÄ
-        char plainText[1024] = "ÎÒ °²ÀûµÄ¼¤·¢ÁË¿ÉÊÇ´ó¼Ò °®ÉÏµÄ¿´·¨¾²°²ËÂjdsalkdjkf***@@dalk545";
+        // æ˜æ–‡
+        char plainText[1024] = "æˆ‘ å®‰åˆ©çš„æ¿€å‘äº†å¯æ˜¯å¤§å®¶ çˆ±ä¸Šçš„çœ‹æ³•é™å®‰å¯ºjdsalkdjkf***@@dalk545";
         char cypherText[1024];
 
-        // ¼ÓÃÜ
+        // åŠ å¯†
         fs::XorEncrypt::Encrypt(plainText, 1024, cypherText, 1024, key, KEY_128BIT);
 
-        // ½âÃÜ
+        // è§£å¯†
         memset(plainText, 0, sizeof(plainText));
         fs::XorEncrypt::Decrypt(cypherText, 1024, plainText, 1024, key, KEY_128BIT);
 
-        // ´òÓ¡
+        // æ‰“å°
         std::cout << plainText << std::endl;
         
     }

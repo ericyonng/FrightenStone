@@ -42,7 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
-// ÏûÏ¢Êı¾İ×Ö½ÚÁ÷ ×Ö½ÚÁ÷½á¹¹£ºbuff = [³¤¶È] + [×Ö½ÚÁ÷Çø]
+// æ¶ˆæ¯æ•°æ®å­—èŠ‚æµ å­—èŠ‚æµç»“æ„ï¼šbuff = [é•¿åº¦] + [å­—èŠ‚æµåŒº]
 class BASE_EXPORT FS_MsgWriteStream :public FS_Stream
 {
     OBJ_POOL_CREATE_DEF(FS_MsgWriteStream);
@@ -50,14 +50,14 @@ public:
     FS_MsgWriteStream(char *data, int size, bool isDelete = false, bool isPoolCreate = false);
     FS_MsgWriteStream(int size = 1024);
 
-    /* Ğ´Èë×Ö½ÚÁ÷ */
+    /* å†™å…¥å­—èŠ‚æµ */
     #pragma region write bytes
     /*
     *   brief:
-    *       1. - SetNetMsgCmd Ğ´ÈëÏûÏ¢ºÅ
-    *       2. - WriteString(const char *str, Int32 len) Ğ´Èë×Ö½ÚÁ÷
-    *       3. - WriteString(const char *str) Ğ´Èë×Ö·û´®
-    *       4. - Finish ×Ö½ÚÁ÷½áÊø£¬ÇëÔÚ½áÊøÊ±Îñ±Øµ÷ÓÃFinishÒÔ±ã·¢ËÍÏûÏ¢ÕıÈ·£¡£¡£¡
+    *       1. - SetNetMsgCmd å†™å…¥æ¶ˆæ¯å·
+    *       2. - WriteString(const char *str, Int32 len) å†™å…¥å­—èŠ‚æµ
+    *       3. - WriteString(const char *str) å†™å…¥å­—ç¬¦ä¸²
+    *       4. - Finish å­—èŠ‚æµç»“æŸï¼Œè¯·åœ¨ç»“æŸæ—¶åŠ¡å¿…è°ƒç”¨Finishä»¥ä¾¿å‘é€æ¶ˆæ¯æ­£ç¡®ï¼ï¼ï¼
     */
 public:
     void SetNetMsgCmd(UInt16 cmd);

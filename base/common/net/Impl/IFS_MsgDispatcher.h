@@ -57,7 +57,7 @@ public:
     virtual Int32 BeforeStart() { return StatusDefs::Success; }
     virtual Int32 Start() = 0;
     virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
+    virtual void WillClose() {} // 鏂紑涓庢ā鍧椾箣闂寸殑渚濊禆
     virtual void BeforeClose() {}
     virtual void Close() = 0;
     virtual void AfterClose() {}
@@ -65,7 +65,7 @@ public:
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut() = 0;
 
-    // consumerId 网络消息消费者id
+    // consumerId 缃戠粶娑堟伅娑堣垂鑰卛d
     virtual void SendData(UInt64 sessionId, UInt64 consumerId, NetMsg_DataHeader *msg) = 0;
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic) = 0;
     virtual void AttachRecvMessageQueue(ConcurrentMessageQueue *messageQueue) = 0;

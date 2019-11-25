@@ -2,12 +2,12 @@
 #include <FrameApp.h>
 #include<AppRoot.h>
 
-//64Î»»ñÈ¡Â·¾¶Ãû³Æ
+//64ä½è·å–è·¯å¾„åç§°
 #include <tlhelp32.h>  
 #include <Psapi.h>  
 #pragma comment (lib,"Psapi.lib")  
 
-//appÊµÀı»¯µ½ÄÚ´æ
+//appå®ä¾‹åŒ–åˆ°å†…å­˜
 CFrameApp theApp;
 
 BEGIN_MESSAGE_MAP(CFrameApp, CWinApp)
@@ -18,17 +18,17 @@ BOOL CFrameApp::InitInstance()
 {
 	CWinApp::InitInstance();
 
-	//»·¾³ÅäÖÃ
+	//ç¯å¢ƒé…ç½®
 	AfxOleInit();
 	AfxInitRichEdit2();
 	InitCommonControls();
 	AfxEnableControlContainer();
 
-	//Í¬Ò»Ä¿Â¼Ö»ÔËĞĞÒ»´Î
+	//åŒä¸€ç›®å½•åªè¿è¡Œä¸€æ¬¡
 	I32 nPidExists = 0;
 	if (!AppNotStartedWithSamePath(nPidExists))
 	{
-		//»½ĞÑÒÑ´æÔÚµÄapp£¬Ïú»Ùµ±Ç°app
+		//å”¤é†’å·²å­˜åœ¨çš„appï¼Œé”€æ¯å½“å‰app
 		if (nPidExists)
 		{
 			auto hExistsWnd = gtool::GetWindowHwndByPID(nPidExists);
@@ -43,21 +43,21 @@ BOOL CFrameApp::InitInstance()
 	}
 	
 
-	//¹¤×÷Ä¿Â¼
+	//å·¥ä½œç›®å½•
 	TCHAR szDirectory[MAX_PATH] = TEXT("");
 	GetWorkDirectory(szDirectory, CountArray(szDirectory));
 
-	//ÉèÖÃ±íÃû
+	//è®¾ç½®è¡¨å
 	SetRegistryKey(TEXT("Lab-WinApp"));
 
-	//ÉèÖÃÄ¿Â¼
+	//è®¾ç½®ç›®å½•
 	SetCurrentDirectory(szDirectory);
 
-	//±äÁ¿¶¨Òå
+	//å˜é‡å®šä¹‰
 	WNDCLASS WndClasss;
 	ZeroMemory(&WndClasss, sizeof(WndClasss));
 
-	//×¢²á´°¿Ú
+	//æ³¨å†Œçª—å£
 	WndClasss.style = CS_DBLCLKS;
 	WndClasss.hIcon = LoadIcon(IDI_ICON1);
 	WndClasss.lpfnWndProc = DefWindowProc;
@@ -72,7 +72,7 @@ BOOL CFrameApp::InitInstance()
 	{
 		auto nRet = m_DlgRoot.DoModal();
 
-		//Ïú»ÙÏß³Ì³Ø
+		//é”€æ¯çº¿ç¨‹æ± 
 		m_DlgRoot.DestroyPool();
 
 		ASSERTEX((nRet >= 0));
@@ -104,7 +104,7 @@ bool CFrameApp::FreeResource()
 
 	SEH_TRY
 	{
-		ASSERTEX(THREAD_TRANSFER::FiniThreadPostModule());				//ÏûÏ¢¶ÓÁĞ
+		ASSERTEX(THREAD_TRANSFER::FiniThreadPostModule());				//æ¶ˆæ¯é˜Ÿåˆ—
 		LOGSYS_FMT_C4096("ThreadPost Module Fini.");
 	}
 		SEH_FULLINFO_CATCH("int CFrameApp::ExitInstance() FreeResource FiniThreadPostModule")
@@ -115,7 +115,7 @@ bool CFrameApp::FreeResource()
 
 	SEH_TRY
 	{
-		gtool::MemPoolFiniModule();					//ÄÚ´æ³Ø
+		gtool::MemPoolFiniModule();					//å†…å­˜æ± 
 		LOGSYS_FMT_C4096("MemPoolFiniModule Module Fini.");
 	}
 		SEH_FULLINFO_CATCH("int CFrameApp::ExitInstance() FreeResource MemPoolFiniModule")
@@ -126,7 +126,7 @@ bool CFrameApp::FreeResource()
 
 	SEH_TRY
 	{
-		IF_NOT(gtool::FinishLogModule())			//log×îºóÊÍ·Å
+		IF_NOT(gtool::FinishLogModule())			//logæœ€åé‡Šæ”¾
 		LOGGEN("gtool::FinishLogModule() ERR!");
 	}
 	SEH_FULLINFO_CATCH("int CFrameApp::ExitInstance() FreeResource FinishLogModule")
@@ -141,16 +141,16 @@ bool CFrameApp::FreeResource()
 	return true;
 }
 
-//½ø³ÌÄ¿Â¼
+//è¿›ç¨‹ç›®å½•
 bool CFrameApp::GetWorkDirectory(TCHAR szWorkDirectory[], WORD wBufferCount)
 {
 	memset(szWorkDirectory, 0, wBufferCount * sizeof(TCHAR));
 
-	//Ä£¿éÂ·¾¶
+	//æ¨¡å—è·¯å¾„
 	TCHAR szModulePath[MAX_PATH] = TEXT("");
 	GetModuleFileName(AfxGetInstanceHandle(), szModulePath, CountArray(szModulePath));
 
-	//·ÖÎöÎÄ¼ş
+	//åˆ†ææ–‡ä»¶
 	for (INT i = lstrlen(szModulePath); i >= 0; i--)
 	{
 		if (szModulePath[i] == TEXT('\\'))
@@ -160,7 +160,7 @@ bool CFrameApp::GetWorkDirectory(TCHAR szWorkDirectory[], WORD wBufferCount)
 		}
 	}
 
-	//ÉèÖÃ½á¹û
+	//è®¾ç½®ç»“æœ
 	ASSERT(szModulePath[0] != 0);
 	lstrcpyn(szWorkDirectory, szModulePath, wBufferCount);
 
@@ -171,13 +171,13 @@ bool CFrameApp::AppNotStartedWithSamePath(I32& nPidExists)
 {
 	nPidExists = 0;
 
-	//Èô´æÔÚÍ¬Ò»¸öÄ¿Â¼App»½ĞÑËü
+	//è‹¥å­˜åœ¨åŒä¸€ä¸ªç›®å½•Appå”¤é†’å®ƒ
 	BUFFER512 szPath = { 0 };
 	CHECKF_NL(gtool::GetProcPath(true, _getpid(), szPath, sizeof(szPath)));
 
 	CHECKF_NL(strlen(szPath) > 0);
 
-	//´´½¨½ø³ÌÓ³Ïó¾ä±ú
+	//åˆ›å»ºè¿›ç¨‹æ˜ è±¡å¥æŸ„
 	auto hProcModule = gtool::CreateProcessSnapshot();
 	CHECKF_NL(hProcModule);
 	BUFFER512 szPathLoop = { 0 };

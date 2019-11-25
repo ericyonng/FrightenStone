@@ -118,9 +118,9 @@ public:
     void Clear();
     void Swap(FS_String &&str);
     FS_String ToHexString() const;
-    void CompressString();      // È¥³ı×Ö·û´®Ä©Î²µÄ\0Ñ¹Ëõ¿Õ¼äÖ»¶Ô0½áÎ²µÄ×Ö·û´®ÓĞĞ§
-    const FS_String &RemoveZeroTail();      // ÒÆ³ıÈİÆ÷ÖĞÎ²²¿µÄ0
-    const FS_String &RemoveHeadZero();      // ÒÆ³ıÈİÆ÷ÖĞÊ×²¿µÄ0
+    void CompressString();      // å»é™¤å­—ç¬¦ä¸²æœ«å°¾çš„\0å‹ç¼©ç©ºé—´åªå¯¹0ç»“å°¾çš„å­—ç¬¦ä¸²æœ‰æ•ˆ
+    const FS_String &RemoveZeroTail();      // ç§»é™¤å®¹å™¨ä¸­å°¾éƒ¨çš„0
+    const FS_String &RemoveHeadZero();      // ç§»é™¤å®¹å™¨ä¸­é¦–éƒ¨çš„0
 
     FS_String &AppendBitData(const char *bitData, Int64 dataSize);
     _These Split(char sep, size_type max_split = -1) const;    // only ascii
@@ -128,19 +128,19 @@ public:
     _These Split(const FS_String &sep, std::string::size_type max_split = -1, bool onlyLikely = false) const;
     _These Split(const _These &seps, size_type max_split = -1) const;
 
-    // strip operation: strip left. È¥Ê×²¿Á¬Ğø×Ö·û
+    // strip operation: strip left. å»é¦–éƒ¨è¿ç»­å­—ç¬¦
     FS_String &lstrip(const FS_String &chars = FS_String());
     FS_String lstrip(const FS_String &chars = FS_String()) const;
 
-    // strip operation: strip right. È¥Î²²¿Á¬Ğø×Ö·û
+    // strip operation: strip right. å»å°¾éƒ¨è¿ç»­å­—ç¬¦
     FS_String &rstrip(const FS_String &chars = FS_String());
     FS_String rstrip(const FS_String &chars = FS_String()) const;
 
-    // strip operation: È¥³ıÊ×Î²×Ö·û
+    // strip operation: å»é™¤é¦–å°¾å­—ç¬¦
     FS_String &strip(const FS_String &chars = FS_String());
     FS_String strip(const FS_String &chars = FS_String()) const;
 
-    // isalpha/isupper/islower ÊÇ·ñ×ÖÄ¸
+    // isalpha/isupper/islower æ˜¯å¦å­—æ¯
     static bool isalpha(const char &c);
     static bool isalpha(const FS_String &s);
     bool isalpha() const;
@@ -151,7 +151,7 @@ public:
     static bool isupper(const FS_String &s);
     bool isupper() const;
 
-    // ÊÇ·ñÊıÖµ
+    // æ˜¯å¦æ•°å€¼
     static bool isdigit(const char &c);
     static bool isdigit(const FS_String &s);
     bool isdigit() const;
@@ -165,7 +165,7 @@ public:
     bool IsStartsWith(const FS_String &s) const;
     bool IsEndsWith(const FS_String &s) const;
 
-    // tolower/toupper operations. ÇëÈ·±£ÊÇÓ¢ÎÄ×Ö·û´® isalpha
+    // tolower/toupper operations. è¯·ç¡®ä¿æ˜¯è‹±æ–‡å­—ç¬¦ä¸² isalpha
     FS_String tolower() const;
     FS_String toupper() const;
 
@@ -189,17 +189,17 @@ public:
     FS_String &Append(Args&&... rest);
     FS_String &AppendFormatCStyle(const char *fmt, ...);
 
-    // ¼æÈİ¸ñÊ½×Ö·û´®ÖĞÃ»ÓĞÕ¼Î»·ûÇé¿ö
+    // å…¼å®¹æ ¼å¼å­—ç¬¦ä¸²ä¸­æ²¡æœ‰å ä½ç¬¦æƒ…å†µ
     template<typename... Args>
     FS_String &FormatCompatibilityNoFmt(const std::string &fmt, const Args&... rest);
 
-    // ¼ÆËãÕ¼Î»·û¸öÊı
+    // è®¡ç®—å ä½ç¬¦ä¸ªæ•°
     static UInt64 CalcPlaceHolderNum(const std::string &fmtStr);
-    // »ñÈ¡µÚÒ»¸öÕ¼Î»·ûÎ»ÖÃ
+    // è·å–ç¬¬ä¸€ä¸ªå ä½ç¬¦ä½ç½®
     static UInt64 GetFirstValidPlaceHolderIndex(const std::string &fmt);
-    // ½²¸ñÊ½·û³õÊ¼»¯¸øoutStr£¬½âÎöÊ±±ØĞë×öµÄ ·µ»ØµÚÒ»¸öÕ¼Î»·ûÎ»ÖÃ
+    // è®²æ ¼å¼ç¬¦åˆå§‹åŒ–ç»™outStrï¼Œè§£ææ—¶å¿…é¡»åšçš„ è¿”å›ç¬¬ä¸€ä¸ªå ä½ç¬¦ä½ç½®
     static UInt64 InitFmtToOutStrFirst(const std::string &fmt, std::string &outStr);
-    // startIndex ±ØĞëÎªµ±Ç°Òª¸ñÊ½»¯µÄ%ËùÔÚÎ»ÖÃ NextPlaceHolderPosÊä³öÏÂÒ»¸öÎ´±»¸ñÊ½»¯µÄÎ»ÖÃoutIndex Êä³östd::string::npos±íÊ¾½áÊø
+    // startIndex å¿…é¡»ä¸ºå½“å‰è¦æ ¼å¼åŒ–çš„%æ‰€åœ¨ä½ç½® NextPlaceHolderPosè¾“å‡ºä¸‹ä¸€ä¸ªæœªè¢«æ ¼å¼åŒ–çš„ä½ç½®outIndex è¾“å‡ºstd::string::nposè¡¨ç¤ºç»“æŸ
     static std::string NextPlaceHolderPos(const std::string &strFmt, UInt64 startIndex, UInt64 &outIndex);
 private:
     template<typename ObjType>

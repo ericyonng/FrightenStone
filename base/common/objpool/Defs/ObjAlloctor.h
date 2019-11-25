@@ -50,7 +50,7 @@ class ObjBlock;
 template<typename ObjType>
 class AlloctorNode;
 
-// ÄÚ´æ·ÖÅäÆ÷»ùÀà
+// å†…å­˜åˆ†é…å™¨åŸºç±»
 template<typename ObjType>
 class IObjAlloctor
 {
@@ -61,17 +61,16 @@ public:
     virtual ~IObjAlloctor();
 
 public:
-    // ÒÀ¾İ__FS_THREAD_SAFE__¿ª¹Ø¿ªÆôÏß³Ì°²È«
     void *Alloc();
     void  Free(void *ptr);
 
-    // Ïß³Ì²»°²È«
+    // çº¿ç¨‹ä¸å®‰å…¨
     void *MixAllocNoLocker();
     void MixFreeNoLocker(void *ptr);
     void *AllocNoLocker();
     void FreeNoLocker(void *ptr);
 
-    // ´ø¹¹ÔìÓëÎö¹¹²Ù×÷ ÒÔÏÂ½Ó¿ÚÏß³Ì²»°²È«
+    // å¸¦æ„é€ ä¸ææ„æ“ä½œ ä»¥ä¸‹æ¥å£çº¿ç¨‹ä¸å®‰å…¨
     template<typename... Args>
     ObjType *New(Args &&... args);
     ObjType *NewWithoutConstruct();
@@ -81,7 +80,7 @@ public:
     void DeleteWithoutDestructor(ObjType *ptr);
 
     size_t GetObjInUse();
-    size_t GetTotalObjBlocks();    // µ±Ç°È«²¿µÄ¶ÔÏó¿é¸öÊı
+    size_t GetTotalObjBlocks();    // å½“å‰å…¨éƒ¨çš„å¯¹è±¡å—ä¸ªæ•°
     size_t GetNodeCnt();
     size_t GetBytesOccupied();
     size_t GetObjBlockSize();
@@ -90,28 +89,28 @@ public:
     void SetAllowMaxOccupiedBytes(UInt64 maxBytes);
 
 private:
-    // Ïß³Ì²»°²È«½Ó¿Ú£¬¶àÏß³ÌÊ±½Ó¿ÚÍâÃæÇë¼ÓËø
+    // çº¿ç¨‹ä¸å®‰å…¨æ¥å£ï¼Œå¤šçº¿ç¨‹æ—¶æ¥å£å¤–é¢è¯·åŠ é”
     void _NewNode();
     void _InitNode(AlloctorNode<ObjType> *newNode);
     void *_AllocFromSys();
 
 protected:
-    void *_curNodeObjs;                     // µ±Ç°½ÚµãµÄ¶ÔÏó³Ø»º³å
-    //std::list<ObjType *> _lastDeleted;      // free¶ÔÏó¹¹³ÉµÄÁ´±íÖ¸ÕëÖ¸ÏòµÄÄÚ´æ´æ´¢µÄÊÇÉÏÒ»´ÎÊÍ·ÅµÄ¶ÔÏóµÄµØÖ·
+    void *_curNodeObjs;                     // å½“å‰èŠ‚ç‚¹çš„å¯¹è±¡æ± ç¼“å†²
+    //std::list<ObjType *> _lastDeleted;      // freeå¯¹è±¡æ„æˆçš„é“¾è¡¨æŒ‡é’ˆæŒ‡å‘çš„å†…å­˜å­˜å‚¨çš„æ˜¯ä¸Šä¸€æ¬¡é‡Šæ”¾çš„å¯¹è±¡çš„åœ°å€
     ObjType *_lastDeleted;
-    size_t _alloctedInCurNode;              // µ±Ç°½ÚµãÒÑ·ÖÅäµÄ¶ÔÏó¸öÊı
-    size_t _nodeCapacity;                   // µ±Ç°½Úµã·ÖÅäµÄÊıÁ¿
-    AlloctorNode<ObjType> *_header;         // Í·½Úµã
-    AlloctorNode<ObjType> *_lastNode;       // ×îĞÂµÄ½Úµã
-    static const size_t _objBlockSize;      // ¶ÔÏó¿é´óĞ¡
-    size_t _objpoolAllowedMaxOccupiedBytes; // ¶ÔÏó³ØÔÊĞíµÄ×î´óÕ¼ÓÃ
+    size_t _alloctedInCurNode;              // å½“å‰èŠ‚ç‚¹å·²åˆ†é…çš„å¯¹è±¡ä¸ªæ•°
+    size_t _nodeCapacity;                   // å½“å‰èŠ‚ç‚¹åˆ†é…çš„æ•°é‡
+    AlloctorNode<ObjType> *_header;         // å¤´èŠ‚ç‚¹
+    AlloctorNode<ObjType> *_lastNode;       // æœ€æ–°çš„èŠ‚ç‚¹
+    static const size_t _objBlockSize;      // å¯¹è±¡å—å¤§å°
+    size_t _objpoolAllowedMaxOccupiedBytes; // å¯¹è±¡æ± å…è®¸çš„æœ€å¤§å ç”¨
 
-    // ÄÚ´æĞ¹Â©Ïà¹Ø
-    size_t          _nodeCnt;               // ½Úµã¸öÊı
-    size_t          _bytesOccupied;         // ¶ÔÏó³ØÕ¼ÓÃÄÚ´æ´óĞ¡ = _objBlockSize * _nodeCnt * node._capacity
-    size_t          _objInUse;              // ÕıÔÚÊ¹ÓÃµÄ¶ÔÏó
-    size_t          _totalBlockCnt;         // ×ÜµÄ¿éÊıÁ¿
-    Locker          _locker;                // Ïß³Ì°²È«
+    // å†…å­˜æ³„æ¼ç›¸å…³
+    size_t          _nodeCnt;               // èŠ‚ç‚¹ä¸ªæ•°
+    size_t          _bytesOccupied;         // å¯¹è±¡æ± å ç”¨å†…å­˜å¤§å° = _objBlockSize * _nodeCnt * node._capacity
+    size_t          _objInUse;              // æ­£åœ¨ä½¿ç”¨çš„å¯¹è±¡
+    size_t          _totalBlockCnt;         // æ€»çš„å—æ•°é‡
+    Locker          _locker;                // çº¿ç¨‹å®‰å…¨
 };
 
 FS_NAMESPACE_END

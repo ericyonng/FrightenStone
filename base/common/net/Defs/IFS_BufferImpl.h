@@ -84,7 +84,7 @@ inline void IFS_Buffer::PopFront(size_t bytesLen)
     bytesLen = _curPos > bytesLen ? bytesLen : _curPos;
     size_t n = _curPos - bytesLen;
 
-    // TODO:如果考虑性能清零可不执行
+    // TODO:濡傛灉鑰冭檻鎬ц兘娓呴浂鍙笉鎵ц
     // ::memset(_buff, 0, bytesLen);
 
 //     if(n > 0)
@@ -97,7 +97,7 @@ inline void IFS_Buffer::PopFront(size_t bytesLen)
 
 inline bool IFS_Buffer::PushBack(const Byte8 *data, size_t len)
 {
-    // 1.判断剩余空间是否足够
+    // 1.鍒ゆ柇鍓╀綑绌洪棿鏄惁瓒冲
     size_t rest = _bufferSize - _curPos;
     if(rest < len)
     {
@@ -105,10 +105,10 @@ inline bool IFS_Buffer::PushBack(const Byte8 *data, size_t len)
         return false;
     }
 
-    // 2.拷贝数据
+    // 2.鎷疯礉鏁版嵁
     ::memcpy(_buff + _curPos, data, len);
 
-    // 3.变更当前位置
+    // 3.鍙樻洿褰撳墠浣嶇疆
     _curPos += len;
     return true;
 }

@@ -90,11 +90,11 @@ inline void FS_List<ObjType>::push_front(ObjType obj)
     auto newNode = _NewNode(obj);
     if(_head)
     {
-        // �׽ڵ㻻λ
+        // 首节点换位
         newNode->_nextNode = _head;
         newNode->_preNode = _head->_preNode;
 
-        // ĩ�ڵ�ָ���׽ڵ�
+        // 末节点指向首节点
         _head->_preNode->_nextNode = newNode;
         _head->_preNode = newNode;
     }
@@ -114,11 +114,11 @@ inline void FS_List<ObjType>::push_back(ObjType obj)
     auto newNode = _NewNode(obj);
     if(_head)
     {
-        // �׽ڵ㻻λ
+        // 首节点换位
         newNode->_nextNode = _head;
         newNode->_preNode = _head->_preNode;
 
-        // ĩ�ڵ�ָ���׽ڵ�
+        // 末节点指向首节点
         _head->_preNode->_nextNode = newNode;
         _head->_preNode = newNode;
     }
@@ -171,7 +171,7 @@ inline const ListNode<ObjType> *FS_List<ObjType>::end() const
 template<typename ObjType>
 inline void FS_List<ObjType>::erase(ListNode<ObjType> *node)
 {
-    // ǰ��ڵ�Խ�
+    // 前后节点对接
     if(_nodeCnt == 1)
     {
         _head = NULL;
@@ -180,7 +180,7 @@ inline void FS_List<ObjType>::erase(ListNode<ObjType> *node)
         return;
     }
     
-    // �Ƿ�ͷ
+    // 是否头
     if(_head == node)
         _head = node->_nextNode;
 
@@ -194,11 +194,11 @@ template<typename ObjType>
 inline void FS_List<ObjType>::insert_before(ObjType newObj, ListNode<ObjType> *specifyPosNode)
 {
     auto newNode = _NewNode(newObj);
-    // ��ɵ�ǰ�ڵ�Խ�
+    // 与旧的前节点对接
     newNode->_preNode = specifyPosNode->_preNode;
     specifyPosNode->_preNode->_nextNode = newNode;
 
-    // ��ָ���ڵ�Խ�
+    // 与指定节点对接
     newNode->_nextNode = specifyPosNode;
     specifyPosNode->_preNode = newNode;
 

@@ -57,10 +57,10 @@ void LogFile::PartitionFile(bool isSysFirstCreate)
     if(isSysFirstCreate)
         return;
 
-    // ¹¹½¨ÎÄ¼şÃû
+    // æ„å»ºæ–‡ä»¶å
     FS_String fileNameCache = _path + _fileName;
 
-    // ²éÕÒ²»´æÔÚµÄÎÄ¼şÃû
+    // æŸ¥æ‰¾ä¸å­˜åœ¨çš„æ–‡ä»¶å
     FS_String wholeName;
     wholeName.AppendFormat("%sOld%d", fileNameCache.c_str(), ++_partNo);
     while(FS_FileUtil::IsFileExist(wholeName.c_str()))
@@ -69,13 +69,13 @@ void LogFile::PartitionFile(bool isSysFirstCreate)
         wholeName.AppendFormat("%sOld%d", fileNameCache.c_str(), ++_partNo);
     }
 
-    // ×ª´¢ÎÄ¼ş
+    // è½¬å‚¨æ–‡ä»¶
     auto dest = FS_FileUtil::OpenFile(wholeName.c_str(), true);
     FS_FileUtil::ResetFileCursor(*_fp);
     FS_FileUtil::CopyFile(*_fp, *dest);
     FS_FileUtil::CloseFile(*dest);
 
-    // É¾³ı²¢ÖØ¿ªÎÄ¼ş
+    // åˆ é™¤å¹¶é‡å¼€æ–‡ä»¶
     Close();
     FS_FileUtil::DelFile(fileNameCache.c_str());
     ASSERT(Reopen());

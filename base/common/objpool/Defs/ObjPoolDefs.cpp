@@ -5,12 +5,12 @@
 
 FS_NAMESPACE_BEGIN
 
-const Int32 ObjPoolDefs::__g_FreeRate = 50;           // ÊÍ·ÅÄÚ´æÊ±ÅÐ¶ÏÄÚ´æ¿éÀûÓÃÂÊµÍÓÚ__g_BusyThresholdValue°Ù·ÖÊýÊ±×ªÎª¿ÉÓÃÇøÄÚ´æ
+const Int32 ObjPoolDefs::__g_FreeRate = 50;           // é‡Šæ”¾å†…å­˜æ—¶åˆ¤æ–­å†…å­˜å—åˆ©ç”¨çŽ‡ä½ŽäºŽ__g_BusyThresholdValueç™¾åˆ†æ•°æ—¶è½¬ä¸ºå¯ç”¨åŒºå†…å­˜
 
 void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_t totalObjBlocks, size_t objBlockSize, size_t bytesOccupied, size_t memObjInUsingCnt, size_t memInUsingBytes, const char *extStr)
 {
     if(memInUsingBytes)
-    {// ÄÚ´æÐ¹Â©´òÓ¡ÄÚ´æÐ¹Â©
+    {// å†…å­˜æ³„æ¼æ‰“å°å†…å­˜æ³„æ¼
         g_Log->objpool("obj name[%s], extStr[%s] pool node cnt[%llu] totalObjBlockCnt[%llu] objBlockSize[%llu] pool memory bytes occupiedBytes[%llu]"
                        " memObjInUsingCnt[%llu] memInUsingBytes[%llu]"
                        , objName
@@ -23,7 +23,7 @@ void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_
                        , memInUsingBytes);
     }
     
-    // ´òÓ¡ÄÚ´æÕ¼ÓÃÐÅÏ¢
+    // æ‰“å°å†…å­˜å ç”¨ä¿¡æ¯
     g_Log->objpool("[objpool memory info cur total occupied bytes[%llu]]: obj name[%s], extStr[%s], pool node cnt[%llu] totalObjBlockCnt[%llu] objBlockSize[%llu] pool memory bytes occupiedBytes[%llu]"
                , (UInt64)(g_curObjPoolOccupiedBytes)
                , objName

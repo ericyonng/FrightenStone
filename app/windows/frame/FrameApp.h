@@ -12,20 +12,20 @@ protected:
 public:
 	CFrameApp() {}
 
-	// 重写
+	// 閲嶅啓
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 	virtual bool FreeResource();
 
-	// 实现
+	// 瀹炵幇
 
 public:
-	//进程目录
+	//杩涚▼鐩綍
 	bool GetWorkDirectory(TCHAR szWorkDirectory[], WORD wBufferCount);
 
 protected:
-	bool AppNotStartedWithSamePath(I32& nPidExists);			//统一路径只能有一个App启动
+	bool AppNotStartedWithSamePath(I32& nPidExists);			//缁熶竴璺緞鍙兘鏈変竴涓狝pp鍚姩
 	static boost::atomic_bool m_bFreeResource;
 	DECLARE_MESSAGE_MAP()
 };

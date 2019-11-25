@@ -37,7 +37,7 @@
 
 struct TestStreamMessage
 {
-    // ĞòÁĞ»¯·´ĞòÁĞ»¯£¨ObjType ±ØĞëÓĞSerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)½Ó¿Ú£©
+    // åºåˆ—åŒ–ååºåˆ—åŒ–ï¼ˆObjType å¿…é¡»æœ‰SerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)æ¥å£ï¼‰
 public:
     TestStreamMessage();
     bool SerializeTo(fs::FS_Stream *stream) const;

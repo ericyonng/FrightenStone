@@ -45,9 +45,9 @@ inline FS_MsgReadStream::FS_MsgReadStream(char *data, Int32 size, bool isDelete,
 {
     OffsetWrLenOnWrChange(size);
 
-    // 预先读取消息长度
+    // 棰勫厛璇诲彇娑堟伅闀垮害
     // ReadInt16();
-    // 预先读取消息命令
+    // 棰勫厛璇诲彇娑堟伅鍛戒护
     // getNetCmd();
 }
 

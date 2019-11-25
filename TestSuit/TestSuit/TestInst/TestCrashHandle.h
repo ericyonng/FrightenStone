@@ -52,12 +52,12 @@ public:
     }
     virtual void Finish()
     {
-        // 释放组件
+        // 閲婃斁缁勪欢
         Fs_SafeFree(_log);
     }
 #pragma endregion
 
-    // 获取资源
+    // 鑾峰彇璧勬簮
 public:
     virtual fs::ILog *GetLog()
     {

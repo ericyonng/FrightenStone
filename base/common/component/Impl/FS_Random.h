@@ -50,33 +50,33 @@ class BASE_EXPORT FS_RandomDefs
 {
 public:
 
-    //����ֲ�����
+    //随机分布类型
     enum RAND_DIS_TYPE
     {
-        RAND_DIS_TYPE_SMALLINT = 0, // һ���������ϵ���ɢ���ȷֲ�
-        RAND_DIS_TYPE_INT,          // һ���������ϵ���ɢ���ȷֲ�
-        RAND_DIS_TYPE_01,           // [0, 1)�ϵ��������ȷֲ�
-        RAND_DIS_TYPE_REAL,         // [min, max)�ϵ��������ȷֲ�
-        RAND_DIS_TYPE_BERNOULLI,    // ��Ŭ���ֲ�
-        RAND_DIS_TYPE_GEOMETRIC,    // ���ηֲ�
-        RAND_DIS_TYPE_TRIANGLE,     // ���Ƿֲ�
-        RAND_DIS_TYPE_EXPONENTIAL,  // ָ���ֲ�
-        RAND_DIS_TYPE_NORMAL,       // ��̬�ֲ�
-        RAND_DIS_TYPE_LOGNORMAL,    // �����ֲ�
-        RAND_DIS_TYPE_ON_SPHERE,    // �����ϵľ��ȷֲ�
-        RAND_DIS_TYPE_BETA,         // �����ֲ�
-        RAND_DIS_TYPE_BINOMIAL,     // ����ֲ�
-        RAND_DIS_TYPE_CAUCHY,       // �����ֲ�
-        RAND_DIS_TYPE_DISCRETE,     // ��ɢ�ֲ�
+        RAND_DIS_TYPE_SMALLINT = 0, // 一个整数集上的离散均匀分布
+        RAND_DIS_TYPE_INT,          // 一个整数集上的离散均匀分布
+        RAND_DIS_TYPE_01,           // [0, 1)上的连续均匀分布
+        RAND_DIS_TYPE_REAL,         // [min, max)上的连续均匀分布
+        RAND_DIS_TYPE_BERNOULLI,    // 伯努利分布
+        RAND_DIS_TYPE_GEOMETRIC,    // 几何分布
+        RAND_DIS_TYPE_TRIANGLE,     // 三角分布
+        RAND_DIS_TYPE_EXPONENTIAL,  // 指数分布
+        RAND_DIS_TYPE_NORMAL,       // 正态分布
+        RAND_DIS_TYPE_LOGNORMAL,    // 对数分布
+        RAND_DIS_TYPE_ON_SPHERE,    // 球面上的均匀分布
+        RAND_DIS_TYPE_BETA,         // 贝塔分布
+        RAND_DIS_TYPE_BINOMIAL,     // 二项分布
+        RAND_DIS_TYPE_CAUCHY,       // 柯西分布
+        RAND_DIS_TYPE_DISCRETE,     // 离散分布
     };
 
-    // �����Դ�����㷨 �㷨�ٶ��иߵ��ͣ��㷨�����ɵ͵���
+    // 随机数源产生算法 算法速度有高到低，算法质量由低到高
     enum  RAND_GEN_ALGORITHM_TYPE
     {
-        RAND_GEN_ALGORITHM_TYPE_RAND48 = 0,             // rand48�㷨�����������
-        RAND_GEN_ALGORITHM_TYPE_MT19937,                // mt19937�㷨�����������
-        RAND_GEN_ALGORITHM_TYPE_MT19937_64,             // mt19937-64�㷨�����������
-        RAND_GEN_ALGORITHM_TYPE_LAGGED_FIBONACCI19937,  // lagged_fibonacci19937�㷨�����������
+        RAND_GEN_ALGORITHM_TYPE_RAND48 = 0,             // rand48算法随机数发生器
+        RAND_GEN_ALGORITHM_TYPE_MT19937,                // mt19937算法随机数发生器
+        RAND_GEN_ALGORITHM_TYPE_MT19937_64,             // mt19937-64算法随机数发生器
+        RAND_GEN_ALGORITHM_TYPE_LAGGED_FIBONACCI19937,  // lagged_fibonacci19937算法随机数发生器
     };
 
 #undef RAND_DIS_NUM_SCOPE_MIN
@@ -88,7 +88,7 @@ public:
 
 };
 
-// �����Դ
+// 随机数源
 template<typename RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE>
 struct RandomSource
 {
@@ -108,12 +108,12 @@ public:
     FS_Random(RandValType minVal, RandValType maxVal);
     virtual ~FS_Random();
 
-    // ���������
+    // 随机数发生
     typename RandValType operator()(MT1993764RandSrc &randomSrc);
     typename RandValType operator()(MT19937RandSrc &randomSrc);
 
 private:
-    // ������ֲ���
+    // 随机数分布器
     template<typename RandValType, FS_RandomDefs::RAND_DIS_TYPE>
     struct Distributor
     {

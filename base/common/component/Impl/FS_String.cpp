@@ -731,7 +731,7 @@ UInt64 FS_String::InitFmtToOutStrFirst(const std::string &fmt, std::string &outS
         return fistPlaceHolderIndex;
     }
 
-    // ÓĞÕ¼Î»·û
+    // æœ‰å ä½ç¬¦
     if(fistPlaceHolderIndex != 0)
         outStr += fmt.substr(0, fistPlaceHolderIndex);
 

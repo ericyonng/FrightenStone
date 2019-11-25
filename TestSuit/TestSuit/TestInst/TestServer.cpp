@@ -54,10 +54,10 @@ FS_NAMESPACE_BEGIN
 //     }
 // 
 //     UInt64 _sessionId;
-//     // ÓÃÓÚserver¼ì²â½ÓÊÕµ½µÄÏûÏ¢IDÊÇ·ñÁ¬Ğø Ã¿ÊÕµ½Ò»¸ö¿Í»§¶ËÏûÏ¢»á×ÔÔö1ÒÔ±ãÓë¿Í»§¶ËµÄmsgidĞ£Ñé£¬²»Æ¥ÅäÔò±¨´í´¦Àí£¨ËµÃ÷¶ª°üµÈ£©
+//     // ç”¨äºserveræ£€æµ‹æ¥æ”¶åˆ°çš„æ¶ˆæ¯IDæ˜¯å¦è¿ç»­ æ¯æ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯æ¶ˆæ¯ä¼šè‡ªå¢1ä»¥ä¾¿ä¸å®¢æˆ·ç«¯çš„msgidæ ¡éªŒï¼Œä¸åŒ¹é…åˆ™æŠ¥é”™å¤„ç†ï¼ˆè¯´æ˜ä¸¢åŒ…ç­‰ï¼‰
 //     Int32 _recvMsgId = 1;
-//     // ²âÊÔ½ÓÊÕ·¢Âß¼­ÓÃ
-//     // ÓÃÓÚclient¼ì²â½ÓÊÕµ½µÄÏûÏ¢IDÊÇ·ñÁ¬Ğø Ã¿·¢ËÍÒ»¸öÏûÏ¢»á×ÔÔö1ÒÔ±ãÓë¿Í»§¶ËµÄsendmsgidĞ£Ñé£¬²»Æ¥ÅäÔò¿Í»§¶Ë±¨´í£¨ËµÃ÷¶ª°üµÈ£©
+//     // æµ‹è¯•æ¥æ”¶å‘é€»è¾‘ç”¨
+//     // ç”¨äºclientæ£€æµ‹æ¥æ”¶åˆ°çš„æ¶ˆæ¯IDæ˜¯å¦è¿ç»­ æ¯å‘é€ä¸€ä¸ªæ¶ˆæ¯ä¼šè‡ªå¢1ä»¥ä¾¿ä¸å®¢æˆ·ç«¯çš„sendmsgidæ ¡éªŒï¼Œä¸åŒ¹é…åˆ™å®¢æˆ·ç«¯æŠ¥é”™ï¼ˆè¯´æ˜ä¸¢åŒ…ç­‰ï¼‰
 //     Int32 _sendMsgId = 1;
 //     IFS_MsgDispatcher *_dispatcher;
 // };
@@ -137,29 +137,29 @@ FS_NAMESPACE_BEGIN
 // 
 //                 //     g_Log->any<MyLogic>("sessionid[%llu] login username[%s], pwd[%s] msgId[%d] user recvmsgid"
 //                 //                         , sessionId, login->_userName, login->_pwd, login->_msgId, user->_recvMsgId);
-//                      // ¼ì²éÏûÏ¢ID
+//                      // æ£€æŸ¥æ¶ˆæ¯ID
 //                 if(login->_msgId != user->_recvMsgId)
-//                 {//µ±Ç°ÏûÏ¢IDºÍ±¾µØÊÕÏûÏ¢´ÎÊı²»Æ¥Åä
+//                 {//å½“å‰æ¶ˆæ¯IDå’Œæœ¬åœ°æ”¶æ¶ˆæ¯æ¬¡æ•°ä¸åŒ¹é…
 //                     g_Log->e<MyLogic>(_LOGFMT_("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>")
 //                                       , sessionId, login->_msgId
 //                                       , user->_recvMsgId, login->_msgId - user->_recvMsgId);
 //                 }
 // 
-//                 // ·µ»Ø°ü
+//                 // è¿”å›åŒ…
 //                 ++user->_recvMsgId;
 //                 fs::LoginRes ret;
 //                 ret._msgId = user->_sendMsgId;
 //                 user->SendData(session, &ret);
 //                 ++user->_sendMsgId;
 //                 return;
-//             }//½ÓÊÕ ÏûÏ¢---´¦Àí ·¢ËÍ   Éú²úÕß Êı¾İ»º³åÇø  Ïû·ÑÕß 
+//             }//æ¥æ”¶ æ¶ˆæ¯---å¤„ç† å‘é€   ç”Ÿäº§è€… æ•°æ®ç¼“å†²åŒº  æ¶ˆè´¹è€… 
 //             break;
 //             case fs::ProtocolCmd::LogoutReq:
 //             {
 //                 fs::FS_MsgReadStream r(msgData);
-//                 // ¶ÁÈ¡ÏûÏ¢³¤¶È
+//                 // è¯»å–æ¶ˆæ¯é•¿åº¦
 //                 r.ReadInt16();
-//                 // ¶ÁÈ¡ÏûÏ¢ÃüÁî
+//                 // è¯»å–æ¶ˆæ¯å‘½ä»¤
 //                 r.GetNetMsgCmd();
 //                 auto n1 = r.ReadInt8();
 //                 auto n2 = r.ReadInt16();
@@ -187,7 +187,7 @@ FS_NAMESPACE_BEGIN
 //                 s.WriteArray(ata, n8);
 //                 s.Finish();
 // 
-//                 // TODO:ĞèÒªÖ§³ÖÁ÷·¢ËÍ
+//                 // TODO:éœ€è¦æ”¯æŒæµå‘é€
 // //                 _dispatcher->SendData(sessionId, )
 // //                 client->SendData(*s.GetDataAddr(), s.GetWrLength());
 //                 //                 g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> logout")
@@ -204,7 +204,7 @@ FS_NAMESPACE_BEGIN
 //             }
 //             default:
 //             {
-//                 g_Log->w<MyLogic>(_LOGFMT_("recv <sessionId=%llu> undefine msgType,dataLen£º%hu")
+//                 g_Log->w<MyLogic>(_LOGFMT_("recv <sessionId=%llu> undefine msgType,dataLenï¼š%hu")
 //                                   , sessionId, msgData->_packetLength);
 //             }
 //             break;
@@ -236,8 +236,8 @@ FS_NAMESPACE_BEGIN
 //         _bSendFull = true;
 //     }
 // 
-//     // FS_Server 4 ¶à¸öÏß³Ì´¥·¢ ²»°²È«
-//     // Èç¹ûÖ»¿ªÆô1¸öcellServer¾ÍÊÇ°²È«µÄ
+//     // FS_Server 4 å¤šä¸ªçº¿ç¨‹è§¦å‘ ä¸å®‰å…¨
+//     // å¦‚æœåªå¼€å¯1ä¸ªcellServerå°±æ˜¯å®‰å…¨çš„
 //     virtual void OnNetJoin(fs::FS_Client * client)
 //     {
 //         fs::FS_TcpServer::OnNetJoin(client);
@@ -247,8 +247,8 @@ FS_NAMESPACE_BEGIN
 // //         g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> joined, client joined cnt<%d>")
 // //                                , static_cast<Int32>(client->GetSocket()), joinedCnt);
 //     }
-//     //cellServer 4 ¶à¸öÏß³Ì´¥·¢ ²»°²È«
-//     //Èç¹ûÖ»¿ªÆô1¸öcellServer¾ÍÊÇ°²È«µÄ
+//     //cellServer 4 å¤šä¸ªçº¿ç¨‹è§¦å‘ ä¸å®‰å…¨
+//     //å¦‚æœåªå¼€å¯1ä¸ªcellServerå°±æ˜¯å®‰å…¨çš„
 //     virtual void OnNetLeave(fs::FS_Client *client)
 //     {
 //         fs::FS_TcpServer::OnNetLeave(client);
@@ -258,8 +258,8 @@ FS_NAMESPACE_BEGIN
 // //         g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> leave, client joined cnt<%d>")
 // //                                , static_cast<Int32>(client->GetSocket()), joinedCnt);
 //     }
-//     //cellServer 4 ¶à¸öÏß³Ì´¥·¢ ²»°²È«
-//     //Èç¹ûÖ»¿ªÆô1¸öcellServer¾ÍÊÇ°²È«µÄ
+//     //cellServer 4 å¤šä¸ªçº¿ç¨‹è§¦å‘ ä¸å®‰å…¨
+//     //å¦‚æœåªå¼€å¯1ä¸ªcellServerå°±æ˜¯å®‰å…¨çš„
 //     virtual Int32 OnNetMsg(fs::FS_Server *server, fs::FS_Client *client, fs::NetMsg_DataHeader *header)
 //     {
 //         fs::FS_TcpServer::OnNetMsg(server, client, header);
@@ -271,11 +271,11 @@ FS_NAMESPACE_BEGIN
 //             {
 //                 fs::LoginReq *login = static_cast<fs::LoginReq *>(header);
 // 
-//                 // ¼ì²éÏûÏ¢ID
+//                 // æ£€æŸ¥æ¶ˆæ¯ID
 //                 if(_isCheckMsgID)
 //                 {
 //                     if(login->_msgId != client->_recvMsgId)
-//                     {//µ±Ç°ÏûÏ¢IDºÍ±¾µØÊÕÏûÏ¢´ÎÊı²»Æ¥Åä
+//                     {//å½“å‰æ¶ˆæ¯IDå’Œæœ¬åœ°æ”¶æ¶ˆæ¯æ¬¡æ•°ä¸åŒ¹é…
 //                         g_Log->e<EasyFSServer>(_LOGFMT_("OnNetMsg socket<%d> msgID<%d> _nRecvMsgID<%d> diff<%d>")
 //                                                , client->GetSocket(), login->_msgId
 //                                                , client->_recvMsgId, login->_msgId - client->_recvMsgId);
@@ -286,10 +286,10 @@ FS_NAMESPACE_BEGIN
 // 
 // //                 g_Log->net<EasyFSServer>("<Recv>socket<%d> loginReq, userName[%s] pwd[%s] msgId[%d] "
 // //                                         , static_cast<Int32>(client->GetSocket()), login->_userName, login->_pwd, login->_msgId);
-//                 // µÇÂ¼Âß¼­
+//                 // ç™»å½•é€»è¾‘
 // 
 //                 // ......
-//                 // »ØÓ¦ÏûÏ¢
+//                 // å›åº”æ¶ˆæ¯
 //                 if(_bSendBack)
 //                 {
 //                     fs::LoginRes ret;
@@ -301,10 +301,10 @@ FS_NAMESPACE_BEGIN
 // 
 // //                     if(SOCKET_ERROR == client->SendData(&ret))
 // //                     {
-// //                         // ·¢ËÍ»º³åÇøÂúÁË£¬ÏûÏ¢Ã»·¢³öÈ¥,Ä¿Ç°Ö±½ÓÅ×ÆúÁË
-// //                         // ¿Í»§¶ËÏûÏ¢Ì«¶à£¬ĞèÒª¿¼ÂÇÓ¦¶Ô²ßÂÔ
-// //                         // Õı³£Á¬½Ó£¬ÒµÎñ¿Í»§¶Ë²»»áÓĞÕâÃ´¶àÏûÏ¢
-// //                         // Ä£Äâ²¢·¢²âÊÔÊ±ÊÇ·ñ·¢ËÍÆµÂÊ¹ı¸ß
+// //                         // å‘é€ç¼“å†²åŒºæ»¡äº†ï¼Œæ¶ˆæ¯æ²¡å‘å‡ºå»,ç›®å‰ç›´æ¥æŠ›å¼ƒäº†
+// //                         // å®¢æˆ·ç«¯æ¶ˆæ¯å¤ªå¤šï¼Œéœ€è¦è€ƒè™‘åº”å¯¹ç­–ç•¥
+// //                         // æ­£å¸¸è¿æ¥ï¼Œä¸šåŠ¡å®¢æˆ·ç«¯ä¸ä¼šæœ‰è¿™ä¹ˆå¤šæ¶ˆæ¯
+// //                         // æ¨¡æ‹Ÿå¹¶å‘æµ‹è¯•æ—¶æ˜¯å¦å‘é€é¢‘ç‡è¿‡é«˜
 // //                         if(_bSendFull)
 // //                             g_Log->w<EasyFSServer>(_LOGFMT_("<Socket=%d> Send Full"), client->GetSocket());
 // //                     }
@@ -315,15 +315,15 @@ FS_NAMESPACE_BEGIN
 //                 }
 // 
 //                 return StatusDefs::Success;
-//                 //CELLLog_Info("recv <Socket=%d> msgType£ºCMD_LOGIN, dataLen£º%d,userName=%s PassWord=%s", cSock, login->dataLength, login->userName, login->PassWord);
-//             }//½ÓÊÕ ÏûÏ¢---´¦Àí ·¢ËÍ   Éú²úÕß Êı¾İ»º³åÇø  Ïû·ÑÕß 
+//                 //CELLLog_Info("recv <Socket=%d> msgTypeï¼šCMD_LOGIN, dataLenï¼š%d,userName=%s PassWord=%s", cSock, login->dataLength, login->userName, login->PassWord);
+//             }//æ¥æ”¶ æ¶ˆæ¯---å¤„ç† å‘é€   ç”Ÿäº§è€… æ•°æ®ç¼“å†²åŒº  æ¶ˆè´¹è€… 
 //             break;
 //             case fs::ProtocolCmd::LogoutReq:
 //             {
 //                 fs::FS_MsgReadStream r(header);
-//                 // ¶ÁÈ¡ÏûÏ¢³¤¶È
+//                 // è¯»å–æ¶ˆæ¯é•¿åº¦
 //                 r.ReadInt16();
-//                 // ¶ÁÈ¡ÏûÏ¢ÃüÁî
+//                 // è¯»å–æ¶ˆæ¯å‘½ä»¤
 //                 r.GetNetMsgCmd();
 //                 auto n1 = r.ReadInt8();
 //                 auto n2 = r.ReadInt16();
@@ -365,7 +365,7 @@ FS_NAMESPACE_BEGIN
 //             }
 //             default:
 //             {
-//                 g_Log->w<EasyFSServer>(_LOGFMT_("recv <socket=%d> undefine msgType,dataLen£º%u")
+//                 g_Log->w<EasyFSServer>(_LOGFMT_("recv <socket=%d> undefine msgType,dataLenï¼š%u")
 //                                        , static_cast<Int32>(client->GetSocket()), header->_packetLength);
 //             }
 //             break;
@@ -375,11 +375,11 @@ FS_NAMESPACE_BEGIN
 //     }
 // 
 // private:
-//     //×Ô¶¨Òå±êÖ¾ ÊÕµ½ÏûÏ¢ºó½«·µ»ØÓ¦´ğÏûÏ¢
+//     //è‡ªå®šä¹‰æ ‡å¿— æ”¶åˆ°æ¶ˆæ¯åå°†è¿”å›åº”ç­”æ¶ˆæ¯
 //     bool _bSendBack;
-//     //×Ô¶¨Òå±êÖ¾ ÊÇ·ñÌáÊ¾£º·¢ËÍ»º³åÇøÒÑĞ´Âú
+//     //è‡ªå®šä¹‰æ ‡å¿— æ˜¯å¦æç¤ºï¼šå‘é€ç¼“å†²åŒºå·²å†™æ»¡
 //     bool _bSendFull;
-//     //ÊÇ·ñ¼ì²é½ÓÊÕµ½µÄÏûÏ¢IDÊÇ·ñÁ¬Ğø
+//     //æ˜¯å¦æ£€æŸ¥æ¥æ”¶åˆ°çš„æ¶ˆæ¯IDæ˜¯å¦è¿ç»­
 //     bool _isCheckMsgID;
 // };
 
@@ -400,7 +400,7 @@ public:
     {
     }
 
-    // NetMsg_DataHeader ±ØĞëÊÇ¶ÑÇø´´½¨µÄ
+    // NetMsg_DataHeader å¿…é¡»æ˜¯å †åŒºåˆ›å»ºçš„
     void SendData(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
     {
         _dispatcher->SendData(sessionId, generatorId, msgData);
@@ -411,10 +411,10 @@ public:
         g_Log->net<User>(" session id[%llu] user disconnect", _sessionId);
     }
     UInt64 _sessionId;
-    // ÓÃÓÚserver¼ì²â½ÓÊÕµ½µÄÏûÏ¢IDÊÇ·ñÁ¬Ğø Ã¿ÊÕµ½Ò»¸ö¿Í»§¶ËÏûÏ¢»á×ÔÔö1ÒÔ±ãÓë¿Í»§¶ËµÄmsgidĞ£Ñé£¬²»Æ¥ÅäÔò±¨´í´¦Àí£¨ËµÃ÷¶ª°üµÈ£©
+    // ç”¨äºserveræ£€æµ‹æ¥æ”¶åˆ°çš„æ¶ˆæ¯IDæ˜¯å¦è¿ç»­ æ¯æ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯æ¶ˆæ¯ä¼šè‡ªå¢1ä»¥ä¾¿ä¸å®¢æˆ·ç«¯çš„msgidæ ¡éªŒï¼Œä¸åŒ¹é…åˆ™æŠ¥é”™å¤„ç†ï¼ˆè¯´æ˜ä¸¢åŒ…ç­‰ï¼‰
     Int32 _recvMsgId = 1;
-    // ²âÊÔ½ÓÊÕ·¢Âß¼­ÓÃ
-    // ÓÃÓÚclient¼ì²â½ÓÊÕµ½µÄÏûÏ¢IDÊÇ·ñÁ¬Ğø Ã¿·¢ËÍÒ»¸öÏûÏ¢»á×ÔÔö1ÒÔ±ãÓë¿Í»§¶ËµÄsendmsgidĞ£Ñé£¬²»Æ¥ÅäÔò¿Í»§¶Ë±¨´í£¨ËµÃ÷¶ª°üµÈ£©
+    // æµ‹è¯•æ¥æ”¶å‘é€»è¾‘ç”¨
+    // ç”¨äºclientæ£€æµ‹æ¥æ”¶åˆ°çš„æ¶ˆæ¯IDæ˜¯å¦è¿ç»­ æ¯å‘é€ä¸€ä¸ªæ¶ˆæ¯ä¼šè‡ªå¢1ä»¥ä¾¿ä¸å®¢æˆ·ç«¯çš„sendmsgidæ ¡éªŒï¼Œä¸åŒ¹é…åˆ™å®¢æˆ·ç«¯æŠ¥é”™ï¼ˆè¯´æ˜ä¸¢åŒ…ç­‰ï¼‰
     Int32 _sendMsgId = 1;
     IFS_MsgDispatcher *_dispatcher;
 };
@@ -517,15 +517,15 @@ public:
 //                               , login->_userName, login->_pwd, _dispatcher->GetId());
                 //     g_Log->any<MyLogic>("sessionid[%llu] login username[%s], pwd[%s] msgId[%d] user recvmsgid"
                 //                         , sessionId, login->_userName, login->_pwd, login->_msgId, user->_recvMsgId);
-                     // ¼ì²éÏûÏ¢ID
+                     // æ£€æŸ¥æ¶ˆæ¯ID
                 if(login->_msgId != user->_recvMsgId)
-                {//µ±Ç°ÏûÏ¢IDºÍ±¾µØÊÕÏûÏ¢´ÎÊı²»Æ¥Åä
+                {//å½“å‰æ¶ˆæ¯IDå’Œæœ¬åœ°æ”¶æ¶ˆæ¯æ¬¡æ•°ä¸åŒ¹é…
                     g_Log->custom("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>"
                                   , sessionId, login->_msgId
                                   , user->_recvMsgId, login->_msgId - user->_recvMsgId);
                 }
 
-                // ·µ»Ø°ü
+                // è¿”å›åŒ…
                 ++user->_recvMsgId;
 
                 for(Int32 i = 0; i < 1; ++i)
@@ -537,14 +537,14 @@ public:
                 }
 
                 return;
-            }//½ÓÊÕ ÏûÏ¢---´¦Àí ·¢ËÍ   Éú²úÕß Êı¾İ»º³åÇø  Ïû·ÑÕß 
+            }//æ¥æ”¶ æ¶ˆæ¯---å¤„ç† å‘é€   ç”Ÿäº§è€… æ•°æ®ç¼“å†²åŒº  æ¶ˆè´¹è€… 
             break;
             case fs::ProtocolCmd::LogoutReq:
             {
                 fs::FS_MsgReadStream r(msgData);
-                // ¶ÁÈ¡ÏûÏ¢³¤¶È
+                // è¯»å–æ¶ˆæ¯é•¿åº¦
                 r.ReadInt16();
-                // ¶ÁÈ¡ÏûÏ¢ÃüÁî
+                // è¯»å–æ¶ˆæ¯å‘½ä»¤
                 r.GetNetMsgCmd();
                 auto n1 = r.ReadInt8();
                 auto n2 = r.ReadInt16();
@@ -572,7 +572,7 @@ public:
                 s.WriteArray(ata, n8);
                 s.Finish();
 
-                // TODO:ĞèÒªÖ§³ÖÁ÷·¢ËÍ
+                // TODO:éœ€è¦æ”¯æŒæµå‘é€
 //                 _dispatcher->SendData(sessionId, )
 //                 client->SendData(*s.GetDataAddr(), s.GetWrLength());
                 //                 g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> logout")
@@ -589,7 +589,7 @@ public:
             }
             default:
             {
-                g_Log->custom("recv <sessionId=%llu> undefine msgType,dataLen£º%hu"
+                g_Log->custom("recv <sessionId=%llu> undefine msgType,dataLenï¼š%hu"
                               , sessionId, msgData->_packetLength);
             }
             break;
@@ -624,7 +624,7 @@ void TestServer::Run()
 
     if(st == StatusDefs::Success)
     {
-        // ²¢·¢ÒµÎñÂß¼­
+        // å¹¶å‘ä¸šåŠ¡é€»è¾‘
         auto dispatcherCnt = g_SvrCfg->GetDispatcherCnt();
         std::vector<fs::IFS_BusinessLogic *> logics;
         logics.resize(dispatcherCnt);

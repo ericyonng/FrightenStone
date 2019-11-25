@@ -101,7 +101,7 @@ void MessageQueue::BeforeClose()
     if(!_isStart)
         return;
 
-    // »½ĞÑÏû·ÑÕßÏß³Ì
+    // å”¤é†’æ¶ˆè´¹è€…çº¿ç¨‹
     _msgGeneratorGuard.Lock();
     _isWorking = false;
     _msgGeneratorGuard.Sinal();
@@ -140,7 +140,7 @@ void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
             _msgGeneratorGuard.Unlock();
         }
 
-        // Éú²úÕßÏûÏ¢×ªÒÆµ½»º´æ
+        // ç”Ÿäº§è€…æ¶ˆæ¯è½¬ç§»åˆ°ç¼“å­˜
         _msgGeneratorGuard.Lock();
         auto genTemp = _msgGeneratorQueue;
         _msgGeneratorQueue = _msgSwitchQueue;
@@ -167,7 +167,7 @@ void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
     _isWorking = false;
 }
 
-/////// ¶àÉú²úÕß¶àÏû·ÑÕß
+/////// å¤šç”Ÿäº§è€…å¤šæ¶ˆè´¹è€…
 
 OBJ_POOL_CREATE_DEF_IMPL(ConcurrentMessageQueue, __DEF_OBJ_POOL_OBJ_NUM__);
 
@@ -248,7 +248,7 @@ void ConcurrentMessageQueue::BeforeClose()
     if(!_isStart)
         return;
 
-    // »½ĞÑÉú²úÕßÏß³Ì
+    // å”¤é†’ç”Ÿäº§è€…çº¿ç¨‹
     _isWorking = false;
     for(UInt32 i = 0; i < _generatorQuantity; ++i)
     {
@@ -260,7 +260,7 @@ void ConcurrentMessageQueue::BeforeClose()
     if(_pool)
         _pool->Close();
 
-    // »½ĞÑÏû·ÑÕßÏß³Ì
+    // å”¤é†’æ¶ˆè´¹è€…çº¿ç¨‹
     while(true)
     {
         bool hasWaiter = false;
@@ -287,7 +287,7 @@ void ConcurrentMessageQueue::Close()
     if(!_isStart)
         return;
 
-    // ÊÍ·ÅÉú²úÕß¶ÓÁĞ×ÊÔ´
+    // é‡Šæ”¾ç”Ÿäº§è€…é˜Ÿåˆ—èµ„æº
     std::set<UInt32> hasMsgQueueId;
     for(UInt32 i = 0; i < _generatorQuantity; ++i)
     {
@@ -306,7 +306,7 @@ void ConcurrentMessageQueue::Close()
         Fs_SafeFree(_genoratorGuards[i]);
     }
 
-    // ´òÓ¡Î´´¦ÀíµÄÉú²úÕßÏûÏ¢¶ÓÁĞid
+    // æ‰“å°æœªå¤„ç†çš„ç”Ÿäº§è€…æ¶ˆæ¯é˜Ÿåˆ—id
     for(auto queueId : hasMsgQueueId)
         g_Log->w<ConcurrentMessageQueue>(_LOGFMT_("generator queueId[%u] has msgs unhandled"), queueId);
 
@@ -330,7 +330,7 @@ void ConcurrentMessageQueue::Close()
     _msgConsumerQueueChanges.clear();
     _consumerMsgQueues.clear();
 
-    // ´òÓ¡Î´´¦ÀíµÄÏû·ÑÕßÏûÏ¢¶ÓÁĞid
+    // æ‰“å°æœªå¤„ç†çš„æ¶ˆè´¹è€…æ¶ˆæ¯é˜Ÿåˆ—id
     for(auto queueId : hasMsgQueueId)
         g_Log->w<ConcurrentMessageQueue>(_LOGFMT_("consumer queueId[%u] has msgs unhandled"), queueId);
 
@@ -342,7 +342,7 @@ void ConcurrentMessageQueue::_Generator2ConsumerQueueTask(ITask *task, FS_Thread
     MessageQueueTask *messageQueueTask = reinterpret_cast<MessageQueueTask *>(task);
     const UInt32 generatorQueueId = messageQueueTask->GetQueueId();
 
-    // ²ÎÊı
+    // å‚æ•°
     _isWorking = true;
     const UInt32 consumerId = generatorQueueId % _consumerQuantity;
     ConditionLocker *localGenGuard = _genoratorGuards[generatorQueueId];
@@ -353,7 +353,7 @@ void ConcurrentMessageQueue::_Generator2ConsumerQueueTask(ITask *task, FS_Thread
     std::list<FS_MessageBlock *> *genTemp = NULL;
     auto &consumerMsgQueue = _consumerMsgQueues[consumerId];
 
-    // ¾ùÔÈ·ÖÅä
+    // å‡åŒ€åˆ†é…
     while(pool->IsPoolWorking() || *_generatorChange[generatorQueueId])
     {
         if(_isWorking)
@@ -363,7 +363,7 @@ void ConcurrentMessageQueue::_Generator2ConsumerQueueTask(ITask *task, FS_Thread
             localGenGuard->Unlock();
         }
 
-        // Éú²úÕßÏûÏ¢×ªÒÆµ½»º´æ
+        // ç”Ÿäº§è€…æ¶ˆæ¯è½¬ç§»åˆ°ç¼“å­˜
         localGenGuard->Lock();
         auto &localGenMsgQueue = _generatorMsgQueues[generatorQueueId];
         auto &localSwitchQueue = _msgSwitchQueues[generatorQueueId];

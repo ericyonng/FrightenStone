@@ -35,11 +35,11 @@
 #pragma once
 
 // messageQueueMgr
-// ��Ҫ֧��ÿ��ϵͳ��Ӧһ����Ϣ����
-// n��ϵͳn+1���߳�
-// ÿ��ϵͳ��һ����������,������������ÿ����һ����Ϣ��Ҫ��֪���������ѣ�������ÿ����һ����Ϣ��Ҫ��֪������
-// һ��ͨ�õ�����һ��ϵͳ�����Լ������Ϣ����
-// ÿ��ϵͳ��Ϣ���յĻص��ӿ�ע��
+// 需要支持每个系统对应一个消息队列
+// n个系统n+1条线程
+// 每个系统有一个生产者锁,与消费者锁，每生产一个消息需要告知消费者消费，消费者每消费一个消息需要告知生产者
+// 一个通用的任意一个系统都可以加入的消息队列
+// 每个系统消息接收的回调接口注册
 // 
 #include "base/common/component/Impl/MessageQueue/Defs/FS_MessageBlock.h"
 #include "base/common/component/Impl/MessageQueue/Impl/MessageQueue.h"

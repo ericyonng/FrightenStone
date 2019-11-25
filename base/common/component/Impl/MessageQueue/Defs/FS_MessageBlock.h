@@ -54,7 +54,7 @@ struct BASE_EXPORT FS_MessageBlock
     template<typename DerivedObjType>
     DerivedObjType *CastTo();
 
-    FS_Stream *_data;                            // ĞòÁĞ»¯µÄÊı¾İ×Ö½ÚÁ÷
+    FS_Stream *_data;                            // åºåˆ—åŒ–çš„æ•°æ®å­—èŠ‚æµ
 };
 
 class BASE_EXPORT MessageBlockType
@@ -62,11 +62,11 @@ class BASE_EXPORT MessageBlockType
 public:
     enum
     {
-        MB_None = 0,                    // ÎŞĞ§
-        MB_NetMsgArrived = 1,           // ÊÕµ½ÍøÂç°ü
-        MB_NetMsgSended = 2,            // ·¢ËÍÍøÂç°ü
-        MB_NetSessionDisconnect = 3,    // »á»°¶Ï¿ª
-        MB_NetSessionConnected = 4,     // »á»°Á¬Èë
+        MB_None = 0,                    // æ— æ•ˆ
+        MB_NetMsgArrived = 1,           // æ”¶åˆ°ç½‘ç»œåŒ…
+        MB_NetMsgSended = 2,            // å‘é€ç½‘ç»œåŒ…
+        MB_NetSessionDisconnect = 3,    // ä¼šè¯æ–­å¼€
+        MB_NetSessionConnected = 4,     // ä¼šè¯è¿å…¥
     };
 };
 
@@ -90,10 +90,10 @@ struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
     template<typename NetMsgObjType>
     NetMsgObjType *CastBufferTo();
 
-    // ÄÚ´æ³Ø´´½¨
+    // å†…å­˜æ± åˆ›å»º
     Int32 _mbType;
     Byte8 *_buffer; // NetMsg_DataHeader *
-    Int32 _generatorId; // Éú²úÕßid
+    Int32 _generatorId; // ç”Ÿäº§è€…id
     UInt64 _sessionId;
 };
 

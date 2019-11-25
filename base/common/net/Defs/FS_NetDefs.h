@@ -57,7 +57,7 @@
 #define SOCKET_ERROR            (-1)
 #endif
 
-//»º³åÇø×îĞ¡µ¥Ôª´óĞ¡
+//ç¼“å†²åŒºæœ€å°å•å…ƒå¤§å°
 #ifndef RECV_BUFF_SZIE
 #define RECV_BUFF_SZIE 16384    // 16K
 #define SEND_BUFF_SZIE 16384    // 16K
@@ -65,14 +65,14 @@
 #endif // !RECV_BUFF_SZIE
 
 
-// ¿Í»§¶ËĞÄÌø¼ì²âËÀÍö¼ÆÊ±Ê±¼ä(µ¥Î»ms)
-// ÔÚ¼ä¸ôÖ¸¶¨Ê±¼äºó²ÅÔÊĞí·¢ËÍ(µ¥Î»ms)
+// å®¢æˆ·ç«¯å¿ƒè·³æ£€æµ‹æ­»äº¡è®¡æ—¶æ—¶é—´(å•ä½ms)
+// åœ¨é—´éš”æŒ‡å®šæ—¶é—´åæ‰å…è®¸å‘é€(å•ä½ms)
 #define CLIENT_SEND_BUFF_TIME 200
-// connectorµÄ»º³å´óĞ¡
+// connectorçš„ç¼“å†²å¤§å°
 #define IOCP_CONNECTOR_BUFFER 1024
-// Í³¼Æ·şÎñÆ÷¸ºÔØµÄÊ±¼ä¼ä¸ô
-#define IOCP_STATISTIC_INTERVAL     1000    // Ê±¼ä¼ä¸ôµ¥Î»ms
-#define SVR_CONFIG_PATH_NAME    "./ServerCfg.ini"   // ·şÎñÆ÷ÅäÖÃ
+// ç»Ÿè®¡æœåŠ¡å™¨è´Ÿè½½çš„æ—¶é—´é—´éš”
+#define IOCP_STATISTIC_INTERVAL     1000    // æ—¶é—´é—´éš”å•ä½ms
+#define SVR_CONFIG_PATH_NAME    "./ServerCfg.ini"   // æœåŠ¡å™¨é…ç½®
 
 #pragma region Listener default config
 #define SVR_CFG_LISTENER_SEG                "Listener"
@@ -81,53 +81,53 @@
 #define SVR_CFG_LISTENER_IP                 "127.0.0.1"
 #define SVR_CFG_LISTENER_PORT_KEY           "port"
 #define SVR_CFG_LISTENER_PORT               "4567"
-#define SVR_CFG_LISTENER_CLN_LIMIT_KEY      "MaxConnectQuantity"        // ×î´óÁ¬½ÓÊı
-#define SVR_CFG_LISTENER_CLN_LIMIT          "100064"                    // Ä¬ÈÏµÄ×î´óÁ¬½ÓÊı
+#define SVR_CFG_LISTENER_CLN_LIMIT_KEY      "MaxConnectQuantity"        // æœ€å¤§è¿æ¥æ•°
+#define SVR_CFG_LISTENER_CLN_LIMIT          "100064"                    // é»˜è®¤çš„æœ€å¤§è¿æ¥æ•°
 
 #pragma endregion
 
 #pragma region Transfer default config
-#define SVR_CFG_TRANSFER_SEG                            "Transfer"                      // Êı¾İ´«ÊäÅäÖÃ
+#define SVR_CFG_TRANSFER_SEG                            "Transfer"                      // æ•°æ®ä¼ è¾“é…ç½®
 
 #define SVR_CFG_TRANSFER_SEG_CNT_KEY                    "TransferCnt"
-#define SVR_CFG_TRANSFER_SEG_CNT                        "8"                             // Êı¾İ´«ÊäÖ§³Ö8Ïß³Ì
-#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY        "HeartbeatDeadTimeInterval"     // ĞÄÌøËÀÍöÊ±¼ä¼ä¸ô
-#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "30000"                         // Ä¬ÈÏ30sĞÄÌø
-#define SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY             "PreparePoolBufferCnt"          // Ô¤ÏÈ×¼±¸µÄÍøÂçbuffer»º³å³ØµÄbuffer¸öÊı
-#define SVR_CFG_PREPARE_POOL_BUFFER_CNT                 "1024"                          // Ô¤ÏÈ×¼±¸µÄÍøÂçbuffer»º³å³ØµÄbuffer¸öÊı
-#define SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY         "MaxMemPoolMBPerTransfer"       // Ã¿¸öÊı¾İ´«ÊäÆ÷ÄÚ´æ³Ø´óĞ¡
-#define SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER             "1024"                          // MBÎªµ¥Î»
+#define SVR_CFG_TRANSFER_SEG_CNT                        "8"                             // æ•°æ®ä¼ è¾“æ”¯æŒ8çº¿ç¨‹
+#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY        "HeartbeatDeadTimeInterval"     // å¿ƒè·³æ­»äº¡æ—¶é—´é—´éš”
+#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "30000"                         // é»˜è®¤30så¿ƒè·³
+#define SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY             "PreparePoolBufferCnt"          // é¢„å…ˆå‡†å¤‡çš„ç½‘ç»œbufferç¼“å†²æ± çš„bufferä¸ªæ•°
+#define SVR_CFG_PREPARE_POOL_BUFFER_CNT                 "1024"                          // é¢„å…ˆå‡†å¤‡çš„ç½‘ç»œbufferç¼“å†²æ± çš„bufferä¸ªæ•°
+#define SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY         "MaxMemPoolMBPerTransfer"       // æ¯ä¸ªæ•°æ®ä¼ è¾“å™¨å†…å­˜æ± å¤§å°
+#define SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER             "1024"                          // MBä¸ºå•ä½
 #pragma endregion
 
 #pragma region Dispatcher default config
-#define SVR_CFG_DISPATCHER_SEG                          "Dispatcher"                      // ÏûÏ¢·Ö·¢ÅäÖÃ
+#define SVR_CFG_DISPATCHER_SEG                          "Dispatcher"                      // æ¶ˆæ¯åˆ†å‘é…ç½®
 
-#define SVR_CFG_DISPATCHER_CNT_KEY                      "DispatcherCnt"                   // ÏûÏ¢·Ö·¢Æ÷ÊıÁ¿
-#define SVR_CFG_DISPATCHER_CNT                          "1"                               // ÏûÏ¢·Ö·¢Æ÷ÊıÁ¿
+#define SVR_CFG_DISPATCHER_CNT_KEY                      "DispatcherCnt"                   // æ¶ˆæ¯åˆ†å‘å™¨æ•°é‡
+#define SVR_CFG_DISPATCHER_CNT                          "1"                               // æ¶ˆæ¯åˆ†å‘å™¨æ•°é‡
 #pragma endregion
 
 #pragma region objpool default config
-#define SVR_CFG_OBJPOOL_SEG                             "ObjPool"                         // ¶ÔÏó³ØÅäÖÃ
+#define SVR_CFG_OBJPOOL_SEG                             "ObjPool"                         // å¯¹è±¡æ± é…ç½®
 
-#define SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED_KEY       "MaxAllowMBOccupied"              // ×î´óÔÊĞíÕ¼ÓÃÄÚ´æ´óĞ¡
-#define SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED           "2048"                            // Ä¬ÈÏ´óĞ¡2GB
+#define SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED_KEY       "MaxAllowMBOccupied"              // æœ€å¤§å…è®¸å ç”¨å†…å­˜å¤§å°
+#define SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED           "2048"                            // é»˜è®¤å¤§å°2GB
 #pragma endregion
 
 #pragma region memorypool default config
-#define SVR_CFG_MEMORY_POOL_SEG                         "MemoryPool"                      // ÄÚ´æ³ØÅäÖÃ
+#define SVR_CFG_MEMORY_POOL_SEG                         "MemoryPool"                      // å†…å­˜æ± é…ç½®
 
-#define SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY       "MaxAllowMBOccupied"              // ×î´óÔÊĞíÕ¼ÓÃÄÚ´æ´óĞ¡
-#define SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED            "2048"                           // Ä¬ÈÏ´óĞ¡2GB
+#define SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY       "MaxAllowMBOccupied"              // æœ€å¤§å…è®¸å ç”¨å†…å­˜å¤§å°
+#define SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED            "2048"                           // é»˜è®¤å¤§å°2GB
 #pragma endregion
 
-// ĞÄÌø¶ÓÁĞÅÅĞò
+// å¿ƒè·³é˜Ÿåˆ—æ’åº
 // class FS_ClientComp
 // {
 // public:
 //     bool operator(const FS_Client *l, const FS_Client *r) const;
 // };
 
-// ÍøÂçÄ£ĞÍ¶¨Òå
+// ç½‘ç»œæ¨¡å‹å®šä¹‰
 class NetModuleType
 {
 public:
