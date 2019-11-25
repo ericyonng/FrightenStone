@@ -43,6 +43,8 @@
 #include <stdexcept>
 #include <deque>
 #include <set>
+#include <list>
+#include <map>
 #pragma endregion
 
 #pragma region base lib

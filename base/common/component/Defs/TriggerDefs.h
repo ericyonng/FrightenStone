@@ -67,6 +67,8 @@ public:
     TriggerExecuteBody(Int32 triggerType, Int32 execTimes = 1);
     ~TriggerExecuteBody();
 
+    FS_String ToString() const;
+
     Int32 _execTimes;
     Int32 _triggerType;
     IDelegate<Int32, TriggerExecuteBody *> *_exec;
@@ -80,9 +82,11 @@ public:
 
 public:
     Int32 Reg(Int32 triggerType, const IDelegate<Int32, TriggerExecuteBody *> &exec, Int32 execTimes = 1);
+    Int32 Reg(Int32 triggerType, IDelegate<Int32, TriggerExecuteBody *> *exec, Int32 execTimes = 1);
     Int32 Exec(std::set<Int32> &triggerType2Erase);
     void Erase(Int32 triggerType);
     bool IsExist(Int32 triggerType) const;
+    FS_String ToString() const;
 
 private:
     std::map<Int32, TriggerExecuteBody *>::iterator _Erase(const std::map<Int32, TriggerExecuteBody *>::iterator &iter);
@@ -91,6 +95,46 @@ private:
     Trigger *_trigger;
     Int32 _occasion;                                                    // 
     std::map<Int32, TriggerExecuteBody *> _triggerTypeRefBodys;         //  
+};
+
+class BASE_EXPORT TriggerOpType
+{
+public:
+    enum
+    {
+        Invalid = 0,    // ÎÞÐ§
+        Reg = 1,        // ×¢²á
+        Erase = 2,      // ÒÆ³ý
+    };
+};
+
+class BASE_EXPORT ITriggerOpInfo
+{
+public:
+    ITriggerOpInfo();
+    virtual ~ITriggerOpInfo() {}
+    Int32 _opType;
+};
+
+class BASE_EXPORT RegTriggerInfo : public ITriggerOpInfo
+{
+public:
+    RegTriggerInfo();
+    ~RegTriggerInfo();
+
+    Int32 _occasionType;
+    Int32 _triggerType;
+    IDelegate<Int32, TriggerExecuteBody *> *_callback;
+    Int32 _execTimes;
+    Int32 _addType;
+};
+
+class BASE_EXPORT EraseTriggerTypeInfo : public ITriggerOpInfo
+{
+public:
+    EraseTriggerTypeInfo();
+    ~EraseTriggerTypeInfo() {}
+    Int32 _triggerType;
 };
 
 
