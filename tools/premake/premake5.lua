@@ -92,14 +92,14 @@ workspace ("Frightenstone_" .. _ACTION)
         symbols("On")
     filter {}
 
-    -- characterset architecture
+    -- characterset architecture 多字节字符
     filter { "language:c++" }
         characterset "MBCS"
     filter {}
 
     -- disable some warnings
     filter { "system:windows", "language:c++" }
-        disablewarnings { "4091" }
+        disablewarnings { "4091", "4819" }
     filter {}
 
 -- ****************************************************************************
@@ -274,4 +274,7 @@ project "TestSuit"
     -- optimize
     set_optimize_opts()
 	
+if IS_WINDOWS == false then
+	print("builddir = " .. FS_BUILD_DIR)
+end
 
