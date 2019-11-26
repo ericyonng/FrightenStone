@@ -50,11 +50,14 @@ class ObjBlock;
 template<typename ObjType>
 class AlloctorNode;
 
+template<typename ObjType>
+class ObjPoolHelper;
+
 // 内存分配器基类
 template<typename ObjType>
 class IObjAlloctor
 {
-    template<typename ObjType>
+    template<ObjType>
     friend class ObjPoolHelper;
 public:
     IObjAlloctor(size_t blockAmountPerNode);
