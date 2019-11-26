@@ -143,7 +143,6 @@ project "fsbase"
     includedirs {
         "../../3rd/openSSL/staticlib/$(Configuration)/include",
 		"../../",
-		"../../base/base",
      }
 
     -- target prefix 前缀
