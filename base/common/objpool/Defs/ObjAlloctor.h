@@ -57,8 +57,8 @@ class ObjPoolHelper;
 template<typename ObjType>
 class IObjAlloctor
 {
-    template<ObjType>
-    friend class ObjPoolHelper;
+    template<>
+    friend class ObjPoolHelper<ObjType>;
 public:
     IObjAlloctor(size_t blockAmountPerNode);
     virtual ~IObjAlloctor();
