@@ -58,7 +58,7 @@ template<typename Type>
 class AutoDelObj<Type, AssistObjsDefs::MultiDelete>
 {
 public:
-    inline void Release(typename Type *&p)
+    inline void Release(Type *&p)
     {
         FsSafeMultiDelete(p);
     }
