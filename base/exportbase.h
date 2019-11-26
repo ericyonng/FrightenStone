@@ -45,10 +45,14 @@
     #ifdef  FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
         #ifdef _WIN32
             #define BASE_EXPORT _declspec(dllexport)
+        #else
+            #define BASE_EXPORT
         #endif
     #else
         #ifdef _WIN32
             #define BASE_EXPORT _declspec(dllimport)
+        #else
+            #define BASE_EXPORT 
         #endif
     #endif
 #endif
