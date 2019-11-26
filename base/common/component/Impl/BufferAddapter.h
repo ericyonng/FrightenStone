@@ -36,6 +36,8 @@
 #pragma once
 #include "base/exportbase.h"
 #include "base/common/basedefs/DataType/DataType.h"
+#include "string.h"
+#include "math.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -44,22 +46,22 @@ struct GetBufferAddapterSize
 {
     static Int16 GetBufferNeeded(const char *&val)
     {
-        return strlen(const_cast<char *>(val));
+        return ::strlen(val);
     }
 
     static Int64 GetBufferNeeded(char *& data)
     {
-        return strlen(reinterpret_cast<char *>(data));
+        return ::strlen(reinterpret_cast<const char *>(data));
     }
 
     static Int16 GetBufferNeeded(char *&&data)
     {
-        return strlen(reinterpret_cast<char *>(data));
+        return ::strlen(reinterpret_cast<const char *>(data));
     }
 
     static Int16 GetBufferNeeded(char * const &&data)
     {
-        return strlen(reinterpret_cast<char *>(data));
+        return ::strlen(reinterpret_cast<const char *>(data));
     }
 };
 

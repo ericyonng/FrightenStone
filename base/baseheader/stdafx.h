@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : net.h
+ * @file  : stdafx.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,21 +29,19 @@
  *
  * 
  */
-#ifndef __Base_Common_Net_Net_H__
-#define __Base_Common_Net_Net_H__
 #pragma once
+// #define _CRTDBG_MAP_ALLOC
+// #include <stdlib.h>
+// #include <crtdbg.h>
 
- // defs ...
- // Impl ...
- // Interface ...
-#include <base/common/net/protocol/protocol.h>
-#include "base/common/net/Impl/Iocp/Example.h"
-#include "base/common/net/Impl/FS_MsgReadStream.h"
-#include "base/common/net/Impl/FS_MsgWriteStream.h"
-#include "base/common/net/Impl/FS_ServerCore.h"
-#include "base/common/net/Impl/IFS_BusinessLogic.h"
-#include "base/common/net/Impl/IFS_MsgDispatcher.h"
-#include "base/common/net/Impl/IFS_ServerConfigMgr.h"
+#define _CRT_SECURE_NO_WARNINGS
 
+#include "targetver.h"
+
+#define WIN32_LEAN_AND_MEAN
+
+#ifdef _WIN32
+#include <windows.h>
 #endif
 
+#include<base/exportbase.h>

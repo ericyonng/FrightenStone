@@ -142,7 +142,8 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
     // 分配新节点
     if(_alloctedInCurNode >= _lastNode->_blockCnt)
     {
-        if(g_curObjPoolOccupiedBytes > _objpoolAllowedMaxOccupiedBytes)
+        // 即将增加的内存大于允许占用的内存
+        if((g_curObjPoolOccupiedBytes + 2 * _objBlockSize*_nodeCapacity) > _objpoolAllowedMaxOccupiedBytes)
             return NULL;
 
         _NewNode();

@@ -33,6 +33,7 @@
 #define __FRIGHTEN_STONE_BASE_EXPORT_BASE_H__
 
 #pragma once
+
 #ifdef _WIN32
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -43,9 +44,17 @@
 // 导出定义
 #ifndef BASE_EXPORT
     #ifdef  FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-        #define BASE_EXPORT _declspec(dllexport)
+        #ifdef _WIN32
+            #define BASE_EXPORT _declspec(dllexport)
+        #else
+            #define BASE_EXPORT
+        #endif
     #else
-        #define BASE_EXPORT _declspec(dllimport)
+        #ifdef _WIN32
+            #define BASE_EXPORT _declspec(dllimport)
+        #else
+            #define BASE_EXPORT 
+        #endif
     #endif
 #endif
 

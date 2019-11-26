@@ -45,7 +45,7 @@ inline void AutoDelObj<Type, delMethod>::Release()
 }
 
 template<typename Type>
-class AutoDelObj<typename Type, AssistObjsDefs::Delete>
+class AutoDelObj<Type, AssistObjsDefs::Delete>
 {
 public:
     inline void Release(Type *&p)
@@ -55,17 +55,17 @@ public:
 };
 
 template<typename Type>
-class AutoDelObj<typename Type, AssistObjsDefs::MultiDelete>
+class AutoDelObj<Type, AssistObjsDefs::MultiDelete>
 {
 public:
-    inline void Release(typename Type *&p)
+    inline void Release(Type *&p)
     {
         FsSafeMultiDelete(p);
     }
 };
 
 template<typename Type>
-class AutoDelObj<typename Type, AssistObjsDefs::SelfRelease>
+class AutoDelObj<Type, AssistObjsDefs::SelfRelease>
 {
 public:
     inline void Release(Type *&p)
@@ -78,7 +78,7 @@ public:
 };
 
 template<typename Type>
-class AutoDelObj<typename Type, AssistObjsDefs::NoDel>
+class AutoDelObj<Type, AssistObjsDefs::NoDel>
 {
 public:
     inline void Release(Type *&p)

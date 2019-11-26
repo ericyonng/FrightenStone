@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : net.h
+ * @file  : LockerHandle.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,21 +29,17 @@
  *
  * 
  */
-#ifndef __Base_Common_Net_Net_H__
-#define __Base_Common_Net_Net_H__
+#ifndef __Base_Common_Asyn_Lock_Defs_LockerHandle_H__
+#define __Base_Common_Asyn_Lock_Defs_LockerHandle_H__
+
 #pragma once
 
- // defs ...
- // Impl ...
- // Interface ...
-#include <base/common/net/protocol/protocol.h>
-#include "base/common/net/Impl/Iocp/Example.h"
-#include "base/common/net/Impl/FS_MsgReadStream.h"
-#include "base/common/net/Impl/FS_MsgWriteStream.h"
-#include "base/common/net/Impl/FS_ServerCore.h"
-#include "base/common/net/Impl/IFS_BusinessLogic.h"
-#include "base/common/net/Impl/IFS_MsgDispatcher.h"
-#include "base/common/net/Impl/IFS_ServerConfigMgr.h"
-
+#ifdef _WIN32
+#include "windows.h"
+typedef CRITICAL_SECTION LockerHandle;
+#else
+#include <unistd.h>
+typedef pthread_mutex_t LockerHandle;
 #endif
 
+#endif // !__Base_Common_BaseDefs_DataType_InnerDataType_Defs_LockerHandle_H_

@@ -70,9 +70,9 @@
 #ifdef __USE_FS_DBGHELP__
 #include <DbgHelp.h>
 #ifdef _DEBUG
-#pragma comment(lib, "DbgHelp\\Debug\\DbgHelp.Lib")
+#pragma comment(lib, "DbgHelp\\debug\\DbgHelp.Lib")
 #else
-#pragma comment(lib, "DbgHelp\\Release\\DbgHelp.Lib")
+#pragma comment(lib, "DbgHelp\\release\\DbgHelp.Lib")
 #endif
 #endif
 

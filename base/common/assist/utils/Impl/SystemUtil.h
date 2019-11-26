@@ -93,6 +93,8 @@ public:
     static Int32 GetConsoleColor();
     // 输出给控制台
     static void OutputToConsole(const FS_String &outStr);
+    // 大小端判断
+    static bool IsLittleEndian();
 };
 
 FS_NAMESPACE_END

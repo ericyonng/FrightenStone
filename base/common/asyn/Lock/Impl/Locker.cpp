@@ -45,15 +45,7 @@ Locker::Locker()
 
 Locker::~Locker()
 {
-    auto obj = _metaLocker.load();
-    if(LIKELY(_metaLocker.load()))
-    {
-        _metaLocker = NULL;
-        delete obj;
-        obj = NULL;
-    }
-
-  // Fs_SafeFree(_metaLocker);
+    _Destroy();
 }
 
 void Locker::Lock()
@@ -61,7 +53,13 @@ void Locker::Lock()
     if(UNLIKELY(!_metaLocker.load()))
         _Init();
 
+#ifdef _WIN32
     EnterCriticalSection(&_metaLocker.load()->_handle);
+#else
+    auto ret = pthread_mutex_lock(&(_metaLocker.load()->_handle));
+    if(ret != 0)
+        perror("mutex lock fail ret[%d]", ret);
+#endif
 }
 
 void Locker::Unlock()
@@ -69,7 +67,13 @@ void Locker::Unlock()
     if(UNLIKELY(!_metaLocker.load()))
         _Init();
 
+#ifdef _WIN32
     LeaveCriticalSection(&_metaLocker.load()->_handle);
+#else
+    int ret = pthread_mutex_unlock(&(_metaLocker.load()->_handle));
+    if(ret != 0)
+        perror("mutex unlock fail ret[%d]", ret);
+#endif // _WIN32
 }
 
 bool Locker::TryLock()
@@ -77,14 +81,31 @@ bool Locker::TryLock()
     if(UNLIKELY(!_metaLocker.load()))
         _Init();
 
+#ifdef _WIN32
     return TryEnterCriticalSection(&_metaLocker.load()->_handle);
+#else
+    auto ret = pthread_mutex_trylock(&(_metaLocker.load()->_handle));
+    if(ret == 0)
+    {
+        return true;
+    }
+    else if(ret != EBUSY)
+    {
+        perror("trylock error!");
+    }
+
+    return false;
+#endif // _WIN32
+
 }
 
-bool Locker::Islock() const
+#ifdef _WIN32
+bool Locker::IsOtherThreadOwnLock() const
 {
     auto curThread = ULongToHandle(GetCurrentThreadId());
     return _metaLocker.load()->_handle.OwningThread != NULL && _metaLocker.load()->_handle.OwningThread != curThread;
 }
+#endif
 
 void Locker::_Init()
 {
@@ -93,15 +114,40 @@ void Locker::_Init()
 
     _metaLocker = new MetaLocker;
 
+#ifdef _WIN32
     // 创建自旋锁，避免线程频繁挂起
     auto spinCnt = static_cast<DWORD>(1 << (WidthUtil::GetBinaryWidth<DWORD>() - 1)) | static_cast<DWORD>(SPINNING_COUNT);
     if(!InitializeCriticalSectionAndSpinCount(&(_metaLocker.load()->_handle), spinCnt))
         printf("MetaLocker create spinlock fail spinCnt[%lu]", spinCnt);
+#else
+    auto ret = pthread_mutex_init(&_metaLocker.load()->_handle, NULL);
+    if(ret != 0)
+        perror("\nMetaLocker create fail ret[%d]\n", ret);
+
+#endif // _WIN32
+
 //     auto spinCnt = static_cast<DWORD>(1 << (WidthUtil::GetBinaryWidth<DWORD>() - 1)) | static_cast<DWORD>(SPINNING_COUNT);
 //     if(!InitializeCriticalSectionAndSpinCount(&(_metaLocker.load()->_handle), spinCnt))
 //         printf("MetaLocker create spinlock fail spinCnt[%lu]", spinCnt);
     // InitializeCriticalSection(&(_metaLocker.load()->_handle)); // 非自旋锁
 
+}
+
+void Locker::_Destroy()
+{
+#ifndef _WIN32
+    auto ret = pthread_mutex_destroy(&(_metaLocker.load()->_handle));
+    if(ret != 0)
+        perror("pthread_mutex_destroy fail ret[%d]", ret);
+#endif
+
+    auto obj = _metaLocker.load();
+    if(LIKELY(_metaLocker.load()))
+    {
+        _metaLocker = NULL;
+        delete obj;
+        obj = NULL;
+    }
 }
 
 FS_NAMESPACE_END

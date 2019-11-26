@@ -38,6 +38,7 @@
 #include "base/common/basedefs/Macro/MacroDefs.h"
 #include "base/common/component/Defs/FS_AesDefs.h"
 #include "base/common/objpool/objpool.h"
+#include "base/common/asyn/asyn.h"
 
 typedef struct aes_key_st AES_KEY;
 
