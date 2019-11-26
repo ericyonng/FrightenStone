@@ -50,15 +50,10 @@ class ObjBlock;
 template<typename ObjType>
 class AlloctorNode;
 
-template<typename ObjType>
-class ObjPoolHelper;
-
 // 内存分配器基类
 template<typename ObjType>
 class IObjAlloctor
 {
-    template<>
-    friend class ObjPoolHelper<ObjType>;
 public:
     IObjAlloctor(size_t blockAmountPerNode);
     virtual ~IObjAlloctor();
@@ -97,6 +92,9 @@ private:
     void _InitNode(AlloctorNode<ObjType> *newNode);
     void *_AllocFromSys();
 
+public:
+    static const size_t _objBlockSize;      // 对象块大小
+
 protected:
     void *_curNodeObjs;                     // 当前节点的对象池缓冲
     //std::list<ObjType *> _lastDeleted;      // free对象构成的链表指针指向的内存存储的是上一次释放的对象的地址
@@ -105,7 +103,6 @@ protected:
     size_t _nodeCapacity;                   // 当前节点分配的数量
     AlloctorNode<ObjType> *_header;         // 头节点
     AlloctorNode<ObjType> *_lastNode;       // 最新的节点
-    static const size_t _objBlockSize;      // 对象块大小
     size_t _objpoolAllowedMaxOccupiedBytes; // 对象池允许的最大占用
 
     // 内存泄漏相关
