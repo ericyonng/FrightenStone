@@ -108,12 +108,7 @@ project "fsbase"
     -- language, kind
     language "c++"
     kind "SharedLib"
-
-	if IS_WINDOWS then
-        pchheader("base/base/stdafx.h")
-	else
-	    pchheader("stdafx.h")
-	end
+	pchheader("stdafx.h")
 	pchsource(FS_HEADER_DIR .. "stdafx.cpp")
 	
     -- symbols
