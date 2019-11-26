@@ -35,8 +35,8 @@
 
 #pragma once
 #include<base/exportbase.h>
-#include <base/common\common.h>
-#include <base/common\asyn\Lock\Impl\Locker.h>
+#include <base/common/common.h>
+#include <base/common/asyn/Lock/Impl/Locker.h>
 
 FS_NAMESPACE_BEGIN
 
