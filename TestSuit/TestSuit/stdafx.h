@@ -43,7 +43,9 @@
 
 
 #include "targetver.h"
-#pragma region 
+#ifdef _WIN32
+
+#pragma region windows sock 
 #include <WinSock2.h>
 #include <windows.h>
 #pragma comment(lib, "ws2_32.lib")
@@ -52,11 +54,12 @@
                         WSAStartup(ver, &dat)
 #pragma endregion
 
+#include <tchar.h>
+#endif
+
 #pragma region C++
-#include "iostream"
+#include <iostream>
 #pragma endregion
 
 #include <stdio.h>
-#include <tchar.h>
 #include"base/exportbase.h"
-
