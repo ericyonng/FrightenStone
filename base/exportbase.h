@@ -34,12 +34,6 @@
 
 #pragma once
 
-#undef D_GLIBCXX_USE_CXX17_ABI
-#define D_GLIBCXX_USE_CXX17_ABI 1
-
-#undef _HAS_CXX17
-#define _HAS_CXX17 1
-
 #ifdef _WIN32
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
