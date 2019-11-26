@@ -245,8 +245,10 @@ inline FS_String::operator const std::string &() const
 
 inline size_t FS_String::CopyTo(char *destData, Int32 destSize, Int32 cntToCopy, Int32 srcOffset) const
 {
-    return _buffer._Copy_s(destData, static_cast<size_t>(destSize), static_cast<size_t>(cntToCopy)
-                           , static_cast<size_t>(srcOffset));
+    ::memcpy(destData, _buffer.data() + srcOffset, cntToCopy);
+    return cntToCopy;
+//     return _buffer._Copy_s(destData, static_cast<size_t>(destSize), static_cast<size_t>(cntToCopy)
+//                            , static_cast<size_t>(srcOffset));
 }
 
 inline const char *FS_String::c_str() const
