@@ -30,7 +30,6 @@
  * 
  */
 #include "stdafx.h"
-#include "base/common/asyn/asyn.h"
 #include "base/common/assist/assistobjs/assistobjs.h"
 #include "base/common/component/Impl/TimeWheel/TimeWheel.h"
 #include "base/common/component/Impl/GlobalInitialize.h"

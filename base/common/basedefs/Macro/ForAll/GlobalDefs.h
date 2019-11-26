@@ -35,7 +35,7 @@
 
 #include "base/exportbase.h"
 #include "base/common/basedefs/Macro/MacroDefs.h"
-// #include "base/common/asyn/asyn.h"
+#include "base/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
