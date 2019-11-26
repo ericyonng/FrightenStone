@@ -434,7 +434,7 @@ struct GetBufferAddapterSize<float>
     static Int16 GetBufferNeeded(const float &val)
     {
         double ceil = 0, intPart = 0;
-        ceil = modf(val, &intPart);
+        ceil = ::modf(val, &intPart);
 
         Int64 integer = static_cast<Int64>(intPart);
         Int16 cnt = (integer > 0 ? 0 : 1) + MAX_CEIL_WIDE / 2 + 1;
@@ -461,7 +461,7 @@ struct GetBufferAddapterSize<float &>
     static Int16 GetBufferNeeded(const float &val)
     {
         double ceil = 0, intPart = 0;
-        ceil = modf(val, &intPart);
+        ceil = ::modf(val, &intPart);
 
         Int64 integer = static_cast<Int64>(intPart);
         Int16 cnt = (integer > 0 ? 0 : 1) + MAX_CEIL_WIDE / 2 + 1;
@@ -488,7 +488,7 @@ struct GetBufferAddapterSize<const float>
     static Int16 GetBufferNeeded(const float &val)
     {
         double ceil = 0, intPart = 0;
-        ceil = modf(val, &intPart);
+        ceil = ::modf(val, &intPart);
 
         Int64 integer = static_cast<Int64>(intPart);
         Int16 cnt = (integer > 0 ? 0 : 1) + MAX_CEIL_WIDE/2 + 1;
@@ -515,7 +515,7 @@ struct GetBufferAddapterSize<const float &>
     static Int16 GetBufferNeeded(const float &val)
     {
         double ceil = 0, intPart = 0;
-        ceil = modf(val, &intPart);
+        ceil = ::modf(val, &intPart);
 
         Int64 integer = static_cast<Int64>(intPart);
         Int16 cnt = (integer > 0 ? 0 : 1) + MAX_CEIL_WIDE / 2 + 1;
@@ -545,7 +545,7 @@ struct GetBufferAddapterSize<double>
     static Int16 GetBufferNeeded(const double &val)
     {
         double ceil = 0, intPart = 0;
-        ceil = modf(val, &intPart);
+        ceil = ::modf(val, &intPart);
 
         Int64 integer = static_cast<Int64>(intPart);
         Int16 cnt = (integer > 0 ? 0 : 1) + MAX_CEIL_WIDE + 1;
@@ -572,7 +572,7 @@ struct GetBufferAddapterSize<double &>
     static Int16 GetBufferNeeded(const double &val)
     {
         double ceil = 0, intPart = 0;
-        ceil = modf(val, &intPart);
+        ceil = ::modf(val, &intPart);
 
         Int64 integer = static_cast<Int64>(intPart);
         Int16 cnt = (integer > 0 ? 0 : 1) + MAX_CEIL_WIDE + 1;
@@ -599,7 +599,7 @@ struct GetBufferAddapterSize<const double>
     static Int16 GetBufferNeeded(const double &val)
     {
         double ceil = 0, intPart = 0;
-        ceil = modf(val, &intPart);
+        ceil = ::modf(val, &intPart);
 
         Int64 integer = static_cast<Int64>(intPart);
         Int16 cnt = (integer > 0 ? 0 : 1) + MAX_CEIL_WIDE + 1;
@@ -626,7 +626,7 @@ struct GetBufferAddapterSize<const double&>
     static Int16 GetBufferNeeded(const double &val)
     {
         double ceil = 0, intPart = 0;
-        ceil = modf(val, &intPart);
+        ceil = ::modf(val, &intPart);
 
         Int64 integer = static_cast<Int64>(intPart);
         Int16 cnt = (integer > 0 ? 0 : 1) + MAX_CEIL_WIDE + 1;
