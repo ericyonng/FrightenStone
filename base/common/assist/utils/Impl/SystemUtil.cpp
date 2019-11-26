@@ -356,6 +356,17 @@ void SystemUtil::OutputToConsole(const FS_String &outStr)
     printf("%s", outStr.c_str());
 }
 
+bool SystemUtil::IsLittleEndian()
+{
+    // 若是小端字节序，从低位开始存储，则顺序为l,?,?,b, 则endian_test.l的第一个字节为'l',若是大端则是'b'
+    static union {
+        char c[4];
+        unsigned long l;
+    } endian_test = {{'l', '?', '?', 'b'}};
+
+    return static_cast<char>(endian_test.l) != 'b';
+}
+
 ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
 {
     PROCESSENTRY32 pe = {0};

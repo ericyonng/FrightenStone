@@ -55,10 +55,14 @@ public:
     void Lock();
     void Unlock();
     bool TryLock();
-    bool Islock() const;
+
+#ifdef _WIN32
+    bool IsOtherThreadOwnLock() const;
+#endif
 
 private:
     void _Init();
+    void _Destroy();
 
 private:
     std::atomic<MetaLocker *> _metaLocker;

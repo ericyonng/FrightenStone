@@ -35,6 +35,7 @@
 #pragma once
 #include "base/exportbase.h"
 #include "base/common/basedefs/BaseDefs.h"
+#include "base/common/asyn/Lock/Defs/LockerHandle.h"
 
 FS_NAMESPACE_BEGIN
 

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : LockerHandle.cpp
+ * @file  : LockerHandle.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,5 +29,17 @@
  *
  * 
  */
-#include "stdafx.h"
-#include "base/common/basedefs/DataType/InnerDataType/Defs/LockerHandle.h"
+#ifndef __Base_Common_Asyn_Lock_Defs_LockerHandle_H__
+#define __Base_Common_Asyn_Lock_Defs_LockerHandle_H__
+
+#pragma once
+
+#ifdef _WIN32
+#include "windows.h"
+typedef CRITICAL_SECTION LockerHandle;
+#else
+#include <unistd.h>
+typedef pthread_mutex_t LockerHandle;
+#endif
+
+#endif // !__Base_Common_BaseDefs_DataType_InnerDataType_Defs_LockerHandle_H_

@@ -43,9 +43,13 @@
 // 导出定义
 #ifndef BASE_EXPORT
     #ifdef  FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL
-        #define BASE_EXPORT _declspec(dllexport)
+        #ifdef _WIN32
+            #define BASE_EXPORT _declspec(dllexport)
+        #endif
     #else
-        #define BASE_EXPORT _declspec(dllimport)
+        #ifdef _WIN32
+            #define BASE_EXPORT _declspec(dllimport)
+        #endif
     #endif
 #endif
 

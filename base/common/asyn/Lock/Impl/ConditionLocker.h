@@ -40,6 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
+// locker是默认锁，linux下由mutex实现，windows下使用自旋锁实现
 class BASE_EXPORT ConditionLocker : public Locker
 {
 public:
