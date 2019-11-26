@@ -37,6 +37,7 @@
 #include "base/exportbase.h"
 #include "base/common/basedefs/DataType/DataType.h"
 #include "string.h"
+#include "math.h"
 
 FS_NAMESPACE_BEGIN
 
