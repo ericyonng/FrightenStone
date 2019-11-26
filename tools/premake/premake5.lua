@@ -7,7 +7,7 @@ IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
 local PY = IS_WINDOWS and "$(ProjectDir)../../tools/py.exe" or "python"
 
 -- header directory
-FS_HEADER_DIR = "../../base/base/"
+FS_HEADER_DIR = "../../base/baseheader/"
 
 -- All libraries output directory
 FS_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
@@ -142,7 +142,7 @@ project "fsbase"
     includedirs {
         "../../3rd/openSSL/staticlib/$(Configuration)/include",
 		"../../",
-		"../../base/baseheader/"
+		"../../base/baseheader/",
      }
 
     -- target prefix 前缀
