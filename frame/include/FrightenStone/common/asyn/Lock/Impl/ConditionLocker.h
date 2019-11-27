@@ -36,6 +36,7 @@
 #pragma once
 #include<FrightenStone/exportbase.h>
 #include <FrightenStone/common/common.h>
+#include "FrightenStone/common/basedefs/DataType/ForAll/ForAll.h"
 #include <FrightenStone/common/asyn/Lock/Impl/Locker.h>
 
 FS_NAMESPACE_BEGIN
@@ -49,8 +50,10 @@ public:
 
 #pragma region sinal
 public:
-    // 支持多线程等待sinal一次只唤醒一个线程
-    int Wait(unsigned long milisec = INFINITE);
+    // 支持多线程等待sinal一次只唤醒一个线程 INFINITE
+    Int32 Wait(UInt64 second, UInt64 microSec);
+    Int32 Wait(UInt64 milliSecond = INFINITE);
+    Int32 DeadWait();
     bool Sinal();
     bool HasWaiter();
     void Broadcast();
@@ -59,16 +62,21 @@ public:
 
     #pragma region inner
 private:
-    bool _InitAnonymousEvent();
-    bool _DestroyEvent();
+    bool _Init();
+    bool _Destroy();
     #pragma endregion
 
-#pragma region member
+    #pragma region member
 private:
-    std::atomic<void *> _event;
-    std::atomic<bool> _isSinal;
     std::atomic<long long> _waitCnt;
-#pragma endregion
+
+    #ifdef _WIN32
+        std::atomic<void *> _event;
+        std::atomic<bool> _isSinal;
+    #else
+        pthread_cond_t _condVal;
+    #endif
+    #pragma endregion
 };
 
 inline bool ConditionLocker::HasWaiter()

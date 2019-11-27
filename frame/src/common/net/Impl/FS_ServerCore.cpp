@@ -234,7 +234,7 @@ Int32 FS_ServerCore::Start(std::vector<IFS_BusinessLogic *> &businessLogic)
 void FS_ServerCore::Wait()
 {
     _waitForClose.Lock();
-    _waitForClose.Wait();
+    _waitForClose.DeadWait();
     _waitForClose.Unlock();
 }
 

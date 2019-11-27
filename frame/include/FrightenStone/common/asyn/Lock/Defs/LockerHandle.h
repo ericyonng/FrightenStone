@@ -39,6 +39,7 @@
 typedef CRITICAL_SECTION LockerHandle;
 #else
 #include <unistd.h>
+#include <pthread.h>
 typedef pthread_mutex_t LockerHandle;
 #endif
 

@@ -93,7 +93,7 @@ inline void MessageQueue::PopLock()
     _msgConsumerGuard.Lock();
 }
 
-inline Int32 MessageQueue::WaitForPoping(std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec)
+inline Int32 MessageQueue::WaitForPoping(std::list<FS_MessageBlock *> *&exportMsgsOut, UInt64 timeoutMilisec)
 {
     Int32 st = _msgConsumerGuard.Wait(timeoutMilisec);
     if(_msgConsumerQueueChange)

@@ -63,8 +63,8 @@ public:
 private:
     void _Init();
     void _Destroy();
-
-private:
+    
+protected:
     std::atomic<MetaLocker *> _metaLocker;
 };
 FS_NAMESPACE_END

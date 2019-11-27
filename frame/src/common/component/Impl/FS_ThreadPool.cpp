@@ -108,8 +108,71 @@ bool FS_ThreadPool::AddTask(IDelegate<void, FS_ThreadPool *> *callback, bool for
     return AddTask(*newTask, forceNewThread, numOfThreadToCreateIfNeed);
 }
 
+#ifdef _WIN32
 unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
 {
+    FS_ThreadPool *pool = static_cast<FS_ThreadPool *>(param);
+    auto &locker = pool->_locker;
+    auto &taskList = pool->_tasks;
+    bool needInitMemPool = pool->_initThreadMemPoolWhenThreadStart;
+    auto &threadIdRefMemPool = pool->_threadIdRefMemPool;
+
+    // 创建线程局部内存池
+    if(needInitMemPool)
+        ASSERT(pool->NewCurThreadMemPool());
+
+    bool isEmpty = false;
+    while(!pool->_isDestroy || !isEmpty)
+    {
+        locker.Lock();
+        if(LIKELY(!taskList.empty()))
+        {
+            auto task = taskList.front();
+            taskList.pop_front();
+            isEmpty = false;
+            locker.Unlock();
+            task->Run();
+            task->Release();
+            continue;
+        }
+
+        ++pool->_waitNum;
+        locker.DeadWait();
+        --pool->_waitNum;
+        isEmpty = taskList.empty();
+        locker.Unlock();
+    }
+
+    try
+    {
+        locker.Lock();
+        --pool->_curTotalNum;
+        bool noThread = pool->_curTotalNum <= 0;
+        if(noThread)
+            locker.Sinal();
+        locker.Unlock();
+    }
+    catch(...)
+    {
+        throw std::logic_error("thread pool task thread crash");
+        std::cout << "hello crash" << std::endl;
+    }
+
+    // 释放线程局部存储资源
+    FS_TlsUtil::FreeUtilTlsTable();
+
+    std::cout << "_endthreadex end" << std::endl;
+    _endthreadex(0L);
+
+    return 0L;
+}
+#else
+void *FS_ThreadPool::ThreadHandler(void *arg)
+{
+    // 线程分离
+    pthread_detach(pthread_self());
+
+    // 定义
     FS_ThreadPool *pool = static_cast<FS_ThreadPool *>(param);
     auto &locker = pool->_locker;
     auto &taskList = pool->_tasks;
@@ -154,17 +217,16 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
     catch(...)
     {
         throw std::logic_error("thread pool task thread crash");
-        std::cout << "hello crash" << std::endl;
+        std::cout << "threadpool thread crash" << std::endl;
     }
 
     // 释放线程局部存储资源
     FS_TlsUtil::FreeUtilTlsTable();
 
     std::cout << "_endthreadex end" << std::endl;
-    _endthreadex(0L);
-
-    return 0L;
+    pthread_exit((void *)0);
 }
+#endif
 
 void FS_ThreadPool::Close()
 {
@@ -235,17 +297,19 @@ IMemoryPoolMgr *FS_ThreadPool::NewCurThreadMemPool()
     return memPool;
 }
 
-bool FS_ThreadPool::_CreateThread(Int32 numToCreate)
+bool FS_ThreadPool::_CreateThread(Int32 numToCreate, UInt64 unixStackSize)
 {
     if(numToCreate <= 0 || numToCreate > (_maxNum - _curTotalNum))
         return false;
 
     UInt32 threadId = 0;
+    Int32 ret = 0;
     for(Int32 i = 0; i < numToCreate; ++i)
     {
+#ifdef _WIN32
         auto threadHandle = reinterpret_cast<HANDLE>(::_beginthreadex(NULL, 0, ThreadHandler, static_cast<void *>(this), 0, &threadId));
         if(LIKELY(threadHandle != INVALID_HANDLE_VALUE))
-            CloseHandle(threadHandle);
+            ::CloseHandle(threadHandle);
         else
         {
             if(i == 0)
@@ -253,7 +317,18 @@ bool FS_ThreadPool::_CreateThread(Int32 numToCreate)
 
             break;
         }
-
+#else
+        pthread_attr_t threadAttr;
+        pthread_attr_init(&threadAttr);
+        pthread_attr_setstacksize(&threadAttr, unixStackSize);
+        ret = pthread_create(&thread, &threadAttr, &FS_ThreadPool::ThreadHandler, (void *)this);
+        pthread_attr_destroy(&threadAttr);
+        if(ret != 0)
+        {
+            perror("pthread_create error!");
+            return false;
+        }
+#endif
         ++_curTotalNum;
     }
 

@@ -44,8 +44,8 @@ public:
         #pragma region [-1, 499]
         Error = -1,                                             // 错误
         Success = 0,                                            // 成功
-        WaitEventFailure = 1,                                   // 等待错误
-        WaitEventTimeOut = 2,                                   // 等待超时
+        WaitFailure = 1,                                        // 等待错误
+        WaitTimeOut = 2,                                        // 等待超时
         Repeat = 3,                                             // 重复
         ParamError = 4,                                         // 参数错误
         Failed = 5,                                             // 失败

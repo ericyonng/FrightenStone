@@ -35,29 +35,42 @@
 #include "FrightenStone/common/status/status.h"
 #include <process.h>
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/component/Impl/Time.h"
 
+#ifdef _WIN32
 #undef FS_IS_EVENT_SINAL_WAKE_UP
 #define FS_IS_EVENT_SINAL_WAKE_UP(waitRet)   \
 (static_cast<long long>(WAIT_OBJECT_0) <= (waitRet)) &&\
 ((waitRet) <= static_cast<long long>(MAXIMUM_WAIT_OBJECTS + WAIT_OBJECT_0))
+#else
+#include<semaphore.h>
+#include<sys/time.h>
+#include<stdlib.h>
+#include<string.h>
+#endif
 
 FS_NAMESPACE_BEGIN
 
 ConditionLocker::ConditionLocker()
+#ifdef _WIN32
     :_event(NULL)
-    ,_isSinal(false)
-    ,_waitCnt(0)
+    , _isSinal(false)
+    , _waitCnt(0)
+#else
+    :_waitCnt(0)
+#endif
 {
-    _InitAnonymousEvent();
+    _Init();
 }
 
 ConditionLocker::~ConditionLocker()
 {
-    _DestroyEvent();
+    _Destroy();
 }
 
-int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
+Int32 ConditionLocker::Wait(UInt64 second, UInt64 microSec)
 {
+#ifdef _WIN32
     long long waitRet = WAIT_OBJECT_0;
     auto *event = _event.load();
     bool oldSinal = _isSinal;
@@ -65,7 +78,7 @@ int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
     {
         Unlock();
         ++_waitCnt;
-        waitRet = WaitForMultipleObjects(1, &event, true, milisec);
+        waitRet = WaitForMultipleObjects(1, &event, true, static_cast<DWORD>(second*Time::_millisecondPerSecond + microSec / Time::_microSecondPerMilliSecond));
         Lock();
         --_waitCnt;
 
@@ -75,14 +88,14 @@ int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
         if(waitRet == WAIT_TIMEOUT)
         {// 无论是否被唤醒（因为唤醒的时机恰好是超时）超时被唤醒
             _isSinal = false;
-            return StatusDefs::WaitEventTimeOut;
+            return StatusDefs::WaitTimeOut;
         }
 
         // 出现错误则直接return
         if(!FS_IS_EVENT_SINAL_WAKE_UP(waitRet))
         {
             _isSinal = false;
-            return StatusDefs::WaitEventFailure;
+            return StatusDefs::WaitFailure;
         }
     }
 
@@ -91,28 +104,164 @@ int ConditionLocker::Wait(unsigned long milisec /*= INFINITE*/)
 
     _isSinal = false;
     return StatusDefs::Success;
-// 
-//     if((static_cast<long long>(WAIT_OBJECT_0) <= waitRet) &&
-//         (waitRet <= static_cast<long long>(MAXIMUM_WAIT_OBJECTS + WAIT_OBJECT_0)))
-//     {// 等待是在合法的返回值（64个内核对象）
-//         return StatusDefs::Success;
-//     }
-//     else if(waitRet == WAIT_TIMEOUT)
-//     {// 超时等待
-//         return StatusDefs::WaitEventTimeOut;
-//     }
-// 
-//     return StatusDefs::WaitEventFailure;
+#else
+    struct timespec abstime;
+    clock_gettime(CLOCK_REALTIME, &abstime);
+    abstime.tv_sec += second;
+    abstime.tv_nsec += microSec * 1000;
+    ++_waitCnt;
+    int ret = pthread_cond_timedwait(&_condVal, &_metaLocker.load()->_handle, &abstime);
+    if(ret == ETIMEDOUT)
+    {
+        --_waitCnt;
+        return StatusDefs::WaitTimeOut;
+    }
+
+    if(ret != 0)
+    {
+        --_waitCnt;
+        perror("pthread cond timewait error");
+        return StatusDefs::WaitFailure;
+    }
+
+    --_waitCnt;
+    return StatusDefs::Success;
+#endif
+}
+
+Int32 ConditionLocker::Wait(UInt64 milliSecond)
+{
+#ifdef _WIN32
+    long long waitRet = WAIT_OBJECT_0;
+    auto *event = _event.load();
+    bool oldSinal = _isSinal;
+    while(!_isSinal)
+    {
+        Unlock();
+        ++_waitCnt;
+        waitRet = WaitForMultipleObjects(1, &event, true, static_cast<DWORD>(milliSecond));
+        Lock();
+        --_waitCnt;
+
+        // 不论是否被唤醒都重置事件避免消耗
+        ResetEvent(_event.load());
+
+        if(waitRet == WAIT_TIMEOUT)
+        {// 无论是否被唤醒（因为唤醒的时机恰好是超时）超时被唤醒
+            _isSinal = false;
+            return StatusDefs::WaitTimeOut;
+        }
+
+        // 出现错误则直接return
+        if(!FS_IS_EVENT_SINAL_WAKE_UP(waitRet))
+        {
+            _isSinal = false;
+            return StatusDefs::WaitFailure;
+        }
+    }
+
+    if(oldSinal)
+        ResetEvent(_event.load());
+
+    _isSinal = false;
+    return StatusDefs::Success;
+#else
+    if(milliSecond == INFINITE)
+        return DeadWait();
+
+    struct timespec abstime;
+    clock_gettime(CLOCK_REALTIME, &abstime);
+    abstime.tv_sec += (milliSecond / Time::_millisecondPerSecond);
+    abstime.tv_nsec += ((milliSecond - (abstime.tv_sec*Time::_millisecondPerSecond))*Time::_microSecondPerMilliSecond);
+    ++_waitCnt;
+    int ret = pthread_cond_timedwait(&_condVal, &_metaLocker.load()->_handle, &abstime);
+    if(ret == ETIMEDOUT)
+    {
+        --_waitCnt;
+        return StatusDefs::WaitTimeOut;
+    }
+
+    if(ret != 0)
+    {
+        --_waitCnt;
+        perror("pthread cond timewait error");
+        return StatusDefs::WaitFailure;
+    }
+
+    --_waitCnt;
+    return StatusDefs::Success;
+#endif
+}
+
+Int32 ConditionLocker::DeadWait()
+{
+#ifdef _WIN32
+    long long waitRet = WAIT_OBJECT_0;
+    auto *event = _event.load();
+    bool oldSinal = _isSinal;
+    while(!_isSinal)
+    {
+        Unlock();
+        ++_waitCnt;
+        waitRet = WaitForMultipleObjects(1, &event, true, INFINITE);
+        Lock();
+        --_waitCnt;
+
+        // 不论是否被唤醒都重置事件避免消耗
+        ResetEvent(_event.load());
+
+        if(waitRet == WAIT_TIMEOUT)
+        {// 无论是否被唤醒（因为唤醒的时机恰好是超时）超时被唤醒
+            _isSinal = false;
+            return StatusDefs::WaitTimeOut;
+        }
+
+        // 出现错误则直接return
+        if(!FS_IS_EVENT_SINAL_WAKE_UP(waitRet))
+        {
+            _isSinal = false;
+            return StatusDefs::WaitFailure;
+        }
+    }
+
+    if(oldSinal)
+        ResetEvent(_event.load());
+
+    _isSinal = false;
+    return StatusDefs::Success;
+#else
+    ++_waitCnt;
+    if(pthread_cond_wait(&_condVal, &_metaLocker.load()->_handle) != 0)
+    {
+        --_waitCnt;
+        perror("cConSync::WaitCon -error waitcon");
+        return StatusDefs::WaitFailure;
+    }
+    --_waitCnt;
+    return StatusDefs::Success;
+#endif
 }
 
 bool ConditionLocker::Sinal()
 {
+#ifdef _WIN32
     _isSinal = SetEvent(_event.load());
     return _isSinal.load();
+#else
+    int ret = pthread_cond_signal(&_condVal);
+    if(ret != 0)
+    {
+        perror("signal fail\n");
+        return false;
+    }
+
+    return true;
+#endif
 }
 
 void ConditionLocker::Broadcast()
 {
+#ifdef _WIN32
     bool isSinal = false;
     while(_waitCnt > 0)
     {
@@ -130,24 +279,45 @@ void ConditionLocker::Broadcast()
         _isSinal = false;
         ResetEvent(_event.load());
     }
+#else
+    int ret = pthread_cond_broadcast(&_condVal);
+    if(ret != 0)
+    {
+        perror("cond broadcast error");
+        return false;
+    }
+
+    return true;
+#endif
 }
 
 void ConditionLocker::ResetSinal()
 {
+#ifdef _WIN32
     ResetEvent(_event.load());
+#endif
 }
 
-bool ConditionLocker::_InitAnonymousEvent()
+bool ConditionLocker::_Init()
 {
+#ifdef _WIN32
     _event = CreateEvent(NULL, true, false, NULL);
     if(UNLIKELY(!_event))
         return false;
-
+#else
+    int ret = pthread_cond_init(&_condVal, NULL);
+    if(ret != 0)
+    {
+        perror("cond init error!");
+        return false;
+    }
+#endif
     return true;
 }
 
-bool ConditionLocker::_DestroyEvent()
+bool ConditionLocker::_Destroy()
 {
+#ifdef _WIN32
     if(UNLIKELY(!_event.load()))
         return true;
 
@@ -159,6 +329,15 @@ bool ConditionLocker::_DestroyEvent()
     _event = NULL;
 
     return true;
+#else
+    int ret = pthread_cond_destroy(&_condVal);
+    if(ret != 0)
+    {
+        perror("cond destroy error");
+        return false;
+    }
+    return true;
+#endif
 }
 
 FS_NAMESPACE_END

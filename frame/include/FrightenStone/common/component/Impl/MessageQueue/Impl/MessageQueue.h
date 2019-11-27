@@ -73,7 +73,7 @@ public:
     // 其他线程等待消息到来并从前节点弹出
     void PopLock();
     // 成功返回超时WaitEventTimeOut或者成功Success exportMsgsOut 必须是堆创建
-    Int32 WaitForPoping(std::list<FS_MessageBlock *> *&exportMsgsOut, ULong timeoutMilisec = INFINITE);
+    Int32 WaitForPoping(std::list<FS_MessageBlock *> *&exportMsgsOut, UInt64 timeoutMilisec = INFINITE);
     void PopImmediately(std::list<FS_MessageBlock *> *&exportMsgsOut);
     bool IsConsumerInHandling();
     bool HasMsgToConsume();

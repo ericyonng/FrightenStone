@@ -136,7 +136,7 @@ void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
         if(_isWorking)
         {
             _msgGeneratorGuard.Lock();
-            _msgGeneratorGuard.Wait();
+            _msgGeneratorGuard.DeadWait();
             _msgGeneratorGuard.Unlock();
         }
 
@@ -359,7 +359,7 @@ void ConcurrentMessageQueue::_Generator2ConsumerQueueTask(ITask *task, FS_Thread
         if(_isWorking)
         {
             localGenGuard->Lock();
-            localGenGuard->Wait();
+            localGenGuard->DeadWait();
             localGenGuard->Unlock();
         }
 

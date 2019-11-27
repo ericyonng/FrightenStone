@@ -21,42 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ForAllResource.h
+ * @file  : ThreadPoolDefs.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/11/27
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_BaseDefs_Resource_ForAll_ForAllResource_H__
-#define __Frame_Include_FrightenStone_Common_BaseDefs_Resource_ForAll_ForAllResource_H__
+#ifndef __Frame_Include_FrightenStone_Common_Component_Defs_ThreadPoolDefs_H__
+#define __Frame_Include_FrightenStone_Common_Component_Defs_ThreadPoolDefs_H__
 
 #pragma once
 
-#pragma region c++ stl
-#include <limits>
-#include <stdio.h>
-#include <atomic>
-#include <thread>
-#include<algorithm>
-#include <stdexcept>
-#include <deque>
-#include <set>
-#include <list>
-#include <map>
-#pragma endregion
-
-#pragma region base lib
-#include "FrightenStone/common/memorypool/memorypool.h"
-#include "FrightenStone/common/objpool/objpool.h"
-#pragma endregion
-
-#ifdef _WIN32
-#else
-#include <unistd.h>
-#include<errno.h>
+#undef THREAD_DEF_STACK_SIZE
+#define THREAD_DEF_STACK_SIZE   1073741824      // ƒ¨»œ’ª¥Û–°10MB
 #endif
-
-
-#endif // !__Frame_Include_FrightenStone_Common_BaseDefs_Resource_ForAll_ForAllResource_H__

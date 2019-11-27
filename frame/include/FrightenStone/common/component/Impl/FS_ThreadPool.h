@@ -42,6 +42,7 @@
 #include <list>
 #include "FrightenStone/common/objpool/objpool.h"
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
+#include "FrightenStone/common/component/Defs/ThreadPoolDefs.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -62,8 +63,14 @@ public:
     bool AddTask(ITask &task, bool forceNewThread = false, Int32 numOfThreadToCreateIfNeed = 1);
     // 添加delegate任务 delegate内部释放 请确保同一个任务只投递一次，避免多线程处理同一任务的情况出现（除非线程池只有一个线程）
     bool AddTask(IDelegate<void, FS_ThreadPool *> *callback, bool forceNewThread = false, Int32 numOfThreadToCreateIfNeed = 1);
+
+#ifdef _WIN32
     // 线程任务执行
     static unsigned __stdcall ThreadHandler(void *param);
+#else
+    static void *ThreadHandler(void *arg);//线程处理函数
+#endif
+
 
     // 清理线程池
     void Close();
@@ -84,7 +91,7 @@ public:
 
 private:
     // 创建线程
-    bool _CreateThread(Int32 numToCreate);
+    bool _CreateThread(Int32 numToCreate, UInt64 unixStackSize = THREAD_DEF_STACK_SIZE);
 
 private:
     std::atomic<Int32> _minNum{0};                      // 最小线程数
