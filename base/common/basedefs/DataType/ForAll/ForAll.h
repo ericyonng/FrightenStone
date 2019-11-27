@@ -36,7 +36,7 @@
 #pragma once
 
 // defs ...
-#include "base/common/basedefs/DataType/ForAll/Defs/NetDataType.h"
+#include "FrightenStone/common/basedefs/DataType/ForAll/Defs/NetDataType.h"
 
 #pragma region base data type
 typedef char Byte8;

@@ -40,24 +40,29 @@
 
 #ifdef __USE_FS_3RD_OPENSSL__
 #pragma region openssl
-// include header
-#ifdef _DEBUG
-#include "3rd/openssl/staticlib/debug/include/openssl/md5.h"
-#include "3rd/openssl/staticlib/debug/include/openssl/aes.h"
+#ifdef _WIN32
+    // include header
+    #ifdef _DEBUG
+        #include "3rd/openssl/staticlib/debug/include/openssl/md5.h"
+        #include "3rd/openssl/staticlib/debug/include/openssl/aes.h"
+    #else
+        #include "3rd/openssl/staticlib/release/include/openssl/md5.h"
+        #include "3rd/openssl/staticlib/release/include/openssl/aes.h"
+    #endif
 
-#else
-#include "3rd/openssl/staticlib/release/include/openssl/md5.h"
-#include "3rd/openssl/staticlib/release/include/openssl/aes.h"
+    // lib static lib
+    #ifdef _DEBUG
+        #pragma comment(lib, "staticlib\\debug\\lib\\libeay32.lib")
+        #pragma comment(lib, "staticlib\\debug\\lib\\ssleay32.lib")
+    #else
+        #pragma comment(lib, "staticlib\\release\\lib\\libeay32.lib")
+        #pragma comment(lib, "staticlib\\release\\lib\\ssleay32.lib")
+    #endif
+
+#else// linux
+
 #endif
 
-// lib static lib
-#ifdef _DEBUG
-#pragma comment(lib, "staticlib\\debug\\lib\\libeay32.lib")
-#pragma comment(lib, "staticlib\\debug\\lib\\ssleay32.lib")
-#else
-#pragma comment(lib, "staticlib\\release\\lib\\libeay32.lib")
-#pragma comment(lib, "staticlib\\release\\lib\\ssleay32.lib")
-#endif
 #pragma endregion
 #endif
 
@@ -68,13 +73,14 @@
 
 // 使用dbghelp
 #ifdef __USE_FS_DBGHELP__
-#include <DbgHelp.h>
-#ifdef _DEBUG
-#pragma comment(lib, "DbgHelp\\debug\\DbgHelp.Lib")
-#else
-#pragma comment(lib, "DbgHelp\\release\\DbgHelp.Lib")
+#ifdef _WIN32
+    #include <DbgHelp.h>
+        #ifdef _DEBUG
+            #pragma comment(lib, "DbgHelp\\debug\\DbgHelp.Lib")
+        #else
+            #pragma comment(lib, "DbgHelp\\release\\DbgHelp.Lib")
+        #endif
+    #endif
 #endif
-#endif
-
 #endif
 

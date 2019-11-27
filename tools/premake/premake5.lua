@@ -4,19 +4,13 @@
 
 -- python tool define
 IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
-local PY = IS_WINDOWS and "$(ProjectDir)../../tools/py.exe" or "python"
-
 -- header directory
-FS_HEADER_DIR = "../../base/baseheader/"
-
+FS_HEADER_DIR = "../../frame/frameheader/"
 -- All libraries output directory
 FS_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
-
 -- root directory
 FS_ROOT_DIR = "../../"
-
-FS_BASE_PROJ_NAME = "fsbase"
-
+-- build directory
 FS_BUILD_DIR = "../../build/"
 
 if IS_WINDOWS then
@@ -38,7 +32,7 @@ end
 function set_optimize_opts()
     filter { "configurations:debug*", "language:c++", "system:not windows" }
         buildoptions {
-            "-ggdb -g",
+            "-ggdb -g -std=c++17",
         }
     filter {}
 
@@ -52,6 +46,7 @@ function set_optimize_opts()
     filter {}
 
     filter { "configurations:release*" }
+	    buildoptions{"-std=c++17"}
         optimize "Speed"
     filter {}
 end
@@ -75,13 +70,13 @@ workspace ("Frightenstone_" .. _ACTION)
     filter {}
 
     -- defines
-    filter { "configurations:Debug*" }
+    filter { "configurations:debug*" }
         defines {
             "DEBUG"
         }
     filter {}
 	
-    filter { "configurations:Release*" }
+    filter { "configurations:release*" }
         defines {
             "NDEBUG"
         }
@@ -104,7 +99,7 @@ workspace ("Frightenstone_" .. _ACTION)
 
 -- ****************************************************************************
 -- FS core library compile setting
-project "fsbase"
+project "Frightenstone"
     -- language, kind
     language "c++"
     kind "SharedLib"
@@ -116,15 +111,15 @@ project "fsbase"
 
     -- files
     files {
-        "../../base/**.h",
-		"../../base/**.c",
-		"../../base/**.cpp",
+        "../../frame/**.h",
+		"../../frame/**.c",
+		"../../frame/**.cpp",
 		"../../3rd/*.h",
 		"../../3rd/tiny-utf8/lib/*.cpp",
     }
 
 	filter{ "system:windows"}
-		defines { "FRIGHTEN_STONE_BASE_EXPORT_BASE_DLL" }
+		defines { "__FRIGHTEN_STONE_FRAME_DLL__" }
 		libdirs { 
 			FS_ROOT_DIR .. "3rd/openssL/",
 			FS_ROOT_DIR .. "3rd/"
@@ -134,7 +129,7 @@ project "fsbase"
 	-- macos需要额外添加
     filter { "system:macosx" }
     files {
-        "../../base/**.mm",
+        "../../frame/**.mm",
     }
     filter {}
 
@@ -142,7 +137,8 @@ project "fsbase"
     includedirs {
         "../../3rd/openSSL/staticlib/$(Configuration)/include",
 		"../../",
-		"../../base/baseheader/",
+		"../../frame/include/",
+		"../../frame/frameheader/",
      }
 
     -- target prefix 前缀
@@ -153,6 +149,7 @@ project "fsbase"
         links {
             "rt",
             "uuid",
+			"pthread",
         }
 
     filter { "system:windows" }
@@ -179,7 +176,7 @@ project "fsbase"
     set_optimize_opts()
 
     -- debug target suffix define
-    filter { "configurations:Debug*" }
+    filter { "configurations:debug*" }
         targetsuffix "_debug"
     filter {}
 
@@ -202,19 +199,24 @@ project "TestSuit"
 
     -- dependents
     dependson {
-        "fsbase",
+        "Frightenstone",
     }
 
     -- files
     files {
         "../../TestSuit/**.h",
         "../../TestSuit/**.cpp",
+		"../../protocols/**.h",
+		"../../protocols/**.c",
+		"../../protocols/**.cpp",
     }
 
     -- includedirswrap\csFS\csharp\script_tools
     includedirs {
 	    "../../",
+		"../../frame/include/",
 		"../../TestSuit/TestSuit/",
+		"../../protocols/Impl/",
     }
 
     -- links
@@ -227,13 +229,13 @@ project "TestSuit"
 
     filter { "system:not windows", "configurations:debug*" }
         links {
-            "fsbase_debug",
+            "Frightenstone_debug",
         }
     filter {}
 
     filter { "system:not windows", "configurations:release*" }
         links {
-            "fsbase",
+            "Frightenstone",
         }
     filter {}
 
@@ -245,13 +247,13 @@ project "TestSuit"
 
     filter { "system:windows", "configurations:debug*" }
         links {
-            "fsbase_debug",
+            "Frightenstone_debug",
         }
     filter {}
 
     filter { "system:windows", "configurations:release*" }
         links {
-            "fsbase",
+            "Frightenstone",
         }
     filter {}
 
