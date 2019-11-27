@@ -21,58 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : CrashHandleUtil.h
+ * @file  : LogFileType.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/7/2
+ * @date  : 2019/11/27
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_CrashHandle_Impl_CrashHandleUtil_H__
-#define __Frame_Include_FrightenStone_Common_CrashHandle_Impl_CrashHandleUtil_H__
-
+#ifndef __Frame_Include_FrightenStone_Common_Log_Defs_LogFileType_H__
+#define __Frame_Include_FrightenStone_Common_Log_Defs_LogFileType_H__
 #pragma once
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 
-#ifdef _WIN32
-
-typedef struct _EXCEPTION_POINTERS EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
-typedef struct _EXCEPTION_RECORD EXCEPTION_RECORD, *PEXCEPTION_RECORD;
-typedef struct _CONTEXT CONTEXT, *PCONTEXT;
-
-#define GET_EXCEPTION_INFO() ((PEXCEPTION_POINTERS)(GetExceptionInformation()))
-
 FS_NAMESPACE_BEGIN
 
-class FS_String;
-struct LogData;
-
-class BASE_EXPORT CrashHandleUtil
+// ÇëÔÚLogDefs.hÌí¼ÓÏìÓ¦µÄÈÕÖ¾ÎÄ¼ş¶¨Òå£¬
+// ²¢ÔÚvirtual Int32 FS_Log::_GetLogFileIndex(Int32 logTypeEnum); Ìî³äÏìÓ¦µÄÊµÏÖ
+class BASE_EXPORT LogFileType
 {
 public:
-    // åˆå§‹åŒ–crashdumpä¿¡æ¯ isUseSehExceptionHandleræ˜¯å¤–éƒ¨æ‰‹åŠ¨åŠ äº†__try __exceptçš„seh
-    static int InitCrashHandleParams(bool isUseSehExceptionHandler = false);
-
-    #ifdef _WIN32
-    // é…åˆ__exceptè§èŒƒä¾‹
-    static Int32 RecordExceptionInfo(EXCEPTION_POINTERS exceptionInfo);
-    #endif
-
-    // åˆå§‹åŒ–pdbç­‰ç¬¦å·ä¿¡æ¯ ç”¨äºæ‰“å°å †æ ˆä¿¡æ¯
-    static Int32 InitSymbol();
-    // æŠ“å–å †æ ˆå¿«ç…§ ä¸»åŠ¨æ‰“å°å †æ ˆä¿¡æ¯
-    static FS_String FS_CaptureStackBackTrace(size_t skipFrames = 0, size_t captureFrames = FS_INFINITE);
-
-protected:
-    static void _OnBeforeCrashLogHook(LogData *logData);
-    static void _OnAfterCrashLogHook(const LogData *logData);
+    enum 
+    {
+        Begin = 0,
+        Crash = Begin,
+        Details,
+        Memleak,
+        Mempool,
+        ObjPool,
+        Net,
+        Sys,
+        Any,
+        Custom,
+        Testcode,
+    };
 };
 
 FS_NAMESPACE_END
-
-#endif
 
 #endif

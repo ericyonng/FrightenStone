@@ -204,6 +204,7 @@ void MemleakMonitor::PrintSysMemoryInfo() const
                    , SystemUtil::GetAvailPhysMemSize()
                    , SystemUtil::GetMemoryLoad());
 
+#ifdef _WIN32
     ProcessMemInfo memInfo = {};
     g_Log->mempool("process occupied memory info:");
     if(SystemUtil::GetProcessMemInfo(SystemUtil::GetCurProcessHandle(), memInfo))
@@ -223,6 +224,10 @@ void MemleakMonitor::PrintSysMemoryInfo() const
     {
         g_Log->mempool("fail get process mem info");
     }
+#else
+    // TODO:linux
+#endif
+
 }
 
 void MemleakMonitor::PrintPoolAll() const

@@ -82,6 +82,7 @@ protected:
     virtual const IDelegate<void, LogData *> *_InstallBeforeLogHookFunc(Int32 level, IDelegate<void, LogData *> *delegate);
     // 日志相关
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData);
+    virtual Int32 _GetLogFileIndex(Int32 logTypeEnum);
 
     // 控制台相关
     void _OutputToConsole(Int32 level, const FS_String &logStr);

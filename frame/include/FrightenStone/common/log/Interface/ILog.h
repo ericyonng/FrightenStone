@@ -36,8 +36,10 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
-#include "FrightenStone/common/log/Defs/LogData.h"
 #include "FrightenStone/common/assist/utils/Impl/SystemUtil.h"
+
+#include "FrightenStone/common/log/Defs/LogData.h"
+#include "FrightenStone/common/log/Defs/LogFileType.h"
 
  // 函数与行号便利宏
 #undef _FUNC_LINE_ARGS_
@@ -125,6 +127,7 @@ protected:
     virtual const IDelegate<void, const LogData *> *_InstallLogHookFunc(Int32 level, IDelegate<void, const LogData *> *delegate) = 0;
     virtual const IDelegate<void, LogData *> *_InstallBeforeLogHookFunc(Int32 level, IDelegate<void, LogData *> *delegate) = 0;
     virtual void _WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData) = 0;
+    virtual Int32 _GetLogFileIndex(Int32 logTypeEnum) = 0;
 };
 
 FS_NAMESPACE_END

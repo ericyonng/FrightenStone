@@ -55,7 +55,7 @@ inline void ILog::i(const char *funcName, Int32 codeLine, const char *fmt, const
                                    , codeLine)
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Info, LogDefs::_SYSLOG_details_, newLogData);
+    _WriteLog(LogLevel::Info, _GetLogFileIndex(LogFileType::Details), newLogData);
 }
 
 template<typename ObjType, typename... Args>
@@ -72,7 +72,7 @@ inline void ILog::d(const char *funcName, Int32 codeLine, const char *fmt, const
                                    , codeLine)
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Debug, LogDefs::_SYSLOG_details_, newLogData);
+    _WriteLog(LogLevel::Debug, _GetLogFileIndex(LogFileType::Details), newLogData);
 }
 
 template<typename ObjType, typename... Args>
@@ -89,7 +89,7 @@ inline void ILog::w(const char *funcName, Int32 codeLine, const char *fmt, const
                                    , codeLine)
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Warning, LogDefs::_SYSLOG_details_, newLogData);
+    _WriteLog(LogLevel::Warning, _GetLogFileIndex(LogFileType::Details), newLogData);
 }
 
 template<typename ObjType, typename... Args>
@@ -106,7 +106,7 @@ inline void ILog::e(const char *funcName, Int32 codeLine, const char *fmt, const
                                    , codeLine)
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Error, LogDefs::_SYSLOG_details_, newLogData);
+    _WriteLog(LogLevel::Error, _GetLogFileIndex(LogFileType::Details), newLogData);
     ASSERT(!"error");
 }
 
@@ -121,7 +121,7 @@ inline void ILog::crash(const char *fmt, const Args&... args)
                                    , LogLevel::GetDescription(LogLevel::Crash))
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Crash, LogDefs::_SYSLOG_crash_, newLogData);
+    _WriteLog(LogLevel::Crash, _GetLogFileIndex(LogFileType::Crash), newLogData);
 }
 
 template<typename ObjType, typename... Args>
@@ -136,7 +136,7 @@ inline void ILog::net(const char *fmt, const Args&... args)
                                    , typeid(ObjType).name())
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Net, LogDefs::_SYSLOG_net_, newLogData);
+    _WriteLog(LogLevel::Net, _GetLogFileIndex(LogFileType::Net), newLogData);
 }
 
 template<typename... Args>
@@ -150,7 +150,7 @@ inline void ILog::memleak(const char *fmt, const Args&... args)
                                    , LogLevel::GetDescription(LogLevel::Memleak))
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Memleak, LogDefs::_SYSLOG_memleak_, newLogData);
+    _WriteLog(LogLevel::Memleak, _GetLogFileIndex(LogFileType::Memleak), newLogData);
 }
 
 template<typename... Args>
@@ -164,7 +164,7 @@ inline void ILog::mempool(const char *fmt, const Args&... args)
                                          , LogLevel::GetDescription(LogLevel::MemPool))
         .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::MemPool, LogDefs::_SYSLOG_mempool_, newLogData);
+    _WriteLog(LogLevel::MemPool, _GetLogFileIndex(LogFileType::Mempool), newLogData);
 }
 
 template<typename... Args>
@@ -178,7 +178,7 @@ inline void ILog::objpool(const char *fmt, const Args&... args)
                                          , LogLevel::GetDescription(LogLevel::ObjPool))
         .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::ObjPool, LogDefs::_SYSLOG_objpool_, newLogData);
+    _WriteLog(LogLevel::ObjPool, _GetLogFileIndex(LogFileType::ObjPool), newLogData);
 }
 template<typename ObjType, typename... Args>
 inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
@@ -194,7 +194,7 @@ inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, con
                                    , codeLine)
         .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Sys, LogDefs::_SYSLOG_sys_, newLogData);
+    _WriteLog(LogLevel::Sys, _GetLogFileIndex(LogFileType::Sys), newLogData);
 }
 
 template<typename ObjType, typename... Args>
@@ -209,7 +209,7 @@ inline void ILog::any(const char *fmt, const Args&... args)
                                          , typeid(ObjType).name())
         .AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Any, LogDefs::_SYSLOG_Any_, newLogData);
+    _WriteLog(LogLevel::Any, _GetLogFileIndex(LogFileType::Any), newLogData);
 }
 
 template<typename... Args>
@@ -220,7 +220,7 @@ inline void ILog::custom(const char *fmt, const Args&... args)
     newLogData->_logTime.FlushTime();
     newLogData->_logToWrite.AppendFormat(fmt, args...) << FS_String::endl;
 
-    _WriteLog(LogLevel::Custom, LogDefs::_SYSLOG_Custom_, newLogData);
+    _WriteLog(LogLevel::Custom, _GetLogFileIndex(LogFileType::Custom), newLogData);
 }
 
 template<typename ObjType>

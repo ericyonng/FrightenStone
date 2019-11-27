@@ -72,7 +72,8 @@ workspace ("Frightenstone_" .. _ACTION)
     -- defines
     filter { "configurations:debug*" }
         defines {
-            "DEBUG"
+            "DEBUG",
+			"_DEBUG",
         }
     filter {}
 	

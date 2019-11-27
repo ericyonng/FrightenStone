@@ -40,6 +40,8 @@
 
 FS_NAMESPACE_BEGIN
 
+// 请在LogFileType.h添加响应的枚举，
+// 并在virtual Int32 FS_Log::_GetLogFileIndex(Int32 logTypeEnum); 填充响应的实现
 class BASE_EXPORT LogDefs
 {
 public:

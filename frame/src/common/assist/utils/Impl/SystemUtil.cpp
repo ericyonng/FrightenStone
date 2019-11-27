@@ -79,6 +79,7 @@ static Int32 GetMemoryStatus(MEMORYSTATUSEX &status)
 
 FS_NAMESPACE_BEGIN
 
+#ifdef _WIN32
 #pragma region windowsdefines
 typedef struct
 {
@@ -86,6 +87,27 @@ typedef struct
     DWORD   dwProcessID;    // 进程ID
 }EnumWindowsArg;
 #pragma endregion
+
+static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
+{
+    auto *pArg = (EnumWindowsArg *)lParam;
+
+    // 通过窗口句柄取得进程ID
+    DWORD  dwProcessID = 0;
+    ::GetWindowThreadProcessId(hwnd, &dwProcessID);
+    if(dwProcessID == pArg->dwProcessID)
+    {
+        pArg->hwndWindow = hwnd;
+        // 找到了返回FALSE
+        return false;
+    }
+
+    // 没找到，继续找，返回TRUE
+    return true;
+}
+#endif
+
+
 
 UInt64 SystemUtil::GetAvailPhysMemSize()
 {
@@ -227,6 +249,34 @@ FS_String SystemUtil::GetCurProgramName()
     return FS_DirectoryUtil::GetFileNameInPath(path);
 }
 
+ULong SystemUtil::GetCurrentThreadId()
+{
+    return ::GetCurrentThreadId();
+}
+
+Int32 SystemUtil::GetCurProcessId()
+{
+    return _getpid();
+}
+
+Int32 SystemUtil::CloseProcess(ULong processId, ULong *lastError)
+{
+#ifdef _WIN32
+    if(!TerminateProcess(OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, false, processId), 0))
+    {
+        if(lastError)
+            *lastError = GetLastError();
+
+        return StatusDefs::Failed;
+    }
+#else
+#endif
+
+    return StatusDefs::Success;
+}
+
+#ifdef _WIN32
+
 HANDLE SystemUtil::CreateProcessSnapshot()
 {
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -245,22 +295,20 @@ ULong SystemUtil::GetFirstProcessPid(HANDLE &hSnapshot)
     return pe.th32ProcessID;
 }
 
-static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
+ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
 {
-    auto *pArg = (EnumWindowsArg *)lParam;
+    PROCESSENTRY32 pe = {0};
+    pe.dwSize = sizeof(pe);
+    if(!Process32Next(hSnapshot, &pe))
+        return 0;
 
-    // 通过窗口句柄取得进程ID
-    DWORD  dwProcessID = 0;
-    ::GetWindowThreadProcessId(hwnd, &dwProcessID);
-    if(dwProcessID == pArg->dwProcessID)
-    {
-        pArg->hwndWindow = hwnd;
-        // 找到了返回FALSE
-        return false;
-    }
+    return pe.th32ProcessID;
+}
 
-    // 没找到，继续找，返回TRUE
-    return true;
+// 获取进程句柄
+HANDLE SystemUtil::GetCurProcessHandle()
+{
+    return ::GetCurrentProcess();
 }
 
 HWND SystemUtil::GetWindowHwndByPID(DWORD dwProcessID)
@@ -281,28 +329,6 @@ void SystemUtil::BringWindowsToTop(HWND curWin)
 {
     ::BringWindowToTop(curWin);
     ::ShowWindow(curWin, SW_SHOW);
-}
-
-bool SystemUtil::IsProcessExist(const FS_String &processName)
-{
-    // 遍历进程
-    auto hProcModule = CreateProcessSnapshot();
-    auto pid = GetFirstProcessPid(hProcModule);
-    bool isFirst = true;
-    fs::FS_String pachCache;
-    for(; isFirst ? isFirst : (pid > 0); pid = GetNextProcessPid(hProcModule))
-    {
-        isFirst = false;
-        pachCache.Clear();
-        if(GetProgramPath(false, pachCache, pid) != StatusDefs::Success)
-            continue;
-        
-        auto iterExist = pachCache.GetRaw().find(processName.GetRaw());
-        if(iterExist != std::string::npos)
-            return true;
-    }
-
-    return false;
 }
 
 // 弹窗
@@ -355,6 +381,38 @@ void SystemUtil::OutputToConsole(const FS_String &outStr)
 {
     printf("%s", outStr.c_str());
 }
+#else
+#endif
+
+
+bool SystemUtil::IsProcessExist(const FS_String &processName)
+{
+#ifdef _WIN32
+    // 遍历进程
+    auto hProcModule = CreateProcessSnapshot();
+    auto pid = GetFirstProcessPid(hProcModule);
+    bool isFirst = true;
+    fs::FS_String pachCache;
+    for(; isFirst ? isFirst : (pid > 0); pid = GetNextProcessPid(hProcModule))
+    {
+        isFirst = false;
+        pachCache.Clear();
+        if(GetProgramPath(false, pachCache, pid) != StatusDefs::Success)
+            continue;
+
+        auto iterExist = pachCache.GetRaw().find(processName.GetRaw());
+        if(iterExist != std::string::npos)
+            return true;
+    }
+
+    return false;
+#else
+    // TODO:linux
+    return false;
+#endif
+}
+
+
 
 bool SystemUtil::IsLittleEndian()
 {
@@ -367,47 +425,6 @@ bool SystemUtil::IsLittleEndian()
     return static_cast<char>(endian_test.l) != 'b';
 }
 
-ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
-{
-    PROCESSENTRY32 pe = {0};
-    pe.dwSize = sizeof(pe);
-    if(!Process32Next(hSnapshot, &pe))
-        return 0;
-
-    return pe.th32ProcessID;
-}
-
-ULong SystemUtil::GetCurrentThreadId()
-{
-    return ::GetCurrentThreadId();
-}
-
-Int32 SystemUtil::GetCurProcessId()
-{
-    return _getpid();
-}
-
-// 获取进程句柄
-HANDLE SystemUtil::GetCurProcessHandle()
-{
-    return ::GetCurrentProcess();
-}
-
-Int32 SystemUtil::CloseProcess(ULong processId, ULong *lastError)
-{
-#ifdef _WIN32
-    if(!TerminateProcess(OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, false, processId), 0))
-    {
-        if(lastError)
-            *lastError = GetLastError();
-
-        return StatusDefs::Failed;
-    }
-#else
-#endif
-
-    return StatusDefs::Success;
-}
 
 void SystemUtil::GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber)
 {

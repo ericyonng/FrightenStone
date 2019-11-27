@@ -54,6 +54,8 @@
 #endif
 
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 static FS_String __dumpFileName;
@@ -429,3 +431,5 @@ void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 }
 
 FS_NAMESPACE_END
+
+#endif
