@@ -32,7 +32,7 @@ end
 function set_optimize_opts()
     filter { "configurations:debug*", "language:c++", "system:not windows" }
         buildoptions {
-            "-ggdb -g -std=c++17",
+            "-ggdb -g",
         }
     filter {}
 
@@ -46,7 +46,6 @@ function set_optimize_opts()
     filter {}
 
     filter { "configurations:release*" }
-	    buildoptions{"-std=c++17"}
         optimize "Speed"
     filter {}
 end
@@ -169,7 +168,7 @@ project "Frightenstone"
     -- flags
     filter { "system:not windows" }
         buildoptions {
-            "-fvisibility=hidden",
+            "-fvisibility=hidden -std=c++17",
         }
     filter {}
 
@@ -270,6 +269,9 @@ project "TestSuit"
     filter { "system:not windows" }
         disablewarnings {
             "invalid-source-encoding",
+        }
+		buildoptions {
+            "-std=c++17",
         }
     filter {}
 
