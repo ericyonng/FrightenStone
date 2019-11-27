@@ -244,6 +244,9 @@ private:\
 #if defined(_WIN32) && defined(_DEBUG)
 #undef ASSERTBOX
 #define ASSERTBOX(str)    (::MessageBox(fs::SystemUtil::GetWindowHwndByPID(fs::SystemUtil::GetCurProcessId()), str, fs::SystemUtil::GetCurProgramName().c_str(), MB_ABORTRETRYIGNORE))
+#else
+#undef ASSERTBOX
+#define ASSERTBOX(str) 
 #endif
 
 #undef ARRAY_ELEM_COUNT

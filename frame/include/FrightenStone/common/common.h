@@ -46,7 +46,7 @@
 #include "FrightenStone/common/basedefs/Resource/Resource.h"
 #pragma region base code
 #ifndef __FRIGHTEN_STONE_FRAME_DLL__
-#include<FrightenStone/common/socket/socket.h>
+#include <FrightenStone/common/socket/socket.h>
 #include <FrightenStone/common/net/net.h>
 #include <FrightenStone/common/status/status.h>
 #include <FrightenStone/common/asyn/asyn.h>
