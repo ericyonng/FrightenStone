@@ -55,10 +55,10 @@ class Locker;
 #ifdef _WIN32
 typedef std::mt19937 FS_Mt19937;
 
-#undef FS_Uniform_Int
-#define FS_Uniform_Int(valueType) std::uniform_int<valueType>
+// #undef FS_Uniform_Int
+// #define FS_Uniform_Int(valueType) std::uniform_int<valueType>
 #else
-typedef std::tr1:mt19937 FS_Mt19937;
+typedef std::tr1::mt19937 FS_Mt19937;
 
 // #undef FS_Uniform_Int
 // #define FS_Uniform_Int(valueType) std::tr1:uniform_int<valueType>
