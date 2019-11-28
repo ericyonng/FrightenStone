@@ -38,7 +38,7 @@ FS_NAMESPACE_BEGIN
 template<typename RandValType>
 struct RandomSource<RandValType, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937>
 {
-    std::mt19937 _generator;
+    FS_Mt19937 _generator;
     RandomSource(const RandValType srandVal = static_cast<RandValType>(std::chrono::system_clock().now().time_since_epoch().count()))
         :_generator(srandVal)
     {
@@ -88,7 +88,7 @@ inline RandValType FS_Random<RandValType, DisType>::operator ()(MT19937RandSrc &
 template<typename RandValType>
 struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_SMALLINT>
 {
-    std::uniform_int<RandValType> _generator;
+    std::uniform_int_distribution<RandValType> _generator;
     Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
         :_generator(minVal, maxVal)
     {

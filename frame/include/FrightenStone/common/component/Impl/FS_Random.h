@@ -37,11 +37,12 @@
 #include "FrightenStone/common/basedefs/DataType/DataType.h"
 #include "FrightenStone/common/basedefs/Macro/MacroDefs.h"
 #include <chrono>
-#ifdef _WIN32
 #include <random>
-#else
-#include <tr1/random>
-#endif
+// #ifdef _WIN32
+// #include <random>
+// #else
+// #include <tr1/random>
+// #endif
 #include <limits>
 #include <numeric>
 #include <atomic>
@@ -49,6 +50,19 @@
 FS_NAMESPACE_BEGIN
 
 class Locker;
+
+// random的类型定义
+#ifdef _WIN32
+typedef std::mt19937 FS_Mt19937;
+
+#undef FS_Uniform_Int
+#define FS_Uniform_Int(valueType) std::uniform_int<valueType>
+#else
+typedef std::tr1:mt19937 FS_Mt19937;
+
+// #undef FS_Uniform_Int
+// #define FS_Uniform_Int(valueType) std::tr1:uniform_int<valueType>
+#endif
 
 class BASE_EXPORT FS_RandomDefs
 {
@@ -119,7 +133,7 @@ public:
     FS_Random(RandValType minVal, RandValType maxVal);
     virtual ~FS_Random();
 
-    // 随机数发生
+    // 随机数发生 需要指定随机数源，建议选择MT1993764RandSrc，并保证随机数源多线程的同步
     RandValType operator()(MT1993764RandSrc &randomSrc);
     RandValType operator()(MT19937RandSrc &randomSrc);
 
