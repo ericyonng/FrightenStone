@@ -52,34 +52,13 @@ inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)
     ,_objpoolAllowedMaxOccupiedBytes(__OBJ_POOL_MAX_ALLOW_BYTES_DEF__)
     ,_totalBlockCnt(0)
 {
-    // 初始化节点
-    _header = new AlloctorNode<ObjType>(_nodeCapacity);
-    _lastNode = _header;
 
-    // lastnode在构造中初始化
-    _curNodeObjs = _lastNode->_objs;
-    _alloctedInCurNode = 0;
-    ++_nodeCnt;
-    _totalBlockCnt += _lastNode->_blockCnt;
-    _bytesOccupied += _lastNode->_nodeSize;
-
-    _InitNode(_lastNode);
 }
 
 template<typename ObjType>
 inline IObjAlloctor<ObjType>::~IObjAlloctor()
 {
-    if(_header)
-    {
-        auto *node = _header->_nextNode;
-        while(node)
-        {
-            auto *nextNode = node->_nextNode;
-            delete node;
-            node = nextNode;
-        }
-        Fs_SafeFree(_header);
-    }
+    DestroyPool();
 }
 
 template<typename ObjType>
@@ -98,6 +77,42 @@ inline void IObjAlloctor<ObjType>::Free(void *ptr)
     // free的对象构成链表用于下次分配
     MixFreeNoLocker(ptr);
     _locker.Unlock();
+}
+
+template<typename ObjType>
+inline void IObjAlloctor<ObjType>::InitPool()
+{
+    if(_header)
+        return;
+
+    // 初始化节点
+    _header = new AlloctorNode<ObjType>(_nodeCapacity);
+    _lastNode = _header;
+
+    // lastnode在构造中初始化
+    _curNodeObjs = _lastNode->_objs;
+    _alloctedInCurNode = 0;
+    ++_nodeCnt;
+    _totalBlockCnt += _lastNode->_blockCnt;
+    _bytesOccupied += _lastNode->_nodeSize;
+
+    _InitNode(_lastNode);
+}
+
+template<typename ObjType>
+inline void IObjAlloctor<ObjType>::DestroyPool()
+{
+    if(UNLIKELY(!_header))
+        return;
+
+    auto *node = _header->_nextNode;
+    while(node)
+    {
+        auto *nextNode = node->_nextNode;
+        delete node;
+        node = nextNode;
+    }
+    Fs_SafeFree(_header);
 }
 
 template<typename ObjType>

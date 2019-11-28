@@ -38,6 +38,8 @@ template<typename ObjType>
 inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
     :_alloctor(new IObjAlloctor<ObjType>(objAmount))
 {
+    _alloctor->InitPool();
+
     // 创建委托
    ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
                                             , DelegatePlusFactory::Create(this, &ObjPoolHelper<ObjType>::PrintObjPool));

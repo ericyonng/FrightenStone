@@ -47,6 +47,18 @@ inline FS_String &FS_String::operator = (const Byte8 *str)
     return *this;
 }
 
+inline FS_String &FS_String::operator = (const std::string &str)
+{
+    _buffer = str;
+    return *this;
+}
+
+inline FS_String &FS_String::operator = (const FS_String &str)
+{
+    _buffer = str._buffer;
+    return *this;
+}
+
 inline FS_String &FS_String::operator << (const FS_String &str)
 {
     _buffer += str._buffer;

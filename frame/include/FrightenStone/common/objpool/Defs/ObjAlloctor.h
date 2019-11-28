@@ -59,10 +59,15 @@ public:
     virtual ~IObjAlloctor();
 
 public:
+    #pragma region thread safe api
     void *Alloc();
     void  Free(void *ptr);
+    #pragma endregion
 
     // 线程不安全
+    #pragma region no thread safe api
+    void InitPool();
+    void DestroyPool();
     void *MixAllocNoLocker();
     void MixFreeNoLocker(void *ptr);
     void *AllocNoLocker();
@@ -76,7 +81,9 @@ public:
     ObjType *NewByPtr(void *ptr, Args &&... args);
     void Delete(ObjType *ptr);
     void DeleteWithoutDestructor(ObjType *ptr);
+    #pragma endregion
 
+    #pragma region thread safe api
     size_t GetObjInUse();
     size_t GetTotalObjBlocks();    // 当前全部的对象块个数
     size_t GetNodeCnt();
@@ -84,7 +91,9 @@ public:
     size_t GetObjBlockSize();
     void Lock();
     void UnLock();
-    void SetAllowMaxOccupiedBytes(UInt64 maxBytes);
+    #pragma endregion
+
+    void SetAllowMaxOccupiedBytes(UInt64 maxBytes);     // 线程不安全
 
 private:
     // 线程不安全接口，多线程时接口外面请加锁

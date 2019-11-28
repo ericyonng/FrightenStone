@@ -67,6 +67,9 @@ public:
     FS_String(const char *other);
     FS_String(const FS_String &other);
     FS_String &operator = (const Byte8 *str);
+    FS_String &operator = (const std::string &str);
+    FS_String &operator = (const FS_String &str);
+
     FS_String &operator << (const FS_String &str);
     FS_String &operator << (const std::string &str);
     FS_String &operator << (const bool &val);

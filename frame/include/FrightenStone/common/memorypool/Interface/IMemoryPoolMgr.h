@@ -41,6 +41,7 @@ FS_NAMESPACE_BEGIN
 
 class FS_String;
 
+// 所有接口都是非线程安全的（除了加解锁）
 class BASE_EXPORT IMemoryPoolMgr
 {
 public:
