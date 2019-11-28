@@ -37,13 +37,13 @@
 #include "FrightenStone/common/component/component.h"
 #include "FrightenStone/common/basedefs/DataType/DataType.h"
 
-#if defined(linux)|defined(__CYGWIN__)
+#ifdef _WIN32
+#include<direct.h>      //mkdir
+#include<io.h>          //access
+#else
 #include<sys/stat.h>
 #include<sys/types.h>
 #include<unistd.h>
-#else
-#include<direct.h>	//mkdir
-#include<io.h>//access
 #endif
 
 FS_NAMESPACE_BEGIN
@@ -386,10 +386,13 @@ bool FS_FileUtil::IsFileExist(const char *fileName)
     if(UNLIKELY(!fileName))
         return false;
 
+#ifdef _WIN32
     if(::_access(fileName, 0) == -1)
-    {
         return false;
-    }
+#else
+    if(::access(fileName, 0) == -1)
+        return false;
+#endif
 
     return true;
 }
