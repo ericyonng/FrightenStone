@@ -74,13 +74,13 @@ inline FS_Random<RandValType, DisType>::~FS_Random()
 }
 
 template<typename RandValType , FS_RandomDefs::RAND_DIS_TYPE DisType>
-inline typename RandValType FS_Random<RandValType, DisType>::operator ()(MT1993764RandSrc &randomSrc)
+inline RandValType FS_Random<RandValType, DisType>::operator ()(MT1993764RandSrc &randomSrc)
 {
      return  static_cast<RandValType>(_distributor._generator(randomSrc._generator));
 }
 
 template<typename RandValType, FS_RandomDefs::RAND_DIS_TYPE DisType>
-inline typename RandValType FS_Random<RandValType, DisType>::operator ()(MT19937RandSrc &randomSrc)
+inline RandValType FS_Random<RandValType, DisType>::operator ()(MT19937RandSrc &randomSrc)
 {
     return  static_cast<RandValType>(_distributor._generator(randomSrc._generator));
 }

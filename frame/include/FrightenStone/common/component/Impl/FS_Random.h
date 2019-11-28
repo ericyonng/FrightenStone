@@ -109,19 +109,19 @@ public:
     virtual ~FS_Random();
 
     // 随机数发生
-    typename RandValType operator()(MT1993764RandSrc &randomSrc);
-    typename RandValType operator()(MT19937RandSrc &randomSrc);
+    RandValType operator()(MT1993764RandSrc &randomSrc);
+    RandValType operator()(MT19937RandSrc &randomSrc);
 
 private:
     // 随机数分布器
-    template<typename RandValType, FS_RandomDefs::RAND_DIS_TYPE>
+    template<typename ValType, FS_RandomDefs::RAND_DIS_TYPE>
     struct Distributor
     {
 
     };
 
     #pragma region dstributor/part template
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_SMALLINT>
    {
         std::uniform_int<RandValType> _generator;
@@ -132,7 +132,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_INT>
     {
         std::uniform_int_distribution<RandValType> _generator;
@@ -143,7 +143,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_REAL>
     {
         std::uniform_real_distribution<RandValType> _generator;
@@ -154,7 +154,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_BERNOULLI>
     {
         std::bernoulli_distribution _generator;
@@ -165,7 +165,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_GEOMETRIC>
     {
         std::geometric_distribution<RandValType> _generator;
@@ -176,7 +176,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_EXPONENTIAL>
     {
         std::exponential_distribution<RandValType> _generator;
@@ -187,7 +187,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_NORMAL>
     {
         std::normal_distribution<RandValType> _generator;
@@ -198,7 +198,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_LOGNORMAL>
     {
         std::lognormal_distribution<RandValType> _generator;
@@ -209,7 +209,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_BINOMIAL>
     {
         std::binomial_distribution<RandValType> _generator;
@@ -220,7 +220,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_CAUCHY>
     {
         std::cauchy_distribution<RandValType> _generator;
@@ -231,7 +231,7 @@ private:
         }
     };
 
-    template<typename RandValType>
+    template<>
     struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_DISCRETE>
     {
         std::discrete_distribution<RandValType> _generator;
