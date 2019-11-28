@@ -269,9 +269,9 @@ bool FS_DirectoryUtil::_CreateSubDir(const std::string &subDir)
             return false;
     }
 #else
-    if(mkdir(strDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
+    if(mkdir(subDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
     {
-        if(access(strDir.c_str(), 0) == -1)
+        if(access(subDir.c_str(), 0) == -1)
             return false;
     }
 #endif
