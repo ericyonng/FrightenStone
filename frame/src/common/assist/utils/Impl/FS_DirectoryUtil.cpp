@@ -41,15 +41,14 @@
 #include<errno.h>
 #include<stdlib.h>
 
-#if defined(linux)|defined(__CYGWIN__)
+#ifdef _WIN32
+#include<direct.h>      //mkdir func
+#include<io.h>          //access func
+#else
 #include<sys/stat.h>
 #include<sys/types.h>
 #include<unistd.h>
-#else
-#include<direct.h>	//mkdir func
-#include<io.h>//access func
 #endif
-
 
 FS_NAMESPACE_BEGIN
 
@@ -258,22 +257,21 @@ bool FS_DirectoryUtil::_CreateRecursiveDir(const FS_String &masterDir, const FS_
     return true;
 }
 
-bool fs::FS_DirectoryUtil::_CreateSubDir(const std::string &subDir)
+bool FS_DirectoryUtil::_CreateSubDir(const std::string &subDir)
 {
     if(subDir.length() <= 0)
         return false;
 
-#if defined(linux)|defined(__CYGWIN__)
-    if(mkdir(strDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
-    {
-        if(access(strDir.c_str(), 0) == -1)
-            return false;
-    }
-
-#else
+#ifdef _WIN32    
     if(::_mkdir(subDir.c_str()) != 0)
     {
         if(::_access(subDir.c_str(), 0) == -1)
+            return false;
+    }
+#else
+    if(mkdir(strDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
+    {
+        if(access(strDir.c_str(), 0) == -1)
             return false;
     }
 #endif
