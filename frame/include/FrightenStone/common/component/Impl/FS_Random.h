@@ -38,11 +38,10 @@
 #include "FrightenStone/common/basedefs/Macro/MacroDefs.h"
 #include <chrono>
 #include <random>
-// #ifdef _WIN32
-// #include <random>
-// #else
-// #include <tr1/random>
-// #endif
+#ifndef _WIN32
+// linux下需要额外加入扩展的c++random库
+#include <tr1/random>
+#endif
 #include <limits>
 #include <numeric>
 #include <atomic>
@@ -114,6 +113,7 @@ struct RandomSource
 };
 
 #pragma region TypeDefine RandomSource
+// 64与32在不同编译器上的性能各不相同，一般64比32会快一点 所以建议使用MT19937-64
 typedef RandomSource<Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64> MT1993764RandSrc;
 typedef RandomSource<Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937> MT19937RandSrc;
 #pragma endregion
