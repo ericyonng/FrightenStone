@@ -37,7 +37,11 @@
 #include "FrightenStone/common/basedefs/DataType/DataType.h"
 #include "FrightenStone/common/basedefs/Macro/MacroDefs.h"
 #include <chrono>
+#ifdef _WIN32
 #include <random>
+#else
+#include <tr1/random>
+#endif
 #include <limits>
 #include <numeric>
 #include <atomic>
