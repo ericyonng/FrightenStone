@@ -42,10 +42,12 @@
 FS_NAMESPACE_BEGIN
 
 FS_CpuInfo::FS_CpuInfo()
-    :_preidleTime{0}
+    :_isInit(false)
+#ifdef _WIN32
+    ,_preidleTime{0}
     ,_preKernalTime{0}
     , _preUserTime{0}
-    ,_isInit(false)
+#endif
 {
 
 }
@@ -55,8 +57,10 @@ bool FS_CpuInfo::Initialize()
     if(UNLIKELY(_isInit))
         return true;
 
+#ifdef _WIN32
     if(UNLIKELY(!GetSystemTimes(&_preidleTime, &_preKernalTime, &_preUserTime)))
         return false;
+#endif
 
     _isInit = true;
     return true;
@@ -64,6 +68,7 @@ bool FS_CpuInfo::Initialize()
 
 Double FS_CpuInfo::GetUsage()
 {
+#ifdef _WIN32
     if(!_isInit)
         return -1;
 
@@ -87,21 +92,26 @@ Double FS_CpuInfo::GetUsage()
     _preKernalTime = kernelTime;
     _preUserTime = userTime;
     return usage;
+#else
+    // TODO
+    return -1;
+#endif
 }
 
 Int32 FS_CpuInfo::GetCpuCoreCnt()
 {
     Int32 count = 1; // at least one
-#if defined (LINUX)  
-    count = sysconf(_SC_NPROCESSORS_CONF);
-#elif defined(_WIN32)  
+#ifdef _WIN32
     SYSTEM_INFO si;
     GetSystemInfo(&si);
     count = si.dwNumberOfProcessors;
+#else
+    count = sysconf(_SC_NPROCESSORS_CONF);
 #endif  
     return count;
 }
 
+#ifdef _WIN32
 Int64 FS_CpuInfo::_CompareFileTime(FILETIME time1, FILETIME time2)
 {
     Int64 a = (static_cast<Int64>(time1.dwHighDateTime) << 32) | static_cast<Int64>(time1.dwLowDateTime);
@@ -109,5 +119,6 @@ Int64 FS_CpuInfo::_CompareFileTime(FILETIME time1, FILETIME time2)
 
     return abs(b - a);
 }
+#endif
 
 FS_NAMESPACE_END

@@ -45,17 +45,26 @@ class BASE_EXPORT FS_CpuInfo
 public:
     FS_CpuInfo();
     bool Initialize();
+
+    // linuxœ¬Œ¥ µœ÷
     Double GetUsage();
+
     Int32 GetCpuCoreCnt();
 
+#ifdef _WIN32
 private:
     Int64 _CompareFileTime(FILETIME time1, FILETIME time2);
+#endif
 
 private:
+    bool _isInit;
+
+#ifdef _WIN32
     FILETIME _preidleTime;
     FILETIME _preKernalTime;
     FILETIME _preUserTime;
-    bool _isInit;
+#endif
+
 };
 
 #pragma region Inline
