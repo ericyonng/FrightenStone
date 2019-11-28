@@ -84,6 +84,128 @@ inline RandValType FS_Random<RandValType, DisType>::operator ()(MT19937RandSrc &
 {
     return  static_cast<RandValType>(_distributor._generator(randomSrc._generator));
 }
+#pragma region dstributor/part template
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_SMALLINT>
+{
+    std::uniform_int<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_INT>
+{
+    std::uniform_int_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_REAL>
+{
+    std::uniform_real_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_BERNOULLI>
+{
+    std::bernoulli_distribution _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_GEOMETRIC>
+{
+    std::geometric_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_EXPONENTIAL>
+{
+    std::exponential_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_NORMAL>
+{
+    std::normal_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_LOGNORMAL>
+{
+    std::lognormal_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_BINOMIAL>
+{
+    std::binomial_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_CAUCHY>
+{
+    std::cauchy_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+
+template<typename RandValType>
+struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_DISCRETE>
+{
+    std::discrete_distribution<RandValType> _generator;
+    Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
+        :_generator(minVal, maxVal)
+    {
+
+    }
+};
+#pragma endregion
 
 FS_NAMESPACE_END
 

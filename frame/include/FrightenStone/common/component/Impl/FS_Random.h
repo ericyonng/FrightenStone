@@ -100,6 +100,13 @@ typedef RandomSource<Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937_64> M
 typedef RandomSource<Int64, FS_RandomDefs::RAND_GEN_ALGORITHM_TYPE_MT19937> MT19937RandSrc;
 #pragma endregion
 
+// 随机数分布器
+template<typename ValType, FS_RandomDefs::RAND_DIS_TYPE>
+struct Distributor
+{
+
+};
+
 template<typename RandValType = Int64, FS_RandomDefs::RAND_DIS_TYPE DisType = FS_RandomDefs::RAND_DIS_TYPE_INT>
 class FS_Random
 {
@@ -111,137 +118,6 @@ public:
     // 随机数发生
     RandValType operator()(MT1993764RandSrc &randomSrc);
     RandValType operator()(MT19937RandSrc &randomSrc);
-
-private:
-    // 随机数分布器
-    template<typename ValType, FS_RandomDefs::RAND_DIS_TYPE>
-    struct Distributor
-    {
-
-    };
-
-    #pragma region dstributor/part template
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_SMALLINT>
-   {
-        std::uniform_int<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_INT>
-    {
-        std::uniform_int_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_REAL>
-    {
-        std::uniform_real_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_BERNOULLI>
-    {
-        std::bernoulli_distribution _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_GEOMETRIC>
-    {
-        std::geometric_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_EXPONENTIAL>
-    {
-        std::exponential_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_NORMAL>
-    {
-        std::normal_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_LOGNORMAL>
-    {
-        std::lognormal_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_BINOMIAL>
-    {
-        std::binomial_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_CAUCHY>
-    {
-        std::cauchy_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-
-    template<>
-    struct Distributor<RandValType, FS_RandomDefs::RAND_DIS_TYPE_DISCRETE>
-    {
-        std::discrete_distribution<RandValType> _generator;
-        Distributor(const RandValType minVal = RAND_DIS_NUM_SCOPE_MIN, const RandValType maxVal = ((std::numeric_limits<RandValType>::max)()))
-            :_generator(minVal, maxVal)
-        {
-
-        }
-    };
-    #pragma endregion
 
 private:
     Distributor<RandValType, DisType>           _distributor;
