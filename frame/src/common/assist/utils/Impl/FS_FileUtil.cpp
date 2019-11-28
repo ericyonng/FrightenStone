@@ -221,7 +221,7 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer)
                 ++bufferTmp;
                 ++cnt;
 
-                if(readDataLen <= cnt) 
+                if(bufferSize <= cnt) 
                     break;
             }
             else
@@ -266,12 +266,8 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, FS_String &outBuffer)
 #else
             if(get_c != '\n')
             {
-                *bufferTmp = get_c;
-                ++bufferTmp;
+                outBuffer.AppendBitData(reinterpret_cast<const char *>(&get_c), 1);
                 ++cnt;
-
-                if(readDataLen <= cnt)
-                    break;
             }
             else
             {
@@ -440,11 +436,20 @@ long FS_FileUtil::GetFileSize(FILE &fp)
 
 Int64 FS_FileUtil::GetFileSizeEx(const char *filepath)
 {
+#ifdef _WIN32
     struct _stat info;
-    if(_stat(filepath, &info) != 0)
+    if(::_stat(filepath, &info) != 0)
         return -1;
 
     return info.st_size;
+#else
+    struct stat info;
+    if(::stat(filepath, &info) != 0)
+        return -1;
+
+    return info.st_size;
+#endif
+
 }
 
 void FS_FileUtil::InsertFileTime(const FS_String &extensionName, const Time &timestamp, FS_String &fileName)
