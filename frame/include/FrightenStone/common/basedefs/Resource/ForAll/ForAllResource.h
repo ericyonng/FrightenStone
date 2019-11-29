@@ -53,9 +53,23 @@
 #pragma endregion
 
 #ifdef _WIN32
+#include<WinSock2.h>
+#include <ws2def.h>
+#include<ws2tcpip.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#pragma comment(lib,"ws2_32.lib")
+#include<MSWSock.h>
+#pragma comment (lib, "MSWSock.lib")
 #else
 #include <unistd.h>
 #include<errno.h>
+
+ // linux socket环境 以及相关网络接口
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #endif
 
 

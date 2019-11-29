@@ -39,6 +39,7 @@ class TestSysTemUtil
 public:
     static void Run()
     {
+#ifdef _WIN32
         // 内存情况
         std::cout << "cur process avail mem size:" << fs::SystemUtil::GetAvailPhysMemSize() << std::endl;
         std::cout << "cur process total mem size: " << fs::SystemUtil::GetTotalPhysMemSize() << std::endl;
@@ -63,6 +64,8 @@ public:
 //             std::cout << "process id:" << nPid << " path:" << pachCache << std::endl;
 //         }
         std::cout << fs::SystemUtil::IsProcessExist(fs::FS_String("TestSuit.exe")) << std::endl;
+#endif
     }
 };
+
 #endif

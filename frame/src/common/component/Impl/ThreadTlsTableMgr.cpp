@@ -44,7 +44,7 @@ ThreadTlsTableMgr::~ThreadTlsTableMgr()
 
 FS_TlsTable *ThreadTlsTableMgr::GetThisThreadTableNoLock()
 {
-    const Int32 threadId = static_cast<Int32>(SystemUtil::GetCurrentThreadId());
+    const UInt64 threadId = SystemUtil::GetCurrentThreadId();
     auto iterTable = _threadIdRefTlsTable.find(threadId);
     if(iterTable == _threadIdRefTlsTable.end())
         return NULL;
@@ -54,7 +54,7 @@ FS_TlsTable *ThreadTlsTableMgr::GetThisThreadTableNoLock()
 
 void ThreadTlsTableMgr::FreeThisThreadTable()
 {
-    const Int32 threadId = static_cast<Int32>(SystemUtil::GetCurrentThreadId());
+    const UInt64 threadId = SystemUtil::GetCurrentThreadId();
 
     _guard.Lock();
     auto iterTable = _threadIdRefTlsTable.find(threadId);
@@ -73,7 +73,7 @@ void ThreadTlsTableMgr::FreeThisThreadTable()
 
 FS_TlsTable *ThreadTlsTableMgr::_GetThisThreadTable()
 {
-    const Int32 threadId = static_cast<Int32>(SystemUtil::GetCurrentThreadId());
+    const UInt64 threadId = SystemUtil::GetCurrentThreadId();
     auto iterTable = _threadIdRefTlsTable.find(threadId);
     if(iterTable == _threadIdRefTlsTable.end())
         return NULL;
@@ -83,7 +83,7 @@ FS_TlsTable *ThreadTlsTableMgr::_GetThisThreadTable()
 
 FS_TlsTable *ThreadTlsTableMgr::_CreateThisThreadTable()
 {
-    const Int32 threadId = static_cast<Int32>(SystemUtil::GetCurrentThreadId());
+    const UInt64 threadId = SystemUtil::GetCurrentThreadId();
     auto iterTable = _threadIdRefTlsTable.find(threadId);
     if(iterTable == _threadIdRefTlsTable.end())
         iterTable = _threadIdRefTlsTable.insert(std::make_pair(threadId, new FS_TlsTable())).first;

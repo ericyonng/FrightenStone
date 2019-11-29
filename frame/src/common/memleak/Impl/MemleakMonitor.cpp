@@ -115,14 +115,14 @@ void MemleakMonitor::UnRegisterObjPool(const char *name)
     _locker.Unlock();
 }
 
-void MemleakMonitor::RegisterMemPoolPrintCallback(Int32 threadId, const IDelegate<void> *callback)
+void MemleakMonitor::RegisterMemPoolPrintCallback(UInt64 threadId, const IDelegate<void> *callback)
 {
     _locker.Lock();
     _threadIdRefMemPoolPrintCallback.insert(std::make_pair(threadId, callback));
     _locker.Unlock();
 }
 
-void MemleakMonitor::UnRegisterMemPoolPrintCallback(Int32 threadId)
+void MemleakMonitor::UnRegisterMemPoolPrintCallback(UInt64 threadId)
 {
     _locker.Lock();
     _threadIdRefMemPoolPrintCallback.erase(threadId);
@@ -198,13 +198,14 @@ void MemleakMonitor::PrintObjPoolInfo(const char *objName) const
 
 void MemleakMonitor::PrintSysMemoryInfo() const
 {
+#ifdef _WIN32
+
     // 系统内存情况
-    g_Log->mempool("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]"
+    g_Log->mempool("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%llu]]"
                    , SystemUtil::GetTotalPhysMemSize()
                    , SystemUtil::GetAvailPhysMemSize()
                    , SystemUtil::GetMemoryLoad());
 
-#ifdef _WIN32
     ProcessMemInfo memInfo = {};
     g_Log->mempool("process occupied memory info:");
     if(SystemUtil::GetProcessMemInfo(SystemUtil::GetCurProcessHandle(), memInfo))

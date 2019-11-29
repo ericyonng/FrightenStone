@@ -98,6 +98,7 @@ public:
         SystemUtil_GetProcessImageFileNameFailed = 907,         // 获取进程镜像文件名失败
         SystemUtil_QueryDosDeviceError = 908,                   // 查询驱动器错误
         SystemUtil_GetDriveError = 909,                         // 获取盘符失败
+        SystemUtil_GetProcNameFail = 910,                       // 获取进程名失败
         #pragma endregion
 
         #pragma region FS_IPUtil[1000, 1099]

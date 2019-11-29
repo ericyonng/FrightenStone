@@ -43,34 +43,34 @@ struct BASE_EXPORT ProcessMemInfo;
 class BASE_EXPORT SystemUtil
 {
 public:
+    /* 进程线程 */
+    // 获取程序目录
+    static Int32 GetProgramPath(bool isCurrentProcess, FS_String &processPath, UInt64 pid = 0);
+    // 获取当前进程名
+    static FS_String GetCurProgramName();
+    // 获取线程id
+    static UInt64 GetCurrentThreadId();
+    // 获取进程id
+    static Int32 GetCurProcessId();
+    // 结束进程
+    static Int32 CloseProcess(Int32 processId, ULong *lastError = NULL);
+
+    #ifdef _WIN32
     // 获取可用的内存大小
     static UInt64 GetAvailPhysMemSize();
     // 获取内存大小
     static UInt64 GetTotalPhysMemSize();
     // 内存使用率
-    static ULong GetMemoryLoad();
+    static UInt64 GetMemoryLoad();
     // 进程占用内存信息
     static bool GetProcessMemInfo(HANDLE processHandle, ProcessMemInfo &info);
 
-    /* 进程线程 */
-    // 获取程序目录
-    static Int32 GetProgramPath(bool isCurrentProcess, FS_String &processPath, ULong pid = 0);
-    // 获取当前进程名
-    static FS_String GetCurProgramName();
-    // 获取线程id
-    static ULong GetCurrentThreadId();
-    // 获取进程id
-    static Int32 GetCurProcessId();
-    // 结束进程
-    static Int32 CloseProcess(ULong processId, ULong *lastError = NULL);
-
-    #ifdef _WIN32
     // 创建进程快照（遍历进程相关）
     static HANDLE CreateProcessSnapshot();
     // 获取第一个进程id
-    static ULong GetFirstProcessPid(HANDLE &hSnapshot);
+    static UInt64 GetFirstProcessPid(HANDLE &hSnapshot);
     // 获取下一个进程id
-    static ULong GetNextProcessPid(HANDLE &hSnapshot);
+    static UInt64 GetNextProcessPid(HANDLE &hSnapshot);
     // 获取进程句柄
     static HANDLE GetCurProcessHandle();
     // 通过进程ID获取窗口句柄
@@ -79,6 +79,10 @@ public:
     static void BringWindowsToTop(HWND curWin);
     // 弹窗
     static void MessageBoxPopup(const FS_String &title, const FS_String &content);
+    // 获取当前调用线程所在的cpu编号信息
+    static void GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber);
+    // 遍历进程判断某进程是否在进程列表
+    static bool IsProcessExist(const FS_String &processName);
 
     /* 控制台 */
     static void LockConsole();
@@ -94,10 +98,6 @@ public:
     #endif
 
     /* 杂项 */
-    // 获取当前调用线程所在的cpu编号信息
-    static void GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber);
-    // 遍历进程判断某进程是否在进程列表
-    static bool IsProcessExist(const FS_String &processName);
     // 大小端判断
     static bool IsLittleEndian();
 };

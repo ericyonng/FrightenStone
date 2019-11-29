@@ -117,7 +117,7 @@ private:
 
 private:
     Int32 _id;
-    ULong _transferThreadId;
+    UInt64 _transferThreadId;
     IMemoryAlloctor *_sessionBufferAlloctor;
     UInt64 _maxAlloctorBytes;
     std::atomic<size_t> _curAlloctorOccupiedBytes;

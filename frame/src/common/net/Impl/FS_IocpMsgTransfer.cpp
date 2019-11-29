@@ -241,7 +241,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("do events error ret[%d]"), ret);
             else
             {
-                g_Log->net<FS_IocpMsgTransfer>("transfer id[%d] threadId[%lu] iocp quit", _id, SystemUtil::GetCurrentThreadId());
+                g_Log->net<FS_IocpMsgTransfer>("transfer id[%d] threadId[%llu] iocp quit", _id, SystemUtil::GetCurrentThreadId());
             }
 
             _RemoveSessions(true);
@@ -255,7 +255,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
         _RemoveSessions();
     }
 
-    g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("transfer id[%d] threadId[%lu] end"), _id, SystemUtil::GetCurrentThreadId());
+    g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("transfer id[%d] threadId[%llu] end"), _id, SystemUtil::GetCurrentThreadId());
 
     // 销毁sessions 此时要保证handler要还没关闭
     _iocp->Destroy();
@@ -271,7 +271,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
     // 处理iocp退出
     if(_ioEvent->_data._code == IocpDefs::IO_QUIT)
     {
-        g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("FS_IocpMsgTransfer iocp退出 threadId<%lu> code=%lld")
+        g_Log->sys<FS_IocpMsgTransfer>(_LOGFMT_("FS_IocpMsgTransfer iocp退出 threadId<%llu> code=%lld")
                                      , SystemUtil::GetCurrentThreadId(), _ioEvent->_data._code);
         return StatusDefs::IocpMsgTransfer_IocpQuit;
     }

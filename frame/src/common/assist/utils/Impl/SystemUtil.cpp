@@ -46,6 +46,7 @@
 #endif
 #pragma endregion
 
+#ifdef _WIN32
 #pragma region defines
 // 获取内存状态函数函数原型指针
 // typedef   void(WINAPI *__GlobalMemoryStatusExFunc)(LPMEMORYSTATUSEX);
@@ -77,6 +78,8 @@ static Int32 GetMemoryStatus(MEMORYSTATUSEX &status)
 }
 #pragma endregion
 
+#endif
+
 FS_NAMESPACE_BEGIN
 
 #ifdef _WIN32
@@ -107,58 +110,9 @@ static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 }
 #endif
 
-
-
-UInt64 SystemUtil::GetAvailPhysMemSize()
+Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, UInt64 pid)
 {
-    MEMORYSTATUSEX status;
-    auto ret = GetMemoryStatus(status);
-    if(ret != StatusDefs::Success)
-        return 0;
-
-    return status.ullAvailPhys;
-}
-
-UInt64 SystemUtil::GetTotalPhysMemSize()
-{
-    MEMORYSTATUSEX status;
-    auto ret = GetMemoryStatus(status);
-    if(ret != StatusDefs::Success)
-        return 0;
-
-    return status.ullTotalPhys;
-}
-
-ULong SystemUtil::GetMemoryLoad()
-{
-    MEMORYSTATUSEX status;
-    auto ret = GetMemoryStatus(status);
-    if(ret != StatusDefs::Success)
-        return 0;
-
-    return status.dwMemoryLoad;
-}
-// 进程占用内存信息
-bool SystemUtil::GetProcessMemInfo(HANDLE processHandle, ProcessMemInfo &info)
-{
-    PROCESS_MEMORY_COUNTERS_EX processInfo = {};
-    if(!GetProcessMemoryInfo(processHandle, (PROCESS_MEMORY_COUNTERS *)&processInfo, sizeof(PROCESS_MEMORY_COUNTERS_EX)))
-        return false;
-
-    info._maxHistorySetSize = processInfo.PeakWorkingSetSize;
-    info._curSetSize = processInfo.WorkingSetSize;
-    info._maxHistoryPagedPoolUsage = processInfo.QuotaPeakPagedPoolUsage;
-    info._pagedPoolUsage = processInfo.QuotaPagedPoolUsage;
-    info._maxHistoryNonPagedPoolUsage = processInfo.QuotaPeakNonPagedPoolUsage;
-    info._curNonPagedPoolUsage = processInfo.QuotaNonPagedPoolUsage;
-    info._curPageFileUsage = processInfo.PagefileUsage;
-    info._maxHistoryPageFileUsage = processInfo.PeakPagefileUsage;
-    info._processAllocMemoryUsage = processInfo.PrivateUsage;
-    return true;
-}
-
-Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, ULong pid)
-{
+#ifdef _WIN32
     HMODULE hModule = NULL;
     HANDLE hProc = NULL;
 
@@ -178,7 +132,7 @@ Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, 
             break;
         }
 
-        hProc = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
+        hProc = OpenProcess(PROCESS_QUERY_INFORMATION, false, static_cast<DWORD>(pid));
         if(UNLIKELY(!hProc))
             return StatusDefs::SystemUtil_OpenProcessQueryInfomationFailed;
 
@@ -240,6 +194,27 @@ Int32 SystemUtil::GetProgramPath(bool isCurrentProcess, FS_String &processPath, 
         CloseHandle(hProc);
 
     return StatusDefs::Success;
+#else
+
+    ssize_t ret = -1;
+    char buf[PATH_MAX + 1];
+    if(isCurrentProcess)
+    {
+        if((ret = readlink("/proc/self/exe", buf, PATH_MAX)) == -1)
+            return StatusDefs::SystemUtil_GetProcNameFail;
+    }
+    else
+    {
+        BUFFER64 proc = {};
+        sprintf(proc, "/proc/%llu/exe", pid);
+        if((ret = readlink(proc, buf, PATH_MAX)) == -1)
+            return StatusDefs::SystemUtil_GetProcNameFail;
+    }
+
+    buf[ret] = '\0';
+    processPath = buf;
+    return StatusDefs::Success;
+#endif
 }
 
 FS_String SystemUtil::GetCurProgramName()
@@ -249,17 +224,25 @@ FS_String SystemUtil::GetCurProgramName()
     return FS_DirectoryUtil::GetFileNameInPath(path);
 }
 
-ULong SystemUtil::GetCurrentThreadId()
+UInt64 SystemUtil::GetCurrentThreadId()
 {
+#ifdef _WIN32
     return ::GetCurrentThreadId();
+#else
+    return ::pthread_self();
+#endif
 }
 
 Int32 SystemUtil::GetCurProcessId()
 {
-    return _getpid();
+#ifdef _WIN32
+    return ::_getpid();
+#else
+    return ::getpid();
+#endif
 }
 
-Int32 SystemUtil::CloseProcess(ULong processId, ULong *lastError)
+Int32 SystemUtil::CloseProcess(Int32 processId, ULong *lastError)
 {
 #ifdef _WIN32
     if(!TerminateProcess(OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, false, processId), 0))
@@ -270,12 +253,79 @@ Int32 SystemUtil::CloseProcess(ULong processId, ULong *lastError)
         return StatusDefs::Failed;
     }
 #else
+    auto ret = kill(processId, SIGKILL);
+    if(ret != 0)
+    {
+        perror("kill process fail");
+        return StatusDefs::Failed;
+    }
 #endif
 
     return StatusDefs::Success;
 }
 
 #ifdef _WIN32
+
+UInt64 SystemUtil::GetAvailPhysMemSize()
+{
+#ifdef _WIN32
+    MEMORYSTATUSEX status;
+    auto ret = GetMemoryStatus(status);
+    if(ret != StatusDefs::Success)
+        return 0;
+
+    return status.ullAvailPhys;
+
+#else
+    // TODO:Linux
+#endif
+}
+
+UInt64 SystemUtil::GetTotalPhysMemSize()
+{
+#ifdef _WIN32
+    MEMORYSTATUSEX status;
+    auto ret = GetMemoryStatus(status);
+    if(ret != StatusDefs::Success)
+        return 0;
+
+    return status.ullTotalPhys;
+#else
+    // TODO:Linux
+#endif
+}
+
+UInt64 SystemUtil::GetMemoryLoad()
+{
+#ifdef _WIN32
+    MEMORYSTATUSEX status;
+    auto ret = GetMemoryStatus(status);
+    if(ret != StatusDefs::Success)
+        return 0;
+
+    return status.dwMemoryLoad;
+#else
+    // TODO:Linux
+#endif
+}
+// 进程占用内存信息
+bool SystemUtil::GetProcessMemInfo(HANDLE processHandle, ProcessMemInfo &info)
+{
+    PROCESS_MEMORY_COUNTERS_EX processInfo = {};
+    if(!GetProcessMemoryInfo(processHandle, (PROCESS_MEMORY_COUNTERS *)&processInfo, sizeof(PROCESS_MEMORY_COUNTERS_EX)))
+        return false;
+
+    info._maxHistorySetSize = processInfo.PeakWorkingSetSize;
+    info._curSetSize = processInfo.WorkingSetSize;
+    info._maxHistoryPagedPoolUsage = processInfo.QuotaPeakPagedPoolUsage;
+    info._pagedPoolUsage = processInfo.QuotaPagedPoolUsage;
+    info._maxHistoryNonPagedPoolUsage = processInfo.QuotaPeakNonPagedPoolUsage;
+    info._curNonPagedPoolUsage = processInfo.QuotaNonPagedPoolUsage;
+    info._curPageFileUsage = processInfo.PagefileUsage;
+    info._maxHistoryPageFileUsage = processInfo.PeakPagefileUsage;
+    info._processAllocMemoryUsage = processInfo.PrivateUsage;
+    return true;
+}
 
 HANDLE SystemUtil::CreateProcessSnapshot()
 {
@@ -286,7 +336,7 @@ HANDLE SystemUtil::CreateProcessSnapshot()
     return hSnapshot;
 }
 
-ULong SystemUtil::GetFirstProcessPid(HANDLE &hSnapshot)
+UInt64 SystemUtil::GetFirstProcessPid(HANDLE &hSnapshot)
 {
     PROCESSENTRY32 pe = {0};
     pe.dwSize = sizeof(pe);
@@ -295,7 +345,7 @@ ULong SystemUtil::GetFirstProcessPid(HANDLE &hSnapshot)
     return pe.th32ProcessID;
 }
 
-ULong SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
+UInt64 SystemUtil::GetNextProcessPid(HANDLE &hSnapshot)
 {
     PROCESSENTRY32 pe = {0};
     pe.dwSize = sizeof(pe);
@@ -337,6 +387,41 @@ void SystemUtil::MessageBoxPopup(const FS_String &title, const FS_String &conten
 #ifdef _WIN32
     auto hwnd = GetWindowHwndByPID(GetCurProcessId());
     ::MessageBoxA(hwnd, content.c_str(), title.c_str(), MB_ABORTRETRYIGNORE);
+#endif
+}
+
+void SystemUtil::GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber)
+{
+    PROCESSOR_NUMBER processorInfo = {};
+    GetCurrentProcessorNumberEx(&processorInfo);
+    cpuGroup = processorInfo.Group;
+    cpuNumber = processorInfo.Number;
+}
+
+bool SystemUtil::IsProcessExist(const FS_String &processName)
+{
+#ifdef _WIN32
+    // 遍历进程
+    auto hProcModule = CreateProcessSnapshot();
+    auto pid = GetFirstProcessPid(hProcModule);
+    bool isFirst = true;
+    fs::FS_String pachCache;
+    for(; isFirst ? isFirst : (pid > 0); pid = GetNextProcessPid(hProcModule))
+    {
+        isFirst = false;
+        pachCache.Clear();
+        if(GetProgramPath(false, pachCache, pid) != StatusDefs::Success)
+            continue;
+
+        auto iterExist = pachCache.GetRaw().find(processName.GetRaw());
+        if(iterExist != std::string::npos)
+            return true;
+    }
+
+    return false;
+#else
+    // TODO:linux
+    return false;
 #endif
 }
 
@@ -385,35 +470,6 @@ void SystemUtil::OutputToConsole(const FS_String &outStr)
 #endif
 
 
-bool SystemUtil::IsProcessExist(const FS_String &processName)
-{
-#ifdef _WIN32
-    // 遍历进程
-    auto hProcModule = CreateProcessSnapshot();
-    auto pid = GetFirstProcessPid(hProcModule);
-    bool isFirst = true;
-    fs::FS_String pachCache;
-    for(; isFirst ? isFirst : (pid > 0); pid = GetNextProcessPid(hProcModule))
-    {
-        isFirst = false;
-        pachCache.Clear();
-        if(GetProgramPath(false, pachCache, pid) != StatusDefs::Success)
-            continue;
-
-        auto iterExist = pachCache.GetRaw().find(processName.GetRaw());
-        if(iterExist != std::string::npos)
-            return true;
-    }
-
-    return false;
-#else
-    // TODO:linux
-    return false;
-#endif
-}
-
-
-
 bool SystemUtil::IsLittleEndian()
 {
     // 若是小端字节序，从低位开始存储，则顺序为l,?,?,b, 则endian_test.l的第一个字节为'l',若是大端则是'b'
@@ -426,13 +482,6 @@ bool SystemUtil::IsLittleEndian()
 }
 
 
-void SystemUtil::GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber)
-{
-    PROCESSOR_NUMBER processorInfo = {};
-    GetCurrentProcessorNumberEx(&processorInfo);
-    cpuGroup = processorInfo.Group;
-    cpuNumber = processorInfo.Number;
-}
 FS_NAMESPACE_END
 
 

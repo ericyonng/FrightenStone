@@ -61,7 +61,7 @@ private:
 
 private:
     Locker _guard;
-    std::map<Int32, FS_TlsTable *> _threadIdRefTlsTable;
+    std::map<UInt64, FS_TlsTable *> _threadIdRefTlsTable;
 };
 
 template class BASE_EXPORT Singleton<ThreadTlsTableMgr, AssistObjsDefs::NoDel>;

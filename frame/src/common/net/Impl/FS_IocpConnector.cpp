@@ -298,7 +298,7 @@ void FS_IocpConnector::_OnIocpMonitorTask(FS_ThreadPool *threadPool)
         // 处理iocp退出
         if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys<FS_IocpConnector>(_LOGFMT_("connector iocp退出 threadId<%lu> code=%lld")
+            g_Log->sys<FS_IocpConnector>(_LOGFMT_("connector iocp退出 threadId<%llu> code=%lld")
                                          , SystemUtil::GetCurrentThreadId(), ioEvent._data._code);
             break;
         }

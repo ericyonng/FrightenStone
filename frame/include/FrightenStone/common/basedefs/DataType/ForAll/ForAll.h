@@ -85,6 +85,7 @@ public:
 
 #ifndef _WIN32
 typedef void* HANDLE;
+#define MAX_PATH  PATH_MAX
 
 #endif
 

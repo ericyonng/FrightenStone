@@ -46,10 +46,10 @@ public:
             testElem = tlsTable->AllocElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
 
         Int32 &tlsCount = testElem->count;
-        Int32 threadId = fs::SystemUtil::GetCurrentThreadId();
+        UInt64 threadId = fs::SystemUtil::GetCurrentThreadId();
         for(Int32 i = 0; i < 10; ++i)
         {
-            g_Log->i<TestTlsTableTask>(_LOGFMT_("threadId[%d], tlsCount[%d]"), threadId, tlsCount);
+            g_Log->i<TestTlsTableTask>(_LOGFMT_("threadId[%llu], tlsCount[%d]"), threadId, tlsCount);
             ++tlsCount;
             Sleep(1000);
         }
@@ -67,7 +67,7 @@ class TestSystemTlsTableTask
 public:
     static void Task(fs::FS_ThreadPool *pool)
     {
-        Int32 threadId = fs::SystemUtil::GetCurrentThreadId();
+        UInt64 threadId = fs::SystemUtil::GetCurrentThreadId();
         for(Int32 i = 0; i < 10; ++i)
         {
             auto tlsTable = fs::FS_TlsUtil::GetUtilTlsTable();
@@ -75,7 +75,7 @@ public:
             if(!testElem)
                 testElem = tlsTable->AllocElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
             Int32 &tlsCount = testElem->count;
-            g_Log->i<TestSystemTlsTableTask>(_LOGFMT_("threadId[%d], tlsCount[%d]"), threadId, tlsCount);
+            g_Log->i<TestSystemTlsTableTask>(_LOGFMT_("threadId[%llu], tlsCount[%d]"), threadId, tlsCount);
             ++tlsCount;
         }
 
@@ -107,8 +107,8 @@ public:
         if(!tlsElem)
             tlsElem = tlsTable->AllocElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
 
-        const Int32 threadId = static_cast<Int32>(fs::SystemUtil::GetCurrentThreadId());
-        g_Log->i<TestTlsTablePerformanceTask>(_LOGFMT_("threadId[%d], escape[%lld] tlsTablecnt[%d]")
+        const UInt64 threadId = fs::SystemUtil::GetCurrentThreadId();
+        g_Log->i<TestTlsTablePerformanceTask>(_LOGFMT_("threadId[%llu], escape[%lld] tlsTablecnt[%d]")
                                               , threadId, (nowTime2 - nowTime1).GetTotalMicroSeconds(), tlsElem->count);
     }
 };
@@ -133,8 +133,8 @@ public:
         if(!tlsElem)
             tlsElem = tlsTable->AllocElement<fs::Tls_TestTls>(fs::TlsElemType::Tls_TestTls);
 
-        const Int32 threadId = static_cast<Int32>(fs::SystemUtil::GetCurrentThreadId());
-        g_Log->i<TestSystemTlsPerformanceTask>(_LOGFMT_("threadId[%d], escape[%lld] tlsTablecnt[%d]")
+        const UInt64 threadId = fs::SystemUtil::GetCurrentThreadId();
+        g_Log->i<TestSystemTlsPerformanceTask>(_LOGFMT_("threadId[%llu], escape[%lld] tlsTablecnt[%d]")
                                               , threadId, (nowTime2 - nowTime1).GetTotalMicroSeconds(), tlsElem->count);
     }
 };

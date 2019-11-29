@@ -55,8 +55,8 @@ public:
 
     void RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback);
     void UnRegisterObjPool(const char *name);
-    void RegisterMemPoolPrintCallback(Int32 threadId, const IDelegate<void> *callback);
-    void UnRegisterMemPoolPrintCallback(Int32 threadId);
+    void RegisterMemPoolPrintCallback(UInt64 threadId, const IDelegate<void> *callback);
+    void UnRegisterMemPoolPrintCallback(UInt64 threadId);
 
     void RegisterObjPoolModifyMaxAllowBytesCallback(IDelegate<void, UInt64> *callback);
 
@@ -76,7 +76,7 @@ private:
     static Locker _locker;
     std::map<FS_String, std::vector<IDelegate<size_t, Int64 &, Int64 &, const char *> *> *> _objNameRefPrintCallback;
     std::list<IDelegate<void, UInt64> *> _objPoolSetMaxAllowOccupiedBytes;
-    std::map<Int32, const IDelegate<void> *> _threadIdRefMemPoolPrintCallback;
+    std::map<UInt64, const IDelegate<void> *> _threadIdRefMemPoolPrintCallback;
 
     FS_ThreadPool *_printInfoPool;
 };

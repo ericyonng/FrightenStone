@@ -162,7 +162,7 @@ void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
 //     _msgConsumerGuard.Lock();
 //     _msgConsumerGuard.ResetSinal();
 //     _msgConsumerGuard.Unlock();
-    g_Log->sys<MessageQueue>(_LOGFMT_("_MsgQueueWaiterThread quit threadId[%lu]"), SystemUtil::GetCurrentThreadId());
+    g_Log->sys<MessageQueue>(_LOGFMT_("_MsgQueueWaiterThread quit threadId[%llu]"), SystemUtil::GetCurrentThreadId());
 
     _isWorking = false;
 }
@@ -389,7 +389,7 @@ void ConcurrentMessageQueue::_Generator2ConsumerQueueTask(ITask *task, FS_Thread
 //     _consumerGuards[consumerId]->Lock();
 //     _consumerGuards[consumerId]->ResetSinal();
 //     _consumerGuards[consumerId]->Unlock();
-    g_Log->sys<ConcurrentMessageQueue>(_LOGFMT_("_Generator2ConsumerQueueTask quit threadId[%lu]"), SystemUtil::GetCurrentThreadId());
+    g_Log->sys<ConcurrentMessageQueue>(_LOGFMT_("_Generator2ConsumerQueueTask quit threadId[%llu]"), SystemUtil::GetCurrentThreadId());
     _isWorking = false;
 }
 

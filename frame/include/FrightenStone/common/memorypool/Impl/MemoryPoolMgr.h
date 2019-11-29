@@ -69,7 +69,7 @@ public:
 private:
     void  _Init(size_t begin, size_t end, IMemoryAlloctor *alloctor);
     void _RegisterPrintCallback();
-    void _UnRegisterPrintCallback(Int32 threadId);
+    void _UnRegisterPrintCallback(UInt64 threadId);
     void _UpdateMemPoolOccupied(size_t newOccupiedBytes);
 
 private:
@@ -83,7 +83,7 @@ private:
     std::atomic<bool> _canCreateNewNode = true;
     const size_t _maxCanAllocMemLimit;      // 最大的块大小
     IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
-    std::atomic<Int32> _curThreadId;
+    std::atomic<UInt64> _curThreadId;
 };
 
 inline void MemoryPoolMgr::Lock()

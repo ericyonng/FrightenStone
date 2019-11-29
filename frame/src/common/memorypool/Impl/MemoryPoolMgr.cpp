@@ -185,7 +185,7 @@ void MemoryPoolMgr::PrintMemPoolInfo() const
 {
     size_t totalOccupiedBytes = 0;
     size_t bytesInUsed = 0;
-    g_Log->mempool("threadId[%d] mem pool total info:", (Int32)(_curThreadId));
+    g_Log->mempool("threadId[%llu] mem pool total info:", (UInt64)(_curThreadId));
     for(auto &alloctor : _allAlloctors)
     {
         alloctor->PrintMemInfo();
@@ -214,7 +214,7 @@ void MemoryPoolMgr::_RegisterPrintCallback()
     g_MemleakMonitor->RegisterMemPoolPrintCallback(_curThreadId, _printCallback);
 }
 
-void MemoryPoolMgr::_UnRegisterPrintCallback(Int32 threadId)
+void MemoryPoolMgr::_UnRegisterPrintCallback(UInt64 threadId)
 {
     g_MemleakMonitor->UnRegisterMemPoolPrintCallback(threadId);
     FS_Release(_printCallback);

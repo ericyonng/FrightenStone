@@ -89,6 +89,9 @@ Int32 FS_IPUtil::GetIPByDomain(
     if(getaddrinfo(domain, service, &hints, &netCardRes) != 0)
     {
         throw std::logic_error("getaddrinfo failed");
+#ifndef _WIN32
+        perror("getaddrinfo fail");
+#endif
         return StatusDefs::FS_IPUtil_GetAddrInfoFailed;
     }
 

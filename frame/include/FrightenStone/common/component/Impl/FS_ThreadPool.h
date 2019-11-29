@@ -102,7 +102,7 @@ private:
     std::atomic<bool> _isStopAddingTask{false};         // 是否停止添加任务
     std::atomic<bool> _isPoolWorking{true};             // 线程池是否工作
     std::atomic<bool> _initThreadMemPoolWhenThreadStart{false};      // 创建线程时候是否初始化线程局部内存池（只对剩余未创建的线程有效）(该部分内存仅限于线程生命周期内使用)
-    std::map<Int32, IMemoryPoolMgr *> _threadIdRefMemPool;  // 线程局部内存池
+    std::map<UInt64, IMemoryPoolMgr *> _threadIdRefMemPool;  // 线程局部内存池
     ConditionLocker _locker;                            // 线程安全对象
     std::list<ITask *> _tasks;                          // 任务队列
 };

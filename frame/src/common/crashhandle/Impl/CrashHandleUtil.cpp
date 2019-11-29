@@ -149,7 +149,7 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
     ::MINIDUMP_EXCEPTION_INFORMATION dmpInfo;
     EXCEPTION_POINTERS cache = *exception;
     dmpInfo.ExceptionPointers = &cache;
-    dmpInfo.ThreadId = GetCurrentThreadId();
+    dmpInfo.ThreadId = ::GetCurrentThreadId();
     dmpInfo.ClientPointers = TRUE;
 
     ::MiniDumpWriteDump(::GetCurrentProcess(),
@@ -410,7 +410,7 @@ void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
     g_MemleakMonitor->PrintObjPoolInfo();
 
     // 系统内存情况
-    g_Log->sys<CrashHandleUtil>(_LOGFMT_("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%lu]]")
+    g_Log->sys<CrashHandleUtil>(_LOGFMT_("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%llu]]")
                , SystemUtil::GetTotalPhysMemSize(), SystemUtil::GetAvailPhysMemSize(), SystemUtil::GetMemoryLoad());
 
     // 弹窗堆栈信息
