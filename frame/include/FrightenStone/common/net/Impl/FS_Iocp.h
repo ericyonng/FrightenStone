@@ -36,7 +36,6 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
-#include<MSWSock.h>
 
 FS_NAMESPACE_BEGIN
 

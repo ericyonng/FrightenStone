@@ -36,12 +36,14 @@
 #include "FrightenStone/common/net/Defs/IocpDefs.h"
 #include "FrightenStone/common/crashhandle/CrashHandle.h"
 
+#ifdef _WIN32
 #pragma region windows api
 #include <windows.h>
-#include <WinSock2.h>
-#pragma comment (lib, "ws2_32.lib")
+// #include <WinSock2.h>
+// #pragma comment (lib, "ws2_32.lib")
  // #pragma comment (lib, "MSWSock.lib")
 #pragma endregion
+#endif
 
 
 FS_NAMESPACE_BEGIN

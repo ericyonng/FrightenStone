@@ -41,6 +41,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #pragma comment(lib,"ws2_32.lib")
+#include<MSWSock.h>
+#pragma comment (lib, "MSWSock.lib")
 
 typedef unsigned long long MYSOCKET;
 #else

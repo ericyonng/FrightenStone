@@ -34,12 +34,14 @@
 #include <FrightenStone/common/status/status.h>
 #include "FrightenStone/common/component/Impl/Time.h"
 
+#ifdef _WIN32
 #pragma region windows
-#include<WinSock2.h>
-#include <ws2def.h>
-#include "ws2tcpip.h"
-#pragma comment(lib,"ws2_32.lib")
+// #include<WinSock2.h>
+// #include <ws2def.h>
+// #include "ws2tcpip.h"
+// #pragma comment(lib,"ws2_32.lib")
 #pragma endregion
+#endif
 
 #ifndef _WIN32
 #include<fcntl.h>

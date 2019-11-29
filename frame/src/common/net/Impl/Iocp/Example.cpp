@@ -36,11 +36,10 @@
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/net/Defs/IocpDefs.h"
 
+#ifdef _WIN32
 #include <windows.h>
-#include <WinSock2.h>
-#pragma comment (lib, "ws2_32.lib")
-#include<MSWSock.h>
-#pragma comment (lib, "MSWSock.lib")
+#endif
+
 FS_NAMESPACE_BEGIN
 
 #define IO_DATA_BUFF_SIZE 1024

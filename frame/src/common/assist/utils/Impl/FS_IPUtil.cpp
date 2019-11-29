@@ -31,14 +31,7 @@
  */
 #include "stdafx.h"
 #pragma region winsock 2
-#include <winsock2.h>
-#include <ws2def.h>
-// #include <MSWSock.h>
-#include<ws2tcpip.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#pragma comment(lib,"ws2_32.lib")
+
 #pragma endregion
 
 #include "FrightenStone/common/component/Impl/FS_String.h"
