@@ -64,6 +64,7 @@
 #pragma comment (lib, "MSWSock.lib")
 #else
 #include <unistd.h>
+#include <limits.h> // 含有PATH_MAX
 #include<errno.h>
 
  // linux socket环境 以及相关网络接口
