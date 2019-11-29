@@ -124,7 +124,7 @@ Int32 FS_IPUtil::GetIPByDomain(
 #else
 
         
-        if(inet_ntop(eFamily, &(addr.sin_addr.s_addr), ipcache, sizeof(ipcache)) == NULL)
+        if(inet_ntop(eFamily, &(addr->sin_addr.s_addr), ipcache, sizeof(ipcache)) == NULL)
         {
             perror("inet_ntop fail");
             continue;
