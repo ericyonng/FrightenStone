@@ -40,8 +40,8 @@ public:
     enum FAMILY_TYPE
     {
         FAMILY_TYPE_UNSPEC = 0,     //  protocal nonrelationship
-        FAMILY_TYPE_AF_INET = 2,    //  IPV4
-        FAMILY_TYPE_AF_INET6 = 23,	//  IPV6
+        FAMILY_TYPE_AF_INET = 2,    //  IPV4 AF_INET
+        FAMILY_TYPE_AF_INET6 = 23,	//  IPV6 AF_INET6
     };
 
     // 协议类型

@@ -78,6 +78,10 @@ Int32 FS_IPUtil::GetIPByDomain(
     // 不可同时为NULL
     if(UNLIKELY(!domain && !service))
         return StatusDefs::FS_IPUtil_ParamError;
+
+#ifndef _WIN32
+    BUFFER64 ipcache = {};
+#endif
     
     // 获取地址的参数设置
     struct addrinfo hints = {0};
@@ -111,12 +115,24 @@ Int32 FS_IPUtil::GetIPByDomain(
             continue;
         }
 
+#ifdef _WIN32
         ipAddrString.AppendFormat("%d.%d.%d.%d"
                 , (*addr).sin_addr.S_un.S_un_b.s_b1
                 , (*addr).sin_addr.S_un.S_un_b.s_b2
                 , (*addr).sin_addr.S_un.S_un_b.s_b3
                 , (*addr).sin_addr.S_un.S_un_b.s_b4);
+#else
 
+        
+        if(inet_ntop(eFamily, &(addr.sin_addr.s_addr), ipcache, sizeof(ipcache)) == NULL)
+        {
+            perror("inet_ntop fail");
+            continue;
+        }
+
+        ipAddrString.AppendFormat("%s", ipcache);
+#endif
+        freeaddrinfo(netCardRes);
         return StatusDefs::Success;
     }
 

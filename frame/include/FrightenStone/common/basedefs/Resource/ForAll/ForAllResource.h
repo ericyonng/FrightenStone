@@ -69,8 +69,8 @@
 
  // linux socket环境 以及相关网络接口
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+#include <sys/socket.h> // 含有 getaddrinfo等
+#include <netdb.h>      //
 #endif
 
 
