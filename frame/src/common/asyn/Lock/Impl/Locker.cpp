@@ -58,7 +58,7 @@ void Locker::Lock()
 #else
     auto ret = pthread_mutex_lock(&(_metaLocker.load()->_handle));
     if(ret != 0)
-        perror("mutex lock fail ret[%d]", ret);
+        perror("mutex lock fail");
 #endif
 }
 
@@ -72,7 +72,7 @@ void Locker::Unlock()
 #else
     int ret = pthread_mutex_unlock(&(_metaLocker.load()->_handle));
     if(ret != 0)
-        perror("mutex unlock fail ret[%d]", ret);
+        perror("mutex unlock fail");
 #endif // _WIN32
 }
 
@@ -122,7 +122,7 @@ void Locker::_Init()
 #else
     auto ret = pthread_mutex_init(&_metaLocker.load()->_handle, NULL);
     if(ret != 0)
-        perror("\nMetaLocker create fail ret[%d]\n", ret);
+        perror("\nMetaLocker create fail");
 
 #endif // _WIN32
 
@@ -138,7 +138,7 @@ void Locker::_Destroy()
 #ifndef _WIN32
     auto ret = pthread_mutex_destroy(&(_metaLocker.load()->_handle));
     if(ret != 0)
-        perror("pthread_mutex_destroy fail ret[%d]", ret);
+        perror("pthread_mutex_destroy fail");
 #endif
 
     auto obj = _metaLocker.load();
