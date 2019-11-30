@@ -68,7 +68,7 @@ public:
     // 线程任务执行
     static unsigned __stdcall ThreadHandler(void *param);
 #else
-    static void *ThreadHandler(void *arg);//线程处理函数
+    static void *ThreadHandler(void *param);//线程处理函数
 #endif
 
 

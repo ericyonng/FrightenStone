@@ -35,6 +35,7 @@
 #include <iostream>
 
 #include "FrightenStone/common/assist/utils/utils.h"
+#include "FrightenStone/common/socket/socket.h"
 
 #pragma region 
 #ifdef _WIN32
@@ -167,7 +168,7 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
     return 0L;
 }
 #else
-void *FS_ThreadPool::ThreadHandler(void *arg)
+void *FS_ThreadPool::ThreadHandler(void *param)
 {
     // 线程分离
     pthread_detach(pthread_self());
@@ -247,7 +248,7 @@ void FS_ThreadPool::Close()
         _locker.Lock();
         _locker.Sinal();
         _locker.Unlock();
-        Sleep(THREAD_POOL_WAIT_FOR_COMPLETED_TIME);
+        SocketUtil::Sleep(THREAD_POOL_WAIT_FOR_COMPLETED_TIME);
         _locker.Lock();
         if(_tasks.empty() && _curTotalNum <= 0)
         {
@@ -318,10 +319,11 @@ bool FS_ThreadPool::_CreateThread(Int32 numToCreate, UInt64 unixStackSize)
             break;
         }
 #else
+        pthread_t theadkey;
         pthread_attr_t threadAttr;
         pthread_attr_init(&threadAttr);
         pthread_attr_setstacksize(&threadAttr, unixStackSize);
-        ret = pthread_create(&thread, &threadAttr, &FS_ThreadPool::ThreadHandler, (void *)this);
+        ret = pthread_create(&theadkey, &threadAttr, &FS_ThreadPool::ThreadHandler, (void *)this);
         pthread_attr_destroy(&threadAttr);
         if(ret != 0)
         {
