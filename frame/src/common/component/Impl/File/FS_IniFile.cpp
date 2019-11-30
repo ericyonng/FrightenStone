@@ -156,7 +156,7 @@ bool FS_IniFile::_Init()
 
 bool FS_IniFile::_LoadAllCfgs()
 {
-#ifndef _WIN32
+//#ifndef _WIN32
     _UpdateIni();
 
     auto fp = FS_FileUtil::OpenFile(_filePath.c_str());
@@ -168,6 +168,8 @@ bool FS_IniFile::_LoadAllCfgs()
     // 一行一行的读取，读到读不出来为止
     _maxLine = 0;
     _lineRefContent.clear();
+    _segOrKeyRefLine.clear();
+    _segmentRefKeyValues.clear();
     std::map<FS_String, FS_String> *curKeyValues = NULL;
     FS_String curSegment;
     while(true)
@@ -186,7 +188,7 @@ bool FS_IniFile::_LoadAllCfgs()
         if(hasValidData)
             _OnReadValidData(validContent, contentType, _maxLine, curSegment, curKeyValues);
     }
-#endif
+//#endif
 
     return true;
 }
@@ -311,7 +313,7 @@ void FS_IniFile::_OnReadValidData(const FS_String &validContent
                                   , FS_String &curSegment
                                   , std::map<FS_String, FS_String> *&curKeyValues)
 {
-#ifndef _WIN32
+//#ifndef _WIN32
     if(contentType == IniFileDefs::ContentType::Segment)
     {// 是段
         curSegment = validContent;
@@ -349,7 +351,7 @@ void FS_IniFile::_OnReadValidData(const FS_String &validContent
             }
         }
     }
-#endif
+//#endif
 
 }
 
