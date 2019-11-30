@@ -51,6 +51,9 @@ const char *FS_String::endl = "\r\n";
 const char *FS_String::endl = "\n";
 #endif
 
+// 默认需要剔除的符号
+const std::string FS_String::_defStripChars = " \t\v\r\n\f";
+
 FS_String::FS_String()
 {
     _cache[0] = 0;

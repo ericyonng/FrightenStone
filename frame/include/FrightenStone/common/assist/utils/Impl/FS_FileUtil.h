@@ -55,8 +55,8 @@ public:
     static FILE *OpenFile(const char *fileName, bool isCreate = false, const char *openType = "rb+");
     static bool CopyFile(const char *srcFile, const char *destFile);
     static bool CopyFile(FILE &src, FILE &dest);
-    static UInt64 ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer);
-    static UInt64 ReadOneLine(FILE &fp, FS_String &outBuffer);
+    static UInt64 ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer);  // 不包含\n
+    static UInt64 ReadOneLine(FILE &fp, FS_String &outBuffer);              // 不包含\n
     static UInt64 ReadFile(FILE &fp, UInt64 bufferSize, char *&buffer);
     static UInt64 ReadFile(FILE &fp, FS_String &outString, Int64 sizeLimit = -1);
     static Int64 WriteFile(FILE &fp, const char *buffer, Int64 dataLenToWrite);

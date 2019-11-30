@@ -45,6 +45,8 @@ class Locker;
 class BASE_EXPORT FS_IniFile
 {
     OBJ_POOL_CREATE_DEF(FS_IniFile);
+
+    
 public:
     FS_IniFile();
     virtual ~FS_IniFile();
@@ -65,20 +67,29 @@ public:
 private:
     bool _Init();
     bool _LoadAllCfgs();
+
     const char *_ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize);
-    const char *_ReadFromDict(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize);
-    bool _WriteStr();
+    bool _WriteStr(const char *segmentName, const char *keyName, const char *wrStr);
     void _UpdateIni();
+
+    void _OnReadValidData(const FS_String &validContent
+                          , Int32 contentType
+                          , Int32 line
+                          , FS_String &curSegment
+                          , std::map<FS_String, FS_String> *&curKeyValues);
 
 private:
     Locker _lock;
     FS_String  _filePath;
 
-#ifndef _WIN32
-    FILE *_fp;
+// #ifndef _WIN32
     bool _isDirtied;
+    Int32 _maxLine;
+    std::map<Int32, FS_String> _lineRefContent;     // 每一行的元数据
+    std::map<FS_String, Int32> _segOrKeyRefLine;    // seg对应的行号或者seg-key所在的行号 例如seg, seg-key
     std::map<FS_String, std::map<FS_String, FS_String>> _segmentRefKeyValues;
-#endif
+    BUFFER256 _cache;
+// #endif
 };
 
 FS_NAMESPACE_END

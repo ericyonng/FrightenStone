@@ -195,6 +195,11 @@ inline bool FS_String::operator == (const FS_String &index) const
     return _buffer == index._buffer;
 }
 
+inline bool FS_String::operator == (const char *str) const
+{
+    return _buffer == str;
+}
+
 inline bool FS_String::operator != (const char *str) const
 {
     return _buffer != str;
@@ -257,8 +262,9 @@ inline FS_String::operator const std::string &() const
 
 inline size_t FS_String::CopyTo(char *destData, Int32 destSize, Int32 cntToCopy, Int32 srcOffset) const
 {
-    ::memcpy(destData, _buffer.data() + srcOffset, cntToCopy);
-    return cntToCopy;
+    const Int32 maxLen = std::min<Int32>(destSize, cntToCopy);
+    ::memcpy(destData, _buffer.data() + srcOffset, maxLen);
+    return maxLen;
 //     return _buffer._Copy_s(destData, static_cast<size_t>(destSize), static_cast<size_t>(cntToCopy)
 //                            , static_cast<size_t>(srcOffset));
 }

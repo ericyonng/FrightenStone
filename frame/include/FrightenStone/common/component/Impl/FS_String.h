@@ -57,6 +57,7 @@ public:
     typedef std::vector<FS_String> _These, FS_Strings;
     typedef std::string::size_type size_type;
     static const char *endl;
+    static const std::string _defStripChars;
 
 public:
     FS_String();
@@ -95,6 +96,7 @@ public:
     const char &operator [] (size_type index) const;    // no out range detect
 
     bool operator == (const FS_String &index) const;
+    bool operator == (const char *str) const;
     bool operator != (const char *str) const;
     bool operator != (const FS_String &str) const;
     FS_String operator + (const FS_String &other) const; // 
@@ -126,7 +128,7 @@ public:
     const FS_String &RemoveHeadZero();      // 移除容器中首部的0
 
     FS_String &AppendBitData(const char *bitData, Int64 dataSize);
-    _These Split(char sep, size_type max_split = -1) const;    // only ascii
+    _These Split(char sep, size_type max_split = -1) const;    // only ascii max_split分割的次数，一次分割两块数据一共分割max_split+1块数据
     _These Split(const char *sep, size_type max_split = -1) const;    // only ascii
     _These Split(const FS_String &sep, std::string::size_type max_split = -1, bool onlyLikely = false) const;
     _These Split(const _These &seps, size_type max_split = -1) const;
