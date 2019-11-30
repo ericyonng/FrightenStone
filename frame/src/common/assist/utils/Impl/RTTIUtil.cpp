@@ -36,6 +36,11 @@
 #include "FrightenStone/common/component/Impl/ThreadTlsTableMgr.h"
 #include "FrightenStone/common/assist/utils/Impl/FS_TlsUtil.h"
 
+#ifndef _WIN32
+// linux下类型识别接口相关
+#include <cxxabi.h>
+#endif
+
 FS_NAMESPACE_BEGIN
 
 // 从rtti中剔除str

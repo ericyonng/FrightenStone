@@ -32,7 +32,7 @@
 #include "stdafx.h"
 #include "FrightenStone/common/assist/utils/Impl/FS_GuidUtil.h"
 #ifndef _WIN32
-#include <uuid.h>
+#include <uuid/uuid.h> // еце§дкuuid/uuid.h
 #endif
 
 FS_NAMESPACE_BEGIN
