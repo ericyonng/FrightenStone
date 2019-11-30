@@ -43,16 +43,23 @@ FS_NAMESPACE_BEGIN
 OBJ_POOL_CREATE_DEF_IMPL(FS_IniFile, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_IniFile::FS_IniFile()
+#ifndef _WIN32
+    :_fp(NULL)
+    ,_isDirtied(false)
+#endif
 {
 
 }
 
 FS_IniFile::~FS_IniFile()
 {
-
+#ifndef _WIN32
+    FS_FileUtil::CloseFile(*_fp);
+    _fp = NULL;
+#endif
 }
 
-bool FS_IniFile::SetPath(const char *path)
+bool FS_IniFile::Init(const char *path)
 {
     // detect if file is existed
     if(UNLIKELY(!FS_FileUtil::IsFileExist(path)))
@@ -66,7 +73,7 @@ bool FS_IniFile::SetPath(const char *path)
 
     _filePath = path;
 
-    return true;
+    return _Init();
 }
 
 const FS_String &FS_IniFile::GetPath() const
@@ -86,12 +93,17 @@ void FS_IniFile::Unlock()
 
 const char * FS_IniFile::ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize)
 {
+#ifdef _WIN32
     if(UNLIKELY(_filePath.empty()))
         return NULL;
 
     // read string
     GetPrivateProfileString(segmentName, keyName, defaultStr, outStr, outSize, _filePath.c_str());
     return outStr;
+#else
+    return _ReadStr(segmentName, keyName, defaultStr, outStr, outSize);
+#endif
+
 }
 
 UInt32 FS_IniFile::ReadInt(const char *segmentName, const char *keyName, Int32 defaultInt)
@@ -114,5 +126,101 @@ bool FS_IniFile::ReadAllKeyValueOfSection(const char *segmentName, char *&outStr
 {
     return  GetPrivateProfileSection(segmentName, outStr, outSize, _filePath.c_str()) != 0;
 }
+
+bool FS_IniFile::_Init()
+{
+#ifndef _WIN32
+    // 读取所有配置内容
+    if(!_LoadAllCfgs())
+        return false;
+#endif
+
+    return true;
+}
+
+bool FS_IniFile::_LoadAllCfgs()
+{
+#ifndef _WIN32
+    if(_fp)
+    {
+        _UpdateIni();
+        FS_FileUtil::CloseFile(*_fp);
+        _fp = NULL;
+    }
+
+    _fp = FS_FileUtil::OpenFile(_filePath.c_str());
+    if(!_fp)
+        return false;
+
+    FS_FileUtil::ReadFile(*_fp, _content);
+#endif
+
+    return true;
+}
+
+const char *FS_IniFile::_ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize)
+{
+#ifndef _WIN32
+    auto result = _ReadFromDict(segmentName, keyName, defaultStr, outStr, outSize);
+    if(!result)
+        _Init();
+
+    return _ReadFromDict(segmentName, keyName, defaultStr, outStr, outSize);
+#endif
+
+    return NULL;
+}
+
+const char *FS_IniFile::_ReadFromDict(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize)
+{
+#ifndef _WIN32
+    auto iterKeyValues = _segmentRefKeyValues.find(segmentName);
+    if(iterKeyValues == _segmentRefKeyValues.end())
+    {// 从配置数据中读取
+        auto &content = _content.GetRaw();
+        auto pos = content.find(segmentName);
+        if(iterSegment == std::string::npos)
+            return NULL;
+
+        iterKeyValues = _segmentRefKeyValues.insert(std::make_pair(segmentName, std::map<FS_String, FS_String>())).first;
+    }
+
+    auto &keyValues = iterKeyValues->second;
+    auto iterValue = keyValues.find(keyName);
+    if(iterValue == keyValues.end())
+    {// 从配置数据中读取
+        auto &content = _content.GetRaw();
+        auto pos = content.find(segmentName);
+        if(pos == std::string::npos)
+            return NULL;
+
+        // 读取到下个segment之前的内容
+    }
+
+#endif
+        return NULL;
+}
+
+bool FS_IniFile::_WriteStr()
+{
+#ifndef _WIN32
+
+#endif
+
+    return true;
+}
+
+void FS_IniFile::_UpdateIni()
+{
+#ifndef _WIN32
+    if(!_isDirtied)
+        return;
+
+    _isDirtied = false;
+    FS_FileUtil::FlushFile(*_fp);
+#endif
+
+}
 FS_NAMESPACE_END
+
 

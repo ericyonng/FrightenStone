@@ -56,7 +56,7 @@ IFS_ServerConfigMgr::~IFS_ServerConfigMgr()
 Int32 IFS_ServerConfigMgr::Init()
 {
     _ini = new FS_IniFile;
-    _ini->SetPath(SVR_CONFIG_PATH_NAME);
+    _ini->Init(SVR_CONFIG_PATH_NAME);
 
     BUFFER256 cfgs;
     char *ptr = cfgs;

@@ -50,7 +50,7 @@ public:
     virtual ~FS_IniFile();
 
 public:
-    bool SetPath(const char *path);
+    bool Init(const char *path);
     const FS_String &GetPath() const;
 
     void Lock();
@@ -61,9 +61,26 @@ public:
     bool WriteStr(const char *segmentName, const char *keyName, const char *wrStr);
 
     bool ReadAllKeyValueOfSection(const char *segmentName, char *&outStr, UInt16 outSize);
+
+private:
+    bool _Init();
+    bool _LoadAllCfgs();
+    const char *_ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize);
+    const char *_ReadFromDict(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize);
+    bool _WriteStr();
+    void _UpdateIni();
+
 private:
     Locker _lock;
     FS_String  _filePath;
+
+#ifndef _WIN32
+    FILE *_fp;
+    bool _isDirtied;
+    FS_String _content;
+    std::map<FS_String, FS_String> _segmentRefContent;      // segµÄÄÚÈÝ
+    std::map<FS_String, std::map<FS_String, FS_String>> _segmentRefKeyValues;
+#endif
 };
 
 FS_NAMESPACE_END
