@@ -77,8 +77,6 @@ private:
 #ifndef _WIN32
     FILE *_fp;
     bool _isDirtied;
-    FS_String _content;
-    std::map<FS_String, FS_String> _segmentRefContent;      // segµÄÄÚÈİ
     std::map<FS_String, std::map<FS_String, FS_String>> _segmentRefKeyValues;
 #endif
 };

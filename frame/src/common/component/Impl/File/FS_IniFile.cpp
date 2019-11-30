@@ -152,7 +152,12 @@ bool FS_IniFile::_LoadAllCfgs()
     if(!_fp)
         return false;
 
-    FS_FileUtil::ReadFile(*_fp, _content);
+    FS_String content;
+    FS_FileUtil::ReadFile(*_fp, content);
+
+    // 解析seg,key value
+    // 读取每一行，遇到[表示新的segment
+    FS_FileUtil::ReadOneLine()
 #endif
 
     return true;
