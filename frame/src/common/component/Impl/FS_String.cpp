@@ -317,12 +317,12 @@ FS_String &FS_String::rstrip(const FS_String &chars)
         willStripChars = chars;
 
     FS_String &thisRef = *this;
-    const UInt64 thisSize = thisRef.size();
+    const size_type thisSize = thisRef.size();
 
-    UInt64 stripFrom = thisSize;
+    size_type stripFrom = thisSize;
     if(thisSize)
     {
-        for(UInt64 i = thisSize - 1; i >= 0; --i)
+        for(size_type i = thisSize - 1; i >= 0; --i)
         {
             bool found = false;
             const char &now = thisRef[i];

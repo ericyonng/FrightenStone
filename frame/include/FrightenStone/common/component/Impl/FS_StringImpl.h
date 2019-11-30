@@ -172,12 +172,12 @@ inline FS_String &FS_String::operator << (void *&&addr)
 
 inline char &FS_String::operator [] (Int32 index)
 {
-    return _buffer[index];
+    return _buffer[static_cast<size_t>(index)];
 }
 
 inline const char &FS_String::operator [] (Int32 index) const
 {
-    return _buffer[index];
+    return _buffer[static_cast<size_t>(index)];
 }
 
 inline char &FS_String::operator [] (size_type index)
