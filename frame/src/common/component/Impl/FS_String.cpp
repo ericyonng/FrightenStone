@@ -116,7 +116,11 @@ FS_String FS_String::ToHexString() const
     for(Int64 i = 0; i < bufferSize; ++i)
     {
         cache[0] = 0;
+#ifdef _WIN32
         const Int32 len = sprintf_s(cache, sizeof(cache), "%02x", static_cast<U8>(_buffer[i]));
+#else
+        const Int32 len = sprintf(cache, "%02x", static_cast<U8>(_buffer[i]));
+#endif
         cache[len] = 0;
         info << cache;
     }
@@ -313,26 +317,29 @@ FS_String &FS_String::rstrip(const FS_String &chars)
         willStripChars = chars;
 
     FS_String &thisRef = *this;
-    const long thisSize = static_cast<long>(thisRef.size());
+    const UInt64 thisSize = thisRef.size();
 
-    long stripFrom = thisSize;
-    for(long i = thisSize - 1; i >= 0; i--)
+    UInt64 stripFrom = thisSize;
+    if(thisSize)
     {
-        bool found = false;
-        const char &now = thisRef[i];
-        for(FS_String::size_type j = 0; j != willStripChars.size(); j++)
+        for(UInt64 i = thisSize - 1; i >= 0; --i)
         {
-            if(now == willStripChars[j])
+            bool found = false;
+            const char &now = thisRef[i];
+            for(FS_String::size_type j = 0; j != willStripChars.size(); j++)
             {
-                found = true;
-                break;
+                if(now == willStripChars[j])
+                {
+                    found = true;
+                    break;
+                }
             }
-        }
 
-        if(found)
-            stripFrom = i;
-        else
-            break;
+            if(found)
+                stripFrom = i;
+            else
+                break;
+        }
     }
 
     if(stripFrom != thisSize)
