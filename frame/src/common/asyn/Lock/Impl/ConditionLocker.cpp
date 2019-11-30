@@ -33,11 +33,12 @@
 #include "stdafx.h"
 #include "FrightenStone/common/asyn/Lock/Impl/ConditionLocker.h"
 #include "FrightenStone/common/status/status.h"
-#include <process.h>
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/component/Impl/Time.h"
 
 #ifdef _WIN32
+#include <process.h>
+
 #undef FS_IS_EVENT_SINAL_WAKE_UP
 #define FS_IS_EVENT_SINAL_WAKE_UP(waitRet)   \
 (static_cast<long long>(WAIT_OBJECT_0) <= (waitRet)) &&\
