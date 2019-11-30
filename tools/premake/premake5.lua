@@ -124,6 +124,9 @@ project "Frightenstone"
 			FS_ROOT_DIR .. "3rd/openssL/",
 			FS_ROOT_DIR .. "3rd/"
 		}
+		includedirs{
+		"../../3rd/openSSL/staticlib/$(Configuration)/include",
+		}
 	filter{}
 	
 	-- macos需要额外添加
@@ -135,7 +138,6 @@ project "Frightenstone"
 
     -- includedirs
     includedirs {
-        "../../3rd/openSSL/staticlib/$(Configuration)/include",
 		"../../",
 		"../../frame/include/",
 		"../../frame/frameheader/",
@@ -146,10 +148,15 @@ project "Frightenstone"
 
     -- links
     filter { "system:linux" }
+	    includedirs {
+        "/usr/include/",
+		}
         links {
             "rt",
             "uuid",
 			"pthread",
+			"crypto",
+			"ssl",
         }
 
     filter { "system:windows" }

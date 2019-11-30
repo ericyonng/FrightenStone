@@ -60,7 +60,8 @@
     #endif
 
 #else// linux
-
+#include "openssl/md5.h"
+#include "openssl/aes.h"
 #endif
 
 #pragma endregion
