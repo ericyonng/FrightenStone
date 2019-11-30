@@ -99,6 +99,7 @@ public:
         SystemUtil_QueryDosDeviceError = 908,                   // 查询驱动器错误
         SystemUtil_GetDriveError = 909,                         // 获取盘符失败
         SystemUtil_GetProcNameFail = 910,                       // 获取进程名失败
+        SystemUtil_NotLittleEndian = 911,                       // 非小端字节序
         #pragma endregion
 
         #pragma region FS_IPUtil[1000, 1099]

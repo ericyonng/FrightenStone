@@ -137,6 +137,14 @@ Int32 FS_ServerCore::Init()
         return ret;
     }
 
+    // 6.大小端判断，服务器只支持x86等小端字节序的cpu
+    if(!SystemUtil::IsLittleEndian())
+    {
+        ret = StatusDefs::SystemUtil_NotLittleEndian;
+        g_Log->e<FS_ServerCore>(_LOGFMT_("not little endian ret[%d]"), ret);
+        return ret;
+    }
+
     // cpu信息初始化
     if(!_cpuInfo->Initialize())
     {
