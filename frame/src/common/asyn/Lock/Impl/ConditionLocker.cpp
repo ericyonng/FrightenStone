@@ -31,6 +31,7 @@
  */
 
 #include "stdafx.h"
+#include "FrightenStone/common/asyn/Lock/Defs/MetaLocker.h"
 #include "FrightenStone/common/asyn/Lock/Impl/ConditionLocker.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
@@ -285,10 +286,7 @@ void ConditionLocker::Broadcast()
     if(ret != 0)
     {
         perror("cond broadcast error");
-        return false;
     }
-
-    return true;
 #endif
 }
 
