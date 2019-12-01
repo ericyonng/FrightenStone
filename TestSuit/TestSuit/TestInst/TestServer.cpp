@@ -620,36 +620,36 @@ void TestServer::Run()
         printf("little endian\n");
     }
 
-    fs::FS_ServerCore *serverCore = new fs::FS_ServerCore();
-    auto st = serverCore->Init();
-
-    if(st == StatusDefs::Success)
-    {
-        // 并发业务逻辑
-        auto dispatcherCnt = g_SvrCfg->GetDispatcherCnt();
-        std::vector<fs::IFS_BusinessLogic *> logics;
-        logics.resize(dispatcherCnt);
-        for(Int32 i = 0; i < dispatcherCnt; ++i)
-            logics[i] = new fs::MyLogic;
-        auto st = serverCore->Start(logics);
-        if(st == StatusDefs::Success)
-        {
-            getchar();
-        }
-        else
-        {
-            g_Log->e<TestServer>(_LOGFMT_("Start server fail st[%d] server will close now. please check! "));
-        }
-    }
-    else
-    {
-        std::cout << "server core init fail." << std::endl;
-    }
-
-    //serverCore->Wait();
-    serverCore->Close();
-    Fs_SafeFree(serverCore);
-    g_Log->FinishModule();
-    std::cout << "free server core" << std::endl;
+//     fs::FS_ServerCore *serverCore = new fs::FS_ServerCore();
+//     auto st = serverCore->Init();
+// 
+//     if(st == StatusDefs::Success)
+//     {
+//         // 并发业务逻辑
+//         auto dispatcherCnt = g_SvrCfg->GetDispatcherCnt();
+//         std::vector<fs::IFS_BusinessLogic *> logics;
+//         logics.resize(dispatcherCnt);
+//         for(Int32 i = 0; i < dispatcherCnt; ++i)
+//             logics[i] = new fs::MyLogic;
+//         auto st = serverCore->Start(logics);
+//         if(st == StatusDefs::Success)
+//         {
+//             getchar();
+//         }
+//         else
+//         {
+//             g_Log->e<TestServer>(_LOGFMT_("Start server fail st[%d] server will close now. please check! "));
+//         }
+//     }
+//     else
+//     {
+//         std::cout << "server core init fail." << std::endl;
+//     }
+// 
+//     //serverCore->Wait();
+//     serverCore->Close();
+//     Fs_SafeFree(serverCore);
+//     g_Log->FinishModule();
+//     std::cout << "free server core" << std::endl;
     getchar();
 }
