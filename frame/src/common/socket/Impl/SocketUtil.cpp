@@ -77,6 +77,7 @@ int SocketUtil::InitSocketEnv()
     // if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
     //  return (1);
     // 忽略异常信号，默认情况会导致进程终止
+    // TODO:Linux下
     signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -111,18 +112,18 @@ Int32 SocketUtil::SetNoBlock(MYSOCKET socket)
 #ifdef _WIN32
     ULong ul = 1;
     if(SOCKET_ERROR == ioctlsocket(socket, FIONBIO, &ul))
-        return StatusDefs::Socket_SetBlockParamError;
+        return StatusDefs::Socket_SetNoBlockParamError;
 #else
     int flags;
     if((flags = fcntl(fd, F_GETFL, NULL)) < 0) {
         // CELLLog_Warring("fcntl(%d, F_GETFL)", fd);
-        return StatusDefs::Socket_SetBlockParamError;
+        return StatusDefs::Socket_SetNoBlockParamError;
     }
 
     if(!(flags & O_NONBLOCK)) {
         if(fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
             // CELLLog_Warring("fcntl(%d, F_SETFL)", fd);
-            return StatusDefs::Socket_SetBlockParamError;
+            return StatusDefs::Socket_SetNoBlockParamError;
         }
     }
 #endif
@@ -132,18 +133,33 @@ Int32 SocketUtil::SetNoBlock(MYSOCKET socket)
 
 Int32 SocketUtil::SetBlock(MYSOCKET socket)
 {
+#ifdef _WIN32
     ULong ul = 0;
     if(0 != ioctlsocket(socket, FIONBIO, &ul))
-        return false;
+        return StatusDefs::Socket_SetBlockParamError;
 
-    return true;
+    return StatusDefs::Success;
+#else
+    int flags;
+    if((flags = fcntl(fd, F_GETFL, NULL)) < 0) {
+        // CELLLog_Warring("fcntl(%d, F_GETFL)", fd);
+        return StatusDefs::Socket_SetBlockParamError;
+    }
+
+    flags &= ~O_NONBLOCK;
+    if(fcntl(fd, F_SETFL, flags) == -1) {
+        // CELLLog_Warring("fcntl(%d, F_SETFL)", fd);
+        return StatusDefs::Socket_SetBlockParamError;
+    }
+#endif
+
 }
 
 
 Int32 SocketUtil::MakeReUseAddr(MYSOCKET socket)
 {
     int flag = 1;
-    if(SOCKET_ERROR == setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&flag, sizeof(flag))) {
+    if(SOCKET_ERROR == ::setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&flag, sizeof(flag))) {
         // CELLLog_Warring("setsockopt socket<%d> SO_REUSEADDR failed", (int)fd);
         return StatusDefs::Socket_Error;
     }
@@ -154,7 +170,7 @@ Int32 SocketUtil::MakeReUseAddr(MYSOCKET socket)
 Int32 SocketUtil::MakeNoDelay(MYSOCKET socket)
 {
     int flag = 1;
-    if(SOCKET_ERROR == setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, (const char *)&flag, sizeof(flag))) {
+    if(SOCKET_ERROR == ::setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, (const char *)&flag, sizeof(flag))) {
         // CELLLog_Warring("setsockopt socket<%d> IPPROTO_TCP TCP_NODELAY failed", (int)fd);
         return StatusDefs::Socket_Error;
     }
@@ -325,17 +341,22 @@ Int32 SocketUtil::SetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TY
         case SocketDefs:: SOCKET_CACHE_TYPE_RECV:
         {
             auto ret = setsockopt(socket, SOL_SOCKET, SO_RCVBUF, (char *)(&cacheSize), sizeof(cacheSize));
-            auto err = WSAGetLastError();
+            Int32 err = StatusDefs::Success;
+#ifdef _WIN32
+            err = WSAGetLastError();
             if(ret != 0)
                 return StatusDefs::Socket_SetSockOptFailed;
+#endif
         }
         break;
         case SocketDefs::SOCKET_CACHE_TYPE_SEND:
         {
             auto ret = setsockopt(socket, SOL_SOCKET, SO_SNDBUF, (char *)(&cacheSize), sizeof(cacheSize));
+#ifdef _WIN32
             auto err = WSAGetLastError();
             if(ret != 0)
                 return StatusDefs::Socket_SetSockOptFailed;
+#endif
         }
         break;
         default:
@@ -358,18 +379,22 @@ Int32 SocketUtil::GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TY
         {
             Int32 Len = sizeof(cacheSize);
             auto nRet = getsockopt(socket, SOL_SOCKET, SO_RCVBUF, (char *)(&cacheSize), &Len);
+#ifdef _WIN32
             auto nErr = WSAGetLastError();
             if(nRet != 0)
                 return StatusDefs::Socket_GetsockoptFailed;
+#endif
         }
         break;
         case SocketDefs::SOCKET_CACHE_TYPE_SEND:
         {
             Int32 Len = sizeof(cacheSize);
             auto ret = getsockopt(socket, SOL_SOCKET, SO_SNDBUF, (char *)(&cacheSize), &Len);
+#ifdef _WIN32
             auto err = WSAGetLastError();
             if(ret != 0)
                 return StatusDefs::Socket_GetsockoptFailed;
+#endif
         }
         break;
         default:

@@ -33,6 +33,8 @@
 #define __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpConnector_H__
 #pragma once
 
+#ifdef _WIN32
+
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/net/Impl/IFS_Connector.h"
@@ -129,5 +131,7 @@ inline void FS_IocpConnector::_AddToUsedIoDataBaseQueue(IoDataBase *used)
 #pragma endregion
 
 FS_NAMESPACE_END
+
+#endif
 
 #endif

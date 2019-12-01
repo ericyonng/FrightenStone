@@ -33,6 +33,8 @@
 #ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpMsgTransfer_H__
 #pragma once
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 inline Int32 FS_IocpMsgTransfer::GetSessionCnt()
 {
@@ -144,5 +146,8 @@ inline void FS_IocpMsgTransfer::_PrintAlloctorOccupiedInfo()
     g_Log->mempool("%s", memInfo.c_str());
 }
 FS_NAMESPACE_END
+
+#endif
+
 #endif
 

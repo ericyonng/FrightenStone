@@ -47,6 +47,8 @@
 #include "FrightenStone/common/component/Impl/TimeWheel/FS_Timer.h"
 #include "FrightenStone/common/assist/utils/utils.h"
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id)
@@ -309,4 +311,4 @@ void FS_IocpMsgDispatcher::_OnDelaySessionDisconnect(UInt64 sessionId)
 
 FS_NAMESPACE_END
 
-
+#endif

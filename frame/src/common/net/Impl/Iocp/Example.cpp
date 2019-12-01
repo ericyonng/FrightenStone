@@ -40,6 +40,8 @@
 #include <windows.h>
 #endif
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 #define IO_DATA_BUFF_SIZE 1024
@@ -331,3 +333,4 @@ int Example::Run()
 }
 
 FS_NAMESPACE_END
+#endif

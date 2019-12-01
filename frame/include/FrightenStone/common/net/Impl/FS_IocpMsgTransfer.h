@@ -33,6 +33,8 @@
 #define __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpMsgTransfer_H__
 #pragma once
 
+#ifdef _WIN32
+
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/net/Impl/IFS_MsgTransfer.h"
@@ -162,5 +164,7 @@ private:
 FS_NAMESPACE_END
 
 #include "FrightenStone/common/net/Impl/FS_IocpMsgTransferImpl.h"
+
+#endif
 
 #endif

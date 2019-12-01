@@ -33,6 +33,8 @@
 #define __Frame_Include_FrightenStone_Common_Net_Impl_FS_Iocp_H__
 #pragma once
 
+#ifdef _WIN32
+
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
@@ -103,5 +105,7 @@ private:
 };
 
 FS_NAMESPACE_END
+
+#endif
 
 #endif

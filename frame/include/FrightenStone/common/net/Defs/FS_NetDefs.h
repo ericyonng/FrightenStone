@@ -42,9 +42,11 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #else
+
 #ifdef __APPLE__
 #define _DARWIN_UNLIMITED_SELECT
 #endif // !__APPLE__
+
 #include<unistd.h> //uni std
 #include<arpa/inet.h>
 #include<string.h>

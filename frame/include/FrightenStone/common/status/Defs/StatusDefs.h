@@ -65,6 +65,7 @@ public:
         Socket_Unknown = 506,                                   // 未知
         Socket_SetBlockParamError = 507,                        // 设置套接字阻塞参数失败
         Socket_Error = 508,                                     // 套接字操作错误
+        Socket_SetNoBlockParamError = 508,                      // 设置套接字非阻塞失败
         #pragma endregion
 
         #pragma region Trigger[600, 699]

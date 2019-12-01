@@ -33,6 +33,8 @@
 
 #pragma once
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 inline FS_IocpBuffer::FS_IocpBuffer(size_t bufferSize, IMemoryAlloctor *memAlloctor)
@@ -146,5 +148,7 @@ inline void FS_IocpBuffer::_OnRecvSucCallback(size_t transferBytes)
 }
 
 FS_NAMESPACE_END
+
+#endif
 
 #endif

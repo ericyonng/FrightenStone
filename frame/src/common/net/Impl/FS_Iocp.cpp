@@ -45,6 +45,7 @@
 #pragma endregion
 #endif
 
+#ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
 
@@ -370,3 +371,5 @@ void FS_Iocp::GetClientAddrInfo(void *wsaBuff, sockaddr_in *&clientAddr)
 #pragma endregion
 
 FS_NAMESPACE_END
+
+#endif

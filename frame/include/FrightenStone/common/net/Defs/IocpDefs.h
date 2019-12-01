@@ -33,14 +33,12 @@
 #define __Frame_Include_FrightenStone_Common_Net_Defs_IocpDefs_H__
 #pragma once
 
+#ifdef _WIN32
+
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
-
-#pragma region IOCP macro
-#define IO_DATA_BUFF_SIZE 1024          // io数据缓冲大小
-#pragma endregion
 
 FS_NAMESPACE_BEGIN
 
@@ -120,6 +118,8 @@ struct BASE_EXPORT IO_EVENT
 
 
 FS_NAMESPACE_END
+
+#endif
 
 #endif
 

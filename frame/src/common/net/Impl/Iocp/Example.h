@@ -36,6 +36,8 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT Example
@@ -45,5 +47,7 @@ public:
 };
 
 FS_NAMESPACE_END
+
+#endif
 
 #endif

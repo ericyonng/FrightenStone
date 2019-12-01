@@ -34,6 +34,8 @@
 
 #pragma once
 
+#ifdef _WIN32
+
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/net/Defs/IFS_Buffer.h"
@@ -68,5 +70,7 @@ private:
 FS_NAMESPACE_END
 
 #include "FrightenStone/common/net/Defs/FS_IocpBufferImpl.h"
+
+#endif
 
 #endif

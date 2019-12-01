@@ -33,6 +33,8 @@
 #ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpSession_H__
 #pragma once
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor)
@@ -117,4 +119,7 @@ inline void FS_IocpSession::OnRecvSuc(size_t transferBytes, IoDataBase *ioData)
     ioData->_callback->Invoke(transferBytes);
 }
 FS_NAMESPACE_END
+
+#endif
+
 #endif

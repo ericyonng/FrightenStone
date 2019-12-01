@@ -50,6 +50,8 @@
 #include "FrightenStone/common/component/Impl/MessageQueue/MessageQueue.h"
 #include "FrightenStone/common/memleak/memleak.h"
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     :_threadPool(NULL)
@@ -731,4 +733,4 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
 
 FS_NAMESPACE_END
 
-
+#endif

@@ -32,9 +32,13 @@
 #ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_Iocp_H__
 #pragma once
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 FS_NAMESPACE_END
+
+#endif
 
 #endif
 

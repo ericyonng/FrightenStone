@@ -33,6 +33,8 @@
 #ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpMsgDispatcher_H__
 #pragma once
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 inline void FS_IocpMsgDispatcher::BindBusinessLogic(IFS_BusinessLogic *businessLogic)
@@ -51,5 +53,7 @@ inline Int32 FS_IocpMsgDispatcher::GetId() const
 }
 
 FS_NAMESPACE_END
+
+#endif
 
 #endif

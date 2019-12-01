@@ -49,6 +49,8 @@
 #include "FrightenStone/common/assist/utils/Impl/SystemUtil.h"
 #include "FrightenStone/common/component/Impl/File/FS_IniFile.h"
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 FS_IocpConnector::FS_IocpConnector()
     :_threadPool(NULL)
@@ -396,4 +398,4 @@ void FS_IocpConnector::_PostAcceptFromUsedDataBaseQuue(FS_Iocp *listenIocp)
 
 FS_NAMESPACE_END
 
-
+#endif

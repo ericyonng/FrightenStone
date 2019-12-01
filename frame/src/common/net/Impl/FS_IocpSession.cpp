@@ -33,6 +33,8 @@
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/FS_IocpBuffer.h"
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 
 OBJ_POOL_CREATE_DEF_IMPL(FS_IocpSession, __DEF_OBJ_POOL_OBJ_NUM__);
@@ -89,3 +91,5 @@ IoDataBase *FS_IocpSession::MakeSendIoData()
 }
 
 FS_NAMESPACE_END
+
+#endif
