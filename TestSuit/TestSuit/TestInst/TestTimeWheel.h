@@ -122,7 +122,7 @@ public:
         fs::g_TimeWheel.GetModifiedResolution(waitMilliSec);
         while(true)
         {
-            Sleep(static_cast<DWORD>(waitMilliSec.GetTotalMilliSeconds()));
+            fs::SystemUtil::Sleep(static_cast<DWORD>(waitMilliSec.GetTotalMilliSeconds()));
 
             // 转动时间轮盘
             fs::g_TimeWheel.RotateWheel();

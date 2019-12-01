@@ -250,7 +250,7 @@ void MemleakMonitor::_PrintInfoPerSeconds(FS_ThreadPool *pool)
 {
     while(pool->IsPoolWorking())
     {
-        Sleep(1000);
+        SystemUtil::Sleep(1000);
         _locker.Lock();
         PrintPoolAll();
         _locker.Unlock();

@@ -100,6 +100,8 @@ public:
     /* 杂项 */
     // 大小端判断
     static bool IsLittleEndian();
+    // 休眠
+    static void Sleep(UInt64 milliSec, UInt64 microSec = 0);
 };
 
 FS_NAMESPACE_END

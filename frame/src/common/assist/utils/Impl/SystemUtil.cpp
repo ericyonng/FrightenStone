@@ -481,7 +481,12 @@ bool SystemUtil::IsLittleEndian()
     return static_cast<char>(endian_test.l) != 'b';
 }
 
-
+void SystemUtil::Sleep(UInt64 milliSec, UInt64 microSec /*= 0*/)
+{
+    std::chrono::microseconds t(milliSec*Time::_microSecondPerMilliSecond + microSec);
+    std::this_thread::sleep_for(t);
+}
 FS_NAMESPACE_END
+
 
 

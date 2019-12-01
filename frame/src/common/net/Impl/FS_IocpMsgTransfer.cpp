@@ -151,7 +151,8 @@ void FS_IocpMsgTransfer::Close()
     {
         if(_sessionCnt <= 0)
             break;
-        Sleep(1000);
+
+        SystemUtil::Sleep(1000);
     }
 
     // 投递iocpquit事件
@@ -220,7 +221,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
         if(_sessions.empty())
         {
             _ClearSenderMessageQueue();
-            SocketUtil::Sleep(1);
+            SystemUtil::Sleep(1);
             continue;
         }
 

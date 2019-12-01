@@ -363,7 +363,7 @@ void FS_ServerCore::_OnSvrRuning(FS_ThreadPool *threadPool)
     while(threadPool->IsPoolWorking())
     {
         // 每隔100毫秒扫描一次
-        Sleep(100);
+        SystemUtil::Sleep(100);
         nowTime.FlushTime();
         const auto &timeSlice = nowTime - _lastStatisticsTime;
         if(timeSlice >= _statisticsInterval)

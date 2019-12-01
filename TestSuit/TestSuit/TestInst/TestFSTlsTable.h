@@ -51,7 +51,7 @@ public:
         {
             g_Log->i<TestTlsTableTask>(_LOGFMT_("threadId[%llu], tlsCount[%d]"), threadId, tlsCount);
             ++tlsCount;
-            Sleep(1000);
+            fs::SystemUtil::Sleep(1000);
         }
 
         // 释放本线程资源

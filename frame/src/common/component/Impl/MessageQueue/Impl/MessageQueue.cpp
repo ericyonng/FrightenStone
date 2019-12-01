@@ -278,7 +278,7 @@ void ConcurrentMessageQueue::BeforeClose()
         if(!hasWaiter)
             break;
 
-        Sleep(0);
+        SystemUtil::Sleep(0);
     }
 }
 
