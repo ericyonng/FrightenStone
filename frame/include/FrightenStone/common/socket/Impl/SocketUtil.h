@@ -61,7 +61,7 @@ public:
     // 转换为网络字节序
     static bool FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, sockaddr_in &addrObj);
     // 转换为主机信息
-    static bool GetAddrInfoFromNetInfo(const sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port);
+    static bool GetAddrInfoFromNetInfo(sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port);
     // 套接字等待超时
     static bool IsDetectTimeOut(
         SOCKET &socket

@@ -115,13 +115,13 @@ Int32 SocketUtil::SetNoBlock(MYSOCKET socket)
         return StatusDefs::Socket_SetNoBlockParamError;
 #else
     int flags;
-    if((flags = fcntl(fd, F_GETFL, NULL)) < 0) {
+    if((flags = fcntl(socket, F_GETFL, NULL)) < 0) {
         // CELLLog_Warring("fcntl(%d, F_GETFL)", fd);
         return StatusDefs::Socket_SetNoBlockParamError;
     }
 
     if(!(flags & O_NONBLOCK)) {
-        if(fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        if(fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
             // CELLLog_Warring("fcntl(%d, F_SETFL)", fd);
             return StatusDefs::Socket_SetNoBlockParamError;
         }
@@ -141,16 +141,18 @@ Int32 SocketUtil::SetBlock(MYSOCKET socket)
     return StatusDefs::Success;
 #else
     int flags;
-    if((flags = fcntl(fd, F_GETFL, NULL)) < 0) {
+    if((flags = fcntl(socket, F_GETFL, NULL)) < 0) {
         // CELLLog_Warring("fcntl(%d, F_GETFL)", fd);
         return StatusDefs::Socket_SetBlockParamError;
     }
 
     flags &= ~O_NONBLOCK;
-    if(fcntl(fd, F_SETFL, flags) == -1) {
+    if(fcntl(socket, F_SETFL, flags) == -1) {
         // CELLLog_Warring("fcntl(%d, F_SETFL)", fd);
         return StatusDefs::Socket_SetBlockParamError;
     }
+
+    return StatusDefs::Success;
 #endif
 
 }
@@ -223,7 +225,9 @@ Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &
     // 获取客户端地址
     if(getpeername(sSocket, (struct sockaddr*)&dstadd_in, &len) != 0)
     {
+#ifdef _WIN32
         lastError = WSAGetLastError();
+#endif
         return StatusDefs::FS_IPUtil_GetPeerNameFailed;
     }
 
@@ -250,9 +254,9 @@ bool SocketUtil::FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, soc
     return true;
 }
 
-bool SocketUtil::GetAddrInfoFromNetInfo(const sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port)
+bool SocketUtil::GetAddrInfoFromNetInfo(sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port)
 {
-    if(inet_ntop(addrObj.sin_family, const_cast<ULong *>(&addrObj.sin_addr.s_addr), ip, szip) == NULL)
+    if(inet_ntop(addrObj.sin_family, &addrObj.sin_addr.s_addr, ip, szip) == NULL)
         return false;
 
     port = ntohs(addrObj.sin_port);
@@ -378,7 +382,11 @@ Int32 SocketUtil::GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TY
         case SocketDefs::SOCKET_CACHE_TYPE_RECV:
         {
             Int32 Len = sizeof(cacheSize);
+#ifdef _WIN32
             auto nRet = getsockopt(socket, SOL_SOCKET, SO_RCVBUF, (char *)(&cacheSize), &Len);
+#else
+            auto nRet = getsockopt(socket, SOL_SOCKET, SO_RCVBUF, (char *)(&cacheSize), (socklen_t *)(&Len));
+#endif
 #ifdef _WIN32
             auto nErr = WSAGetLastError();
             if(nRet != 0)
@@ -389,7 +397,11 @@ Int32 SocketUtil::GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TY
         case SocketDefs::SOCKET_CACHE_TYPE_SEND:
         {
             Int32 Len = sizeof(cacheSize);
+#ifdef _WIN32
             auto ret = getsockopt(socket, SOL_SOCKET, SO_SNDBUF, (char *)(&cacheSize), &Len);
+#else
+            auto ret = getsockopt(socket, SOL_SOCKET, SO_SNDBUF, (char *)(&cacheSize), (socklen_t *)(&Len));
+#endif
 #ifdef _WIN32
             auto err = WSAGetLastError();
             if(ret != 0)

@@ -81,6 +81,8 @@ bool IFS_Session::HasMsgToRead() const
 #ifdef _WIN32
     return _recvBuffer->CastToBuffer<FS_IocpBuffer>()->HasMsg();
 #else
+    // TODO:Linux
+    return false;
 #endif
 }
 

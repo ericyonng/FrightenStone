@@ -41,7 +41,8 @@ IFS_Buffer *FS_BufferFactory::Create(size_t bufferSize, IMemoryAlloctor *memAllo
 #ifdef _WIN32
     return new FS_IocpBuffer(bufferSize, memAlloctor);
 #else
-
+    // TODO:Linux
+    return NULL;
 #endif
 }
 FS_NAMESPACE_END
