@@ -144,7 +144,7 @@ project "Frightenstone"
      }
 
     -- target prefix 前缀
-    targetprefix ""
+    targetprefix "lib"
 
     -- links
     filter { "system:linux" }
@@ -254,13 +254,13 @@ project "TestSuit"
 
     filter { "system:windows", "configurations:debug*" }
         links {
-            "Frightenstone_debug",
+            "libFrightenstone_debug",
         }
     filter {}
 
     filter { "system:windows", "configurations:release*" }
         links {
-            "Frightenstone",
+            "libFrightenstone",
         }
     filter {}
 
