@@ -297,17 +297,14 @@ project "TestSuit"
 		"../../protocols/**.cpp",
     }
 
-	include_libfs(false)
-	
-    -- includedirswrap\csFS\csharp\script_tools
-    includedirs {
+	includedirs {
 	    "../../",
 		"../../frame/include/",
 		"../../TestSuit/TestSuit/",
 		"../../protocols/Impl/",
     }
-
-    -- links
+	
+	-- links
     libdirs { FS_OUTPUT_DIR }
     filter { "system:linux" }
         links {
@@ -319,7 +316,8 @@ project "TestSuit"
 			"ssl",
         }
     filter {}
-
+	
+	include_libfs(false)
     filter { "system:not windows", "configurations:debug*" }
         links {
             "Frightenstone_debug",
