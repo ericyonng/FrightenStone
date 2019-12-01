@@ -132,28 +132,22 @@ bool IniFileMethods::SpiltKeyValue(const FS_String &validContent, FS_String &key
         return false;
 
     {// 消除key的无效值第一个英文字符开始
-        auto &keyRawRaw = keyRaw.GetRaw();
-        const auto len = keyRawRaw.length();
-        size_t validKeyPos = std::string::npos;
-        for(size_t i = 0; i < len; ++i)
-        {
-            const auto ch = keyRawRaw.at(i);
-            if(ch >= 'a'&&ch <= 'z' ||
-               ch >= 'A'&&ch <= 'Z')
-            {
-                validKeyPos = i;
-                break;
-            }
-        }
-
-        // 没有有效key
-        if(validKeyPos == std::string::npos)
+        keyRaw.lstrip();
+        keyRaw.rstrip();
+        if(!IniFileMethods::IsEnglishChar(keyRaw[0]))
             return false;
 
-        key = keyRawRaw.substr(validKeyPos, keyRawRaw.size() - validKeyPos);
+        // key必须是连续的英文或者数值
+        auto &keyRawRaw = keyRaw.GetRaw();
+        const auto len = keyRawRaw.length();
+        for(size_t i = 0; i < len; ++i)
+        {
+            if(!IniFileMethods::IsEnglishChar(keyRawRaw.at(i)) &&
+               !IniFileMethods::IsNumChar(keyRawRaw.at(i)))
+                return false;
+        }
 
-        // 去除右边无效符
-        key.rstrip();
+        key = keyRawRaw.substr(0, keyRawRaw.size());
     }
 
     if(key.empty())
@@ -187,4 +181,14 @@ bool IniFileMethods::IsNumChar(char ch)
     return ch >= '0'&&ch <= '9';
 }
 
+void IniFileMethods::MakeSegKey(const FS_String &segment, const FS_String &key, FS_String &segKeyOut)
+{
+    segKeyOut = segment + "-" + key;
+}
+
+void IniFileMethods::MakeKeyValuePairStr(const FS_String &key, const FS_String &value, FS_String &keyValueStrOut)
+{
+    keyValueStrOut = key + "=" + value;
+}
 FS_NAMESPACE_END
+

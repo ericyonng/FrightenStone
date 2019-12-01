@@ -58,38 +58,44 @@ public:
     void Lock();
     void Unlock();
 
-    const char *ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize);
-    UInt32 ReadInt(const char *segmentName, const char *keyName, Int32 defaultInt);
+    bool ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, FS_String &strOut);
+    Int64 ReadInt(const char *segmentName, const char *keyName, Int64 defaultInt);
     bool WriteStr(const char *segmentName, const char *keyName, const char *wrStr);
 
-    bool ReadAllKeyValueOfSection(const char *segmentName, char *&outStr, UInt16 outSize);
+    bool HasCfgs(const char *segmentName);
 
 private:
     bool _Init();
     bool _LoadAllCfgs();
 
-    const char *_ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize);
+    bool _ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, FS_String &strOut);
     bool _WriteStr(const char *segmentName, const char *keyName, const char *wrStr);
+
+    // 插入新行数据
+    bool _InsertNewLineData(Int32 line, const FS_String &segment, const FS_String &key,  const FS_String &value); // 会重新加载配置，容器迭代器全部失效
+    // 更新配置
     void _UpdateIni();
 
+    // 读取到有效的数据
     void _OnReadValidData(const FS_String &validContent
                           , Int32 contentType
                           , Int32 line
                           , FS_String &curSegment
                           , std::map<FS_String, FS_String> *&curKeyValues);
 
+    // 段的所包含的键值对的最大行
+    Int32 _GetSegmentKeyValueMaxValidLine(const FS_String &segment) const;  // 返回-1该段不存在
+
 private:
     Locker _lock;
     FS_String  _filePath;
 
-// #ifndef _WIN32
     bool _isDirtied;
     Int32 _maxLine;
     std::map<Int32, FS_String> _lineRefContent;     // 每一行的元数据
     std::map<FS_String, Int32> _segOrKeyRefLine;    // seg对应的行号或者seg-key所在的行号 例如seg, seg-key
     std::map<FS_String, std::map<FS_String, FS_String>> _segmentRefKeyValues;
-    BUFFER256 _cache;
-// #endif
+    std::map<FS_String, Int32> _segmentRefMaxValidLine;        // key：段， value:该段有效的最大行号
 };
 
 FS_NAMESPACE_END

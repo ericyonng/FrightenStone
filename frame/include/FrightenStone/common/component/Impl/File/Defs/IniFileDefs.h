@@ -65,6 +65,9 @@ public:
 
     static bool IsEnglishChar(char ch);
     static bool IsNumChar(char ch);
+
+    static void MakeSegKey(const FS_String &segment, const FS_String &key, FS_String &segKeyOut);
+    static void MakeKeyValuePairStr(const FS_String &key, const FS_String &value, FS_String &keyValueStrOut);
 };
 
 FS_NAMESPACE_END

@@ -48,20 +48,17 @@ FS_NAMESPACE_BEGIN
 OBJ_POOL_CREATE_DEF_IMPL(FS_IniFile, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_IniFile::FS_IniFile()
-// #ifndef _WIN32
     :_isDirtied(false)
     ,_maxLine(0)
-    , _cache{0}
-// #endif
 {
 
 }
 
 FS_IniFile::~FS_IniFile()
 {
-#ifndef _WIN32
+//#ifndef _WIN32
     _UpdateIni();
-#endif
+//#endif
 }
 
 bool FS_IniFile::Init(const char *path)
@@ -96,67 +93,48 @@ void FS_IniFile::Unlock()
     _lock.Unlock();
 }
 
-const char * FS_IniFile::ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize)
+bool FS_IniFile::ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, FS_String &strOut)
 {
-#ifdef _WIN32
     if(UNLIKELY(_filePath.empty()))
-        return NULL;
+        return false;
 
-    // read string
-    GetPrivateProfileString(segmentName, keyName, defaultStr, outStr, outSize, _filePath.c_str());
-    return outStr;
-#else
-    return _ReadStr(segmentName, keyName, defaultStr, outStr, outSize);
-#endif
-
+    return _ReadStr(segmentName, keyName, defaultStr, strOut);
 }
 
-UInt32 FS_IniFile::ReadInt(const char *segmentName, const char *keyName, Int32 defaultInt)
+Int64 FS_IniFile::ReadInt(const char *segmentName, const char *keyName, Int64 defaultInt)
 {
-    if(UNLIKELY(_filePath.empty()))
-        return 0;
+    FS_String cache;
+    if(_ReadStr(segmentName, keyName, "", cache) && !cache.empty())
+        return StringUtil::StringToInt64(cache.c_str());
 
-    return GetPrivateProfileInt(segmentName, keyName, defaultInt, _filePath.c_str());
-
-    char *ptr = _cache;
-    _cache[0] = 0;
-    if(_ReadStr(segmentName, keyName, "", ptr, sizeof(_cache)))
-        return static_cast<UInt32>(StringUtil::StringToUInt64(_cache));
-
-    return static_cast<UInt32>(defaultInt);
+    return defaultInt;
 }
 
 bool FS_IniFile::WriteStr(const char *segmentName, const char *keyName, const char *wrStr)
 {
-#ifdef _WIN32
     if(UNLIKELY(_filePath.empty()))
         return false;
 
-    return WritePrivateProfileString(segmentName, keyName, wrStr, _filePath.c_str());
-#else
     return _WriteStr(segmentName, keyName, wrStr);
-#endif
 }
 
-bool FS_IniFile::ReadAllKeyValueOfSection(const char *segmentName, char *&outStr, UInt16 outSize)
+bool FS_IniFile::HasCfgs(const char *segmentName)
 {
-    return  GetPrivateProfileSection(segmentName, outStr, outSize, _filePath.c_str()) != 0;
+    return  _segmentRefKeyValues.find(segmentName) != _segmentRefKeyValues.end();
 }
 
 bool FS_IniFile::_Init()
 {
-// #ifndef _WIN32
     // 读取所有配置内容
     if(!_LoadAllCfgs())
         return false;
-// #endif
 
     return true;
 }
 
 bool FS_IniFile::_LoadAllCfgs()
 {
-//#ifndef _WIN32
+    // 刷新文件
     _UpdateIni();
 
     auto fp = FS_FileUtil::OpenFile(_filePath.c_str());
@@ -170,16 +148,22 @@ bool FS_IniFile::_LoadAllCfgs()
     _lineRefContent.clear();
     _segOrKeyRefLine.clear();
     _segmentRefKeyValues.clear();
+    _segmentRefMaxValidLine.clear();
+
     std::map<FS_String, FS_String> *curKeyValues = NULL;
     FS_String curSegment;
     while(true)
     {
         FS_String lineData;
         auto cnt = FS_FileUtil::ReadOneLine(*fp, lineData);
+        if(cnt || !FS_FileUtil::IsEnd(*fp))
+            _lineRefContent.insert(std::make_pair(++_maxLine, lineData));
         if(!cnt)
-            break;
-
-        _lineRefContent.insert(std::make_pair(++_maxLine, lineData));
+        {
+            if(FS_FileUtil::IsEnd(*fp))
+                break;
+            continue;
+        }
 
         // 粗提取
         Int32 contentType = IniFileDefs::ContentType::Invalid;
@@ -188,44 +172,35 @@ bool FS_IniFile::_LoadAllCfgs()
         if(hasValidData)
             _OnReadValidData(validContent, contentType, _maxLine, curSegment, curKeyValues);
     }
-//#endif
 
     return true;
 }
 
-const char *FS_IniFile::_ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, char *&outStr, UInt16 outSize)
+bool FS_IniFile::_ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, FS_String &strOut)
 {
-//#ifndef _WIN32
     auto iterKeyValue = _segmentRefKeyValues.find(segmentName);
     if(iterKeyValue == _segmentRefKeyValues.end())
-        return NULL;
+        return false;
 
     auto &keyValue = iterKeyValue->second;
     auto iterValue = keyValue.find(keyName);
     if(iterValue == keyValue.end())
-        return NULL;
+        return false;
 
     if(iterValue->second.empty())
     {
-        const size_t maxLen = std::min<size_t>(strlen(defaultStr), outSize - 1);
-        ::memcpy(outStr, defaultStr, maxLen);
-        outStr[maxLen + 1] = 0;
+        strOut << defaultStr;
     }
     else
     {
-        const size_t maxLen = std::min<size_t>(strlen(iterValue->second.c_str()), outSize - 1);
-        iterValue->second.CopyTo(outStr, outSize, static_cast<Int32>(maxLen), 0);
+        strOut = iterValue->second;
     }
 
-    return outStr;
-//#endif
-
-    return NULL;
+    return true;
 }
 
 bool FS_IniFile::_WriteStr(const char *segmentName, const char *keyName, const char *wrStr)
 {
-// #ifndef _WIN32
     // 寻找段 没有便创建段，并追加行号
     auto iterKeyValue = _segmentRefKeyValues.find(segmentName);
     if(iterKeyValue == _segmentRefKeyValues.end())
@@ -244,29 +219,53 @@ bool FS_IniFile::_WriteStr(const char *segmentName, const char *keyName, const c
     auto iterValue = keyValue.find(keyName);
     if(iterValue == keyValue.end())
     {
+        const auto &segStr = iterKeyValue->first;
+        Int32 segMaxValidLine = _GetSegmentKeyValueMaxValidLine(segStr);
+        if(segMaxValidLine < 0)
+        {// 段不存在
+            return false;
+        }
+
+        // 更新keyvalue
         keyValue.insert(std::make_pair(keyName, wrStr));
-
-        FS_String segKey = iterKeyValue->first + "-" + keyName;
-        _segOrKeyRefLine.insert(std::make_pair(segKey, ++_maxLine));
-
         FS_String keyValueContent = keyName;
         keyValueContent << "=" << wrStr;
-        _lineRefContent.insert(std::make_pair(_maxLine, keyValueContent));
-        _isDirtied = true;
+
+        // 为key创建段中唯一索引
+        FS_String segKey = segStr + "-" + keyName;
+
+        // 插入新的行数据
+        return _InsertNewLineData(++segMaxValidLine, segStr, keyName, wrStr);
     }
     else
     {
         if(iterValue->second != wrStr)
         {
+            // 新值
             iterValue->second = wrStr;
 
+            // 新的键值对所在行
             FS_String segKey = iterKeyValue->first + "-" + keyName;
             auto iterLine = _segOrKeyRefLine.find(segKey);
 
             auto iterContent = _lineRefContent.find(iterLine->second);
             auto &content = iterContent->second;
+
+            // 分离
+            const auto &splitStr = content.Split(';', 1);
+
+            FS_String comments;
+            if(splitStr.size() >= 2)
+            {// 含有注释
+                comments << ";";
+                comments << splitStr[1];
+            }
+
             content = keyName;
             content << "=" << iterValue->second;
+            if(!comments.empty())
+                content << "\t\t\t\t" << comments;
+
             _isDirtied = true;
         }
     }
@@ -274,18 +273,54 @@ bool FS_IniFile::_WriteStr(const char *segmentName, const char *keyName, const c
     // 更新文件
     _UpdateIni();
 
-    // 寻找键 没有便创建键值对 并追加行号
-    // 写入 _segmentRefKeyValues _segOrKeyRefLine _lineRefContent（写入时段需要添加[]符号）
-    // 标脏
-    // 更新文件
-// #endif
-
     return true;
+}
+
+bool FS_IniFile::_InsertNewLineData(Int32 line, const FS_String &segment, const FS_String &key,  const FS_String &value)
+{
+    // 段不存在不可插入
+    auto iterKeyValue = _segmentRefKeyValues.find(segment);
+    if(iterKeyValue == _segmentRefKeyValues.end())
+        return false;
+
+    auto iterContent = _lineRefContent.find(line);
+    if(iterContent != _lineRefContent.end())
+    {// 已存在则需要挪动行数据
+        FS_String swapStr, frontStr;
+        frontStr = iterContent->second;
+        for(++iterContent; iterContent != _lineRefContent.end(); ++iterContent)
+        {
+            swapStr = iterContent->second;
+            iterContent->second = frontStr;
+            frontStr = swapStr;
+        }
+
+        // 最后一个节点挪到新的行
+        ++_maxLine;
+        _lineRefContent.insert(std::make_pair(_maxLine, frontStr));
+        auto iterToModify = _lineRefContent.find(line);
+        IniFileMethods::MakeKeyValuePairStr(key, value, iterToModify->second);
+    }
+    else
+    {// 不存在则不用挪直接插入
+        FS_String keyValue;
+        IniFileMethods::MakeKeyValuePairStr(key, value, keyValue);
+        _lineRefContent.insert(std::make_pair(line, keyValue));
+    }
+
+    // 更新最大行号
+    if(_maxLine < line)
+        _maxLine = line;
+
+    _isDirtied = true;
+    _UpdateIni();
+
+    // 重新加载配置
+    return _LoadAllCfgs();
 }
 
 void FS_IniFile::_UpdateIni()
 {
-#ifndef _WIN32
     if(!_isDirtied)
         return;
 
@@ -303,8 +338,6 @@ void FS_IniFile::_UpdateIni()
 
     FS_FileUtil::FlushFile(*fp);
     FS_FileUtil::CloseFile(*fp);
-#endif
-
 }
 
 void FS_IniFile::_OnReadValidData(const FS_String &validContent
@@ -313,7 +346,6 @@ void FS_IniFile::_OnReadValidData(const FS_String &validContent
                                   , FS_String &curSegment
                                   , std::map<FS_String, FS_String> *&curKeyValues)
 {
-//#ifndef _WIN32
     if(contentType == IniFileDefs::ContentType::Segment)
     {// 是段
         curSegment = validContent;
@@ -325,7 +357,9 @@ void FS_IniFile::_OnReadValidData(const FS_String &validContent
         // 记录段所在的行号
         auto iterLine = _segOrKeyRefLine.find(curSegment);
         if(iterLine == _segOrKeyRefLine.end())
+        {
             _segOrKeyRefLine.insert(std::make_pair(curSegment, line));
+        }
     }
     else if(contentType == IniFileDefs::ContentType::KeyValue)
     {// 是键值对
@@ -348,13 +382,36 @@ void FS_IniFile::_OnReadValidData(const FS_String &validContent
 
                     _segOrKeyRefLine.insert(std::make_pair(segKey, line));
                 }
+
+                // 更新键值对最大有效行号
+                auto iterMaxValidLine = _segmentRefMaxValidLine.find(curSegment);
+                if(iterMaxValidLine == _segmentRefMaxValidLine.end())
+                    iterMaxValidLine = _segmentRefMaxValidLine.insert(std::make_pair(curSegment, 0)).first;
+
+                if(iterMaxValidLine->second < line)
+                    iterMaxValidLine->second = line;
             }
         }
     }
-//#endif
-
 }
 
+Int32 FS_IniFile::_GetSegmentKeyValueMaxValidLine(const FS_String &segment) const
+{
+    // 若该段是空的则以segment所在行作为最大行号
+    auto iterLine = _segmentRefMaxValidLine.find(segment);
+    if(iterLine == _segmentRefMaxValidLine.end())
+    {
+        auto iterSegLine = _segOrKeyRefLine.find(segment);
+        if(iterSegLine == _segOrKeyRefLine.end())
+        {// 该段不存在
+            return -1;
+        }
+
+        return iterSegLine->second;
+    }
+
+    return iterLine->second;
+}
 
 FS_NAMESPACE_END
 

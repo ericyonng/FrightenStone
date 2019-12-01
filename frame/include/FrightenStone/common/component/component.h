@@ -47,6 +47,7 @@
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
 #include "FrightenStone/common/component/Impl/File/FS_File.h"
 #include "FrightenStone/common/component/Impl/File/LogFile.h"
+#include "FrightenStone/common/component/Impl/File/FS_IniFile.h"
 #include "FrightenStone/common/component/Impl/SmartVar/SmartVar.h"
 #include "FrightenStone/common/component/Defs/FS_AesDefs.h"
 #include "FrightenStone/common/component/Impl/Aes/FS_Aes.h"

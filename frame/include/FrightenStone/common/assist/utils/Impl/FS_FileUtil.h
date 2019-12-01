@@ -61,6 +61,7 @@ public:
     static UInt64 ReadFile(FILE &fp, FS_String &outString, Int64 sizeLimit = -1);
     static Int64 WriteFile(FILE &fp, const char *buffer, Int64 dataLenToWrite);
     static Int64 WriteFile(FILE &fp, const FS_String &bitData);
+    static bool IsEnd(FILE &fp);
     static bool CloseFile(FILE &fp);
     static bool IsFileExist(const char *fileName);
     static Int32 GetFileCusorPos(FILE &fp);

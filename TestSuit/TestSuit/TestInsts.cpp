@@ -67,6 +67,7 @@
 
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
 #include "TestSuit/TestSuit/TestInst/TestMemAlign.h"
+#include "TestSuit/TestSuit/TestInst/TestIniFile.h"
 
 void TestInsts::Run()
 {

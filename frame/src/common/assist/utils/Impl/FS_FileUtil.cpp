@@ -136,6 +136,8 @@ bool FS_FileUtil::CopyFile(const char *srcFile, const char *destFile)
     if(!destFp)
         return false;
 
+    clearerr(srcFp);
+    clearerr(destFp);
     unsigned char get_c = 0;
     char count = 0, wrCount = 0;
     const auto sizeByte = GetFileSize(*srcFp);  //
@@ -160,6 +162,8 @@ bool FS_FileUtil::CopyFile(const char *srcFile, const char *destFile)
 
 bool FS_FileUtil::CopyFile(FILE &src, FILE &dest)
 {
+    clearerr(&src);
+    clearerr(&dest);
     unsigned char get_c = 0;
     char count = 0, wrCount = 0;
     const auto sizeByte = GetFileSize(src);  //
@@ -189,6 +193,7 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer)
     unsigned char *bufferTmp = reinterpret_cast<unsigned char *>(buffer);
     memset(bufferTmp, 0, bufferSize);
 
+    clearerr(&fp);
     UInt64 cnt = 0;
     while(!feof(&fp))
     {
@@ -243,6 +248,7 @@ UInt64 FS_FileUtil::ReadOneLine(FILE &fp, UInt64 bufferSize, char *&buffer)
 
 UInt64 FS_FileUtil::ReadOneLine(FILE &fp, FS_String &outBuffer)
 {
+    clearerr(&fp);
     unsigned char get_c = 0;
     UInt64 cnt = 0;
     while(!feof(&fp))
@@ -290,6 +296,7 @@ UInt64 FS_FileUtil::ReadFile(FILE &fp, UInt64 bufferSize, char *&buffer)
     if(!buffer || !bufferSize)
         return 0;
 
+    clearerr(&fp);
     UInt64 readCnt = 0;
     unsigned char *bufferTmp = reinterpret_cast<unsigned char *>(buffer);
     unsigned char get_c = 0;
@@ -316,6 +323,7 @@ UInt64 FS_FileUtil::ReadFile(FILE &fp, UInt64 bufferSize, char *&buffer)
 
 UInt64 FS_FileUtil::ReadFile(FILE &fp, FS_String &outString, Int64 sizeLimit)
 {
+    clearerr(&fp);
     UInt64 readCnt = 0;
     unsigned char get_c = 0;
     while(!feof(&fp))
@@ -344,6 +352,7 @@ Int64 FS_FileUtil::WriteFile(FILE &fp, const char *buffer, Int64 dataLenToWrite)
 //     if(!buffer || dataLenToWrite == 0)
 //         return 0;
 
+    clearerr(&fp);
     Int64 cnt = 0;
     while(dataLenToWrite != 0)
     {
@@ -366,6 +375,11 @@ Int64 FS_FileUtil::WriteFile(FILE &fp, const char *buffer, Int64 dataLenToWrite)
 Int64 FS_FileUtil::WriteFile(FILE &fp, const FS_String &bitData)
 {
     return WriteFile(fp, bitData.GetRaw().data(), bitData.GetLength());
+}
+
+bool FS_FileUtil::IsEnd(FILE &fp)
+{
+    return feof(&fp);
 }
 
 bool FS_FileUtil::CloseFile(FILE &fp)
