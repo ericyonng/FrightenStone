@@ -231,6 +231,11 @@ project "TestSuit"
     filter { "system:linux" }
         links {
             "dl",
+			"rt",
+            "uuid",
+			"pthread",
+			"crypto",
+			"ssl",
         }
     filter {}
 
