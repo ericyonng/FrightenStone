@@ -31,6 +31,7 @@
  */
 #include "stdafx.h"
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
+#include "FrightenStone/exportbase.h"
 
 FS_NAMESPACE_BEGIN
 // 
