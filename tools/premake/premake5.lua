@@ -69,7 +69,7 @@ function include_libfs(do_post_build)
         "/usr/include/",
 		}
         libdirs {
-            FS_ROOT_DIR .. "/lib/linux/x64",
+            FS_ROOT_DIR .. "/usr/lib64/",
         }
     filter {}
 	
@@ -140,7 +140,7 @@ workspace ("Frightenstone_" .. _ACTION)
     targetdir (FS_OUTPUT_DIR)
 
     -- configurations 默认64位 不输出32位
-    configurations {"Debug", "Release"}
+    configurations {"debug", "release"}
 
     -- architecture 全部配置都生成64位程序
     filter { "configurations:*" }
