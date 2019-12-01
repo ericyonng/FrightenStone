@@ -50,6 +50,82 @@ function set_optimize_opts()
     filter {}
 end
 
+
+-- lib include实现
+function include_libfs(do_post_build)
+    -- includedirs
+    includedirs {
+        FS_ROOT_DIR .. "/frame/include/",
+    }
+
+    -- files
+    files {
+        FS_ROOT_DIR .. "/frame/include/**.h",
+    }
+
+    -- libdirs(linux)
+    filter { "system:linux"}
+        libdirs {
+            FS_ROOT_DIR .. "/lib/linux/x64",
+        }
+    filter {}
+	
+    -- libdirs(windows)
+    filter { "system:windows"}
+        libdirs {
+            FS_ROOT_DIR .. "/lib/win/x64",
+        }
+    filter {}
+
+    -- links(not windows)
+    filter { "system:not windows", "configurations:debug*" }
+        links {
+            "Frightenstone_debug",
+        }
+    filter {}
+    filter { "system:not windows", "configurations:release*" }
+        links {
+            "Frightenstone",
+        }
+    filter {}
+
+    -- links(windows)
+    filter { "system:windows" }
+        links {
+            -- "ws2_32",
+        }
+    filter {}
+    filter { "system:windows", "configurations:debug*" }
+        links {
+            "libFrightenstone_debug",
+        }
+    filter {}
+    filter { "system:windows", "configurations:release*" }
+        links {
+            "libFrightenstone",
+        }
+    filter {}
+	
+	    -- post build
+    if do_post_build then
+	    postbuildmessage "Copying dependencies of Frightenstone ..."
+
+        -- post build(windows)
+        filter { "system:windows", "configurations:debug" }
+        postbuildcommands("copy /Y " .. string.gsub("$(SolutionDir)../../lib/win/x64/libFrightenstone_debug.* $(TargetDir)libFrightenstone_debug.*", "/", "\\"))
+        filter { "system:windows", "configurations:release" }
+        postbuildcommands("copy /Y " .. string.gsub("$(SolutionDir)../../lib/win/x64/libFrightenstone.* $(TargetDir)libFrightenstone.9", "/", "\\"))
+        filter {}
+
+        -- post build(linux)
+        filter { "system:linux", "configurations:debug" }
+        postbuildcommands(string.format("cp -Rf %s/lib/linux/x64/libFrightenstone_debug.so %s/libFrightenstone_debug.so",  FS_ROOT_DIR, "${TARGETDIR}"))
+        filter { "system:linux", "configurations:release64" }
+        postbuildcommands(string.format("cp -Rf %s/lib/linux/x64/libFrightenstone.so %s/libFrightenstone.so",  FS_ROOT_DIR, "${TARGETDIR}"))
+        filter {}
+    end
+end
+
 -- zlib library:
 -- local ZLIB_LIB = "../../FS/3rd_party/zlib"
 -- #########################################################################
@@ -218,6 +294,8 @@ project "TestSuit"
 		"../../protocols/**.cpp",
     }
 
+	include_libfs(false)
+	
     -- includedirswrap\csFS\csharp\script_tools
     includedirs {
 	    "../../",
