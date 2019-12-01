@@ -42,6 +42,8 @@ IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sock
 #ifdef _WIN32
     return new FS_IocpSession(sessionId, sock, addrInfo, memAlloctor);
 #else
+    // TODO:linux
+    return NULL;
 #endif
 }
 
@@ -51,6 +53,8 @@ IFS_Session *FS_SessionFactory::Create(const BriefSessionInfo &sessionInfo, IMem
 #ifdef _WIN32
     return new FS_IocpSession(sessionInfo._sessionId, sessionInfo._sock, &(sessionInfo._addrInfo), memAlloctor);
 #else
+    // TODO:linux
+    return NULL;
 #endif
 }
 

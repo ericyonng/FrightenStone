@@ -34,8 +34,6 @@
 
 #pragma once
 
-#ifdef _WIN32
-
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/net/Defs/IFS_Buffer.h"
@@ -43,6 +41,8 @@
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
+
+#ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
 
