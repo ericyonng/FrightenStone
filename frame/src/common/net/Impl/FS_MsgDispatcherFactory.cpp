@@ -40,6 +40,8 @@ IFS_MsgDispatcher *FS_MsgDispatcherFactory::Create(UInt32 id)
 #ifdef _WIN32
     return new FS_IocpMsgDispatcher(id);
 #else
+    // TODO:Linux
+    return NULL;
 #endif
 }
 

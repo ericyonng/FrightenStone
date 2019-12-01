@@ -41,6 +41,8 @@ IFS_ServerConfigMgr *FS_ServerConfigMgrFactory::Create()
 #ifdef _WIN32
     return new IFS_ServerConfigMgr();
 #else
+    // TODO:Linux
+    return NULL;
 #endif
 }
 

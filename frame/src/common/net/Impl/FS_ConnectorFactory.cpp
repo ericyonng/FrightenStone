@@ -40,6 +40,8 @@ IFS_Connector *FS_ConnectorFactory::Create()
 #ifdef _WIN32
     return new FS_IocpConnector();
 #else
+    // TODO:Linux
+    return NULL;
 #endif
 }
 

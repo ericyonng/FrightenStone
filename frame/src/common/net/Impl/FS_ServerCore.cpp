@@ -129,13 +129,15 @@ Int32 FS_ServerCore::Init()
         return ret;
     }
 
+#ifdef _WIN32
     // 5. crash dump switch start
-    ret = fs::CrashHandleUtil::InitCrashHandleParams();
+    ret = CrashHandleUtil::InitCrashHandleParams();
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_ServerCore>(_LOGFMT_("init crash handle params fail ret[%d]"), ret);
         return ret;
     }
+#endif
 
     // 6.大小端判断，服务器只支持x86等小端字节序的cpu
     if(!SystemUtil::IsLittleEndian())
