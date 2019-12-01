@@ -97,8 +97,8 @@ void FS_SessionMgr::EraseSession(UInt64 sessionId)
     auto session = iterSession->second;
     if(!session->CanDestroy())
     {
-        g_Log->e<FS_SessionMgr>(_LOGFMT_("cant destroy session sessionId[%llu], stack trace back:[%s]")
-                                , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+        g_Log->e<FS_SessionMgr>(_LOGFMT_("cant destroy session sessionId[%llu]")
+                                , sessionId);
     }
 
     Fs_SafeFree(iterSession->second);

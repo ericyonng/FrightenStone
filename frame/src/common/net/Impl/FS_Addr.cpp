@@ -58,16 +58,16 @@ FS_Addr::FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo)
         Int32 st = SocketUtil::GetPeerAddr(sessionSock, sizeof(_ip), _ipPtr, _port, lastError);
         if(st != StatusDefs::Success)
         {
-            g_Log->e<FS_Addr>(_LOGFMT_("SocketUtil::GetPeerAddr fail st[%d] sessionId[%llu], socketId[%llu] lastError[%d]\n stack trace back:%s")
-                              , st, sessionId, sessionSock, lastError, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+            g_Log->e<FS_Addr>(_LOGFMT_("SocketUtil::GetPeerAddr fail st[%d] sessionId[%llu], socketId[%llu] lastError[%d]\n")
+                              , st, sessionId, sessionSock, lastError);
             return;
         }
 
         // todo 若要支持ipv6请修改为ipv6的family
         if(!SocketUtil::FillTcpAddrInfo(_ipPtr, _port, AF_INET, _addrInfo))
         {
-            g_Log->e<FS_Addr>(_LOGFMT_("SocketUtil::FillTcpAddrInfo fail, sessionId[%llu], socket[%llu]\n stack trace back:%s")
-                              , sessionId, sessionSock, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+            g_Log->e<FS_Addr>(_LOGFMT_("SocketUtil::FillTcpAddrInfo fail, sessionId[%llu], socket[%llu]")
+                              , sessionId, sessionSock);
             return;
         }
 
