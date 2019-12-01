@@ -1,4 +1,4 @@
-s/*!
+/*!
  * MIT License
  *
  * Copyright (c) 2019 ericyonng<120453674@qq.com>
