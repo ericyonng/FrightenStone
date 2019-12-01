@@ -65,6 +65,9 @@ function include_libfs(do_post_build)
 
     -- libdirs(linux)
     filter { "system:linux"}
+		includedirs {
+        "/usr/include/",
+		}
         libdirs {
             FS_ROOT_DIR .. "/lib/linux/x64",
         }
