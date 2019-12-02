@@ -58,7 +58,7 @@ public:
         fs::FS_String strRead;
         logFile.ReadOneLine(strRead);
         std::cout << strRead << std::endl;
-        logFile.PartitionFile();
+        logFile.PartitionFile(&nowTime);
     }
 };
 #endif
