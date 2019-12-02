@@ -50,7 +50,7 @@ inline void ILog::i(const char *funcName, Int32 codeLine, const char *fmt, const
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
                                    , newLogData->_logTime.ToString().c_str()
                                    , LogLevel::GetDescription(LogLevel::Info)
-                                   , typeid(ObjType).name()
+                                   , RTTIUtil::GetByType<ObjType>()
                                    , funcName
                                    , codeLine)
                             .AppendFormat(fmt, args...) << FS_String::endl;
@@ -67,7 +67,7 @@ inline void ILog::d(const char *funcName, Int32 codeLine, const char *fmt, const
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
                                    , newLogData->_logTime.ToString().c_str()
                                    , LogLevel::GetDescription(LogLevel::Debug)
-                                   , typeid(ObjType).name()
+                                   , RTTIUtil::GetByType<ObjType>()
                                    , funcName
                                    , codeLine)
                             .AppendFormat(fmt, args...) << FS_String::endl;
@@ -84,7 +84,7 @@ inline void ILog::w(const char *funcName, Int32 codeLine, const char *fmt, const
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
                                    , newLogData->_logTime.ToString().c_str()
                                    , LogLevel::GetDescription(LogLevel::Warning)
-                                   , typeid(ObjType).name()
+                                   , RTTIUtil::GetByType<ObjType>()
                                    , funcName
                                    , codeLine)
                             .AppendFormat(fmt, args...) << FS_String::endl;
@@ -101,7 +101,7 @@ inline void ILog::e(const char *funcName, Int32 codeLine, const char *fmt, const
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
                                    , newLogData->_logTime.ToString().c_str()
                                    , LogLevel::GetDescription(LogLevel::Error)
-                                   , typeid(ObjType).name()
+                                   , RTTIUtil::GetByType<ObjType>()
                                    , funcName
                                    , codeLine)
                             .AppendFormat(fmt, args...) << FS_String::endl;
@@ -133,7 +133,7 @@ inline void ILog::net(const char *fmt, const Args&... args)
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s]: "
                                    , newLogData->_logTime.ToString().c_str()
                                    , LogLevel::GetDescription(LogLevel::Net)
-                                   , typeid(ObjType).name())
+                                   , RTTIUtil::GetByType<ObjType>())
                             .AppendFormat(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Net, _GetLogFileIndex(LogFileType::Net), newLogData);
@@ -189,7 +189,7 @@ inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, con
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
                                    , newLogData->_logTime.ToString().c_str()
                                    , LogLevel::GetDescription(LogLevel::Sys)
-                                   , typeid(ObjType).name()
+                                   , RTTIUtil::GetByType<ObjType>()
                                    , funcName
                                    , codeLine)
         .AppendFormat(fmt, args...) << FS_String::endl;
@@ -206,7 +206,7 @@ inline void ILog::any(const char *fmt, const Args&... args)
     newLogData->_logToWrite.AppendFormat("%s<%s>[%s]: "
                                          , newLogData->_logTime.ToString().c_str()
                                          , LogLevel::GetDescription(LogLevel::Any)
-                                         , typeid(ObjType).name())
+                                         , RTTIUtil::GetByType<ObjType>())
         .AppendFormat(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Any, _GetLogFileIndex(LogFileType::Any), newLogData);

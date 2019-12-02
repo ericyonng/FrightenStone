@@ -40,6 +40,7 @@
 #include "FrightenStone/common/objpool/Defs/ObjPoolDefs.h"
 #include "FrightenStone/common/objpool/Defs/ObjAlloctor.h"
 #include "FrightenStone/common/objpool/Defs/AlloctorNode.h"
+#include "FrightenStone/common/assist/utils/Impl/RTTIUtil.h"
 
 FS_NAMESPACE_BEGIN
 

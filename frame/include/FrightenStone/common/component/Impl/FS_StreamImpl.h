@@ -154,7 +154,7 @@ inline bool FS_Stream::Read(ObjType &n, bool isOffset)
         return true;
     }
 
-    g_Log->e<FS_Stream>(_LOGFMT_("error, Cant Read. struct name[%s]."), typeid(ObjType).name());
+    g_Log->e<FS_Stream>(_LOGFMT_("error, Cant Read. struct name[%s]."),RTTIUtil::GetByType<ObjType>());
     return false;
 }
 
@@ -187,7 +187,7 @@ inline UInt32 FS_Stream::ReadArray(ObjType *arr, UInt32 len)
         }
     }
 
-    g_Log->e<FS_Stream>(_LOGFMT_("error,ReadArray failed. element name[%s]."), typeid(ObjType).name());
+    g_Log->e<FS_Stream>(_LOGFMT_("error,ReadArray failed. element name[%s]."), RTTIUtil::GetByType<ObjType>());
     return 0;
 }
 
@@ -286,7 +286,7 @@ inline bool FS_Stream::Write(const ObjType &n)
     bool canWrite = CanWrite(len);
     if(!canWrite && !_isPoolCreate)
     {// 不能写入且不是内存池创建的缓冲区
-        g_Log->e<FS_Stream>(_LOGFMT_("Write failed. obj name[%s]"), typeid(ObjType).name());
+        g_Log->e<FS_Stream>(_LOGFMT_("Write failed. obj name[%s]"), RTTIUtil::GetByType<ObjType>());
         return false;
     }
     else if(!canWrite)
@@ -315,7 +315,7 @@ inline bool FS_Stream::WriteArray(ObjType *data, UInt32 len)
     bool canWrite = CanWrite(static_cast<Int32>(bytes + sizeof(UInt32)));
     if(!canWrite && !_isPoolCreate)
     {// 不能写入且不是内存池创建的缓冲区
-        g_Log->e<FS_Stream>(_LOGFMT_("WriteArray failed. obj name[%s]"), typeid(ObjType).name());
+        g_Log->e<FS_Stream>(_LOGFMT_("WriteArray failed. obj name[%s]"), RTTIUtil::GetByType<ObjType>());
         return false;
     }
     else if(!canWrite)

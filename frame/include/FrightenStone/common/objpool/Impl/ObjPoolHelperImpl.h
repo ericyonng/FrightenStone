@@ -41,7 +41,7 @@ inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
     _alloctor->InitPool();
 
     // 创建委托
-   ObjPoolMethods::RegisterToMemleakMonitor(typeid(ObjType).name()
+   ObjPoolMethods::RegisterToMemleakMonitor(RTTIUtil::GetByType<ObjType>()
                                             , DelegatePlusFactory::Create(this, &ObjPoolHelper<ObjType>::PrintObjPool));
 
    ObjPoolMethods::RegisterModifyAllowMaxBytes(DelegatePlusFactory::Create(_alloctor, &IObjAlloctor<ObjType>::SetAllowMaxOccupiedBytes));
@@ -52,7 +52,7 @@ inline ObjPoolHelper<ObjType>::ObjPoolHelper(size_t objAmount)
 template<typename ObjType>
 inline ObjPoolHelper<ObjType>::~ObjPoolHelper()
 {
-    ObjPoolMethods::UnRegisterMemleakDelegate(typeid(ObjType).name());
+    ObjPoolMethods::UnRegisterMemleakDelegate(RTTIUtil::GetByType<ObjType>());
 
     _locker.Lock();
 
@@ -74,7 +74,7 @@ inline size_t ObjPoolHelper<ObjType>::GetMemleakObjNum() const
 template<typename ObjType>
 inline const char *ObjPoolHelper<ObjType>::GetObjName() const
 {
-    return typeid(ObjType).name();
+    return RTTIUtil::GetByType<ObjType>();
 }
 
 template<typename ObjType>
@@ -95,7 +95,7 @@ inline size_t ObjPoolHelper<ObjType>::PrintObjPool(Int64 &poolOccupiedBytes, Int
     objInUsed = _alloctor->GetObjInUse();
     auto memInUsingBytes = _alloctor->GetObjInUse()*IObjAlloctor<ObjType>::_objBlockSize;
     poolOccupiedBytes = _alloctor->GetBytesOccupied();
-    ObjPoolMethods::PrintObjPoolInfo(typeid(ObjType).name()
+    ObjPoolMethods::PrintObjPoolInfo(RTTIUtil::GetByType<ObjType>()
                                      , _alloctor->GetNodeCnt()
                                      , _alloctor->GetTotalObjBlocks()
                                      , _alloctor->GetObjBlockSize()

@@ -40,6 +40,7 @@
 
 #include "FrightenStone/common/log/Defs/LogData.h"
 #include "FrightenStone/common/log/Defs/LogFileType.h"
+#include "FrightenStone/common/assist/utils/Impl/RTTIUtil.h"
 
  // 函数与行号便利宏
 #undef _FUNC_LINE_ARGS_
