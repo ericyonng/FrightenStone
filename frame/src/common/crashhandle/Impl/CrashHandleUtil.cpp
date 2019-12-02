@@ -41,10 +41,15 @@
 #include "iostream"
 #include "FrightenStone/common/memleak/memleak.h"
 
+#ifndef _WIN32
+// linux下堆栈追踪头文件
+#include <execinfo.h>
+#endif
+
 #define __USE_FS_DBGHELP__
 #include "3rd/3rd.h"
 
-#if _WIN32
+#ifdef _WIN32
 #define FS_CFG_APP_DUMPFILE_DUMPTYPES               (MiniDumpWithFullMemory | \
                                                      MiniDumpWithFullMemoryInfo | \
                                                      MiniDumpIgnoreInaccessibleMemory | \
