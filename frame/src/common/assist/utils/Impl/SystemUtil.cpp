@@ -464,9 +464,11 @@ Int32 SystemUtil::GetConsoleColor()
         __g_consoleLock.Unlock();
         return StatusDefs::Error;
     }
-#endif
 
     return info.wAttributes;
+#endif
+
+    return 0;
 }
 
 void SystemUtil::OutputToConsole(const FS_String &outStr)
