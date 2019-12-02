@@ -51,6 +51,8 @@ public:
         auto st = g_Log->InitModule();
         if(st != StatusDefs::Success)
             std::cout << "init log fail" << std::endl;
+        else
+            std::cout << "init log suc" << std::endl;
         while(true)
         {
             fs::SystemUtil::Sleep(1000);
