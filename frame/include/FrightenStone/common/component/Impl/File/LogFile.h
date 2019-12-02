@@ -47,16 +47,16 @@ public:
     virtual ~LogFile();
 
 public:
-    bool IsDayPass(const Time &lastModifyTime) const;
-    void UpdateLastTimestamp();
+    bool IsDayPass(const Time &nowTime) const;
+    void UpdateLastPassDayTime(Time *nowTime = NULL);
 
     // 分割文件
     bool IsTooLarge(Int64 limitSize) const;
-    void PartitionFile(bool isSysFirstCreate = false);
+    void PartitionFile(bool isSysFirstCreate = false, Time *nowTime = NULL);
 
 protected:
     Int32 _partNo;
-    Time  _lastModifyTime;
+    Time  _lastPassDayTime;
 };
 
 FS_NAMESPACE_END

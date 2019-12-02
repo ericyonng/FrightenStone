@@ -45,14 +45,20 @@ inline bool LogFile::IsTooLarge(Int64 limitSize) const
     return _fileSize >= limitSize;
 }
 
-inline bool LogFile::IsDayPass(const Time &lastModifyTime) const
+inline bool LogFile::IsDayPass(const Time &nowTime) const
 {
-    return _lastModifyTime.GetZeroTime() != lastModifyTime.GetZeroTime();
+    return _lastPassDayTime.GetZeroTime() != nowTime.GetZeroTime();
 }
 
-inline void LogFile::UpdateLastTimestamp()
+inline void LogFile::UpdateLastPassDayTime(Time *nowTime)
 {
-    _lastModifyTime.FlushTime();
+    if(!nowTime)
+    {
+        _lastPassDayTime.FlushTime();
+        return;
+    }
+
+    _lastPassDayTime = *nowTime;
 }
 
 FS_NAMESPACE_END

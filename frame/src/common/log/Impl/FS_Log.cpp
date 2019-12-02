@@ -242,7 +242,7 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
 
         // 4.创建文件
         logFile = new LogFile;
-        if(!logFile->Open(logName.c_str(), true, "ab+", false))
+        if(!logFile->Open(logName.c_str(), true, "ab+", true))
         {
             ret = StatusDefs::Log_CreateLogFileFail;
             ASSERT(!"log file open fail");
@@ -251,7 +251,7 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
 
         // 系统启动备份旧日志
         logFile->PartitionFile(isFirstCreate);
-        logFile->UpdateLastTimestamp();
+        logFile->UpdateLastPassDayTime();
         _logFiles[fileUnqueIndex] = logFile;
 
         // 4.创建日志内容
@@ -417,6 +417,14 @@ void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
     LogFile *logFile = _logFiles[logFileIndex];
     for(auto &iterLog : *swapCache)
     {
+        // 跨天重新打开
+        if(logFile->IsDayPass(iterLog->_logTime))
+        {
+            // 跨天需要重新打开文件
+            logFile->Reopen(&iterLog->_logTime);
+            logFile->UpdateLastPassDayTime(&iterLog->_logTime);
+        }
+
         // 文件过大转储到分立文件
         if(logFile->IsTooLarge(LOG_SIZE_LIMIT))
             logFile->PartitionFile();

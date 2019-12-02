@@ -56,8 +56,8 @@ public:
     virtual ~FS_File();
 
 public:
-    virtual bool Open(const char *fileName, bool isCreate = false, const char *openMode = "ab+", bool useTimestampTailer = false);
-    virtual bool Reopen();
+    virtual bool Open(const char *fileWholeName, bool isCreate = false, const char *openMode = "ab+", bool useTimestampTailer = false, Time *nowTime = NULL);
+    virtual bool Reopen(Time *nowTime = NULL);
     virtual bool Flush();
     virtual bool Close();
 
@@ -73,11 +73,16 @@ public:
     const FS_String &GetPath() const;
     const FS_String &GetFileName() const;
     Int64 GetSize() const;
+    void GetCurrentFileName(FS_String &curName) const;
 
 public:
     operator bool() const;
     operator FILE *();
     operator const FILE *() const;
+
+protected:
+    void _BuildFileName(const char *fileName, bool useTimeTail, FS_String &fileNameOut, FS_String &extensionNameOut) const;
+    void _BuildFileName(FS_String &fileNameOut) const;
 
 protected:
     FILE *_fp = NULL;
@@ -122,6 +127,11 @@ inline const FS_String &FS_File::GetFileName() const
 inline Int64 FS_File::GetSize() const
 {
     return _fileSize;
+}
+
+inline void FS_File::GetCurrentFileName(FS_String &curName) const
+{
+    _BuildFileName(curName);
 }
 
 inline FS_File::operator bool() const

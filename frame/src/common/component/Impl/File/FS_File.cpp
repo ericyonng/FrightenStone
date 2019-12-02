@@ -60,7 +60,7 @@ FS_File::~FS_File()
     _locker.Unlock();
 }
 
-bool FS_File::Open(const char *fileName, bool isCreate /*= false*/, const char *openMode /*= "ab+"*/, bool useTimestampTailer /*= false*/)
+bool FS_File::Open(const char *fileWholeName, bool isCreate /*= false*/, const char *openMode /*= "ab+"*/, bool useTimestampTailer /*= false*/, Time *nowTime/* =NULL */)
 {
     if(UNLIKELY(_fp))
     {
@@ -69,26 +69,26 @@ bool FS_File::Open(const char *fileName, bool isCreate /*= false*/, const char *
         return false;
     }
 
-    FS_String fileNameCache = fileName;
-    _createFileTime = Time::Now();
+    _createFileTime = nowTime ? *nowTime : Time::Now();
     _modifyFileTime = _createFileTime;
     _useTimestampTailer = useTimestampTailer;
-    _extensionName = FS_FileUtil::ExtractFileExtension(fileNameCache);
-    if(isCreate && _useTimestampTailer)
-        FS_FileUtil::InsertFileTime(_extensionName, _createFileTime, fileNameCache);
+
+    // 构建文件名
+    FS_String fileNameCache;
+    _BuildFileName(fileWholeName, isCreate && _useTimestampTailer, fileNameCache, _extensionName);
 
     _fp = FS_FileUtil::OpenFile(fileNameCache.c_str(), isCreate, openMode);
     if(!_fp)
     {
         // 创建目录
-        const auto &dir = FS_DirectoryUtil::GetFileDirInPath(fileName);
+        const auto &dir = FS_DirectoryUtil::GetFileDirInPath(fileWholeName);
         if(FS_DirectoryUtil::CreateDir(dir))
             _fp = FS_FileUtil::OpenFile(fileNameCache.c_str(), isCreate, openMode);
     }
 
     if(LIKELY(_fp))
     {
-        _fileName = FS_DirectoryUtil::GetFileNameInPath(fileName);
+        _fileName = FS_DirectoryUtil::GetFileNameInPath(fileWholeName);
         _path = FS_DirectoryUtil::GetFileDirInPath(fileNameCache);
         _openMode = openMode;
     }
@@ -99,7 +99,7 @@ bool FS_File::Open(const char *fileName, bool isCreate /*= false*/, const char *
     return _fp != NULL;
 }
 
-bool FS_File::Reopen()
+bool FS_File::Reopen(Time *nowTime /* = NULL */)
 {
     if(UNLIKELY(!Close()))
     {
@@ -108,7 +108,7 @@ bool FS_File::Reopen()
     }
 
     FS_String wholeName = _path + _fileName;
-    return Open(wholeName.c_str(), true, _openMode.c_str(), _useTimestampTailer);
+    return Open(wholeName.c_str(), true, _openMode.c_str(), _useTimestampTailer, nowTime);
 }
 
 bool FS_File::Flush()
@@ -170,6 +170,22 @@ Int64 FS_File::ReadOneLine(FS_String &outBuffer)
         return StatusDefs::Error;
 
     return static_cast<Int64>(FS_FileUtil::ReadOneLine(*_fp, outBuffer));
+}
+
+void FS_File::_BuildFileName(const char *fileName, bool useTimeTail, FS_String &fileNameOut, FS_String &extensionNameOut) const
+{
+    fileNameOut = fileName;
+    extensionNameOut = FS_FileUtil::ExtractFileExtension(fileNameOut);
+
+    if(useTimeTail)
+        FS_FileUtil::InsertFileTime(extensionNameOut, _createFileTime, fileNameOut);
+}
+
+void FS_File::_BuildFileName(FS_String &fileNameOut) const
+{
+    fileNameOut = _path + _fileName;
+    if(_useTimestampTailer)
+        FS_FileUtil::InsertFileTime(_extensionName, _createFileTime, fileNameOut);
 }
 
 FS_NAMESPACE_END

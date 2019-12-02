@@ -106,7 +106,7 @@ Int32 FS_ServerCore::Init()
     // 1.时区
     TimeUtil::SetTimeZone();
 
-    // 2.类型识别
+    // 2.智能变量的类型识别
     SmartVarRtti::InitRttiTypeNames();
 
     // 3.初始化线程局部存储句柄
@@ -119,7 +119,7 @@ Int32 FS_ServerCore::Init()
         return ret;
     }
 
-    // 4.log初始化
+    // 4.log初始化 NULL默认以程序名为基准创建目录
     ret = g_Log->InitModule(NULL);
     if(ret != StatusDefs::Success)
     {
@@ -129,7 +129,6 @@ Int32 FS_ServerCore::Init()
         return ret;
     }
 
-#ifdef _WIN32
     // 5. crash dump switch start
     ret = CrashHandleUtil::InitCrashHandleParams();
     if(ret != StatusDefs::Success)
@@ -137,7 +136,6 @@ Int32 FS_ServerCore::Init()
         g_Log->e<FS_ServerCore>(_LOGFMT_("init crash handle params fail ret[%d]"), ret);
         return ret;
     }
-#endif
 
     // 6.大小端判断，服务器只支持x86等小端字节序的cpu
     if(!SystemUtil::IsLittleEndian())

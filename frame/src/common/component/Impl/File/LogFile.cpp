@@ -52,13 +52,14 @@ LogFile::~LogFile()
 
 }
 
-void LogFile::PartitionFile(bool isSysFirstCreate)
+void LogFile::PartitionFile(bool isSysFirstCreate, Time *nowTime)
 {
     if(isSysFirstCreate)
         return;
 
     // 构建文件名
-    FS_String fileNameCache = _path + _fileName;
+    FS_String fileNameCache;
+    GetCurrentFileName(fileNameCache);
 
     // 查找不存在的文件名
     FS_String wholeName;
@@ -78,6 +79,6 @@ void LogFile::PartitionFile(bool isSysFirstCreate)
     // 删除并重开文件
     Close();
     FS_FileUtil::DelFile(fileNameCache.c_str());
-    ASSERT(Reopen());
+    ASSERT(Reopen(nowTime));
 }
 FS_NAMESPACE_END

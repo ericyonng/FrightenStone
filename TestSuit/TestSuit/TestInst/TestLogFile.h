@@ -42,14 +42,23 @@ public:
         std::cout << "TestLogFile" << std::endl;
         fs::TimeUtil::SetTimeZone();
         fs::LogFile logFile;
-        logFile.Open("./log2.log", true);
+        logFile.Open("./log2.log", true, "ab+", true);
         fs::FS_String logStr = "hello test log file";
         logFile.Write(logStr.c_str(), logStr.GetLength());
         logFile.Flush();
+
+        // ¿çÌì
+        fs::Time nowTime;
+        nowTime.FlushTime(fs::Time::Now().AddDays(1).GetMicroTimestamp());
+
+        if(logFile.IsDayPass(nowTime))
+            logFile.Reopen(&nowTime);
+
         fs::FS_FileUtil::ResetFileCursor(*static_cast<FILE *>(logFile));
         fs::FS_String strRead;
         logFile.ReadOneLine(strRead);
         std::cout << strRead << std::endl;
+        logFile.PartitionFile();
     }
 };
 #endif
