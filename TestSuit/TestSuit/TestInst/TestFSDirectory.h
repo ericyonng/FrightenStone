@@ -41,7 +41,7 @@ class TestFSDirectory
 public:
     static void Run()
     {
-        auto filename = fs::FS_DirectoryUtil::GetFileNameInPath(".\\log/net/bb/file.dd");
+        auto filename = fs::FS_DirectoryUtil::GetFileNameInPath("./log/net/bb/file.dd");
         std::cout << filename.GetRaw() << std::endl;
     }
 };

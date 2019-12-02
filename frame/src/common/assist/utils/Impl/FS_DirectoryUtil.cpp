@@ -54,7 +54,11 @@ FS_NAMESPACE_BEGIN
 
 bool FS_DirectoryUtil::CreateDir(const FS_String &path)
 {
+    if(path.empty())
+        return false;
+
     FS_String rootDir, subDir;
+#ifdef _WIN32
     auto startPos = path.GetRaw().find(':', 0);    // judge if include path
     if(startPos == std::string::npos)
     {
@@ -72,6 +76,22 @@ bool FS_DirectoryUtil::CreateDir(const FS_String &path)
 
         subDir = path.GetRaw().substr(startPos, path.GetLength() - startPos);
     }
+#else
+    if(path.GetRaw().at[0] == '/')
+    {
+        rootDir = "";
+        subDir = path;
+    }
+    else
+    {
+        auto startPos = path.GetRaw().find_first_of('/', 0);
+        if(startPos == std::string::npos)
+            return false;
+
+        subDir = path.GetRaw().substr(startPos, path.GetLength() - startPos);
+        rootDir = path.GetRaw().substr(0, startPos);
+    }
+#endif
 
     return _CreateRecursiveDir(rootDir, subDir);
 }

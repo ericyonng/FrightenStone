@@ -228,8 +228,8 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
             break;
 
         // 2.创建文件夹
-        FS_String logName = ".\\";
-        logName += (_rootDirName + "\\" + logPath);
+        FS_String logName = "./";
+        logName += (_rootDirName + "/" + logPath);
         if(!FS_DirectoryUtil::CreateDir(logName))
         {
             ret = StatusDefs::Log_CreateDirFail;
