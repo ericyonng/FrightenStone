@@ -62,7 +62,7 @@ public:
         {
             fs::SystemUtil::Sleep(1000);
             g_Log->any<TestLogModule>("hello linux");
-            std::cout << "print suc" << std::endl;
+            std::cout << "g_Log suc" << std::endl;
         }
 //         g_EasyGlobal2->Init();
 //         fs::Time nowTime, nowTime2;

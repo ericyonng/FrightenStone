@@ -50,6 +50,7 @@ FS_NAMESPACE_BEGIN
 
 void FS_FileUtil::DelFile(const char *filePath)
 {
+#ifdef _WIN32
     std::string strDelCmd = "del ";
     strDelCmd += filePath;
     size_t findPos = 0;
@@ -62,6 +63,12 @@ void FS_FileUtil::DelFile(const char *filePath)
     strDelCmd += " /f/s/q";
 
     system(strDelCmd.c_str());
+#else
+    std::string strDelCmd = "rm -rf ";
+    strDelCmd += filePath;
+    if(system(strDelCmd.c_str()) == -1)
+        perror("del files fail");
+#endif
 }
 
 bool FS_FileUtil::DelFileCStyle(const char *filePath)
