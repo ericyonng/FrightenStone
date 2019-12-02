@@ -44,6 +44,8 @@
 #ifndef _WIN32
 // linux下堆栈追踪头文件
 #include <execinfo.h>
+// linux下类型识别接口相关
+#include <cxxabi.h>
 #endif
 
 #define __USE_FS_DBGHELP__
@@ -346,6 +348,7 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
     if(win32Symboal)
         delete[]win32Symboal;
 #else // Non-Win32
+    FS_String backTrace;
     char rtti[__FS_RTTI_BUF_SIZE__] = {};
     const int frames = ::backtrace(stack, captureFrames + skipFrames);
     char **strs = ::backtrace_symbols(stack, frames);
