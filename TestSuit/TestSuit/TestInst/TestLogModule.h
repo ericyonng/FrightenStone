@@ -48,6 +48,11 @@ public:
     {
         std::cout << "test log module" << std::endl;
         fs::TimeUtil::SetTimeZone();
+        std::cout << "timezone:" << fs::TimeUtil::GetTimeZone() << std::endl;
+        fs::Time nowTime;
+        nowTime.FlushTime();
+        std::cout << "now time" << nowTime.ToString() << std::endl;
+        getchar();
         auto st = g_Log->InitModule();
         if(st != StatusDefs::Success)
             std::cout << "init log fail" << std::endl;
