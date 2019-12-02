@@ -107,15 +107,19 @@ Int32 ConditionLocker::Wait(UInt64 second, UInt64 microSec)
     _isSinal = false;
     return StatusDefs::Success;
 #else
-    struct timespec abstime;
+    struct timespec abstime; // nsec是时刻中的纳秒部分，注意溢出
+    const Int64 nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
+    Int64 secInc = milliSecond / Time::_millisecondPerSecond;
+    Int64 nanoSecInc = (milliSecond - secInc * Time::_millisecondPerSecond)*Time::_microSecondPerMilliSecond * 1000;
     clock_gettime(CLOCK_REALTIME, &abstime);
-    abstime.tv_sec += second;
-    abstime.tv_nsec += microSec * 1000; // 不能超过一秒
-    
-    // 纳妙超过秒的部分重新算纳秒
-    auto nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
-    abstime.tv_sec += (abstime.tv_nsec / nanoSecPerSecond);
-    abstime.tv_nsec = abstime.tv_nsec%nanoSecPerSecond;
+    abstime.tv_sec += secInc;
+    abstime.tv_nsec += static_cast<Long>(nanoSecInc);
+
+    // 纳秒部分溢出1秒
+    Int64 curNanoSecPart = static_cast<Int64>(abstime.tv_nsec);
+    abstime.tv_sec += curNanoSecPart / nanoSecPerSecond;
+    curNanoSecPart %= nanoSecPerSecond;
+    abstime.tv_nsec = static_cast<Long>(curNanoSecPart);
 
     ++_waitCnt;
     int ret = pthread_cond_timedwait(&_condVal, &_metaLocker.load()->_handle, &abstime);
@@ -178,15 +182,19 @@ Int32 ConditionLocker::Wait(UInt64 milliSecond)
     if(milliSecond == INFINITE)
         return DeadWait();
 
-    struct timespec abstime;
+    struct timespec abstime; // nsec是时刻中的纳秒部分，注意溢出
+    const Int64 nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
+    Int64 secInc = milliSecond / Time::_millisecondPerSecond;
+    Int64 nanoSecInc = (milliSecond - secInc * Time::_millisecondPerSecond)*Time::_microSecondPerMilliSecond * 1000;
     clock_gettime(CLOCK_REALTIME, &abstime);
-    abstime.tv_sec += (milliSecond / Time::_millisecondPerSecond);
-    abstime.tv_nsec += ((milliSecond - (abstime.tv_sec*Time::_millisecondPerSecond))*Time::_microSecondPerMilliSecond);
+    abstime.tv_sec += secInc;
+    abstime.tv_nsec += static_cast<Long>(nanoSecInc);
 
-    // 纳妙超过秒的部分重新算纳秒
-    auto nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
-    abstime.tv_sec += (abstime.tv_nsec / nanoSecPerSecond);
-    abstime.tv_nsec = abstime.tv_nsec%nanoSecPerSecond;
+    // 纳秒部分溢出1秒
+    Int64 curNanoSecPart = static_cast<Int64>(abstime.tv_nsec);
+    abstime.tv_sec += curNanoSecPart / nanoSecPerSecond;
+    curNanoSecPart %= nanoSecPerSecond;
+    abstime.tv_nsec = static_cast<Long>(curNanoSecPart);
 
     ++_waitCnt;
     int ret = pthread_cond_timedwait(&_condVal, &_metaLocker.load()->_handle, &abstime);
@@ -200,6 +208,7 @@ Int32 ConditionLocker::Wait(UInt64 milliSecond)
     {
         --_waitCnt;
         printf("\nret=%d\n", ret);
+        printf("")
         perror("pthread cond timewait error");
         return StatusDefs::WaitFailure;
     }
