@@ -4,12 +4,12 @@
 #!/usr/bin/env bash
 
 SCRIPT_PATH=$(cd '$(dirname "$0")'; pwd)
-CONFIG = $1
-OUTPUT_DIR = $SCRIPT_PATH/output/gmake/$CONFIG
+ver = "$1"
+OUTPUT_DIR = $SCRIPT_PATH/output/gmake/$ver
 DEBUG_LIBS = {"libFrightenstone_debug.so"}
 RELEASE_LIBS = {"libFrightenstone.so"}
 
-if [$CONFIG = "debug"]
+if [$ver = "debug"]
 then
     # 创建debug版本的so连接符号
 	for libName in $DEBUG_LIBS
