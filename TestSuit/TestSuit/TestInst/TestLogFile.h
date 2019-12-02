@@ -39,6 +39,7 @@ class TestLogFile
 public:
     static void Run()
     {
+        std::cout << "TestLogFile" << std::endl;
         fs::TimeUtil::SetTimeZone();
         fs::LogFile logFile;
         logFile.Open("./log2.log", true);

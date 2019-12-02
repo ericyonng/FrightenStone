@@ -255,7 +255,7 @@ project "Frightenstone"
     -- flags
     filter { "system:not windows" }
         buildoptions {
-            "-fvisibility=hidden",
+            "-fvisibility=hidden -std=c++17",
         }
     filter {}
 
@@ -355,7 +355,7 @@ project "TestSuit"
     filter {}
 
     -- enable multithread compile
-    enable_multithread_comp()
+    enable_multithread_comp("C++14")
 
     -- warnings
     filter { "system:not windows" }

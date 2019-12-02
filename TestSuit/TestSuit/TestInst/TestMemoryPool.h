@@ -58,7 +58,7 @@ public:
 
 };
 
-MEMPOOL_CREATE_IMPL(TestMemPoolObj, _memHelper)
+// MEMPOOL_CREATE_IMPL(TestMemPoolObj, _memHelper)
 
 
 class TestMemPoolObj2

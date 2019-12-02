@@ -10,9 +10,9 @@ class TestIocpExample
 public:
     static void Run()
     {
-        g_Log->InitModule("IOCP_TEST");
-        fs::CrashHandleUtil::InitCrashHandleParams();
-        fs::Example::Run();
+//         g_Log->InitModule("IOCP_TEST");
+//         fs::CrashHandleUtil::InitCrashHandleParams();
+//         fs::Example::Run();
     }
 };
 #endif

@@ -22,7 +22,7 @@ private:
     Int64 _int64obj;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10, __DEF_OBJ_POOL_MAX_ALLOW_BYTES__)
+OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10)
 
 
 class TestObjPoolObj2
