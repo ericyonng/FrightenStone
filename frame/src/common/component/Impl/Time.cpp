@@ -61,7 +61,14 @@ const Int64 Time::_millisecondPerSecond = 1000LL;
 
 const Int64 Time::_microSecondPerMilliSecond = 1000LL;
 
-const Int64 Time::_resolutionPerMicroSecond = 10LL;
+// std::chrono::system_clock::now().time_since_epoch().count() 精度问题
+#ifdef _WIN32
+// 在windows下系统时间最小分辨率只能到微妙以下10分位
+const Int64 Time::_resolutionPerMicroSecond = 10LL; // 
+#else
+// linux最小分辨率可以到微妙下千分位即可以精确到纳秒
+const Int64 Time::_resolutionPerMicroSecond = 1000LL; // 
+#endif
 
 #pragma endregion
 
