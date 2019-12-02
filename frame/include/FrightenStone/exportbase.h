@@ -47,13 +47,13 @@
         #ifdef _WIN32
             #define BASE_EXPORT _declspec(dllexport)
         #else
-            #define BASE_EXPORT
+            #define BASE_EXPORT __attribute__ ((__visibility__("default"))) // default是默认导出符号（linux下）
         #endif
     #else
         #ifdef _WIN32
             #define BASE_EXPORT _declspec(dllimport)
         #else
-            #define BASE_EXPORT 
+            #define BASE_EXPORT __attribute__ ((__visibility__("default")))
         #endif
     #endif
 #endif
