@@ -46,12 +46,16 @@ class TestLogModule
 public:
     static void Run()
     {
+        std::cout << "test log module" << std::endl;
         fs::TimeUtil::SetTimeZone();
-        g_Log->InitModule();
+        auto st = g_Log->InitModule();
+        if(st != StatusDefs::Success)
+            std::cout << "init log fail" << std::endl;
         while(true)
         {
             fs::SystemUtil::Sleep(1000);
             g_Log->any<TestLogModule>("hello linux");
+            std::cout << "print suc" << std::endl;
         }
 //         g_EasyGlobal2->Init();
 //         fs::Time nowTime, nowTime2;
