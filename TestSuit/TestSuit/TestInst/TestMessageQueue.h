@@ -216,7 +216,9 @@ public:
         fs::SmartVarRtti::InitRttiTypeNames();
         fs::FS_TlsUtil::CreateUtilTlsHandle();
         g_Log->InitModule(NULL);
+#ifdef _WIN32
         fs::CrashHandleUtil::InitCrashHandleParams();
+#endif
         g_MemleakMonitor->Start();
 
         g_testMsgQueue.BeforeStart();
