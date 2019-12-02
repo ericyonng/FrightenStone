@@ -36,11 +36,6 @@
 #include <stdarg.h>
 #include <set>
 
-inline std::ostream &operator <<(std::ostream &stream, const fs::FS_String &str)
-{
-    return stream << str.GetRaw().c_str();
-}
-
 FS_NAMESPACE_BEGIN
 
 OBJ_POOL_CREATE_DEF_IMPL(FS_String, __DEF_OBJ_POOL_OBJ_NUM__);

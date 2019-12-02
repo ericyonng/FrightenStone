@@ -33,6 +33,13 @@
 
 #pragma once
 
+inline std::ostream &operator <<(std::ostream &o, const FS_NS SmartVar &smartVar)
+{
+    FS_NS FS_String str = smartVar.ToString();
+    o.write(str.c_str(), str.GetLength());
+    return o;
+}
+
 FS_NAMESPACE_BEGIN
 
 inline SmartVar::SmartVar()

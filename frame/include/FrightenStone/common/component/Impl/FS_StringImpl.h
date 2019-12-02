@@ -38,6 +38,11 @@
 #include "FrightenStone/common/assist/assistobjs/assistobjs.h"
 #include "FrightenStone/common/component/Impl/FS_ArgsExpander.h"
 
+inline std::ostream &operator <<(std::ostream &stream, const fs::FS_String &str)
+{
+    return stream << str.GetRaw().c_str();
+}
+
 FS_NAMESPACE_BEGIN
 
 #pragma region << 
