@@ -32,7 +32,7 @@ end
 function set_optimize_opts()
     filter { "configurations:debug*", "language:c++", "system:not windows" }
         buildoptions {
-            "-ggdb -g",
+            "-std=c++17 -ggdb -g",
         }
     filter {}
 
@@ -236,6 +236,7 @@ project "Frightenstone"
 			"pthread",
 			"crypto",
 			"ssl",
+			"dl",
         }
 
     filter { "system:windows" }
@@ -254,7 +255,7 @@ project "Frightenstone"
     -- flags
     filter { "system:not windows" }
         buildoptions {
-            "-fvisibility=hidden -std=c++17",
+            "-fvisibility=hidden",
         }
     filter {}
 
@@ -308,12 +309,12 @@ project "TestSuit"
     libdirs { FS_OUTPUT_DIR }
     filter { "system:linux" }
         links {
-            "dl",
-			"rt",
+		    "rt",
             "uuid",
 			"pthread",
 			"crypto",
 			"ssl",
+            "dl",
         }
     filter {}
 	
@@ -360,9 +361,6 @@ project "TestSuit"
     filter { "system:not windows" }
         disablewarnings {
             "invalid-source-encoding",
-        }
-		buildoptions {
-            "-std=c++17",
         }
     filter {}
 
