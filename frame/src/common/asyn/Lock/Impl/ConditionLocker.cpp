@@ -70,6 +70,7 @@ ConditionLocker::~ConditionLocker()
     _Destroy();
 }
 
+static const Int64 g_nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
 Int32 ConditionLocker::Wait(UInt64 second, UInt64 microSec)
 {
 #ifdef _WIN32
@@ -108,17 +109,16 @@ Int32 ConditionLocker::Wait(UInt64 second, UInt64 microSec)
     return StatusDefs::Success;
 #else
     struct timespec abstime; // nsec是时刻中的纳秒部分，注意溢出
-    const Int64 nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
-    Int64 secInc = milliSecond / Time::_millisecondPerSecond;
-    Int64 nanoSecInc = (milliSecond - secInc * Time::_millisecondPerSecond)*Time::_microSecondPerMilliSecond * 1000;
+    Int64 secInc = second + microSec / Time::_microSecondPerSecond;
+    Int64 nanoSecInc = microSec % Time::_microSecondPerSecond * 1000;
     clock_gettime(CLOCK_REALTIME, &abstime);
     abstime.tv_sec += secInc;
     abstime.tv_nsec += static_cast<Long>(nanoSecInc);
 
     // 纳秒部分溢出1秒
     Int64 curNanoSecPart = static_cast<Int64>(abstime.tv_nsec);
-    abstime.tv_sec += curNanoSecPart / nanoSecPerSecond;
-    curNanoSecPart %= nanoSecPerSecond;
+    abstime.tv_sec += curNanoSecPart / g_nanoSecPerSecond;
+    curNanoSecPart %= g_nanoSecPerSecond;
     abstime.tv_nsec = static_cast<Long>(curNanoSecPart);
 
     ++_waitCnt;
@@ -183,17 +183,16 @@ Int32 ConditionLocker::Wait(UInt64 milliSecond)
         return DeadWait();
 
     struct timespec abstime; // nsec是时刻中的纳秒部分，注意溢出
-    const Int64 nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
     Int64 secInc = milliSecond / Time::_millisecondPerSecond;
-    Int64 nanoSecInc = (milliSecond - secInc * Time::_millisecondPerSecond)*Time::_microSecondPerMilliSecond * 1000;
+    Int64 nanoSecInc = (milliSecond % Time::_millisecondPerSecond)*Time::_microSecondPerMilliSecond * 1000;
     clock_gettime(CLOCK_REALTIME, &abstime);
     abstime.tv_sec += secInc;
     abstime.tv_nsec += static_cast<Long>(nanoSecInc);
 
     // 纳秒部分溢出1秒
     Int64 curNanoSecPart = static_cast<Int64>(abstime.tv_nsec);
-    abstime.tv_sec += curNanoSecPart / nanoSecPerSecond;
-    curNanoSecPart %= nanoSecPerSecond;
+    abstime.tv_sec += curNanoSecPart / g_nanoSecPerSecond;
+    curNanoSecPart %= g_nanoSecPerSecond;
     abstime.tv_nsec = static_cast<Long>(curNanoSecPart);
 
     ++_waitCnt;
