@@ -122,6 +122,7 @@ Int32 ConditionLocker::Wait(UInt64 second, UInt64 microSec)
     if(ret != 0)
     {
         --_waitCnt;
+        printf("\nret=%d\n", ret);
         perror("pthread cond timewait error");
         return StatusDefs::WaitFailure;
     }
@@ -186,6 +187,7 @@ Int32 ConditionLocker::Wait(UInt64 milliSecond)
     if(ret != 0)
     {
         --_waitCnt;
+        printf("\nret=%d\n", ret);
         perror("pthread cond timewait error");
         return StatusDefs::WaitFailure;
     }
@@ -233,9 +235,11 @@ Int32 ConditionLocker::DeadWait()
     return StatusDefs::Success;
 #else
     ++_waitCnt;
-    if(pthread_cond_wait(&_condVal, &_metaLocker.load()->_handle) != 0)
+    auto ret = pthread_cond_wait(&_condVal, &_metaLocker.load()->_handle);
+    if(ret != 0)
     {
         --_waitCnt;
+        printf("\nret=%d\n", ret);
         perror("cConSync::WaitCon -error waitcon");
         return StatusDefs::WaitFailure;
     }
@@ -253,6 +257,7 @@ bool ConditionLocker::Sinal()
     int ret = pthread_cond_signal(&_condVal);
     if(ret != 0)
     {
+        printf("\nret=%d\n", ret);
         perror("signal fail\n");
         return false;
     }
@@ -285,6 +290,7 @@ void ConditionLocker::Broadcast()
     int ret = pthread_cond_broadcast(&_condVal);
     if(ret != 0)
     {
+        printf("\nret=%d\n", ret);
         perror("cond broadcast error");
     }
 #endif
@@ -307,6 +313,7 @@ bool ConditionLocker::_Init()
     int ret = pthread_cond_init(&_condVal, NULL);
     if(ret != 0)
     {
+        printf("\nret=%d\n", ret);
         perror("cond init error!");
         return false;
     }
@@ -332,6 +339,7 @@ bool ConditionLocker::_Destroy()
     int ret = pthread_cond_destroy(&_condVal);
     if(ret != 0)
     {
+        printf("\nret=%d\n", ret);
         perror("cond destroy error");
         return false;
     }

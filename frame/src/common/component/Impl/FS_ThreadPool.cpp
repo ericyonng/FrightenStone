@@ -327,6 +327,7 @@ bool FS_ThreadPool::_CreateThread(Int32 numToCreate, UInt64 unixStackSize)
         pthread_attr_destroy(&threadAttr);
         if(ret != 0)
         {
+            printf("\nret=%d\n", ret);
             perror("pthread_create error!");
             return false;
         }
