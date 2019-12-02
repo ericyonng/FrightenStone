@@ -208,7 +208,6 @@ Int32 ConditionLocker::Wait(UInt64 milliSecond)
     {
         --_waitCnt;
         printf("\nret=%d\n", ret);
-        printf("")
         perror("pthread cond timewait error");
         return StatusDefs::WaitFailure;
     }
