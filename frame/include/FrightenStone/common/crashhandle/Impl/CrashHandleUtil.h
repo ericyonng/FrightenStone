@@ -45,6 +45,8 @@ typedef struct _CONTEXT CONTEXT, *PCONTEXT;
 
 #define GET_EXCEPTION_INFO() ((PEXCEPTION_POINTERS)(GetExceptionInformation()))
 
+#endif
+
 FS_NAMESPACE_BEGIN
 
 class FS_String;
@@ -72,7 +74,5 @@ protected:
 };
 
 FS_NAMESPACE_END
-
-#endif
 
 #endif

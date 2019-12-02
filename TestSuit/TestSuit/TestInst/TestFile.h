@@ -48,7 +48,6 @@ public:
         std::cout << file.IsOpen() << std::endl;
         std::cout << file.GetPath()<< std::endl;
         std::cout << file.GetFileName() << std::endl;
-        std::cout << file << std::endl;
         FILE *fileptr = file;
     }
 };

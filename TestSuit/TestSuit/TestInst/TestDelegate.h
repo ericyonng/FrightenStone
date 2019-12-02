@@ -75,7 +75,9 @@ public:
     static void Run()
     {
         g_Log->InitModule("testdelegate");
+#ifdef _WIN32
         fs::CrashHandleUtil::InitCrashHandleParams();
+#endif
         Test1 test1;
         fs::IDelegate<void> *delegate = fs::DelegatePlusFactory::Create(&test1, &Test1::print);
         delegate->Invoke();

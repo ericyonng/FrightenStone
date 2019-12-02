@@ -54,13 +54,13 @@
 #endif
 
 
-#ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
 
 static FS_String __dumpFileName;
 static Locker __g_SehLocker;
 
+#ifdef _WIN32
 static void __GetExceptionBackTrace(PCONTEXT ctx, FS_String &backTrace)
 {
 #if defined(_M_IX86)    // 32位cpu
@@ -206,12 +206,13 @@ static BOOL __PreventSetUnhandledExceptionFilter()
                                 sizeof(execute),
                                 &bytesWritten);
 }
+#endif
 
 int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
 {
 #ifndef _WIN32
-    return StatusDefs::Error;
-#endif
+    return StatusDefs::Success;
+#else
 
     FS_String procPath;
     SystemUtil::GetProgramPath(true, procPath);
@@ -223,14 +224,14 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
     nowTime.FlushTime();
     fileName = fileNameExt[0];
     fileName.AppendFormat("_%d%02d%02d_%02d%02d%02d_%06d_%s"
-                    , nowTime.GetLocalYear()
-                    , nowTime.GetLocalMonth()
-                    , nowTime.GetLocalDay()
-                    , nowTime.GetLocalHour()
-                    , nowTime.GetLocalMinute()
-                    , nowTime.GetLocalSecond()
-                    , nowTime.GetLocalMilliSecond() * 1000 + nowTime.GetLocalMicroSecond()
-                    , fileNameExt[1].c_str());
+                          , nowTime.GetLocalYear()
+                          , nowTime.GetLocalMonth()
+                          , nowTime.GetLocalDay()
+                          , nowTime.GetLocalHour()
+                          , nowTime.GetLocalMinute()
+                          , nowTime.GetLocalSecond()
+                          , nowTime.GetLocalMilliSecond() * 1000 + nowTime.GetLocalMicroSecond()
+                          , fileNameExt[1].c_str());
 
     if(fileNameExt[1] != ".dmp")
         fileName += ".dmp";
@@ -244,7 +245,7 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
     if(!isUseSehExceptionHandler)
         __PreventSetUnhandledExceptionFilter();
 #endif // Release
-    
+
     const Int32 initSymbolRet = InitSymbol();
     ASSERT(initSymbolRet == StatusDefs::Success);
     if(initSymbolRet != StatusDefs::Success)
@@ -255,6 +256,7 @@ int CrashHandleUtil::InitCrashHandleParams(bool isUseSehExceptionHandler)
     auto afterDelegate = g_Log->InstallLogHookFunc(LogLevel::Crash, &CrashHandleUtil::_OnAfterCrashLogHook);
 
     return StatusDefs::Success;
+#endif
 }
 
 #ifdef _WIN32
@@ -280,7 +282,7 @@ Int32 CrashHandleUtil::InitSymbol()
 
     return StatusDefs::Success;
 #else // Non-Win32
-    return StatusDefs::Failed;
+    return StatusDefs::Success;
 #endif
 }
 
@@ -295,6 +297,8 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
     // 初始化堆栈结构
     void *stackArray[SYMBOL_MAX_CAPTURE_FRAMES] = {0};
     void **stack = stackArray;
+
+#ifdef _WIN32
     // name是个变长数组
     SYMBOL_INFO *win32Symboal = reinterpret_cast<SYMBOL_INFO *>(new char[sizeof(::SYMBOL_INFO) + (SYMBOL_MAX_SYMBOL_NAME + 1) * sizeof(char)]);
     memset(win32Symboal, 0, sizeof(SYMBOL_INFO));
@@ -304,7 +308,6 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
     ::memset(&win32ImgHelpLine64, 0, sizeof(win32ImgHelpLine64));
     win32ImgHelpLine64.SizeOfStruct = sizeof(win32ImgHelpLine64);
 
-#ifdef _WIN32
     // 抓取快照 取得各个展开的函数地址
     DWORD displacement;
     HANDLE curProc = ::GetCurrentProcess();
@@ -334,6 +337,9 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
         if(frame != frames - 1)
             backTrace.AppendBitData("\n", 1);
     }
+
+    if(win32Symboal)
+        delete[]win32Symboal;
 #else // Non-Win32
     char rtti[__FS_RTTI_BUF_SIZE__] = {};
     const int frames = ::backtrace(stack, captureFrames + skipFrames);
@@ -390,9 +396,6 @@ FS_String CrashHandleUtil::FS_CaptureStackBackTrace(size_t skipFrames /*= 0*/, s
     }
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
-    if(win32Symboal)
-        delete[]win32Symboal;
-
     return backTrace;
 }
 
@@ -406,6 +409,7 @@ void CrashHandleUtil::_OnBeforeCrashLogHook(LogData *logData)
 
 void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 {
+#ifdef _WIN32
     // 内存泄漏信息
     g_MemleakMonitor->PrintObjPoolInfo();
 
@@ -418,6 +422,7 @@ void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
     SystemUtil::GetProgramPath(true, path);
     auto fileName = FS_DirectoryUtil::GetFileNameInPath(path);
     SystemUtil::MessageBoxPopup(fileName, logData->_logToWrite);
+#endif
 
 // #ifdef _DEBUG
 //     // 弹窗堆栈信息
@@ -431,5 +436,3 @@ void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 }
 
 FS_NAMESPACE_END
-
-#endif

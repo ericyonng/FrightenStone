@@ -36,7 +36,7 @@
 #include "stdafx.h"
 #include <limits>
 
-inline fs::FS_String &&GetString()
+inline fs::FS_String GetString()
 {
     return fs::FS_String();
 }
