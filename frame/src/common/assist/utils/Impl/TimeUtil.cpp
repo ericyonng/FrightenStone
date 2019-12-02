@@ -44,7 +44,7 @@ void TimeUtil::SetTimeZone()
 #ifndef _WIN32
     tzset();
     time_t now = time(NULL);
-    __g_timezone = static_cast<Int32>(localtime(&now)->tm_gmtoff);
+    __g_timezone = -1 * static_cast<Int32>(localtime(&now)->tm_gmtoff);         // linux下localtime(&now)->tm_gmtoff是个整数，但是本框架需要取得相反的数，如+8时区，这里需要输出-28800
 #else // WIN32
     _tzset();
     __g_timezone = _timezone;
