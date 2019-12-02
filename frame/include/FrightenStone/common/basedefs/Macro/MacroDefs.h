@@ -35,12 +35,7 @@
 
 #pragma once
 
-#ifdef __FRIGHTEN_STONE_FRAME_DLL__
-
 #include "FrightenStone/common/basedefs/Macro/Inner/InnerMacro.h"
-
-#endif
-
 #include "FrightenStone/common/basedefs/Macro/Export/ExportMacro.h"
 
 #include "FrightenStone/common/basedefs/Macro/ForAll/ForAllMacro.h"

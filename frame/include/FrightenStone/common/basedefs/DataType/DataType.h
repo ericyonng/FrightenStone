@@ -34,11 +34,7 @@
 
 
 #pragma once
-
-    #ifdef __FRIGHTEN_STONE_FRAME_DLL__
-        #include "FrightenStone/common/basedefs/DataType/InnerDataType/InnerDataType.h"
-    #endif
-
+#include "FrightenStone/common/basedefs/DataType/InnerDataType/InnerDataType.h"
 #include "FrightenStone/common/basedefs/DataType/ExportDataType/ExportDataType.h"
 
 #include "FrightenStone/common/basedefs/DataType/ForAll/ForAll.h"
