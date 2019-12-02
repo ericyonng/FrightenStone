@@ -43,7 +43,7 @@
 #include "FrightenStone/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
-class FS_String;
+class BASE_EXPORT FS_String;
 FS_NAMESPACE_END
 
 extern BASE_EXPORT std::ostream &operator <<(std::ostream &stream, const fs::FS_String &);
