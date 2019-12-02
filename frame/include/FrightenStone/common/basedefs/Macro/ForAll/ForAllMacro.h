@@ -255,6 +255,7 @@ private:\
 #ifdef _WIN32
 #define FS_INFINITE INFINITE
 #else
+#define FS_INFINITE ((int)0xFFFFFFFF)
 #endif
 
 #define FS_USE_IOCP
