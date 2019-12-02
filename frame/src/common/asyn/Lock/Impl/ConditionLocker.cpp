@@ -110,7 +110,13 @@ Int32 ConditionLocker::Wait(UInt64 second, UInt64 microSec)
     struct timespec abstime;
     clock_gettime(CLOCK_REALTIME, &abstime);
     abstime.tv_sec += second;
-    abstime.tv_nsec += microSec * 1000;
+    abstime.tv_nsec += microSec * 1000; // 不能超过一秒
+    
+    // 纳妙超过秒的部分重新算纳秒
+    auto nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
+    abstime.tv_sec += (abstime.tv_nsec / nanoSecPerSecond);
+    abstime.tv_nsec = abstime.tv_nsec%nanoSecPerSecond;
+
     ++_waitCnt;
     int ret = pthread_cond_timedwait(&_condVal, &_metaLocker.load()->_handle, &abstime);
     if(ret == ETIMEDOUT)
@@ -176,6 +182,12 @@ Int32 ConditionLocker::Wait(UInt64 milliSecond)
     clock_gettime(CLOCK_REALTIME, &abstime);
     abstime.tv_sec += (milliSecond / Time::_millisecondPerSecond);
     abstime.tv_nsec += ((milliSecond - (abstime.tv_sec*Time::_millisecondPerSecond))*Time::_microSecondPerMilliSecond);
+
+    // 纳妙超过秒的部分重新算纳秒
+    auto nanoSecPerSecond = Time::_microSecondPerSecond * 1000;
+    abstime.tv_sec += (abstime.tv_nsec / nanoSecPerSecond);
+    abstime.tv_nsec = abstime.tv_nsec%nanoSecPerSecond;
+
     ++_waitCnt;
     int ret = pthread_cond_timedwait(&_condVal, &_metaLocker.load()->_handle, &abstime);
     if(ret == ETIMEDOUT)
