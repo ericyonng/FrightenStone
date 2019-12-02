@@ -219,7 +219,7 @@ void FS_Log::FlushAllFile()
 Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName)
 {
     Int32 ret = StatusDefs::Success;
-    _locker.Lock();
+    // _locker.Lock();
     do 
     {
         // 1.是否创建过
@@ -258,7 +258,7 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
         _logDatas[fileUnqueIndex] = new std::list<LogData *>;
     } while(0);
     
-    _locker.Unlock();
+    // _locker.Unlock();
 
     return ret;
 }
