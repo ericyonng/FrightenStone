@@ -83,8 +83,11 @@ public:
     static void GetCallingThreadCpuInfo(UInt16 &cpuGroup, Byte8 &cpuNumber);
     // 遍历进程判断某进程是否在进程列表
     static bool IsProcessExist(const FS_String &processName);
-
-    /* 控制台 */
+    #else
+    // ...linux
+    #endif
+    
+        /* 控制台 */
     static void LockConsole();
     static void UnlockConsole();
     // 设置控制台颜色
@@ -93,9 +96,6 @@ public:
     static Int32 GetConsoleColor();
     // 输出给控制台
     static void OutputToConsole(const FS_String &outStr);
-    #else
-    // ...linux
-    #endif
 
     /* 杂项 */
     // 大小端判断

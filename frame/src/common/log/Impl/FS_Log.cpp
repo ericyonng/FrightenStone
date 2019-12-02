@@ -339,7 +339,7 @@ Int32 FS_Log::_GetLogFileIndex(Int32 logTypeEnum)
 
 void FS_Log::_OutputToConsole(Int32 level,const FS_String &logStr)
 {
-#ifdef _WIN32
+//#ifdef _WIN32
     // windows下需要打印控制台
     if(_IsAllowToConsole(level))
     {
@@ -350,7 +350,7 @@ void FS_Log::_OutputToConsole(Int32 level,const FS_String &logStr)
         SystemUtil::SetConsoleColor(oldColor);
         SystemUtil::UnlockConsole();
     }
-#endif
+//#endif
 
 }
 

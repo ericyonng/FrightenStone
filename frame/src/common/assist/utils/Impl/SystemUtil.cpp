@@ -425,6 +425,9 @@ bool SystemUtil::IsProcessExist(const FS_String &processName)
 #endif
 }
 
+#else
+#endif
+
 void SystemUtil::LockConsole()
 {
     __g_consoleLock.Lock();
@@ -437,6 +440,7 @@ void SystemUtil::UnlockConsole()
 
 Int32 SystemUtil::SetConsoleColor(Int32 color)
 {
+#ifdef _WIN32
     HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
     if(::SetConsoleTextAttribute(handle, color) == 0)
     {
@@ -444,12 +448,14 @@ Int32 SystemUtil::SetConsoleColor(Int32 color)
         __g_consoleLock.Unlock();
         return StatusDefs::Failed;
     }
+#endif
 
     return StatusDefs::Success;
 }
 
 Int32 SystemUtil::GetConsoleColor()
 {
+#ifdef _WIN32
     HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO info;
     if(::GetConsoleScreenBufferInfo(handle, &info) == 0)
@@ -458,6 +464,7 @@ Int32 SystemUtil::GetConsoleColor()
         __g_consoleLock.Unlock();
         return StatusDefs::Error;
     }
+#endif
 
     return info.wAttributes;
 }
@@ -466,9 +473,6 @@ void SystemUtil::OutputToConsole(const FS_String &outStr)
 {
     printf("%s", outStr.c_str());
 }
-#else
-#endif
-
 
 bool SystemUtil::IsLittleEndian()
 {
