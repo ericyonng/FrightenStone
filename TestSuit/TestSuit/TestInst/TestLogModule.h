@@ -46,6 +46,7 @@ class TestLogModule
 public:
     static void Run()
     {
+        fs::FS_TlsUtil::CreateUtilTlsHandle();
         std::cout << "test log module" << std::endl;
         fs::TimeUtil::SetTimeZone();
         std::cout << "timezone:" << fs::TimeUtil::GetTimeZone() << std::endl;
