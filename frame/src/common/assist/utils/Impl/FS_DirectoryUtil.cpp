@@ -77,7 +77,7 @@ bool FS_DirectoryUtil::CreateDir(const FS_String &path)
         subDir = path.GetRaw().substr(startPos, path.GetLength() - startPos);
     }
 #else
-    if(path.GetRaw().at[0] == '/')
+    if(path.GetRaw().at(0) == '/')
     {
         rootDir = "";
         subDir = path;
