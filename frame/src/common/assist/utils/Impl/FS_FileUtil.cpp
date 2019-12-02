@@ -476,7 +476,7 @@ Int64 FS_FileUtil::GetFileSizeEx(const char *filepath)
 void FS_FileUtil::InsertFileTime(const FS_String &extensionName, const Time &timestamp, FS_String &fileName)
 {
     auto endPos = fileName.GetRaw().rfind('.', fileName.GetLength() - 1);
-    const auto &timeFmtStr = timestamp.Format("%Y-%m-%d");
+    const auto &timeFmtStr = timestamp.Format("-%Y-%m-%d");
     if(endPos == std::string::npos)
     {
         fileName << timeFmtStr << extensionName;

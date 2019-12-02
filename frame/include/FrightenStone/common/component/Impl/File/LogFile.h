@@ -52,7 +52,7 @@ public:
 
     // 分割文件
     bool IsTooLarge(Int64 limitSize) const;
-    void PartitionFile(bool isSysFirstCreate = false, Time *nowTime = NULL);
+    void PartitionFile(bool isSysFirstCreate = false, Time *nowTime = NULL);    // isSysFirstCreate=true:系统第一次创建不会分文件
 
 protected:
     Int32 _partNo;

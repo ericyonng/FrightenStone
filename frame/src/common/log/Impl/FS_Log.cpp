@@ -427,7 +427,7 @@ void FS_Log::_OnThreadWriteLog(Int32 logFileIndex)
 
         // 文件过大转储到分立文件
         if(logFile->IsTooLarge(LOG_SIZE_LIMIT))
-            logFile->PartitionFile();
+            logFile->PartitionFile(false, &iterLog->_logTime);
 
         // 写入文件
         logFile->Write(iterLog->_logToWrite.c_str(), iterLog->_logToWrite.GetLength());
