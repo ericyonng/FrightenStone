@@ -31,18 +31,18 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	fi
 	
 	# 开启coredump
-	echo "set tmp unlimited"
-    ulimit -c unlimited
-	SET_PATTEN="${OUTPUT_DIR}/core_%e_%t_%p_%s"
-	CORE_PATTERN_PATH="/proc/sys/kernel/core_pattern"
-	echo "set tmp coredump format"
-	if grep -qE ".*${SET_PATTEN}.*" ${CORE_PATTERN_PATH}
-	then
-	    echo "core dump name format is already set"
-	else
-	    echo "will set core dump name format"
-		echo "${SET_PATTEN}" > ${CORE_PATTERN_PATH}
-	fi
+#	echo "set tmp unlimited"
+#    ulimit -c unlimited
+#	SET_PATTEN="${OUTPUT_DIR}/core_%e_%t_%p_%s"
+#	CORE_PATTERN_PATH="/proc/sys/kernel/core_pattern"
+#	echo "set tmp coredump format"
+#	if grep -qE ".*${SET_PATTEN}.*" ${CORE_PATTERN_PATH}
+#	then
+#	    echo "core dump name format is already set"
+#	else
+#	    echo "will set core dump name format"
+#		echo "${SET_PATTEN}" > ${CORE_PATTERN_PATH}
+#	fi
 	
 	# coredump设置永久生效
 	LIMITS_CONF_PATH="/etc/security/limits.conf"
@@ -63,8 +63,9 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	else
 	    echo "will set core dump format forever"
 		echo -e "kernel.core_pattern=${SET_PATTEN}\nkernel.core_uses_pid=0\n" > ${SYSCTL_CONF_PATH}
-		sysctl -p
+		# sysctl -p
 	fi
+	sysctl -p
 fi
 
 
