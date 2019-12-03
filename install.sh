@@ -33,6 +33,7 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	# 开启coredump
     ulimit -c unlimited
 	SET_PATTEN="${OUTPUT_DIR}/core_%e_%t_p_s"
+	echo $SET_PATTEN
 	if grep -qE ".*${SET_PATTEN}.*"
 	then
 	    echo "core dump name format is already set"
@@ -43,6 +44,7 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	
 	# coredump设置永久生效
 	LIMITS_CONF_PATH="/etc/security/limits.conf"
+	echo $LIMITS_CONF_PATH
 	if grep -qE ".*@root soft core unlimited.*" ${LIMITS_CONF_PATH}
 	then
 	    echo "it is alread setted unlimited forever"
@@ -52,6 +54,7 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	fi
 	
     SYSCTL_CONF_PATH="/proc/sys/sysctl.conf"
+	echo $SYSCTL_CONF_PATH
 	if grep -qE ".*${SET_PATTEN}.*" ${SYSCTL_CONF_PATH}
 	then
 	    echo "core dump format is alread setted forever"
