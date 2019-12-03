@@ -50,8 +50,10 @@
 // #pragma endregion
 
 #pragma region create folder
+#ifdef _WIN32
 #include "shlwapi.h"
 #pragma comment(lib,"shlwapi.lib")
+#endif
 #pragma endregion
 
 #endif
