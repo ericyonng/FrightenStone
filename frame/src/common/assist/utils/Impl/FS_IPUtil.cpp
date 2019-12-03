@@ -39,6 +39,10 @@
 #include "FrightenStone/common/assist/utils/Impl/FS_IPUtil.h"
 #include "FrightenStone/common/status/status.h"
 
+#ifndef _WIN32
+#include <arpa/inet.h>
+#endif
+
 FS_NAMESPACE_BEGIN
 
 Int32 FS_IPUtil::GetLocalIP(FS_String &ip, Int32 netCardNo, bool isToBind, bool isStreamSock, bool isIpv4)

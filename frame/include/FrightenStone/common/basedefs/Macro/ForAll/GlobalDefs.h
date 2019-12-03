@@ -40,11 +40,11 @@
 FS_NAMESPACE_BEGIN
 
 // openssl全局锁
-class BASE_EXPORT Locker;
+class Locker;
 extern BASE_EXPORT Locker g_OpenSSL_Locker;
 
 // 默认的时间轮盘对象
-class BASE_EXPORT TimeWheel;
+class TimeWheel;
 extern BASE_EXPORT TimeWheel g_TimeWheel;
 
 FS_NAMESPACE_END
