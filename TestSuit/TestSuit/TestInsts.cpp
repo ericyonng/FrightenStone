@@ -81,7 +81,7 @@ void TestInsts::Run()
 //     pool->AddTask(deleg);
 //     getchar();
 //     pool->Clear();
-    TestLogFile::Run();
+    TestServer::Run();
     //TestServer::Run();
     getchar();
     // TestJson::Run();
