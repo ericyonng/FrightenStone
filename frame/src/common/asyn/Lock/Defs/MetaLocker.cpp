@@ -31,6 +31,7 @@
  */
 #include "stdafx.h"
 #include "FrightenStone/common/asyn/Lock/Defs/MetaLocker.h"
+#include <string.h>
 
 FS_NAMESPACE_BEGIN
 
