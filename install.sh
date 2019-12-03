@@ -33,7 +33,7 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	# 开启coredump
 	echo "set tmp unlimited"
     ulimit -c unlimited
-	SET_PATTEN="${OUTPUT_DIR}/core_%e_%t_p_s"
+	SET_PATTEN="${OUTPUT_DIR}/core_%e_%t_%p_%s"
 	CORE_PATTERN_PATH="/proc/sys/kernel/core_pattern"
 	echo "set tmp coredump format"
 	if grep -qE ".*${SET_PATTEN}.*" ${CORE_PATTERN_PATH}
