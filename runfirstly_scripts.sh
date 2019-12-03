@@ -18,3 +18,12 @@ ln -sv /usr/local/openssl/lib/libcrypto.so.1.0.0 /usr/lib64/libcrypto.so
 ln -sv /usr/local/openssl/lib/libssl.so.1.0.0 /usr/lib64/libssl.so
 ln -sv /usr/local/openssl/lib/libcrypto.so.1.0.0 /usr/lib64/libcrypto.so.1.0.0
 ln -sv /usr/local/openssl/lib/libssl.so.1.0.0 /usr/lib64/libssl.so.1.0.0
+
+# 开启coredump
+keystr="ulimit -S"
+patten='.*'.$keystr'*'
+destpath=$(find /etc/ -regex '.*' -type f  -exec grep -qE "${patten}" {} \; -print)
+echo $destpath
+ulimit -S -c unlimited
+echo -e "\n# enable coredump whitch unlimited file-size for allusers\n* ulimit -S -c unlimited > /dev/null 2>&1" >> $destpath
+

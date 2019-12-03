@@ -31,6 +31,7 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	fi
 fi
 
+# 开启coredump
 
 
 
