@@ -43,6 +43,10 @@
 #include "tlhelp32.h"
 #include "process.h"
 #include "sysinfoapi.h"
+#else
+// linux:
+#include <sys/types.h>
+#include <signal.h>
 #endif
 #pragma endregion
 
