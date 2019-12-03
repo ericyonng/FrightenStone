@@ -55,6 +55,7 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 		echo -e "@root soft core unlimited \n@root hard core unlimited\n" > ${LIMITS_CONF_PATH}
 	fi
 	
+	SET_PATTEN="${OUTPUT_DIR}/core_%e_%t_%p_%s"
     SYSCTL_CONF_PATH="/etc/sysctl.conf"
 	echo "set forever coredump format"
 	if grep -qE ".*${SET_PATTEN}.*" ${SYSCTL_CONF_PATH}
