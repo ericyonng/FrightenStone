@@ -33,13 +33,14 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	# 开启coredump
     ulimit -c unlimited
 	SET_PATTEN="${OUTPUT_DIR}/core_%e_%t_p_s"
+	CORE_PATTERN_PATH="/proc/sys/kernel/core_pattern"
 	echo $SET_PATTEN
-	if grep -qE ".*${SET_PATTEN}.*"
+	if grep -qE ".*${SET_PATTEN}.*" ${CORE_PATTERN_PATH}
 	then
 	    echo "core dump name format is already set"
 	else
 	    echo "will set core dump name format"
-		echo "${SET_PATTEN}" > /proc/sys/kernel/core_pattern
+		echo "${SET_PATTEN}" > ${CORE_PATTERN_PATH}
 	fi
 	
 	# coredump设置永久生效
