@@ -38,6 +38,7 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/log/Log.h"
+#include "FrightenStone/common/net/Defs/FS_NetDefs.h"
 
 FS_NAMESPACE_BEGIN
 
