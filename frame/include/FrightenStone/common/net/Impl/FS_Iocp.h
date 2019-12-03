@@ -41,8 +41,8 @@
 
 FS_NAMESPACE_BEGIN
 
-struct BASE_EXPORT IoDataBase;
-struct BASE_EXPORT IO_EVENT;
+struct IoDataBase;
+struct IO_EVENT;
 
 class BASE_EXPORT FS_Iocp
 {

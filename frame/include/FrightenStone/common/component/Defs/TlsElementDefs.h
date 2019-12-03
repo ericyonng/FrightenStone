@@ -46,7 +46,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IMemoryPoolMgr;
+class IMemoryPoolMgr;
 
 // 所有局部存储对象请派生于ITlsBase
 // 线程局部存储需要存储的对象类型

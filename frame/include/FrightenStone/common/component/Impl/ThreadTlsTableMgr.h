@@ -40,7 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_TlsTable;
+class FS_TlsTable;
 
 class BASE_EXPORT ThreadTlsTableMgr
 {

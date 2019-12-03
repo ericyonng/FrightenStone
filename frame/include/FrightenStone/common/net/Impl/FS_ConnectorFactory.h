@@ -38,7 +38,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Connector;
+class IFS_Connector;
 
 class BASE_EXPORT FS_ConnectorFactory
 {

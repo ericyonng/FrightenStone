@@ -38,8 +38,9 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
-class BASE_EXPORT FS_String;
-struct BASE_EXPORT ProcessMemInfo;
+class FS_String;
+struct ProcessMemInfo;
+
 class BASE_EXPORT SystemUtil
 {
 public:

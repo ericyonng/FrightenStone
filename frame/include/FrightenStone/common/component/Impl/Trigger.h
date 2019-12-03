@@ -42,7 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT TriggerOccasion;
+class TriggerOccasion;
 
 class BASE_EXPORT Trigger
 {

@@ -41,11 +41,11 @@
 
 FS_NAMESPACE_BEGIN
 
-struct BASE_EXPORT NetMsg_DataHeader;
-class BASE_EXPORT IFS_MsgTransfer;
-class BASE_EXPORT IFS_BusinessLogic;
-class BASE_EXPORT MessageQueue;
-class BASE_EXPORT ConcurrentMessageQueue;
+struct NetMsg_DataHeader;
+class  IFS_MsgTransfer;
+class  IFS_BusinessLogic;
+class  MessageQueue;
+class  ConcurrentMessageQueue;
 
 class BASE_EXPORT IFS_MsgDispatcher
 {

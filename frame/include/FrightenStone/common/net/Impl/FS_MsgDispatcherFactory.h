@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_MsgDispatcher;
+class IFS_MsgDispatcher;
 
 class BASE_EXPORT FS_MsgDispatcherFactory
 {

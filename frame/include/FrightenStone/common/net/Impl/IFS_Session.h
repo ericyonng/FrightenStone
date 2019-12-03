@@ -40,11 +40,11 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_SessionMgr;
-class BASE_EXPORT IFS_Packet;
-class BASE_EXPORT FS_Addr;
-struct BASE_EXPORT NetMsg_DataHeader;
-class BASE_EXPORT IFS_Buffer;
+class  FS_SessionMgr;
+class  IFS_Packet;
+class  FS_Addr;
+struct NetMsg_DataHeader;
+class  IFS_Buffer;
 
 // TODO: IFS_Session, FS_IocpSession, FS_EpollSession
 // 只支持单线程

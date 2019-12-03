@@ -47,7 +47,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT Time;
+class Time;
 
 class BASE_EXPORT StringUtil
 {

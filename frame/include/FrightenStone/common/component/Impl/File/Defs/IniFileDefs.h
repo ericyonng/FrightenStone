@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_String;
+class FS_String;
 
 class BASE_EXPORT IniFileDefs
 {

@@ -47,8 +47,8 @@
 
 FS_NAMESPACE_BEGIN
 
-struct BASE_EXPORT NetMsg_DataHeader;
-class BASE_EXPORT IFS_MsgDispatcher;
+struct NetMsg_DataHeader;
+class  IFS_MsgDispatcher;
 
 class BASE_EXPORT IFS_BusinessLogic
 {

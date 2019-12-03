@@ -40,7 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
-struct BASE_EXPORT ITlsBase;
+struct ITlsBase;
 
 // 请不要过度依赖于线程局部存储
 // 请勿频繁创建

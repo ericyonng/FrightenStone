@@ -26,7 +26,7 @@
  * @date  : 2019/5/24
  * @brief :
  * 
- *
+ *    只能放第三方资源，或者标准库，不能将自己的资源包含在内
  * 
  */
 #ifndef __Frame_Include_FrightenStone_Common_BaseDefs_Resource_Inner_InnerResource_H__

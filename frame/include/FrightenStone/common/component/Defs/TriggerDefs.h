@@ -43,7 +43,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT Trigger;
+class Trigger;
 
 class BASE_EXPORT TriggerDefs
 {

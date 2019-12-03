@@ -39,7 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_IniFile;
+class FS_IniFile;
 class BASE_EXPORT IFS_ServerConfigMgr
 {
 public:

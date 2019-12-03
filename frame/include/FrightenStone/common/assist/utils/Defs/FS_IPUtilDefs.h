@@ -33,7 +33,9 @@
 #define __Frame_Include_FrightenStone_Common_Assist_Utils_Impl_Defs_FS_IPUtilDefs_H__
 #pragma once
 
-class FS_IPUtilDefs
+#include "FrightenStone/exportbase.h"
+
+class BASE_EXPORT FS_IPUtilDefs
 {
 public:
     // 族类型

@@ -42,7 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
+class IFS_Session;
 
 class BASE_EXPORT IFS_Connector
 {

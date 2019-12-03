@@ -43,7 +43,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT MetaLocker;
+class MetaLocker;
 
 class BASE_EXPORT Locker
 {

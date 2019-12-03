@@ -46,8 +46,8 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT ITask;
-class BASE_EXPORT IMemoryPoolMgr;
+class ITask;
+class IMemoryPoolMgr;
 
 // 不可使用包含线程池对象的对象包装
 class BASE_EXPORT FS_ThreadPool

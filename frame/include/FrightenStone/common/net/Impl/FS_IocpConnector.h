@@ -45,10 +45,10 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
-class BASE_EXPORT FS_IniFile;
-class BASE_EXPORT FS_Iocp;
-struct BASE_EXPORT IoDataBase;
+class IFS_Session;
+class FS_IniFile;
+class FS_Iocp;
+struct IoDataBase;
 
 class BASE_EXPORT FS_IocpConnector : public IFS_Connector
 {

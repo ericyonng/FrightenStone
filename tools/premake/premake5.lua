@@ -197,8 +197,8 @@ project "Frightenstone"
 		"../../3rd/tiny-utf8/lib/*.cpp",
     }
 
-	filter{ "system:windows"}
-		defines { "__FRIGHTEN_STONE_FRAME_DLL__" }
+	defines { "__FRIGHTEN_STONE_FRAME_DLL__" }
+	filter{ "system:windows"}		
 		libdirs { 
 			FS_ROOT_DIR .. "3rd/openssL/",
 			FS_ROOT_DIR .. "3rd/"

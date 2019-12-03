@@ -41,7 +41,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_ThreadPool;
+class FS_ThreadPool;
 
 class BASE_EXPORT MessageQueueTask : public ITask 
 {

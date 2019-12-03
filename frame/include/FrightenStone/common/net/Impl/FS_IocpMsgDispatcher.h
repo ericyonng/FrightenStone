@@ -45,13 +45,13 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_ThreadPool;
-class BASE_EXPORT IFS_Session;
-struct BASE_EXPORT NetMsg_DataHeader;
-class BASE_EXPORT IFS_MsgTransfer;
-class BASE_EXPORT IFS_BusinessLogic;
-class BASE_EXPORT ConcurrentMessageQueue;
-struct BASE_EXPORT FS_MessageBlock;
+class FS_ThreadPool;
+class IFS_Session;
+struct NetMsg_DataHeader;
+class IFS_MsgTransfer;
+class IFS_BusinessLogic;
+class ConcurrentMessageQueue;
+struct FS_MessageBlock;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {

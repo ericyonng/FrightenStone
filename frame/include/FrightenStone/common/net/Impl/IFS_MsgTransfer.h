@@ -40,11 +40,11 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
-struct BASE_EXPORT NetMsg_DataHeader;
-class BASE_EXPORT ConcurrentMessageQueue;
-class BASE_EXPORT MessageQueue;
-struct BASE_EXPORT BriefSessionInfo;
+class  IFS_Session;
+struct NetMsg_DataHeader;
+class ConcurrentMessageQueue;
+class MessageQueue;
+struct BriefSessionInfo;
 
 class BASE_EXPORT IFS_MsgTransfer
 {

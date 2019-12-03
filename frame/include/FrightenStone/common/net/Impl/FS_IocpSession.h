@@ -46,7 +46,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_IocpBuffer;
+class FS_IocpBuffer;
 
 class BASE_EXPORT FS_IocpSession : public IFS_Session
 {

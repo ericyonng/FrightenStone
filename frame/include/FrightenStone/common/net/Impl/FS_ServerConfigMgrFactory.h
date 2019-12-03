@@ -38,7 +38,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_ServerConfigMgr;
+class IFS_ServerConfigMgr;
 
 class BASE_EXPORT FS_ServerConfigMgrFactory
 {

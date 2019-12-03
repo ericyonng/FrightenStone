@@ -41,21 +41,21 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
-class BASE_EXPORT IFS_ServerConfigMgr;
-class BASE_EXPORT IFS_Connector;
-class BASE_EXPORT IFS_MsgTransfer;
-class BASE_EXPORT IFS_MsgDispatcher;
-class BASE_EXPORT FS_SessionMgr;
-class BASE_EXPORT FS_CpuInfo;
-class BASE_EXPORT FS_ThreadPool;
-class BASE_EXPORT TimeSlice;
-class BASE_EXPORT Time;
-class BASE_EXPORT IFS_BusinessLogic;
-class BASE_EXPORT ConcurrentMessageQueue;
-struct BASE_EXPORT NetMsg_DataHeader;
-class BASE_EXPORT MessageQueue;
-struct BASE_EXPORT BriefSessionInfo;
+class  IFS_Session;
+class  IFS_ServerConfigMgr;
+class  IFS_Connector;
+class  IFS_MsgTransfer;
+class  IFS_MsgDispatcher;
+class  FS_SessionMgr;
+class  FS_CpuInfo;
+class  FS_ThreadPool;
+class  TimeSlice;
+class  Time;
+class  IFS_BusinessLogic;
+class  ConcurrentMessageQueue;
+struct NetMsg_DataHeader;
+class  MessageQueue;
+struct BriefSessionInfo;
 
 class BASE_EXPORT FS_ServerCore
 {

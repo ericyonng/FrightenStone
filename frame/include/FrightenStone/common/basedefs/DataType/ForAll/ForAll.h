@@ -36,6 +36,7 @@
 #pragma once
 
 // defs ...
+#include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/DataType/ForAll/Defs/NetDataType.h"
 
 #pragma region base data type
@@ -72,7 +73,7 @@ typedef Byte8 BUFFER256[BUFFER_LEN256];
 typedef Byte8 BUFFER512[BUFFER_LEN512];
 typedef Byte8 BUFFER1024[BUFFER_LEN1024];
 
-class FileCursorOffsetType
+class BASE_EXPORT FileCursorOffsetType
 {
 public:
     enum FILE_CURSOR_POS

@@ -40,7 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_MsgTransfer;
+class IFS_MsgTransfer;
 
 class BASE_EXPORT FS_MsgTransferFactory
 {

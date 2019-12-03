@@ -46,13 +46,13 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_ThreadPool;
-class BASE_EXPORT FS_Iocp;
-struct BASE_EXPORT IO_EVENT;
-class BASE_EXPORT FS_IocpSession;
-struct BASE_EXPORT NetMsg_DataHeader;
-struct BASE_EXPORT FS_MessageBlock;
-struct BASE_EXPORT BriefSessionInfo;
+class  FS_ThreadPool;
+class  FS_Iocp;
+struct IO_EVENT;
+class  FS_IocpSession;
+struct NetMsg_DataHeader;
+struct FS_MessageBlock;
+struct BriefSessionInfo;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {

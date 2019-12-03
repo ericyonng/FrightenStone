@@ -33,9 +33,11 @@
 #define __Frame_Include_FrightenStone_Common_Assist_Utils_Impl_Defs_FS_GuidUtilDefs_H__
 #pragma once
 
+#include "FrightenStone/exportbase.h"
+
  // guid data type define.
 #ifndef _WIN32
-struct FS_GUID
+struct BASE_EXPORT FS_GUID
 {
     unsigned long Data1;
     unsigned short Data2;

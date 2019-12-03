@@ -42,7 +42,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_Event;
+class FS_Event;
 
 class BASE_EXPORT EventManager
 {

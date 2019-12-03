@@ -40,7 +40,7 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Buffer;
+class IFS_Buffer;
 
 class BASE_EXPORT FS_BufferFactory
 {

@@ -42,9 +42,9 @@
 
 FS_NAMESPACE_BEGIN
 
-struct BASE_EXPORT FS_MessageBlock;
-class BASE_EXPORT FS_ThreadPool;
-class BASE_EXPORT ITask;
+struct FS_MessageBlock;
+class FS_ThreadPool;
+class ITask;
 
 // 消息队列遵循FIFO原则，单一生产者对单一消费者
 class BASE_EXPORT MessageQueue

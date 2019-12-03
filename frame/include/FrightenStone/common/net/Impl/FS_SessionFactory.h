@@ -40,9 +40,9 @@
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT IFS_Session;
-class BASE_EXPORT FS_SessionMgr;
-struct BASE_EXPORT BriefSessionInfo;
+class IFS_Session;
+class FS_SessionMgr;
+struct BriefSessionInfo;
 
 class BASE_EXPORT FS_SessionFactory
 {
