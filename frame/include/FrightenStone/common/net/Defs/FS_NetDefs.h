@@ -54,7 +54,7 @@
 #include<sys/socket.h>
 #include<netinet/tcp.h>
 
-#define SOCKET int
+#define SOCKET UInt64
 #define INVALID_SOCKET  (SOCKET)(~0)
 #define SOCKET_ERROR            (-1)
 #endif

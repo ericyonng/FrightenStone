@@ -55,6 +55,11 @@ inline FS_String FS_Addr::ToString() const
     return info;
 }
 
+inline void FS_Addr::Reset()
+{
+    _FromSession();
+}
+
 FS_NAMESPACE_END
 
 #endif

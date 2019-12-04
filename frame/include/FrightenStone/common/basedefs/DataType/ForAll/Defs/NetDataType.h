@@ -36,7 +36,7 @@
 #ifdef _WIN32
 typedef unsigned long long MYSOCKET;
 #else
-typedef int MYSOCKET;
+typedef unsigned long long MYSOCKET;
 #endif
 
 #endif
