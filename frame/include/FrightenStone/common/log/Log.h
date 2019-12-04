@@ -34,7 +34,6 @@
 #pragma once
 
 // defs...
-#include "FrightenStone/common/log/Defs/LogDefs.h"
 // interface...
 #include "FrightenStone/common/log/Interface/ILog.h"
 

@@ -31,7 +31,7 @@
  */
 #include "stdafx.h"
 #include "FrightenStone/common/log/Interface/ILog.h"
-#include "FrightenStone/common/log/Impl/FS_Log.h"
+#include "frame/src/common/log/Impl/FS_Log.h"
 #include "FrightenStone/common/status/status.h"
     
 // fs::ILog *g_LogObj = NULL;

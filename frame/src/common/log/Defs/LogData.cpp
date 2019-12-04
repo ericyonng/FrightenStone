@@ -30,7 +30,7 @@
  * 
  */
 #include "stdafx.h"
-#include "FrightenStone/common/log/Defs/LogData.h"
+#include "frame/src/common/log/Defs/LogData.h"
 
 FS_NAMESPACE_BEGIN
 static const char *__g_LogLevelDescription[LogLevel::End + 1] = 

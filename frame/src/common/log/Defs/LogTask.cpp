@@ -30,7 +30,7 @@
  * 
  */
 #include "stdafx.h"
-#include "FrightenStone/common/log/Defs/LogTask.h"
+#include "frame/src/common/log/Defs/LogTask.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
 #include "FrightenStone/common/component/Impl/Time.h"

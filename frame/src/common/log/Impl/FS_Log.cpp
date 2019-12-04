@@ -30,14 +30,14 @@
  * 
  */
 #include "stdafx.h"
-#include "FrightenStone/common/log/Impl/FS_Log.h"
+#include "frame/src/common/log/Impl/FS_Log.h"
 #include "FrightenStone/common/assist/utils/utils.h"
 #include "FrightenStone/common/component/Impl/File/LogFile.h"
 #include "FrightenStone/common/status/status.h"
-#include "FrightenStone/common/log/Defs/LogDefs.h"
-#include "FrightenStone/common/log/Defs/LogTask.h"
+#include "frame/src/common/log/Defs/LogDefs.h"
+#include "frame/src/common/log/Defs/LogTask.h"
 #include "FrightenStone/common/assist/utils/Impl/FS_FileUtil.h"
-#include "FrightenStone/common/log/Defs/LogCaches.h"
+#include "frame/src/common/log/Defs/LogCaches.h"
 
 #pragma region log config options
 #define LOG_THREAD_INTERVAL_MS_TIME 100         // 日志线程写日志间隔时间ms

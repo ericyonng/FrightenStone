@@ -30,7 +30,7 @@
  * 
  */
 #include "stdafx.h"
-#include "FrightenStone/common/log/Defs/LogCaches.h"
+#include "frame/src/common/log/Defs/LogCaches.h"
 #include "FrightenStone/common/log/Defs/LogData.h"
 #include "FrightenStone/common/component/Impl/File/LogFile.h"
 #include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
