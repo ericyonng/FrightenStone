@@ -70,7 +70,6 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     ,_canCreateNewNodeForAlloctor(true)
     ,_maxAlloctorBytes(0)
     ,_curAlloctorOccupiedBytes(0)
-    ,_updateAlloctorOccupied(NULL)
     ,_transferThreadId(0)
     ,_printAlloctorOccupiedInfo(NULL)
 {
@@ -87,7 +86,6 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
     Fs_SafeFree(_senderMsgs);
     Fs_SafeFree(_recvMsgList);
     Fs_SafeFree(_sessionBufferAlloctor);
-    Fs_SafeFree(_updateAlloctorOccupied);
     Fs_SafeFree(_printAlloctorOccupiedInfo);
 
 //     _CrtMemCheckpoint(&s2);
@@ -104,8 +102,8 @@ Int32 FS_IocpMsgTransfer::BeforeStart()
         return StatusDefs::IocpMsgTransfer_CfgError;
     }
     _maxAlloctorBytes = g_SvrCfg->GetMaxMemPoolBytesPerTransfer();
-    _updateAlloctorOccupied = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor);
-    _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, _updateAlloctorOccupied, &_canCreateNewNodeForAlloctor);
+    auto updateAlloctorOccupied = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor);
+    _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, updateAlloctorOccupied, &_canCreateNewNodeForAlloctor);
     _sessionBufferAlloctor->InitMemory();
     _printAlloctorOccupiedInfo = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_PrintAlloctorOccupiedInfo);
 
@@ -182,8 +180,6 @@ void FS_IocpMsgTransfer::AfterClose()
 
     if(_sessionBufferAlloctor)
         _sessionBufferAlloctor->FinishMemory();
-
-    Fs_SafeFree(_updateAlloctorOccupied);
 }
 
 void FS_IocpMsgTransfer::OnConnect(const BriefSessionInfo  &sessionInfo)
@@ -337,6 +333,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
         // 消息发送回调
         g_ServerCore->_OnSendMsg(session, _ioEvent->_bytesTrans);
 
+        // TODO:有被疯狂发包的风险，解决方案：心跳包协议+频繁发包计数+发包成功时更新时间戳
         _UpdateSessionHeartbeat(session);
 
         // 重新投递接收

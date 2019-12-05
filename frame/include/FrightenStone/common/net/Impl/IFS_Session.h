@@ -80,9 +80,11 @@ public:
 public:
     void Close();
     void UpdateHeartBeatExpiredTime();
+    void ResetAddr();
 
     // 一个session只投递一个send，发完再继续发下一个，务必从队列头开始投递
     bool PushMsgToSend(NetMsg_DataHeader *header);   // 请外部调用的时候务必加锁
+    bool PushMsgToSend(const Byte8 *data, UInt64 len);   // 请外部调用的时候务必加锁
 
     /* 事件 */
 public:

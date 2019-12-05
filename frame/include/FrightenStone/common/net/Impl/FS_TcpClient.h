@@ -64,11 +64,10 @@ public:
     bool IsRun();
 
     // 接收数据 处理粘包 拆分包
-    Int32 RecvData();
     void DoMsg();
-    // 发送数据
-    int SendData(NetMsg_DataHeader *header);
-    int SendData(const Byte8 *data, Int32 len);
+    // 发送数据 发送成功返回发送的数据长度，失败返回 error
+    Int32 SendData(NetMsg_DataHeader *header);
+    Int32 SendData(const Byte8 *data, UInt64 len);
 
     // 处理网络消息
     virtual bool OnRun(Int32 microseconds = 1) = 0;
@@ -79,7 +78,7 @@ protected:
     virtual void OnInitSocket() {}
     virtual void OnConnect() {}
 
-private:
+protected:
     std::atomic<UInt64> _maxSessionId;
     IFS_Session *_session;
     bool _isConnect;

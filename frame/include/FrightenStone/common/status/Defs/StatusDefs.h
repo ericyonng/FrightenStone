@@ -171,6 +171,14 @@ public:
         #pragma region FS_ServerCore[2000, 2099]
         FS_ServerCore_StartFailOfSvrRuningTaskFailure = 2000,       // 添加svrruing线程任务时候失败
         #pragma endregion
+
+        #pragma region FS_TcpClient[3000, 3099]
+        FS_TcpClient_ConnectFail = 3000,                        // 连接失败
+        #pragma endregion
+
+        #pragma region FS_IocpTcpClient[4000, 4099]
+        FS_IocpTcpClient_IocpQuit= 4000,                        // iocp退出
+        #pragma endregion
     };
 };
 

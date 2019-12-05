@@ -97,6 +97,11 @@ void IFS_Session::UpdateHeartBeatExpiredTime()
     _heartBeatExpiredTime.FlushAppendTime(_heartbeatInterval*Time::_microSecondPerMilliSecond);
 }
 
+void IFS_Session::ResetAddr()
+{
+    _addr->Reset();
+}
+
 bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
 {
     if(_isDestroy)
@@ -123,6 +128,37 @@ bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
         g_Log->e<IFS_Session>(_LOGFMT_("push back data fail cmd[%hu] len[%hu]")
                               , header->_cmd
                               , header->_packetLength);
+        return false;
+    }
+
+    return true;
+}
+
+bool IFS_Session::PushMsgToSend(const Byte8 *data, UInt64 len)
+{
+    if(_isDestroy)
+        return false;
+
+    if(_toSend.empty())
+    {
+        auto newBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF, _alloctor);
+        _toSend.push_back(newBuffer);
+        newBuffer->BindTo(_sessionId, _sock);
+    }
+
+    // 缓冲空间不足
+    IFS_Buffer *buffer = _toSend.back();
+    if(!buffer->CanPush(len))
+    {
+        buffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF, _alloctor);
+        buffer->BindTo(_sessionId, _sock);
+        _toSend.push_back(buffer);
+    }
+
+    if(!buffer->PushBack(data, len))
+    {
+        g_Log->e<IFS_Session>(_LOGFMT_("push back data fail len[%llu]")
+                              , len);
         return false;
     }
 

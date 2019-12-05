@@ -125,7 +125,6 @@ private:
     UInt64 _maxAlloctorBytes;
     std::atomic<size_t> _curAlloctorOccupiedBytes;
     std::atomic_bool _canCreateNewNodeForAlloctor;
-    IDelegate<void, size_t> *_updateAlloctorOccupied;
     IDelegate<void> *_printAlloctorOccupiedInfo;
 
     std::atomic<Int32> _sessionCnt;             // 会话个数
