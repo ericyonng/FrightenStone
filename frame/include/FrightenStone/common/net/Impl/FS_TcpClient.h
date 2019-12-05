@@ -51,6 +51,8 @@ public:
     virtual ~FS_TcpClient();
 
 public:
+    Int32 Init();
+
     // 初始化socket
     SOCKET InitSocket(Int32 sendSize = SEND_BUFF_SZIE, Int32 recvSize = RECV_BUFF_SZIE);
     // 连接服务器
@@ -78,19 +80,12 @@ protected:
     virtual void OnConnect() {}
 
 private:
-    inline void _UpdateCanCreateNewNodeForAlloctor(size_t addOccupiedBytes);
-
-private:
     std::atomic<UInt64> _maxSessionId;
     IFS_Session *_session;
     bool _isConnect;
 
-    /* 内存池用于缓冲 */ // TODO:可以抽象一个有上限的内存池方便使用
+    /* 内存池用于缓冲 */
     IMemoryAlloctor *_sessionBufferAlloctor;
-    UInt64 _maxAlloctorBytes;
-    std::atomic<size_t> _curAlloctorOccupiedBytes;
-    std::atomic_bool _canCreateNewNodeForAlloctor;
-    IDelegate<void, size_t> *_updateAlloctorOccupied;
 };
 
 FS_NAMESPACE_END

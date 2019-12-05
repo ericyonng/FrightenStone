@@ -37,6 +37,7 @@
 #include "FrightenStone/common/basedefs/DataType/DataType.h"
 #include "FrightenStone/common/basedefs/Macro/MacroDefs.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include <FrightenStone/common/component/Impl/FS_String.h>
 
 FS_NAMESPACE_BEGIN
 
@@ -60,6 +61,7 @@ public:
 
     bool ReadStr(const char *segmentName, const char *keyName, const char *defaultStr, FS_String &strOut);
     Int64 ReadInt(const char *segmentName, const char *keyName, Int64 defaultInt);
+    UInt64 ReadUInt(const char *segmentName, const char *keyName, UInt64 defaultInt);
     bool WriteStr(const char *segmentName, const char *keyName, const char *wrStr);
 
     bool HasCfgs(const char *segmentName);

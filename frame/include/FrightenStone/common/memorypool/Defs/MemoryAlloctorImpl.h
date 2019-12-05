@@ -75,6 +75,16 @@ inline void IMemoryAlloctor::Unlock()
     _locker.Unlock();
 }
 
+inline void MemoryAlloctorWithLimit::_UpdateCanCreateNewNode(size_t addOccupiedBytes)
+{
+    if(!_canCreateNewNodeForAlloctor)
+        return;
+
+    _curAlloctorOccupiedBytes += addOccupiedBytes;
+    if(_curAlloctorOccupiedBytes >= _maxAlloctorBytes)
+        _canCreateNewNodeForAlloctor = false;
+}
+
 FS_NAMESPACE_END
 
 #endif

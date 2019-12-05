@@ -127,6 +127,21 @@ public:
     virtual ~MemoryAlloctor();
 };
 
+class BASE_EXPORT MemoryAlloctorWithLimit : public IMemoryAlloctor
+{
+public:
+    MemoryAlloctorWithLimit(size_t blockSize, size_t blockAmount, UInt64 maxAlloctBytes);
+    ~MemoryAlloctorWithLimit();
+
+private:
+    void _UpdateCanCreateNewNode(size_t addOccupiedBytes);
+
+private:
+    UInt64 _maxAlloctorBytes;
+    std::atomic<size_t> _curAlloctorOccupiedBytes;
+    std::atomic_bool _canCreateNewNodeForAlloctor;
+};
+
 FS_NAMESPACE_END
 
 #include "FrightenStone/common/memorypool/Defs/MemoryAlloctorImpl.h"

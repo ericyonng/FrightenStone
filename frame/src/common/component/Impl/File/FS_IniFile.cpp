@@ -110,6 +110,15 @@ Int64 FS_IniFile::ReadInt(const char *segmentName, const char *keyName, Int64 de
     return defaultInt;
 }
 
+UInt64 FS_IniFile::ReadUInt(const char *segmentName, const char *keyName, UInt64 defaultInt)
+{
+    FS_String cache;
+    if(_ReadStr(segmentName, keyName, "", cache) && !cache.empty())
+        return StringUtil::StringToUInt64(cache.c_str());
+
+    return defaultInt;
+}
+
 bool FS_IniFile::WriteStr(const char *segmentName, const char *keyName, const char *wrStr)
 {
     if(UNLIKELY(_filePath.empty()))
@@ -189,7 +198,7 @@ bool FS_IniFile::_ReadStr(const char *segmentName, const char *keyName, const ch
 
     if(iterValue->second.empty())
     {
-        strOut << defaultStr;
+        strOut = defaultStr;
     }
     else
     {

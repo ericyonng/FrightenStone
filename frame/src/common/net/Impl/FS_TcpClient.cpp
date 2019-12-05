@@ -36,6 +36,7 @@
 #include <FrightenStone/common/status/status.h>
 #include <FrightenStone/common/log/Log.h>
 #include <FrightenStone/common/net/Impl/FS_SessionFactory.h>
+#include <FrightenStone/common/net/Impl/FS_ClientCfgMgr.h>
 
 FS_NAMESPACE_BEGIN
 
@@ -51,6 +52,19 @@ FS_TcpClient::FS_TcpClient()
 FS_TcpClient::~FS_TcpClient()
 {
     Fs_SafeFree(_sessionBufferAlloctor);
+}
+
+Int32 FS_TcpClient::Init()
+{
+    // ³õÊ¼»¯ÅäÖÃ
+    const UInt64 sendBufferSize = g_ClientCfgMgr->GetSendBufferSize();
+    const UInt64 recvBufferSize = g_ClientCfgMgr->GetRecvBufferSize();
+    const UInt64 bufferSize = std::max<UInt64>(recvBufferSize, sendBufferSize);
+    _sessionBufferAlloctor = new MemoryAlloctorWithLimit(bufferSize
+                                                         , g_ClientCfgMgr->GetMemPoolBufferCntInit()
+                                                         , g_ClientCfgMgr->GetMemPoolAllocMaxBytes());
+    _sessionBufferAlloctor->InitMemory();
+    return StatusDefs::Success;
 }
 
 SOCKET FS_TcpClient::InitSocket(Int32 sendSize /*= SEND_BUFF_SZIE*/, Int32 recvSize /*= RECV_BUFF_SZIE*/)
@@ -76,12 +90,6 @@ SOCKET FS_TcpClient::InitSocket(Int32 sendSize /*= SEND_BUFF_SZIE*/, Int32 recvS
     }
     else {
         SocketUtil::MakeReUseAddr(sock);
-
-        // TODO:clientcfg
-        _maxAlloctorBytes = 1024000000;
-        _updateAlloctorOccupied = DelegatePlusFactory::Create(this, &FS_TcpClient::_UpdateCanCreateNewNodeForAlloctor);
-        _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, 128, _updateAlloctorOccupied, &_canCreateNewNodeForAlloctor);
-        _sessionBufferAlloctor->InitMemory();
 
         _session = FS_SessionFactory::Create(++_maxSessionId, sock, NULL, _sessionBufferAlloctor);
         OnInitSocket();

@@ -60,6 +60,7 @@ IMemoryAlloctor::IMemoryAlloctor(std::atomic<bool>  *canCreateNewNode)
 IMemoryAlloctor::~IMemoryAlloctor()
 {
     FinishMemory();
+    Fs_SafeFree(_updateMemPoolOccupied);
 }
 
 void *IMemoryAlloctor::MixAlloc(size_t bytes)
@@ -278,6 +279,23 @@ MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<v
 }
 
 MemoryAlloctor::~MemoryAlloctor()
+{
+}
+
+MemoryAlloctorWithLimit::MemoryAlloctorWithLimit(size_t blockSize, size_t blockAmount, UInt64 maxAlloctBytes)
+    :IMemoryAlloctor(&_canCreateNewNodeForAlloctor)
+    ,_canCreateNewNodeForAlloctor(true)
+    ,_curAlloctorOccupiedBytes(0)
+    ,_maxAlloctorBytes(maxAlloctBytes)
+{
+    _curBlockAmount = blockAmount;
+    _blockSize = __FS_MEMORY_ALIGN__(blockSize);
+    _blockSize += sizeof(MemoryBlock);
+    _effectiveBlockSize = _blockSize - sizeof(MemoryBlock);
+    _updateMemPoolOccupied = DelegatePlusFactory::Create(this, &MemoryAlloctorWithLimit::_UpdateCanCreateNewNode);
+}
+
+MemoryAlloctorWithLimit::~MemoryAlloctorWithLimit()
 {
 }
 
