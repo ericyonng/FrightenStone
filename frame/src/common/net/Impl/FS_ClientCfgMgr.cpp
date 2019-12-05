@@ -219,18 +219,6 @@ void FS_ClientCfgMgr::_ReadAllCfgs()
     _isSendAfterSvrResArrive = _ini->ReadInt(CLIENT_CFG_SEG, CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE_KEY, 0) != 0;
     _memPoolBufferCntInit = static_cast<Int32>(_ini->ReadInt(CLIENT_CFG_SEG, CLIENT_MEMPOOL_BUFFER_CNT_INIT_KEY, 0));
     _memPoolAllocMaxBytes = _ini->ReadUInt(CLIENT_CFG_SEG, CLIENT_MEMPOOL_ALLOC_MAX_BYTES_KEY, 0);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
-    _ini->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
 }
 
 FS_NAMESPACE_END
