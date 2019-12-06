@@ -37,8 +37,8 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor)
-    :IFS_Session(sessionId, sock, addrInfo, memAlloctor)
+inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartBeatInterval)
+    :IFS_Session(sessionId, sock, addrInfo, memAlloctor, heartBeatInterval)
     ,_isPostRecv(false)
     ,_isPostSend(false)
 {

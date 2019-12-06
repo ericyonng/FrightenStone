@@ -51,10 +51,10 @@ public:
     virtual ~FS_TcpClient();
 
 public:
-    Int32 Init();
+    virtual Int32 Init();
 
     // 初始化socket
-    SOCKET InitSocket(Int32 sendSize = SEND_BUFF_SZIE, Int32 recvSize = RECV_BUFF_SZIE);
+    SOCKET InitSocket();
     // 连接服务器
     Int32 Connect(const Byte8 *ip, UInt16 port);
     // 关闭套接字

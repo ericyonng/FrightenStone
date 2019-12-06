@@ -67,6 +67,7 @@ public:
     bool IsSendAfterSvrResArrive() const;
     Int32 GetMemPoolBufferCntInit() const;
     UInt64 GetMemPoolAllocMaxBytes() const;
+    Int64 GetHeartbeatDeadTimeInterval() const;
 
 public:
     void Lock();
@@ -92,6 +93,7 @@ private:
     bool _isSendAfterSvrResArrive = 0;
     Int32 _memPoolBufferCntInit = 0;
     UInt64 _memPoolAllocMaxBytes = 0;
+    Int64 _heartbeatInterval = 0;
 };
 
 FS_NAMESPACE_END

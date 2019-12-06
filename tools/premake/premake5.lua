@@ -72,13 +72,6 @@ function include_libfs(do_post_build)
             FS_ROOT_DIR .. "/usr/lib64/",
         }
     filter {}
-	
-    -- libdirs(windows)
-    filter { "system:windows"}
-        libdirs {
-            FS_ROOT_DIR .. "/lib/win/x64",
-        }
-    filter {}
 
     -- links(not windows)
     filter { "system:not windows", "configurations:debug*" }
@@ -108,25 +101,6 @@ function include_libfs(do_post_build)
             "libFrightenstone",
         }
     filter {}
-	
-	    -- post build
-    if do_post_build then
-	    postbuildmessage "Copying dependencies of Frightenstone ..."
-
-        -- post build(windows)
-        filter { "system:windows", "configurations:debug" }
-        postbuildcommands("copy /Y " .. string.gsub("$(SolutionDir)../../lib/win/x64/libFrightenstone_debug.* $(TargetDir)libFrightenstone_debug.*", "/", "\\"))
-        filter { "system:windows", "configurations:release" }
-        postbuildcommands("copy /Y " .. string.gsub("$(SolutionDir)../../lib/win/x64/libFrightenstone.* $(TargetDir)libFrightenstone.9", "/", "\\"))
-        filter {}
-
-        -- post build(linux)
-        filter { "system:linux", "configurations:debug" }
-        postbuildcommands(string.format("cp -Rf %s/lib/linux/x64/libFrightenstone_debug.so %s/libFrightenstone_debug.so",  FS_ROOT_DIR, "${TARGETDIR}"))
-        filter { "system:linux", "configurations:release64" }
-        postbuildcommands(string.format("cp -Rf %s/lib/linux/x64/libFrightenstone.so %s/libFrightenstone.so",  FS_ROOT_DIR, "${TARGETDIR}"))
-        filter {}
-    end
 end
 
 -- zlib library:
@@ -319,35 +293,73 @@ project "TestSuit"
     filter {}
 	
 	include_libfs(false)
-    filter { "system:not windows", "configurations:debug*" }
-        links {
-            "Frightenstone_debug",
+
+    -- debug target suffix define
+    filter { "configurations:debug*" }
+        targetsuffix "_debug"
+    filter {}
+
+    -- enable multithread compile
+    enable_multithread_comp("C++14")
+
+    -- warnings
+    filter { "system:not windows" }
+        disablewarnings {
+            "invalid-source-encoding",
         }
     filter {}
 
-    filter { "system:not windows", "configurations:release*" }
-        links {
-            "Frightenstone",
-        }
-    filter {}
+    -- optimize
+    set_optimize_opts()
+	
+	-- core library testsuite compile setting
+project "FS_MyClient"
+    -- language, kind
+    language "c++"
+    kind "ConsoleApp"
 
-    filter { "system:windows" }
-        links {
-            "ws2_32",
-        }
-    filter {}
+	-- precompile header
+	pchheader("stdafx.h")
+	pchsource(FS_ROOT_DIR .. "FS_MyClient/FS_MyClient/stdafx.cpp")
+	
+    -- symbols
+    symbols "On"
 
-    filter { "system:windows", "configurations:debug*" }
-        links {
-            "libFrightenstone_debug",
-        }
-    filter {}
+    -- dependents
+    dependson {
+        "Frightenstone",
+    }
 
-    filter { "system:windows", "configurations:release*" }
+    -- files
+    files {
+        "../../FS_MyClient/**.h",
+        "../../FS_MyClient/**.cpp",
+		"../../protocols/**.h",
+		"../../protocols/**.c",
+		"../../protocols/**.cpp",
+    }
+
+	includedirs {
+	    "../../",
+		"../../frame/include/",
+		"../../FS_MyClient/FS_MyClient/",
+		"../../protocols/Impl/",
+    }
+	
+	-- links
+    libdirs { FS_OUTPUT_DIR }
+    filter { "system:linux" }
         links {
-            "libFrightenstone",
+		    "rt",
+            "uuid",
+			"pthread",
+			"crypto",
+			"ssl",
+            "dl",
         }
     filter {}
+	
+	include_libfs(false)
 
     -- debug target suffix define
     filter { "configurations:debug*" }

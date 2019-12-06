@@ -84,6 +84,7 @@ public:
     static Int32 GetSocketCacheSize(SOCKET &socket, SocketDefs::SOCKET_CACHE_TYPE eType, Int64 &cacheSize);
 
     static FS_String ToFmtSpeedPerSec(Int64 bytesps);
+    static bool IsValidSock(SOCKET sock);
 
 private:
     static bool _isInitEnv;

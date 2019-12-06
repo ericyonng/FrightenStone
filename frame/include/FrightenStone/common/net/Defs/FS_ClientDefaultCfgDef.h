@@ -74,5 +74,8 @@
 // 内存池分配上限
 #define CLIENT_MEMPOOL_ALLOC_MAX_BYTES_KEY  "MemPoolAllocMaxBytes"
 #define CLIENT_MEMPOOL_ALLOC_MAX_BYTES      "549755813888"          // 512MB
+// 心跳时间
+#define CLIENT_HEARTBEATINTERVAL_KEY  "HeartBeatInterval"
+#define CLIENT_HEARTBEATINTERVAL      "3000000"          // 300s
 #endif
 

@@ -52,7 +52,7 @@ class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
     OBJ_POOL_CREATE_DEF(FS_IocpSession);
 public:
-    FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor);
+    FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartBeatInterval);
     virtual ~FS_IocpSession();
 
     // 操作

@@ -70,7 +70,7 @@ Int32 FS_TcpClient::Init()
     return StatusDefs::Success;
 }
 
-SOCKET FS_TcpClient::InitSocket(Int32 sendSize /*= SEND_BUFF_SZIE*/, Int32 recvSize /*= RECV_BUFF_SZIE*/)
+SOCKET FS_TcpClient::InitSocket()
 {
     auto ret = SocketUtil::InitSocketEnv();
     if(ret != StatusDefs::Success)
@@ -94,7 +94,7 @@ SOCKET FS_TcpClient::InitSocket(Int32 sendSize /*= SEND_BUFF_SZIE*/, Int32 recvS
     else {
         SocketUtil::MakeReUseAddr(sock);
 
-        _session = FS_SessionFactory::Create(++_maxSessionId, sock, NULL, _sessionBufferAlloctor);
+        _session = FS_SessionFactory::Create(++_maxSessionId, sock, NULL, _sessionBufferAlloctor, g_ClientCfgMgr->GetHeartbeatDeadTimeInterval());
         OnInitSocket();
     }
     return sock;

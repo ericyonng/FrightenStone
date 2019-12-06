@@ -102,6 +102,7 @@ Int32 FS_ClientCfgMgr::_InitDefCfgs()
     _ini->WriteStr(CLIENT_CFG_SEG, CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE_KEY, CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE);
     _ini->WriteStr(CLIENT_CFG_SEG, CLIENT_MEMPOOL_BUFFER_CNT_INIT_KEY, CLIENT_MEMPOOL_BUFFER_CNT_INIT);
     _ini->WriteStr(CLIENT_CFG_SEG, CLIENT_MEMPOOL_ALLOC_MAX_BYTES_KEY, CLIENT_MEMPOOL_ALLOC_MAX_BYTES);
+    _ini->WriteStr(CLIENT_CFG_SEG, CLIENT_HEARTBEATINTERVAL_KEY, CLIENT_HEARTBEATINTERVAL);
 
     // 检查是否写入正确
     FS_String result;
@@ -201,6 +202,14 @@ Int32 FS_ClientCfgMgr::_InitDefCfgs()
         return StatusDefs::Failed;
     }
 
+    _ini->ReadStr(CLIENT_CFG_SEG, CLIENT_HEARTBEATINTERVAL_KEY, "", result);
+    if(result != CLIENT_HEARTBEATINTERVAL)
+    {
+        g_Log->e<FS_ClientCfgMgr>(_LOGFMT_("_InitDefCfgs fail CLIENT_HEARTBEATINTERVAL_KEY not match result[%s] default[%s]")
+                                  , result.c_str(), CLIENT_HEARTBEATINTERVAL);
+        return StatusDefs::Failed;
+    }
+
     return StatusDefs::Success;
 }
 
@@ -218,7 +227,7 @@ void FS_ClientCfgMgr::_ReadAllCfgs()
     _checkMsgId = _ini->ReadInt(CLIENT_CFG_SEG, CLIENT_CHECK_MSG_ID_KEY, 0) != 0;
     _isSendAfterSvrResArrive = _ini->ReadInt(CLIENT_CFG_SEG, CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE_KEY, 0) != 0;
     _memPoolBufferCntInit = static_cast<Int32>(_ini->ReadInt(CLIENT_CFG_SEG, CLIENT_MEMPOOL_BUFFER_CNT_INIT_KEY, 0));
-    _memPoolAllocMaxBytes = _ini->ReadUInt(CLIENT_CFG_SEG, CLIENT_MEMPOOL_ALLOC_MAX_BYTES_KEY, 0);
+    _heartbeatInterval = _ini->ReadUInt(CLIENT_CFG_SEG, CLIENT_HEARTBEATINTERVAL_KEY, 0);
 }
 
 FS_NAMESPACE_END

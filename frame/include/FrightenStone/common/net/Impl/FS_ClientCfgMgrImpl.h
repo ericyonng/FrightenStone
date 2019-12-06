@@ -94,6 +94,11 @@ inline UInt64 FS_ClientCfgMgr::GetMemPoolAllocMaxBytes() const
     return _memPoolAllocMaxBytes;
 }
 
+inline Int64 FS_ClientCfgMgr::GetHeartbeatDeadTimeInterval() const
+{
+    return _heartbeatInterval;
+}
+
 FS_NAMESPACE_END
 
 #endif

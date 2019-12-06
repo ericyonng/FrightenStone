@@ -44,15 +44,6 @@ inline void FS_IocpTcpClient::OnInitSocket()
     const auto sock = _session->GetSocket();
     const auto sessionId = _session->GetSessionId();
 
-    // 重新更新地址信息，以便地址正常
-    _session->ResetAddr();
-    _session->OnConnect();
-    auto addr = _session->GetAddr();
-    g_Log->net<FS_IocpTcpClient>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
-                                   , sessionId
-                                   , sock
-                                   , addr->GetAddr().c_str()
-                                   , addr->GetPort());
     // 绑定iocp
     auto st = _iocp.Reg(sock, sessionId);
     if(st != StatusDefs::Success)

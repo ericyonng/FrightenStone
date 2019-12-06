@@ -21,49 +21,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : FS_MyClient.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/12/6
  * @brief :
  * 
  *
  * 
  */
+#ifndef __FS_MyClient_FS_MyClient_FS_MyClient_H__
+#define __FS_MyClient_FS_MyClient_FS_MyClient_H__
 
-#include "stdafx.h"
-#ifdef _WIN32
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#endif // _WIN32
+#include <FrightenStone/exportbase.h>
 
-#include "TestSuit/TestSuit/TestInsts.h"
-#include "stdio.h"
-#include "iostream"
+#pragma once
 
-
-// int _tmain(int argc, _TCHAR* argv[])
-// {
-//     TestCrashHandle::Run();
-//     getchar();
-//     return 0;
-// }
-// 
-
-int main()
+class FS_MyClient : public fs::FS_IocpTcpClient
 {
-#ifdef _WIN32
-    _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+public:
+    FS_MyClient();
+    ~FS_MyClient();
+
+public:
+    Int32 Init();
+    virtual void OnNetMsg(fs::NetMsg_DataHeader *header);
+    Int32 SendTest(fs::LoginReq *login);
+    bool CheckSend(time_t dt);
+
+public:
+    // 发送时间计数
+    time_t _restTime = 0; // 毫秒
+private:
+    // 接收消息id计数
+    int _recvMsgID = 1;
+    // 发送消息id计数
+    int _sendMsgID = 1;
+    // 发送条数计数
+    int _sendCount = 0;
+    // 检查接收到的服务端消息ID是否连续
+    bool _checkMsgID = false;
+    //
+    bool _isSend = false;
+};
+
+class ClientTask : public fs::ITask
+{
+public:
+    ClientTask(fs::FS_ThreadPool *pool, Int32 id);
+    ~ClientTask();
+
+    virtual Int32 Run();
+
+private:
+    Int32 _id;
+    fs::FS_ThreadPool *_pool;
+};
+
+class FS_ClientRun
+{
+public:
+    static void Run();
+};
 #endif
-
-    TestInsts inst;
-    inst.Run();
-    std::cout << "main end" << std::endl;
-
-#ifdef _WIN32
-    _CrtDumpMemoryLeaks();
-#endif
-
-    getchar();
-    return 0;
-}

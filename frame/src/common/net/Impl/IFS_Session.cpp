@@ -46,10 +46,9 @@ OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor)
+IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatInterval)
     :_isDestroy(false)
     ,_sessionId(sessionId)
-    ,_addr(new FS_Addr(this, addrInfo))
     ,_sock(sock)
     ,_isListen(false)
     ,_recvBuffer(NULL)
@@ -57,10 +56,10 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
     ,_sendMsgId(1)
     ,_lastErrorReason{StatusDefs::Success}
     ,_maskClose(false)
-    ,_heartbeatInterval(0)
+    ,_heartbeatInterval(heartbeatInterval)
     ,_alloctor(memAlloctor)
 {
-    _heartbeatInterval = static_cast<Int64>(g_SvrCfg->GetHeartbeatDeadTimeInterval());
+    _addr = new FS_Addr(this, addrInfo);
     _recvBuffer = FS_BufferFactory::Create(FS_BUFF_SIZE_DEF, _alloctor);
     _recvBuffer->BindTo(_sessionId, sock);
 

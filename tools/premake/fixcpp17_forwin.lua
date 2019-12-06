@@ -6,7 +6,7 @@
 IS_WINDOWS = string.match(_ACTION, 'vs') ~= nil
 
 -- All libraries output directory
-PROJ_MODULE_NAME = {"Frightenstone", "TestSuit"}
+PROJ_MODULE_NAME = {"Frightenstone", "TestSuit", "FS_MyClient"}
 FS_BUILD_DIR = "../../build/"
 
 -----------------------------------------------------------------------------------------------------------

@@ -454,5 +454,18 @@ FS_String SocketUtil::ToFmtSpeedPerSec(Int64 bytesps)
 
     return "";
 }
+
+bool SocketUtil::IsValidSock(SOCKET sock)
+{
+#ifdef _WIN32
+    return sock != INVALID_SOCKET;
+#else
+    // TODO:linux下需要额外判断sock的有效性
+    return sock != INVALID_SOCKET;
+#endif
+}
+
 FS_NAMESPACE_END
+
+
 

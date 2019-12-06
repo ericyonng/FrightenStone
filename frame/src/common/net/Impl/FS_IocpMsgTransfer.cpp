@@ -689,7 +689,7 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
         for(auto iterSession = _pendingNewSessionInfos.begin(); iterSession != _pendingNewSessionInfos.end();)
         {
             auto &newSessionInfo = *iterSession;
-            auto newSession = FS_SessionFactory::Create(newSessionInfo, _sessionBufferAlloctor)->CastTo<FS_IocpSession>();
+            auto newSession = FS_SessionFactory::Create(newSessionInfo, _sessionBufferAlloctor, g_SvrCfg->GetHeartbeatDeadTimeInterval())->CastTo<FS_IocpSession>();
             _sessions.insert(std::make_pair(newSessionInfo._sessionId, newSession));
             newSession->OnConnect();
             auto addr = newSession->GetAddr();

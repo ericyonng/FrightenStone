@@ -74,6 +74,9 @@ bool FS_Addr::UpdateAddrInfo()
 void FS_Addr::_FromSession()
 {
     const UInt64 sessionSock = _session->GetSocket();
+    if(!fs::SocketUtil::IsValidSock(sessionSock))
+        return;
+
     const UInt64 sessionId = _session->GetSessionId();
     g_Log->w<FS_Addr>(_LOGFMT_("addrInfo input nill value sessionId[%llu], socketId[%llu]")
                       , _session->GetSessionId(), sessionSock);
@@ -82,7 +85,7 @@ void FS_Addr::_FromSession()
     Int32 st = SocketUtil::GetPeerAddr(sessionSock, sizeof(_ip), _ipPtr, _port, lastError);
     if(st != StatusDefs::Success)
     {
-        g_Log->e<FS_Addr>(_LOGFMT_("SocketUtil::GetPeerAddr fail st[%d] sessionId[%llu], socketId[%llu] lastError[%d]\n")
+        g_Log->w<FS_Addr>(_LOGFMT_("SocketUtil::GetPeerAddr fail st[%d] sessionId[%llu], socketId[%llu] lastError[%d]\n")
                           , st, sessionId, sessionSock, lastError);
         return;
     }

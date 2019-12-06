@@ -37,10 +37,10 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor)
+IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartBeatInterVal)
 {
 #ifdef _WIN32
-    return new FS_IocpSession(sessionId, sock, addrInfo, memAlloctor);
+    return new FS_IocpSession(sessionId, sock, addrInfo, memAlloctor, heartBeatInterVal);
 #else
     // TODO:linux
     return NULL;
@@ -48,10 +48,10 @@ IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sock
 }
 
 
-IFS_Session *FS_SessionFactory::Create(const BriefSessionInfo &sessionInfo, IMemoryAlloctor *memAlloctor)
+IFS_Session *FS_SessionFactory::Create(const BriefSessionInfo &sessionInfo, IMemoryAlloctor *memAlloctor, Int64 heartBeatInterVal)
 {
 #ifdef _WIN32
-    return new FS_IocpSession(sessionInfo._sessionId, sessionInfo._sock, &(sessionInfo._addrInfo), memAlloctor);
+    return new FS_IocpSession(sessionInfo._sessionId, sessionInfo._sock, &(sessionInfo._addrInfo), memAlloctor, heartBeatInterVal);
 #else
     // TODO:linux
     return NULL;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : stdafx.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,41 +29,35 @@
  *
  * 
  */
+#pragma once
+// #define _CRTDBG_MAP_ALLOC
+// #include <stdlib.h>
+// #include <crtdbg.h>
 
-#include "stdafx.h"
+
+#define _CRT_SECURE_NO_WARNINGS
+
+#undef _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 
+
 #ifdef _WIN32
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#endif // _WIN32
 
-#include "TestSuit/TestSuit/TestInsts.h"
-#include "stdio.h"
-#include "iostream"
+#pragma region windows sock 
+#include <WinSock2.h>
+#include <windows.h>
+#pragma comment(lib, "ws2_32.lib")
+#define INIT_WIN_SOCK()   WORD ver = MAKEWORD(2, 2);  \
+                        WSADATA dat;                \
+                        WSAStartup(ver, &dat)
+#pragma endregion
 
-
-// int _tmain(int argc, _TCHAR* argv[])
-// {
-//     TestCrashHandle::Run();
-//     getchar();
-//     return 0;
-// }
-// 
-
-int main()
-{
-#ifdef _WIN32
-    _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#include <tchar.h>
 #endif
 
-    TestInsts inst;
-    inst.Run();
-    std::cout << "main end" << std::endl;
+#pragma region C++
+#include <iostream>
+#pragma endregion
 
-#ifdef _WIN32
-    _CrtDumpMemoryLeaks();
-#endif
-
-    getchar();
-    return 0;
-}
+#include <stdio.h>
+#include "protocols/protocol.h"
+#include"FrightenStone/exportbase.h"

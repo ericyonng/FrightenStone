@@ -43,6 +43,19 @@ FS_IocpTcpClient::~FS_IocpTcpClient()
 {
 }
 
+void FS_IocpTcpClient::OnConnect()
+{
+    // 重新更新地址信息，以便地址正常
+    _session->ResetAddr();
+    _session->OnConnect();
+    auto addr = _session->GetAddr();
+    g_Log->net<FS_IocpTcpClient>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
+                                 , _session->GetSessionId()
+                                 , _session->GetSocket()
+                                 , addr->GetAddr().c_str()
+                                 , addr->GetPort());
+}
+
 bool FS_IocpTcpClient::OnRun(int microseconds)
 {
     if(IsRun())
@@ -52,51 +65,60 @@ bool FS_IocpTcpClient::OnRun(int microseconds)
         if(iocpSession->HasMsgToSend())
         {
             auto ioData = iocpSession->MakeSendIoData();
-            auto st = _iocp.PostSend(iocpSession->GetSocket(), ioData);
-            if(st != StatusDefs::Success)
+            if(ioData)
             {
-                iocpSession->ResetPostSendMask();
-                if(st != StatusDefs::IOCP_ClientForciblyClosed)
+                auto st = _iocp.PostSend(iocpSession->GetSocket(), ioData);
+                if(st != StatusDefs::Success)
                 {
-                    g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
-                                               , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
-                }
+                    iocpSession->ResetPostSendMask();
+                    if(st != StatusDefs::IOCP_ClientForciblyClosed)
+                    {
+                        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
+                                                   , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
+                    }
 
-                Close();
-                return false;
+                    Close();
+                    return false;
+                }
             }
 
             // --
             ioData = iocpSession->MakeRecvIoData();
-            st = _iocp.PostRecv(iocpSession->GetSocket(), ioData);
-            if(st != StatusDefs::Success)
+            if(ioData)
             {
-                iocpSession->ResetPostRecvMask();
-                if(st != StatusDefs::IOCP_ClientForciblyClosed)
+                auto st = _iocp.PostRecv(iocpSession->GetSocket(), ioData);
+                if(st != StatusDefs::Success)
                 {
-                    g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
-                                               , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
-                }
+                    iocpSession->ResetPostRecvMask();
+                    if(st != StatusDefs::IOCP_ClientForciblyClosed)
+                    {
+                        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
+                                                   , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
+                    }
 
-                Close();
-                return false;
+                    Close();
+                    return false;
+                }
             }
         }
         else {
             // --
             auto ioData = iocpSession->MakeRecvIoData();
-            Int32 st = _iocp.PostRecv(iocpSession->GetSocket(), ioData);
-            if(st != StatusDefs::Success)
+            if(ioData)
             {
-                iocpSession->ResetPostRecvMask();
-                if(st != StatusDefs::IOCP_ClientForciblyClosed)
+                Int32 st = _iocp.PostRecv(iocpSession->GetSocket(), ioData);
+                if(st != StatusDefs::Success)
                 {
-                    g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
-                                               , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
-                }
+                    iocpSession->ResetPostRecvMask();
+                    if(st != StatusDefs::IOCP_ClientForciblyClosed)
+                    {
+                        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
+                                                   , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
+                    }
 
-                Close();
-                return false;
+                    Close();
+                    return false;
+                }
             }
         }
 

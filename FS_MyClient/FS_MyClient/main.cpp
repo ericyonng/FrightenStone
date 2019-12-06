@@ -37,9 +37,9 @@
 #include <crtdbg.h>
 #endif // _WIN32
 
-#include "TestSuit/TestSuit/TestInsts.h"
 #include "stdio.h"
 #include "iostream"
+#include <FS_MyClient/FS_MyClient/FS_MyClient.h>
 
 
 // int _tmain(int argc, _TCHAR* argv[])
@@ -56,13 +56,12 @@ int main()
     _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
-    TestInsts inst;
-    inst.Run();
-    std::cout << "main end" << std::endl;
 
 #ifdef _WIN32
     _CrtDumpMemoryLeaks();
 #endif
+
+    FS_ClientRun::Run();
 
     getchar();
     return 0;

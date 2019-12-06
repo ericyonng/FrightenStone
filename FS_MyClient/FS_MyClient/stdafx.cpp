@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : main.cpp
+ * @file  : stdafx.cpp
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/5/24
  * @brief :
@@ -29,41 +29,4 @@
  *
  * 
  */
-
 #include "stdafx.h"
-#ifdef _WIN32
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#endif // _WIN32
-
-#include "TestSuit/TestSuit/TestInsts.h"
-#include "stdio.h"
-#include "iostream"
-
-
-// int _tmain(int argc, _TCHAR* argv[])
-// {
-//     TestCrashHandle::Run();
-//     getchar();
-//     return 0;
-// }
-// 
-
-int main()
-{
-#ifdef _WIN32
-    _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif
-
-    TestInsts inst;
-    inst.Run();
-    std::cout << "main end" << std::endl;
-
-#ifdef _WIN32
-    _CrtDumpMemoryLeaks();
-#endif
-
-    getchar();
-    return 0;
-}

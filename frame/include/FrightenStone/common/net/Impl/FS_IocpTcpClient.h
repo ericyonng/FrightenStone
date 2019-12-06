@@ -55,6 +55,7 @@ public:
     /* ÖØÐ´½Ó¿Ú */
 public:
     virtual void OnInitSocket();
+    virtual void OnConnect();
     virtual void Close();
     virtual bool OnRun(int microseconds = 1);
 
