@@ -46,15 +46,16 @@ FS_Addr::FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo)
     ,_ip{0}
     ,_port(0)
     ,_ipPtr(_ip)
+    ,_isSucInit(false)
 {
     if(!addrInfo)
     {
-        _FromSession();
+        _isSucInit = _FromSession();
         return;
     }
 
     _addrInfo = *addrInfo;
-    UpdateAddrInfo();
+    _isSucInit = UpdateAddrInfo();
 }
 
 bool FS_Addr::UpdateAddrInfo()
@@ -70,12 +71,11 @@ bool FS_Addr::UpdateAddrInfo()
     return true;
 }
 
-
-void FS_Addr::_FromSession()
+bool FS_Addr::_FromSession()
 {
     const UInt64 sessionSock = _session->GetSocket();
     if(!fs::SocketUtil::IsValidSock(sessionSock))
-        return;
+        return false;
 
     const UInt64 sessionId = _session->GetSessionId();
     g_Log->w<FS_Addr>(_LOGFMT_("addrInfo input nill value sessionId[%llu], socketId[%llu]")
@@ -87,7 +87,7 @@ void FS_Addr::_FromSession()
     {
         g_Log->w<FS_Addr>(_LOGFMT_("SocketUtil::GetPeerAddr fail st[%d] sessionId[%llu], socketId[%llu] lastError[%d]\n")
                           , st, sessionId, sessionSock, lastError);
-        return;
+        return false;
     }
 
     // todo 若要支持ipv6请修改为ipv6的family
@@ -95,10 +95,11 @@ void FS_Addr::_FromSession()
     {
         g_Log->e<FS_Addr>(_LOGFMT_("SocketUtil::FillTcpAddrInfo fail, sessionId[%llu], socket[%llu]")
                           , sessionId, sessionSock);
-        return;
+        return false;
     }
 
     _strIp = _ip;
+    return true;
 }
 
 FS_NAMESPACE_END

@@ -172,6 +172,8 @@ void IFS_Session::OnDestroy()
 void IFS_Session::OnConnect()
 {
     //UpdateHeartBeatExpiredTime();
+    if(!_addr->IsSucInit())
+        _addr->Reset();
 }
 
 void IFS_Session::OnDisconnect()

@@ -155,6 +155,13 @@ private:
     std::atomic<Int64> _recvMsgBytesPerSecond;      // 每秒收到的包的字节数
     std::atomic<Int64> _sendMsgBytesPerSecond;      // 每秒发送的包字节数
     std::atomic<Int64> _heartbeatTimeOutDisconnected;   // 心跳超时断开会话数
+
+   // 会话数据
+    Locker _sessionlocker;
+    Int32 _curSessionCnt;
+    Int32 _maxSessionQuantityLimit;
+    UInt64 _curMaxSessionId;
+    const UInt64 _maxSessionIdLimit;
 };
 
 FS_NAMESPACE_END

@@ -89,7 +89,7 @@ public:
             7. 接口只能由msgtransfer调度，避免线程不安全 msghandler不能有fs_session对象，只能创建user对象使用userId与sessionId关联，且不处理session的任意内容，只持有sessionId,避免导致线程不安全
     */
 protected:
-    void _OnConnected(const BriefSessionInfo &sessionInfo);
+    void _OnConnected(BriefSessionInfo *sessionInfo);
     void _OnDisconnected(IFS_Session *session);
     void _OnHeartBeatTimeOut(IFS_Session *session);
     // 每接收一个完整包调用一次

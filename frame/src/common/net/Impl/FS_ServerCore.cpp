@@ -312,7 +312,7 @@ void FS_ServerCore::Close()
 
 /* 网络事件 */
 #pragma region
-void FS_ServerCore::_OnConnected(const BriefSessionInfo &sessionInfo)
+void FS_ServerCore::_OnConnected(BriefSessionInfo *sessionInfo)
 {// 只有connector调用接口
 
     // 求余法，将session分配到各个消息处理模块
@@ -340,7 +340,7 @@ void FS_ServerCore::_OnDisconnected(IFS_Session *session)
     ++_sessionDisconnectedCnt;
 
     // _msgDispatcher->OnDisconnected(session);
-    _connector->OnDisconnected(session);
+    _connector->OnUserDisconnected(session);
 }
 
 void FS_ServerCore::_OnHeartBeatTimeOut(IFS_Session *session)

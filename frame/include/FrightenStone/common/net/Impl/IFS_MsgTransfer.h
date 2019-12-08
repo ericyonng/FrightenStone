@@ -61,7 +61,7 @@ public:
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    virtual void OnConnect(const BriefSessionInfo  &sessionInfo) = 0;
+    virtual void OnConnect(BriefSessionInfo *sessionInfo) = 0;
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
 

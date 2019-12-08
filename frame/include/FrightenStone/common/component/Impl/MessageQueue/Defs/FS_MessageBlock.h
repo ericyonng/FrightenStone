@@ -44,6 +44,7 @@
 
 FS_NAMESPACE_BEGIN
 
+class IUser;
 struct BASE_EXPORT FS_MessageBlock
 {
     OBJ_POOL_CREATE_DEF(FS_MessageBlock);
@@ -91,10 +92,14 @@ struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
     NetMsgObjType *CastBufferTo();
 
     // 内存池创建
-    Int32 _mbType;
+    Int32 _mbType;      // MessageBlockType
     Byte8 *_buffer; // NetMsg_DataHeader *
     Int32 _generatorId; // 生产者id
     UInt64 _sessionId;
+
+    /* 连入时候的额外回调参数 _mbType==MB_NetSessionConnected */
+    IDelegate<void, IUser *> *_newUserRes;
+    IDelegate<void, IUser *> *_userDisconnected;
 };
 
 FS_NAMESPACE_END

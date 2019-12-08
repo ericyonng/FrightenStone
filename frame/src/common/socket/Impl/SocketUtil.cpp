@@ -232,7 +232,12 @@ Int32 SocketUtil::GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &
     }
 
     if(inet_ntop(dstadd_in.sin_family, &dstadd_in.sin_addr.s_addr, ip, sizeIp) == NULL)
-        return -1;
+    {
+#ifdef _WIN32
+        lastError = WSAGetLastError();
+#endif
+        return StatusDefs::Error;
+    }
 
     port = ntohs(dstadd_in.sin_port);
 
@@ -266,67 +271,73 @@ bool SocketUtil::GetAddrInfoFromNetInfo(sockaddr_in &addrObj, UInt64 szip, char 
 
 bool SocketUtil::IsDetectTimeOut(
     SOCKET &socket
-    , fd_set &readableSet
-    , fd_set &writableSet
-    , long tv_sec
-    , long tv_usec
+    , timeval timeout
     , bool enableReadableDetect
     , bool enableWriteableDetect
     , int *errOut
-    , bool setOneAtLeast
     , bool isInfiniteWaiting)
 {
-    //清理
+    // 清理
+    fd_set *readableDetect = NULL;
+    fd_set *writableDetect = NULL;
+    fd_set  readableSet;
+    fd_set  writableSet;
     FD_ZERO(&readableSet);
     FD_ZERO(&writableSet);
-    FD_SET(socket, &readableSet);
-    FD_SET(socket, &writableSet);
 
-    // 超时监控参数初始化 秒/微妙
-    timeval timeout;
-    timeout.tv_sec = tv_sec;
-    timeout.tv_usec = tv_usec;
+    if(enableReadableDetect)
+    {
+        readableDetect = &readableSet;
+        FD_SET(socket, &readableSet);
+    }
+
+    if(enableWriteableDetect)
+    {
+        writableDetect = &writableSet;
+        FD_SET(socket, &writableSet);
+    }
 
     int ret = SOCKET_ERROR;
     if(isInfiniteWaiting) { //永久阻塞
         // 0表示超时，否则返回SOCKET_ERROR 当返回为-1时，所有描述符集清0。 
         // 当返回为正数时，表示已经准备好的描述符数。
-        ret = select(static_cast<Int32>(socket + 1), &readableSet, &writableSet, NULL, NULL); 
+        ret = select(static_cast<Int32>(socket + 1), readableDetect, writableDetect, NULL, NULL); 
     }
     else {
         // 0表示超时，否则返回SOCKET_ERROR 当返回为-1时，所有描述符集清0。
         // 当返回为正数时，表示已经准备好的描述符数。
-        ret = select(static_cast<Int32>(socket + 1), &readableSet, &writableSet, NULL, &timeout); 
+        ret = select(static_cast<Int32>(socket + 1), readableDetect, writableDetect, NULL, &timeout); 
     }
 
-    //出错带出
+    // select结果带出去
     if(errOut) 
         *errOut = ret;
 
     if(ret == SOCKET_ERROR) {
+#ifndef _WIN32
+        perror("select fail");
+#else
+        auto lastErr = GetLastError();
+        FS_String err;
+        err.AppendFormat("\nselect fail lastErr[%lu]\n", lastErr);
+        SystemUtil::LockConsole();
+        SystemUtil::OutputToConsole(err);
+        SystemUtil::UnlockConsole();
+#endif
         FD_CLR(socket, &readableSet);
         FD_CLR(socket, &writableSet);
+
         return true;
     }
 
-    // 监听状态导出
-    bool isTimeOut = false;
-    if(setOneAtLeast) {
-        isTimeOut = (!FD_ISSET(socket, &readableSet) || !FD_ISSET(socket, &writableSet));
-    }
-    else {
-        if(enableReadableDetect && !enableWriteableDetect) {
-            isTimeOut = !FD_ISSET(socket, &readableSet);
-        }
-        else if(!enableReadableDetect && enableWriteableDetect) {
-            isTimeOut = !FD_ISSET(socket, &writableSet);
-        }
-        else {
-            isTimeOut = (!FD_ISSET(socket, &readableSet) && !FD_ISSET(socket, &writableSet));
-        }
-    }
+    FD_CLR(socket, &readableSet);
+    FD_CLR(socket, &writableSet);
 
-    return isTimeOut;
+    // 没有超时
+    if(ret > 0)
+        return false;
+
+    return true;
 }
 
 void SocketUtil::Sleep(UInt64 milliSec, UInt64 microSec)

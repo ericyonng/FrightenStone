@@ -60,6 +60,11 @@ inline void FS_Addr::Reset()
     _FromSession();
 }
 
+inline bool FS_Addr::IsSucInit() const
+{
+    return _isSucInit;
+}
+
 FS_NAMESPACE_END
 
 #endif

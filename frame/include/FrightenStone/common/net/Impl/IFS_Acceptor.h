@@ -21,73 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_MessageBlockImpl.h
+ * @file  : IFS_Acceptor.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/11/03
+ * @date  : 2019/12/08
  * @brief :
  * 
  *
  * 
  */
+#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
+#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
 
-#ifdef __Frame_Include_FrightenStone_Common_Component_Impl_MessageQueue_Defs_FS_MessageBlock_H__
 #pragma once
 
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
+
 FS_NAMESPACE_BEGIN
-inline FS_MessageBlock::FS_MessageBlock()
-    :_data(NULL)
+
+class IFS_Session;
+
+class BASE_EXPORT IFS_Acceptor
 {
-}
+public:
+    IFS_Acceptor();
+    virtual ~IFS_Acceptor();
 
-inline FS_MessageBlock::~FS_MessageBlock()
-{
-    FS_Release(_data);
-}
+public:
+    virtual Int32 BeforeStart() { return StatusDefs::Success; }
+    virtual Int32 Start() = 0;
+    virtual Int32 AfterStart() { return StatusDefs::Success; }
+    virtual void WillClose() {} // 断开与模块之间的依赖
+    virtual void BeforeClose() {}
+    virtual void Close() = 0;
+    virtual void AfterClose() {}
 
-template<typename DerivedObjType>
-inline DerivedObjType *FS_MessageBlock::CastTo()
-{
-    return static_cast<DerivedObjType *>(this);
-}
-
-// inline FS_NetMsgBlock::FS_NetMsgBlock()
-//     :_msgData(NULL)
-// {
-// }
-// 
-// inline FS_NetMsgBlock::~FS_NetMsgBlock()
-// {
-//     //ProtocoalAssist::DelNetMsg(_msgData);
-// }
-
-inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
-    :_buffer(NULL)
-    ,_generatorId(-1)
-    ,_sessionId(0)
-    ,_mbType(MessageBlockType::MB_None)
-    ,_newUserRes(NULL)
-    ,_userDisconnected(NULL)
-{
-}
-
-inline FS_NetMsgBufferBlock::~FS_NetMsgBufferBlock()
-{
-    if(_buffer)
-    {
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(_buffer);
-        g_MemoryPool->Unlock();
-    }
-
-    FS_Release(_newUserRes);
-    FS_Release(_userDisconnected);
-}
-
-template<typename NetMsgObjType>
-inline NetMsgObjType *FS_NetMsgBufferBlock::CastBufferTo()
-{
-    return reinterpret_cast<NetMsgObjType *>(_buffer);
-}
+    // 回调接口
+    virtual void OnDisconnected(IFS_Session *session) = 0;
+};
 
 FS_NAMESPACE_END
 

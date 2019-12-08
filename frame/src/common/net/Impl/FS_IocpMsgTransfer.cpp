@@ -182,7 +182,7 @@ void FS_IocpMsgTransfer::AfterClose()
         _sessionBufferAlloctor->FinishMemory();
 }
 
-void FS_IocpMsgTransfer::OnConnect(const BriefSessionInfo  &sessionInfo)
+void FS_IocpMsgTransfer::OnConnect(BriefSessionInfo *sessionInfo)
 {
     _connectorGuard.Lock();
     _pendingNewSessionInfos.push_back(sessionInfo);
@@ -533,12 +533,16 @@ bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session)
     return true;
 }
 
-void FS_IocpMsgTransfer::_NtySessionConnectedMsg(UInt64 sessionId)
+void FS_IocpMsgTransfer::_NtySessionConnectedMsg(UInt64 sessionId, BriefSessionInfo *newSessionInfo)
 {
     FS_NetMsgBufferBlock *newMsgBlock = new FS_NetMsgBufferBlock;
     newMsgBlock->_generatorId = _id;
     newMsgBlock->_mbType = MessageBlockType::MB_NetSessionConnected;
     newMsgBlock->_sessionId = sessionId;
+    newMsgBlock->_newUserRes = newSessionInfo->_newUserRes;
+    newSessionInfo->_newUserRes = NULL;
+    newMsgBlock->_userDisconnected = newSessionInfo->_userDisconnectedRes;
+    newSessionInfo->_userDisconnectedRes = NULL;
     _messageQueue->PushLock(_id);
     if(!_messageQueue->Push(_id, newMsgBlock))
         Fs_SafeFree(newMsgBlock);
@@ -689,8 +693,8 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
         for(auto iterSession = _pendingNewSessionInfos.begin(); iterSession != _pendingNewSessionInfos.end();)
         {
             auto &newSessionInfo = *iterSession;
-            auto newSession = FS_SessionFactory::Create(newSessionInfo, _sessionBufferAlloctor, g_SvrCfg->GetHeartbeatDeadTimeInterval())->CastTo<FS_IocpSession>();
-            _sessions.insert(std::make_pair(newSessionInfo._sessionId, newSession));
+            auto newSession = FS_SessionFactory::Create(*newSessionInfo, _sessionBufferAlloctor, g_SvrCfg->GetHeartbeatDeadTimeInterval())->CastTo<FS_IocpSession>();
+            _sessions.insert(std::make_pair(newSessionInfo->_sessionId, newSession));
             newSession->OnConnect();
             auto addr = newSession->GetAddr();
             g_Log->net<FS_IocpMsgTransfer>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
@@ -699,15 +703,15 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
                                          , addr->GetAddr().c_str()
                                          , addr->GetPort());
             // 绑定iocp
-            auto st = _iocp->Reg(newSessionInfo._sock, newSessionInfo._sessionId);
+            auto st = _iocp->Reg(newSessionInfo->_sock, newSessionInfo->_sessionId);
             if(st != StatusDefs::Success)
             {
                 g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("reg socket[%llu] sessionId[%llu] fail st[%d]")
-                                             , newSessionInfo._sock, newSessionInfo._sessionId, st);
+                                             , newSessionInfo->_sock, newSessionInfo->_sessionId, st);
             }
 
             // 推送会话连入消息
-            _NtySessionConnectedMsg(newSessionInfo._sessionId);
+            _NtySessionConnectedMsg(newSessionInfo->_sessionId);
 
             // 投递接收数据
             if(!_DoPostRecv(newSession))
@@ -720,6 +724,7 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
                 _UpdateSessionHeartbeat(newSession);
             }
 
+            Fs_SafeFree(newSessionInfo);
             iterSession = _pendingNewSessionInfos.erase(iterSession);
         }
         _hasNewSessionLinkin = false;

@@ -69,7 +69,7 @@ public:
     virtual void AfterClose();
 
     // 网络
-    virtual void OnConnect(const BriefSessionInfo  &sessionInfo);
+    virtual void OnConnect(BriefSessionInfo  *sessionInfo);
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut(IFS_Session *session);
 
@@ -98,7 +98,7 @@ private:
     bool _DoPostRecv(FS_IocpSession *session);
 
 private:
-    void _NtySessionConnectedMsg(UInt64 sessionId);
+    void _NtySessionConnectedMsg(UInt64 sessionId, BriefSessionInfo *newSessionInfo);
     void _NtySessionDisConnectMsg(UInt64 sessionId);
 
     // 辅助
@@ -143,7 +143,7 @@ private:
     // 缓冲区
     Locker _connectorGuard;
     std::atomic<bool> _hasNewSessionLinkin;         // 
-    std::list<BriefSessionInfo> _pendingNewSessionInfos;     // 连入的会话缓冲区
+    std::list<BriefSessionInfo *> _pendingNewSessionInfos;     // 连入的会话缓冲区
 
     // 待发送的会话缓冲区
 //     Locker _asynSendGuard;

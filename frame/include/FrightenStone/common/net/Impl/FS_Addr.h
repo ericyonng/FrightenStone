@@ -56,11 +56,13 @@ public:
     bool UpdateAddrInfo();
     FS_String ToString() const;
     void Reset();
+    bool IsSucInit() const;
 
 private:
-    void _FromSession();
+    bool _FromSession();
 
 private:
+    bool _isSucInit;
     BUFFER64 _ip;
     FS_String _strIp;
     char *_ipPtr;

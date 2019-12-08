@@ -21,73 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_MessageBlockImpl.h
+ * @file  : IUser.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/11/03
+ * @date  : 2019/12/09
  * @brief :
  * 
  *
  * 
  */
 
-#ifdef __Frame_Include_FrightenStone_Common_Component_Impl_MessageQueue_Defs_FS_MessageBlock_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IUser_H__
+#define __Frame_Include_FrightenStone_Common_Net_Impl_IUser_H__
+
 #pragma once
 
+#include <FrightenStone/exportbase.h>
+#include <FrightenStone/common/basedefs/BaseDefs.h>
+
 FS_NAMESPACE_BEGIN
-inline FS_MessageBlock::FS_MessageBlock()
-    :_data(NULL)
+
+class BASE_EXPORT IUser
 {
-}
-
-inline FS_MessageBlock::~FS_MessageBlock()
-{
-    FS_Release(_data);
-}
-
-template<typename DerivedObjType>
-inline DerivedObjType *FS_MessageBlock::CastTo()
-{
-    return static_cast<DerivedObjType *>(this);
-}
-
-// inline FS_NetMsgBlock::FS_NetMsgBlock()
-//     :_msgData(NULL)
-// {
-// }
-// 
-// inline FS_NetMsgBlock::~FS_NetMsgBlock()
-// {
-//     //ProtocoalAssist::DelNetMsg(_msgData);
-// }
-
-inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
-    :_buffer(NULL)
-    ,_generatorId(-1)
-    ,_sessionId(0)
-    ,_mbType(MessageBlockType::MB_None)
-    ,_newUserRes(NULL)
-    ,_userDisconnected(NULL)
-{
-}
-
-inline FS_NetMsgBufferBlock::~FS_NetMsgBufferBlock()
-{
-    if(_buffer)
-    {
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(_buffer);
-        g_MemoryPool->Unlock();
-    }
-
-    FS_Release(_newUserRes);
-    FS_Release(_userDisconnected);
-}
-
-template<typename NetMsgObjType>
-inline NetMsgObjType *FS_NetMsgBufferBlock::CastBufferTo()
-{
-    return reinterpret_cast<NetMsgObjType *>(_buffer);
-}
+public:
+    virtual UInt64 GetSessionId() const = 0;
+    virtual void Close() = 0;
+};
 
 FS_NAMESPACE_END
 

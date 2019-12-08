@@ -164,6 +164,9 @@ void FS_IocpMsgDispatcher::Close()
 
     STLUtil::DelListContainer(*_recvMsgBlocks);
     Fs_SafeFree(_recvMsgBlocks);
+    for(auto &iterDelegateInfo : _sessionIdRefUserDisconnected)
+        STLUtil::DelListContainer(iterDelegateInfo.second);
+    _sessionIdRefUserDisconnected.clear();
 }
 // 
 // void FS_IocpMsgDispatcher::OnRecv(std::list<IFS_Session *> &sessions, Int64 &incPacketsCnt)
@@ -267,26 +270,37 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 void FS_IocpMsgDispatcher::_OnBusinessProcessing()
 {
     // 将网络数据转移到缓冲区
-    for(auto iterBlock = _recvMsgBlocks->begin(); iterBlock != _recvMsgBlocks->end();)
     {
-        auto netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
-
-        if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionDisconnect)
-        {// 客户端断开
-            _delayDisconnectedSessions.insert(netMsgBlock->_sessionId);
-        }
-        else if(netMsgBlock->_mbType == MessageBlockType::MB_NetMsgArrived)
-        {// 收到网络包
-            auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
-            _DoBusinessProcess(netMsgBlock->_sessionId, netMsgBlock->_generatorId, netMsg);
-        }
-        else if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionConnected)
+        FS_NetMsgBufferBlock *netMsgBlock = NULL;
+        UInt64 sessionId = 0;
+        for(auto iterBlock = _recvMsgBlocks->begin(); iterBlock != _recvMsgBlocks->end();)
         {
-            _logic->OnSessionConnected(netMsgBlock->_sessionId);
-        }
+            netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
+            sessionId = netMsgBlock->_sessionId;
+            if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionDisconnect)
+            {// 会话断开
+                _delayDisconnectedSessions.insert(sessionId);
+            }
+            else if(netMsgBlock->_mbType == MessageBlockType::MB_NetMsgArrived)
+            {// 收到网络包
+                auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
+                _DoBusinessProcess(sessionId, netMsgBlock->_generatorId, netMsg);
+            }
+            else if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionConnected)
+            {// 会话连入
+                auto newUser = _logic->OnSessionConnected(sessionId);
+                netMsgBlock->_newUserRes->Invoke(newUser);
 
-        Fs_SafeFree(netMsgBlock);
-        iterBlock = _recvMsgBlocks->erase(iterBlock);
+                auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
+                if(iterDisconnected == _sessionIdRefUserDisconnected.end())
+                    iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>>())).first;
+                iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
+                netMsgBlock->_userDisconnected = NULL;
+            }
+
+            Fs_SafeFree(netMsgBlock);
+            iterBlock = _recvMsgBlocks->erase(iterBlock);
+        }
     }
 
     // 延迟断开连接
@@ -304,9 +318,22 @@ void FS_IocpMsgDispatcher::_DoBusinessProcess(UInt64 sessionId, UInt64 generator
 
 void FS_IocpMsgDispatcher::_OnDelaySessionDisconnect(UInt64 sessionId)
 {
+    std::list<IDelegate<void, IUser *> *> *delagates = NULL;
+    auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
+    if(iterDisconnected != _sessionIdRefUserDisconnected.end())
+        delagates = &iterDisconnected->second;
+
     // TODO:真实的session断开
     if(_logic)
-        _logic->OnSessionDisconnected(sessionId);
+        _logic->OnSessionDisconnected(sessionId, delagates);
+
+    if(delagates)
+    {
+        if(!delagates->empty())
+            STLUtil::DelListContainer(*delagates);
+
+        _sessionIdRefUserDisconnected.erase(iterDisconnected);
+    }
 }
 
 FS_NAMESPACE_END

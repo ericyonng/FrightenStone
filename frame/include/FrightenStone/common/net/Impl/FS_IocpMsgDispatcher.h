@@ -52,6 +52,7 @@ class IFS_MsgTransfer;
 class IFS_BusinessLogic;
 class ConcurrentMessageQueue;
 struct FS_MessageBlock;
+class IUser;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
@@ -68,7 +69,7 @@ public:
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut();
 
-    virtual void SendData(UInt64 sessionId,  UInt64 consumerId, NetMsg_DataHeader *msg);
+    virtual void SendData(UInt64 sessionId,  UInt64 consumerId, NetMsg_DataHeader *msg);// 线程安全
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
     virtual void AttachRecvMessageQueue(ConcurrentMessageQueue *messageQueue);
     virtual Int32 GetId() const;
@@ -93,6 +94,7 @@ private:
     TimeSlice _resolutionInterval;      // 时钟轮盘时间间隔
     TimeWheel *_timeWheel;
     IFS_BusinessLogic *_logic;
+    std::map<UInt64, std::list<IDelegate<void, IUser *> *>> _sessionIdRefUserDisconnected;
 
     std::list<FS_MessageBlock *> *_recvMsgBlocks;       // 需要转换成 FS_NetMsgBufferBlock
     ConcurrentMessageQueue *_messgeQueue;

@@ -58,21 +58,17 @@ public:
 
     // 获取对象地址信息 0表示成功其他值为错误信息 获取远程客户端地址信息 需要在accept成功完成后才可以调用
     static Int32 GetPeerAddr(UInt64 sSocket, Int32 sizeIp, Byte8 *&ip, UInt16 &port, Int32 &lastError);
-    // 转换为网络字节序
+    // 转换为网络字节序 family:AF_INET(udp,tcp)
     static bool FillTcpAddrInfo(const char *ip, UInt16 port, UInt16 family, sockaddr_in &addrObj);
     // 转换为主机信息
     static bool GetAddrInfoFromNetInfo(sockaddr_in &addrObj, UInt64 szip, char *&ip, UInt16 &port);
     // 套接字等待超时
     static bool IsDetectTimeOut(
         SOCKET &socket
-        , fd_set &readableSet
-        , fd_set &writableSet
-        , long tv_sec
-        , long tv_usec
+        , timeval timeout
         , bool enableReadableDetect = true
         , bool enableWriteableDetect = false
         , int *errOut = NULL
-        , bool setOneAtLeast = false
         , bool isInfiniteWaiting = false);
 
     static void Sleep(UInt64 milliSec, UInt64 microSec = 0);

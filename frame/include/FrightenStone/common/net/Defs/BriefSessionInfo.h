@@ -37,16 +37,21 @@
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include <FrightenStone/common/component/Impl/FS_Delegate.h>
 
 FS_NAMESPACE_BEGIN
 
+class IUser;
 struct BASE_EXPORT BriefSessionInfo
 {
     BriefSessionInfo();
+    ~BriefSessionInfo();
 
     UInt64 _sessionId;
     SOCKET _sock;
     sockaddr_in _addrInfo;
+    IDelegate<void, IUser *> *_newUserRes;      // 当发生转移时需要创建一个新_newUserRes Copy
+    IDelegate<void, IUser *> *_userDisconnectedRes; // 当发生转移时需要创建一个新_userDisconnectedRes Copy
 };
 
 FS_NAMESPACE_END

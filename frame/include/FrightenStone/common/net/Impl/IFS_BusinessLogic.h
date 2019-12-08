@@ -44,11 +44,13 @@
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 #include "FrightenStone/common/net/Impl/FS_MsgReadStream.h"
 #include "FrightenStone/common/net/Impl/FS_MsgWriteStream.h"
+#include <FrightenStone/common/component/Impl/FS_Delegate.h>
 
 FS_NAMESPACE_BEGIN
 
 struct NetMsg_DataHeader;
 class  IFS_MsgDispatcher;
+class IUser;
 
 class BASE_EXPORT IFS_BusinessLogic
 {
@@ -68,8 +70,8 @@ public:
 
 public:
     virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData) = 0;
-    virtual void OnSessionDisconnected(UInt64 sessionId) = 0;
-    virtual void OnSessionConnected(UInt64 sessionId) = 0;
+    virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, IUser *> *> *disconnectedDelegate) = 0;
+    virtual IUser *OnSessionConnected(UInt64 sessionId) = 0;
 
     void SetDispatcher(IFS_MsgDispatcher *dispatcher);
 

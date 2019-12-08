@@ -38,22 +38,20 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/net/Impl/IFS_Connector.h"
-#include "FrightenStone/common/component/Impl/FS_Delegate.h"
-#include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
-#include "FrightenStone/common/asyn/asyn.h"
-#include "FrightenStone/common/component/Impl/FS_String.h"
+#include <FrightenStone/common/component/Impl/FS_String.h>
 
 FS_NAMESPACE_BEGIN
 
-class IFS_Session;
-class FS_IniFile;
-class FS_Iocp;
-struct IoDataBase;
-
+class User;
 class BASE_EXPORT FS_IocpConnector : public IFS_Connector
 {
 public:
-    FS_IocpConnector();
+    FS_IocpConnector(Locker &locker
+                     , Int32 &curSessionCnt
+                     , Int32 &maxSessionQuantityLimit
+                     ,UInt64 &curMaxSessionId
+                     , const UInt64 &maxSessionIdLimit
+                     , Int32 timeOutMillSec);
     virtual ~FS_IocpConnector();
 
 public:
@@ -61,75 +59,57 @@ public:
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
-    virtual void OnDisconnected(IFS_Session *session);
-    /* TCP 常规操作 */
-    #pragma region tcp normal operate
-    /*
-    * brief:
-    *       1. - InitSocket 初始化Socket等
-    *       2. - Bind 绑定IP和端口号
-    *       3. - Listen 监听端口号
-    */
+
+public:
+    // 连接
+    virtual Int32 Connect(const FS_ConnectInfo &connectInfo);
+    virtual std::map<UInt64, IUser *> &GetUsers();
+
+    // 成功连接时的回调
+    virtual void RegOnSucConnect(IDelegate<void, BriefSessionInfo *> *sucCallback);
+
 private:
-    SOCKET _InitSocket();
-    Int32 _Bind(const Byte8 *ip, UInt16 port);
-    Int32 _Listen(Int32 unconnectQueueLen = SOMAXCONN);
-    #pragma endregion
+    // 连入成功 从dispatcher调用委托回调
+    void _OnNewUserRes(IUser *user);
+    // 断开 从dispatcher调用委托回调
+    void _OnUserDisconnected(IUser *user);
 
-    /* 网络事件 */
-    #pragma region net event
-    /*
-    * brief: 
-    *       1. FS_Server 4 多个线程触发 不安全 如果只开启1个FS_Server就是安全的
-    *       2. _OnNetMonitorTask 监听网络任务 OnRun(旧版) 建议多条线程去做monitor而不是单条线程，完成端口的get是线程安全的
-    *       3. OnNetJoin 玩家加入 线程不安全
-    *       4. OnNetLeave 玩家掉线 线程不安全
-    *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）线程不安全 NetMsg_DataHeader 转发到其他线程需要拷贝避免消息被覆盖
-    *       6. OnNetRecv 接收到数据 线程不安全
-    */
+    Int32 _CheckConnect(const FS_ConnectInfo &connectInfo, FS_String &addrInfoOut) const;
+    void _MakeAddrInfo(const FS_String &ip, UInt64 port, FS_String &addrInfo) const;
+    Int32 _Connect(SOCKET sock, const sockaddr_in &sin, const FS_ConnectInfo &connectInfo);
+
 private:
-    void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS_Iocp *iocpListener);
-    void _OnDisconnected(IFS_Session *session);
-    void _OnIocpMonitorTask(FS_ThreadPool *threadPool);
-    void _PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, IoDataBase **&ioDataArray);
-    void _FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray);
-    void _AddToUsedIoDataBaseQueue(IoDataBase *used);
-    void _PostAcceptFromUsedDataBaseQuue(FS_Iocp *listenIocp);
-
-    #pragma endregion
-
-    /* 数据成员 */
-    #pragma region data member
-private:
-    // 线程 
-    FS_ThreadPool *_threadPool;
-    SOCKET _sock;
-
-    // 网络事件回调
-    IDelegate<void> *_closeIocpDelegate;
-
     // 客户端连接上限
-    Locker _locker;
-    Int32 _curSessionCnt;
-    Int32 _maxSessionQuantityLimit;
-    UInt64 _curMaxSessionId;
-    const UInt64 _maxSessionIdLimit;
+    Locker &_locker;
+    Int32 &_curSessionCnt;
+    Int32 &_maxSessionQuantityLimit;
+    UInt64 &_curMaxSessionId;
+    const UInt64 &_maxSessionIdLimit;
+    Int32 _timeOutMillSec;              // 连接超时ms
+    std::set<UInt64> _sucConnectedSessionIds;
+    std::map<UInt64, IUser *> _sessionIdRefUser;
 
-    std::list<IoDataBase *> _usedIoQueue;
-
-//     _CrtMemState s1;
-//     _CrtMemState s2;
-//     _CrtMemState s3;
-#pragma endregion
+    // 成功连接后
+    IDelegate<void, BriefSessionInfo *> *_onConnectSuc;
 };
 
 #pragma region inline
-inline void FS_IocpConnector::_AddToUsedIoDataBaseQueue(IoDataBase *used)
+inline void FS_IocpConnector::_MakeAddrInfo(const FS_String &ip, UInt64 port, FS_String &addrInfo) const
 {
-    _usedIoQueue.push_back(used);
+    addrInfo.AppendFormat("%s%hu", ip.c_str(), port);
+}
+
+inline std::map<UInt64, IUser *> &FS_IocpConnector::GetUsers()
+{
+    return _sessionIdRefUser;
+}
+
+inline void FS_IocpConnector::RegOnSucConnect(IDelegate<void, BriefSessionInfo *> *sucCallback)
+{
+    FS_Release(_onConnectSuc);
+    _onConnectSuc = sucCallback;
 }
 #pragma endregion
-
 FS_NAMESPACE_END
 
 #endif

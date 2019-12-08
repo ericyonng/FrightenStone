@@ -151,11 +151,11 @@ public:
         Tls_CreateHandleFail = 1600,                            // tlshandle创建失败
         #pragma endregion
 
-        #pragma region IocpConnector[1700, 1799]
-        IocpConnector_StartFailOfMonitorTaskFailure = 1700,     // iocpconnector 添加monitor task失败
-        IocpConnector_CreateCfgIniFail = 1701,                  // 创建配置文件失败
-        IocpConnector_InitDefIniFail = 1702,                    // 初始化写入默认配置失败
-        IocpConnector_InitListenSocketFail = 1703,              // 初始化监听套接字失败
+        #pragma region IocpAcceptor[1700, 1799]
+        IocpAcceptor_StartFailOfMonitorTaskFailure = 1700,     // iocpconnector 添加monitor task失败
+        IocpAcceptor_CreateCfgIniFail = 1701,                  // 创建配置文件失败
+        IocpAcceptor_InitDefIniFail = 1702,                    // 初始化写入默认配置失败
+        IocpAcceptor_InitListenSocketFail = 1703,              // 初始化监听套接字失败
         #pragma endregion
 
         #pragma region IocpMsgTransfer[1800, 1899]
@@ -178,6 +178,15 @@ public:
 
         #pragma region FS_IocpTcpClient[4000, 4099]
         FS_IocpTcpClient_IocpQuit= 4000,                        // iocp退出
+        #pragma endregion
+
+        #pragma region FS_IocpConnector[4100, 4199]
+        FS_IocpConnector_CreateSocketFail = 4100,               // 创建套接字失败
+        FS_IocpConnector_ConnectRepeated = 4101,                // 重复连接目标
+        FS_IocpConnector_ConnectFail = 4102,                    // 连接失败
+        FS_IocpConnector_ConnectOverLimit = 4103,               // 连接数过多
+        FS_IocpConnector_SessionIdOverLimit = 4104,             // sessionId无法再分配
+        FS_IocpConnector_ConnectTimeOut = 4105,                 // 连接超时
         #pragma endregion
     };
 };

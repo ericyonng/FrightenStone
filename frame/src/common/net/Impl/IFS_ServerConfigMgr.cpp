@@ -107,28 +107,28 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     if(strcmp(buffer.c_str(), "127.0.0.1") != 0)
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail ip not match"));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     UInt16 port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_PORT_KEY, 0));
     if(port != atoi(SVR_CFG_LISTENER_PORT))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail port not match"));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto maxConnectQuantity = _ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_CLN_LIMIT_KEY, 0);
     if(maxConnectQuantity != atoi(SVR_CFG_LISTENER_CLN_LIMIT))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail maxConnectQuantity not match"));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto cnt = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_TRANSFER_SEG_CNT_KEY, 0);
     if(cnt != atoi(SVR_CFG_TRANSFER_SEG_CNT))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail transfer cnt not match"));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto heartbeatTime = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0);
@@ -136,7 +136,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%lld] not match SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] default")
                                       , heartbeatTime, static_cast<UInt32>(atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL)));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto preBufferCnt = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, 0);
@@ -144,7 +144,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_PREPARE_POOL_BUFFER_CNT[%lld] not match SVR_CFG_PREPARE_POOL_BUFFER_CNT[%u] default")
                                       , preBufferCnt, static_cast<UInt32>(atoi(SVR_CFG_PREPARE_POOL_BUFFER_CNT)));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto memPoolMBPerTransfer = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY, 0);
@@ -152,7 +152,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%lld] not match SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%u] default")
                                       , memPoolMBPerTransfer, static_cast<UInt32>(atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER)));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto dispatcherCnt = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_CNT_KEY, 0);
@@ -160,7 +160,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_DISPATCHER_CNT[%lld] not match SVR_CFG_DISPATCHER_CNT[%u] default")
                                       , dispatcherCnt, static_cast<UInt32>(atoi(SVR_CFG_DISPATCHER_CNT)));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto maxAllowMB = _ini->ReadInt(SVR_CFG_OBJPOOL_SEG, SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED_KEY, 0);
@@ -168,7 +168,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED[%lld] not match SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED[%u] default")
                                       , maxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED)));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto memPoolMaxAllowMB = _ini->ReadInt(SVR_CFG_MEMORY_POOL_SEG, SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY, 0);
@@ -176,7 +176,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED[%lld] not match SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED[%u] default")
                                       , memPoolMaxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED)));
-        return StatusDefs::IocpConnector_InitDefIniFail;
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     return StatusDefs::Success;

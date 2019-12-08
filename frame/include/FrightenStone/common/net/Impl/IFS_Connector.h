@@ -43,6 +43,9 @@
 FS_NAMESPACE_BEGIN
 
 class IFS_Session;
+class BriefSessionInfo;
+class IUser;
+struct FS_ConnectInfo;
 
 class BASE_EXPORT IFS_Connector
 {
@@ -59,8 +62,12 @@ public:
     virtual void Close() = 0;
     virtual void AfterClose() {}
 
-    // 回调接口
-    virtual void OnDisconnected(IFS_Session *session) = 0;
+    // 连接
+    virtual Int32 Connect(const FS_ConnectInfo &connectInfo) = 0;
+    virtual std::map<UInt64, IUser *> &GetUsers() = 0;
+
+    // 成功连接时的回调
+    virtual void RegOnSucConnect(IDelegate<void, BriefSessionInfo *> *sucCallback) = 0;
 };
 
 FS_NAMESPACE_END
