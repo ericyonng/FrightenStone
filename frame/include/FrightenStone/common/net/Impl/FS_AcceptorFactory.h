@@ -21,55 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_Acceptor.h
+ * @file  : FS_AcceptorFactory.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/08
+ * @date  : 2019/12/9
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_AcceptorFactory_H__
+#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_AcceptorFactory_H__
 
 #pragma once
 
-#include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
+#include <FrightenStone/exportbase.h>
+#include <FrightenStone/common/basedefs/BaseDefs.h>
 
 FS_NAMESPACE_BEGIN
 
-class IFS_Session;
+class IFS_Acceptor;
+class Locker;
 
-class BASE_EXPORT IFS_Acceptor
+class BASE_EXPORT FS_AcceptorFactory
 {
 public:
-    IFS_Acceptor();
-    virtual ~IFS_Acceptor();
-
-public:
-    virtual Int32 BeforeStart() { return StatusDefs::Success; }
-    virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}
-    virtual void Close() = 0;
-    virtual void AfterClose() {}
-
-    // 回调接口
-    virtual void OnDisconnected(IFS_Session *session) = 0;
+    IFS_Acceptor * Create(Locker &sessionLocker
+                          , Int32 &curSessionCnt
+                          , Int32 &maxSessionQuantityLimit
+                          , UInt64 &curMaxSessionId
+                          , const UInt64 &maxSessionIdLimit);
 };
-
-#pragma region inline
-inline IFS_Acceptor::IFS_Acceptor()
-{
-}
-
-inline IFS_Acceptor::~IFS_Acceptor()
-{
-}
-
-#pragma endregion
 
 FS_NAMESPACE_END
 

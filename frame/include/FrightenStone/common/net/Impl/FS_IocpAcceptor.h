@@ -56,10 +56,10 @@ class BASE_EXPORT FS_IocpAcceptor : public IFS_Acceptor
 {
 public:
     FS_IocpAcceptor(Locker &sessionLocker
-                    ,Int32 &_curSessionCnt
-                    ,Int32 &_maxSessionQuantityLimit
-                    ,UInt64 &_curMaxSessionId
-                    ,const UInt64 &_maxSessionIdLimit);
+                    ,Int32 &curSessionCnt
+                    ,Int32 &maxSessionQuantityLimit
+                    ,UInt64 &curMaxSessionId
+                    ,const UInt64 &maxSessionIdLimit);
     virtual ~FS_IocpAcceptor();
 
 public:
