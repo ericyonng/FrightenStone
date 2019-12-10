@@ -21,40 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_BusinessLogicImpl.h
+ * @file  : FS_UserType.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/20
+ * @date  : 2019/12/10
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_BusinessLogic_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Defs_FS_UserType_H__
+#define __Frame_Include_FrightenStone_Common_Net_Defs_FS_UserType_H__
 
 #pragma once
 
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
+
 FS_NAMESPACE_BEGIN
-inline IFS_BusinessLogic::IFS_BusinessLogic()
-    :_dispatcher(NULL)
-    ,_timeWheel(NULL)
-{
-    g_Logic = this;
-}
 
-inline IFS_BusinessLogic::~IFS_BusinessLogic()
+class BASE_EXPORT FS_UserType
 {
-
-}
-
-inline void IFS_BusinessLogic::SetDispatcher(IFS_MsgDispatcher *dispatcher)
-{
-    _dispatcher = dispatcher;
-}
-
-inline void IFS_BusinessLogic::SetTimeWheel(TimeWheel *timeWheel)
-{
-    _timeWheel = timeWheel;
-}
+public:
+    enum 
+    {
+        UT_Begin = 0,           // 开始
+        UT_Service = 1,         // 服务类用户
+        UT_NormalUsr = 2,       // 普通人类用户
+        UT_End,
+    };
+};
 
 FS_NAMESPACE_END
 

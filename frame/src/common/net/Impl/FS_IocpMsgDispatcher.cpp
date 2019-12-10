@@ -68,7 +68,6 @@ FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
 {
     Fs_SafeFree(_pool);
     Fs_SafeFree(_timeWheel);
-    g_BusinessTimeWheel = NULL;
 
 //     _CrtMemCheckpoint(&s2);
 //     if(_CrtMemDifference(&s3, &s1, &s2))
@@ -85,6 +84,7 @@ Int32 FS_IocpMsgDispatcher::BeforeStart()
 
     if(_logic)
     {
+        _logic->SetTimeWheel(_timeWheel);
         auto st = _logic->BeforeStart();
         if(st != StatusDefs::Success)
         {
@@ -140,8 +140,6 @@ void FS_IocpMsgDispatcher::Close()
 
     // 线程退出
     _pool->Close();
-
-    g_BusinessTimeWheel = NULL;
 
     if(_logic)
         _logic->Close();

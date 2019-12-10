@@ -21,58 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : ForAllResource.h
+ * @file  : FS_NetEngineImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/5/24
+ * @date  : 2019/12/10
  * @brief :
  * 
- *    只能放第三方资源，或者标准库，不能将自己的资源包含在内
+ *
  * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_BaseDefs_Resource_ForAll_ForAllResource_H__
-#define __Frame_Include_FrightenStone_Common_BaseDefs_Resource_ForAll_ForAllResource_H__
-
+#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_NetEngine_H__
 #pragma once
 
-#pragma region c++ stl
-#include <limits>
-#include <stdio.h>
-#include <atomic>
-#include <thread>
-#include<algorithm>
-#include <stdexcept>
-#include <deque>
-#include <set>
-#include <list>
-#include <map>
-#pragma endregion
+FS_NAMESPACE_BEGIN
+inline void FS_NetEngine::_OnSendMsg(IFS_Session *session, Int64 transferBytes)
+{
+    _sendMsgBytesPerSecond += transferBytes;
+}
 
-// TODO:不可加在resource中
-#pragma region base lib 
-// #include "FrightenStone/common/memorypool/memorypool.h"
-// #include "FrightenStone/common/objpool/objpool.h"
-#pragma endregion
+inline void FS_NetEngine::_OnRecvMsgAmount(NetMsg_DataHeader *msgArrived)
+{
+    ++_recvMsgCountPerSecond;
+}
 
-#ifdef _WIN32
-#include<WinSock2.h>
-#include <ws2def.h>
-#include<ws2tcpip.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#pragma comment(lib,"ws2_32.lib")
-#include<MSWSock.h>
-#pragma comment (lib, "MSWSock.lib")
-#else
-#include <unistd.h>
-#include <limits.h> // 含有PATH_MAX
-#include<errno.h>
+inline std::vector<MessageQueue *> &FS_NetEngine::_GetSenderMq()
+{
+    return _senderMessageQueue;
+}
+FS_NAMESPACE_END
 
- // linux socket环境 以及相关网络接口
-#include <sys/types.h>
-#include <sys/socket.h> // 含有 getaddrinfo等
-#include <netdb.h>      //
 #endif
-
-
-#endif // !__Frame_Include_FrightenStone_Common_BaseDefs_Resource_ForAll_ForAllResource_H__

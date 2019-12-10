@@ -74,9 +74,11 @@ public:
     virtual IUser *OnSessionConnected(UInt64 sessionId) = 0;
 
     void SetDispatcher(IFS_MsgDispatcher *dispatcher);
+    void SetTimeWheel(TimeWheel *timeWheel);
 
 protected:
-    IFS_MsgDispatcher *_dispatcher;
+    IFS_MsgDispatcher *_dispatcher;     // 消息分发
+    TimeWheel *_timeWheel;              // 时间轮盘
 };
 
 

@@ -166,7 +166,7 @@ private:
 
 FS_NAMESPACE_END
 
-#include "FrightenStone/common/net/Impl/FS_ServerCoreImpl.h"
+#include "FrightenStone/common/net/Impl/FS_NetEngineImpl.h"
 
 extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;                         // 服务核心
 extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;                       // 服务器配置

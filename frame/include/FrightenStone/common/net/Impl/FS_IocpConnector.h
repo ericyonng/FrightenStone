@@ -63,7 +63,7 @@ public:
 public:
     // 连接
     virtual Int32 Connect(const FS_ConnectInfo &connectInfo);
-    virtual std::map<UInt64, IUser *> &GetUsers();
+    virtual std::map<UInt64, IUser *> &GetUsers();  // 可以在user中启动定时器
 
     // 成功连接时的回调
     virtual void RegOnSucConnect(IDelegate<void, BriefSessionInfo *> *sucCallback);
