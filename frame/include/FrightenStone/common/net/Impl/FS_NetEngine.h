@@ -129,23 +129,24 @@ private:
 
 private:
     std::atomic_bool _isInit;
-    FS_CpuInfo *_cpuInfo;                            // cpu信息
-    IFS_ServerConfigMgr *_serverConfigMgr;          // 服务器配置
+    FS_CpuInfo *_cpuInfo;                               // cpu信息
+    //IFS_ServerConfigMgr *_serverConfigMgr;            // 服务器配置,配置依赖具体的派生类,不可被抽象
 
     Locker _locker;
     IFS_Connector * _connector;                         // 连接器
+    std::vector<IFS_Acceptor *> _acceptors;             // 支持监听多端口，具体看派生类对象的配置
     std::vector<IFS_MsgTransfer *> _msgTransfers;       // 多线程消息收发器
     ConcurrentMessageQueue *_messageQueue;              // 消息队列
     std::vector<MessageQueue *> _senderMessageQueue;    // 发送消息队列
 
-    std::vector<IFS_MsgDispatcher *> _msgDispatchers;  // 消息处理器 业务线程处理
-    std::vector<IFS_BusinessLogic *> _logics;          // 多业务逻辑并发
+    std::vector<IFS_MsgDispatcher *> _msgDispatchers;   // 业务消息处理器 业务线程处理,支持多线程并发处理
+    // std::vector<IFS_BusinessLogic *> _logics;        // 多业务逻辑并发 logic应该并到每个dispatcher中
 
     // TODO:sessionmgr可能需要移除避免锁冲突
-    ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
+    ConditionLocker _waitForClose;                      // 一般在主线程，用于阻塞等待程序结束
     FS_ThreadPool *_pool;
 
-    // 统计区
+    // 统计数据
     Time _lastStatisticsTime;                       // 最后一次统计的时间
     TimeSlice _statisticsInterval;                  // 统计的时间间隔
     std::atomic<Int64> _curSessionConnecting;       // 正连接的会话数量
@@ -156,7 +157,7 @@ private:
     std::atomic<Int64> _sendMsgBytesPerSecond;      // 每秒发送的包字节数
     std::atomic<Int64> _heartbeatTimeOutDisconnected;   // 心跳超时断开会话数
 
-   // 会话数据
+   // 连接的会话数据
     Locker _sessionlocker;
     Int32 _curSessionCnt;
     Int32 _maxSessionQuantityLimit;
@@ -168,11 +169,11 @@ FS_NAMESPACE_END
 
 #include "FrightenStone/common/net/Impl/FS_NetEngineImpl.h"
 
-extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;                         // 服务核心
-extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;                       // 服务器配置
-extern BASE_EXPORT fs::IFS_MsgDispatcher *g_Dispatcher;                     // 网络包分发器
-extern BASE_EXPORT fs::IFS_BusinessLogic *g_Logic;                          // 业务逻辑层
-extern BASE_EXPORT fs::ConcurrentMessageQueue *g_net2LogicMessageQueue;     // 网络层到业务层的消息队列
+// extern BASE_EXPORT fs::FS_ServerCore *g_ServerCore;                         // 服务核心
+// extern BASE_EXPORT fs::IFS_ServerConfigMgr *g_SvrCfg;                       // 服务器配置
+// extern BASE_EXPORT fs::IFS_MsgDispatcher *g_Dispatcher;                     // 网络包分发器
+// extern BASE_EXPORT fs::IFS_BusinessLogic *g_Logic;                          // 业务逻辑层
+// extern BASE_EXPORT fs::ConcurrentMessageQueue *g_net2LogicMessageQueue;     // 网络层到业务层的消息队列
 
 
 #endif
