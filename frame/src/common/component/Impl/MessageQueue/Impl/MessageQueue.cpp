@@ -42,7 +42,6 @@
 #include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(MessageQueue, __DEF_OBJ_POOL_OBJ_NUM__);
 
 MessageQueue::MessageQueue()
     :_msgGeneratorChange{false}
@@ -168,8 +167,6 @@ void MessageQueue::_MsgQueueWaiterThread(FS_ThreadPool *pool)
 }
 
 /////// 多生产者多消费者
-
-OBJ_POOL_CREATE_DEF_IMPL(ConcurrentMessageQueue, __DEF_OBJ_POOL_OBJ_NUM__);
 
 ConcurrentMessageQueue::ConcurrentMessageQueue(UInt32 generatorQuantity, UInt32 consumerQuantity)
     :_generatorQuantity{generatorQuantity}

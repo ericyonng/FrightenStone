@@ -36,10 +36,7 @@
 #pragma once
 
 #include<FrightenStone/exportbase.h>
-#include "FrightenStone/common/assist/assistobjs/Defs/AssistObjsDefs.h"
-#include "FrightenStone/common/basedefs/Macro/MacroDefs.h"
-#include "FrightenStone/common/basedefs/Resource/Resource.h"
-
+#include <FrightenStone/common/basedefs/Macro/ForAll/ForAllMacro.h>
 
 FS_NAMESPACE_BEGIN
 

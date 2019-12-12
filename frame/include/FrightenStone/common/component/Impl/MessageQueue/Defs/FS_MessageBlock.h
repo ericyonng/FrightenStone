@@ -47,8 +47,6 @@ FS_NAMESPACE_BEGIN
 class IUser;
 struct BASE_EXPORT FS_MessageBlock
 {
-    OBJ_POOL_CREATE_DEF(FS_MessageBlock);
-
     FS_MessageBlock();
     virtual ~FS_MessageBlock();
 
@@ -71,20 +69,8 @@ public:
     };
 };
 
-// struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
-// {
-//     OBJ_POOL_CREATE_DEF(FS_NetMsgBlock);
-// 
-//     FS_NetMsgBlock();
-//     ~FS_NetMsgBlock();
-// 
-//     NetMsg_DataHeader *_msgData;
-// };
-
 struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
 {
-    OBJ_POOL_CREATE_DEF(FS_NetMsgBufferBlock);
-
     FS_NetMsgBufferBlock();
     ~FS_NetMsgBufferBlock();
 

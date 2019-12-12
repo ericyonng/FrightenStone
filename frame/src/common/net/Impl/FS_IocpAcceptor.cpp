@@ -31,7 +31,7 @@
  */
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/FS_IocpAcceptor.h"
-#include "FrightenStone/common/net/Impl/FS_ServerCore.h"
+#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 #include "FrightenStone/common/net/Impl/FS_Iocp.h"
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Impl/FS_Addr.h"
@@ -56,8 +56,10 @@ FS_IocpAcceptor::FS_IocpAcceptor(Locker &sessionLocker
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
                                  , UInt64 &curMaxSessionId
-                                 , const UInt64 &maxSessionIdLimit)
-    :_threadPool(NULL)
+                                 , const UInt64 &maxSessionIdLimit
+                                 , FS_NetEngine *netEngine )
+    :IFS_Acceptor(netEngine)
+    ,_threadPool(NULL)
     , _sock(INVALID_SOCKET)
     , _closeIocpDelegate(NULL)
     , _locker(sessionLocker)
@@ -147,6 +149,11 @@ void FS_IocpAcceptor::OnDisconnected(IFS_Session *session)
     }
 
     _locker.Unlock();
+}
+
+void FS_IocpAcceptor::SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo)
+{
+
 }
 
 SOCKET FS_IocpAcceptor::_InitSocket()
@@ -249,7 +256,7 @@ void FS_IocpAcceptor::_OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS_
         newSessionInfo->_sessionId = _curMaxSessionId;
         newSessionInfo->_sock = sock;
         newSessionInfo->_addrInfo = *addrInfo;
-        g_ServerCore->_OnConnected(newSessionInfo);
+        _netEngine->_OnConnected(newSessionInfo);
     }
     else {
         _locker.Unlock();

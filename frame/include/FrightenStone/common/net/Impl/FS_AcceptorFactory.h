@@ -41,15 +41,17 @@ FS_NAMESPACE_BEGIN
 
 class IFS_Acceptor;
 class Locker;
+class FS_NetEngine;
 
 class BASE_EXPORT FS_AcceptorFactory
 {
 public:
-    IFS_Acceptor * Create(Locker &sessionLocker
+    static IFS_Acceptor * Create(Locker &sessionLocker
                           , Int32 &curSessionCnt
                           , Int32 &maxSessionQuantityLimit
                           , UInt64 &curMaxSessionId
-                          , const UInt64 &maxSessionIdLimit);
+                          , const UInt64 &maxSessionIdLimit
+                                 , FS_NetEngine *netEngine);
 };
 
 FS_NAMESPACE_END

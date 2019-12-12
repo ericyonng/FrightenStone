@@ -50,8 +50,6 @@ static const int g_aes_key_bytes[] = {
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_Aes, __DEF_OBJ_POOL_OBJ_NUM__);
-
 FS_Aes::FS_Aes()
     :_innerKey(NULL)
 {

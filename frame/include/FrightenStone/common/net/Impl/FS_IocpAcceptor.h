@@ -44,6 +44,7 @@
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
 #include "FrightenStone/common/asyn/asyn.h"
 #include "FrightenStone/common/component/Impl/FS_String.h"
+#include "FrightenStone/common/net/Defs/BriefListenAddrInfo.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -59,7 +60,7 @@ public:
                     ,Int32 &curSessionCnt
                     ,Int32 &maxSessionQuantityLimit
                     ,UInt64 &curMaxSessionId
-                    ,const UInt64 &maxSessionIdLimit);
+                    ,const UInt64 &maxSessionIdLimit, FS_NetEngine *netEngine);
     virtual ~FS_IocpAcceptor();
 
 public:
@@ -68,6 +69,8 @@ public:
     virtual void BeforeClose();
     virtual void Close();
     virtual void OnDisconnected(IFS_Session *session);
+    // 监听地址
+    virtual void SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo);
     /* TCP 常规操作 */
     #pragma region tcp normal operate
     /*
@@ -111,7 +114,6 @@ private:
     // 网络事件回调
     IDelegate<void> *_closeIocpDelegate;
 
-
     // 客户端连接上限
     Locker &_locker;
     Int32 &_curSessionCnt;
@@ -119,6 +121,8 @@ private:
     UInt64 &_curMaxSessionId;
     const UInt64 &_maxSessionIdLimit;
     std::set<UInt64> _sucConnectedSessionIds;
+
+    BriefListenAddrInfo _listenAddrInfo;
 
 #pragma endregion
 };

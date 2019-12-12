@@ -30,10 +30,10 @@
  * 
  */
 #include "stdafx.h"
-#include "FrightenStone/common/asyn/Lock/Impl/Locker.h"
 #include "FrightenStone/common/asyn/Lock/Defs/MetaLocker.h"
+#include "FrightenStone/common/asyn/Lock/Impl/Locker.h"
 
-#include "FrightenStone/common/assist/assist.h"
+#include <FrightenStone/common/assist/utils/Impl/WidthUtil.h>
 
 FS_NAMESPACE_BEGIN
 

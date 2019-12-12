@@ -33,5 +33,4 @@
 #include "FrightenStone/common/net/Impl/FS_MsgReadStream.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_MsgReadStream, __DEF_OBJ_POOL_OBJ_NUM__);
 FS_NAMESPACE_END

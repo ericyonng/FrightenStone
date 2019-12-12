@@ -43,7 +43,7 @@
 FS_NAMESPACE_BEGIN
 
 class IFS_Session;
-class BriefSessionInfo;
+struct BriefSessionInfo;
 class IUser;
 struct FS_ConnectInfo;
 

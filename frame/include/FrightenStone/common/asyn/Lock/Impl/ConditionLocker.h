@@ -35,7 +35,6 @@
 
 #pragma once
 #include<FrightenStone/exportbase.h>
-#include <FrightenStone/common/common.h>
 #include "FrightenStone/common/basedefs/DataType/ForAll/ForAll.h"
 #include <FrightenStone/common/asyn/Lock/Impl/Locker.h>
 

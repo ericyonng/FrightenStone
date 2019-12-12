@@ -56,5 +56,4 @@ const char *LogLevel::GetDescription(Int32 level)
     return __g_LogLevelDescription[level];
 }
 
-OBJ_POOL_CREATE_DEF_IMPL(LogData, __DEF_OBJ_POOL_OBJ_NUM__)
 FS_NAMESPACE_END

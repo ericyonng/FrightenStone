@@ -35,10 +35,15 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_Connector *FS_ConnectorFactory::Create()
+IFS_Connector *FS_ConnectorFactory::Create(Locker &locker
+                                           , Int32 &curSessionCnt
+                                           , Int32 &maxSessionQuantityLimit
+                                           , UInt64 &curMaxSessionId
+                                           , const UInt64 &maxSessionIdLimit
+                                           , Int32 timeOutMillSec)
 {
 #ifdef _WIN32
-    return new FS_IocpConnector();
+    return new FS_IocpConnector(locker, curSessionCnt, maxSessionQuantityLimit, curMaxSessionId, maxSessionIdLimit, timeOutMillSec);
 #else
     // TODO:Linux
     return NULL;

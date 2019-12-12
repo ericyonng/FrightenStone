@@ -38,7 +38,7 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/net/Impl/IFS_Session.h"
-#include "FrightenStone/common/net/Impl/FS_ServerCore.h"
+#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"

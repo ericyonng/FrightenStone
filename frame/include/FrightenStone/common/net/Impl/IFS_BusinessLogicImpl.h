@@ -38,7 +38,7 @@ inline IFS_BusinessLogic::IFS_BusinessLogic()
     :_dispatcher(NULL)
     ,_timeWheel(NULL)
 {
-    g_Logic = this;
+
 }
 
 inline IFS_BusinessLogic::~IFS_BusinessLogic()

@@ -40,6 +40,7 @@
 #include <set>
 #include <map>
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
+#include "FrightenStone/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 

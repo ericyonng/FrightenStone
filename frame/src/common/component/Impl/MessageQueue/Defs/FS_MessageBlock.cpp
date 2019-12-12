@@ -33,7 +33,5 @@
 #include "FrightenStone/common/component/Impl/MessageQueue/Defs/FS_MessageBlock.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_MessageBlock, __DEF_OBJ_POOL_OBJ_NUM__);
-//OBJ_POOL_CREATE_DEF_IMPL(FS_NetMsgBlock, __DEF_OBJ_POOL_OBJ_NUM__);
-OBJ_POOL_CREATE_DEF_IMPL(FS_NetMsgBufferBlock, __DEF_OBJ_POOL_OBJ_NUM__);
+
 FS_NAMESPACE_END

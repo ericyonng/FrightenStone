@@ -36,8 +36,6 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(Time, __DEF_OBJ_POOL_OBJ_NUM__);
-
 static const FS_String __g_ZeroTimeString = "1970-01-01 00:00:00.000000";
 
 #pragma region 

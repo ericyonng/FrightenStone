@@ -43,7 +43,12 @@ class IFS_Connector;
 class BASE_EXPORT FS_ConnectorFactory
 {
 public:
-    static IFS_Connector *Create();
+    static IFS_Connector *Create(Locker &locker
+                                 , Int32 &curSessionCnt
+                                 , Int32 &maxSessionQuantityLimit
+                                 , UInt64 &curMaxSessionId
+                                 , const UInt64 &maxSessionIdLimit
+                                 , Int32 timeOutMillSec);
 };
 
 FS_NAMESPACE_END

@@ -39,8 +39,6 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(LogFile, __DEF_OBJ_POOL_OBJ_NUM__);
-
 LogFile::LogFile()
     :_partNo(0)
 {

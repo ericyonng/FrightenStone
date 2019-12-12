@@ -35,7 +35,7 @@
 #include "FrightenStone/common/net/Defs/FS_IocpBuffer.h"
 #include "FrightenStone/common/net/Impl/IFS_MsgTransfer.h"
 #include "FrightenStone/common/net/Impl/IFS_BusinessLogic.h"
-#include "FrightenStone/common/net/Impl/FS_ServerCore.h"
+#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 
 #include "FrightenStone/common/memorypool/memorypool.h"
@@ -51,7 +51,7 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id)
+FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id, Int64 resulutionInterval)
     :_pool(NULL)
     , _isClose{false}
     ,_timeWheel(NULL)
@@ -60,8 +60,7 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id)
     ,_id(id)
     ,_recvMsgBlocks(NULL)
 {
-/*    _CrtMemCheckpoint(&s1);*/
-    g_Dispatcher = this;
+    _resolutionInterval = resulutionInterval;
 }
 
 FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
@@ -76,7 +75,6 @@ FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
 
 Int32 FS_IocpMsgDispatcher::BeforeStart()
 {
-    _resolutionInterval = 100 * Time::_microSecondPerMilliSecond;
     _timeWheel = new TimeWheel(_resolutionInterval);
     // g_BusinessTimeWheel = _timeWheel;
     _pool = new FS_ThreadPool(0, 1);
@@ -84,6 +82,7 @@ Int32 FS_IocpMsgDispatcher::BeforeStart()
 
     if(_logic)
     {
+        _logic->SetDispatcher(this);
         _logic->SetTimeWheel(_timeWheel);
         auto st = _logic->BeforeStart();
         if(st != StatusDefs::Success)

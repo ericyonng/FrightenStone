@@ -39,14 +39,15 @@ IFS_Acceptor *FS_AcceptorFactory::Create(Locker &sessionLocker
                                          , Int32 &curSessionCnt
                                          , Int32 &maxSessionQuantityLimit
                                          , UInt64 &curMaxSessionId
-                                         , const UInt64 &maxSessionIdLimit)
+                                         , const UInt64 &maxSessionIdLimit
+                                         , FS_NetEngine *netEngine)
 {
 #ifdef _WIN32
     return new FS_IocpAcceptor(sessionLocker
                                , curSessionCnt
                                , maxSessionQuantityLimit
                                , curMaxSessionId
-                               , maxSessionIdLimit)
+                               , maxSessionIdLimit, netEngine);
 #else
     // TODO:Linux
     return NULL;

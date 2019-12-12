@@ -39,6 +39,7 @@
 #include "FrightenStone/common/asyn/asyn.h"
 #include "FrightenStone/common/component/Impl/Time.h"
 #include "FrightenStone/common/component/Impl/TimeSlice.h"
+#include <FrightenStone/common/status/status.h>
 
 FS_NAMESPACE_BEGIN
 
@@ -61,10 +62,7 @@ struct BriefSessionInfo;
 
 class BASE_EXPORT FS_NetEngine
 {
-    friend class FS_IocpMsgTransfer;
-    friend class FS_IocpConnector;
-    friend class FS_IocpMsgDispatcher;
-
+    friend class FS_IocpAcceptor;
 public:
     FS_NetEngine();
     virtual ~FS_NetEngine();
@@ -73,7 +71,7 @@ public:
     #pragma region api
 public:
     virtual Int32 Init();
-    virtual Int32 Start(std::vector<IFS_BusinessLogic *> &businessLogic);
+    virtual Int32 Start();
     virtual void Wait();
     virtual void Close();
     #pragma endregion
@@ -91,7 +89,7 @@ public:
             7. 接口只能由msgtransfer调度，避免线程不安全 msghandler不能有fs_session对象，只能创建user对象使用userId与sessionId关联，且不处理session的任意内容，只持有sessionId,避免导致线程不安全
     */
 protected:
-    void _OnConnected(const BriefSessionInfo &sessionInfo);
+    void _OnConnected(BriefSessionInfo *sessionInfo);
     void _OnDisconnected(IFS_Session *session);
     void _OnHeartBeatTimeOut(IFS_Session *session);
     // 每接收一个完整包调用一次
@@ -105,6 +103,15 @@ protected:
     virtual void _OnSvrRuning(FS_ThreadPool *threadPool);
     void _PrintSvrLoadInfo(const TimeSlice &dis);
     #pragma endregion
+
+    // 派生类重写
+protected:
+    // 读取配置位置
+    virtual Int32 _OnReadCfgs() = 0;
+    // 获取业务层,以便绑定到dispatcher上
+    virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics) {}
+    // 初始化结束时
+    virtual Int32 _InitFinish() { return StatusDefs::Success; }
 
     /* 内部方法 */
     #pragma region inner api
@@ -134,11 +141,15 @@ private:
 
     Locker _locker;
     IFS_Connector * _connector;                         // 连接器
+    UInt32 _acceptorQuantity;                            // 接受连接数量
     std::vector<IFS_Acceptor *> _acceptors;             // 支持监听多端口，具体看派生类对象的配置
+    UInt32 _transferCnt;                                 // 消息收发器数量
     std::vector<IFS_MsgTransfer *> _msgTransfers;       // 多线程消息收发器
     ConcurrentMessageQueue *_messageQueue;              // 消息队列
     std::vector<MessageQueue *> _senderMessageQueue;    // 发送消息队列
 
+    UInt32 _dispatcherCnt;
+    Int64 _dispatcherResolutionInterval;                // 消息分配器的时间轮盘精度 microseconds 默认1ms
     std::vector<IFS_MsgDispatcher *> _msgDispatchers;   // 业务消息处理器 业务线程处理,支持多线程并发处理
     // std::vector<IFS_BusinessLogic *> _logics;        // 多业务逻辑并发 logic应该并到每个dispatcher中
 
@@ -163,6 +174,7 @@ private:
     Int32 _maxSessionQuantityLimit;
     UInt64 _curMaxSessionId;
     const UInt64 _maxSessionIdLimit;
+    Int32 _connectTimeOutMs;
 };
 
 FS_NAMESPACE_END

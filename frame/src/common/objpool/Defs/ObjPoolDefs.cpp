@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FrightenStone/common/objpool/Defs/ObjPoolDefs.h"
+#include <FrightenStone/common/objpool/Defs/FS_ObjPoolDefs.h>
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/memleak/memleak.h"
 

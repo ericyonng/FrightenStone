@@ -37,11 +37,8 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(TimeSlice, __DEF_OBJ_POOL_OBJ_NUM__);
-
 TimeSlice::TimeSlice(const FS_String &fmtSlice)
 {
-
     // Ensure the slice string is time format, not datetime format.
     FS_String sliceRepr = fmtSlice;
     std::string::size_type spaceIdx = fmtSlice.GetRaw().find(' ');

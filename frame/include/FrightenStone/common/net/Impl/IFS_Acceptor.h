@@ -36,15 +36,18 @@
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
 class IFS_Session;
+class FS_NetEngine;
+class BriefListenAddrInfo;
 
 class BASE_EXPORT IFS_Acceptor
 {
 public:
-    IFS_Acceptor();
+    IFS_Acceptor(FS_NetEngine *netEngine);
     virtual ~IFS_Acceptor();
 
 public:
@@ -58,10 +61,16 @@ public:
 
     // 回调接口
     virtual void OnDisconnected(IFS_Session *session) = 0;
+    // 监听地址
+    virtual void SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo) = 0;
+
+protected:
+    FS_NetEngine *_netEngine;
 };
 
 #pragma region inline
-inline IFS_Acceptor::IFS_Acceptor()
+inline IFS_Acceptor::IFS_Acceptor(FS_NetEngine *netEngine)
+    :_netEngine(netEngine)
 {
 }
 

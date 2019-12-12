@@ -50,7 +50,6 @@ class  IFS_Buffer;
 // 只支持单线程
 class BASE_EXPORT IFS_Session
 {
-    OBJ_POOL_CREATE_DEF(IFS_Session);
 public:
     explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatInterval);
     virtual ~IFS_Session();

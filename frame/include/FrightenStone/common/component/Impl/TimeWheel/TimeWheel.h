@@ -46,7 +46,6 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT TimeWheel
 {
-    OBJ_POOL_CREATE_DEF(TimeWheel);
 public:
     explicit TimeWheel(const TimeSlice &resolutionSlice);
     virtual ~TimeWheel();

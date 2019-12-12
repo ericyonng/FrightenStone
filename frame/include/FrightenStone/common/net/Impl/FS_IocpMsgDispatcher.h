@@ -57,7 +57,7 @@ class IUser;
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
 public:
-    FS_IocpMsgDispatcher(UInt32 id);
+    FS_IocpMsgDispatcher(UInt32 id, Int64 resulutionInterval);
     virtual ~FS_IocpMsgDispatcher();
 
 public:
@@ -91,7 +91,7 @@ private:
     std::set<UInt64> _delayDisconnectedSessions;
 
     // 业务层资源
-    TimeSlice _resolutionInterval;      // 时钟轮盘时间间隔
+    TimeSlice _resolutionInterval;      // 时钟轮盘时间间隔 microsecond
     TimeWheel *_timeWheel;
     IFS_BusinessLogic *_logic;
     std::map<UInt64, std::list<IDelegate<void, IUser *> *>> _sessionIdRefUserDisconnected;

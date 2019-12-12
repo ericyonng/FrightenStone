@@ -49,8 +49,6 @@ class ITask;
 // 消息队列遵循FIFO原则，单一生产者对单一消费者
 class BASE_EXPORT MessageQueue
 {
-    OBJ_POOL_CREATE_DEF(MessageQueue);
-
 public:
     MessageQueue();
     virtual ~MessageQueue();
@@ -102,7 +100,6 @@ private:
 // 多生产者对多消费者并发型消息队列 生产者与消费者数量必须呈倍数关系，以便均衡的分配消息 生产者需大于消费者
 class BASE_EXPORT ConcurrentMessageQueue
 {
-    OBJ_POOL_CREATE_DEF(ConcurrentMessageQueue);
 public:
     ConcurrentMessageQueue(UInt32 generatorQuantity, UInt32 consumerQuantity = 1);
     ~ConcurrentMessageQueue();

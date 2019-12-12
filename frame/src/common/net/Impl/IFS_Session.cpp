@@ -37,12 +37,11 @@
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 #include "FrightenStone/common/net/Defs/FS_BufferFactory.h"
 #include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
-#include "FrightenStone/common/net/Impl/FS_ServerCore.h"
+#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 
 #include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
 #include "FrightenStone/common/socket/socket.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(fs::IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__)
 
 FS_NAMESPACE_BEGIN
 

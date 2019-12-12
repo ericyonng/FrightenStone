@@ -88,7 +88,6 @@ public:
 
 struct LoginReq : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(LoginReq);
     LoginReq();
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
@@ -98,7 +97,6 @@ struct LoginReq : public NetMsg_DataHeader
 
 struct LoginRes : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(LoginRes);
     LoginRes();
 
     Int32 _result;
@@ -108,7 +106,6 @@ struct LoginRes : public NetMsg_DataHeader
 
 struct LoginNty : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(LoginNty);
     LoginNty();
     
     char _userName[MAX_NAME_LEN];
@@ -117,22 +114,17 @@ struct LoginNty : public NetMsg_DataHeader
 
 struct CreatePlayerNty : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(CreatePlayerNty);
     CreatePlayerNty();
     Int32 _socket;
 };
 
 struct CheckHeartReq : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(CheckHeartReq);
-
     CheckHeartReq();
 };
 
 struct CheckHeartRes : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(CheckHeartRes);
-
     CheckHeartRes();
 };
 

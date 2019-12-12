@@ -81,8 +81,6 @@ FS_NAMESPACE_END
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(SmartVar, __DEF_OBJ_POOL_OBJ_NUM__);
-
 static void BecomeAndAllocDict(SmartVar &var, SmartVar::Raw &raw)
 {
     if(!var.IsDict())

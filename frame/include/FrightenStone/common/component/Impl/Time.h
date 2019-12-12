@@ -47,7 +47,6 @@ class TimeSlice;
 
 class BASE_EXPORT Time 
 {
-    OBJ_POOL_CREATE_DEF(Time);
     #pragma region 
 public:
     static const Int64 _hourPerDay;

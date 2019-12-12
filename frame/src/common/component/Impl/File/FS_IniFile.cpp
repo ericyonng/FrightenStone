@@ -45,8 +45,6 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_IniFile, __DEF_OBJ_POOL_OBJ_NUM__);
-
 FS_IniFile::FS_IniFile()
     :_isDirtied(false)
     ,_maxLine(0)

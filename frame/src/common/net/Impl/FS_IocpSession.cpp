@@ -37,7 +37,6 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_IocpSession, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_IocpSession::~FS_IocpSession()
 {
