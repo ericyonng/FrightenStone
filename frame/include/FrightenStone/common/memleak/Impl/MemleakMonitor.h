@@ -50,7 +50,7 @@ public:
     virtual ~MemleakMonitor();
 
     static MemleakMonitor *GetInstance();
-    void Start();
+    void Start(UInt64 maxAllowObjPoolBytes, UInt64 maxAllowMemoryPoolBytes);
     void Finish();
 
     void RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback);

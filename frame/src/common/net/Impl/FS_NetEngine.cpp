@@ -81,6 +81,8 @@ FS_NetEngine::FS_NetEngine()
     ,_curMaxSessionId(0)
     ,_maxSessionIdLimit((std::numeric_limits<UInt64>::max)())
     ,_connectTimeOutMs(15000)    // 默认连接超时15s
+    , _maxAllowObjPoolBytesOccupied(StringUtil::StringToUInt64(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED) * 1024 * 1024)
+    , _maxAllowMemPoolBytesOccupied(StringUtil::StringToUInt64(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED) * 1024 * 1024)
 {
 
 }
@@ -93,7 +95,6 @@ FS_NetEngine::~FS_NetEngine()
     STLUtil::DelVectorContainer(_msgDispatchers);
     STLUtil::DelVectorContainer(_msgTransfers);
     Fs_SafeFree(_cpuInfo);
-    g_ServerCore = NULL;
 
     STLUtil::DelVectorContainer(_senderMessageQueue);
     Fs_SafeFree(_messageQueue);
@@ -190,7 +191,7 @@ Int32 FS_NetEngine::Start()
         return StatusDefs::NotInit;
 
     // 8.内存监控
-    g_MemleakMonitor->Start();
+    g_MemleakMonitor->Start(_maxAllowObjPoolBytesOccupied, _maxAllowMemPoolBytesOccupied);
 
     // 9.启动监控器
     _pool = new FS_ThreadPool(0, 1);
@@ -444,7 +445,7 @@ Int32 FS_NetEngine::_CreateNetModules()
                                              ,_connectTimeOutMs);
     // 接受连接
     _acceptors.resize(_acceptorQuantity);
-    for(Int32 i = 0; i < _acceptorQuantity; ++i)
+    for(UInt32 i = 0; i < _acceptorQuantity; ++i)
     {
         _acceptors[i] = FS_AcceptorFactory::Create(_sessionlocker
                                                    , _curSessionCnt
@@ -469,7 +470,7 @@ Int32 FS_NetEngine::_CreateNetModules()
     _msgTransfers.resize(_transferCnt);
     _messageQueue = new ConcurrentMessageQueue(_transferCnt, _dispatcherCnt);
     _senderMessageQueue.resize(_transferCnt);
-    for(Int32 i = 0; i < _transferCnt; ++i)
+    for(UInt32 i = 0; i < _transferCnt; ++i)
     {
         _senderMessageQueue[i] = new MessageQueue();
         _msgTransfers[i] = FS_MsgTransferFactory::Create(i);

@@ -40,6 +40,7 @@
 #include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
+#include "FrightenStone/common/net/Defs/BriefListenAddrInfo.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/log/Log.h"
@@ -84,9 +85,6 @@ FS_IocpAcceptor::~FS_IocpAcceptor()
 Int32 FS_IocpAcceptor::BeforeStart()
 {
     _threadPool = new FS_ThreadPool(0, 1);
-    _maxSessionQuantityLimit = g_SvrCfg->GetMaxConnectQuantityLimit();
-    const auto &ip = g_SvrCfg->GetListenIp();
-    UInt16 port = g_SvrCfg->GetListenPort();
 
     // ³õÊ¼»¯
     auto sock = _InitSocket();
@@ -96,7 +94,7 @@ Int32 FS_IocpAcceptor::BeforeStart()
         return StatusDefs::IocpAcceptor_InitListenSocketFail;
     }
 
-    Int32 st = _Bind(ip.GetLength() == 0 ? NULL : ip.c_str(), port);
+    Int32 st = _Bind(_listenAddrInfo._ip.GetLength() == 0 ? NULL : _listenAddrInfo._ip.c_str(), _listenAddrInfo._port);
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpAcceptor>(_LOGFMT_("listen sock[%llu] bind ip[%s:%hu] fail st[%d]")
@@ -153,7 +151,7 @@ void FS_IocpAcceptor::OnDisconnected(IFS_Session *session)
 
 void FS_IocpAcceptor::SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo)
 {
-
+    _listenAddrInfo = listenAddrInfo;
 }
 
 SOCKET FS_IocpAcceptor::_InitSocket()

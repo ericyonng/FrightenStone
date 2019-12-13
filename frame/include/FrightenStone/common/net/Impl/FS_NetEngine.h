@@ -175,6 +175,10 @@ private:
     UInt64 _curMaxSessionId;
     const UInt64 _maxSessionIdLimit;
     Int32 _connectTimeOutMs;
+
+    // ∂‘œÛ≥ÿ≈‰÷√
+    UInt64 _maxAllowObjPoolBytesOccupied;
+    UInt64 _maxAllowMemPoolBytesOccupied;
 };
 
 FS_NAMESPACE_END

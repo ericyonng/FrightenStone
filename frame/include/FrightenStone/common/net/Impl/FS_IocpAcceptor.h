@@ -44,7 +44,6 @@
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
 #include "FrightenStone/common/asyn/asyn.h"
 #include "FrightenStone/common/component/Impl/FS_String.h"
-#include "FrightenStone/common/net/Defs/BriefListenAddrInfo.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -52,6 +51,7 @@ class IFS_Session;
 class FS_IniFile;
 class FS_Iocp;
 struct IoDataBase;
+struct BriefListenAddrInfo;
 
 class BASE_EXPORT FS_IocpAcceptor : public IFS_Acceptor
 {
