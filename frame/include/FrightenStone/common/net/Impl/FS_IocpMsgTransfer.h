@@ -53,16 +53,17 @@ class  FS_IocpSession;
 struct NetMsg_DataHeader;
 struct FS_MessageBlock;
 struct BriefSessionInfo;
+class FS_NetEngine;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
 
 public:
-    FS_IocpMsgTransfer(Int32 id);
+    FS_IocpMsgTransfer(FS_NetEngine *netEngine, Int32 id);
     virtual ~FS_IocpMsgTransfer();
 
 public:
-    virtual Int32 BeforeStart();
+    virtual Int32 BeforeStart(Int32 prepareBufferPoolCnt, UInt64 maxMempoolBytesPerTransfer);
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
@@ -120,6 +121,7 @@ private:
 private:
     Int32 _id;
     UInt64 _transferThreadId;
+    FS_NetEngine *_netEngine;
 
     IMemoryAlloctor *_sessionBufferAlloctor;
     UInt64 _maxAlloctorBytes;
@@ -131,6 +133,7 @@ private:
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;
     std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列
+    Int32 _heartbeatDeadTimeInterval;
     FS_ThreadPool *_threadPool;
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;

@@ -21,65 +21,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_Acceptor.h
+ * @file  : NetCfgDefs.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/08
+ * @date  : 2019/12/16
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Defs_NetCfgDefs_H__
+#define __Frame_Include_FrightenStone_Common_Net_Defs_NetCfgDefs_H__
 
 #pragma once
 
-#include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
-#include "FrightenStone/common/status/status.h"
+#include <FrightenStone/exportbase.h>
+#include <FrightenStone/common/basedefs/BaseDefs.h>
 
 FS_NAMESPACE_BEGIN
 
-class IFS_Session;
-class FS_NetEngine;
-struct BriefListenAddrInfo;
-
-class BASE_EXPORT IFS_Acceptor
+struct BASE_EXPORT NetEngineCfgs
 {
-public:
-    IFS_Acceptor(FS_NetEngine *netEngine);
-    virtual ~IFS_Acceptor();
 
-public:
-    virtual Int32 BeforeStart() { return StatusDefs::Success; }
-    virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}
-    virtual void Close() = 0;
-    virtual void AfterClose() {}
-
-    // 回调接口
-    virtual void OnDisconnected(IFS_Session *session) = 0;
-    // 监听地址
-    virtual void SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo) = 0;
-
-protected:
-    FS_NetEngine *_netEngine;
 };
 
-#pragma region inline
-inline IFS_Acceptor::IFS_Acceptor(FS_NetEngine *netEngine)
-    :_netEngine(netEngine)
+struct BASE_EXPORT ConnectorCfgs
 {
-}
 
-inline IFS_Acceptor::~IFS_Acceptor()
+};
+
+struct BASE_EXPORT AcceptorCfgs
 {
-}
 
-#pragma endregion
+};
+
+struct BASE_EXPORT TransferCfgs
+{
+
+};
+
+struct BASE_EXPORT DispatcherCfgs
+{
+
+};
+
+struct BASE_EXPORT NetEngineTotalCfgs
+{
+    NetEngineCfgs _netEngineBaseCfgs;
+    ConnectorCfgs _connectorCfgs;
+    AcceptorCfgs _acceptorCfgs;
+    TransferCfgs _transferCfgs;
+    DispatcherCfgs _dispatcherCfgs;
+};
 
 FS_NAMESPACE_END
 
 #endif
+

@@ -40,6 +40,7 @@
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
+#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
@@ -53,8 +54,9 @@
 #ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
-FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
+FS_IocpMsgTransfer::FS_IocpMsgTransfer(FS_NetEngine *netEngine, Int32 id)
     :_threadPool(NULL)
+    ,_netEngine(netEngine)
     ,_iocp(NULL)
     ,_ioEvent(NULL)
     ,_sessionCnt{0}
@@ -72,6 +74,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(Int32 id)
     ,_curAlloctorOccupiedBytes(0)
     ,_transferThreadId(0)
     ,_printAlloctorOccupiedInfo(NULL)
+    ,_heartbeatDeadTimeInterval()
 {
 /*        _CrtMemCheckpoint(&s1);*/
 }
@@ -93,15 +96,15 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
 //         _CrtMemDumpStatistics(&s3);
 }
 
-Int32 FS_IocpMsgTransfer::BeforeStart()
+Int32 FS_IocpMsgTransfer::BeforeStart(Int32 prepareBufferPoolCnt, UInt64 maxMempoolBytesPerTransfer)
 {
-    size_t blockAmount = g_SvrCfg->GetPrepareBufferPoolCnt();
+    size_t blockAmount = static_cast<size_t>(prepareBufferPoolCnt);
     if(blockAmount <= 0)
     {
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("prepare buffer pool block amount is zero."));
         return StatusDefs::IocpMsgTransfer_CfgError;
     }
-    _maxAlloctorBytes = g_SvrCfg->GetMaxMemPoolBytesPerTransfer();
+    _maxAlloctorBytes = maxMempoolBytesPerTransfer;
     auto updateAlloctorOccupied = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor);
     _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, updateAlloctorOccupied, &_canCreateNewNodeForAlloctor);
     _sessionBufferAlloctor->InitMemory();
@@ -304,7 +307,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
         session->OnRecvSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
 
         // 消息接收回调
-        g_ServerCore->_OnRecvMsg(session, _ioEvent->_bytesTrans);
+        _netEngine->_OnRecvMsg(session, _ioEvent->_bytesTrans);
         // _OnMsgArrived(session);
 
         _msgArriviedSessions.push_back(session);
@@ -331,7 +334,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
         session->OnSendSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
 
         // 消息发送回调
-        g_ServerCore->_OnSendMsg(session, _ioEvent->_bytesTrans);
+        _netEngine->_OnSendMsg(session, _ioEvent->_bytesTrans);
 
         // TODO:有被疯狂发包的风险，解决方案：心跳包协议+频繁发包计数+发包成功时更新时间戳
         _UpdateSessionHeartbeat(session);
@@ -389,7 +392,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
             ::memcpy(newBlock->_buffer, frontMsg, frontMsg->_packetLength);
 
             _recvMsgList->push_back(newBlock);
-            g_ServerCore->_OnRecvMsgAmount(frontMsg);
+            _netEngine->_OnRecvMsgAmount(frontMsg);
             recvBuffer->PopFront(frontMsg->_packetLength);
         }
 
@@ -431,7 +434,7 @@ void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
             ::memcpy(newBlock->_buffer, frontMsg, frontMsg->_packetLength);
 
             _recvMsgList->push_back(newBlock);
-            g_ServerCore->_OnRecvMsgAmount(frontMsg);
+            _netEngine->_OnRecvMsgAmount(frontMsg);
             recvBuffer->PopFront(frontMsg->_packetLength);
         }
     }
@@ -463,7 +466,7 @@ void FS_IocpMsgTransfer::_OnDisconnected(FS_IocpSession *session)
 
     // servercore收到断开回调 不要回调到本模块线程安全的接口避免死锁
     _sessionHeartbeatQueue.erase(session);
-    g_ServerCore->_OnDisconnected(session);
+    _netEngine->_OnDisconnected(session);
 
     // 推送会话断开消息
     _NtySessionDisConnectMsg(sessionId);
@@ -585,7 +588,7 @@ void FS_IocpMsgTransfer::_CheckSessionHeartbeat()
         if(session->GetHeartBeatExpiredTime() > _curTime)
             break;
 
-        g_ServerCore->_OnHeartBeatTimeOut(session);
+        _netEngine->_OnHeartBeatTimeOut(session);
         iterSession = _sessionHeartbeatQueue.erase(iterSession);
         session->MaskClose();
         _toRemove.insert(session);

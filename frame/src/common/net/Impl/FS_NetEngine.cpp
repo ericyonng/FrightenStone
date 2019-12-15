@@ -83,6 +83,9 @@ FS_NetEngine::FS_NetEngine()
     ,_connectTimeOutMs(15000)    // 默认连接超时15s
     , _maxAllowObjPoolBytesOccupied(StringUtil::StringToUInt64(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED) * 1024 * 1024)
     , _maxAllowMemPoolBytesOccupied(StringUtil::StringToUInt64(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED) * 1024 * 1024)
+    ,_prepareBufferPoolCnt(StringUtil::StringToInt32(SVR_CFG_PREPARE_POOL_BUFFER_CNT))    // 默认buffer1024个
+    ,_maxMempoolBytesPerTransfer(StringUtil::StringToUInt64(SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER)*1024*1024)
+    ,_totalCfgs(NULL)
 {
 
 }
@@ -98,6 +101,7 @@ FS_NetEngine::~FS_NetEngine()
 
     STLUtil::DelVectorContainer(_senderMessageQueue);
     Fs_SafeFree(_messageQueue);
+    Fs_SafeFree(_totalCfgs);
 }
 
 #pragma region api
@@ -593,7 +597,7 @@ Int32 FS_NetEngine::_BeforeStart()
 
     for(auto &msgTransfer : _msgTransfers)
     {
-        ret = msgTransfer->BeforeStart();
+        ret = msgTransfer->BeforeStart(_prepareBufferPoolCnt, _maxMempoolBytesPerTransfer);
         if(ret != StatusDefs::Success)
         {
             g_Log->e<FS_NetEngine>(_LOGFMT_("msgTransfer BeforeStart fail ret[%d]"), ret);

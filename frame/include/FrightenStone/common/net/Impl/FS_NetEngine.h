@@ -59,10 +59,12 @@ class  ConcurrentMessageQueue;
 struct NetMsg_DataHeader;
 class  MessageQueue;
 struct BriefSessionInfo;
+struct NetEngineTotalCfgs;
 
 class BASE_EXPORT FS_NetEngine
 {
     friend class FS_IocpAcceptor;
+    friend class FS_IocpMsgTransfer;
 public:
     FS_NetEngine();
     virtual ~FS_NetEngine();
@@ -135,6 +137,7 @@ private:
     #pragma endregion
 
 private:
+    NetEngineTotalCfgs *_totalCfgs;
     std::atomic_bool _isInit;
     FS_CpuInfo *_cpuInfo;                               // cpu信息
     //IFS_ServerConfigMgr *_serverConfigMgr;            // 服务器配置,配置依赖具体的派生类,不可被抽象
@@ -179,6 +182,9 @@ private:
     // 对象池配置
     UInt64 _maxAllowObjPoolBytesOccupied;
     UInt64 _maxAllowMemPoolBytesOccupied;
+
+    Int32 _prepareBufferPoolCnt;
+    UInt64 _maxMempoolBytesPerTransfer;
 };
 
 FS_NAMESPACE_END

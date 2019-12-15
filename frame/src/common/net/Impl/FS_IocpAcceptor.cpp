@@ -68,6 +68,7 @@ FS_IocpAcceptor::FS_IocpAcceptor(Locker &sessionLocker
     , _maxSessionQuantityLimit(maxSessionQuantityLimit)
     , _curMaxSessionId(curMaxSessionId)
     , _maxSessionIdLimit(maxSessionIdLimit)
+    ,_listenAddrInfo(NULL)
 {
     /*     _CrtMemCheckpoint(&s1);*/
 }
@@ -76,6 +77,7 @@ FS_IocpAcceptor::~FS_IocpAcceptor()
 {
     Fs_SafeFree(_closeIocpDelegate);
     Fs_SafeFree(_threadPool);
+    Fs_SafeFree(_listenAddrInfo);
 
     //     _CrtMemCheckpoint(&s2);
     //     if(_CrtMemDifference(&s3, &s1, &s2))
@@ -94,11 +96,12 @@ Int32 FS_IocpAcceptor::BeforeStart()
         return StatusDefs::IocpAcceptor_InitListenSocketFail;
     }
 
-    Int32 st = _Bind(_listenAddrInfo._ip.GetLength() == 0 ? NULL : _listenAddrInfo._ip.c_str(), _listenAddrInfo._port);
+    auto &ip = _listenAddrInfo->_ip;
+    Int32 st = _Bind(ip.GetLength() == 0 ? NULL : ip.c_str(), _listenAddrInfo->_port);
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpAcceptor>(_LOGFMT_("listen sock[%llu] bind ip[%s:%hu] fail st[%d]")
-                                   , _sock, ip.c_str(), port, st);
+                                   , _sock, ip.c_str(), _listenAddrInfo->_port, st);
         return st;
     }
 
@@ -106,7 +109,7 @@ Int32 FS_IocpAcceptor::BeforeStart()
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpAcceptor>(_LOGFMT_("listen sock[%llu] listen ip[%s:%hu] fail st[%d]")
-                                   , _sock, ip.c_str(), port, st);
+                                   , _sock, ip.c_str(), _listenAddrInfo->_port, st);
         return st;
     }
 
@@ -151,7 +154,9 @@ void FS_IocpAcceptor::OnDisconnected(IFS_Session *session)
 
 void FS_IocpAcceptor::SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo)
 {
-    _listenAddrInfo = listenAddrInfo;
+    Fs_SafeFree(_listenAddrInfo);
+    _listenAddrInfo = new BriefListenAddrInfo;
+    *_listenAddrInfo = listenAddrInfo;
 }
 
 SOCKET FS_IocpAcceptor::_InitSocket()

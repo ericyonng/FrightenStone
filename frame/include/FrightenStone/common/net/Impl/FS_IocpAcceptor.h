@@ -122,7 +122,7 @@ private:
     const UInt64 &_maxSessionIdLimit;
     std::set<UInt64> _sucConnectedSessionIds;
 
-    BriefListenAddrInfo _listenAddrInfo;
+    BriefListenAddrInfo *_listenAddrInfo;
 
 #pragma endregion
 };

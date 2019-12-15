@@ -203,7 +203,7 @@ Int32 FS_IocpConnector::_Connect(SOCKET sock, const sockaddr_in &sin, const FS_C
     auto conRet = ::connect(sock, (const struct sockaddr *)&sin, sizeof(sockaddr_in));
 
     Int32 detectRet = 0;
-    timeout.tv_usec = _timeOutMillSec * Time::_microSecondPerMilliSecond;
+    timeout.tv_usec = static_cast<Long>(_timeOutMillSec * Time::_microSecondPerMilliSecond);
     isTimeOut = SocketUtil::IsDetectTimeOut(sock, timeout, false, true, &detectRet);
 
     // 判断是否链接成功
