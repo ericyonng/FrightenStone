@@ -51,7 +51,7 @@ class FS_IocpBuffer;
 class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
 public:
-    FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartBeatInterval);
+    FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds);
     virtual ~FS_IocpSession();
 
     // 操作

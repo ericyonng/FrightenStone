@@ -60,9 +60,7 @@
 #endif
 
 //缓冲区最小单元大小
-#ifndef RECV_BUFF_SZIE
-#define RECV_BUFF_SZIE 16384    // 16K
-#define SEND_BUFF_SZIE 16384    // 16K
+#ifndef FS_BUFF_SIZE_DEF
 #define FS_BUFF_SIZE_DEF 16384  // 16K
 #endif // !RECV_BUFF_SZIE
 
@@ -71,7 +69,7 @@
 // 在间隔指定时间后才允许发送(单位ms)
 #define CLIENT_SEND_BUFF_TIME 200
 // connector的缓冲大小
-#define IOCP_CONNECTOR_BUFFER 1024
+#define IOCP_ACCEPTOR_BUFFER 1024
 // 统计服务器负载的时间间隔
 #define IOCP_STATISTIC_INTERVAL     1000    // 时间间隔单位ms
 #define SVR_CONFIG_PATH_NAME    "./ServerCfg.ini"   // 服务器配置

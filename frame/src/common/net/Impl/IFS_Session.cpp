@@ -45,7 +45,7 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatInterval)
+IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds)
     :_isDestroy(false)
     ,_sessionId(sessionId)
     ,_sock(sock)
@@ -55,7 +55,7 @@ IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrI
     ,_sendMsgId(1)
     ,_lastErrorReason{StatusDefs::Success}
     ,_maskClose(false)
-    ,_heartbeatInterval(heartbeatInterval)
+    ,_heartbeatIntervalMicroSeconds(heartbeatIntervalMicroSeconds)
     ,_alloctor(memAlloctor)
 {
     _addr = new FS_Addr(this, addrInfo);
@@ -92,7 +92,7 @@ void IFS_Session::Close()
 
 void IFS_Session::UpdateHeartBeatExpiredTime()
 {
-    _heartBeatExpiredTime.FlushAppendTime(_heartbeatInterval*Time::_microSecondPerMilliSecond);
+    _heartBeatExpiredTime.FlushAppendTime(_heartbeatIntervalMicroSeconds);
 }
 
 void IFS_Session::ResetAddr()

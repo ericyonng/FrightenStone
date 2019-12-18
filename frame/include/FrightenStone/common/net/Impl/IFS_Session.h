@@ -51,7 +51,7 @@ class  IFS_Buffer;
 class BASE_EXPORT IFS_Session
 {
 public:
-    explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatInterval);
+    explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds);
     virtual ~IFS_Session();
 
     // 获取属性与状态
@@ -110,7 +110,7 @@ protected:
     std::atomic<Int32> _lastErrorReason;
     bool _isListen;
     Time _heartBeatExpiredTime; // 心跳过期时间
-    Int64 _heartbeatInterval;   // ms
+    Int64 _heartbeatIntervalMicroSeconds;   // ms
     IFS_Buffer *_recvBuffer;
     std::list<IFS_Buffer *> _toSend;
     IMemoryAlloctor *_alloctor;

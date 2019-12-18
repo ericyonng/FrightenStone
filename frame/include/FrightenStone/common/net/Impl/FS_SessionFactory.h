@@ -49,8 +49,8 @@ struct BriefSessionInfo;
 class BASE_EXPORT FS_SessionFactory
 {
 public:
-    static IFS_Session *Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartBeatInterVal);
-    static IFS_Session *Create(const BriefSessionInfo &sessionInfo, IMemoryAlloctor *memAlloctor, Int64 heartBeatInterVal);
+    static IFS_Session *Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds);
+    static IFS_Session *Create(const BriefSessionInfo &sessionInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds);
 };
 
 FS_NAMESPACE_END

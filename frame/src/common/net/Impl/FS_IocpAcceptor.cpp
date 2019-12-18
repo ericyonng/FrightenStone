@@ -311,7 +311,7 @@ void FS_IocpAcceptor::_OnIocpMonitorTask(FS_ThreadPool *threadPool)
         // 处理iocp退出
         if(ioEvent._data._code == IocpDefs::IO_QUIT)
         {
-            g_Log->sys<FS_IocpAcceptor>(_LOGFMT_("connector iocp退出 threadId<%llu> code=%lld")
+            g_Log->sys<FS_IocpAcceptor>(_LOGFMT_("acceptor iocp退出 threadId<%llu> code=%lld")
                                          , SystemUtil::GetCurrentThreadId(), ioEvent._data._code);
             break;
         }
@@ -350,7 +350,7 @@ void FS_IocpAcceptor::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, 
     for(Int32 i = 0; i < _maxSessionQuantityLimit; ++i)
     {
         g_MemoryPool->Lock();
-        bufArray[i] = g_MemoryPool->Alloc<char>(IOCP_CONNECTOR_BUFFER);
+        bufArray[i] = g_MemoryPool->Alloc<char>(IOCP_ACCEPTOR_BUFFER);
         g_MemoryPool->Unlock();
     }
 
@@ -368,7 +368,7 @@ void FS_IocpAcceptor::_PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, 
 
         memset(ioDataArray[i], 0, sizeof(IoDataBase));
         ioDataArray[i]->_wsaBuff.buf = bufArray[i];
-        ioDataArray[i]->_wsaBuff.len = IOCP_CONNECTOR_BUFFER;
+        ioDataArray[i]->_wsaBuff.len = IOCP_ACCEPTOR_BUFFER;
 
         st = listenIocp->PostAccept(_sock, ioDataArray[i]);
         if(st != StatusDefs::Success)
