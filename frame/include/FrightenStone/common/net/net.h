@@ -38,6 +38,7 @@
  // Interface ...
 #include <FrightenStone/common/net/ProtocolInterface/protocol.h>
 // #include "FrightenStone/common/net/Impl/Iocp/Example.h"
+#include "FrightenStone/common/net/Impl/IUser.h"
 #include "FrightenStone/common/net/Impl/FS_MsgReadStream.h"
 #include "FrightenStone/common/net/Impl/FS_MsgWriteStream.h"
 #include "FrightenStone/common/net/Impl/IFS_BusinessLogic.h"

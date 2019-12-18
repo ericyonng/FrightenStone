@@ -387,7 +387,7 @@
 // OBJ_POOL_CREATE_DEF_IMPL(EasyFSServer, 10)
 
 FS_NAMESPACE_BEGIN
-class User
+class User : public IUser
 {
 public:
     User(UInt64 sessionId, IFS_MsgDispatcher *dispatcher)
@@ -399,6 +399,15 @@ public:
     }
     ~User()
     {
+    }
+    virtual UInt64 GetSessionId() const
+    {
+        return _sessionId;
+    }
+
+    virtual void Close()
+    {
+        // TODO:抛一个断开session的消息到transfer 通过dispatcher
     }
 
     // NetMsg_DataHeader 必须是堆区创建的
@@ -486,19 +495,28 @@ public:
     {
     }
 
-    virtual void OnSessionDisconnected(UInt64 sessionId)
+    virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, IUser *> *> *disconnectedDelegate)
     {
         auto user = GetUser(sessionId);
         if(user)
+        {
+            for(auto &iterDelegate = disconnectedDelegate->begin(); iterDelegate!=disconnectedDelegate->end(); )
+            {
+                auto item = *iterDelegate;
+                item->Invoke(user);
+                FS_Release(item);
+                iterDelegate = disconnectedDelegate->erase(iterDelegate);
+            }
             user->OnDisconnect();
+        }
 
         RemoveUser(sessionId);
         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }
 
-    virtual void OnSessionConnected(UInt64 sessionId)
+    virtual fs::IUser *OnSessionConnected(UInt64 sessionId)
     {
-        NewUser(sessionId);
+        return NewUser(sessionId);
     }
 
     virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
@@ -600,6 +618,32 @@ public:
     }
 };
 
+class FS_ServerEngine : public FS_NetEngine
+{
+public:
+    FS_ServerEngine()
+    {
+        _logics.resize(1);
+        for(Int32 i = 0; i < 1; ++i)
+            _logics[i] = new fs::MyLogic;
+    }
+protected:
+    // 读取配置位置
+    virtual Int32 _OnReadCfgs()
+    {
+        // TODO:
+        return StatusDefs::Success;
+    }
+    // 获取业务层,以便绑定到dispatcher上
+    virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics)
+    {
+        logics = _logics;
+    }
+
+private:
+    std::vector<fs::IFS_BusinessLogic *> _logics;
+};
+
 FS_NAMESPACE_END
 
 
@@ -620,18 +664,14 @@ void TestServer::Run()
         printf("little endian\n");
     }
 
-    fs::FS_ServerCore *serverCore = new fs::FS_ServerCore();
+    fs::FS_NetEngine *serverCore = new fs::FS_ServerEngine();
     auto st = serverCore->Init();
 
     if(st == StatusDefs::Success)
     {
         // 并发业务逻辑
-        auto dispatcherCnt = g_SvrCfg->GetDispatcherCnt();
-        std::vector<fs::IFS_BusinessLogic *> logics;
-        logics.resize(dispatcherCnt);
-        for(Int32 i = 0; i < dispatcherCnt; ++i)
-            logics[i] = new fs::MyLogic;
-        auto st = serverCore->Start(logics);
+        //auto dispatcherCnt = g_SvrCfg->GetDispatcherCnt();
+        auto st = serverCore->Start();
         if(st == StatusDefs::Success)
         {
             std::cout << "server suc start" << std::endl;
