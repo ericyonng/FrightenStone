@@ -41,6 +41,7 @@
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 #include "FrightenStone/common/net/Defs/BriefListenAddrInfo.h"
+#include <FrightenStone/common/net/Defs/NetCfgDefs.h>
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/log/Log.h"
@@ -69,6 +70,7 @@ FS_IocpAcceptor::FS_IocpAcceptor(Locker &sessionLocker
     , _curMaxSessionId(curMaxSessionId)
     , _maxSessionIdLimit(maxSessionIdLimit)
     ,_listenAddrInfo(NULL)
+    ,_cfgs(NULL)
 {
     /*     _CrtMemCheckpoint(&s1);*/
 }
@@ -78,14 +80,17 @@ FS_IocpAcceptor::~FS_IocpAcceptor()
     Fs_SafeFree(_closeIocpDelegate);
     Fs_SafeFree(_threadPool);
     Fs_SafeFree(_listenAddrInfo);
+    Fs_SafeFree(_cfgs);
 
     //     _CrtMemCheckpoint(&s2);
     //     if(_CrtMemDifference(&s3, &s1, &s2))
     //         _CrtMemDumpStatistics(&s3);
 }
 
-Int32 FS_IocpAcceptor::BeforeStart()
+Int32 FS_IocpAcceptor::BeforeStart(const AcceptorCfgs &acceptorCfgs)
 {
+    _cfgs = new AcceptorCfgs;
+    *_cfgs = acceptorCfgs;
     _threadPool = new FS_ThreadPool(0, 1);
 
     // ≥ı ºªØ

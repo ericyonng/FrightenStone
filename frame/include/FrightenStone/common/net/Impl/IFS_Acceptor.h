@@ -43,6 +43,7 @@ FS_NAMESPACE_BEGIN
 class IFS_Session;
 class FS_NetEngine;
 struct BriefListenAddrInfo;
+struct AcceptorCfgs;
 
 class BASE_EXPORT IFS_Acceptor
 {
@@ -51,7 +52,7 @@ public:
     virtual ~IFS_Acceptor();
 
 public:
-    virtual Int32 BeforeStart() { return StatusDefs::Success; }
+    virtual Int32 BeforeStart(const AcceptorCfgs &acceptorCfgs) { return StatusDefs::Success; }
     virtual Int32 Start() = 0;
     virtual Int32 AfterStart() { return StatusDefs::Success; }
     virtual void WillClose() {} // 断开与模块之间的依赖

@@ -36,17 +36,23 @@
 
 #include <FrightenStone/exportbase.h>
 #include <FrightenStone/common/basedefs/BaseDefs.h>
+#include <FrightenStone/common/component/Impl/TimeSlice.h>
 
 FS_NAMESPACE_BEGIN
 
-struct BASE_EXPORT NetEngineCfgs
+struct BASE_EXPORT CommonCfgs
 {
-
+    CommonCfgs();
+    Int32 _maxSessionQuantityLimit;                     // 最大连接数
+    UInt32 _acceptorQuantityLimit;                      // 监听端口数量
+    UInt32 _transferQuantity;                           // 数据传输器数量
+    UInt32 _dispatcherQuantity;                         // 业务层消息分配器数量
 };
 
 struct BASE_EXPORT ConnectorCfgs
 {
-
+    ConnectorCfgs();
+    Int32 _connectTimeOutMs;                             // 连接超时时间
 };
 
 struct BASE_EXPORT AcceptorCfgs
@@ -56,21 +62,39 @@ struct BASE_EXPORT AcceptorCfgs
 
 struct BASE_EXPORT TransferCfgs
 {
-
+    TransferCfgs();
+    Int64 _heartbeatDeadTimeMsInterval;                  // 每个session的心跳间隔时间 单位ms
+    Int32 _prepareBufferPoolCnt;                         // 预创建的buffer数量
+    UInt64 _maxAlloctorBytesPerTransfer;                 // 每个收发器buffer 分配器最大占用
 };
 
 struct BASE_EXPORT DispatcherCfgs
 {
+    DispatcherCfgs();
+    TimeSlice _dispatcherResolutionInterval;                // 消息分配器的时间轮盘精度 microseconds 默认1ms
+};
 
+struct BASE_EXPORT ObjPoolCfgs
+{
+    ObjPoolCfgs();
+    UInt64 _maxAllowObjPoolBytesOccupied;               // 对象池最大占用内存空间
+};
+
+struct BASE_EXPORT MempoolCfgs
+{
+    MempoolCfgs();
+    UInt64 _maxAllowMemPoolBytesOccupied;               // 内存池最大占用内存空间
 };
 
 struct BASE_EXPORT NetEngineTotalCfgs
 {
-    NetEngineCfgs _netEngineBaseCfgs;
+    CommonCfgs _commonCfgs;
     ConnectorCfgs _connectorCfgs;
     AcceptorCfgs _acceptorCfgs;
     TransferCfgs _transferCfgs;
     DispatcherCfgs _dispatcherCfgs;
+    ObjPoolCfgs _objPoolCfgs;
+    MempoolCfgs _mempoolCfgs;
 };
 
 FS_NAMESPACE_END

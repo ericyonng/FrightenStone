@@ -101,6 +101,16 @@ function include_libfs(do_post_build)
             "libFrightenstone",
         }
     filter {}
+	
+	-- post build
+    if do_post_build then
+	    postbuildmessage "Copying dependencies of frightenstnoe ..."
+
+        -- post build(linux)
+        filter { "system:linux"}
+        postbuildcommands(string.format("%s/install.sh",  FS_ROOT_DIR))
+        filter {}
+    end
 end
 
 -- zlib library:
@@ -292,7 +302,7 @@ project "TestSuit"
         }
     filter {}
 	
-	include_libfs(false)
+	include_libfs(true)
 
     -- debug target suffix define
     filter { "configurations:debug*" }
@@ -359,7 +369,7 @@ project "FS_MyClient"
         }
     filter {}
 	
-	include_libfs(false)
+	include_libfs(true)
 
     -- debug target suffix define
     filter { "configurations:debug*" }

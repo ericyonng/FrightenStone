@@ -46,6 +46,7 @@ class IFS_Session;
 struct BriefSessionInfo;
 class IUser;
 struct FS_ConnectInfo;
+struct ConnectorCfgs;
 
 class BASE_EXPORT IFS_Connector
 {
@@ -54,7 +55,7 @@ public:
     virtual ~IFS_Connector();
 
 public:
-    virtual Int32 BeforeStart() { return StatusDefs::Success; }
+    virtual Int32 BeforeStart(const ConnectorCfgs &cfgs) { return StatusDefs::Success; }
     virtual Int32 Start() = 0;
     virtual Int32 AfterStart() { return StatusDefs::Success; }
     virtual void WillClose() {} // 断开与模块之间的依赖

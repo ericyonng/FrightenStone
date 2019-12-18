@@ -53,15 +53,16 @@ class IFS_BusinessLogic;
 class ConcurrentMessageQueue;
 struct FS_MessageBlock;
 class IUser;
+class FS_NetEngine;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
 public:
-    FS_IocpMsgDispatcher(UInt32 id, Int64 resulutionInterval);
+    FS_IocpMsgDispatcher(UInt32 id, FS_NetEngine *netEngine);
     virtual ~FS_IocpMsgDispatcher();
 
 public:
-    virtual Int32 BeforeStart();
+    virtual Int32 BeforeStart(const DispatcherCfgs &cfgs);
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
@@ -83,6 +84,8 @@ private:
     void _OnDelaySessionDisconnect(UInt64 sessionId);
 
 private:
+    DispatcherCfgs * _cfgs;
+    FS_NetEngine *_netEngine;
     UInt32 _id;
     std::atomic<bool> _isClose;
     FS_ThreadPool *_pool;
@@ -91,7 +94,6 @@ private:
     std::set<UInt64> _delayDisconnectedSessions;
 
     // 业务层资源
-    TimeSlice _resolutionInterval;      // 时钟轮盘时间间隔 microsecond
     TimeWheel *_timeWheel;
     IFS_BusinessLogic *_logic;
     std::map<UInt64, std::list<IDelegate<void, IUser *> *>> _sessionIdRefUserDisconnected;

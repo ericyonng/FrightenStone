@@ -47,8 +47,7 @@ public:
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
                                  , UInt64 &curMaxSessionId
-                                 , const UInt64 &maxSessionIdLimit
-                                 , Int32 timeOutMillSec);
+                                 , const UInt64 &maxSessionIdLimit);
 };
 
 FS_NAMESPACE_END

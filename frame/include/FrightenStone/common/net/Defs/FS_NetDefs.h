@@ -76,6 +76,19 @@
 #define IOCP_STATISTIC_INTERVAL     1000    // 时间间隔单位ms
 #define SVR_CONFIG_PATH_NAME    "./ServerCfg.ini"   // 服务器配置
 
+#pragma region CommonCfg
+#define SVR_CFG_COMMONCFG_SEG                "CommonCfg"
+
+#define SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY      "MaxSessionQuantity"        // 最大会话数
+#define SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT          "100064"                    // 默认的最大会话数
+#define SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY            "TransferQuantity"
+#define SVR_CFG_COMMONCFG_TRANSFER_QUANTITY                "8"                        // 数据传输支持8线程
+#define SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY_KEY          "DispatcherQuantity"       // 消息分发器数量
+#define SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY              "1"                        // 消息分发器数量
+#define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY            "AcceptorQuantity"         // 监听器数量
+#define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY                 "1"                       // 监听器数量
+#pragma endregion
+
 #pragma region Listener default config
 #define SVR_CFG_LISTENER_SEG                "Listener"
 
@@ -83,16 +96,18 @@
 #define SVR_CFG_LISTENER_IP                 "127.0.0.1"
 #define SVR_CFG_LISTENER_PORT_KEY           "port"
 #define SVR_CFG_LISTENER_PORT               "4567"
-#define SVR_CFG_LISTENER_CLN_LIMIT_KEY      "MaxConnectQuantity"        // 最大连接数
-#define SVR_CFG_LISTENER_CLN_LIMIT          "100064"                    // 默认的最大连接数
+#pragma endregion
 
+#pragma region Connector default config
+#define SVR_CFG_CONNECTOR_SEG               "Connector"
+
+#define SVR_CFG_CONNECTOR_CONNECT_TIME_OUT_KEY  "ConnectTimeOutMs"                      // 超时连接毫秒数
+#define SVR_CFG_CONNECTOR_CONNECT_TIME_OUT      "15000"                                 // 默认超时连接15s间隔
 #pragma endregion
 
 #pragma region Transfer default config
 #define SVR_CFG_TRANSFER_SEG                            "Transfer"                      // 数据传输配置
 
-#define SVR_CFG_TRANSFER_SEG_CNT_KEY                    "TransferCnt"
-#define SVR_CFG_TRANSFER_SEG_CNT                        "8"                             // 数据传输支持8线程
 #define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY        "HeartbeatDeadTimeInterval"     // 心跳死亡时间间隔
 #define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "30000"                         // 默认30s心跳
 #define SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY             "PreparePoolBufferCnt"          // 预先准备的网络buffer缓冲池的buffer个数
@@ -104,8 +119,8 @@
 #pragma region Dispatcher default config
 #define SVR_CFG_DISPATCHER_SEG                          "Dispatcher"                      // 消息分发配置
 
-#define SVR_CFG_DISPATCHER_CNT_KEY                      "DispatcherCnt"                   // 消息分发器数量
-#define SVR_CFG_DISPATCHER_CNT                          "1"                               // 消息分发器数量
+#define SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY      "DispatecherResolutionInterval"   // 消息分发器时钟间隔默认1ms
+#define SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL          "1"                               // 单位ms
 #pragma endregion
 
 #pragma region objpool default config

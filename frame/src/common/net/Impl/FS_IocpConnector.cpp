@@ -34,6 +34,7 @@
 #include <FrightenStone/common/net/Defs/FS_ConnectInfo.h>
 #include <FrightenStone/common/net/Defs/BriefSessionInfo.h>
 #include <FrightenStone/common/net/Impl/IUser.h>
+#include "FrightenStone/common/net/Defs/NetCfgDefs.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/log/Log.h"
@@ -46,14 +47,13 @@ FS_IocpConnector::FS_IocpConnector(Locker &locker
                                    , Int32 &curSessionCnt
                                    , Int32 &maxSessionQuantityLimit
                                    , UInt64 &curMaxSessionId
-                                   , const UInt64 &maxSessionIdLimit
-                                   , Int32 timeOutMillSec)
+                                   , const UInt64 &maxSessionIdLimit)
     :_locker(locker)
     ,_curSessionCnt(curSessionCnt)
     ,_maxSessionQuantityLimit(maxSessionQuantityLimit)
     ,_curMaxSessionId(curMaxSessionId)
     ,_maxSessionIdLimit(maxSessionIdLimit)
-    ,_timeOutMillSec(timeOutMillSec)
+    ,_cfgs(NULL)
 {
 /*     _CrtMemCheckpoint(&s1);*/
 }
@@ -61,10 +61,13 @@ FS_IocpConnector::FS_IocpConnector(Locker &locker
 FS_IocpConnector::~FS_IocpConnector()
 {
     FS_Release(_onConnectSuc);
+    Fs_SafeFree(_cfgs);
 }
 
-Int32 FS_IocpConnector::BeforeStart()
+Int32 FS_IocpConnector::BeforeStart(const ConnectorCfgs &cfgs)
 {
+    _cfgs = new ConnectorCfgs;
+    *_cfgs = cfgs;
     return StatusDefs::Success;
 }
 
@@ -203,7 +206,7 @@ Int32 FS_IocpConnector::_Connect(SOCKET sock, const sockaddr_in &sin, const FS_C
     auto conRet = ::connect(sock, (const struct sockaddr *)&sin, sizeof(sockaddr_in));
 
     Int32 detectRet = 0;
-    timeout.tv_usec = static_cast<Long>(_timeOutMillSec * Time::_microSecondPerMilliSecond);
+    timeout.tv_usec = static_cast<Long>(_cfgs->_connectTimeOutMs * Time::_microSecondPerMilliSecond);
     isTimeOut = SocketUtil::IsDetectTimeOut(sock, timeout, false, true, &detectRet);
 
     // 判断是否链接成功
@@ -232,9 +235,5 @@ Int32 FS_IocpConnector::_Connect(SOCKET sock, const sockaddr_in &sin, const FS_C
     return StatusDefs::Success;
 }
 FS_NAMESPACE_END
-
-
-
-
 
 #endif

@@ -65,6 +65,8 @@ class BASE_EXPORT FS_NetEngine
 {
     friend class FS_IocpAcceptor;
     friend class FS_IocpMsgTransfer;
+    friend class FS_IocpMsgDispatcher;
+
 public:
     FS_NetEngine();
     virtual ~FS_NetEngine();
@@ -144,15 +146,11 @@ private:
 
     Locker _locker;
     IFS_Connector * _connector;                         // 连接器
-    UInt32 _acceptorQuantity;                            // 接受连接数量
     std::vector<IFS_Acceptor *> _acceptors;             // 支持监听多端口，具体看派生类对象的配置
-    UInt32 _transferCnt;                                 // 消息收发器数量
     std::vector<IFS_MsgTransfer *> _msgTransfers;       // 多线程消息收发器
     ConcurrentMessageQueue *_messageQueue;              // 消息队列
     std::vector<MessageQueue *> _senderMessageQueue;    // 发送消息队列
 
-    UInt32 _dispatcherCnt;
-    Int64 _dispatcherResolutionInterval;                // 消息分配器的时间轮盘精度 microseconds 默认1ms
     std::vector<IFS_MsgDispatcher *> _msgDispatchers;   // 业务消息处理器 业务线程处理,支持多线程并发处理
     // std::vector<IFS_BusinessLogic *> _logics;        // 多业务逻辑并发 logic应该并到每个dispatcher中
 
@@ -174,17 +172,8 @@ private:
    // 连接的会话数据
     Locker _sessionlocker;
     Int32 _curSessionCnt;
-    Int32 _maxSessionQuantityLimit;
     UInt64 _curMaxSessionId;
     const UInt64 _maxSessionIdLimit;
-    Int32 _connectTimeOutMs;
-
-    // 对象池配置
-    UInt64 _maxAllowObjPoolBytesOccupied;
-    UInt64 _maxAllowMemPoolBytesOccupied;
-
-    Int32 _prepareBufferPoolCnt;
-    UInt64 _maxMempoolBytesPerTransfer;
 };
 
 FS_NAMESPACE_END

@@ -37,6 +37,7 @@
 #include "FrightenStone/common/net/Impl/IFS_BusinessLogic.h"
 #include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
+#include "FrightenStone/common/net/Defs/NetCfgDefs.h"
 
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/status/status.h"
@@ -51,7 +52,7 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id, Int64 resulutionInterval)
+FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id, FS_NetEngine *netEngine)
     :_pool(NULL)
     , _isClose{false}
     ,_timeWheel(NULL)
@@ -59,23 +60,27 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id, Int64 resulutionInterval)
     ,_messgeQueue(NULL)
     ,_id(id)
     ,_recvMsgBlocks(NULL)
+    ,_cfgs(NULL)
+    ,_netEngine(netEngine)
 {
-    _resolutionInterval = resulutionInterval;
 }
 
 FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
 {
     Fs_SafeFree(_pool);
     Fs_SafeFree(_timeWheel);
+    Fs_SafeFree(_cfgs);
 
 //     _CrtMemCheckpoint(&s2);
 //     if(_CrtMemDifference(&s3, &s1, &s2))
 //         _CrtMemDumpStatistics(&s3);
 }
 
-Int32 FS_IocpMsgDispatcher::BeforeStart()
+Int32 FS_IocpMsgDispatcher::BeforeStart(const DispatcherCfgs &cfgs)
 {
-    _timeWheel = new TimeWheel(_resolutionInterval);
+    _cfgs = new DispatcherCfgs;
+    *_cfgs = cfgs;
+    _timeWheel = new TimeWheel(_cfgs->_dispatcherResolutionInterval);
     // g_BusinessTimeWheel = _timeWheel;
     _pool = new FS_ThreadPool(0, 1);
     _recvMsgBlocks = new std::list<FS_MessageBlock *>;
@@ -217,7 +222,7 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
         return;
 
     // sender是一对一的需要找到对应的收到网络包的那个transfer 的id
-    auto &senderMq = g_ServerCore->_GetSenderMq();
+    auto &senderMq = _netEngine->_GetSenderMq();
 
     // 新的待发送的消息
     FS_NetMsgBufferBlock *newMsgBlock = new FS_NetMsgBufferBlock;
@@ -241,10 +246,11 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 {// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
 
     // _timeWheel->GetModifiedResolution(_resolutionInterval);
+    const auto &resolutionIntervalSlice = _cfgs->_dispatcherResolutionInterval;
     while(pool->IsPoolWorking())
     {
         _messgeQueue->PopLock(_id);
-        _messgeQueue->WaitForPoping(_id, _recvMsgBlocks, static_cast<ULong>(_resolutionInterval.GetTotalMilliSeconds()));
+        _messgeQueue->WaitForPoping(_id, _recvMsgBlocks, static_cast<ULong>(resolutionIntervalSlice.GetTotalMilliSeconds()));
         _messgeQueue->PopUnlock(_id);
 
         // Sleep(100);
@@ -290,7 +296,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
 
                 auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
                 if(iterDisconnected == _sessionIdRefUserDisconnected.end())
-                    iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>>())).first;
+                    iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
                 iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
                 netMsgBlock->_userDisconnected = NULL;
             }

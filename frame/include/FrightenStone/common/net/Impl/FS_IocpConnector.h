@@ -43,6 +43,8 @@
 FS_NAMESPACE_BEGIN
 
 class User;
+struct ConnectorCfgs;
+
 class BASE_EXPORT FS_IocpConnector : public IFS_Connector
 {
 public:
@@ -50,12 +52,11 @@ public:
                      , Int32 &curSessionCnt
                      , Int32 &maxSessionQuantityLimit
                      ,UInt64 &curMaxSessionId
-                     , const UInt64 &maxSessionIdLimit
-                     , Int32 timeOutMillSec);
+                     , const UInt64 &maxSessionIdLimit);
     virtual ~FS_IocpConnector();
 
 public:
-    virtual Int32 BeforeStart();
+    virtual Int32 BeforeStart(const ConnectorCfgs &cfgs);
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
@@ -79,13 +80,14 @@ private:
     Int32 _Connect(SOCKET sock, const sockaddr_in &sin, const FS_ConnectInfo &connectInfo);
 
 private:
+    // 连接器配置
+    ConnectorCfgs * _cfgs;
     // 客户端连接上限
     Locker &_locker;
     Int32 &_curSessionCnt;
     Int32 &_maxSessionQuantityLimit;
     UInt64 &_curMaxSessionId;
     const UInt64 &_maxSessionIdLimit;
-    Int32 _timeOutMillSec;              // 连接超时ms
     std::set<UInt64> _sucConnectedSessionIds;
     std::map<UInt64, IUser *> _sessionIdRefUser;
 

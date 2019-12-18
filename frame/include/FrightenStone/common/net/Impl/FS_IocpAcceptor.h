@@ -52,6 +52,7 @@ class FS_IniFile;
 class FS_Iocp;
 struct IoDataBase;
 struct BriefListenAddrInfo;
+struct AcceptorCfgs;
 
 class BASE_EXPORT FS_IocpAcceptor : public IFS_Acceptor
 {
@@ -64,7 +65,7 @@ public:
     virtual ~FS_IocpAcceptor();
 
 public:
-    virtual Int32 BeforeStart();
+    virtual Int32 BeforeStart(const AcceptorCfgs &acceptorCfgs);
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
@@ -107,10 +108,12 @@ private:
     /* 数据成员 */
     #pragma region data member
 private:
+    // 配置
+    AcceptorCfgs *_cfgs;
     // 线程 
     FS_ThreadPool *_threadPool;
+    // 监听端口套接字
     SOCKET _sock;
-
     // 网络事件回调
     IDelegate<void> *_closeIocpDelegate;
 

@@ -49,6 +49,7 @@
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/FS_IocpBuffer.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
+#include "FrightenStone/common/net/Defs/NetCfgDefs.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/log/Log.h"
@@ -72,19 +73,9 @@ FS_NetEngine::FS_NetEngine()
     , _sendMsgBytesPerSecond{0}
     , _heartbeatTimeOutDisconnected{0}
     , _isInit(false)
-    ,_acceptorQuantity(1)// 默认1
-    ,_transferCnt(1)
-    ,_dispatcherCnt(1)
-    ,_dispatcherResolutionInterval(Time::_microSecondPerMilliSecond)
     ,_curSessionCnt(0)
-    ,_maxSessionQuantityLimit(0)
     ,_curMaxSessionId(0)
     ,_maxSessionIdLimit((std::numeric_limits<UInt64>::max)())
-    ,_connectTimeOutMs(15000)    // 默认连接超时15s
-    , _maxAllowObjPoolBytesOccupied(StringUtil::StringToUInt64(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED) * 1024 * 1024)
-    , _maxAllowMemPoolBytesOccupied(StringUtil::StringToUInt64(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED) * 1024 * 1024)
-    ,_prepareBufferPoolCnt(StringUtil::StringToInt32(SVR_CFG_PREPARE_POOL_BUFFER_CNT))    // 默认buffer1024个
-    ,_maxMempoolBytesPerTransfer(StringUtil::StringToUInt64(SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER)*1024*1024)
     ,_totalCfgs(NULL)
 {
 
@@ -176,6 +167,14 @@ Int32 FS_NetEngine::Init()
         return ret;
     }
 
+    // 8.日志是否加载
+    if(!_totalCfgs)
+    {
+        ret = StatusDefs::Error;
+        g_Log->e<FS_NetEngine>(_LOGFMT_("_totalCfgs total cfgs not init [%d]"), ret);
+        return ret;
+    }
+
     // 8.初始化即将结束
     ret = _InitFinish();
     if(ret != StatusDefs::Success)
@@ -195,7 +194,7 @@ Int32 FS_NetEngine::Start()
         return StatusDefs::NotInit;
 
     // 8.内存监控
-    g_MemleakMonitor->Start(_maxAllowObjPoolBytesOccupied, _maxAllowMemPoolBytesOccupied);
+    g_MemleakMonitor->Start(_totalCfgs->_objPoolCfgs._maxAllowObjPoolBytesOccupied, _totalCfgs->_mempoolCfgs._maxAllowMemPoolBytesOccupied);
 
     // 9.启动监控器
     _pool = new FS_ThreadPool(0, 1);
@@ -309,19 +308,20 @@ void FS_NetEngine::Close()
     // STLUtil::DelVectorContainer(_logics);
     SocketUtil::ClearSocketEnv();
 
-    STLUtil::DelVectorContainer<decltype(_logics), AssistObjsDefs::SelfRelease>(_logics);
+    // STLUtil::DelVectorContainer<decltype(_logics), AssistObjsDefs::SelfRelease>(_logics);
     Fs_SafeFree(_pool);
     Fs_SafeFree(_connector);
     STLUtil::DelVectorContainer(_msgDispatchers);
     STLUtil::DelVectorContainer(_msgTransfers);
     Fs_SafeFree(_cpuInfo);
-    g_ServerCore = NULL;
 
     // 当前日志全部着盘
     g_MemleakMonitor->Finish();
     g_Log->FlushAllFile();
     g_Log->FinishModule();
     g_MemoryPool->FinishPool();
+
+    Fs_SafeFree(_totalCfgs);
 }
 
 #pragma endregion
@@ -443,49 +443,51 @@ Int32 FS_NetEngine::_CreateNetModules()
     // 连接器
     _connector = FS_ConnectorFactory::Create(_sessionlocker
                                              , _curSessionCnt
-                                             , _maxSessionQuantityLimit
+                                             ,_totalCfgs->_commonCfgs._maxSessionQuantityLimit
                                              , _curMaxSessionId
-                                             , _maxSessionIdLimit
-                                             ,_connectTimeOutMs);
+                                             , _maxSessionIdLimit);
     // 接受连接
-    _acceptors.resize(_acceptorQuantity);
-    for(UInt32 i = 0; i < _acceptorQuantity; ++i)
+    const UInt32 acceptorQuantity = _totalCfgs->_commonCfgs._acceptorQuantityLimit;
+    _acceptors.resize(acceptorQuantity);
+    for(UInt32 i = 0; i < acceptorQuantity; ++i)
     {
         _acceptors[i] = FS_AcceptorFactory::Create(_sessionlocker
                                                    , _curSessionCnt
-                                                   , _maxSessionQuantityLimit
+                                                   , _totalCfgs->_commonCfgs._maxSessionQuantityLimit
                                                    , _curMaxSessionId
-                                                   , _maxSessionIdLimit);
+                                                   , _maxSessionIdLimit
+                                                   , this);
+    }
+
+    //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
+    // const UInt32 dispatcherCnt = static_cast<UInt32>(logics.size());
+
+    const auto transferQuatity = _totalCfgs->_commonCfgs._transferQuantity;
+    const auto dispatcherQuatity = _totalCfgs->_commonCfgs._dispatcherQuantity;
+    if((transferQuatity % dispatcherQuatity) != 0)
+    {
+        g_Log->w<FS_NetEngine>(_LOGFMT_("transfer cnt[%u] cant divide by dispatcher cnt[%u], it will break balance!")
+                                , transferQuatity, dispatcherQuatity);
+    }
+
+    _msgTransfers.resize(_totalCfgs->_commonCfgs._transferQuantity);
+    _messageQueue = new ConcurrentMessageQueue(transferQuatity, dispatcherQuatity);
+    _senderMessageQueue.resize(transferQuatity);
+    for(UInt32 i = 0; i < transferQuatity; ++i)
+    {
+        _senderMessageQueue[i] = new MessageQueue();
+        _msgTransfers[i] = FS_MsgTransferFactory::Create(i, this);
+        _msgTransfers[i]->AttachMsgQueue(_messageQueue, i);
+        _msgTransfers[i]->AttachSenderMsgQueue(_senderMessageQueue[i]);
     }
 
     // 业务层
     std::vector<IFS_BusinessLogic *> logics;
     _GetLogics(logics);
-
-    //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
-    // const UInt32 dispatcherCnt = static_cast<UInt32>(logics.size());
-
-    if((_transferCnt % _dispatcherCnt) != 0)
+    _msgDispatchers.resize(dispatcherQuatity);
+    for(UInt32 i = 0; i < dispatcherQuatity; ++i)
     {
-        g_Log->w<FS_NetEngine>(_LOGFMT_("transfer cnt[%u] cant divide by dispatcher cnt[%u], it will break balance!")
-                                , _transferCnt, _dispatcherCnt);
-    }
-
-    _msgTransfers.resize(_transferCnt);
-    _messageQueue = new ConcurrentMessageQueue(_transferCnt, _dispatcherCnt);
-    _senderMessageQueue.resize(_transferCnt);
-    for(UInt32 i = 0; i < _transferCnt; ++i)
-    {
-        _senderMessageQueue[i] = new MessageQueue();
-        _msgTransfers[i] = FS_MsgTransferFactory::Create(i);
-        _msgTransfers[i]->AttachMsgQueue(_messageQueue, i);
-        _msgTransfers[i]->AttachSenderMsgQueue(_senderMessageQueue[i]);
-    }
-
-    _msgDispatchers.resize(_dispatcherCnt);
-    for(UInt32 i = 0; i < _dispatcherCnt; ++i)
-    {
-        _msgDispatchers[i] = FS_MsgDispatcherFactory::Create(i, _dispatcherResolutionInterval);
+        _msgDispatchers[i] = FS_MsgDispatcherFactory::Create(i, this);
         _msgDispatchers[i]->AttachRecvMessageQueue(_messageQueue);
 
         if(!logics.empty() && i < logics.size())
@@ -523,7 +525,8 @@ Int32 FS_NetEngine::_StartModules()
         return ret;
     }
 
-    for(Int32 i = 0; i < _acceptorQuantity; ++i)
+    const auto acceptoreQuantity = static_cast<Int32>(_acceptors.size());
+    for(Int32 i = 0; i < acceptoreQuantity; ++i)
     {
         ret = _acceptors[i]->Start();
         if(ret != StatusDefs::Success)
@@ -578,9 +581,10 @@ Int32 FS_NetEngine::_BeforeStart()
         }
     }
 
-    for(Int32 i = 0; i < _acceptorQuantity; ++i)
+    const Int32 acceptorQuatity = static_cast<Int32>(_acceptors.size());
+    for(Int32 i = 0; i < acceptorQuatity; ++i)
     {
-        ret = _acceptors[i]->BeforeStart();
+        ret = _acceptors[i]->BeforeStart(_totalCfgs->_acceptorCfgs);
         if(ret != StatusDefs::Success)
         {
             g_Log->e<FS_NetEngine>(_LOGFMT_("_acceptors BeforeStart fail i[%u] ret[%d]"), i, ret);
@@ -588,7 +592,7 @@ Int32 FS_NetEngine::_BeforeStart()
         }
     }
 
-    ret = _connector->BeforeStart();
+    ret = _connector->BeforeStart(_totalCfgs->_connectorCfgs);
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_NetEngine>(_LOGFMT_("connector BeforeStart fail ret[%d]"), ret);
@@ -597,7 +601,7 @@ Int32 FS_NetEngine::_BeforeStart()
 
     for(auto &msgTransfer : _msgTransfers)
     {
-        ret = msgTransfer->BeforeStart(_prepareBufferPoolCnt, _maxMempoolBytesPerTransfer);
+        ret = msgTransfer->BeforeStart(_totalCfgs->_transferCfgs);
         if(ret != StatusDefs::Success)
         {
             g_Log->e<FS_NetEngine>(_LOGFMT_("msgTransfer BeforeStart fail ret[%d]"), ret);
@@ -608,7 +612,7 @@ Int32 FS_NetEngine::_BeforeStart()
     const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
     for(Int32 i = 0; i < dispatcherSize; ++i)
     {
-        ret = _msgDispatchers[i]->BeforeStart();
+        ret = _msgDispatchers[i]->BeforeStart(_totalCfgs->_dispatcherCfgs);
         if(ret != StatusDefs::Success)
         {
             g_Log->e<FS_NetEngine>(_LOGFMT_("msgHandler BeforeStart fail ret[%d] i[%d]"), ret, i);
@@ -627,7 +631,8 @@ Int32 FS_NetEngine::_OnStart()
 Int32 FS_NetEngine::_AfterStart()
 {
     Int32 ret = StatusDefs::Success;
-    for(Int32 i = 0; i < _acceptorQuantity; ++i)
+    const Int32 acceptorQuatity = static_cast<Int32>(_acceptors.size());
+    for(Int32 i = 0; i < acceptorQuatity; ++i)
     {
         ret = _acceptors[i]->AfterStart();
         if(ret != StatusDefs::Success)

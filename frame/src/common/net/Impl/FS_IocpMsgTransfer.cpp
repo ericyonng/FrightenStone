@@ -41,6 +41,7 @@
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 #include "FrightenStone/common/net/Impl/FS_NetEngine.h"
+#include "FrightenStone/common/net/Defs/NetCfgDefs.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
@@ -70,11 +71,10 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(FS_NetEngine *netEngine, Int32 id)
     ,_recvMsgList(NULL)
     ,_sessionBufferAlloctor(NULL)
     ,_canCreateNewNodeForAlloctor(true)
-    ,_maxAlloctorBytes(0)
     ,_curAlloctorOccupiedBytes(0)
     ,_transferThreadId(0)
     ,_printAlloctorOccupiedInfo(NULL)
-    ,_heartbeatDeadTimeInterval()
+    ,_cfgs(NULL)
 {
 /*        _CrtMemCheckpoint(&s1);*/
 }
@@ -90,21 +90,24 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
     Fs_SafeFree(_recvMsgList);
     Fs_SafeFree(_sessionBufferAlloctor);
     Fs_SafeFree(_printAlloctorOccupiedInfo);
+    Fs_SafeFree(_cfgs);
 
 //     _CrtMemCheckpoint(&s2);
 //     if(_CrtMemDifference(&s3, &s1, &s2))
 //         _CrtMemDumpStatistics(&s3);
 }
 
-Int32 FS_IocpMsgTransfer::BeforeStart(Int32 prepareBufferPoolCnt, UInt64 maxMempoolBytesPerTransfer)
+Int32 FS_IocpMsgTransfer::BeforeStart(const TransferCfgs &transferCfgs)
 {
-    size_t blockAmount = static_cast<size_t>(prepareBufferPoolCnt);
+    _cfgs = new TransferCfgs;
+    *_cfgs = transferCfgs;
+    size_t blockAmount = static_cast<size_t>(_cfgs->_prepareBufferPoolCnt);
     if(blockAmount <= 0)
     {
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("prepare buffer pool block amount is zero."));
         return StatusDefs::IocpMsgTransfer_CfgError;
     }
-    _maxAlloctorBytes = maxMempoolBytesPerTransfer;
+
     auto updateAlloctorOccupied = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor);
     _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, updateAlloctorOccupied, &_canCreateNewNodeForAlloctor);
     _sessionBufferAlloctor->InitMemory();
@@ -696,7 +699,7 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
         for(auto iterSession = _pendingNewSessionInfos.begin(); iterSession != _pendingNewSessionInfos.end();)
         {
             auto &newSessionInfo = *iterSession;
-            auto newSession = FS_SessionFactory::Create(*newSessionInfo, _sessionBufferAlloctor, g_SvrCfg->GetHeartbeatDeadTimeInterval())->CastTo<FS_IocpSession>();
+            auto newSession = FS_SessionFactory::Create(*newSessionInfo, _sessionBufferAlloctor, _cfgs->_heartbeatDeadTimeMsInterval * Time::_microSecondPerMilliSecond)->CastTo<FS_IocpSession>();
             _sessions.insert(std::make_pair(newSessionInfo->_sessionId, newSession));
             newSession->OnConnect();
             auto addr = newSession->GetAddr();
@@ -714,12 +717,12 @@ void FS_IocpMsgTransfer::_LinkCacheToSessions()
             }
 
             // 推送会话连入消息
-            _NtySessionConnectedMsg(newSessionInfo->_sessionId);
+            _NtySessionConnectedMsg(newSessionInfo->_sessionId, newSessionInfo);
 
             // 投递接收数据
             if(!_DoPostRecv(newSession))
             {
-                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu] serverId[%d]"), newSessionInfo._sessionId, _id);
+                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("post recv fail sessionId[%llu] serverId[%d]"), newSessionInfo->_sessionId, _id);
                 _toRemove.insert(newSession);
             }
             else

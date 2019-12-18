@@ -43,6 +43,7 @@
 #include "FrightenStone/common/net/Impl/IFS_Session.h"
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/HeartBeatComp.h"
+#include "FrightenStone/common/net/Defs/NetCfgDefs.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -63,7 +64,7 @@ public:
     virtual ~FS_IocpMsgTransfer();
 
 public:
-    virtual Int32 BeforeStart(Int32 prepareBufferPoolCnt, UInt64 maxMempoolBytesPerTransfer);
+    virtual Int32 BeforeStart(const TransferCfgs &transferCfgs);
     virtual Int32 Start();
     virtual void BeforeClose();
     virtual void Close();
@@ -119,12 +120,12 @@ private:
     void _PrintAlloctorOccupiedInfo();
 
 private:
+    TransferCfgs *_cfgs;
     Int32 _id;
     UInt64 _transferThreadId;
     FS_NetEngine *_netEngine;
 
     IMemoryAlloctor *_sessionBufferAlloctor;
-    UInt64 _maxAlloctorBytes;
     std::atomic<size_t> _curAlloctorOccupiedBytes;
     std::atomic_bool _canCreateNewNodeForAlloctor;
     IDelegate<void> *_printAlloctorOccupiedInfo;
@@ -133,7 +134,6 @@ private:
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;
     std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列
-    Int32 _heartbeatDeadTimeInterval;
     FS_ThreadPool *_threadPool;
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;

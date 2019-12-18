@@ -35,10 +35,10 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_MsgTransfer *FS_MsgTransferFactory::Create(Int32 id)
+IFS_MsgTransfer *FS_MsgTransferFactory::Create(Int32 id, FS_NetEngine *netEngine)
 {
 #ifdef _WIN32
-    return new FS_IocpMsgTransfer(id);
+    return new FS_IocpMsgTransfer(netEngine, id);
 #else
     // TODO:Linux
     return NULL;

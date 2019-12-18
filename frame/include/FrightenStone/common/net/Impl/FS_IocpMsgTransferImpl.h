@@ -128,7 +128,7 @@ inline void FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor(size_t addOcc
         return;
 
     _curAlloctorOccupiedBytes += addOccupiedBytes;
-    if(_curAlloctorOccupiedBytes >= _maxAlloctorBytes)
+    if(_curAlloctorOccupiedBytes >= _cfgs->_maxAlloctorBytesPerTransfer)
         _canCreateNewNodeForAlloctor = false;
 }
 

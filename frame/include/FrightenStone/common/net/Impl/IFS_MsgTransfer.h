@@ -45,6 +45,7 @@ struct NetMsg_DataHeader;
 class ConcurrentMessageQueue;
 class MessageQueue;
 struct BriefSessionInfo;
+struct TransferCfgs;
 
 class BASE_EXPORT IFS_MsgTransfer
 {
@@ -53,7 +54,7 @@ public:
     virtual ~IFS_MsgTransfer();
 
 public:
-    virtual Int32 BeforeStart(Int32 prepareBufferPoolCnt, UInt64 maxMempoolBytesPerTransfer) { return StatusDefs::Success; }
+    virtual Int32 BeforeStart(const TransferCfgs &transferCfgs) { return StatusDefs::Success; }
     virtual Int32 Start() = 0;
     virtual Int32 AfterStart() { return StatusDefs::Success; }
     virtual void WillClose() {} // 断开与模块之间的依赖

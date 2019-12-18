@@ -41,11 +41,12 @@
 FS_NAMESPACE_BEGIN
 
 class IFS_MsgTransfer;
+class FS_NetEngine;
 
 class BASE_EXPORT FS_MsgTransferFactory
 {
 public:
-    static IFS_MsgTransfer *Create(Int32 id);
+    static IFS_MsgTransfer *Create(Int32 id, FS_NetEngine *netEngine);
 };
 
 FS_NAMESPACE_END
