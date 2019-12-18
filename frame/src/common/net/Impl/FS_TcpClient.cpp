@@ -147,10 +147,6 @@ void FS_TcpClient::DoMsg()
     //循环 判断是否有消息需要处理
 #ifdef _WIN32
     auto recvBuffer = _session->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
-#else
-    // TODO:linux
-#endif
-
     while(recvBuffer->HasMsg())
     {
         // 处理网络消息
@@ -159,6 +155,9 @@ void FS_TcpClient::DoMsg()
         // 移除消息队列（缓冲区）最前的一条数据       
         recvBuffer->PopFront(frontMsg->_packetLength);
     }
+#else
+    // TODO:linux
+#endif
 }
 
 Int32 FS_TcpClient::SendData(NetMsg_DataHeader *header)
