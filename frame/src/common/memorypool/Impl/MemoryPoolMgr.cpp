@@ -71,11 +71,11 @@ Int32 MemoryPoolMgr::InitPool()
     }
 
     _curThreadId = SystemUtil::GetCurrentThreadId();
-    _updateMemPoolOccupied = DelegatePlusFactory::Create(this, &MemoryPoolMgr::_UpdateMemPoolOccupied);
     Int32 multi = __MEMORY_POOL_MINIMUM_BLOCK__;
     for(Int32 i = 0; i < __MEMORY_POOL_MAXBLOCK_LIMIT__; )
     {
-        _Init(i, i + multi, new MemoryAlloctor(i + multi, BLOCK_AMOUNT_DEF, _updateMemPoolOccupied, &_canCreateNewNode));
+        auto updateMemPoolOccupied = DelegatePlusFactory::Create(this, &MemoryPoolMgr::_UpdateMemPoolOccupied);
+        _Init(i, i + multi, new MemoryAlloctor(i + multi, BLOCK_AMOUNT_DEF, updateMemPoolOccupied, &_canCreateNewNode));
         _UpdateMemPoolOccupied(i + multi * BLOCK_AMOUNT_DEF);
 
         // 下一次分配的是原来的2倍的内存 64-128-256-512-...
@@ -102,7 +102,6 @@ void MemoryPoolMgr::FinishPool()
     for(auto iter : _allAlloctors)
         Fs_SafeFree(iter);
     _allAlloctors.clear();
-    Fs_SafeFree(_updateMemPoolOccupied);
     _locker.Unlock();
 }
 

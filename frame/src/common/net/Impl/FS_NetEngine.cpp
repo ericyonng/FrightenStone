@@ -446,6 +446,11 @@ Int32 FS_NetEngine::_CreateNetModules()
                                              ,_totalCfgs->_commonCfgs._maxSessionQuantityLimit
                                              , _curMaxSessionId
                                              , _maxSessionIdLimit);
+
+    // 连接成功回调
+    auto connectSucCallback = DelegatePlusFactory::Create(this, &FS_NetEngine::_OnConnected);
+    _connector->RegOnSucConnect(connectSucCallback);
+
     // 接受连接
     const UInt32 acceptorQuantity = _totalCfgs->_commonCfgs._acceptorQuantityLimit;
     _acceptors.resize(acceptorQuantity);

@@ -89,13 +89,13 @@
 #define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY                 "1"                       // 监听器数量
 #pragma endregion
 
-#pragma region Listener default config
-#define SVR_CFG_LISTENER_SEG                "Listener"
+#pragma region Acceptor default config
+#define SVR_CFG_ACCEPTOR_SEG                "Acceptor"
 
-#define SVR_CFG_LISTENER_IP_KEY             "ip"
-#define SVR_CFG_LISTENER_IP                 "127.0.0.1"
-#define SVR_CFG_LISTENER_PORT_KEY           "port"
-#define SVR_CFG_LISTENER_PORT               "4567"
+#define SVR_CFG_ACCEPTOR_IP_KEY             "ip"
+#define SVR_CFG_ACCEPTOR_IP                 "127.0.0.1"
+#define SVR_CFG_ACCEPTOR_PORT_KEY           "port"
+#define SVR_CFG_ACCEPTOR_PORT               "4567"
 #pragma endregion
 
 #pragma region Connector default config

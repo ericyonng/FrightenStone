@@ -60,7 +60,7 @@ Int32 IFS_ServerConfigMgr::Init()
 
     BUFFER256 cfgs;
     char *ptr = cfgs;
-    if(!_ini->HasCfgs(SVR_CFG_LISTENER_SEG))
+    if(!_ini->HasCfgs(SVR_CFG_ACCEPTOR_SEG))
     {
         _InitDefCfgs();
     }
@@ -74,9 +74,9 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
 {
     #pragma region listener
     // ip
-    _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_IP_KEY, SVR_CFG_LISTENER_IP);
+    _ini->WriteStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, SVR_CFG_ACCEPTOR_IP);
     // port
-    _ini->WriteStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_PORT_KEY, SVR_CFG_LISTENER_PORT);
+    _ini->WriteStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, SVR_CFG_ACCEPTOR_PORT);
     // 最大连接数
     _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT);
     #pragma endregion
@@ -112,15 +112,15 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
 
     // 检查是否写入正确
     FS_String buffer;
-    _ini->ReadStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_IP_KEY, "", buffer);
+    _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "", buffer);
     if(strcmp(buffer.c_str(), "127.0.0.1") != 0)
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail ip not match"));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
-    UInt16 port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_PORT_KEY, 0));
-    if(port != atoi(SVR_CFG_LISTENER_PORT))
+    UInt16 port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, 0));
+    if(port != atoi(SVR_CFG_ACCEPTOR_PORT))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail port not match"));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
@@ -201,8 +201,8 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
 
 void IFS_ServerConfigMgr::_ReadCfgs()
 {
-    _ini->ReadStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_IP_KEY, "",_ip);
-    _port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_PORT_KEY, 0));
+    _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "",_ip);
+    _port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, 0));
     _maxSessionQuantityLimit = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0));
 
     _transferCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY, 0));

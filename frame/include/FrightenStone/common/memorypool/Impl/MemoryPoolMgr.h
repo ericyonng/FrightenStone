@@ -82,7 +82,6 @@ private:
     std::atomic<size_t> _maxAllowOccupiedBytes;         // 内存池最大允许占用
     std::atomic<bool> _canCreateNewNode = true;
     const size_t _maxCanAllocMemLimit;      // 最大的块大小
-    IDelegate<void, size_t> *_updateMemPoolOccupied = NULL;
     std::atomic<UInt64> _curThreadId;
 };
 

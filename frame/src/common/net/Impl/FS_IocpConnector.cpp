@@ -54,6 +54,7 @@ FS_IocpConnector::FS_IocpConnector(Locker &locker
     ,_curMaxSessionId(curMaxSessionId)
     ,_maxSessionIdLimit(maxSessionIdLimit)
     ,_cfgs(NULL)
+    ,_onConnectSuc(NULL)
 {
 /*     _CrtMemCheckpoint(&s1);*/
 }

@@ -54,6 +54,7 @@ IMemoryAlloctor::IMemoryAlloctor(std::atomic<bool>  *canCreateNewNode)
     ,_canCreateNewNode(canCreateNewNode)
     ,_totalOccupiedSize(0)
     ,_totalBlockAmount(0)
+    ,_updateMemPoolOccupied(NULL)
 {
 }
 

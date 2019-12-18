@@ -400,6 +400,7 @@ public:
     ~User()
     {
     }
+
     virtual UInt64 GetSessionId() const
     {
         return _sessionId;
@@ -470,7 +471,7 @@ public:
         if(iterUser == _users.end())
             return;
 
-        Fs_SafeFree(iterUser->second);
+        FS_Release(iterUser->second);
         _users.erase(iterUser);
     }
 
@@ -488,7 +489,7 @@ public:
 
     void BeforeClose()
     {
-        STLUtil::DelMapContainer(_users);
+        //STLUtil::DelMapContainer(_users);
     }
 
     virtual void Close()

@@ -43,6 +43,11 @@ FS_NAMESPACE_BEGIN
 class BASE_EXPORT IUser
 {
 public:
+    IUser() {}
+    virtual ~IUser() {}
+    virtual void Release() { delete this; }
+
+public:
     virtual UInt64 GetSessionId() const = 0;
     virtual void Close() = 0;
 };
