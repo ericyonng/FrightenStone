@@ -260,4 +260,13 @@ private:\
 
 #define FS_USE_IOCP
 
+// 内存对齐
+#undef __MEMORY_ALIGN_BYTES__
+#define __MEMORY_ALIGN_BYTES__          (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
+
+// 内存对齐
+#undef __FS_MEMORY_ALIGN__
+#define __FS_MEMORY_ALIGN__(BYTES)  \
+(BYTES) / __MEMORY_ALIGN_BYTES__ * __MEMORY_ALIGN_BYTES__ + ((BYTES)%__MEMORY_ALIGN_BYTES__ ? __MEMORY_ALIGN_BYTES__ : 0)
+
 #endif // !__Frame_Include_FrightenStone_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__

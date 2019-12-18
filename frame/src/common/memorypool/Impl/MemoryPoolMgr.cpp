@@ -50,7 +50,7 @@ MemoryPoolMgr::MemoryPoolMgr()
     :_alloctors{NULL}
     ,_isInit(false)
     ,_printCallback(NULL)
-    ,_maxCanAllocMemLimit(__MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_POOL_ALIGN_BYTES__*__MEMORY_POOL_ALIGN_BYTES__)
+    ,_maxCanAllocMemLimit(__MEMORY_POOL_MAXBLOCK_LIMIT__ / __MEMORY_ALIGN_BYTES__*__MEMORY_ALIGN_BYTES__)
     ,_maxAllowOccupiedBytes(__MEMORY_POOL_MAX_EXPAND_BYTES__)
 {
     InitPool();
