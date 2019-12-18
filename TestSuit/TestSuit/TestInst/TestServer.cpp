@@ -500,7 +500,7 @@ public:
         auto user = GetUser(sessionId);
         if(user)
         {
-            for(auto &iterDelegate = disconnectedDelegate->begin(); iterDelegate!=disconnectedDelegate->end(); )
+            for(auto iterDelegate = disconnectedDelegate->begin(); iterDelegate != disconnectedDelegate->end(); )
             {
                 auto item = *iterDelegate;
                 item->Invoke(user);
