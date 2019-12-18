@@ -53,6 +53,16 @@ end
 
 -- lib include实现
 function include_libfs(do_post_build)
+	-- post build
+    if do_post_build then
+	    postbuildmessage "Copying dependencies of frightenstnoe ..."
+
+        -- post build(linux)
+        filter { "system:linux"}
+        postbuildcommands(string.format("%s/install.sh",  FS_ROOT_DIR))
+        filter {}
+    end
+	
     -- includedirs
     includedirs {
         FS_ROOT_DIR .. "/frame/include/",
@@ -101,16 +111,6 @@ function include_libfs(do_post_build)
             "libFrightenstone",
         }
     filter {}
-	
-	-- post build
-    if do_post_build then
-	    postbuildmessage "Copying dependencies of frightenstnoe ..."
-
-        -- post build(linux)
-        filter { "system:linux"}
-        postbuildcommands(string.format("%s/install.sh",  FS_ROOT_DIR))
-        filter {}
-    end
 end
 
 -- zlib library:
