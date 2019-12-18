@@ -46,7 +46,7 @@ CommonCfgs::CommonCfgs()
 }
 
 ConnectorCfgs::ConnectorCfgs()
-    :_connectTimeOutMs(StringUtil::StringToInt32(SVR_CFG_CONNECTOR_CONNECT_TIME_OUT))
+    :_connectTimeOutMs(StringUtil::StringToInt64(SVR_CFG_CONNECTOR_CONNECT_TIME_OUT))
 {
 }
 

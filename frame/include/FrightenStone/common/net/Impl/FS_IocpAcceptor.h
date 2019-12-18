@@ -70,8 +70,6 @@ public:
     virtual void BeforeClose();
     virtual void Close();
     virtual void OnDisconnected(IFS_Session *session);
-    // 监听地址
-    virtual void SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo);
     /* TCP 常规操作 */
     #pragma region tcp normal operate
     /*
@@ -124,9 +122,6 @@ private:
     UInt64 &_curMaxSessionId;
     const UInt64 &_maxSessionIdLimit;
     std::set<UInt64> _sucConnectedSessionIds;
-
-    BriefListenAddrInfo *_listenAddrInfo;
-
 #pragma endregion
 };
 

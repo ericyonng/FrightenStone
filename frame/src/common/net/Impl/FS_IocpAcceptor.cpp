@@ -69,7 +69,6 @@ FS_IocpAcceptor::FS_IocpAcceptor(Locker &sessionLocker
     , _maxSessionQuantityLimit(maxSessionQuantityLimit)
     , _curMaxSessionId(curMaxSessionId)
     , _maxSessionIdLimit(maxSessionIdLimit)
-    ,_listenAddrInfo(NULL)
     ,_cfgs(NULL)
 {
     /*     _CrtMemCheckpoint(&s1);*/
@@ -79,7 +78,6 @@ FS_IocpAcceptor::~FS_IocpAcceptor()
 {
     Fs_SafeFree(_closeIocpDelegate);
     Fs_SafeFree(_threadPool);
-    Fs_SafeFree(_listenAddrInfo);
     Fs_SafeFree(_cfgs);
 
     //     _CrtMemCheckpoint(&s2);
@@ -101,12 +99,12 @@ Int32 FS_IocpAcceptor::BeforeStart(const AcceptorCfgs &acceptorCfgs)
         return StatusDefs::IocpAcceptor_InitListenSocketFail;
     }
 
-    auto &ip = _listenAddrInfo->_ip;
-    Int32 st = _Bind(ip.GetLength() == 0 ? NULL : ip.c_str(), _listenAddrInfo->_port);
+    auto &ip = _cfgs->_ip;
+    Int32 st = _Bind(ip.GetLength() == 0 ? NULL : ip.c_str(), _cfgs->_port);
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpAcceptor>(_LOGFMT_("listen sock[%llu] bind ip[%s:%hu] fail st[%d]")
-                                   , _sock, ip.c_str(), _listenAddrInfo->_port, st);
+                                   , _sock, ip.c_str(), _cfgs->_port, st);
         return st;
     }
 
@@ -114,7 +112,7 @@ Int32 FS_IocpAcceptor::BeforeStart(const AcceptorCfgs &acceptorCfgs)
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpAcceptor>(_LOGFMT_("listen sock[%llu] listen ip[%s:%hu] fail st[%d]")
-                                   , _sock, ip.c_str(), _listenAddrInfo->_port, st);
+                                   , _sock, ip.c_str(), _cfgs->_port, st);
         return st;
     }
 
@@ -155,13 +153,6 @@ void FS_IocpAcceptor::OnDisconnected(IFS_Session *session)
     }
 
     _locker.Unlock();
-}
-
-void FS_IocpAcceptor::SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo)
-{
-    Fs_SafeFree(_listenAddrInfo);
-    _listenAddrInfo = new BriefListenAddrInfo;
-    *_listenAddrInfo = listenAddrInfo;
 }
 
 SOCKET FS_IocpAcceptor::_InitSocket()
@@ -237,7 +228,7 @@ Int32 FS_IocpAcceptor::_Listen(Int32 unconnectQueueLen)
         return StatusDefs::Socket_Error;
     }
 
-    g_Log->net<FS_IocpAcceptor>("listen port socket<%llu> success...", _sock);
+    g_Log->net<FS_IocpAcceptor>("listen port socket<%llu> success... %s:%hu", _sock, _cfgs->_ip.c_str(), _cfgs->_port);
     return StatusDefs::Success;
 }
 

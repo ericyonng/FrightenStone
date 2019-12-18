@@ -115,7 +115,7 @@ protected:
     // 获取业务层,以便绑定到dispatcher上
     virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics) {}
     // 初始化结束时
-    virtual Int32 _InitFinish() { return StatusDefs::Success; }
+    virtual Int32 _OnInitFinish() { return StatusDefs::Success; }
 
     /* 内部方法 */
     #pragma region inner api
@@ -138,7 +138,7 @@ private:
     std::vector<MessageQueue *> &_GetSenderMq();
     #pragma endregion
 
-private:
+protected:
     NetEngineTotalCfgs *_totalCfgs;
     std::atomic_bool _isInit;
     FS_CpuInfo *_cpuInfo;                               // cpu信息

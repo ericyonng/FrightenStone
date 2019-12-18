@@ -34,9 +34,12 @@
 #pragma once
 
  // defs ...
+#include "FrightenStone/common/net/Defs/NetCfgDefs.h"
+
  // Impl ...
  // Interface ...
 #include <FrightenStone/common/net/ProtocolInterface/protocol.h>
+
 // #include "FrightenStone/common/net/Impl/Iocp/Example.h"
 #include "FrightenStone/common/net/Impl/IUser.h"
 #include "FrightenStone/common/net/Impl/FS_MsgReadStream.h"

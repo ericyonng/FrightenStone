@@ -52,12 +52,13 @@ struct BASE_EXPORT CommonCfgs
 struct BASE_EXPORT ConnectorCfgs
 {
     ConnectorCfgs();
-    Int32 _connectTimeOutMs;                             // 连接超时时间
+    Int64 _connectTimeOutMs;                             // 连接超时时间
 };
 
 struct BASE_EXPORT AcceptorCfgs
 {
-
+    FS_String _ip;
+    UInt16 _port;
 };
 
 struct BASE_EXPORT TransferCfgs

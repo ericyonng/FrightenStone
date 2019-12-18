@@ -500,13 +500,17 @@ public:
         auto user = GetUser(sessionId);
         if(user)
         {
-            for(auto iterDelegate = disconnectedDelegate->begin(); iterDelegate != disconnectedDelegate->end(); )
+            if(disconnectedDelegate)
             {
-                auto item = *iterDelegate;
-                item->Invoke(user);
-                FS_Release(item);
-                iterDelegate = disconnectedDelegate->erase(iterDelegate);
+                for(auto iterDelegate = disconnectedDelegate->begin(); iterDelegate != disconnectedDelegate->end(); )
+                {
+                    auto item = *iterDelegate;
+                    item->Invoke(user);
+                    FS_Release(item);
+                    iterDelegate = disconnectedDelegate->erase(iterDelegate);
+                }
             }
+
             user->OnDisconnect();
         }
 
@@ -623,16 +627,65 @@ class FS_ServerEngine : public FS_NetEngine
 public:
     FS_ServerEngine()
     {
-        _logics.resize(1);
-        for(Int32 i = 0; i < 1; ++i)
-            _logics[i] = new fs::MyLogic;
+        _config = new IFS_ServerConfigMgr;
     }
+    ~FS_ServerEngine()
+    {
+        STLUtil::DelVectorContainer(_logics);
+        Fs_SafeFree(_config);
+    }
+
 protected:
     // 读取配置位置
     virtual Int32 _OnReadCfgs()
     {
+        auto ret = _config->Init();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_ServerEngine>(_LOGFMT_("config Init fail ret[%d]"), ret);
+            return ret;
+        }
+
         // TODO:
+        _totalCfgs = new NetEngineTotalCfgs;
+        auto &commonConfig = _totalCfgs->_commonCfgs;
+        commonConfig._maxSessionQuantityLimit = _config->GetMaxSessionQuantityLimit();
+        commonConfig._acceptorQuantityLimit = _config->GetAcceptorQuantity();
+        commonConfig._dispatcherQuantity = _config->GetDispatcherCnt();
+        commonConfig._transferQuantity = _config->GetTransferCnt();
+
+        auto &connectorCfg = _totalCfgs->_connectorCfgs;
+        connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
+
+        auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
+        acceptorCfg._ip = _config->GetListenIp();
+        acceptorCfg._port = _config->GetListenPort();
+
+        auto &transferCfg = _totalCfgs->_transferCfgs;
+        transferCfg._heartbeatDeadTimeMsInterval = _config->GetHeartbeatDeadTimeIntervalMs();
+        transferCfg._maxAlloctorBytesPerTransfer = _config->GetMaxAllowAlloctorBytesPerTransfer();
+        transferCfg._prepareBufferPoolCnt = _config->GetPrepareBufferCnt();
+
+        auto &dispatcherCfg = _totalCfgs->_dispatcherCfgs;
+        dispatcherCfg._dispatcherResolutionInterval = _config->GetDispatcherResolutionIntervalMs()*Time::_microSecondPerMilliSecond;
+
+        auto &objPoolCfgs = _totalCfgs->_objPoolCfgs;
+        objPoolCfgs._maxAllowObjPoolBytesOccupied = _config->GetMaxAllowObjPoolBytesOccupied();
+
+        auto &mempoolCfgs = _totalCfgs->_mempoolCfgs;
+        mempoolCfgs._maxAllowMemPoolBytesOccupied = _config->GetMaxAllowMemPoolBytesOccupied();
         return StatusDefs::Success;
+    }
+
+    // 初始化结束时
+    virtual Int32 _OnInitFinish() 
+    { 
+        _logics.resize(_totalCfgs->_commonCfgs._dispatcherQuantity);
+        Int32 quantity = static_cast<Int32>(_logics.size());
+        for(Int32 i = 0; i < quantity; ++i)
+            _logics[i] = new fs::MyLogic;
+
+        return StatusDefs::Success; 
     }
     // 获取业务层,以便绑定到dispatcher上
     virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics)
@@ -641,6 +694,7 @@ protected:
     }
 
 private:
+    IFS_ServerConfigMgr * _config;
     std::vector<fs::IFS_BusinessLogic *> _logics;
 };
 

@@ -91,6 +91,15 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
 
     #pragma region dispatcher
     _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY_KEY, SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY);
+    _ini->WriteStr(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY, SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL);
+    #pragma endregion
+
+    #pragma region acceptor
+    _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY);
+    #pragma endregion
+
+    #pragma region connector
+    _ini->WriteStr(SVR_CFG_CONNECTOR_SEG, SVR_CFG_CONNECTOR_CONNECT_TIME_OUT_KEY, SVR_CFG_CONNECTOR_CONNECT_TIME_OUT);
     #pragma endregion
 
     #pragma region objpool
@@ -117,7 +126,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
-    auto maxConnectQuantity = _ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0);
+    auto maxConnectQuantity = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0);
     if(maxConnectQuantity != atoi(SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT not match"));
@@ -132,7 +141,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     }
 
     auto heartbeatTime = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0);
-    if(heartbeatTime != atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL))
+    if(heartbeatTime != atoll(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%lld] not match SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] default")
                                       , heartbeatTime, static_cast<UInt32>(atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL)));
@@ -179,6 +188,14 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
+    auto acceptorQuatity = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, 0);
+    if(acceptorQuatity != atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY))
+    {
+        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%u] default")
+                                      , memPoolMaxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY)));
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
+    }
+
     return StatusDefs::Success;
 }
 
@@ -186,17 +203,22 @@ void IFS_ServerConfigMgr::_ReadCfgs()
 {
     _ini->ReadStr(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_IP_KEY, "",_ip);
     _port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_LISTENER_SEG, SVR_CFG_LISTENER_PORT_KEY, 0));
-    _maxConnectQuantityLimit = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0));
+    _maxSessionQuantityLimit = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0));
 
     _transferCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY, 0));
-    _heartbeatDeadTimeInterval = static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0));
-    _prepareBufferPoolCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, 0));
-    _maxMemPoolBytesPerTransfer = static_cast<UInt64>((_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY, 0))) * 1024 * 1024;
+    _heartbeatDeadTimeIntervalMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0));
+    _prepareBufferCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, 0));
+    _maxAlloctorBytesPerTransfer = static_cast<UInt64>((_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY, 0))) * 1024 * 1024;
 
     _dispatcherCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY_KEY, 0));
 
     _maxAllowObjPoolBytesOccupied = static_cast<UInt64>(_ini->ReadInt(SVR_CFG_OBJPOOL_SEG, SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED_KEY, 0)) * 1024 * 1024;
     _maxAllowMemPoolBytesOccupied = static_cast<UInt64>(_ini->ReadInt(SVR_CFG_MEMORY_POOL_SEG, SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY, 0)) * 1024 * 1024;
+
+    _acceptorQuantity = static_cast<UInt32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, 0));
+    _connectorConnectTimeOutMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_CONNECTOR_SEG, SVR_CFG_CONNECTOR_CONNECT_TIME_OUT_KEY, 0));
+    
+    _dispatcherResolutionIntervalMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY, 0));
 }
 FS_NAMESPACE_END
 

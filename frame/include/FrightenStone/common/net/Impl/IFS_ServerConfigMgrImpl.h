@@ -45,9 +45,9 @@ inline UInt16 IFS_ServerConfigMgr::GetListenPort() const
     return _port;
 }
 
-inline Int32 IFS_ServerConfigMgr::GetMaxConnectQuantityLimit() const
+inline Int32 IFS_ServerConfigMgr::GetMaxSessionQuantityLimit() const
 {
-    return _maxConnectQuantityLimit;
+    return _maxSessionQuantityLimit;
 }
 
 inline Int32 IFS_ServerConfigMgr::GetTransferCnt() const
@@ -55,19 +55,19 @@ inline Int32 IFS_ServerConfigMgr::GetTransferCnt() const
     return _transferCnt;
 }
 
-inline Int32 IFS_ServerConfigMgr::GetHeartbeatDeadTimeInterval() const
+inline Int64 IFS_ServerConfigMgr::GetHeartbeatDeadTimeIntervalMs() const
 {
-    return _heartbeatDeadTimeInterval;
+    return _heartbeatDeadTimeIntervalMs;
 }
 
-inline Int32 IFS_ServerConfigMgr::GetPrepareBufferPoolCnt() const
+inline Int32 IFS_ServerConfigMgr::GetPrepareBufferCnt() const
 {
-    return _prepareBufferPoolCnt;
+    return _prepareBufferCnt;
 }
 
-inline UInt64 IFS_ServerConfigMgr::GetMaxMemPoolBytesPerTransfer() const
+inline UInt64 IFS_ServerConfigMgr::GetMaxAllowAlloctorBytesPerTransfer() const
 {
-    return _maxMemPoolBytesPerTransfer;
+    return _maxAlloctorBytesPerTransfer;
 }
 
 inline Int32 IFS_ServerConfigMgr::GetDispatcherCnt() const
@@ -80,9 +80,24 @@ inline UInt64 IFS_ServerConfigMgr::GetMaxAllowObjPoolBytesOccupied() const
     return _maxAllowObjPoolBytesOccupied;
 }
 
-inline UInt64 IFS_ServerConfigMgr::GetMaxAllowMemoryPoolBytesOccupied() const
+inline UInt64 IFS_ServerConfigMgr::GetMaxAllowMemPoolBytesOccupied() const
 {
     return _maxAllowMemPoolBytesOccupied;
+}
+
+inline UInt32 IFS_ServerConfigMgr::GetAcceptorQuantity() const
+{
+    return _acceptorQuantity;
+}
+
+inline Int64 IFS_ServerConfigMgr::GetConnectorConnectTimeOutMs() const
+{
+    return _connectorConnectTimeOutMs;
+}
+
+inline Int64 IFS_ServerConfigMgr::GetDispatcherResolutionIntervalMs() const
+{
+    return _dispatcherResolutionIntervalMs;
 }
 
 FS_NAMESPACE_END

@@ -62,8 +62,6 @@ public:
 
     // 回调接口
     virtual void OnDisconnected(IFS_Session *session) = 0;
-    // 监听地址
-    virtual void SetListenAddrInfo(const BriefListenAddrInfo &listenAddrInfo) = 0;
 
 protected:
     FS_NetEngine *_netEngine;

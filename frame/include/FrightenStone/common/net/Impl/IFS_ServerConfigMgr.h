@@ -54,13 +54,13 @@ public:
     /* listener */
     FS_String GetListenIp() const;
     UInt16 GetListenPort() const;
-    Int32 GetMaxConnectQuantityLimit() const;
+    Int32 GetMaxSessionQuantityLimit() const;
 
     /* transfer */
     Int32 GetTransferCnt() const;
-    Int32 GetHeartbeatDeadTimeInterval() const;
-    Int32 GetPrepareBufferPoolCnt() const;
-    UInt64 GetMaxMemPoolBytesPerTransfer() const;
+    Int64 GetHeartbeatDeadTimeIntervalMs() const;
+    Int32 GetPrepareBufferCnt() const;
+    UInt64 GetMaxAllowAlloctorBytesPerTransfer() const;
 
     /* dispatcher */
     Int32 GetDispatcherCnt() const;
@@ -69,7 +69,10 @@ public:
     UInt64 GetMaxAllowObjPoolBytesOccupied() const;
 
     /* 内存池最大占用大小 */
-    UInt64 GetMaxAllowMemoryPoolBytesOccupied() const;
+    UInt64 GetMaxAllowMemPoolBytesOccupied() const;
+    UInt32 GetAcceptorQuantity() const;
+    Int64 GetConnectorConnectTimeOutMs() const;
+    Int64 GetDispatcherResolutionIntervalMs() const;
 
 private:
     Int32 _InitDefCfgs();
@@ -80,17 +83,22 @@ private:
 
     FS_String _ip;
     UInt16 _port;
-    Int32 _maxConnectQuantityLimit;
+    Int32 _maxSessionQuantityLimit;
     
     Int32 _transferCnt;
-    Int32 _heartbeatDeadTimeInterval;
-    Int32 _prepareBufferPoolCnt;
-    UInt64 _maxMemPoolBytesPerTransfer;
+    Int64 _heartbeatDeadTimeIntervalMs;
+    Int32 _prepareBufferCnt;
+    UInt64 _maxAlloctorBytesPerTransfer;
 
     Int32 _dispatcherCnt;
 
     UInt64 _maxAllowObjPoolBytesOccupied;
     UInt64 _maxAllowMemPoolBytesOccupied;
+
+    UInt32 _acceptorQuantity;
+    Int64 _connectorConnectTimeOutMs;
+
+    Int64 _dispatcherResolutionIntervalMs;
 };
 
 FS_NAMESPACE_END

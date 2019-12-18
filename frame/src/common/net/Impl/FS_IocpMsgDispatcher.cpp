@@ -292,13 +292,19 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
             else if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionConnected)
             {// 会话连入
                 auto newUser = _logic->OnSessionConnected(sessionId);
-                netMsgBlock->_newUserRes->Invoke(newUser);
+                auto newUserRes = netMsgBlock->_newUserRes;
+                if(newUserRes)
+                    newUserRes->Invoke(newUser);
 
-                auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
-                if(iterDisconnected == _sessionIdRefUserDisconnected.end())
-                    iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
-                iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
-                netMsgBlock->_userDisconnected = NULL;
+                auto userDisconnectedDelegates = netMsgBlock->_userDisconnected;
+                if(userDisconnectedDelegates)
+                {
+                    auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
+                    if(iterDisconnected == _sessionIdRefUserDisconnected.end())
+                        iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
+                    iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
+                    netMsgBlock->_userDisconnected = NULL;
+                }
             }
 
             Fs_SafeFree(netMsgBlock);

@@ -176,7 +176,7 @@ Int32 FS_NetEngine::Init()
     }
 
     // 8.初始化即将结束
-    ret = _InitFinish();
+    ret = _OnInitFinish();
     if(ret != StatusDefs::Success)
     {
         g_Log->e<FS_NetEngine>(_LOGFMT_("_InitFinish fail ret[%d]"), ret);
