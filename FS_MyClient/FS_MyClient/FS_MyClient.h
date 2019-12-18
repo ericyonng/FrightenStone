@@ -36,6 +36,8 @@
 
 #pragma once
 
+#ifdef _WIN32
+
 class FS_MyClient : public fs::FS_IocpTcpClient
 {
 public:
@@ -82,4 +84,6 @@ class FS_ClientRun
 public:
     static void Run();
 };
+#endif
+
 #endif

@@ -34,6 +34,8 @@
 
 static fs::FS_ClientCfgMgr g_CfgMgr;
 
+#ifdef _WIN32
+
 FS_MyClient::FS_MyClient()
 {
 
@@ -361,3 +363,4 @@ void FS_ClientRun::Run()
     g_Log->custom("¡£¡£ÒÑÍË³ö¡£¡£");
     return;
 }
+#endif

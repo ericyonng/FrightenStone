@@ -61,8 +61,9 @@ int main()
     _CrtDumpMemoryLeaks();
 #endif
 
+#ifdef _WIN32
     FS_ClientRun::Run();
-
+#endif
     getchar();
     return 0;
 }
