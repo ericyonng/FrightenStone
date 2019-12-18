@@ -39,6 +39,7 @@
 #include "FrightenStone/common/component/Impl/FS_String.h"
 #include <map>
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include <iostream>
 
 FS_NAMESPACE_BEGIN
 
