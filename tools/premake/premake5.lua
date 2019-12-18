@@ -52,17 +52,7 @@ end
 
 
 -- lib include实现
-function include_libfs(do_post_build)
-	-- post build
-    if do_post_build then
-	    postbuildmessage "Copying dependencies of frightenstnoe ..."
-
-        -- post build(linux)
-        filter { "system:linux"}
-        postbuildcommands(string.format("%s/install.sh",  FS_ROOT_DIR))
-        filter {}
-    end
-	
+function include_libfs(do_post_build)	
     -- includedirs
     includedirs {
         FS_ROOT_DIR .. "/frame/include/",
@@ -253,6 +243,12 @@ project "Frightenstone"
 
     -- enable multithread compile
     enable_multithread_comp("C++14")
+	
+	-- post build(linux)
+	filter { "system:linux"}
+	postbuildmessage "Copying dependencies of frightenstnoe ..."
+	postbuildcommands(string.format("%sinstall.sh",  FS_ROOT_DIR))
+	filter {}
 
 -- ****************************************************************************
 -- core library testsuite compile setting
