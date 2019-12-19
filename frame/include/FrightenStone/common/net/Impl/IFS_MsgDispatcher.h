@@ -72,6 +72,7 @@ public:
     virtual void AttachRecvMessageQueue(ConcurrentMessageQueue *messageQueue) = 0;
 
     virtual Int32 GetId() const = 0;
+    virtual void CloseSession(UInt64 sessionId, UInt64 consumerId) = 0;
 };
 
 FS_NAMESPACE_END

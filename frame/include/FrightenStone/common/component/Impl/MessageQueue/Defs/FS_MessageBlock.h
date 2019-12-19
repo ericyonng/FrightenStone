@@ -62,10 +62,11 @@ public:
     enum
     {
         MB_None = 0,                    // 无效
-        MB_NetMsgArrived = 1,           // 收到网络包
-        MB_NetMsgSended = 2,            // 发送网络包
-        MB_NetSessionDisconnect = 3,    // 会话断开
-        MB_NetSessionConnected = 4,     // 会话连入
+        MB_NetMsgArrived = 1,           // 收到网络包 Transfer to Dispatcher
+        MB_NetMsgSended = 2,            // 发送网络包 Dispatcher to Transfer
+        MB_NetSessionDisconnect = 3,    // 会话断开 Transfer to Dispatcher
+        MB_NetSessionConnected = 4,     // 会话连入 Transfer to Dispatcher
+        MB_NetCloseSession = 5,         // 关闭会话 Dispatcher to Transfer
     };
 };
 

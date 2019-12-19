@@ -71,7 +71,7 @@ public:
 public:
     virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData) = 0;
     virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, IUser *> *> *disconnectedDelegate) = 0;
-    virtual IUser *OnSessionConnected(UInt64 sessionId) = 0;
+    virtual IUser *OnSessionConnected(UInt64 sessionId, UInt64 generatorId) = 0;
 
     void SetDispatcher(IFS_MsgDispatcher *dispatcher);
     void SetTimeWheel(TimeWheel *timeWheel);

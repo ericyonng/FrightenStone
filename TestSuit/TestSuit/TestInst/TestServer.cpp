@@ -390,10 +390,11 @@ FS_NAMESPACE_BEGIN
 class User : public IUser
 {
 public:
-    User(UInt64 sessionId, IFS_MsgDispatcher *dispatcher)
+    User(UInt64 sessionId, UInt64 generatorId, IFS_MsgDispatcher *dispatcher)
         :_sessionId(sessionId)
         , _recvMsgId(1)
         , _sendMsgId(1)
+        ,_belongTransferId(generatorId)
         , _dispatcher(dispatcher)
     {
     }
@@ -409,6 +410,7 @@ public:
     virtual void Close()
     {
         // TODO:抛一个断开session的消息到transfer 通过dispatcher
+        _dispatcher->CloseSession(_sessionId, _belongTransferId);
     }
 
     // NetMsg_DataHeader 必须是堆区创建的
@@ -428,6 +430,7 @@ public:
     // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
     Int32 _sendMsgId = 1;
     IFS_MsgDispatcher *_dispatcher;
+    UInt64 _belongTransferId;
 };
 
 class MyLogic : public IFS_BusinessLogic
@@ -475,9 +478,9 @@ public:
         _users.erase(iterUser);
     }
 
-    User *NewUser(UInt64 sessionId)
+    User *NewUser(UInt64 sessionId, UInt64 generatorId)
     {
-        auto user = new User(sessionId, _dispatcher);
+        auto user = new User(sessionId, generatorId, _dispatcher);
         _users.insert(std::make_pair(sessionId, user));
         return user;
     }
@@ -519,9 +522,9 @@ public:
         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }
 
-    virtual fs::IUser *OnSessionConnected(UInt64 sessionId)
+    virtual fs::IUser *OnSessionConnected(UInt64 sessionId, UInt64 generatorId)
     {
-        return NewUser(sessionId);
+        return NewUser(sessionId, generatorId);
     }
 
     virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)

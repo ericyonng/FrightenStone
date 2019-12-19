@@ -65,7 +65,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(FS_NetEngine *netEngine, Int32 id)
     // ,_isSendCacheDirtied(false)
     ,_id(id)
     ,_messageQueue(NULL)
-    ,_senderMsgs(NULL)
+    ,_msgsFromDispatcher(NULL)
     ,_senderMessageQueue(NULL)
     ,_generatorId(0)
     ,_recvMsgList(NULL)
@@ -84,9 +84,9 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
     Fs_SafeFree(_threadPool);
     Fs_SafeFree(_iocp);
     Fs_SafeFree(_ioEvent);
-    STLUtil::DelListContainer(*_senderMsgs);
+    STLUtil::DelListContainer(*_msgsFromDispatcher);
     STLUtil::DelListContainer(*_recvMsgList);
-    Fs_SafeFree(_senderMsgs);
+    Fs_SafeFree(_msgsFromDispatcher);
     Fs_SafeFree(_recvMsgList);
     Fs_SafeFree(_sessionBufferAlloctor);
     Fs_SafeFree(_printAlloctorOccupiedInfo);
@@ -116,7 +116,7 @@ Int32 FS_IocpMsgTransfer::BeforeStart(const TransferCfgs &transferCfgs)
     _threadPool = new FS_ThreadPool(0, 1);
     _iocp = new FS_Iocp;
     _ioEvent = new IO_EVENT;
-    _senderMsgs = new std::list<FS_MessageBlock *>;
+    _msgsFromDispatcher = new std::list<FS_MessageBlock *>;
     _recvMsgList = new std::list<FS_MessageBlock *>;
     const Int32 st = _iocp->Create();
     if(st != StatusDefs::Success)
@@ -171,11 +171,11 @@ void FS_IocpMsgTransfer::Close()
     // 线程退出
     _threadPool->Close();
 
-    if(!_senderMsgs->empty())
+    if(!_msgsFromDispatcher->empty())
     {
-        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sender has [%llu] unhandled msgs"), _senderMsgs->size());
-        STLUtil::DelListContainer(*_senderMsgs);
-        Fs_SafeFree(_senderMsgs);
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("sender has [%llu] unhandled msgs"), _msgsFromDispatcher->size());
+        STLUtil::DelListContainer(*_msgsFromDispatcher);
+        Fs_SafeFree(_msgsFromDispatcher);
     }
 }
 
@@ -233,7 +233,7 @@ void FS_IocpMsgTransfer::_OnMoniterMsg(FS_ThreadPool *pool)
         _CheckSessionHeartbeat();
 
         // postsend 消耗比较大
-        _AsynSendFromDispatcher();
+        _AsynHandleFromDispatcher();
 
         // 5.post session to iocp
         _PostEventsToIocp();
@@ -632,51 +632,63 @@ void FS_IocpMsgTransfer::_PostEventsToIocp()
     }
 }
 
-void FS_IocpMsgTransfer::_AsynSendFromDispatcher()
+void FS_IocpMsgTransfer::_AsynHandleFromDispatcher()
 {
     _senderMessageQueue->PopLock();
-    _senderMessageQueue->PopImmediately(_senderMsgs);
+    _senderMessageQueue->PopImmediately(_msgsFromDispatcher);
     _senderMessageQueue->PopUnlock();
 
     // TODO:消息过多时候会死在循环中，严重拖慢速度（需要先按sessionId分类组成一个包队列）（需要在消息队列中定制分类方法回调（使用组合方式））
     // 返回：std::map<UInt64, std::list<FS_NetMsgBufferBlock *>> *队列
-    for(auto iterBlock = _senderMsgs->begin(); iterBlock != _senderMsgs->end();)
+    for(auto iterBlock = _msgsFromDispatcher->begin(); iterBlock != _msgsFromDispatcher->end();)
     {
         FS_NetMsgBufferBlock *sendMsgBufferBlock = static_cast<FS_NetMsgBufferBlock *>(*iterBlock);
-        auto session = _GetSession(sendMsgBufferBlock->_sessionId);
-        if(session && session->CanPost())
-        {
-            NetMsg_DataHeader *header = reinterpret_cast<NetMsg_DataHeader *>(sendMsgBufferBlock->_buffer);
-            if(!session->PushMsgToSend(header))
+        if(sendMsgBufferBlock->_mbType == MessageBlockType::MB_NetMsgSended)
+        {// 发送消息给客户端
+            auto session = _GetSession(sendMsgBufferBlock->_sessionId);
+            if(session && session->CanPost())
             {
-                g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg cmd[%hu] len[%hu] fail")
-                                             , sendMsgBufferBlock->_sessionId
-                                             , header->_cmd, header->_packetLength);
-            }
+                NetMsg_DataHeader *header = reinterpret_cast<NetMsg_DataHeader *>(sendMsgBufferBlock->_buffer);
+                if(!session->PushMsgToSend(header))
+                {
+                    g_Log->w<FS_IocpMsgTransfer>(_LOGFMT_("sessionid[%llu] send msg cmd[%hu] len[%hu] fail")
+                                                 , sendMsgBufferBlock->_sessionId
+                                                 , header->_cmd, header->_packetLength);
+                }
 
-            if(!session->IsPostSend())
-            {
-                _DoPostSend(session);
-                _toPostSend.erase(session);
+                if(!session->IsPostSend())
+                {
+                    _DoPostSend(session);
+                    _toPostSend.erase(session);
+                }
             }
         }
-
+        else if(sendMsgBufferBlock->_mbType == MessageBlockType::MB_NetCloseSession)
+        {// 关闭会话
+            auto session = _GetSession(sendMsgBufferBlock->_sessionId);
+            if(session)
+            {
+                session->MaskClose();
+                _toRemove.insert(session);
+            }
+        }
+        
         Fs_SafeFree(sendMsgBufferBlock);
-        iterBlock = _senderMsgs->erase(iterBlock);
+        iterBlock = _msgsFromDispatcher->erase(iterBlock);
     }
 }
 
 void FS_IocpMsgTransfer::_ClearSenderMessageQueue()
 {
     _senderMessageQueue->PopLock();
-    _senderMessageQueue->PopImmediately(_senderMsgs);
+    _senderMessageQueue->PopImmediately(_msgsFromDispatcher);
     _senderMessageQueue->PopUnlock();
 
     // 提示有n条消息由于对端关闭而无法发出去
-    if(!_senderMsgs->empty())
+    if(!_msgsFromDispatcher->empty())
     {
-        g_Log->net<FS_IocpMsgTransfer>("it has %llu messages unhandled which will send to remote session!", _senderMsgs->size());
-        STLUtil::DelListContainer(*_senderMsgs);
+        g_Log->net<FS_IocpMsgTransfer>("it has %llu messages unhandled which will send to remote session!", _msgsFromDispatcher->size());
+        STLUtil::DelListContainer(*_msgsFromDispatcher);
     }
 }
 

@@ -111,7 +111,7 @@ private:
     void _UpdateSessionHeartbeat(IFS_Session *session); // 线程不安全
     void _CheckSessionHeartbeat();  // 线程不安全
     void _PostEventsToIocp();
-    void _AsynSendFromDispatcher();
+    void _AsynHandleFromDispatcher();
     void _ClearSenderMessageQueue();
     void _FreeSendList(std::list<NetMsg_DataHeader *> *sendQueue);
     void _LinkCacheToSessions();
@@ -138,7 +138,7 @@ private:
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;
     ConcurrentMessageQueue *_messageQueue;
-    std::list<FS_MessageBlock *> *_senderMsgs;
+    std::list<FS_MessageBlock *> *_msgsFromDispatcher;
     std::list<FS_MessageBlock *> *_recvMsgList;
     MessageQueue *_senderMessageQueue;
     Int32 _generatorId;

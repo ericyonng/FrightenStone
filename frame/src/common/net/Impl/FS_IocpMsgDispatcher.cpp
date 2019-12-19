@@ -242,6 +242,28 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
     senderMq[consumerId]->PushUnlock();
 }
 
+void FS_IocpMsgDispatcher::CloseSession(UInt64 sessionId, UInt64 consumerId)
+{
+    if(_isClose)
+        return;
+
+    // sender是一对一的需要找到对应的收到网络包的那个transfer 的id
+    auto &senderMq = _netEngine->_GetSenderMq();
+
+    // 新的待发送的消息
+    FS_NetMsgBufferBlock *newMsgBlock = new FS_NetMsgBufferBlock;
+    newMsgBlock->_mbType = MessageBlockType::MB_NetCloseSession;
+    newMsgBlock->_generatorId = 0;
+    newMsgBlock->_sessionId = sessionId;
+
+    // 送入消息队列
+    senderMq[consumerId]->PushLock();
+    if(!senderMq[consumerId]->Push(newMsgBlock))
+        Fs_SafeFree(newMsgBlock);
+    senderMq[consumerId]->Notify();
+    senderMq[consumerId]->PushUnlock();
+}
+
 void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 {// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
 
@@ -291,7 +313,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
             }
             else if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionConnected)
             {// 会话连入
-                auto newUser = _logic->OnSessionConnected(sessionId);
+                auto newUser = _logic->OnSessionConnected(sessionId, netMsgBlock->_generatorId);
                 auto newUserRes = netMsgBlock->_newUserRes;
                 if(newUserRes)
                     newUserRes->Invoke(newUser);
@@ -313,9 +335,12 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
     }
 
     // 延迟断开连接
-    for(auto &sessionId : _delayDisconnectedSessions)
-        _OnDelaySessionDisconnect(sessionId);
-    _delayDisconnectedSessions.clear();
+    for(auto iterSession = _delayDisconnectedSessions.begin(); 
+        iterSession != _delayDisconnectedSessions.end();)
+    {
+        _OnDelaySessionDisconnect(*iterSession);
+        iterSession = _delayDisconnectedSessions.erase(iterSession);
+    }
 }
 
 void FS_IocpMsgDispatcher::_DoBusinessProcess(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
