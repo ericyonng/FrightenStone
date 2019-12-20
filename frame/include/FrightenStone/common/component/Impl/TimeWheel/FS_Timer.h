@@ -62,6 +62,7 @@ public:
     // 设置超时执行函数
     template<typename ObjType>
     void SetTimeOutHandler(ObjType *objType, void (ObjType::*handler)(FS_Timer *, const Time &, const Time &));
+    // timer对象 上一次timeout的时间,当前timewheel时间
     void SetTimeOutHandler(void(*handler)(FS_Timer *, const Time &, const Time &));
     // 设置cancel执行函数
     template<typename ObjType>

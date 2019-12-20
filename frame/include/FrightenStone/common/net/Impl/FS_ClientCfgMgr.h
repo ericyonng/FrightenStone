@@ -37,12 +37,13 @@
 #include "FrightenStone/exportbase.h"
 #include <FrightenStone/common/basedefs/BaseDefs.h>
 #include <FrightenStone/common/component/Impl/FS_String.h>
+#include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
 
 FS_NAMESPACE_BEGIN
 
 class FS_IniFile;
 
-class BASE_EXPORT FS_ClientCfgMgr
+class BASE_EXPORT FS_ClientCfgMgr : IFS_ServerConfigMgr
 {
 public:
     FS_ClientCfgMgr();

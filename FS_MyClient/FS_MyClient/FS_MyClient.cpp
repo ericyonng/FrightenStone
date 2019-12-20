@@ -283,6 +283,329 @@ Int32 ClientTask::Run()
     return 0;
 }
 
+
+FS_NAMESPACE_BEGIN
+class User : public IUser
+{
+public:
+    User(UInt64 sessionId, UInt64 generatorId, IFS_MsgDispatcher *dispatcher)
+        :_sessionId(sessionId)
+        , _recvMsgId(1)
+        , _sendMsgId(1)
+        , _belongTransferId(generatorId)
+        , _dispatcher(dispatcher)
+    {
+    }
+    ~User()
+    {
+    }
+
+    virtual UInt64 GetSessionId() const
+    {
+        return _sessionId;
+    }
+
+    virtual void Close()
+    {
+        // TODO:抛一个断开session的消息到transfer 通过dispatcher
+        _dispatcher->CloseSession(_sessionId, _belongTransferId);
+    }
+
+    // NetMsg_DataHeader 必须是堆区创建的
+    void SendData(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
+    {
+        _dispatcher->SendData(sessionId, generatorId, msgData);
+    }
+
+    void OnDisconnect()
+    {
+        g_Log->net<User>(" session id[%llu] user disconnect", _sessionId);
+    }
+
+
+
+    UInt64 _sessionId;
+    // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
+    Int32 _recvMsgId = 1;
+    // 测试接收发逻辑用
+    // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
+    Int32 _sendMsgId = 1;
+    IFS_MsgDispatcher *_dispatcher;
+    UInt64 _belongTransferId;
+    FS_Timer _time;
+};
+
+class MyLogic : public IFS_BusinessLogic
+{
+public:
+    std::map<UInt64, User *> _users;
+
+public:
+    MyLogic() {}
+    virtual ~MyLogic()
+    {
+        STLUtil::DelMapContainer(_users);
+    }
+    virtual void Release()
+    {
+        delete this;
+    }
+
+public:
+    User * GetUser(UInt64 sessionId)
+    {
+        auto iterUser = _users.find(sessionId);
+        if(iterUser == _users.end())
+            return NULL;
+
+        return iterUser->second;
+    }
+
+    void OnDisconnect(UInt64 sessionId)
+    {
+        auto iterUser = _users.find(sessionId);
+        if(iterUser == _users.end())
+            return;
+
+        iterUser->second->OnDisconnect();
+    }
+
+    void RemoveUser(UInt64 sessionId)
+    {
+        auto iterUser = _users.find(sessionId);
+        if(iterUser == _users.end())
+            return;
+
+        FS_Release(iterUser->second);
+        _users.erase(iterUser);
+    }
+
+    User *NewUser(UInt64 sessionId, UInt64 generatorId)
+    {
+        auto user = new User(sessionId, generatorId, _dispatcher);
+        _users.insert(std::make_pair(sessionId, user));
+        return user;
+    }
+
+    virtual Int32 Start()
+    {
+        return StatusDefs::Success;
+    }
+
+    void BeforeClose()
+    {
+        //STLUtil::DelMapContainer(_users);
+    }
+
+    virtual void Close()
+    {
+    }
+
+    virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, IUser *> *> *disconnectedDelegate)
+    {
+        auto user = GetUser(sessionId);
+        if(user)
+        {
+            if(disconnectedDelegate)
+            {
+                for(auto iterDelegate = disconnectedDelegate->begin(); iterDelegate != disconnectedDelegate->end(); )
+                {
+                    auto item = *iterDelegate;
+                    item->Invoke(user);
+                    FS_Release(item);
+                    iterDelegate = disconnectedDelegate->erase(iterDelegate);
+                }
+            }
+
+            user->OnDisconnect();
+        }
+
+        RemoveUser(sessionId);
+        // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
+    }
+
+    virtual fs::IUser *OnSessionConnected(UInt64 sessionId, UInt64 generatorId)
+    {
+        return NewUser(sessionId, generatorId);
+    }
+
+    virtual void OnMsgDispatch(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
+    {
+        auto user = GetUser(sessionId);
+        if(!user)
+            return;
+
+        // g_Log->any<MyLogic>("sessionid[%llu] handle a msg", sessionId);
+        switch(msgData->_cmd)
+        {
+            case fs::ProtocolCmd::LoginReq:
+            {
+                fs::LoginReq *login = static_cast<fs::LoginReq *>(msgData);
+
+                //                 g_Log->custom("user[%s] pwd[%s] login. at dispatcher[%d]"
+                //                               , login->_userName, login->_pwd, _dispatcher->GetId());
+                                //     g_Log->any<MyLogic>("sessionid[%llu] login username[%s], pwd[%s] msgId[%d] user recvmsgid"
+                                //                         , sessionId, login->_userName, login->_pwd, login->_msgId, user->_recvMsgId);
+                                     // 检查消息ID
+                if(login->_msgId != user->_recvMsgId)
+                {//当前消息ID和本地收消息次数不匹配
+                    g_Log->custom("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>"
+                                  , sessionId, login->_msgId
+                                  , user->_recvMsgId, login->_msgId - user->_recvMsgId);
+                }
+
+                // 返回包
+                ++user->_recvMsgId;
+
+                for(Int32 i = 0; i < 1; ++i)
+                {
+                    fs::LoginRes ret;
+                    ret._msgId = user->_sendMsgId;
+                    user->SendData(sessionId, generatorId, &ret);
+                    ++user->_sendMsgId;
+                }
+
+                return;
+            }//接收 消息---处理 发送   生产者 数据缓冲区  消费者 
+            break;
+            case fs::ProtocolCmd::LogoutReq:
+            {
+                fs::FS_MsgReadStream r(msgData);
+                // 读取消息长度
+                r.ReadInt16();
+                // 读取消息命令
+                r.GetNetMsgCmd();
+                auto n1 = r.ReadInt8();
+                auto n2 = r.ReadInt16();
+                auto n3 = r.ReadInt32();
+                auto n4 = r.ReadFloat();
+                auto n5 = r.ReadDouble();
+                uint32_t n = 0;
+                r.ReadWithoutOffsetPos(n);
+                char name[32] = {};
+                auto n6 = r.ReadArray(name, 32);
+                char pw[32] = {};
+                auto n7 = r.ReadArray(pw, 32);
+                int ata[10] = {};
+                auto n8 = r.ReadArray(ata, 10);
+                ///
+                fs::FS_MsgWriteStream s(128);
+                s.SetNetMsgCmd(fs::ProtocolCmd::LogoutNty);
+                s.WriteInt8(n1);
+                s.WriteInt16(n2);
+                s.WriteInt32(n3);
+                s.WriteFloat(n4);
+                s.WriteDouble(n5);
+                s.WriteArray(name, n6);
+                s.WriteArray(pw, n7);
+                s.WriteArray(ata, n8);
+                s.Finish();
+
+                // TODO:需要支持流发送
+//                 _dispatcher->SendData(sessionId, )
+//                 client->SendData(*s.GetDataAddr(), s.GetWrLength());
+                //                 g_Log->i<EasyFSServer>(_LOGFMT_("socket<%d> logout")
+                //                                        , static_cast<Int32>(client->GetSocket()));
+                return;
+            }
+            break;
+            case fs::ProtocolCmd::CheckHeartReq:
+            {
+                fs::CheckHeartRes ret;
+                //_dispatcher->SendData(sessionId, &ret);
+                //g_Log->any("socket<%d> CheckHeartReq", static_cast<Int32>(client->GetSocket()));
+                return;
+            }
+            default:
+            {
+                g_Log->custom("recv <sessionId=%llu> undefine msgType,dataLen：%hu"
+                              , sessionId, msgData->_packetLength);
+            }
+            break;
+        }
+
+        return;
+    }
+};
+
+class FS_MyClient : public FS_NetEngine
+{
+public:
+    FS_MyClient()
+    {
+        _config = new FS_ClientCfgMgr;
+    }
+    ~FS_MyClient()
+    {
+        STLUtil::DelVectorContainer(_logics);
+        Fs_SafeFree(_config);
+    }
+
+protected:
+    // 读取配置位置
+    virtual Int32 _OnReadCfgs()
+    {
+        auto ret = _config->Init();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<FS_MyClient>(_LOGFMT_("config Init fail ret[%d]"), ret);
+            return ret;
+        }
+
+        // TODO:
+        _totalCfgs = new NetEngineTotalCfgs;
+        auto &commonConfig = _totalCfgs->_commonCfgs;
+        commonConfig._maxSessionQuantityLimit = _config->GetMaxSessionQuantityLimit();
+        commonConfig._acceptorQuantityLimit = _config->GetAcceptorQuantity();
+        commonConfig._dispatcherQuantity = _config->GetDispatcherCnt();
+        commonConfig._transferQuantity = _config->GetTransferCnt();
+
+        auto &connectorCfg = _totalCfgs->_connectorCfgs;
+        connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
+
+        auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
+        acceptorCfg._ip = _config->GetListenIp();
+        acceptorCfg._port = _config->GetListenPort();
+
+        auto &transferCfg = _totalCfgs->_transferCfgs;
+        transferCfg._heartbeatDeadTimeMsInterval = _config->GetHeartbeatDeadTimeIntervalMs();
+        transferCfg._maxAlloctorBytesPerTransfer = _config->GetMaxAllowAlloctorBytesPerTransfer();
+        transferCfg._prepareBufferPoolCnt = _config->GetPrepareBufferCnt();
+
+        auto &dispatcherCfg = _totalCfgs->_dispatcherCfgs;
+        dispatcherCfg._dispatcherResolutionInterval = _config->GetDispatcherResolutionIntervalMs()*Time::_microSecondPerMilliSecond;
+
+        auto &objPoolCfgs = _totalCfgs->_objPoolCfgs;
+        objPoolCfgs._maxAllowObjPoolBytesOccupied = _config->GetMaxAllowObjPoolBytesOccupied();
+
+        auto &mempoolCfgs = _totalCfgs->_mempoolCfgs;
+        mempoolCfgs._maxAllowMemPoolBytesOccupied = _config->GetMaxAllowMemPoolBytesOccupied();
+        return StatusDefs::Success;
+    }
+
+    // 初始化结束时
+    virtual Int32 _OnInitFinish()
+    {
+        _logics.resize(_totalCfgs->_commonCfgs._dispatcherQuantity);
+        Int32 quantity = static_cast<Int32>(_logics.size());
+        for(Int32 i = 0; i < quantity; ++i)
+            _logics[i] = new fs::MyLogic;
+
+        return StatusDefs::Success;
+    }
+    // 获取业务层,以便绑定到dispatcher上
+    virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics)
+    {
+        logics = _logics;
+    }
+
+private:
+    FS_ClientCfgMgr * _config;
+    std::vector<fs::IFS_BusinessLogic *> _logics;
+};
+
+FS_NAMESPACE_END
+
 void FS_ClientRun::Run()
 {
     // 1.时区
