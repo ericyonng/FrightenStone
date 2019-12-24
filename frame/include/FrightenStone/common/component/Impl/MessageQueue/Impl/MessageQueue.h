@@ -160,6 +160,25 @@ class RapidMq
 public:
 };
 
+// 无线程消息队列
+class BASE_EXPORT SimpleMessageQueue
+{
+public:
+
+private:
+    ConditionLocker _msgGeneratorGuard;
+    std::atomic_bool _msgGeneratorChange;
+    std::list<FS_MessageBlock *> *_msgGeneratorQueue;
+    std::list<FS_MessageBlock *> *_msgSwitchQueue;
+
+    ConditionLocker _msgConsumerGuard;
+    std::atomic_bool _msgConsumerQueueChange;
+    std::list<FS_MessageBlock *> *_msgConsumerQueue;
+
+    std::atomic_bool _isWorking;
+    std::atomic_bool _isStart;
+};
+
 FS_NAMESPACE_END
 
 #include "FrightenStone/common/component/Impl/MessageQueue/Impl/MessageQueueImpl.h"
