@@ -26,17 +26,13 @@
  * @date  : 2019/11/03
  * @brief :
  * 
- *  结论：带线程的消息队列在8生产者1消费者的情况下达到，消费每秒百万数据包（每个包256字节）2Gb/s消费能力 但在消费者线程小于生产者线程时候内存有被耗尽的风险
-          支持每个生产者每秒17万数据包压力 8生产者8消费者下会达到250w数据包且这个时候内存消耗达到动态平衡
+ *  结论：消息队列在8生产者1消费者的情况下达到，消费每秒百万数据包（每个包256字节）2Gb/s消费能力
+          支持每个生产者每秒17万数据包压力
 
-          无线程的消息队列在8生产者1消费者的情况下达到,消费每秒98w数据包 8生产者8消费者下会达到135w
-          每个生产者最低11.2w数据包,最高
-
-          带线程消息队列与不带线程消息队列主要区别在于锁冲突的时间长短,带线程的由于有一条闲置线程只管对消息包的转运,没有业务处理所以锁冲突时间较短性能高
  * 
  */
-#ifndef __Test_TestMessageQueue_H__
-#define __Test_TestMessageQueue_H__
+#ifndef __Test_TestMessageQueue2_H__
+#define __Test_TestMessageQueue2_H__
 
 #pragma once
 
@@ -44,10 +40,10 @@
 
 // 8个生产者线程 1个消费者线程
 #undef TEST_GENERATOR_QUANTITY
+#undef TEST_CONSUMER_QUANTITY
 #define TEST_GENERATOR_QUANTITY 8
-#define TEST_CONSUMER_QUANTITY 1
-// fs::ConcurrentMessageQueue g_testMsgQueue(TEST_GENERATOR_QUANTITY, 1);
-fs::ConcurrentMessageQueueNoThread g_TestMsgNoThreadQueue(TEST_GENERATOR_QUANTITY, TEST_CONSUMER_QUANTITY);
+#define TEST_CONSUMER_QUANTITY  8
+fs::ConcurrentMessageQueue g_testMsgQueue(TEST_GENERATOR_QUANTITY, TEST_CONSUMER_QUANTITY);
 
 struct TestMessage
 {
@@ -61,20 +57,18 @@ public:
     BUFFER256 _buffer;
 };
 
-std::atomic<UInt64> g_consumCount = 0;
-
-class ComsumerTask :public fs::ITask
+class ComsumerTask : public fs::ITask
 {
 public:
     UInt32 _id;
     fs::FS_ThreadPool *_pool;
 
 public:
-    ComsumerTask(UInt32 id, fs::FS_ThreadPool *pool):_id(id), _pool(pool) {}
+    ComsumerTask(UInt32 id,  fs::FS_ThreadPool *pool):_id(id),_pool(pool) {}
     ~ComsumerTask() {}
 
 public:
-    Int32 Run() 
+    Int32 Run()
     {
         Handler(_pool);
         return StatusDefs::Success;
@@ -82,99 +76,16 @@ public:
 public:
     void Handler(fs::FS_ThreadPool *pool)
     {
-        std::vector<std::list<fs::FS_MessageBlock *> *> *generatorMsgsQueue = new std::vector<std::list<fs::FS_MessageBlock *> *>;
-        generatorMsgsQueue->resize(TEST_GENERATOR_QUANTITY);
-        for(UInt32 i = 0; i < TEST_GENERATOR_QUANTITY; ++i)
-            (*generatorMsgsQueue)[i] = new std::list<fs::FS_MessageBlock *>;
-
+        std::list<fs::FS_MessageBlock *> *msgBlocks = new std::list<fs::FS_MessageBlock *>;
         Int64 countMsg = 0;
         fs::Time start, end;
         start.FlushTime();
         bool isFirst = true;
-        bool hasMsg = true;
-        while(true)
+        while(g_testMsgQueue.IsQueueInHandling(_id) || !msgBlocks->empty())
         {
-            g_TestMsgNoThreadQueue.PopLock(_id);
-            g_TestMsgNoThreadQueue.WaitForPoping(_id, generatorMsgsQueue, hasMsg);
-            g_TestMsgNoThreadQueue.PopUnlock(_id);
-
-            if(isFirst)
-            {
-                isFirst = false;
-                start.FlushTime();
-            }
-
-            if(!g_TestMsgNoThreadQueue.IsWorking())
-            {
-                if(hasMsg)
-                {
-                    for(UInt32 i = 0; i < TEST_GENERATOR_QUANTITY; ++i)
-                    {
-                        auto msgBlockList = generatorMsgsQueue->at(i);
-                        if(!msgBlockList)
-                            continue;
-
-                        for(auto iterBlock = msgBlockList->begin(); iterBlock != msgBlockList->end();)
-                        {
-                            auto msgBlock = *iterBlock;
-                            TestMessage msg;
-                            msgBlock->_data->DeserializeTo(msg);
-                            Fs_SafeFree(msgBlock);
-                            ++countMsg;
-                            iterBlock = msgBlockList->erase(iterBlock);
-                        }
-                    }
-                }
-
-                break;
-            }
-            
-            if(!hasMsg)
-                continue;
-
-            for(UInt32 i = 0; i < TEST_GENERATOR_QUANTITY; ++i)
-            {
-                auto msgBlockList = generatorMsgsQueue->at(i);
-                if(!msgBlockList)
-                    continue;
-
-                for(auto iterBlock = msgBlockList->begin(); iterBlock != msgBlockList->end();)
-                {
-                    auto msgBlock = *iterBlock;
-                    TestMessage msg;
-                    msgBlock->_data->DeserializeTo(msg);
-                    Fs_SafeFree(msgBlock);
-                    ++countMsg;
-                    iterBlock = msgBlockList->erase(iterBlock);
-                }
-            }
-
-            hasMsg = false;
-        }
-
-        end.FlushTime();
-        g_consumCount += countMsg;
-        g_Log->any<ComsumerTask>("comsumer[%u] end consum [%lld] totalmsg[%llu] msgs escape time[%llu]"
-                                 , _id, countMsg, (UInt64)(g_consumCount), (end - start).GetTotalMicroSeconds());
-    }
-
-    static void Handler2(fs::FS_ThreadPool *pool)
-    {
-        std::vector<std::list<fs::FS_MessageBlock *> *> *generatorMsgsQueue = new std::vector<std::list<fs::FS_MessageBlock *> *>;
-        generatorMsgsQueue->resize(TEST_GENERATOR_QUANTITY);
-        for(UInt32 i = 0; i < TEST_GENERATOR_QUANTITY; ++i)
-            (*generatorMsgsQueue)[i] = new std::list<fs::FS_MessageBlock *>;
-
-        Int64 countMsg = 0;
-        fs::Time start, end;
-        start.FlushTime();
-        bool isFirst = true;
-        bool hasMsg = true;
-        while(g_TestMsgNoThreadQueue.IsWorking() || hasMsg)
-        {
-            g_TestMsgNoThreadQueue.PopLock(1);
-            g_TestMsgNoThreadQueue.WaitForPoping(1, generatorMsgsQueue, hasMsg, 1);
-            g_TestMsgNoThreadQueue.PopUnlock(1);
+            g_testMsgQueue.PopLock(_id);
+            g_testMsgQueue.WaitForPoping(_id, msgBlocks);
+            g_testMsgQueue.PopUnlock(_id);
 
             if(isFirst)
             {
@@ -183,24 +94,51 @@ public:
             }
 
             // Sleep(30000);
-            for(UInt32 i = 0; i < TEST_GENERATOR_QUANTITY; ++i)
+            for(auto iterMsgBlock = msgBlocks->begin(); iterMsgBlock != msgBlocks->end();)
             {
-                auto msgBlockList = generatorMsgsQueue->at(i);
-                if(!msgBlockList)
-                    continue;
+                auto msgBlock = *iterMsgBlock;
+                TestMessage msg;
+                msgBlock->_data->DeserializeTo(msg);
+                Fs_SafeFree(msgBlock);
+                ++countMsg;
+                iterMsgBlock = msgBlocks->erase(iterMsgBlock);
+            }
+        }
 
-                for(auto iterBlock = msgBlockList->begin(); iterBlock != msgBlockList->end();)
-                {
-                    auto msgBlock = *iterBlock;
-                    TestMessage msg;
-                    msgBlock->_data->DeserializeTo(msg);
-                    Fs_SafeFree(msgBlock);
-                    ++countMsg;
-                    iterBlock = msgBlockList->erase(iterBlock);
-                }
+        end.FlushTime();
+        g_Log->any<ComsumerTask>("comsumer[0] end consum [%lld] msgs escape time[%llu]"
+                                 , countMsg, (end - start).GetTotalMicroSeconds());
+    }
+
+    static void Handler2(fs::FS_ThreadPool *pool)
+    {
+        std::list<fs::FS_MessageBlock *> *msgBlocks = new std::list<fs::FS_MessageBlock *>;
+        Int64 countMsg = 0;
+        fs::Time start, end;
+        start.FlushTime();
+        bool isFirst = true;
+        while(g_testMsgQueue.IsQueueInHandling(1) || !msgBlocks->empty())
+        {
+            g_testMsgQueue.PopLock(1);
+            g_testMsgQueue.WaitForPoping(1, msgBlocks);
+            g_testMsgQueue.PopUnlock(1);
+
+            if(isFirst)
+            {
+                isFirst = false;
+                start.FlushTime();
             }
 
-            hasMsg = false;
+            // Sleep(30000);
+            for(auto iterMsgBlock = msgBlocks->begin(); iterMsgBlock != msgBlocks->end();)
+            {
+                auto msgBlock = *iterMsgBlock;
+                TestMessage msg;
+                msgBlock->_data->DeserializeTo(msg);
+                Fs_SafeFree(msgBlock);
+                ++countMsg;
+                iterMsgBlock = msgBlocks->erase(iterMsgBlock);
+            }
         }
 
         end.FlushTime();
@@ -241,18 +179,15 @@ public:
             newMsgBlock->_data->SerializeFrom(newMsg);
             msgBlocks->push_back(newMsgBlock);
 
-            g_TestMsgNoThreadQueue.PushLock(_queueId);
-            if(g_TestMsgNoThreadQueue.IsWorking())
-                g_TestMsgNoThreadQueue.Push(_queueId, msgBlocks);
+            g_testMsgQueue.PushLock(_queueId);
+            if(g_testMsgQueue.IsWorking())
+                g_testMsgQueue.Push(_queueId, msgBlocks);
             else
             {
                 count -= msgBlocks->size();
                 fs::STLUtil::DelListContainer(*msgBlocks);
             }
-            g_TestMsgNoThreadQueue.PushUnlock(_queueId);
-
-            // 注意notifyconsumer需要在pushunlock之后避免死锁
-            g_TestMsgNoThreadQueue.NotifyConsumer(_queueId);
+            g_testMsgQueue.PushUnlock(_queueId);
             //fs::SocketUtil::Sleep(0, 0);
         }
 
@@ -300,19 +235,18 @@ public:
 #ifdef _WIN32
         fs::CrashHandleUtil::InitCrashHandleParams();
 #endif
-        g_MemleakMonitor->Start(100000000, 100000000);
+        g_MemleakMonitor->Start(1000000, 1000000);
 
-        g_TestMsgNoThreadQueue.BeforeStart();
-        g_TestMsgNoThreadQueue.Start();
-//         g_testMsgQueue.BeforeStart();
-//         g_testMsgQueue.Start();
+        g_testMsgQueue.BeforeStart();
+        g_testMsgQueue.Start();
 
         fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, TEST_GENERATOR_QUANTITY + TEST_CONSUMER_QUANTITY);
         for(UInt32 i = 0; i < TEST_CONSUMER_QUANTITY; ++i)
         {
-            auto consumTask = new ComsumerTask(i, pool);
-            pool->AddTask(*consumTask, true);
+            auto comsumerTask = new ComsumerTask(i, pool);
+            pool->AddTask(*comsumerTask, true);
         }
+  
 //         auto comsumerTask2 = fs::DelegatePlusFactory::Create(&ComsumerTask::Handler2);
 //         pool->AddTask(comsumerTask2, true);
         
@@ -324,11 +258,9 @@ public:
         
         getchar();
         g_Log->any<TestMessageQueue>(_LOGFMT_("will close all test"));
-        //g_testMsgQueue.BeforeClose();
-        g_TestMsgNoThreadQueue.BeforeClose();
+        g_testMsgQueue.BeforeClose();
         pool->Close();
-        //g_testMsgQueue.Close();
-        g_TestMsgNoThreadQueue.Close();
+        g_testMsgQueue.Close();
 
         // 主线程发送间隔一秒钟发送一个消息，消费者线程需要打印出消息
     }

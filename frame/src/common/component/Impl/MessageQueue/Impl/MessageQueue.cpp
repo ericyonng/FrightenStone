@@ -390,5 +390,113 @@ void ConcurrentMessageQueue::_Generator2ConsumerQueueTask(ITask *task, FS_Thread
     _isWorking = false;
 }
 
+
+Int32 ConcurrentMessageQueueNoThread::BeforeStart()
+{
+    if(_isStart)
+    {
+        g_Log->w<ConcurrentMessageQueueNoThread>(_LOGFMT_("message queue is already started"));
+        return StatusDefs::Success;
+    }
+
+    _generatorGuards.resize(_generatorQuantity);
+    _consumerGuards.resize(_consumerQuantity);
+    _msgConsumerQueueChanges.resize(_consumerQuantity);
+    _consumerMsgQueues.resize(_consumerQuantity);
+    _msgGeneratorMsgQueueChanges.resize(_generatorQuantity);
+
+    for(UInt32 j = 0; j < _generatorQuantity; ++j)
+    {
+        auto newQueueChange = new std::atomic_bool;
+        *newQueueChange = false;
+        _msgGeneratorMsgQueueChanges[j] = newQueueChange;
+        _generatorGuards[j] = new ConditionLocker;
+    }
+
+    for(UInt32 i = 0; i < _consumerQuantity; ++i)
+    {
+        _consumerGuards[i] = new ConditionLocker;
+        _msgConsumerQueueChanges[i] = new std::atomic_bool;
+        *_msgConsumerQueueChanges[i] = false;
+        auto newConsumerMsgQueue = new std::vector<std::list<FS_MessageBlock *> *>;
+        _consumerMsgQueues[i] = newConsumerMsgQueue;
+        newConsumerMsgQueue->resize(_generatorQuantity);
+        for(UInt32 j = 0; j < _generatorQuantity; ++j)
+            (*newConsumerMsgQueue)[j] = new std::list<FS_MessageBlock *>;
+    }
+
+    return StatusDefs::Success;
+}
+
+void ConcurrentMessageQueueNoThread::BeforeClose()
+{
+    if(!_isStart)
+        return;
+
+    // 唤醒生产者线程
+    _isWorking = false;
+
+    // 唤醒消费者线程
+    while(true)
+    {
+        bool hasWaiter = false;
+        for(UInt32 i = 0; i < _consumerQuantity; ++i)
+        {
+            _consumerGuards[i]->Lock();
+            if(_consumerGuards[i]->HasWaiter())
+            {
+                hasWaiter = true;
+                _consumerGuards[i]->Sinal();
+            }
+            _consumerGuards[i]->Unlock();
+        }
+
+        if(!hasWaiter)
+            break;
+
+        SystemUtil::Sleep(0);
+    }
+}
+
+void ConcurrentMessageQueueNoThread::Close()
+{
+    if(!_isStart)
+        return;
+
+    // 释放生产者队列资源
+    std::set<UInt32> hasMsgQueueId;
+    STLUtil::DelVectorContainer(_generatorGuards);
+    STLUtil::DelVectorContainer(_msgGeneratorMsgQueueChanges);
+
+    hasMsgQueueId.clear();
+    for(UInt32 i = 0; i < _consumerQuantity; ++i)
+    {
+        auto consumerMsgQueue = _consumerMsgQueues[i];
+        for(UInt32 j = 0; j < _generatorQuantity; ++j)
+        {
+            auto generatorMsgQueue = (*consumerMsgQueue)[j];
+            if(!generatorMsgQueue->empty())
+            {
+                STLUtil::DelListContainer(*generatorMsgQueue);
+                hasMsgQueueId.insert(j);
+            }
+            Fs_SafeFree(generatorMsgQueue);
+        }
+        Fs_SafeFree(consumerMsgQueue);
+        Fs_SafeFree(_msgConsumerQueueChanges[i]);
+        Fs_SafeFree(_consumerGuards[i]);
+    }
+    _consumerMsgQueues.clear();
+    _msgConsumerQueueChanges.clear();
+    _consumerGuards.clear();
+    _generatorGuards.clear();
+
+    // 打印未处理的消费者消息队列id
+    for(auto queueId : hasMsgQueueId)
+        g_Log->w<ConcurrentMessageQueue>(_LOGFMT_("consumer queueId[%u] has msgs unhandled"), queueId);
+
+    _isStart = false;
+}
+
 FS_NAMESPACE_END
 

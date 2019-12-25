@@ -73,7 +73,7 @@ public:
     // 成功返回超时WaitEventTimeOut或者成功Success exportMsgsOut 必须是堆创建
     Int32 WaitForPoping(std::list<FS_MessageBlock *> *&exportMsgsOut, UInt64 timeoutMilisec = INFINITE);
     void PopImmediately(std::list<FS_MessageBlock *> *&exportMsgsOut);
-    bool IsConsumerInHandling();
+    bool IsQueueInHandling();
     bool HasMsgToConsume();
     bool IsWorking() const;
     void PopUnlock();
@@ -110,7 +110,7 @@ public:
     void BeforeClose();
     void Close();
     bool IsWorking() const;
-    bool IsConsumerInHandling(UInt32 consumerQueueId) const;
+    bool IsQueueInHandling(UInt32 consumerQueueId) const;
 
 public:
     // 压入末节点
@@ -161,20 +161,53 @@ public:
 };
 
 // 无线程消息队列
-class BASE_EXPORT SimpleMessageQueue
+class BASE_EXPORT ConcurrentMessageQueueNoThread
 {
 public:
+    ConcurrentMessageQueueNoThread(UInt32 generatorQuantity, UInt32 consumerQuantity = 1);
+    ~ConcurrentMessageQueueNoThread();
+
+public:
+    Int32 BeforeStart();
+    Int32 Start();
+    void BeforeClose();
+    void Close();
+    bool IsWorking() const;
+
+public:
+    // 压入末节点
+    void PushLock(UInt32 generatorQueueId);
+    bool Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs);
+    bool Push(UInt32 generatorQueueId, FS_MessageBlock *messageBlock);
+    void PushUnlock(UInt32 generatorQueueId);
+    void NotifyConsumer(UInt32 generatorQueueId);
+
+    // 其他线程等待消息到来并从前节点弹出
+    void PopLock(UInt32 consumerQueueId);
+    // 成功返回超时WaitEventTimeOut或者成功Success  generatorMsgs 的索引是generatorid 且vector中的list需要预先堆创建,以便采用swap方式快速拷贝
+    Int32 WaitForPoping(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs, ULong timeoutMilisec = INFINITE);
+    void NotifyPop(UInt32 consumerQueueId);
+    // generatorMsgs 的索引是generatorid 且vector中的list需要预先堆创建,以便采用swap方式快速拷贝
+    void PopImmediately(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs);
+    void PopUnlock(UInt32 consumerQueueId);
+    bool HasMsgToConsume(UInt32 consumerQueueId) const;
 
 private:
-    ConditionLocker _msgGeneratorGuard;
-    std::atomic_bool _msgGeneratorChange;
-    std::list<FS_MessageBlock *> *_msgGeneratorQueue;
-    std::list<FS_MessageBlock *> *_msgSwitchQueue;
+    UInt32 _GetConsumerIdByGeneratorId(UInt32 generatorId) const;
 
-    ConditionLocker _msgConsumerGuard;
-    std::atomic_bool _msgConsumerQueueChange;
-    std::list<FS_MessageBlock *> *_msgConsumerQueue;
+private:
+    /* 生产者消费者参数 */
+    std::vector<ConditionLocker *>  _generatorGuards;   // 操作数据
+    std::vector<std::atomic_bool *> _msgGeneratorMsgQueueChanges;   // 生产者有消息未被消费者消费
+    std::vector<ConditionLocker *> _consumerGuards;     // 用于唤醒消费者
+    std::vector<std::atomic_bool *> _msgConsumerQueueChanges;
+    // 第一次容器使用consumerid索引,第2层vector通过generatorid索引,这个时候由于消费者生产者线程处于不同线程需要加锁,再一层的list是真正的generator的消息队列
+    // 消息加入之后需要通过consumerguards唤醒消费者线程
+    std::vector<std::vector<std::list<FS_MessageBlock *> *> *> _consumerMsgQueues;     // 第一层vector通过consumerid索引到对应的消费者队列,std::list<FS_MessageBlock *> *只是某个消费者塞进去的消息,避免了遍历list
 
+    /* 系统参数 */
+    std::atomic<UInt32> _consumerQuantity;
+    std::atomic<UInt32> _generatorQuantity;
     std::atomic_bool _isWorking;
     std::atomic_bool _isStart;
 };

@@ -71,6 +71,7 @@ inline bool MessageQueue::Push(FS_MessageBlock *msg)
         return false;
 
     _msgGeneratorQueue->push_back(msg);
+    _msgGeneratorChange = true;
     return true;
 }
 
@@ -118,7 +119,7 @@ inline void MessageQueue::PopImmediately(std::list<FS_MessageBlock *> *&exportMs
     }
 }
 
-inline bool MessageQueue::IsConsumerInHandling()
+inline bool MessageQueue::IsQueueInHandling()
 {
     return HasMsgToConsume() || IsWorking();
 }
@@ -146,7 +147,7 @@ inline bool ConcurrentMessageQueue::IsWorking() const
     return _isWorking;
 }
 
-inline bool ConcurrentMessageQueue::IsConsumerInHandling(UInt32 consumerQueueId) const
+inline bool ConcurrentMessageQueue::IsQueueInHandling(UInt32 consumerQueueId) const
 {
     return HasMsgToConsume(consumerQueueId) || IsWorking();
 }
@@ -190,6 +191,7 @@ inline bool ConcurrentMessageQueue::Push(UInt32 generatorQueueId, FS_MessageBloc
         return false;
 
     _generatorMsgQueues[generatorQueueId]->push_back(messageBlock);
+    *_generatorChange[generatorQueueId] = true;
     return true;
 }
 
@@ -254,6 +256,168 @@ inline bool ConcurrentMessageQueue::HasMsgToConsume(UInt32 consumerQueueId) cons
     bool isEmpty = _consumerMsgQueues[consumerQueueId]->empty();
     _consumerGuards[consumerQueueId]->Unlock();
     return !isEmpty;
+}
+
+inline ConcurrentMessageQueueNoThread::ConcurrentMessageQueueNoThread(UInt32 generatorQuantity, UInt32 consumerQuantity)
+    :_consumerQuantity(consumerQuantity)
+    ,_generatorQuantity(generatorQuantity)
+    ,_isWorking(false)
+    ,_isStart(false)
+{
+}
+
+inline ConcurrentMessageQueueNoThread::~ConcurrentMessageQueueNoThread()
+{
+    BeforeClose();
+    Close();
+}
+
+
+inline Int32 ConcurrentMessageQueueNoThread::Start()
+{
+    if(_isStart)
+        return StatusDefs::Success;
+
+    _isStart = true;
+    _isWorking = true;
+    return StatusDefs::Success;
+}
+
+inline bool ConcurrentMessageQueueNoThread::IsWorking() const
+{
+    return _isWorking;
+}
+
+inline void ConcurrentMessageQueueNoThread::PushLock(UInt32 generatorQueueId)
+{
+    _generatorGuards[generatorQueueId]->Lock();
+}
+
+inline bool ConcurrentMessageQueueNoThread::Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs)
+{
+    if(UNLIKELY(!_isWorking))
+        return false;
+
+    const auto consumerId = _GetConsumerIdByGeneratorId(generatorQueueId);
+    auto consumerQueue = _consumerMsgQueues[consumerId];
+    auto generatorMsgQueue = consumerQueue->at(generatorQueueId);
+    if(*_msgGeneratorMsgQueueChanges[generatorQueueId])
+    {// 生产者消息还未被消费
+
+        for(auto iterMsg = msgs->begin(); iterMsg != msgs->end(); )
+        {
+            generatorMsgQueue->push_back(*iterMsg);
+            iterMsg = msgs->erase(iterMsg);
+        }
+    }
+    else
+    {// 空队列则交换
+        std::list<FS_MessageBlock *> *gemTemp = NULL;
+        gemTemp = msgs;
+        msgs = generatorMsgQueue;
+        (*consumerQueue)[generatorQueueId] = gemTemp;
+        *_msgGeneratorMsgQueueChanges[generatorQueueId] = true;
+    }
+
+    *_msgConsumerQueueChanges[consumerId] = true;
+
+    return true;
+}
+
+inline bool ConcurrentMessageQueueNoThread::Push(UInt32 generatorQueueId, FS_MessageBlock *messageBlock)
+{
+    if(UNLIKELY(!_isWorking))
+        return false;
+
+    const auto consumerId = _GetConsumerIdByGeneratorId(generatorQueueId);
+    _consumerMsgQueues[consumerId]->at(generatorQueueId)->push_back(messageBlock);
+    *_msgGeneratorMsgQueueChanges[generatorQueueId] = true;
+    *_msgConsumerQueueChanges[consumerId] = true;
+
+    return true;
+}
+
+inline void ConcurrentMessageQueueNoThread::PushUnlock(UInt32 generatorQueueId)
+{
+    _generatorGuards[generatorQueueId]->Unlock();
+}
+
+inline void ConcurrentMessageQueueNoThread::NotifyConsumer(UInt32 generatorQueueId)
+{
+    if(!_isWorking)
+        return;
+
+    auto consumerId = _GetConsumerIdByGeneratorId(generatorQueueId);
+    auto guards = _consumerGuards[consumerId];
+    guards->Lock();
+    guards->Sinal();
+    guards->Unlock();
+}
+
+inline void ConcurrentMessageQueueNoThread::PopLock(UInt32 consumerQueueId)
+{
+    _consumerGuards[consumerQueueId]->Lock();
+}
+
+inline Int32 ConcurrentMessageQueueNoThread::WaitForPoping(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs, ULong timeoutMilisec)
+{
+    Int32 st = _consumerGuards[consumerQueueId]->Wait(timeoutMilisec);
+    PopImmediately(consumerQueueId, generatorMsgs, hasMsgs);
+
+    return st;
+}
+
+inline void ConcurrentMessageQueueNoThread::NotifyPop(UInt32 consumerQueueId)
+{
+    _consumerGuards[consumerQueueId]->Sinal();
+}
+
+inline void ConcurrentMessageQueueNoThread::PopImmediately(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs)
+{
+    if(*_msgConsumerQueueChanges[consumerQueueId])
+    {
+        std::list<FS_MessageBlock *> *temp = NULL;
+        auto consumerQueue = _consumerMsgQueues[consumerQueueId];
+        auto &generatorMsgVec = *generatorMsgs;
+        ConditionLocker *guard = NULL;
+        for(UInt32 i = 0; i < _generatorQuantity; ++i)
+        {
+            auto temp = (*consumerQueue)[i];
+            if(!temp)
+                continue;
+
+            guard = _generatorGuards[i];
+            guard->Lock();
+            if(temp->empty())
+            {
+                guard->Unlock();
+                continue;
+            }
+
+            (*consumerQueue)[i] = generatorMsgVec[i];
+            generatorMsgVec[i] = temp;
+            *_msgGeneratorMsgQueueChanges[i] = false;
+            guard->Unlock();
+            hasMsgs = true;
+        }
+
+        *_msgConsumerQueueChanges[consumerQueueId] = false;
+    }
+}
+
+inline void ConcurrentMessageQueueNoThread::PopUnlock(UInt32 consumerQueueId)
+{
+    _consumerGuards[consumerQueueId]->Unlock();
+}
+
+inline bool ConcurrentMessageQueueNoThread::HasMsgToConsume(UInt32 consumerQueueId) const
+{
+    return *_msgConsumerQueueChanges[consumerQueueId];
+}
+
+inline UInt32 ConcurrentMessageQueueNoThread::_GetConsumerIdByGeneratorId(UInt32 generatorId) const
+{
+    return generatorId % _consumerQuantity;
 }
 
 FS_NAMESPACE_END
