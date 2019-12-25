@@ -42,7 +42,7 @@
 #undef TEST_GENERATOR_QUANTITY
 #undef TEST_CONSUMER_QUANTITY
 #define TEST_GENERATOR_QUANTITY 8
-#define TEST_CONSUMER_QUANTITY  8
+#define TEST_CONSUMER_QUANTITY  1
 fs::ConcurrentMessageQueue g_testMsgQueue(TEST_GENERATOR_QUANTITY, TEST_CONSUMER_QUANTITY);
 
 struct TestMessage
@@ -56,7 +56,7 @@ public:
 public:
     BUFFER256 _buffer;
 };
-
+std::atomic<UInt64> g_consumCount = 0;
 class ComsumerTask : public fs::ITask
 {
 public:
@@ -81,7 +81,7 @@ public:
         fs::Time start, end;
         start.FlushTime();
         bool isFirst = true;
-        while(g_testMsgQueue.IsQueueInHandling(_id) || !msgBlocks->empty())
+        while(true)
         {
             g_testMsgQueue.PopLock(_id);
             g_testMsgQueue.WaitForPoping(_id, msgBlocks);
@@ -91,6 +91,20 @@ public:
             {
                 isFirst = false;
                 start.FlushTime();
+            }
+
+            if(!g_testMsgQueue.IsQueueInHandling(_id))
+            {
+                for(auto iterMsgBlock = msgBlocks->begin(); iterMsgBlock != msgBlocks->end();)
+                {
+                    auto msgBlock = *iterMsgBlock;
+                    TestMessage msg;
+                    msgBlock->_data->DeserializeTo(msg);
+                    Fs_SafeFree(msgBlock);
+                    ++countMsg;
+                    iterMsgBlock = msgBlocks->erase(iterMsgBlock);
+                }
+                break;
             }
 
             // Sleep(30000);
@@ -105,9 +119,10 @@ public:
             }
         }
 
+        g_consumCount += countMsg;
         end.FlushTime();
-        g_Log->any<ComsumerTask>("comsumer[0] end consum [%lld] msgs escape time[%llu]"
-                                 , countMsg, (end - start).GetTotalMicroSeconds());
+        g_Log->any<ComsumerTask>("comsumer[%u] end consum [%lld] totalmsgs[%llu] msgs escape time[%llu]"
+                                 ,_id, countMsg, UInt64(g_consumCount), (end - start).GetTotalMicroSeconds());
     }
 
     static void Handler2(fs::FS_ThreadPool *pool)
@@ -222,7 +237,7 @@ inline bool TestMessage::DeserializeFrom(fs::FS_Stream *stream)
     return readStream->Read(_buffer);
 }
 
-class TestMessageQueue
+class TestMessageQueue2
 {
 public:
     static void Run()
@@ -257,7 +272,7 @@ public:
         }
         
         getchar();
-        g_Log->any<TestMessageQueue>(_LOGFMT_("will close all test"));
+        g_Log->any<TestMessageQueue2>(_LOGFMT_("will close all test"));
         g_testMsgQueue.BeforeClose();
         pool->Close();
         g_testMsgQueue.Close();

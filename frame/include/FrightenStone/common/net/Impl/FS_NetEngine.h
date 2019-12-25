@@ -55,9 +55,9 @@ class  FS_ThreadPool;
 class  TimeSlice;
 class  Time;
 class  IFS_BusinessLogic;
-class  ConcurrentMessageQueue;
+class  ConcurrentMessageQueueNoThread;
+class MessageQueueNoThread;
 struct NetMsg_DataHeader;
-class  MessageQueue;
 struct BriefSessionInfo;
 struct NetEngineTotalCfgs;
 
@@ -135,7 +135,7 @@ private:
     // 将监听的接口注册到模块中
     void _RegisterToModule();
 
-    std::vector<MessageQueue *> &_GetSenderMq();
+    std::vector<MessageQueueNoThread *> &_GetSenderMq();
     #pragma endregion
 
 protected:
@@ -148,8 +148,8 @@ protected:
     IFS_Connector * _connector;                         // 连接器
     std::vector<IFS_Acceptor *> _acceptors;             // 支持监听多端口，具体看派生类对象的配置
     std::vector<IFS_MsgTransfer *> _msgTransfers;       // 多线程消息收发器
-    ConcurrentMessageQueue *_messageQueue;              // 消息队列
-    std::vector<MessageQueue *> _senderMessageQueue;    // 发送消息队列
+    ConcurrentMessageQueueNoThread *_messageQueue;      // 消息队列
+    std::vector<MessageQueueNoThread *> _senderMessageQueue;    // 发送消息队列
 
     std::vector<IFS_MsgDispatcher *> _msgDispatchers;   // 业务消息处理器 业务线程处理,支持多线程并发处理
     // std::vector<IFS_BusinessLogic *> _logics;        // 多业务逻辑并发 logic应该并到每个dispatcher中

@@ -68,7 +68,8 @@
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
 #include "TestSuit/TestSuit/TestInst/TestMemAlign.h"
 #include "TestSuit/TestSuit/TestInst/TestIniFile.h"
-#include "TestSuit/TestSuit/TestInst/TestMessageQueue.h"
+//#include "TestSuit/TestSuit/TestInst/TestMessageQueue.h"
+#include "TestSuit/TestSuit/TestInst/TestMessageQueue2.h"
 
 void TestInsts::Run()
 {
@@ -82,8 +83,8 @@ void TestInsts::Run()
 //     pool->AddTask(deleg);
 //     getchar();
 //     pool->Clear();
-    //TestServer::Run();
-    TestMessageQueue::Run();
+    TestServer::Run();
+    //TestMessageQueue2::Run();
     //TestServer::Run();
     getchar();
     // TestJson::Run();

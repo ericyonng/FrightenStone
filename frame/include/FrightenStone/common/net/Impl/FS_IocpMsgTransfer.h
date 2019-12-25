@@ -78,8 +78,8 @@ public:
     virtual Int32 GetSessionCnt();
 
     // 消息队列
-    virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue, Int32 generatorId);
-    virtual void AttachSenderMsgQueue(MessageQueue *messageQueue);
+    virtual void AttachMsgQueue(ConcurrentMessageQueueNoThread *messageQueue, Int32 generatorId);
+    virtual void AttachSenderMsgQueue(MessageQueueNoThread *messageQueue);
 
 private:
     void _OnMoniterMsg(FS_ThreadPool *pool);
@@ -137,10 +137,10 @@ private:
     FS_ThreadPool *_threadPool;
     FS_Iocp *_iocp;
     IO_EVENT *_ioEvent;
-    ConcurrentMessageQueue *_messageQueue;
+    ConcurrentMessageQueueNoThread *_messageQueue;
     std::list<FS_MessageBlock *> *_msgsFromDispatcher;
     std::list<FS_MessageBlock *> *_recvMsgList;
-    MessageQueue *_senderMessageQueue;
+    MessageQueueNoThread *_senderMessageQueue;
     Int32 _generatorId;
 
     // 缓冲区

@@ -498,5 +498,52 @@ void ConcurrentMessageQueueNoThread::Close()
     _isStart = false;
 }
 
+Int32 MessageQueueNoThread::BeforeStart()
+{
+    if(_isStart)
+        return StatusDefs::Success;
+
+    _consumerMsgQueue = new std::list<FS_MessageBlock *>;
+    return StatusDefs::Success;
+}
+
+Int32 MessageQueueNoThread::Start()
+{
+    if(_isStart)
+        return StatusDefs::Success;
+
+    _isStart = true;
+    _isWorking = true;
+    return StatusDefs::Success;
+}
+
+void MessageQueueNoThread::BeforeClose()
+{
+    if(!_isStart)
+        return;
+
+    // 唤醒生产者线程
+    _isWorking = false;
+
+    // 唤醒消费者线程
+    _consumerGuard.Broadcast();
+}
+
+void MessageQueueNoThread::Close()
+{
+    if(!_isStart)
+        return;
+
+    // 释放生产者队列资源
+    auto unhandleBlock = _consumerMsgQueue->size();
+    STLUtil::DelListContainer(*_consumerMsgQueue);
+    Fs_SafeFree(_consumerMsgQueue);
+
+    // 打印未处理的消费者消息队列id
+    g_Log->w<ConcurrentMessageQueue>(_LOGFMT_("consumer has [%llu] msgs unhandled"), unhandleBlock);
+
+    _isStart = false;
+}
+
 FS_NAMESPACE_END
 

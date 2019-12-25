@@ -42,8 +42,8 @@ FS_NAMESPACE_BEGIN
 
 class  IFS_Session;
 struct NetMsg_DataHeader;
-class ConcurrentMessageQueue;
-class MessageQueue;
+class ConcurrentMessageQueueNoThread;
+class MessageQueueNoThread;
 struct BriefSessionInfo;
 struct TransferCfgs;
 
@@ -70,8 +70,8 @@ public:
     virtual Int32 GetSessionCnt() = 0;
 
     // 消息队列
-    virtual void AttachMsgQueue(ConcurrentMessageQueue *messageQueue, Int32 generatorId) = 0;
-    virtual void AttachSenderMsgQueue(MessageQueue *messageQueue) = 0;
+    virtual void AttachMsgQueue(ConcurrentMessageQueueNoThread *messageQueue, Int32 generatorId) = 0;
+    virtual void AttachSenderMsgQueue(MessageQueueNoThread *messageQueue) = 0;
 };
 
 FS_NAMESPACE_END

@@ -83,7 +83,11 @@ Int32 FS_IocpMsgDispatcher::BeforeStart(const DispatcherCfgs &cfgs)
     _timeWheel = new TimeWheel(_cfgs->_dispatcherResolutionInterval);
     // g_BusinessTimeWheel = _timeWheel;
     _pool = new FS_ThreadPool(0, 1);
-    _recvMsgBlocks = new std::list<FS_MessageBlock *>;
+    _recvMsgBlocks = new std::vector<std::list<FS_MessageBlock *> *>;
+    auto generatorQuatity = _messgeQueue->GetGeneratorQuality();
+    _recvMsgBlocks->resize(generatorQuatity);
+    for(UInt32 i = 0; i < generatorQuatity; ++i)
+        (*_recvMsgBlocks)[i] = new std::list<FS_MessageBlock *>;
 
     if(_logic)
     {
@@ -127,9 +131,7 @@ void FS_IocpMsgDispatcher::BeforeClose()
     if(_isClose)
         return;
 
-    _messgeQueue->PopLock(_id);
-    _messgeQueue->NotifyPop(_id);
-    _messgeQueue->PopUnlock(_id);
+    _messgeQueue->NotifyConsumerByGenerator(_id);
 
     if(_logic)
         _logic->BeforeClose();
@@ -150,18 +152,30 @@ void FS_IocpMsgDispatcher::Close()
 
     if(!_recvMsgBlocks->empty())
     {
-        g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("recv msg block queue has unhandled msgs[%llu]"), _recvMsgBlocks->size());
-        for(auto &recvMsgBlock : *_recvMsgBlocks)
+        UInt32 generatorSize = static_cast<UInt32>(_recvMsgBlocks->size());
+        UInt64 blockCount = 0;
+        for(UInt32 i = 0; i < generatorSize; ++i)
         {
-            FS_NetMsgBufferBlock *netMsg = recvMsgBlock->CastTo<FS_NetMsgBufferBlock>();
-            NetMsg_DataHeader *header = netMsg->CastBufferTo<NetMsg_DataHeader>();
-            g_Log->net<FS_IocpMsgDispatcher>("net msg[%hu] data size[%hu] generatorid[%d] sessionId[%llu] is unhandled"
-                                             , header->_cmd
-                                             , header->_packetLength
-                                             , netMsg->_generatorId
-                                             , netMsg->_sessionId);
+            auto msgQueue = _recvMsgBlocks->at(i);
+            if(!msgQueue)
+                continue;
+
+            for(auto &recvMsgBlock : *msgQueue)
+            {
+                FS_NetMsgBufferBlock *netMsg = recvMsgBlock->CastTo<FS_NetMsgBufferBlock>();
+                NetMsg_DataHeader *header = netMsg->CastBufferTo<NetMsg_DataHeader>();
+                g_Log->net<FS_IocpMsgDispatcher>("net msg[%hu] data size[%hu] generatorid[%d] sessionId[%llu] is unhandled"
+                                                 , header->_cmd
+                                                 , header->_packetLength
+                                                 , netMsg->_generatorId
+                                                 , netMsg->_sessionId);
+                ++blockCount;
+                Fs_SafeFree(recvMsgBlock);
+            }
+            msgQueue->clear();
         }
 
+        g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("recv msg block queue has unhandled msgs[%llu]"), blockCount);
     }
 
     STLUtil::DelListContainer(*_recvMsgBlocks);
@@ -235,11 +249,8 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMs
     newMsgBlock->_sessionId = sessionId;
 
     // 送入消息队列
-    senderMq[consumerId]->PushLock();
     if(!senderMq[consumerId]->Push(newMsgBlock))
         Fs_SafeFree(newMsgBlock);
-    senderMq[consumerId]->Notify();
-    senderMq[consumerId]->PushUnlock();
 }
 
 void FS_IocpMsgDispatcher::CloseSession(UInt64 sessionId, UInt64 consumerId)
@@ -257,11 +268,8 @@ void FS_IocpMsgDispatcher::CloseSession(UInt64 sessionId, UInt64 consumerId)
     newMsgBlock->_sessionId = sessionId;
 
     // 送入消息队列
-    senderMq[consumerId]->PushLock();
     if(!senderMq[consumerId]->Push(newMsgBlock))
         Fs_SafeFree(newMsgBlock);
-    senderMq[consumerId]->Notify();
-    senderMq[consumerId]->PushUnlock();
 }
 
 void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
@@ -269,11 +277,10 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 
     // _timeWheel->GetModifiedResolution(_resolutionInterval);
     const auto &resolutionIntervalSlice = _cfgs->_dispatcherResolutionInterval;
+    bool hasMsg = false;
     while(pool->IsPoolWorking())
     {
-        _messgeQueue->PopLock(_id);
-        _messgeQueue->WaitForPoping(_id, _recvMsgBlocks, static_cast<ULong>(resolutionIntervalSlice.GetTotalMilliSeconds()));
-        _messgeQueue->PopUnlock(_id);
+        _messgeQueue->WaitForPoping(_id, _recvMsgBlocks, hasMsg, static_cast<ULong>(resolutionIntervalSlice.GetTotalMilliSeconds()));
 
         // Sleep(100);
         // 先执行定时器事件
@@ -283,7 +290,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
         // 清理完成的异步事件 TODO:
 
         // 再执行业务事件
-        _OnBusinessProcessing();
+        _OnBusinessProcessing(hasMsg);
 
         // 投递业务产生的异步处理事件 TODO: 不合适修正，因为可能会错过跨天等重要节点
         // _timeWheel->GetModifiedResolution(_resolutionInterval);
@@ -292,45 +299,53 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
     g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end"));
 }
 
-void FS_IocpMsgDispatcher::_OnBusinessProcessing()
+void FS_IocpMsgDispatcher::_OnBusinessProcessing(bool hasMsg)
 {
     // 将网络数据转移到缓冲区
+    if(hasMsg)
     {
         FS_NetMsgBufferBlock *netMsgBlock = NULL;
         UInt64 sessionId = 0;
-        for(auto iterBlock = _recvMsgBlocks->begin(); iterBlock != _recvMsgBlocks->end();)
+        for(auto iterGeneratorQueue = _recvMsgBlocks->begin(); iterGeneratorQueue != _recvMsgBlocks->end();++iterGeneratorQueue)
         {
-            netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
-            sessionId = netMsgBlock->_sessionId;
-            if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionDisconnect)
-            {// 会话断开
-                _delayDisconnectedSessions.insert(sessionId);
-            }
-            else if(netMsgBlock->_mbType == MessageBlockType::MB_NetMsgArrived)
-            {// 收到网络包
-                auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
-                _DoBusinessProcess(sessionId, netMsgBlock->_generatorId, netMsg);
-            }
-            else if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionConnected)
-            {// 会话连入
-                auto newUser = _logic->OnSessionConnected(sessionId, netMsgBlock->_generatorId);
-                auto newUserRes = netMsgBlock->_newUserRes;
-                if(newUserRes)
-                    newUserRes->Invoke(newUser);
+            auto blockQueue = *iterGeneratorQueue;
+            if(blockQueue->empty())
+                continue;
 
-                auto userDisconnectedDelegates = netMsgBlock->_userDisconnected;
-                if(userDisconnectedDelegates)
-                {
-                    auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
-                    if(iterDisconnected == _sessionIdRefUserDisconnected.end())
-                        iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
-                    iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
-                    netMsgBlock->_userDisconnected = NULL;
+            for(auto iterBlock = blockQueue->begin(); iterBlock != blockQueue->end();)
+            {
+                netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
+                sessionId = netMsgBlock->_sessionId;
+                if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionDisconnect)
+                {// 会话断开
+                    _delayDisconnectedSessions.insert(sessionId);
                 }
-            }
+                else if(netMsgBlock->_mbType == MessageBlockType::MB_NetMsgArrived)
+                {// 收到网络包
+                    auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
+                    _DoBusinessProcess(sessionId, netMsgBlock->_generatorId, netMsg);
+                }
+                else if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionConnected)
+                {// 会话连入
+                    auto newUser = _logic->OnSessionConnected(sessionId, netMsgBlock->_generatorId);
+                    auto newUserRes = netMsgBlock->_newUserRes;
+                    if(newUserRes)
+                        newUserRes->Invoke(newUser);
 
-            Fs_SafeFree(netMsgBlock);
-            iterBlock = _recvMsgBlocks->erase(iterBlock);
+                    auto userDisconnectedDelegates = netMsgBlock->_userDisconnected;
+                    if(userDisconnectedDelegates)
+                    {
+                        auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
+                        if(iterDisconnected == _sessionIdRefUserDisconnected.end())
+                            iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
+                        iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
+                        netMsgBlock->_userDisconnected = NULL;
+                    }
+                }
+
+                Fs_SafeFree(netMsgBlock);
+                iterBlock = blockQueue->erase(iterBlock);
+            }
         }
     }
 

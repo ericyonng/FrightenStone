@@ -50,7 +50,7 @@ class IFS_Session;
 struct NetMsg_DataHeader;
 class IFS_MsgTransfer;
 class IFS_BusinessLogic;
-class ConcurrentMessageQueue;
+class ConcurrentMessageQueueNoThread;
 struct FS_MessageBlock;
 class IUser;
 class FS_NetEngine;
@@ -72,14 +72,14 @@ public:
 
     virtual void SendData(UInt64 sessionId,  UInt64 consumerId, NetMsg_DataHeader *msg);// 线程安全
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
-    virtual void AttachRecvMessageQueue(ConcurrentMessageQueue *messageQueue);
+    virtual void AttachRecvMessageQueue(ConcurrentMessageQueueNoThread *messageQueue);
     virtual Int32 GetId() const;
     virtual void CloseSession(UInt64 sessionId, UInt64 consumerId);
 
 private:
     // msgData会拷贝到内存池创建的缓冲区中 线程不安全，外部需要加锁
     void _OnBusinessProcessThread(FS_ThreadPool *pool);
-    void _OnBusinessProcessing();
+    void _OnBusinessProcessing(bool hasMsg);
 
     void _DoBusinessProcess(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData);
     void _OnDelaySessionDisconnect(UInt64 sessionId);
@@ -99,8 +99,8 @@ private:
     IFS_BusinessLogic *_logic;
     std::map<UInt64, std::list<IDelegate<void, IUser *> *>> _sessionIdRefUserDisconnected;
 
-    std::list<FS_MessageBlock *> *_recvMsgBlocks;       // 需要转换成 FS_NetMsgBufferBlock
-    ConcurrentMessageQueue *_messgeQueue;
+    std::vector<std::list<FS_MessageBlock *> *> *_recvMsgBlocks;       // 需要转换成 FS_NetMsgBufferBlock
+    ConcurrentMessageQueueNoThread *_messgeQueue;
 
     // TODO:订阅网络协议的facade开发，使用委托方式，各个系统关注各自的协议，注册到本系统
 

@@ -173,27 +173,24 @@ public:
     void BeforeClose();
     void Close();
     bool IsWorking() const;
+    UInt32 GetGeneratorQuality() const;
 
 public:
-    // 压入末节点
-    void PushLock(UInt32 generatorQueueId);
     bool Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs);
     bool Push(UInt32 generatorQueueId, FS_MessageBlock *messageBlock);
-    void PushUnlock(UInt32 generatorQueueId);
-    void NotifyConsumer(UInt32 generatorQueueId);
+    void NotifyConsumerByGenerator(UInt32 generatorQueueId);
 
     // 其他线程等待消息到来并从前节点弹出
-    void PopLock(UInt32 consumerQueueId);
     // 成功返回超时WaitEventTimeOut或者成功Success  generatorMsgs 的索引是generatorid 且vector中的list需要预先堆创建,以便采用swap方式快速拷贝
-    Int32 WaitForPoping(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs, ULong timeoutMilisec = INFINITE);
-    void NotifyPop(UInt32 consumerQueueId);
     // generatorMsgs 的索引是generatorid 且vector中的list需要预先堆创建,以便采用swap方式快速拷贝
+    Int32 WaitForPoping(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs, ULong timeoutMilisec = INFINITE);
     void PopImmediately(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs);
-    void PopUnlock(UInt32 consumerQueueId);
+    void NotifyConsumer(UInt32 consumerQueueId);
     bool HasMsgToConsume(UInt32 consumerQueueId) const;
 
 private:
     UInt32 _GetConsumerIdByGeneratorId(UInt32 generatorId) const;
+    void _PopImmediately(std::vector<std::list<FS_MessageBlock *> *> *consumerQueue, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool isConsumerQueueChange);
 
 private:
     /* 生产者消费者参数 */
@@ -211,6 +208,45 @@ private:
     std::atomic_bool _isWorking;
     std::atomic_bool _isStart;
 };
+
+// 无线程消息队列
+class BASE_EXPORT MessageQueueNoThread
+{
+public:
+    MessageQueueNoThread();
+    ~MessageQueueNoThread();
+
+public:
+    Int32 BeforeStart();
+    Int32 Start();
+    void BeforeClose();
+    void Close();
+    bool IsWorking() const;
+
+public:
+    bool Push(std::list<FS_MessageBlock *> *&msgs);
+    bool Push(FS_MessageBlock *messageBlock);
+    void NotifyConsumerByGenerator();
+
+    Int32 WaitForPoping(std::list<FS_MessageBlock *> *&generatorMsgs, ULong timeoutMilisec = INFINITE);
+    void PopImmediately(std::list<FS_MessageBlock *> *&generatorMsgs);
+    void NotifyConsumer();
+    bool HasMsgToConsume() const;
+
+private:
+    void _PopImmediately(std::list<FS_MessageBlock *> *&generatorMsgs);
+
+private:
+    /* 生产者消费者参数 */
+    ConditionLocker _consumerGuard;     // 用于唤醒消费者
+    std::atomic_bool _msgConsumerQueueChange;
+    std::list<FS_MessageBlock *> *_consumerMsgQueue;
+
+    /* 系统参数 */
+    std::atomic_bool _isWorking;
+    std::atomic_bool _isStart;
+};
+
 
 FS_NAMESPACE_END
 

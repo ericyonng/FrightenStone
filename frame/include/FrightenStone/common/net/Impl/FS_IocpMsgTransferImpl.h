@@ -41,13 +41,13 @@ inline Int32 FS_IocpMsgTransfer::GetSessionCnt()
     return _sessionCnt;
 }
 
-inline void FS_IocpMsgTransfer::AttachMsgQueue(ConcurrentMessageQueue *messageQueue, Int32 generatorId)
+inline void FS_IocpMsgTransfer::AttachMsgQueue(ConcurrentMessageQueueNoThread *messageQueue, Int32 generatorId)
 {
     _messageQueue = messageQueue;
     _generatorId = generatorId;
 }
 
-inline void FS_IocpMsgTransfer::AttachSenderMsgQueue(MessageQueue *messageQueue)
+inline void FS_IocpMsgTransfer::AttachSenderMsgQueue(MessageQueueNoThread *messageQueue)
 {
     _senderMessageQueue = messageQueue;
 }

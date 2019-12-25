@@ -94,10 +94,7 @@ public:
         bool hasMsg = true;
         while(true)
         {
-            g_TestMsgNoThreadQueue.PopLock(_id);
             g_TestMsgNoThreadQueue.WaitForPoping(_id, generatorMsgsQueue, hasMsg);
-            g_TestMsgNoThreadQueue.PopUnlock(_id);
-
             if(isFirst)
             {
                 isFirst = false;
@@ -172,9 +169,7 @@ public:
         bool hasMsg = true;
         while(g_TestMsgNoThreadQueue.IsWorking() || hasMsg)
         {
-            g_TestMsgNoThreadQueue.PopLock(1);
             g_TestMsgNoThreadQueue.WaitForPoping(1, generatorMsgsQueue, hasMsg, 1);
-            g_TestMsgNoThreadQueue.PopUnlock(1);
 
             if(isFirst)
             {
@@ -241,18 +236,17 @@ public:
             newMsgBlock->_data->SerializeFrom(newMsg);
             msgBlocks->push_back(newMsgBlock);
 
-            g_TestMsgNoThreadQueue.PushLock(_queueId);
             if(g_TestMsgNoThreadQueue.IsWorking())
                 g_TestMsgNoThreadQueue.Push(_queueId, msgBlocks);
             else
             {
                 count -= msgBlocks->size();
                 fs::STLUtil::DelListContainer(*msgBlocks);
+                //g_TestMsgNoThreadQueue.NotifyConsumerByGenerator(_queueId);
             }
-            g_TestMsgNoThreadQueue.PushUnlock(_queueId);
 
             // 注意notifyconsumer需要在pushunlock之后避免死锁
-            g_TestMsgNoThreadQueue.NotifyConsumer(_queueId);
+            //g_TestMsgNoThreadQueue.NotifyConsumerByGenerator(_queueId);
             //fs::SocketUtil::Sleep(0, 0);
         }
 

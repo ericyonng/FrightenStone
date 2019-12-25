@@ -476,11 +476,11 @@ Int32 FS_NetEngine::_CreateNetModules()
     }
 
     _msgTransfers.resize(_totalCfgs->_commonCfgs._transferQuantity);
-    _messageQueue = new ConcurrentMessageQueue(transferQuatity, dispatcherQuatity);
+    _messageQueue = new ConcurrentMessageQueueNoThread(transferQuatity, dispatcherQuatity);
     _senderMessageQueue.resize(transferQuatity);
     for(UInt32 i = 0; i < transferQuatity; ++i)
     {
-        _senderMessageQueue[i] = new MessageQueue();
+        _senderMessageQueue[i] = new MessageQueueNoThread;
         _msgTransfers[i] = FS_MsgTransferFactory::Create(i, this);
         _msgTransfers[i]->AttachMsgQueue(_messageQueue, i);
         _msgTransfers[i]->AttachSenderMsgQueue(_senderMessageQueue[i]);

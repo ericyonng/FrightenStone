@@ -402,15 +402,12 @@ void FS_IocpMsgTransfer::_OnMsgArrived()
         iterSession = _msgArriviedSessions.erase(iterSession);
     }
 
-    _messageQueue->PushLock(_generatorId);
     if(!_messageQueue->Push(_generatorId, _recvMsgList))
     {
         if(!_recvMsgList->empty())
             g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", _recvMsgList->size());
         STLUtil::DelListContainer(*_recvMsgList);
     }
-    _messageQueue->PushUnlock(_generatorId);
-
 }
 
 void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
@@ -442,15 +439,12 @@ void FS_IocpMsgTransfer::_OnMsgArrived(FS_IocpSession *session)
         }
     }
 
-    _messageQueue->PushLock(_generatorId);
     if(!_messageQueue->Push(_generatorId, _recvMsgList))
     {
         if(!_recvMsgList->empty())
             g_Log->memleak("_OnMsgArrived mem leak FS_MessageBlock cnt[%llu]", _recvMsgList->size());
         STLUtil::DelListContainer(*_recvMsgList);
     }
-    _messageQueue->PushUnlock(_generatorId);
-
 }
 
 void FS_IocpMsgTransfer::_OnDelayDisconnected(FS_IocpSession *session)
@@ -549,12 +543,8 @@ void FS_IocpMsgTransfer::_NtySessionConnectedMsg(UInt64 sessionId, BriefSessionI
     newSessionInfo->_newUserRes = NULL;
     newMsgBlock->_userDisconnected = newSessionInfo->_userDisconnectedRes;
     newSessionInfo->_userDisconnectedRes = NULL;
-    _messageQueue->PushLock(_id);
     if(!_messageQueue->Push(_id, newMsgBlock))
         Fs_SafeFree(newMsgBlock);
-
-    _messageQueue->Notify(_id);
-    _messageQueue->PushUnlock(_id);
 }
 
 void FS_IocpMsgTransfer::_NtySessionDisConnectMsg(UInt64 sessionId)
@@ -563,11 +553,8 @@ void FS_IocpMsgTransfer::_NtySessionDisConnectMsg(UInt64 sessionId)
     newMsgBlock->_generatorId = _id;
     newMsgBlock->_mbType = MessageBlockType::MB_NetSessionDisconnect;
     newMsgBlock->_sessionId = sessionId;
-    _messageQueue->PushLock(_id);
     if(!_messageQueue->Push(_id, newMsgBlock))
         Fs_SafeFree(newMsgBlock);
-    _messageQueue->Notify(_id);
-    _messageQueue->PushUnlock(_id);
 }
 
 void FS_IocpMsgTransfer::_ClearSessionsWhenClose()
@@ -634,9 +621,7 @@ void FS_IocpMsgTransfer::_PostEventsToIocp()
 
 void FS_IocpMsgTransfer::_AsynHandleFromDispatcher()
 {
-    _senderMessageQueue->PopLock();
     _senderMessageQueue->PopImmediately(_msgsFromDispatcher);
-    _senderMessageQueue->PopUnlock();
 
     // TODO:消息过多时候会死在循环中，严重拖慢速度（需要先按sessionId分类组成一个包队列）（需要在消息队列中定制分类方法回调（使用组合方式））
     // 返回：std::map<UInt64, std::list<FS_NetMsgBufferBlock *>> *队列
@@ -680,9 +665,7 @@ void FS_IocpMsgTransfer::_AsynHandleFromDispatcher()
 
 void FS_IocpMsgTransfer::_ClearSenderMessageQueue()
 {
-    _senderMessageQueue->PopLock();
     _senderMessageQueue->PopImmediately(_msgsFromDispatcher);
-    _senderMessageQueue->PopUnlock();
 
     // 提示有n条消息由于对端关闭而无法发出去
     if(!_msgsFromDispatcher->empty())

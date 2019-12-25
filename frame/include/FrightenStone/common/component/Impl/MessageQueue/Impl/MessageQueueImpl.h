@@ -288,9 +288,9 @@ inline bool ConcurrentMessageQueueNoThread::IsWorking() const
     return _isWorking;
 }
 
-inline void ConcurrentMessageQueueNoThread::PushLock(UInt32 generatorQueueId)
+inline UInt32 ConcurrentMessageQueueNoThread::GetGeneratorQuality() const
 {
-    _generatorGuards[generatorQueueId]->Lock();
+    return _generatorQuantity;
 }
 
 inline bool ConcurrentMessageQueueNoThread::Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs)
@@ -300,6 +300,8 @@ inline bool ConcurrentMessageQueueNoThread::Push(UInt32 generatorQueueId, std::l
 
     const auto consumerId = _GetConsumerIdByGeneratorId(generatorQueueId);
     auto consumerQueue = _consumerMsgQueues[consumerId];
+
+    _generatorGuards[generatorQueueId]->Lock();
     auto generatorMsgQueue = consumerQueue->at(generatorQueueId);
     if(*_msgGeneratorMsgQueueChanges[generatorQueueId])
     {// 生产者消息还未被消费
@@ -318,8 +320,12 @@ inline bool ConcurrentMessageQueueNoThread::Push(UInt32 generatorQueueId, std::l
         (*consumerQueue)[generatorQueueId] = gemTemp;
         *_msgGeneratorMsgQueueChanges[generatorQueueId] = true;
     }
+    _generatorGuards[generatorQueueId]->Unlock();
 
+    _consumerGuards[consumerId]->Lock();
     *_msgConsumerQueueChanges[consumerId] = true;
+    _consumerGuards[consumerId]->Sinal();
+    _consumerGuards[consumerId]->Unlock();
 
     return true;
 }
@@ -330,19 +336,21 @@ inline bool ConcurrentMessageQueueNoThread::Push(UInt32 generatorQueueId, FS_Mes
         return false;
 
     const auto consumerId = _GetConsumerIdByGeneratorId(generatorQueueId);
+
+    _generatorGuards[generatorQueueId]->Lock();
     _consumerMsgQueues[consumerId]->at(generatorQueueId)->push_back(messageBlock);
     *_msgGeneratorMsgQueueChanges[generatorQueueId] = true;
+    _generatorGuards[generatorQueueId]->Unlock();
+
+    _consumerGuards[consumerId]->Lock();
     *_msgConsumerQueueChanges[consumerId] = true;
+    _consumerGuards[consumerId]->Sinal();
+    _consumerGuards[consumerId]->Unlock();
 
     return true;
 }
 
-inline void ConcurrentMessageQueueNoThread::PushUnlock(UInt32 generatorQueueId)
-{
-    _generatorGuards[generatorQueueId]->Unlock();
-}
-
-inline void ConcurrentMessageQueueNoThread::NotifyConsumer(UInt32 generatorQueueId)
+inline void ConcurrentMessageQueueNoThread::NotifyConsumerByGenerator(UInt32 generatorQueueId)
 {
     if(!_isWorking)
         return;
@@ -354,60 +362,39 @@ inline void ConcurrentMessageQueueNoThread::NotifyConsumer(UInt32 generatorQueue
     guards->Unlock();
 }
 
-inline void ConcurrentMessageQueueNoThread::PopLock(UInt32 consumerQueueId)
-{
-    _consumerGuards[consumerQueueId]->Lock();
-}
-
 inline Int32 ConcurrentMessageQueueNoThread::WaitForPoping(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs, ULong timeoutMilisec)
 {
-    Int32 st = _consumerGuards[consumerQueueId]->Wait(timeoutMilisec);
-    PopImmediately(consumerQueueId, generatorMsgs, hasMsgs);
+    auto consumerGuard = _consumerGuards[consumerQueueId];
+    consumerGuard->Lock();
+    Int32 st = consumerGuard->Wait(timeoutMilisec);
+    hasMsgs = *_msgConsumerQueueChanges[consumerQueueId];
+    *_msgConsumerQueueChanges[consumerQueueId] = false;
+    consumerGuard->Unlock();
+
+    auto consumerQueue = _consumerMsgQueues[consumerQueueId];
+    _PopImmediately(consumerQueue, generatorMsgs, hasMsgs);
 
     return st;
 }
 
-inline void ConcurrentMessageQueueNoThread::NotifyPop(UInt32 consumerQueueId)
+inline void ConcurrentMessageQueueNoThread::NotifyConsumer(UInt32 consumerQueueId)
 {
-    _consumerGuards[consumerQueueId]->Sinal();
+    auto guard = _consumerGuards[consumerQueueId];
+    guard->Lock();
+    guard->Sinal();
+    guard->Unlock();
 }
 
 inline void ConcurrentMessageQueueNoThread::PopImmediately(UInt32 consumerQueueId, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool &hasMsgs)
 {
-    if(*_msgConsumerQueueChanges[consumerQueueId])
-    {
-        std::list<FS_MessageBlock *> *temp = NULL;
-        auto consumerQueue = _consumerMsgQueues[consumerQueueId];
-        auto &generatorMsgVec = *generatorMsgs;
-        ConditionLocker *guard = NULL;
-        for(UInt32 i = 0; i < _generatorQuantity; ++i)
-        {
-            auto temp = (*consumerQueue)[i];
-            if(!temp)
-                continue;
+    auto consumerGuard = _consumerGuards[consumerQueueId];
+    consumerGuard->Lock();
+    hasMsgs = *_msgConsumerQueueChanges[consumerQueueId];
+    *_msgConsumerQueueChanges[consumerQueueId] = false;
+    consumerGuard->Unlock();
 
-            guard = _generatorGuards[i];
-            guard->Lock();
-            if(temp->empty())
-            {
-                guard->Unlock();
-                continue;
-            }
-
-            (*consumerQueue)[i] = generatorMsgVec[i];
-            generatorMsgVec[i] = temp;
-            *_msgGeneratorMsgQueueChanges[i] = false;
-            guard->Unlock();
-            hasMsgs = true;
-        }
-
-        *_msgConsumerQueueChanges[consumerQueueId] = false;
-    }
-}
-
-inline void ConcurrentMessageQueueNoThread::PopUnlock(UInt32 consumerQueueId)
-{
-    _consumerGuards[consumerQueueId]->Unlock();
+    auto consumerQueue = _consumerMsgQueues[consumerQueueId];
+    _PopImmediately(consumerQueue, generatorMsgs, hasMsgs);
 }
 
 inline bool ConcurrentMessageQueueNoThread::HasMsgToConsume(UInt32 consumerQueueId) const
@@ -420,6 +407,140 @@ inline UInt32 ConcurrentMessageQueueNoThread::_GetConsumerIdByGeneratorId(UInt32
     return generatorId % _consumerQuantity;
 }
 
+inline void ConcurrentMessageQueueNoThread::_PopImmediately(std::vector<std::list<FS_MessageBlock *> *> *consumerQueue, std::vector<std::list<FS_MessageBlock *> *> *&generatorMsgs, bool isConsumerQueueChange)
+{
+    if(!isConsumerQueueChange)
+        return;
+
+    std::list<FS_MessageBlock *> *temp = NULL;
+    auto &generatorMsgVec = *generatorMsgs;
+    ConditionLocker *guard = NULL;
+    for(UInt32 i = 0; i < _generatorQuantity; ++i)
+    {
+        guard = _generatorGuards[i];
+        guard->Lock();
+        temp = (*consumerQueue)[i];
+        if(!temp || temp->empty())
+        {
+            guard->Unlock();
+            continue;
+        }
+
+        (*consumerQueue)[i] = generatorMsgVec[i];
+        generatorMsgVec[i] = temp;
+        *_msgGeneratorMsgQueueChanges[i] = false;
+        guard->Unlock();
+    }
+}
+
+inline MessageQueueNoThread::MessageQueueNoThread()
+    :_msgConsumerQueueChange(false)
+    ,_consumerMsgQueue(NULL)
+    ,_isWorking(false)
+    ,_isStart(false)
+{
+}
+
+inline MessageQueueNoThread::~MessageQueueNoThread()
+{
+    BeforeClose();
+    Close();
+}
+
+inline bool MessageQueueNoThread::IsWorking() const
+{
+    return _isWorking;
+}
+
+inline bool MessageQueueNoThread::Push(std::list<FS_MessageBlock *> *&msgs)
+{
+    if(UNLIKELY(!_isWorking))
+        return false;
+
+    _consumerGuard.Lock();
+    if(_msgConsumerQueueChange)
+    {
+        for(auto iterMsg = msgs->begin(); iterMsg != msgs->end();)
+        {
+            _consumerMsgQueue->push_back(*iterMsg);
+            iterMsg = msgs->erase(iterMsg);
+        }
+    }
+    else
+    {
+        std::list<FS_MessageBlock *> *gemTemp = NULL;
+        gemTemp = msgs;
+        msgs = _consumerMsgQueue;
+        _consumerMsgQueue = gemTemp;
+        _msgConsumerQueueChange = true;
+    }
+    _consumerGuard.Sinal();
+    _consumerGuard.Unlock();
+    return true;
+}
+
+inline bool MessageQueueNoThread::Push(FS_MessageBlock *messageBlock)
+{
+    if(UNLIKELY(!_isWorking))
+        return false;
+
+    _consumerGuard.Lock();
+    _msgConsumerQueueChange = true;
+    _consumerMsgQueue->push_back(messageBlock);
+    _consumerGuard.Sinal();
+    _consumerGuard.Unlock();
+    return true;
+}
+
+inline void MessageQueueNoThread::NotifyConsumerByGenerator()
+{
+    if(UNLIKELY(!_isWorking))
+        return;
+
+    _consumerGuard.Lock();
+    _consumerGuard.Sinal();
+    _consumerGuard.Unlock();
+}
+
+inline Int32 MessageQueueNoThread::WaitForPoping(std::list<FS_MessageBlock *> *&generatorMsgs, ULong timeoutMilisec)
+{
+    _consumerGuard.Lock();
+    auto ret = _consumerGuard.Wait(timeoutMilisec);
+    _PopImmediately(generatorMsgs);
+    _consumerGuard.Unlock();
+    return ret;
+}
+
+inline void MessageQueueNoThread::PopImmediately(std::list<FS_MessageBlock *> *&generatorMsgs)
+{
+    _consumerGuard.Lock();
+    _PopImmediately(generatorMsgs);
+    _consumerGuard.Unlock();
+}
+
+inline void MessageQueueNoThread::NotifyConsumer()
+{
+    _consumerGuard.Lock();
+    _consumerGuard.Sinal();
+    _consumerGuard.Unlock();
+}
+
+inline bool MessageQueueNoThread::HasMsgToConsume() const
+{
+    return _msgConsumerQueueChange;
+}
+
+inline void MessageQueueNoThread::_PopImmediately(std::list<FS_MessageBlock *> *&generatorMsgs)
+{
+    if(!_msgConsumerQueueChange)
+        return;
+
+    std::list<FS_MessageBlock *> *temp = NULL;
+    temp = generatorMsgs;
+    generatorMsgs = _consumerMsgQueue;
+    _consumerMsgQueue = temp;
+    _msgConsumerQueueChange = false;
+}
 FS_NAMESPACE_END
 
 #endif

@@ -43,7 +43,7 @@ inline void FS_NetEngine::_OnRecvMsgAmount(NetMsg_DataHeader *msgArrived)
     ++_recvMsgCountPerSecond;
 }
 
-inline std::vector<MessageQueue *> &FS_NetEngine::_GetSenderMq()
+inline std::vector<MessageQueueNoThread *> &FS_NetEngine::_GetSenderMq()
 {
     return _senderMessageQueue;
 }
