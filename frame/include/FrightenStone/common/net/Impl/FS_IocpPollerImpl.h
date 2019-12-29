@@ -21,56 +21,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpTcpClient.h
+ * @file  : FS_IocpPollerImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/05
+ * @date  : 2019/12/29
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
-
+#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpPoller_H__
 #pragma once
-
 #ifdef _WIN32
-
-#include <FrightenStone/exportbase.h>
-#include <FrightenStone/common/basedefs/BaseDefs.h>
-#include <FrightenStone/common/net/Impl/FS_TcpClient.h>
-#include <FrightenStone/common/net/Impl/FS_Iocp.h>
-#include <FrightenStone/common/net/Defs/IocpDefs.h>
-#include <FrightenStone/common/net/Impl/FS_IocpSession.h>
-#include <FrightenStone/common/net/Impl/FS_Addr.h>
-#include "FrightenStone/common/net/Defs/IoEvDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_IocpTcpClient : public FS_TcpClient
+inline FS_IocpPoller::FS_IocpPoller(UInt32 id, Int32 pollerSubType)
+    :_id(id)
+    ,_mainType(PollerDefs::MainType_Iocp)
+    ,_monitorType(pollerSubType)
+    ,_acceptorSock(INVALID_SOCKET)
+    ,_pool(NULL)
+    ,_iocp(NULL)
+    ,_ioEv(NULL)
+    ,_quitIocpMonitor(NULL)
+    ,_mq(NULL)
+    ,_isInit(false)
+    , _locker(NULL)
+    , _curSessionCnt(NULL)
+    ,_maxSessionQuantityLimit(0)
+    ,_curMaxSessionId(NULL)
 {
-public:
-    FS_IocpTcpClient();
-    ~FS_IocpTcpClient();
+}
 
-    /* ÖØÐ´½Ó¿Ú */
-public:
-    virtual void OnInitSocket();
-    virtual void OnConnect();
-    virtual void Close();
-    virtual bool OnRun(int microseconds = 1);
+inline FS_IocpPoller::~FS_IocpPoller()
+{
+    BeforeClose();
+    Close();
+}
 
-protected:
-    Int32 DoIocpNetEvents(int microseconds);
+inline void FS_IocpPoller::AttachMessageQueue(ConcurrentMessageQueueNoThread *mq)
+{
+    _mq = mq;
+}
 
-private:
-    FS_Iocp _iocp;
-    IoEvent _ev;
-};
+inline void FS_IocpPoller::AttachAcceptorParam(SOCKET sock
+                                               , Int32 maxSessionQuantityLimit
+                                               , Locker *locker
+                                               , Int32 *curSessionCnt
+                                               , UInt64 *curMaxSessionId)
+{
+    _acceptorSock = sock;
+    _maxSessionQuantityLimit = maxSessionQuantityLimit;
+    _locker = locker;
+    _curSessionCnt = curSessionCnt;
+    _curMaxSessionId = curMaxSessionId;
+}
 
 FS_NAMESPACE_END
-
-#include <FrightenStone/common/net/Impl/FS_IocpTcpClientImpl.h>
 
 #endif
 

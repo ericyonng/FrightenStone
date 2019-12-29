@@ -21,57 +21,74 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpTcpClient.h
+ * @file  : IFS_NetEngine.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/05
+ * @date  : 2019/12/28
  * @brief :
  * 
  *
  * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
-
 #pragma once
+#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_NetEngine_H__
+#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_NetEngine_H__
 
-#ifdef _WIN32
-
-#include <FrightenStone/exportbase.h>
-#include <FrightenStone/common/basedefs/BaseDefs.h>
-#include <FrightenStone/common/net/Impl/FS_TcpClient.h>
-#include <FrightenStone/common/net/Impl/FS_Iocp.h>
-#include <FrightenStone/common/net/Defs/IocpDefs.h>
-#include <FrightenStone/common/net/Impl/FS_IocpSession.h>
-#include <FrightenStone/common/net/Impl/FS_Addr.h>
-#include "FrightenStone/common/net/Defs/IoEvDefs.h"
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/status/status.h"
+#include "FrightenStone/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_IocpTcpClient : public FS_TcpClient
+class FS_ThreadPool;
+class TimeSlice;
+struct NetEngineTotalCfgs;
+
+class BASE_EXPORT IFS_NetEngine
 {
 public:
-    FS_IocpTcpClient();
-    ~FS_IocpTcpClient();
+    IFS_NetEngine();
+    virtual ~IFS_NetEngine();
 
-    /* 重写接口 */
 public:
-    virtual void OnInitSocket();
-    virtual void OnConnect();
+    virtual Int32 Init();
+    virtual Int32 Start();
+    virtual void Wait();
     virtual void Close();
-    virtual bool OnRun(int microseconds = 1);
 
 protected:
-    Int32 DoIocpNetEvents(int microseconds);
+    virtual void _Monitor(FS_ThreadPool *threadPool);
+    void _PrintInfo(const TimeSlice &dis);
 
-private:
-    FS_Iocp _iocp;
-    IoEvent _ev;
+    /* 启服关服时序调用 */
+protected:
+    Int32 _ReadConfig();
+    Int32 _CreateNetModules();
+    Int32 _StartModules();
+
+    Int32 _BeforeStart();
+    Int32 _OnStart();
+    Int32 _AfterStart();
+
+    void _WillClose();
+    void _BeforeClose();
+    void _AfterClose();
+
+    /* 配置 */
+protected:
+    // 读取配置位置
+    virtual Int32 _OnReadCfgs() = 0;
+    // 初始化结束时
+    virtual Int32 _OnInitFinish() { return StatusDefs::Success; }
+
+protected:
+    NetEngineTotalCfgs *_totalCfgs;
+    std::atomic_bool _isInit;
+
+    Locker _locker;
 };
 
+
 FS_NAMESPACE_END
-
-#include <FrightenStone/common/net/Impl/FS_IocpTcpClientImpl.h>
-
-#endif
 
 #endif

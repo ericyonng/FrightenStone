@@ -68,7 +68,7 @@
 // 客户端心跳检测死亡计时时间(单位ms)
 // 在间隔指定时间后才允许发送(单位ms)
 #define CLIENT_SEND_BUFF_TIME 200
-// connector的缓冲大小
+// acceptor的缓冲大小
 #define IOCP_ACCEPTOR_BUFFER 1024
 // 统计服务器负载的时间间隔
 #define IOCP_STATISTIC_INTERVAL     1000    // 时间间隔单位ms

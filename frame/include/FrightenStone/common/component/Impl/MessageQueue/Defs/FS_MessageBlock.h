@@ -56,38 +56,6 @@ struct BASE_EXPORT FS_MessageBlock
     FS_Stream *_data;                            // 序列化的数据字节流
 };
 
-class BASE_EXPORT MessageBlockType
-{
-public:
-    enum
-    {
-        MB_None = 0,                    // 无效
-        MB_NetMsgArrived = 1,           // 收到网络包 Transfer to Dispatcher
-        MB_NetMsgSended = 2,            // 发送网络包 Dispatcher to Transfer
-        MB_NetSessionDisconnect = 3,    // 会话断开 Transfer to Dispatcher
-        MB_NetSessionConnected = 4,     // 会话连入 Transfer to Dispatcher
-        MB_NetCloseSession = 5,         // 关闭会话 Dispatcher to Transfer
-    };
-};
-
-struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
-{
-    FS_NetMsgBufferBlock();
-    ~FS_NetMsgBufferBlock();
-
-    template<typename NetMsgObjType>
-    NetMsgObjType *CastBufferTo();
-
-    // 内存池创建
-    Int32 _mbType;      // MessageBlockType
-    Byte8 *_buffer; // NetMsg_DataHeader *
-    Int32 _generatorId; // 生产者id
-    UInt64 _sessionId;
-
-    /* 连入时候的额外回调参数 _mbType==MB_NetSessionConnected */
-    IDelegate<void, IUser *> *_newUserRes;
-    IDelegate<void, IUser *> *_userDisconnected;
-};
 
 FS_NAMESPACE_END
 

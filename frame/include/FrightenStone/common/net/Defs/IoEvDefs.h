@@ -21,57 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpTcpClient.h
+ * @file  : IoEvDefs.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/05
+ * @date  : 2019/12/29
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Defs_IoEvDefs_H__
+#define __Frame_Include_FrightenStone_Common_Net_Defs_IoEvDefs_H__
 
 #pragma once
-
-#ifdef _WIN32
-
-#include <FrightenStone/exportbase.h>
-#include <FrightenStone/common/basedefs/BaseDefs.h>
-#include <FrightenStone/common/net/Impl/FS_TcpClient.h>
-#include <FrightenStone/common/net/Impl/FS_Iocp.h>
-#include <FrightenStone/common/net/Defs/IocpDefs.h>
-#include <FrightenStone/common/net/Impl/FS_IocpSession.h>
-#include <FrightenStone/common/net/Impl/FS_Addr.h>
-#include "FrightenStone/common/net/Defs/IoEvDefs.h"
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_IocpTcpClient : public FS_TcpClient
+struct BASE_EXPORT IoEvent
 {
-public:
-    FS_IocpTcpClient();
-    ~FS_IocpTcpClient();
-
-    /* 重写接口 */
-public:
-    virtual void OnInitSocket();
-    virtual void OnConnect();
-    virtual void Close();
-    virtual bool OnRun(int microseconds = 1);
-
-protected:
-    Int32 DoIocpNetEvents(int microseconds);
-
-private:
-    FS_Iocp _iocp;
-    IoEvent _ev;
+    IoEvent();
+    UInt64 _sessionId;       // 会话id
+    void *_ioData;          // 网络数据信息由dispatcher进行解析 iocp 是IoDataBase
+    UInt64 _bytesTrans;     // 传输的字节数
 };
 
 FS_NAMESPACE_END
 
-#include <FrightenStone/common/net/Impl/FS_IocpTcpClientImpl.h>
-
-#endif
+#include "FrightenStone/common/net/Defs/IoEvDefsImpl.h"
 
 #endif

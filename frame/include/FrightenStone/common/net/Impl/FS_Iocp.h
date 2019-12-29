@@ -93,7 +93,7 @@ public:
     Int32 PostSend(SOCKET targetSock, IoDataBase *ioData);
 
     Int32 PostQuit();
-    Int32 WaitForCompletion(IO_EVENT &ioEvent, ULong millisec = INFINITE);
+    Int32 WaitForCompletion(IoEvent &ioEvent, ULong millisec = INFINITE);
     void GetClientAddrInfo(void *wsaBuff, sockaddr_in *&clientAddr);
     #pragma endregion
 

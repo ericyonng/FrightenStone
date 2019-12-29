@@ -21,57 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpTcpClient.h
+ * @file  : MessageBlockUtil.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/05
+ * @date  : 2019/12/29
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Defs_MessageBlockUtil_H__
+#define __Frame_Include_FrightenStone_Common_Net_Defs_MessageBlockUtil_H__
 
 #pragma once
 
-#ifdef _WIN32
-
-#include <FrightenStone/exportbase.h>
-#include <FrightenStone/common/basedefs/BaseDefs.h>
-#include <FrightenStone/common/net/Impl/FS_TcpClient.h>
-#include <FrightenStone/common/net/Impl/FS_Iocp.h>
-#include <FrightenStone/common/net/Defs/IocpDefs.h>
-#include <FrightenStone/common/net/Impl/FS_IocpSession.h>
-#include <FrightenStone/common/net/Impl/FS_Addr.h>
-#include "FrightenStone/common/net/Defs/IoEvDefs.h"
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_IocpTcpClient : public FS_TcpClient
+struct FS_MessageBlock;
+struct IoEvent;
+
+class BASE_EXPORT MessageBlockUtil
 {
 public:
-    FS_IocpTcpClient();
-    ~FS_IocpTcpClient();
-
-    /* ÖØÐ´½Ó¿Ú */
-public:
-    virtual void OnInitSocket();
-    virtual void OnConnect();
-    virtual void Close();
-    virtual bool OnRun(int microseconds = 1);
-
-protected:
-    Int32 DoIocpNetEvents(int microseconds);
-
-private:
-    FS_Iocp _iocp;
-    IoEvent _ev;
+    static FS_MessageBlock *BuildTransferMonitorArrivedMessageBlock(Int32 generatorId, IoEvent *ev, Int32 transferReason);
+    static FS_MessageBlock *BuildAcceptorMessageBlock(Int32 generatorId, UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
 };
 
 FS_NAMESPACE_END
-
-#include <FrightenStone/common/net/Impl/FS_IocpTcpClientImpl.h>
-
-#endif
 
 #endif

@@ -60,34 +60,6 @@ inline DerivedObjType *FS_MessageBlock::CastTo()
 //     //ProtocoalAssist::DelNetMsg(_msgData);
 // }
 
-inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
-    :_buffer(NULL)
-    ,_generatorId(-1)
-    ,_sessionId(0)
-    ,_mbType(MessageBlockType::MB_None)
-    ,_newUserRes(NULL)
-    ,_userDisconnected(NULL)
-{
-}
-
-inline FS_NetMsgBufferBlock::~FS_NetMsgBufferBlock()
-{
-    if(_buffer)
-    {
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(_buffer);
-        g_MemoryPool->Unlock();
-    }
-
-    FS_Release(_newUserRes);
-    FS_Release(_userDisconnected);
-}
-
-template<typename NetMsgObjType>
-inline NetMsgObjType *FS_NetMsgBufferBlock::CastBufferTo()
-{
-    return reinterpret_cast<NetMsgObjType *>(_buffer);
-}
 
 FS_NAMESPACE_END
 

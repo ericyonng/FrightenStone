@@ -21,57 +21,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpTcpClient.h
+ * @file  : FS_NetMessageBlockImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/05
+ * @date  : 2019/12/29
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
-
+#ifdef __Frame_Include_FrightenStone_Common_Net_Defs_FS_NetMessageBlock_H__
 #pragma once
-
-#ifdef _WIN32
-
-#include <FrightenStone/exportbase.h>
-#include <FrightenStone/common/basedefs/BaseDefs.h>
-#include <FrightenStone/common/net/Impl/FS_TcpClient.h>
-#include <FrightenStone/common/net/Impl/FS_Iocp.h>
-#include <FrightenStone/common/net/Defs/IocpDefs.h>
-#include <FrightenStone/common/net/Impl/FS_IocpSession.h>
-#include <FrightenStone/common/net/Impl/FS_Addr.h>
-#include "FrightenStone/common/net/Defs/IoEvDefs.h"
 
 FS_NAMESPACE_BEGIN
 
-class BASE_EXPORT FS_IocpTcpClient : public FS_TcpClient
+inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
+    :_generatorId(0)
+    , _netMessageBlockType(NetMessageBlockType::Net_None)
 {
-public:
-    FS_IocpTcpClient();
-    ~FS_IocpTcpClient();
+}
 
-    /* ÖØÐ´½Ó¿Ú */
-public:
-    virtual void OnInitSocket();
-    virtual void OnConnect();
-    virtual void Close();
-    virtual bool OnRun(int microseconds = 1);
+inline FS_NetMsgBufferBlock::~FS_NetMsgBufferBlock()
+{
 
-protected:
-    Int32 DoIocpNetEvents(int microseconds);
+}
 
-private:
-    FS_Iocp _iocp;
-    IoEvent _ev;
-};
+inline FS_NetArrivedMsg::FS_NetArrivedMsg()
+    :_ioEv(NULL)
+    ,_errorCode(StatusDefs::Success)
+{
+    _netMessageBlockType = NetMessageBlockType::Net_NetMsgArrived;
+}
+
+inline FS_NetArrivedMsg::~FS_NetArrivedMsg()
+{
+    if(_ioEv)
+    {
+        g_MemoryPool->Lock();
+        g_MemoryPool->Free(_ioEv);
+        g_MemoryPool->Unlock();
+    }
+}
+
+inline FS_NetSessionWillConnectMsg::FS_NetSessionWillConnectMsg()
+    :_sessionId(0)
+    ,_sock(INVALID_SOCKET)
+    ,_addrInfo{0}
+{
+    _netMessageBlockType = NetMessageBlockType::Met_NetSessionConnected;
+}
+
+inline FS_NetSessionWillConnectMsg::~FS_NetSessionWillConnectMsg()
+{
+}
 
 FS_NAMESPACE_END
-
-#include <FrightenStone/common/net/Impl/FS_IocpTcpClientImpl.h>
-
-#endif
-
 #endif

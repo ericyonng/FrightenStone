@@ -131,7 +131,7 @@ Int32 FS_IocpMsgTransfer::BeforeStart(const TransferCfgs &transferCfgs)
 Int32 FS_IocpMsgTransfer::Start()
 {
     auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_OnMoniterMsg);
-    if(!_threadPool->AddTask(task, this))
+    if(!_threadPool->AddTask(task, true))
     {
         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("addtask fail"));
         return StatusDefs::IocpMsgTransfer_StartFailOfMoniterMsgFailure;

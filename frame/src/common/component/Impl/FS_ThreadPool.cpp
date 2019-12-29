@@ -130,8 +130,8 @@ unsigned __stdcall FS_ThreadPool::ThreadHandler(void *param)
         {
             auto task = taskList.front();
             taskList.pop_front();
-            isEmpty = false;
             locker.Unlock();
+            isEmpty = false;
             task->Run();
             task->Release();
             continue;
@@ -192,15 +192,15 @@ void *FS_ThreadPool::ThreadHandler(void *param)
         {
             auto task = taskList.front();
             taskList.pop_front();
-            isEmpty = false;
             locker.Unlock();
+            isEmpty = false;
             task->Run();
             task->Release();
             continue;
         }
 
         ++pool->_waitNum;
-        locker.Wait();
+        locker.DeadWait();
         --pool->_waitNum;
         isEmpty = taskList.empty();
         locker.Unlock();

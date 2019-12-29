@@ -31,9 +31,11 @@
  */
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/FS_Iocp.h"
+#include "FrightenStone/common/net/Defs/IocpDefs.h"
+#include "FrightenStone/common/net/Defs/IoEvDefs.h"
+
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/status/status.h"
-#include "FrightenStone/common/net/Defs/IocpDefs.h"
 #include "FrightenStone/common/crashhandle/CrashHandle.h"
 
 #ifdef _WIN32
@@ -272,34 +274,42 @@ Int32 FS_Iocp::PostQuit()
     return StatusDefs::Success;
 }
 
-Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // clientId为完成键
+Int32 FS_Iocp::WaitForCompletion(IoEvent &ioEvent, ULong millisec)    // clientId为完成键
 {
     // 获取完成端口状态
     // 关键在于 completekey(关联iocp端口时候传入的自定义完成键)会原样返回
     // 以及重叠结构ioDataPtr 用于获取数据重叠结构会原样返回
     ioEvent._bytesTrans = 0;
     ioEvent._ioData = NULL;
-    ioEvent._data._sessionId = 0;
+    ioEvent._sessionId = 0;
     if(FALSE == GetQueuedCompletionStatus(_completionPort
-                                          , &ioEvent._bytesTrans
-                                          , reinterpret_cast<PULONG_PTR>(&ioEvent._data)
+                                          , LPDWORD(&ioEvent._bytesTrans)
+                                          , reinterpret_cast<PULONG_PTR>(&ioEvent._sessionId)
                                           , reinterpret_cast<LPOVERLAPPED *>(&ioEvent._ioData)
                                           , millisec))
     {
         const Int32 error = GetLastError();
         if(WAIT_TIMEOUT == error)
-        {
-//             g_Log->net<FS_Iocp>("WaitForMessage time out error<%d> status[%d]"
-//                        , error, StatusDefs::IOCP_WaitTimeOut);
-//             g_Log->any<FS_Iocp>("WaitForMessage time out error<%d> status[%d]"
-//                                 , error, StatusDefs::IOCP_WaitTimeOut);
             return StatusDefs::IOCP_WaitTimeOut;
-        }
+
+        DWORD flags = 0;
+        DWORD bytesTransfer = 0;
+#if _DEBUG
+        BOOL grRet =
+#endif
+            ::WSAGetOverlappedResult((ioEvent._ioData)->_sock,
+                                     (LPOVERLAPPED)(ioEvent._ioData),
+                                     &bytesTransfer,
+                                     TRUE,
+                                     &flags);
+#if _DEBUG
+        ASSERT(grRet == FALSE && "library internal error, in GetQueuedCompletionStatus()!");
+#endif
 
         if(ERROR_NETNAME_DELETED == error)
         {
-            g_Log->net<FS_Iocp>("WaitForMessage session closed sessionId[%llu] bytesTrans<%lu> error<%d> status[%d]"
-                       , ioEvent._data._sessionId,ioEvent._bytesTrans, error, StatusDefs::IOCP_IODisconnect);
+//             g_Log->net<FS_Iocp>("WaitForMessage session closed sessionId[%llu] bytesTrans<%lu> error<%d> status[%d]"
+//                        , ioEvent._data._sessionId,ioEvent._bytesTrans, error, StatusDefs::IOCP_IODisconnect);
 //             g_Log->any<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
 //                                 , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
             // 此时ioevent的数据被正确的填充，只是ioEvent._bytesTrans<=0这个事件可以在recv事件做处理
@@ -310,39 +320,39 @@ Int32 FS_Iocp::WaitForCompletion(IO_EVENT &ioEvent, ULong millisec)    // client
 
         if(ERROR_CONNECTION_ABORTED == error)
         {// TODO:这个错误码要不要处理 本系统终止网络连接
-            g_Log->net<FS_Iocp>("local system closesocket sessionId[%llu] bytesTrans<%lu>. WaitForMessage invalid client socket error<%d> status<%d>"
-                              , ioEvent._data._sessionId, ioEvent._bytesTrans, error, StatusDefs::Unknown);
+//             g_Log->net<FS_Iocp>("local system closesocket sessionId[%llu] bytesTrans<%lu>. WaitForMessage invalid client socket error<%d> status<%d>"
+//                               , ioEvent._data._sessionId, ioEvent._bytesTrans, error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
 
         if(ERROR_SEM_TIMEOUT == error)
         {// TODO:这个错误码要不要处理 压力过大可以重新投递相应的数据
-            g_Log->w<FS_Iocp>(_LOGFMT_("pressure is too large for this machine."
-                                       " please improve machine performance or "
-                                       "expand net card bandwidth error<%d> status<%d>"
-                                       "sessionId<%llu> bytesTrans<%lu>")
-                              , error
-                              , StatusDefs::Unknown
-                              , ioEvent._data._sessionId
-                              , ioEvent._bytesTrans);
+//             g_Log->w<FS_Iocp>(_LOGFMT_("pressure is too large for this machine."
+//                                        " please improve machine performance or "
+//                                        "expand net card bandwidth error<%d> status<%d>"
+//                                        "sessionId<%llu> bytesTrans<%lu>")
+//                               , error
+//                               , StatusDefs::Unknown
+//                               , ioEvent._data._sessionId
+//                               , ioEvent._bytesTrans);
             return StatusDefs::Success;
         }
 
         if(ERROR_OPERATION_ABORTED == error)
         {// 由于其他原因或者调用CancelIo，CancelIoEx等导致io被取消 此时bytestransfer为0 可以断开session连接
-            g_Log->net<FS_Iocp>("windows error<%d> sessionId[%llu] bytesTrans[%lu] io data has be abort. check if invoke CancelIo or CancelIoEx, or other reason."
-                              , error, ioEvent._data._sessionId, ioEvent._bytesTrans);
+//             g_Log->net<FS_Iocp>("windows error<%d> sessionId[%llu] bytesTrans[%lu] io data has be abort. check if invoke CancelIo or CancelIoEx, or other reason."
+//                               , error, ioEvent._data._sessionId, ioEvent._bytesTrans);
             return StatusDefs::Success;
         }
 
-        const auto &stackBackTrace = CrashHandleUtil::FS_CaptureStackBackTrace();
-        g_Log->e<FS_Iocp>(_LOGFMT_("sessionId[%llu] _bytesTrans[%lu] WaitForMessage other error error<%d> status[%d]\n"
-                                   "StackBackTrace:\n%s")
-                          , ioEvent._data._sessionId
-                          , ioEvent._bytesTrans
-                          , error
-                          , StatusDefs::IOCP_PostSendFail
-                          , stackBackTrace.c_str());
+//         const auto &stackBackTrace = CrashHandleUtil::FS_CaptureStackBackTrace();
+//         g_Log->e<FS_Iocp>(_LOGFMT_("sessionId[%llu] _bytesTrans[%lu] WaitForMessage other error error<%d> status[%d]\n"
+//                                    "StackBackTrace:\n%s")
+//                           , ioEvent._data._sessionId
+//                           , ioEvent._bytesTrans
+//                           , error
+//                           , StatusDefs::IOCP_PostSendFail
+//                           , stackBackTrace.c_str());
 
         return StatusDefs::IOCP_WaitOtherError;
     }
