@@ -63,7 +63,8 @@ struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
     FS_NetMsgBufferBlock();
     ~FS_NetMsgBufferBlock();
 
-    Int32 _generatorId;                 // 生产者id
+    UInt32 _compId;                     // 组件id
+    UInt32 _generatorId;                // 生产者id
     Int32 _netMessageBlockType;         // NetMessageBlockType
 
 

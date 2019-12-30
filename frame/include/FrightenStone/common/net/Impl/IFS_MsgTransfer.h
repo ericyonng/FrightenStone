@@ -68,6 +68,16 @@ public:
 
     // 会话个数
     virtual Int32 GetSessionCnt() = 0;
+    // 获取组件id
+    virtual Int32 GetCompId() const = 0;
+    // 获取生产者id
+    virtual Int32 GetGeneratorId() const = 0;
+    // 获取消费者id
+    virtual Int32 GetConsumerId() const = 0;
+    // 绑定生产者id
+    virtual void BindGeneratorId(Int32 generatorId) = 0;
+    // 绑定消费者id
+    virtual void BindConsumerId(Int32 consumerId) = 0;
 
     // 消息队列
     virtual void AttachMsgQueue(ConcurrentMessageQueueNoThread *messageQueue, Int32 generatorId) = 0;

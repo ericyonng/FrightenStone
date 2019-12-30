@@ -36,9 +36,10 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_MessageBlock *MessageBlockUtil::BuildTransferMonitorArrivedMessageBlock(Int32 generatorId, IoEvent *ev, Int32 errorCode)
+FS_MessageBlock *MessageBlockUtil::BuildTransferMonitorArrivedMessageBlock(UInt32 compId, UInt32 generatorId, IoEvent *ev, Int32 errorCode)
 {
     FS_NetArrivedMsg *block = new FS_NetArrivedMsg();
+    block->_compId = compId;
     block->_generatorId = generatorId;
     g_MemoryPool->Lock();
     block->_ioEv = g_MemoryPool->Alloc<IoEvent>(sizeof(IoEvent));
@@ -48,7 +49,7 @@ FS_MessageBlock *MessageBlockUtil::BuildTransferMonitorArrivedMessageBlock(Int32
     return block;
 }
 
-FS_MessageBlock *MessageBlockUtil::BuildAcceptorMessageBlock(Int32 generatorId, UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
+FS_MessageBlock *MessageBlockUtil::BuildTransferWillConnectMessageBlock(Int32 generatorId, UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
 {
     FS_NetSessionWillConnectMsg *block = new FS_NetSessionWillConnectMsg;
     block->_generatorId = generatorId;

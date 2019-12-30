@@ -33,6 +33,8 @@
 #include "FrightenStone/common/net/Defs/MessageBlockUtil.h"
 #include "FrightenStone/common/net/Defs/NetMethodUtil.h"
 #include "FrightenStone/common/net/Defs/IoEvDefs.h"
+#include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
+#include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
 
 #include <FrightenStone/common/component/Impl/FS_ThreadPool.h>
 #include "FrightenStone/common/log/Log.h"
@@ -116,6 +118,8 @@ void FS_IocpPoller::OnAcceptorDisconnected(UInt64 sessionId)
 void FS_IocpPoller::_TransferMonitor(FS_ThreadPool *pool)
 {
     Int32 st = StatusDefs::Success;
+    const UInt32 generatorId = _engineComp->GetGeneratorId();
+    const UInt32 compId = _engineComp->GetCompId();
     while(pool->IsPoolWorking())
     {
         st = _iocp->WaitForCompletion(*_ioEv, __FS_POLLER_MONITOR_TIME_OUT_INTERVAL__);
@@ -123,18 +127,19 @@ void FS_IocpPoller::_TransferMonitor(FS_ThreadPool *pool)
         if(st == StatusDefs::IOCP_WaitTimeOut)
             continue;
 
-        _mq->Push(_id, MessageBlockUtil::BuildTransferMonitorArrivedMessageBlock(_id, _ioEv, st));
+        _mq->Push(generatorId, MessageBlockUtil::BuildTransferMonitorArrivedMessageBlock(compId, generatorId, _ioEv, st));
     }
 
     _iocp->Destroy();
-    g_Log->sys<FS_IocpPoller>(_LOGFMT_("FS_IocpPoller id[%d] threadId[%llu] end"), _id, SystemUtil::GetCurrentThreadId());
+    g_Log->sys<FS_IocpPoller>(_LOGFMT_("FS_IocpPoller compId[%u] generatorId[%u] threadId[%llu] end"),_compId, _generatorId, SystemUtil::GetCurrentThreadId());
 }
 
 void FS_IocpPoller::_AcceptorMonitor(FS_ThreadPool *pool)
 {
-    // 1.白丁监听端口
+    // 1.监听端口
     _iocp->Reg(_acceptorSock);
     _iocp->LoadAcceptEx(_acceptorSock);
+    auto netEngine = _engineComp->GetEngine();
 
     // 2.定义关闭iocp
     auto __quitIocpFunc = [this]()->void {
@@ -197,7 +202,7 @@ void FS_IocpPoller::_AcceptorMonitor(FS_ThreadPool *pool)
     NetMethodUtil::FreePrepareAcceptBuffers(bufArray, ioDataArray, _maxSessionQuantityLimit);
 }
 
-void FS_IocpPoller::_HandleSessionWillConnect(SOCKET sock, const sockaddr_in *addrInfo)
+void FS_IocpPoller::_HandleSessionWillConnect(IFS_NetEngine *netEngine, SOCKET sock, const sockaddr_in *addrInfo)
 {
     if(INVALID_SOCKET == sock)
     {
@@ -216,8 +221,8 @@ void FS_IocpPoller::_HandleSessionWillConnect(SOCKET sock, const sockaddr_in *ad
         // socket重用
         SocketUtil::MakeReUseAddr(sock);
 
-        // 消息队列
-        _mq->Push(_id, MessageBlockUtil::BuildAcceptorMessageBlock(_id, curMaxSession, sock, addrInfo));
+        // select transfer and postrecv
+        
     }
     else {
         _locker->Unlock();

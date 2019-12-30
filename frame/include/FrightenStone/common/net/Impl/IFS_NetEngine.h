@@ -43,6 +43,11 @@ FS_NAMESPACE_BEGIN
 class FS_ThreadPool;
 class TimeSlice;
 struct NetEngineTotalCfgs;
+class IFS_Connector;
+class IFS_Acceptor;
+class IFS_MsgTransfer;
+class ConcurrentMessageQueueNoThread;
+class MessageQueueNoThread;
 
 class BASE_EXPORT IFS_NetEngine
 {
@@ -55,6 +60,10 @@ public:
     virtual Int32 Start();
     virtual void Wait();
     virtual void Close();
+
+    // 组件事件
+public:
+    virtual void HandleCompEv_WillConnect( SOCKET sock, const sockaddr_in *addrInfo);
 
 protected:
     virtual void _Monitor(FS_ThreadPool *threadPool);
@@ -81,11 +90,23 @@ protected:
     // 初始化结束时
     virtual Int32 _OnInitFinish() { return StatusDefs::Success; }
 
+    // 生成组件id
+    Int32 _GenerateCompId();
+
 protected:
     NetEngineTotalCfgs *_totalCfgs;
     std::atomic_bool _isInit;
 
     Locker _locker;
+    IFS_Connector * _connector;                         // 连接器
+    std::vector<IFS_Acceptor *> _acceptors;             // 支持监听多端口，具体看派生类对象的配置
+    std::vector<IFS_MsgTransfer *> _msgTransfers;       // 多线程消息收发器
+    Int32 _curMaxCompId;                                // 组件id最大值
+
+    ConcurrentMessageQueueNoThread *_mq;                // 单向,只能从生产者到消费者 generatorid 与consumerId需要特殊生成
+    Int32 _curMaxGeneratorId;                           // 当前生产者最大id
+    Int32 _curMaxConsumerId;                            // 当前最大消费者id
+    std::map<Int32, MessageQueueNoThread *> _compIdRefConsumerMq;       // 组件对应消费者消息队列
 };
 
 

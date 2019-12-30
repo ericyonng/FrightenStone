@@ -32,8 +32,9 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_IocpPoller::FS_IocpPoller(UInt32 id, Int32 pollerSubType)
-    :_id(id)
+inline FS_IocpPoller::FS_IocpPoller(IFS_EngineComp *engineComp
+                                    , Int32 pollerSubType)
+    :_engineComp(engineComp)
     ,_mainType(PollerDefs::MainType_Iocp)
     ,_monitorType(pollerSubType)
     ,_acceptorSock(INVALID_SOCKET)

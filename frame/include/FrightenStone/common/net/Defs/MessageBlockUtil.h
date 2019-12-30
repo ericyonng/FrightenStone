@@ -42,8 +42,8 @@ struct IoEvent;
 class BASE_EXPORT MessageBlockUtil
 {
 public:
-    static FS_MessageBlock *BuildTransferMonitorArrivedMessageBlock(Int32 generatorId, IoEvent *ev, Int32 transferReason);
-    static FS_MessageBlock *BuildAcceptorMessageBlock(Int32 generatorId, UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
+    static FS_MessageBlock *BuildTransferMonitorArrivedMessageBlock(UInt32 compId, UInt32 generatorId, IoEvent *ev, Int32 transferReason);
+    static FS_MessageBlock *BuildTransferWillConnectMessageBlock(Int32 generatorId, UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
 };
 
 FS_NAMESPACE_END

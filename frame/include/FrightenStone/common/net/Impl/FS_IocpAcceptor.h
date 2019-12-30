@@ -53,11 +53,13 @@ class FS_Iocp;
 struct IoDataBase;
 struct BriefListenAddrInfo;
 struct AcceptorCfgs;
+class FS_IocpPoller;
 
 class BASE_EXPORT FS_IocpAcceptor : public IFS_Acceptor
 {
 public:
-    FS_IocpAcceptor(Locker &sessionLocker
+    FS_IocpAcceptor(UInt32 compId
+                    , Locker &sessionLocker
                     ,Int32 &curSessionCnt
                     ,Int32 &maxSessionQuantityLimit
                     ,UInt64 &curMaxSessionId
@@ -108,8 +110,7 @@ private:
 private:
     // 配置
     AcceptorCfgs *_cfgs;
-    // 线程 
-    FS_ThreadPool *_threadPool;
+    FS_IocpPoller *_poller;
     // 监听端口套接字
     SOCKET _sock;
     // 网络事件回调

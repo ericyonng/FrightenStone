@@ -21,35 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_NetEngine.cpp
+ * @file  : IFS_EngineCompImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/28
+ * @date  : 2019/12/30
  * @brief :
- * 
- *
- * 
  */
-#include "stdafx.h"
-#include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
-#include "FrightenStone/common/net/Impl/IFS_MsgTransfer.h"
-
+#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_EngineComp_H__
+#pragma once
 FS_NAMESPACE_BEGIN
-
-void IFS_NetEngine::HandleCompEv_WillConnect(SOCKET sock, const sockaddr_in *addrInfo)
+inline IFS_EngineComp::IFS_EngineComp(IFS_NetEngine *engine, UInt32 compId)
+    :_compId(compId)
+    ,_generatorId(0)
+    ,_consumerId(0)
+    ,_engine(engine)
 {
-    const Int32 transferQuantity = static_cast<Int32>(_msgTransfers.size());
-    IFS_MsgTransfer *minTransfer = _msgTransfers[0];
-    for(Int32 i = 0; i < transferQuantity; ++i)
-    {
-        if(minTransfer->GetSessionCnt() > _msgTransfers[i]->GetSessionCnt())
-            minTransfer = _msgTransfers[i];
-    }
+}
 
-    // 统计session数量
-    ++_curSessionConnecting;
-    ++_sessionConnectedBefore;
+inline UInt32 IFS_EngineComp::GetCompId() const
+{
+    return _compId;
+}
 
-    minTransfer->OnConnect(sessionInfo);
+inline UInt32 IFS_EngineComp::GetGeneratorId() const
+{
+    return _generatorId;
+}
+
+inline UInt32 IFS_EngineComp::GetConsumerId() const
+{
+    return _consumerId;
+}
+
+inline void IFS_EngineComp::BindGeneratorId(UInt32 generatorId)
+{
+    _generatorId = generatorId;
+}
+
+inline void IFS_EngineComp::BindConsumerId(UInt32 consumerId)
+{
+    _consumerId = consumerId;
+}
+
+inline IFS_NetEngine *IFS_EngineComp::GetEngine()
+{
+    return _engine;
 }
 
 FS_NAMESPACE_END
+
+#endif

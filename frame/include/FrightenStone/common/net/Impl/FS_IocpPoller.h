@@ -47,11 +47,13 @@ class FS_ThreadPool;
 class FS_Iocp;
 struct IoEvent;
 class ConcurrentMessageQueueNoThread;
+class IFS_EngineComp;
+class IFS_NetEngine;
 
 class BASE_EXPORT FS_IocpPoller : public IFS_BasePoller
 {
 public:
-    FS_IocpPoller(UInt32 id, Int32 pollerSubType);
+    FS_IocpPoller(IFS_EngineComp *engineComp, Int32 pollerSubType);
     ~FS_IocpPoller();
 
 public:
@@ -72,10 +74,10 @@ public:
 private:
     void _TransferMonitor(FS_ThreadPool *pool);
     void _AcceptorMonitor(FS_ThreadPool *pool);
-    void _HandleSessionWillConnect(SOCKET sock, const sockaddr_in *addrInfo);
+    void _HandleSessionWillConnect(IFS_NetEngine *netEngine, SOCKET sock, const sockaddr_in *addrInfo);
 
 private:
-    UInt32 _id;
+    IFS_EngineComp *_engineComp;
     Int32 _mainType;
     Int32 _monitorType;
     SOCKET _acceptorSock;

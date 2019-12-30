@@ -21,66 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_Acceptor.h
+ * @file  : IFS_EngineComp.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/08
+ * @date  : 2019/12/30
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_EngineComp_H__
+#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_EngineComp_H__
 
 #pragma once
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
-#include "FrightenStone/common/status/status.h"
-#include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
 
 FS_NAMESPACE_BEGIN
 
-class IFS_Session;
 class IFS_NetEngine;
-struct BriefListenAddrInfo;
-struct AcceptorCfgs;
 
-class BASE_EXPORT IFS_Acceptor : public IFS_EngineComp
+class BASE_EXPORT IFS_EngineComp
 {
 public:
-    IFS_Acceptor(UInt32 compId, IFS_NetEngine *netEngine);
-    virtual ~IFS_Acceptor();
+    IFS_EngineComp(IFS_NetEngine *engine, Int32 compId);
+    virtual ~IFS_EngineComp() {}
 
 public:
-    virtual Int32 BeforeStart(const AcceptorCfgs &acceptorCfgs) { return StatusDefs::Success; }
-    virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}
-    virtual void Close() = 0;
-    virtual void AfterClose() {}
-
-    // 回调接口
-    virtual void OnDisconnected(IFS_Session *session) = 0;
+    // 获取组件id
+    virtual UInt32 GetCompId() const;
+    // 获取生产者id
+    virtual UInt32 GetGeneratorId() const;
+    // 获取消费者id
+    virtual UInt32 GetConsumerId() const;
+    // 绑定生产者id
+    virtual void BindGeneratorId(UInt32 generatorId);
+    // 绑定消费者id
+    virtual void BindConsumerId(UInt32 consumerId);
+    // 引擎对象
+    IFS_NetEngine *GetEngine();
 
 protected:
-    IFS_NetEngine *_netEngine;
+    UInt32 _compId;
+    UInt32 _generatorId;
+    UInt32 _consumerId;
+    IFS_NetEngine *_engine;
 };
 
-#pragma region inline
-inline IFS_Acceptor::IFS_Acceptor(UInt32 compId, IFS_NetEngine *netEngine)
-    :IFS_EngineComp(compId)
-    , _netEngine(netEngine)
-{
-}
-
-inline IFS_Acceptor::~IFS_Acceptor()
-{
-}
-
-#pragma endregion
-
 FS_NAMESPACE_END
+
+#include "FrightenStone/common/net/Impl/IFS_EngineCompImpl.h"
 
 #endif

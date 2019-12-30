@@ -42,6 +42,7 @@
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 #include "FrightenStone/common/net/Defs/BriefListenAddrInfo.h"
 #include <FrightenStone/common/net/Defs/NetCfgDefs.h>
+#include "FrightenStone/common/net/Impl/FS_IocpPoller.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/log/Log.h"
@@ -54,14 +55,14 @@
 #ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
-FS_IocpAcceptor::FS_IocpAcceptor(Locker &sessionLocker
+FS_IocpAcceptor::FS_IocpAcceptor(UInt32 compId
+                                 , Locker &sessionLocker
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
                                  , UInt64 &curMaxSessionId
                                  , const UInt64 &maxSessionIdLimit
-                                 , FS_NetEngine *netEngine )
-    :IFS_Acceptor(netEngine)
-    ,_threadPool(NULL)
+                                 , FS_NetEngine *netEngine)
+    :IFS_Acceptor(compId, netEngine)
     , _sock(INVALID_SOCKET)
     , _closeIocpDelegate(NULL)
     , _locker(sessionLocker)
@@ -70,6 +71,7 @@ FS_IocpAcceptor::FS_IocpAcceptor(Locker &sessionLocker
     , _curMaxSessionId(curMaxSessionId)
     , _maxSessionIdLimit(maxSessionIdLimit)
     ,_cfgs(NULL)
+    ,_poller(NULL)
 {
     /*     _CrtMemCheckpoint(&s1);*/
 }
@@ -77,7 +79,7 @@ FS_IocpAcceptor::FS_IocpAcceptor(Locker &sessionLocker
 FS_IocpAcceptor::~FS_IocpAcceptor()
 {
     Fs_SafeFree(_closeIocpDelegate);
-    Fs_SafeFree(_threadPool);
+    Fs_SafeFree(_poller);
     Fs_SafeFree(_cfgs);
 
     //     _CrtMemCheckpoint(&s2);
@@ -89,7 +91,7 @@ Int32 FS_IocpAcceptor::BeforeStart(const AcceptorCfgs &acceptorCfgs)
 {
     _cfgs = new AcceptorCfgs;
     *_cfgs = acceptorCfgs;
-    _threadPool = new FS_ThreadPool(0, 1);
+    _poller = new FS_IocpPoller(_compId, PollerDefs::MonitorType_Acceptor);
 
     // ³õÊ¼»¯
     auto sock = _InitSocket();
@@ -100,7 +102,7 @@ Int32 FS_IocpAcceptor::BeforeStart(const AcceptorCfgs &acceptorCfgs)
     }
 
     auto &ip = _cfgs->_ip;
-    Int32 st = _Bind(ip.GetLength() == 0 ? NULL : ip.c_str(), _cfgs->_port);
+    st = _Bind(ip.GetLength() == 0 ? NULL : ip.c_str(), _cfgs->_port);
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpAcceptor>(_LOGFMT_("listen sock[%llu] bind ip[%s:%hu] fail st[%d]")
@@ -113,6 +115,16 @@ Int32 FS_IocpAcceptor::BeforeStart(const AcceptorCfgs &acceptorCfgs)
     {
         g_Log->e<FS_IocpAcceptor>(_LOGFMT_("listen sock[%llu] listen ip[%s:%hu] fail st[%d]")
                                    , _sock, ip.c_str(), _cfgs->_port, st);
+        return st;
+    }
+
+    _poller->AttachMessageQueue();
+    _poller->AttachAcceptorParam(_sock, _maxSessionQuantityLimit, &_locker, &_curSessionCnt, &_curMaxSessionId);
+
+    Int32 st = _poller->BeforeStart();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpAcceptor>(_LOGFMT_("_poller BeforeStart fail st[%d]"), st);
         return st;
     }
 

@@ -160,7 +160,7 @@ class RapidMq
 public:
 };
 
-// 无线程并发消息队列
+// 单向无线程并发消息队列
 class BASE_EXPORT ConcurrentMessageQueueNoThread
 {
 public:
@@ -209,7 +209,7 @@ private:
     std::atomic_bool _isStart;
 };
 
-// 无线程同步消息队列
+// 只能单向,只能从生产者到消费者 无线程同步消息队列
 class BASE_EXPORT MessageQueueNoThread
 {
 public:
