@@ -37,6 +37,7 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
+#include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,37 +48,23 @@ class MessageQueueNoThread;
 struct BriefSessionInfo;
 struct TransferCfgs;
 
-class BASE_EXPORT IFS_MsgTransfer
+class BASE_EXPORT IFS_MsgTransfer : public IFS_EngineComp
 {
 public:
-    IFS_MsgTransfer();
+    IFS_MsgTransfer(IFS_NetEngine *engine, Int32 compId);
     virtual ~IFS_MsgTransfer();
 
+    /* 网络事件 */
 public:
-    virtual Int32 BeforeStart(const TransferCfgs &transferCfgs) { return StatusDefs::Success; }
-    virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}   // 处理未决数据，初步的清理
-    virtual void Close() = 0;
-    virtual void AfterClose() {}
+    virtual void OnWillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo) = 0;
 
-    virtual void OnConnect(BriefSessionInfo *sessionInfo) = 0;
+    /* 属性方法 */
+public:
+    virtual Int32 GetSessionCnt() = 0;
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
-
-    // 会话个数
-    virtual Int32 GetSessionCnt() = 0;
-    // 获取组件id
-    virtual Int32 GetCompId() const = 0;
-    // 获取生产者id
-    virtual Int32 GetGeneratorId() const = 0;
-    // 获取消费者id
-    virtual Int32 GetConsumerId() const = 0;
-    // 绑定生产者id
-    virtual void BindGeneratorId(Int32 generatorId) = 0;
-    // 绑定消费者id
-    virtual void BindConsumerId(Int32 consumerId) = 0;
 
     // 消息队列
     virtual void AttachMsgQueue(ConcurrentMessageQueueNoThread *messageQueue, Int32 generatorId) = 0;

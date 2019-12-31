@@ -53,25 +53,13 @@ public:
     virtual ~IFS_Acceptor();
 
 public:
-    virtual Int32 BeforeStart(const AcceptorCfgs &acceptorCfgs) { return StatusDefs::Success; }
-    virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}
-    virtual void Close() = 0;
-    virtual void AfterClose() {}
-
     // 回调接口
     virtual void OnDisconnected(IFS_Session *session) = 0;
-
-protected:
-    IFS_NetEngine *_netEngine;
 };
 
 #pragma region inline
 inline IFS_Acceptor::IFS_Acceptor(UInt32 compId, IFS_NetEngine *netEngine)
-    :IFS_EngineComp(compId)
-    , _netEngine(netEngine)
+    :IFS_EngineComp(netEngine, compId)
 {
 }
 

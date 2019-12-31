@@ -32,6 +32,9 @@
 
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/FS_IocpMsgTransfer.h"
+
+#include "FrightenStone/common/net/Defs/MessageBlockUtil.h"
+///////////////////////////////////////以下需要清理
 #include "FrightenStone/common/net/Impl/IFS_Session.h"
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/FS_IocpBuffer.h"
@@ -40,8 +43,8 @@
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
-#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
-#include "FrightenStone/common/net/Defs/NetCfgDefs.h"
+#include "FrightenStone/common/net/Impl/IFS_NetEngine.h"'
+#include "FrightenStone/common/net/Defs/NetCfgDefs"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
@@ -195,6 +198,12 @@ void FS_IocpMsgTransfer::OnConnect(BriefSessionInfo *sessionInfo)
     _hasNewSessionLinkin = true;
     ++_sessionCnt;
     _connectorGuard.Unlock();
+}
+
+void FS_IocpMsgTransfer::OnWillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
+{
+    // TODO:连接消息消息
+    MessageBlockUtil::BuildTransferWillConnectMessageBlock(_generatorId, sessionId, sock, addrInfo);
 }
 
 void FS_IocpMsgTransfer::OnDestroy()

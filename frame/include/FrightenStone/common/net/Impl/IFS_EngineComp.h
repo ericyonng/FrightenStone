@@ -33,6 +33,7 @@
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -43,6 +44,15 @@ class BASE_EXPORT IFS_EngineComp
 public:
     IFS_EngineComp(IFS_NetEngine *engine, Int32 compId);
     virtual ~IFS_EngineComp() {}
+
+public:
+    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs) { return StatusDefs::Success; }
+    virtual Int32 Start() = 0;
+    virtual Int32 AfterStart() { return StatusDefs::Success; }
+    virtual void WillClose() {}         // 断开与模块之间的依赖
+    virtual void BeforeClose() {}       // 处理未决数据，初步的清理
+    virtual void Close() = 0;
+    virtual void AfterClose() {}
 
 public:
     // 获取组件id
@@ -57,7 +67,7 @@ public:
     virtual void BindConsumerId(UInt32 consumerId);
     // 引擎对象
     IFS_NetEngine *GetEngine();
-
+    
 protected:
     UInt32 _compId;
     UInt32 _generatorId;

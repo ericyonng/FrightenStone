@@ -35,7 +35,7 @@
 
 FS_NAMESPACE_BEGIN
 
-void IFS_NetEngine::HandleCompEv_WillConnect(SOCKET sock, const sockaddr_in *addrInfo)
+void IFS_NetEngine::HandleCompEv_WillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
 {
     const Int32 transferQuantity = static_cast<Int32>(_msgTransfers.size());
     IFS_MsgTransfer *minTransfer = _msgTransfers[0];
@@ -49,7 +49,7 @@ void IFS_NetEngine::HandleCompEv_WillConnect(SOCKET sock, const sockaddr_in *add
     ++_curSessionConnecting;
     ++_sessionConnectedBefore;
 
-    minTransfer->OnConnect(sessionInfo);
+    minTransfer->OnWillConnect(sessionId, sock, addrInfo);
 }
 
 FS_NAMESPACE_END

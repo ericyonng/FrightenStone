@@ -70,8 +70,12 @@ public:
     virtual void Close();
     virtual void AfterClose();
 
-    // 网络
-    virtual void OnConnect(BriefSessionInfo  *sessionInfo);
+    // 网络事件
+public:
+    virtual void OnWillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
+
+
+// TODO:以下旧接口/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut(IFS_Session *session);
 
@@ -120,44 +124,42 @@ private:
     void _PrintAlloctorOccupiedInfo();
 
 private:
-    TransferCfgs *_cfgs;
-    Int32 _id;
-    UInt64 _transferThreadId;
-    FS_NetEngine *_netEngine;
-
-    IMemoryAlloctor *_sessionBufferAlloctor;
-    std::atomic<size_t> _curAlloctorOccupiedBytes;
-    std::atomic_bool _canCreateNewNodeForAlloctor;
-    IDelegate<void> *_printAlloctorOccupiedInfo;
-
-    std::atomic<Int32> _sessionCnt;             // 会话个数
-    std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
-    Time _curTime;
-    std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列
-    FS_ThreadPool *_threadPool;
-    FS_Iocp *_iocp;
-    IO_EVENT *_ioEvent;
-    ConcurrentMessageQueueNoThread *_messageQueue;
-    std::list<FS_MessageBlock *> *_msgsFromDispatcher;
-    std::list<FS_MessageBlock *> *_recvMsgList;
-    MessageQueueNoThread *_senderMessageQueue;
-    Int32 _generatorId;
-
-    // 缓冲区
-    Locker _connectorGuard;
-    std::atomic<bool> _hasNewSessionLinkin;         // 
-    std::list<BriefSessionInfo *> _pendingNewSessionInfos;     // 连入的会话缓冲区
-
-    // 待发送的会话缓冲区
-//     Locker _asynSendGuard;
-//     std::atomic<bool> _isSendCacheDirtied;
-//     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueueCache; // key:sessionId
-//     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueue;  // key:sessionId
-
-    std::list<FS_IocpSession *> _msgArriviedSessions;  // 消息到达的会话
-    std::set<FS_IocpSession *> _toPostRecv;
-    std::set<FS_IocpSession *> _toPostSend;
-    std::set<FS_IocpSession *> _toRemove;
+//     TransferCfgs *_cfgs;
+//     UInt64 _transferThreadId;
+//     FS_NetEngine *_netEngine;
+// 
+//     IMemoryAlloctor *_sessionBufferAlloctor;
+//     std::atomic<size_t> _curAlloctorOccupiedBytes;
+//     std::atomic_bool _canCreateNewNodeForAlloctor;
+//     IDelegate<void> *_printAlloctorOccupiedInfo;
+// 
+//     std::atomic<Int32> _sessionCnt;             // 会话个数
+//     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
+//     Time _curTime;
+//     std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列
+//     FS_ThreadPool *_threadPool;
+//     FS_Iocp *_iocp;
+//     IO_EVENT *_ioEvent;
+//     ConcurrentMessageQueueNoThread *_messageQueue;
+//     std::list<FS_MessageBlock *> *_msgsFromDispatcher;
+//     std::list<FS_MessageBlock *> *_recvMsgList;
+//     MessageQueueNoThread *_senderMessageQueue;
+// 
+//     // 缓冲区
+//     Locker _connectorGuard;
+//     std::atomic<bool> _hasNewSessionLinkin;         // 
+//     std::list<BriefSessionInfo *> _pendingNewSessionInfos;     // 连入的会话缓冲区
+// 
+//     // 待发送的会话缓冲区
+// //     Locker _asynSendGuard;
+// //     std::atomic<bool> _isSendCacheDirtied;
+// //     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueueCache; // key:sessionId
+// //     std::map<UInt64, std::list<NetMsg_DataHeader *> *> _asynSendMsgQueue;  // key:sessionId
+// 
+//     std::list<FS_IocpSession *> _msgArriviedSessions;  // 消息到达的会话
+//     std::set<FS_IocpSession *> _toPostRecv;
+//     std::set<FS_IocpSession *> _toPostSend;
+//     std::set<FS_IocpSession *> _toRemove;
 
 //     _CrtMemState s1;
 //     _CrtMemState s2;

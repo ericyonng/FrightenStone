@@ -37,6 +37,8 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/asyn/asyn.h"
+#include "FrightenStone/common/component/Impl/Time.h"
+#include "FrightenStone/common/component/Impl/TimeSlice.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -63,7 +65,7 @@ public:
 
     // 组件事件
 public:
-    virtual void HandleCompEv_WillConnect( SOCKET sock, const sockaddr_in *addrInfo);
+    virtual void HandleCompEv_WillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
 
 protected:
     virtual void _Monitor(FS_ThreadPool *threadPool);
@@ -107,9 +109,22 @@ protected:
     Int32 _curMaxGeneratorId;                           // 当前生产者最大id
     Int32 _curMaxConsumerId;                            // 当前最大消费者id
     std::map<Int32, MessageQueueNoThread *> _compIdRefConsumerMq;       // 组件对应消费者消息队列
+    
+    /* 统计数据 */ 
+    Time _lastStatisticsTime;                       // 最后一次统计的时间
+    TimeSlice _statisticsInterval;                  // 统计的时间间隔
+    std::atomic<Int64> _curSessionConnecting;       // 正连接的会话数量
+    std::atomic<Int64> _sessionConnectedBefore;     // 曾经连入的会话数量
+    std::atomic<Int64> _sessionDisconnectedCnt;     // 断开链接的会话数量
+    std::atomic<Int64> _recvMsgCountPerSecond;      // 每秒收到的包个数
+    std::atomic<Int64> _recvMsgBytesPerSecond;      // 每秒收到的包的字节数
+    std::atomic<Int64> _sendMsgBytesPerSecond;      // 每秒发送的包字节数
+    std::atomic<Int64> _heartbeatTimeOutDisconnected;   // 心跳超时断开会话数
 };
 
 
 FS_NAMESPACE_END
+
+#include "FrightenStone/common/net/Impl/IFS_NetEngineImpl.h"
 
 #endif

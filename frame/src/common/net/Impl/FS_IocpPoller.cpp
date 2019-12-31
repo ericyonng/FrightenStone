@@ -222,7 +222,7 @@ void FS_IocpPoller::_HandleSessionWillConnect(IFS_NetEngine *netEngine, SOCKET s
         SocketUtil::MakeReUseAddr(sock);
 
         // select transfer and postrecv
-        
+        netEngine->HandleCompEv_WillConnect(curMaxSession, sock, addrInfo);
     }
     else {
         _locker->Unlock();
