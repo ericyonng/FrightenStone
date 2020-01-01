@@ -36,15 +36,10 @@
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
-#include "FrightenStone/common/objpool/objpool.h"
-#include "FrightenStone/common/memorypool/memorypool.h"
-#include "FrightenStone/common/component/Impl/FS_Delegate.h"
 #include "FrightenStone/common/component/Impl/FS_Stream.h"
-#include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 
 FS_NAMESPACE_BEGIN
 
-class IUser;
 struct BASE_EXPORT FS_MessageBlock
 {
     FS_MessageBlock();

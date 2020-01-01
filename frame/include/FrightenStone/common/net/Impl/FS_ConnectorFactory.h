@@ -46,8 +46,7 @@ public:
     static IFS_Connector *Create(Locker &locker
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
-                                 , UInt64 &curMaxSessionId
-                                 , const UInt64 &maxSessionIdLimit);
+                                 , UInt64 &curMaxSessionId);
 };
 
 FS_NAMESPACE_END

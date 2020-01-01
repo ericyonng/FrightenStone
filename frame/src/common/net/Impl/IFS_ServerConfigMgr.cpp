@@ -44,6 +44,19 @@ FS_NAMESPACE_BEGIN
 
 IFS_ServerConfigMgr::IFS_ServerConfigMgr()
     :_ini(NULL)
+    ,_port(0)
+    ,_maxSessionQuantityLimit(0)
+    ,_transferCnt(0)
+    ,_heartbeatDeadTimeIntervalMs(0)
+    ,_prepareBufferCnt(0)
+    ,_maxAlloctorBytesPerTransfer(0)
+    ,_dispatcherCnt(0)
+    ,_maxAllowObjPoolBytesOccupied(0)
+    ,_maxAllowMemPoolBytesOccupied(0)
+    ,_acceptorQuantity(0)
+    ,_connectorConnectTimeOutMs(0)
+    ,_dispatcherResolutionIntervalMs(0)
+    ,_isOpenMemoryMonitor(false)
 {
 
 }
@@ -58,11 +71,12 @@ Int32 IFS_ServerConfigMgr::Init()
     _ini = new FS_IniFile;
     _ini->Init(SVR_CONFIG_PATH_NAME);
 
-    BUFFER256 cfgs;
-    char *ptr = cfgs;
-    if(!_ini->HasCfgs(SVR_CFG_ACCEPTOR_SEG))
+    if(!_ini->HasCfgs(SVR_CFG_COMMONCFG_SEG))
     {
+        // 初始化默认配置
         _InitDefCfgs();
+        // 段与段之间需要换行
+        _ChangeLineBetweenSegs();
     }
 
     _ReadCfgs();
@@ -108,6 +122,10 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
 
     #pragma region memorypool
     _ini->WriteStr(SVR_CFG_MEMORY_POOL_SEG, SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY, SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED);
+    #pragma endregion
+
+    #pragma region memory monitor
+    _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR);
     #pragma endregion
 
     // 检查是否写入正确
@@ -192,7 +210,15 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     if(acceptorQuatity != atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%u] default")
-                                      , memPoolMaxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY)));
+                                      , acceptorQuatity, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY)));
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
+    }
+
+    auto isOpenMonitor = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, 0);
+    if(isOpenMonitor != atoi(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR))
+    {
+        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR[%lld] not match SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR[%u] default")
+                                      , isOpenMonitor, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
@@ -219,6 +245,14 @@ void IFS_ServerConfigMgr::_ReadCfgs()
     _connectorConnectTimeOutMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_CONNECTOR_SEG, SVR_CFG_CONNECTOR_CONNECT_TIME_OUT_KEY, 0));
     
     _dispatcherResolutionIntervalMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY, 0));
+    _isOpenMemoryMonitor = static_cast<bool>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, 0));
 }
+
+void fs::IFS_ServerConfigMgr::_ChangeLineBetweenSegs()
+{
+    _ini->ChangeLineBetweenSegs();
+}
+
 FS_NAMESPACE_END
+
 

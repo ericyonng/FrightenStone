@@ -200,10 +200,11 @@ void FS_IocpMsgTransfer::OnConnect(BriefSessionInfo *sessionInfo)
     _connectorGuard.Unlock();
 }
 
-void FS_IocpMsgTransfer::OnWillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
+void FS_IocpMsgTransfer::OnWillConnect(BriefSessionInfo *newSessionInfo)
 {
     // TODO:连接消息消息
-    MessageBlockUtil::BuildTransferWillConnectMessageBlock(_generatorId, sessionId, sock, addrInfo);
+    MessageBlockUtil::BuildTransferWillConnectMessageBlock(_compId, _generatorId, newSessionInfo);
+    ++_sessionCnt; 
 }
 
 void FS_IocpMsgTransfer::OnDestroy()

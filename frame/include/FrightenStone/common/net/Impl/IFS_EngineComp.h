@@ -38,21 +38,22 @@
 FS_NAMESPACE_BEGIN
 
 class IFS_NetEngine;
+struct NetEngineTotalCfgs;
 
 class BASE_EXPORT IFS_EngineComp
 {
 public:
-    IFS_EngineComp(IFS_NetEngine *engine, Int32 compId);
+    IFS_EngineComp(IFS_NetEngine *engine, UInt32 compId);
     virtual ~IFS_EngineComp() {}
 
 public:
-    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs) { return StatusDefs::Success; }
+    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs) = 0;
     virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {}         // 断开与模块之间的依赖
-    virtual void BeforeClose() {}       // 处理未决数据，初步的清理
+    virtual void AfterStart() = 0;
+    virtual void WillClose() = 0;         // 断开与模块之间的依赖
+    virtual void BeforeClose() = 0;       // 处理未决数据，初步的清理
     virtual void Close() = 0;
-    virtual void AfterClose() {}
+    virtual void AfterClose() = 0;
 
 public:
     // 获取组件id

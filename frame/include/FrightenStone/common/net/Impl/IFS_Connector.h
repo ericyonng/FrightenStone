@@ -39,6 +39,7 @@
 #include "FrightenStone/common/net/Defs/ServerCompsDef.h"
 #include "FrightenStone/common/component/Impl/SmartVar/SmartVar.h"
 #include "FrightenStone/common/status/status.h"
+#include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -48,27 +49,16 @@ class IUser;
 struct FS_ConnectInfo;
 struct ConnectorCfgs;
 
-class BASE_EXPORT IFS_Connector
+class BASE_EXPORT IFS_Connector : public IFS_EngineComp
 {
 public:
     IFS_Connector();
     virtual ~IFS_Connector();
 
 public:
-    virtual Int32 BeforeStart(const ConnectorCfgs &cfgs) { return StatusDefs::Success; }
-    virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}
-    virtual void Close() = 0;
-    virtual void AfterClose() {}
-
     // 连接
     virtual Int32 Connect(const FS_ConnectInfo &connectInfo) = 0;
     virtual std::map<UInt64, IUser *> &GetUsers() = 0;
-
-    // 成功连接时的回调
-    virtual void RegOnSucConnect(IDelegate<void, BriefSessionInfo *> *sucCallback) = 0;
 };
 
 FS_NAMESPACE_END

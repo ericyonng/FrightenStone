@@ -35,19 +35,22 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_Acceptor *FS_AcceptorFactory::Create(Locker &sessionLocker
+IFS_Acceptor *FS_AcceptorFactory::Create(UInt32 compId,
+                                         Locker &sessionLocker
                                          , Int32 &curSessionCnt
                                          , Int32 &maxSessionQuantityLimit
                                          , UInt64 &curMaxSessionId
                                          , const UInt64 &maxSessionIdLimit
-                                         , FS_NetEngine *netEngine)
+                                         , IFS_NetEngine *netEngine)
 {
 #ifdef _WIN32
-    return new FS_IocpAcceptor(sessionLocker
+    return new FS_IocpAcceptor(compId
+                               , sessionLocker
                                , curSessionCnt
                                , maxSessionQuantityLimit
                                , curMaxSessionId
-                               , maxSessionIdLimit, netEngine);
+                               , maxSessionIdLimit
+                               , netEngine);
 #else
     // TODO:Linux
     return NULL;

@@ -294,10 +294,11 @@ Int32 FS_Iocp::WaitForCompletion(IoEvent &ioEvent, ULong millisec)    // clientI
 
         DWORD flags = 0;
         DWORD bytesTransfer = 0;
+        IoDataBase *ioData = reinterpret_cast<IoDataBase *>(ioEvent._ioData);
 #if _DEBUG
         BOOL grRet =
 #endif
-            ::WSAGetOverlappedResult((ioEvent._ioData)->_sock,
+            ::WSAGetOverlappedResult(ioData->_sock,
                                      (LPOVERLAPPED)(ioEvent._ioData),
                                      &bytesTransfer,
                                      TRUE,

@@ -62,6 +62,7 @@ public:
     bool WriteStr(const char *segmentName, const char *keyName, const char *wrStr);
 
     bool HasCfgs(const char *segmentName);
+    bool ChangeLineBetweenSegs();
 
 private:
     bool _Init();

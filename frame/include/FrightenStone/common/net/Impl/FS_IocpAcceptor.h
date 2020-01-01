@@ -54,6 +54,7 @@ struct IoDataBase;
 struct BriefListenAddrInfo;
 struct AcceptorCfgs;
 class FS_IocpPoller;
+class IFS_NetEngine;
 
 class BASE_EXPORT FS_IocpAcceptor : public IFS_Acceptor
 {
@@ -63,15 +64,20 @@ public:
                     ,Int32 &curSessionCnt
                     ,Int32 &maxSessionQuantityLimit
                     ,UInt64 &curMaxSessionId
-                    ,const UInt64 &maxSessionIdLimit, FS_NetEngine *netEngine);
+                    ,const UInt64 &maxSessionIdLimit
+                    , IFS_NetEngine *netEngine);
     virtual ~FS_IocpAcceptor();
 
-public:
-    virtual Int32 BeforeStart(const AcceptorCfgs &acceptorCfgs);
+public:    
+    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs);
     virtual Int32 Start();
+    virtual void AfterStart();
+    virtual void WillClose();
     virtual void BeforeClose();
     virtual void Close();
-    virtual void OnDisconnected(IFS_Session *session);
+    virtual void AfterClose();
+
+
     /* TCP 常规操作 */
     #pragma region tcp normal operate
     /*
@@ -87,23 +93,8 @@ private:
     #pragma endregion
 
     /* 网络事件 */
-    #pragma region net event
-    /*
-    * brief: 
-    *       1. FS_Server 4 多个线程触发 不安全 如果只开启1个FS_Server就是安全的
-    *       2. _OnNetMonitorTask 监听网络任务 OnRun(旧版) 建议多条线程去做monitor而不是单条线程，完成端口的get是线程安全的
-    *       3. OnNetJoin 玩家加入 线程不安全
-    *       4. OnNetLeave 玩家掉线 线程不安全
-    *       5. OnNetMsg 玩家消息到来（消息是从FS_Server的_HandleNetMsg传入）线程不安全 NetMsg_DataHeader 转发到其他线程需要拷贝避免消息被覆盖
-    *       6. OnNetRecv 接收到数据 线程不安全
-    */
 private:
-    void _OnConnected(SOCKET sock, const sockaddr_in *addrInfo, FS_Iocp *iocpListener);
-    void _OnIocpMonitorTask(FS_ThreadPool *threadPool);
-    void _PreparePostAccept(FS_Iocp *listenIocp, char **&bufArray, IoDataBase **&ioDataArray);
-    void _FreePrepareAcceptBuffers(char **&bufArray, IoDataBase **&ioDataArray);
-
-    #pragma endregion
+    virtual void OnDisconnected(UInt64 sessionId);
 
     /* 数据成员 */
     #pragma region data member
@@ -113,8 +104,7 @@ private:
     FS_IocpPoller *_poller;
     // 监听端口套接字
     SOCKET _sock;
-    // 网络事件回调
-    IDelegate<void> *_closeIocpDelegate;
+    bool _isInit;
 
     // 客户端连接上限
     Locker &_locker;
@@ -122,7 +112,6 @@ private:
     Int32 &_maxSessionQuantityLimit;
     UInt64 &_curMaxSessionId;
     const UInt64 &_maxSessionIdLimit;
-    std::set<UInt64> _sucConnectedSessionIds;
 #pragma endregion
 };
 

@@ -56,7 +56,7 @@ public:
 
     /* 网络事件 */
 public:
-    virtual void OnWillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo) = 0;
+    virtual void OnWillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IDelegate) = 0;
 
     /* 属性方法 */
 public:

@@ -130,6 +130,32 @@ bool FS_IniFile::HasCfgs(const char *segmentName)
     return  _segmentRefKeyValues.find(segmentName) != _segmentRefKeyValues.end();
 }
 
+bool FS_IniFile::ChangeLineBetweenSegs()
+{
+    // 打开并清空文件
+    auto fp = FS_FileUtil::OpenFile(_filePath.c_str(), false, "w");
+    if(!fp)
+        return false;
+
+    FS_String lineData;
+    FS_String seg;
+    for(auto iterLineData = _lineRefContent.begin(); iterLineData != _lineRefContent.end(); ++iterLineData)
+    {
+        lineData.Clear();
+        lineData = iterLineData->second + "\n";
+        if(IniFileMethods::IsSegment(lineData, seg))
+            FS_FileUtil::WriteFile(*fp, "\n");
+        FS_FileUtil::WriteFile(*fp, lineData);
+    }
+
+    FS_FileUtil::FlushFile(*fp);
+    FS_FileUtil::CloseFile(*fp);
+
+    // 重新load配置
+    _isDirtied = false;
+    return _LoadAllCfgs();
+}
+
 bool FS_IniFile::_Init()
 {
     // 读取所有配置内容

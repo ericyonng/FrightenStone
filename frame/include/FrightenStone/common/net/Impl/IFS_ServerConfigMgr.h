@@ -74,9 +74,12 @@ public:
     Int64 GetConnectorConnectTimeOutMs() const;
     Int64 GetDispatcherResolutionIntervalMs() const;
 
+    bool GetIsOpenMemoryMonitor() const;
+
 private:
     Int32 _InitDefCfgs();
     void _ReadCfgs();
+    void _ChangeLineBetweenSegs();
 
 private:
     FS_IniFile *_ini;
@@ -99,6 +102,8 @@ private:
     Int64 _connectorConnectTimeOutMs;
 
     Int64 _dispatcherResolutionIntervalMs;
+
+    bool  _isOpenMemoryMonitor;
 };
 
 FS_NAMESPACE_END

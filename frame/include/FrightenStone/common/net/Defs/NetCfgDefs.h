@@ -47,6 +47,7 @@ struct BASE_EXPORT CommonCfgs
     UInt32 _acceptorQuantityLimit;                      // 监听端口数量
     UInt32 _transferQuantity;                           // 数据传输器数量
     UInt32 _dispatcherQuantity;                         // 业务层消息分配器数量
+    bool _isOpenMemoryMonitor;                          // 是否开启内存监控
 };
 
 struct BASE_EXPORT ConnectorCfgs

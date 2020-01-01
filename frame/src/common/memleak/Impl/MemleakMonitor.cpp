@@ -68,13 +68,17 @@ MemleakMonitor *MemleakMonitor::GetInstance()
     return g_MemleakMonitor;
 }
 
-void MemleakMonitor::Start(UInt64 maxAllowObjPoolBytes, UInt64 maxAllowMemoryPoolBytes)
+Int32 MemleakMonitor::BeforeStart(UInt64 maxAllowObjPoolBytes, UInt64 maxAllowMemoryPoolBytes)
 {
     // TODO:monitor是通用的对象不可与服务端配置耦合
     for(auto &setInvoke : _objPoolSetMaxAllowOccupiedBytes)
         setInvoke->Invoke(maxAllowObjPoolBytes);
 
     g_MemoryPool->SetMaxAllowOccupiedBytes(maxAllowMemoryPoolBytes);
+}
+
+void MemleakMonitor::Start()
+{
     _printInfoPool->AddTask(DelegatePlusFactory::Create(this, &MemleakMonitor::_PrintInfoPerSeconds));
 }
 

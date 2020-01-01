@@ -3,6 +3,7 @@
 #include <FrightenStone/common/objpool/Defs/FS_ObjPoolDefs.h>
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/memleak/memleak.h"
+#include "FrightenStone/common/memoryhelper/MemoryHelper.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -55,10 +56,10 @@ void ObjPoolMethods::UnRegisterMemleakDelegate(const char *objName)
 void ObjPoolMethods::RegisterModifyAllowMaxBytes(IDelegate<void, UInt64> *callback)
 {
     // TODO
-    if(!g_MemleakMonitor)
-        fs::MemleakMonitor::GetInstance();
+    if(!g_MemoryHelper)
+        fs::MemoryHelper::GetInstance();
 
-    g_MemleakMonitor->RegisterObjPoolModifyMaxAllowBytesCallback(callback);
+    g_MemoryHelper->RegisterObjPoolModifyMaxAllowBytesCallback(callback);
 }
 
 FS_NAMESPACE_END

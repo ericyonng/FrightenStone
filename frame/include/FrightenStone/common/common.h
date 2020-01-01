@@ -58,6 +58,7 @@
 #include <FrightenStone/common/objpool/objpool.h>
 #include <FrightenStone/common/memleak/memleak.h>
 #include <FrightenStone/common/memorypool/memorypool.h>
+#include <FrightenStone/common/memoryhelper/MemoryHelper.h>
 #include <FrightenStone/common/net/net.h>
 #endif
 #pragma endregion

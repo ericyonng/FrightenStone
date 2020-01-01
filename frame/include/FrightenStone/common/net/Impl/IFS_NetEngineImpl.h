@@ -35,11 +35,10 @@ FS_NAMESPACE_BEGIN
 inline IFS_NetEngine::IFS_NetEngine()
     :_totalCfgs(NULL)
     ,_isInit(false)
+    ,_cpuInfo(NULL)
     ,_connector(NULL)
     ,_curMaxCompId(0)
-    ,_mq(NULL)
-    ,_curMaxGeneratorId(0)
-    ,_curMaxConsumerId(0)
+    ,_concurrentMq(NULL)
     ,_curSessionConnecting(0)
     ,_sessionConnectedBefore(0)
     ,_sessionDisconnectedCnt(0)
@@ -50,10 +49,29 @@ inline IFS_NetEngine::IFS_NetEngine()
 {
 }
 
-inline IFS_NetEngine::~IFS_NetEngine()
+inline void IFS_NetEngine::Wait()
 {
+    _waitForClose.Lock();
+    _waitForClose.DeadWait();
+    _waitForClose.Unlock();
 }
 
+inline void IFS_NetEngine::Sinal()
+{
+    _waitForClose.Lock();
+    _waitForClose.Sinal();
+    _waitForClose.Unlock();
+}
+
+inline UInt32 IFS_NetEngine::_GenerateCompId()
+{
+    return ++_curMaxCompId;
+}
+
+inline ConcurrentMessageQueueNoThread *IFS_NetEngine::_GetConcurrentMQ()
+{
+    return _concurrentMq;
+}
 
 FS_NAMESPACE_END
 

@@ -48,7 +48,7 @@ public:
 public:
     virtual Int32 BeforeStart() { return StatusDefs::Success; }
     virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
+    virtual void AfterStart() {}
     virtual void WillClose() {}
     virtual void BeforeClose() {}
     virtual void Close() = 0;

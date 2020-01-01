@@ -263,6 +263,8 @@ inline ConcurrentMessageQueueNoThread::ConcurrentMessageQueueNoThread(UInt32 gen
     ,_generatorQuantity(generatorQuantity)
     ,_isWorking(false)
     ,_isStart(false)
+    ,_generatorMaxId(0)
+    ,_consumerMaxId(0)
 {
 }
 
@@ -291,6 +293,24 @@ inline bool ConcurrentMessageQueueNoThread::IsWorking() const
 inline UInt32 ConcurrentMessageQueueNoThread::GetGeneratorQuality() const
 {
     return _generatorQuantity;
+}
+
+inline UInt32 ConcurrentMessageQueueNoThread::GenerateGeneratorId()
+{
+    _sysLocker.Lock();
+    UInt32 id = _generatorMaxId;
+    ++_generatorMaxId;
+    _sysLocker.Unlock();
+    return id;
+}
+
+inline UInt32 ConcurrentMessageQueueNoThread::GenerateConsumerId()
+{
+    _sysLocker.Lock();
+    UInt32 id = _consumerMaxId;
+    ++_consumerMaxId;
+    _sysLocker.Unlock();
+    return id;
 }
 
 inline bool ConcurrentMessageQueueNoThread::Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs)

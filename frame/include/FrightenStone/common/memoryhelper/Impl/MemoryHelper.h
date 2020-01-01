@@ -21,54 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_Acceptor.h
+ * @file  : MemoryHelper.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/08
+ * @date  : 2020/01/01
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Acceptor_H__
-
+#ifndef __Frame_Include_FrightenStone_Common_MemoryHelper_Impl_MemoryHelper_H__
+#define __Frame_Include_FrightenStone_Common_MemoryHelper_Impl_MemoryHelper_H__
 #pragma once
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
-#include "FrightenStone/common/status/status.h"
-#include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
+#include "FrightenStone/common/component/Impl/FS_Delegate.h"
+#include "FrightenStone/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
-class IFS_Session;
-class IFS_NetEngine;
-struct BriefListenAddrInfo;
-struct AcceptorCfgs;
-
-class BASE_EXPORT IFS_Acceptor : public IFS_EngineComp
+class BASE_EXPORT MemoryHelper
 {
 public:
-    IFS_Acceptor(UInt32 compId, IFS_NetEngine *netEngine);
-    virtual ~IFS_Acceptor();
+    MemoryHelper();
+    ~MemoryHelper();
 
-    /* ÍøÂçÊÂ¼þ */
-public:
-    virtual void OnDisconnected(UInt64 sessionId) = 0;
+    static MemoryHelper *GetInstance();
+
+    void Start(UInt64 maxObjPoolBytesLimit, UInt64 maxGlobalMemoryPoolBytesLimit);
+    void Finish();
+
+    void RegisterObjPoolModifyMaxAllowBytesCallback(IDelegate<void, UInt64> *callback);
+
+private:
+    static Locker _locker;
+    std::atomic_bool _isStart;
+    UInt64 _maxObjPoolBytesLimit;
+    std::list<IDelegate<void, UInt64> *> _objPoolSetMaxAllowOccupiedBytes;
 };
 
-#pragma region inline
-inline IFS_Acceptor::IFS_Acceptor(UInt32 compId, IFS_NetEngine *netEngine)
-    :IFS_EngineComp(netEngine, compId)
-{
-}
-
-inline IFS_Acceptor::~IFS_Acceptor()
-{
-}
-
-#pragma endregion
-
 FS_NAMESPACE_END
+
+#include "FrightenStone/common/memoryhelper/Impl/MemoryHelperImpl.h"
+
+extern BASE_EXPORT fs::MemoryHelper *g_MemoryHelper;
 
 #endif

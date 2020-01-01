@@ -39,6 +39,7 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/net/Impl/IFS_Connector.h"
 #include <FrightenStone/common/component/Impl/FS_String.h>
+#include "FrightenStone/common/asyn/asyn.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -51,23 +52,22 @@ public:
     FS_IocpConnector(Locker &locker
                      , Int32 &curSessionCnt
                      , Int32 &maxSessionQuantityLimit
-                     ,UInt64 &curMaxSessionId
-                     , const UInt64 &maxSessionIdLimit);
+                     ,UInt64 &curMaxSessionId);
     virtual ~FS_IocpConnector();
 
 public:
-    virtual Int32 BeforeStart(const ConnectorCfgs &cfgs);
+    virtual Int32 BeforeStart(const NetEngineTotalCfgs &cfgs);
     virtual Int32 Start();
+    virtual void AfterStart() {};
+    virtual void WillClose() {};
     virtual void BeforeClose();
     virtual void Close();
+    virtual void AfterClose() {}
 
 public:
     // 连接
     virtual Int32 Connect(const FS_ConnectInfo &connectInfo);
     virtual std::map<UInt64, IUser *> &GetUsers();  // 可以在user中启动定时器
-
-    // 成功连接时的回调
-    virtual void RegOnSucConnect(IDelegate<void, BriefSessionInfo *> *sucCallback);
 
 private:
     // 连入成功 从dispatcher调用委托回调
@@ -87,12 +87,8 @@ private:
     Int32 &_curSessionCnt;
     Int32 &_maxSessionQuantityLimit;
     UInt64 &_curMaxSessionId;
-    const UInt64 &_maxSessionIdLimit;
     std::set<UInt64> _sucConnectedSessionIds;
     std::map<UInt64, IUser *> _sessionIdRefUser;
-
-    // 成功连接后
-    IDelegate<void, BriefSessionInfo *> *_onConnectSuc;
 };
 
 #pragma region inline
@@ -106,11 +102,6 @@ inline std::map<UInt64, IUser *> &FS_IocpConnector::GetUsers()
     return _sessionIdRefUser;
 }
 
-inline void FS_IocpConnector::RegOnSucConnect(IDelegate<void, BriefSessionInfo *> *sucCallback)
-{
-    FS_Release(_onConnectSuc);
-    _onConnectSuc = sucCallback;
-}
 #pragma endregion
 FS_NAMESPACE_END
 

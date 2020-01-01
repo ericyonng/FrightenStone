@@ -50,6 +50,9 @@ class IFS_Acceptor;
 class IFS_MsgTransfer;
 class ConcurrentMessageQueueNoThread;
 class MessageQueueNoThread;
+class FS_CpuInfo;
+struct BriefSessionInfo;
+class IFS_MsgDispatcher;
 
 class BASE_EXPORT IFS_NetEngine
 {
@@ -61,11 +64,12 @@ public:
     virtual Int32 Init();
     virtual Int32 Start();
     virtual void Wait();
+    virtual void Sinal();
     virtual void Close();
 
-    // 组件事件
-public:
-    virtual void HandleCompEv_WillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
+    /* 组件事件 */
+protected:
+    virtual void _HandleCompEv_WillConnect(BriefSessionInfo *newSessionInfo);
 
 protected:
     virtual void _Monitor(FS_ThreadPool *threadPool);
@@ -92,25 +96,36 @@ protected:
     // 初始化结束时
     virtual Int32 _OnInitFinish() { return StatusDefs::Success; }
 
+    /* 辅助 */
+protected:
     // 生成组件id
-    Int32 _GenerateCompId();
+    UInt32 _GenerateCompId();
+    // 获取transfer->dispatcher并发消息队列
+    ConcurrentMessageQueueNoThread *_GetConcurrentMQ();
 
 protected:
+    /* 友元 */
+    friend class FS_IocpPoller;
+    friend class FS_IocpConnector;
+    friend class FS_IocpAcceptor;
+    
     NetEngineTotalCfgs *_totalCfgs;
+    FS_CpuInfo *_cpuInfo;
     std::atomic_bool _isInit;
 
     Locker _locker;
     IFS_Connector * _connector;                         // 连接器
     std::vector<IFS_Acceptor *> _acceptors;             // 支持监听多端口，具体看派生类对象的配置
     std::vector<IFS_MsgTransfer *> _msgTransfers;       // 多线程消息收发器
-    Int32 _curMaxCompId;                                // 组件id最大值
+    std::vector<IFS_MsgDispatcher *> _msgDispatchers;   // 业务消息处理器 业务线程处理,支持多线程并发处理
+    UInt32 _curMaxCompId;                                // 组件id最大值
 
-    ConcurrentMessageQueueNoThread *_mq;                // 单向,只能从生产者到消费者 generatorid 与consumerId需要特殊生成
-    Int32 _curMaxGeneratorId;                           // 当前生产者最大id
-    Int32 _curMaxConsumerId;                            // 当前最大消费者id
-    std::map<Int32, MessageQueueNoThread *> _compIdRefConsumerMq;       // 组件对应消费者消息队列
+    ConcurrentMessageQueueNoThread *_concurrentMq;                // 单向,只能从生产者到消费者 generatorid 与consumerId需要特殊生成
+    std::map<UInt32, MessageQueueNoThread *> _compIdRefConsumerMq;       // 组件对应消费者消息队列
     
     /* 统计数据 */ 
+    ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
+    FS_ThreadPool *_pool;
     Time _lastStatisticsTime;                       // 最后一次统计的时间
     TimeSlice _statisticsInterval;                  // 统计的时间间隔
     std::atomic<Int64> _curSessionConnecting;       // 正连接的会话数量
@@ -120,6 +135,11 @@ protected:
     std::atomic<Int64> _recvMsgBytesPerSecond;      // 每秒收到的包的字节数
     std::atomic<Int64> _sendMsgBytesPerSecond;      // 每秒发送的包字节数
     std::atomic<Int64> _heartbeatTimeOutDisconnected;   // 心跳超时断开会话数
+    
+    /* 连接的会话数据 */ 
+    Locker _sessionlocker;
+    Int32 _curSessionCnt;
+    UInt64 _curMaxSessionId;
 };
 
 

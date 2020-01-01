@@ -64,12 +64,16 @@ inline FS_NetSessionWillConnectMsg::FS_NetSessionWillConnectMsg()
     :_sessionId(0)
     ,_sock(INVALID_SOCKET)
     ,_addrInfo{0}
+    ,_onNewUserRes(NULL)
+    ,_onUserDisconnectedRes(NULL)
 {
     _netMessageBlockType = NetMessageBlockType::Met_NetSessionConnected;
 }
 
 inline FS_NetSessionWillConnectMsg::~FS_NetSessionWillConnectMsg()
 {
+    FS_Release(_onNewUserRes);
+    FS_Release(_onUserDisconnectedRes);
 }
 
 FS_NAMESPACE_END

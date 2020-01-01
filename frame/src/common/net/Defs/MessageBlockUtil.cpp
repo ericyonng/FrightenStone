@@ -30,6 +30,7 @@
 #include "FrightenStone/common/net/Defs/MessageBlockUtil.h"
 #include "FrightenStone/common/net/Defs/FS_NetMessageBlock.h"
 #include "FrightenStone/common/net/Defs/IocpDefs.h"
+#include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 
 #include "FrightenStone/common/component/Impl/MessageQueue/MessageQueue.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
@@ -49,13 +50,20 @@ FS_MessageBlock *MessageBlockUtil::BuildTransferMonitorArrivedMessageBlock(UInt3
     return block;
 }
 
-FS_MessageBlock *MessageBlockUtil::BuildTransferWillConnectMessageBlock(Int32 generatorId, UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo)
+FS_MessageBlock *MessageBlockUtil::BuildTransferWillConnectMessageBlock(UInt32 compId
+                                                                        , UInt32 generatorId
+                                                                        , BriefSessionInfo *newSessionInfo)
 {
     FS_NetSessionWillConnectMsg *block = new FS_NetSessionWillConnectMsg;
+    block->_compId = compId;
     block->_generatorId = generatorId;
-    block->_sessionId = sessionId;
-    block->_sock = sock;
-    block->_addrInfo = *addrInfo;
+    block->_sessionId = newSessionInfo->_sessionId;
+    block->_sock = newSessionInfo->_sock;
+    block->_addrInfo = *newSessionInfo->_addrInfo;
+    block->_onNewUserRes = newSessionInfo->_newUserRes;
+    newSessionInfo->_newUserRes = NULL;
+    block->_onUserDisconnectedRes = newSessionInfo->_userDisconnectedRes;
+    newSessionInfo->_userDisconnectedRes = NULL;
     return block;
 }
 

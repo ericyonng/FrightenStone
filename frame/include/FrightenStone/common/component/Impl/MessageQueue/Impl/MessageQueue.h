@@ -174,6 +174,8 @@ public:
     void Close();
     bool IsWorking() const;
     UInt32 GetGeneratorQuality() const;
+    UInt32 GenerateGeneratorId();
+    UInt32 GenerateConsumerId();
 
 public:
     bool Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs);
@@ -203,10 +205,13 @@ private:
     std::vector<std::vector<std::list<FS_MessageBlock *> *> *> _consumerMsgQueues;     // 第一层vector通过consumerid索引到对应的消费者队列,std::list<FS_MessageBlock *> *只是某个消费者塞进去的消息,避免了遍历list
 
     /* 系统参数 */
+    ConditionLocker _sysLocker;
     std::atomic<UInt32> _consumerQuantity;
     std::atomic<UInt32> _generatorQuantity;
     std::atomic_bool _isWorking;
     std::atomic_bool _isStart;
+    std::atomic<UInt32> _generatorMaxId;
+    std::atomic<UInt32> _consumerMaxId;
 };
 
 // 只能单向,只能从生产者到消费者 无线程同步消息队列

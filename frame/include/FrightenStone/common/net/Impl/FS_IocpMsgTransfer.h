@@ -72,7 +72,7 @@ public:
 
     // 网络事件
 public:
-    virtual void OnWillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo);
+    virtual void OnWillConnect(BriefSessionInfo *newSessionInfo);
 
 
 // TODO:以下旧接口/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,16 +124,15 @@ private:
     void _PrintAlloctorOccupiedInfo();
 
 private:
-//     TransferCfgs *_cfgs;
-//     UInt64 _transferThreadId;
-//     FS_NetEngine *_netEngine;
-// 
+     TransferCfgs *_cfgs;
+     UInt64 _transferThreadId;
+
 //     IMemoryAlloctor *_sessionBufferAlloctor;
 //     std::atomic<size_t> _curAlloctorOccupiedBytes;
 //     std::atomic_bool _canCreateNewNodeForAlloctor;
 //     IDelegate<void> *_printAlloctorOccupiedInfo;
 // 
-//     std::atomic<Int32> _sessionCnt;             // 会话个数
+     std::atomic<Int32> _sessionCnt;             // transfer处理的会话个数
 //     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
 //     Time _curTime;
 //     std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列

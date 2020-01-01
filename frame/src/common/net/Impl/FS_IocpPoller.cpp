@@ -35,6 +35,7 @@
 #include "FrightenStone/common/net/Defs/IoEvDefs.h"
 #include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
 #include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
+#include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 
 #include <FrightenStone/common/component/Impl/FS_ThreadPool.h>
 #include "FrightenStone/common/log/Log.h"
@@ -185,7 +186,7 @@ void FS_IocpPoller::_AcceptorMonitor(FS_ThreadPool *pool)
             sockaddr_in *clientAddrInfo = NULL;
             _iocp->GetClientAddrInfo(ioData->_wsaBuff.buf, clientAddrInfo);
 
-            _HandleSessionWillConnect(ioData->_sock, clientAddrInfo);
+            _HandleSessionWillConnect(netEngine, ioData->_sock, clientAddrInfo);
 
             // 重新post加速连入
             const auto st = _iocp->PostAccept(_acceptorSock, ioData);
@@ -221,8 +222,12 @@ void FS_IocpPoller::_HandleSessionWillConnect(IFS_NetEngine *netEngine, SOCKET s
         // socket重用
         SocketUtil::MakeReUseAddr(sock);
 
-        // select transfer and postrecv
-        netEngine->HandleCompEv_WillConnect(curMaxSession, sock, addrInfo);
+        // 新会话连入
+        BriefSessionInfo newSessionInfo;
+        newSessionInfo._addrInfo = addrInfo;
+        newSessionInfo._sessionId = curMaxSession;
+        newSessionInfo._sock = sock;
+        netEngine->_HandleCompEv_WillConnect(&newSessionInfo);
     }
     else {
         _locker->Unlock();

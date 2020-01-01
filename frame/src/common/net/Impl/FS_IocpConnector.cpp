@@ -35,6 +35,7 @@
 #include <FrightenStone/common/net/Defs/BriefSessionInfo.h>
 #include <FrightenStone/common/net/Impl/IUser.h>
 #include "FrightenStone/common/net/Defs/NetCfgDefs.h"
+#include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/log/Log.h"
@@ -46,29 +47,25 @@ FS_NAMESPACE_BEGIN
 FS_IocpConnector::FS_IocpConnector(Locker &locker
                                    , Int32 &curSessionCnt
                                    , Int32 &maxSessionQuantityLimit
-                                   , UInt64 &curMaxSessionId
-                                   , const UInt64 &maxSessionIdLimit)
+                                   , UInt64 &curMaxSessionId)
     :_locker(locker)
     ,_curSessionCnt(curSessionCnt)
     ,_maxSessionQuantityLimit(maxSessionQuantityLimit)
     ,_curMaxSessionId(curMaxSessionId)
-    ,_maxSessionIdLimit(maxSessionIdLimit)
     ,_cfgs(NULL)
-    ,_onConnectSuc(NULL)
 {
 /*     _CrtMemCheckpoint(&s1);*/
 }
 
 FS_IocpConnector::~FS_IocpConnector()
 {
-    FS_Release(_onConnectSuc);
     Fs_SafeFree(_cfgs);
 }
 
-Int32 FS_IocpConnector::BeforeStart(const ConnectorCfgs &cfgs)
+Int32 FS_IocpConnector::BeforeStart(const NetEngineTotalCfgs &cfgs)
 {
     _cfgs = new ConnectorCfgs;
-    *_cfgs = cfgs;
+    *_cfgs = cfgs._connectorCfgs;
     return StatusDefs::Success;
 }
 
@@ -127,13 +124,16 @@ Int32 FS_IocpConnector::Connect(const FS_ConnectInfo &connectInfo)
 
         sockaddr_in addr_in;
         SocketUtil::FillTcpAddrInfo(connectInfo._ip.c_str(), connectInfo._port, AF_INET, addr_in);
-        BriefSessionInfo *newSessionInfo = new BriefSessionInfo;
-        newSessionInfo->_sessionId = curMaxSessionId;
-        newSessionInfo->_sock = sock;
-        newSessionInfo->_addrInfo = addr_in;
-        newSessionInfo->_newUserRes = DelegatePlusFactory::Create(this, &FS_IocpConnector::_OnNewUserRes);
-        newSessionInfo->_userDisconnectedRes = DelegatePlusFactory::Create(this, &FS_IocpConnector::_OnUserDisconnected);
-        _onConnectSuc->Invoke(newSessionInfo);
+
+        // 新会话
+        auto netEngine = GetEngine();
+        BriefSessionInfo newSessionInfo;
+        newSessionInfo._addrInfo = &addr_in;
+        newSessionInfo._newUserRes = DelegatePlusFactory::Create(this, &FS_IocpConnector::_OnNewUserRes);
+        newSessionInfo._sessionId = curMaxSessionId;
+        newSessionInfo._sock = sock;
+        newSessionInfo._userDisconnectedRes = DelegatePlusFactory::Create(this, &FS_IocpConnector::_OnUserDisconnected);
+        netEngine->_HandleCompEv_WillConnect(&newSessionInfo);
     }
     else
     {
@@ -176,12 +176,6 @@ Int32 FS_IocpConnector::_CheckConnect(const FS_ConnectInfo &connectInfo, FS_Stri
         if(_curSessionCnt >= _maxSessionQuantityLimit)
         {
             ret = StatusDefs::FS_IocpConnector_ConnectOverLimit;
-            break;
-        }
-
-        if(_curMaxSessionId >= _maxSessionIdLimit)
-        {
-            ret = StatusDefs::FS_IocpConnector_SessionIdOverLimit;
             break;
         }
     } while(0);

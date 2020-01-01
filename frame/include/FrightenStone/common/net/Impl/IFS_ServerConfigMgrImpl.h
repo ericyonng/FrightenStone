@@ -100,6 +100,11 @@ inline Int64 IFS_ServerConfigMgr::GetDispatcherResolutionIntervalMs() const
     return _dispatcherResolutionIntervalMs;
 }
 
+inline bool IFS_ServerConfigMgr::GetIsOpenMemoryMonitor() const
+{
+    return _isOpenMemoryMonitor;
+}
+
 FS_NAMESPACE_END
 
 #endif

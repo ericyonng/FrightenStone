@@ -71,9 +71,13 @@ public:
 
     virtual void OnAcceptorDisconnected(UInt64 sessionId);
 
+    /* ¼àÌý */
 private:
     void _TransferMonitor(FS_ThreadPool *pool);
     void _AcceptorMonitor(FS_ThreadPool *pool);
+
+    /* ÍøÂçÊÂ¼þ */
+private:
     void _HandleSessionWillConnect(IFS_NetEngine *netEngine, SOCKET sock, const sockaddr_in *addrInfo);
 
 private:

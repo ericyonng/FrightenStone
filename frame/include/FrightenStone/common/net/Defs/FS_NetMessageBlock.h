@@ -36,6 +36,7 @@
 #include "FrightenStone/common/component/Impl/MessageQueue/MessageQueue.h"
 #include "FrightenStone/common/net/Defs/IoEvDefs.h"
 #include "FrightenStone/common/status/status.h"
+#include "FrightenStone/common/component/Impl/FS_Delegate.h"
 
 #ifdef _WIN32
 // #include "ws2def.h"
@@ -43,6 +44,8 @@
 #endif
 
 FS_NAMESPACE_BEGIN
+
+class IUser;
 
 class BASE_EXPORT NetMessageBlockType
 {
@@ -95,6 +98,10 @@ struct BASE_EXPORT FS_NetSessionWillConnectMsg : public FS_NetMsgBufferBlock
     UInt64 _sessionId;
     SOCKET _sock;
     sockaddr_in _addrInfo;
+
+    /* 连接器的额外参数 */
+    IDelegate<void, IUser *> *_onNewUserRes;
+    IDelegate<void, IUser *> *_onUserDisconnectedRes;
 };
 
 FS_NAMESPACE_END
