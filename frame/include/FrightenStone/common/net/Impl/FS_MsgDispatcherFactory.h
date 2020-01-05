@@ -40,12 +40,12 @@
 FS_NAMESPACE_BEGIN
 
 class IFS_MsgDispatcher;
-class FS_NetEngine;
+class IFS_NetEngine;
 
 class BASE_EXPORT FS_MsgDispatcherFactory
 {
 public:
-    static IFS_MsgDispatcher *Create(UInt32 id, FS_NetEngine *netEngine);
+    static IFS_MsgDispatcher *Create(UInt32 compId, IFS_NetEngine *netEngine);
 };
 
 FS_NAMESPACE_END

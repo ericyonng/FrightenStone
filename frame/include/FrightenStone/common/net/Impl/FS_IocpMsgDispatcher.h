@@ -42,6 +42,7 @@
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
 #include <set>
 #include "FrightenStone/common/component/Impl/TimeSlice.h"
+#include "FrightenStone/common/net/Defs/HeartBeatComp.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -53,27 +54,30 @@ class IFS_BusinessLogic;
 class ConcurrentMessageQueueNoThread;
 struct FS_MessageBlock;
 class IUser;
-class FS_NetEngine;
+class IFS_NetEngine;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
 public:
-    FS_IocpMsgDispatcher(UInt32 id, FS_NetEngine *netEngine);
+    FS_IocpMsgDispatcher(IFS_NetEngine *netEngine, UInt32 compId);
     virtual ~FS_IocpMsgDispatcher();
 
 public:
-    virtual Int32 BeforeStart(const DispatcherCfgs &cfgs);
+    virtual Int32 BeforeStart(const NetEngineTotalCfgs &cfgs);
     virtual Int32 Start();
+    virtual void AfterStart() {}
+    virtual void WillClose() {}
     virtual void BeforeClose();
     virtual void Close();
+    virtual void AfterClose() {}
 
+    /////////////////////////////////////////////////////////////////////////旧的接口
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut();
 
     virtual void SendData(UInt64 sessionId,  UInt64 consumerId, NetMsg_DataHeader *msg);// 线程安全
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
     virtual void AttachRecvMessageQueue(ConcurrentMessageQueueNoThread *messageQueue);
-    virtual Int32 GetId() const;
     virtual void CloseSession(UInt64 sessionId, UInt64 consumerId);
 
 private:
@@ -86,8 +90,6 @@ private:
 
 private:
     DispatcherCfgs * _cfgs;
-    FS_NetEngine *_netEngine;
-    UInt32 _id;
     std::atomic<bool> _isClose;
     FS_ThreadPool *_pool;
 
@@ -100,7 +102,16 @@ private:
     std::map<UInt64, std::list<IDelegate<void, IUser *> *>> _sessionIdRefUserDisconnected;
 
     std::vector<std::list<FS_MessageBlock *> *> *_recvMsgBlocks;       // 需要转换成 FS_NetMsgBufferBlock
-    ConcurrentMessageQueueNoThread *_messgeQueue;
+
+    /* 会话 */ 
+    IMemoryAlloctor *_sessionBufferAlloctor;
+    std::atomic<size_t> _curAlloctorOccupiedBytes;
+    std::atomic_bool _canCreateNewNodeForAlloctor;
+    IDelegate<void> *_printAlloctorOccupiedInfo;
+
+    std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
+    Time _curTime;
+    std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列
 
     // TODO:订阅网络协议的facade开发，使用委托方式，各个系统关注各自的协议，注册到本系统
 

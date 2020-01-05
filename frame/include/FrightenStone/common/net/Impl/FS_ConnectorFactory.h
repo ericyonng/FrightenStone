@@ -39,11 +39,14 @@
 FS_NAMESPACE_BEGIN
 
 class IFS_Connector;
+class IFS_NetEngine;
 
 class BASE_EXPORT FS_ConnectorFactory
 {
 public:
-    static IFS_Connector *Create(Locker &locker
+    static IFS_Connector *Create(IFS_NetEngine *netEngine
+                                 , UInt32 compId
+                                 , Locker &locker
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
                                  , UInt64 &curMaxSessionId);

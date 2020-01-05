@@ -34,12 +34,4 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_Connector::IFS_Connector()
-{
-}
-
-IFS_Connector::~IFS_Connector()
-{
-}
-
 FS_NAMESPACE_END

@@ -52,6 +52,7 @@ FS_MessageBlock *MessageBlockUtil::BuildTransferMonitorArrivedMessageBlock(UInt3
 
 FS_MessageBlock *MessageBlockUtil::BuildTransferWillConnectMessageBlock(UInt32 compId
                                                                         , UInt32 generatorId
+                                                                        , IFS_NetModule *netModule
                                                                         , BriefSessionInfo *newSessionInfo)
 {
     FS_NetSessionWillConnectMsg *block = new FS_NetSessionWillConnectMsg;
@@ -64,6 +65,7 @@ FS_MessageBlock *MessageBlockUtil::BuildTransferWillConnectMessageBlock(UInt32 c
     newSessionInfo->_newUserRes = NULL;
     block->_onUserDisconnectedRes = newSessionInfo->_userDisconnectedRes;
     newSessionInfo->_userDisconnectedRes = NULL;
+    block->_netModule = netModule;
     return block;
 }
 

@@ -64,9 +64,9 @@ IFS_NetEngine::~IFS_NetEngine()
     STLUtil::DelVectorContainer(_msgTransfers);
     Fs_SafeFree(_cpuInfo);
 
-    STLUtil::DelVectorContainer(_compIdRefConsumerMq);
     Fs_SafeFree(_concurrentMq);
     Fs_SafeFree(_totalCfgs);
+    STLUtil::DelVectorContainer(_compConsumerMq);
 }
 
 Int32 IFS_NetEngine::Init()
@@ -128,7 +128,7 @@ Int32 IFS_NetEngine::Init()
     ret = SocketUtil::InitSocketEnv();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("InitSocketEnv fail ret[%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("InitSocketEnv fail ret[%d]"), ret);
         return ret;
     }
 
@@ -136,7 +136,7 @@ Int32 IFS_NetEngine::Init()
     ret = _ReadConfig();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("_ReadConfig fail ret[%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_ReadConfig fail ret[%d]"), ret);
         return ret;
     }
 
@@ -144,7 +144,7 @@ Int32 IFS_NetEngine::Init()
     if(!_totalCfgs)
     {
         ret = StatusDefs::Error;
-        g_Log->e<FS_NetEngine>(_LOGFMT_("_totalCfgs total cfgs not init [%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_totalCfgs total cfgs not init [%d]"), ret);
         return ret;
     }
 
@@ -152,7 +152,7 @@ Int32 IFS_NetEngine::Init()
     ret = _OnInitFinish();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("_InitFinish fail ret[%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_InitFinish fail ret[%d]"), ret);
         return ret;
     }
 
@@ -169,14 +169,15 @@ Int32 IFS_NetEngine::Start()
     // 1.内存助手
     g_MemoryHelper->Start(_totalCfgs->_objPoolCfgs._maxAllowObjPoolBytesOccupied, _totalCfgs->_mempoolCfgs._maxAllowMemPoolBytesOccupied);
     // 2.内存监控
-    g_MemleakMonitor->Start();
+    if(_totalCfgs->_commonCfgs._isOpenMemoryMonitor)
+        g_MemleakMonitor->Start();
 
     // 3.启动监控器
     _pool = new FS_ThreadPool(0, 1);
     auto task = DelegatePlusFactory::Create(this, &IFS_NetEngine::_Monitor);
     if(!_pool->AddTask(task, true))
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("add task fail"));
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("add task fail"));
         return StatusDefs::FS_ServerCore_StartFailOfSvrRuningTaskFailure;
     }
 
@@ -184,7 +185,7 @@ Int32 IFS_NetEngine::Start()
     Int32 ret = _CreateNetModules();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("_CreateNetModules fail ret[%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_CreateNetModules fail ret[%d]"), ret);
         return ret;
     }
 
@@ -192,7 +193,7 @@ Int32 IFS_NetEngine::Start()
     ret = _BeforeStart();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("_BeforeStart fail ret[%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_BeforeStart fail ret[%d]"), ret);
         return ret;
     }
 
@@ -200,7 +201,7 @@ Int32 IFS_NetEngine::Start()
     ret = _StartModules();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("_StartModules fail ret[%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_StartModules fail ret[%d]"), ret);
         return ret;
     }
 
@@ -208,23 +209,73 @@ Int32 IFS_NetEngine::Start()
     ret = _OnStart();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("_OnStart fail ret[%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_OnStart fail ret[%d]"), ret);
         return ret;
     }
 
     // 9._AfterStart
-    ret = _AfterStart();
-    if(ret != StatusDefs::Success)
-    {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("_AfterStart fail ret[%d]"), ret);
-        return ret;
-    }
+    _AfterStart();
 
     return StatusDefs::Success;
 }
 
 void IFS_NetEngine::Close()
 {
+    if(!_isInit)
+        return;
+
+    _isInit = false;
+
+    // 断开所有依赖
+    _WillClose();
+
+    // 各自自个模块移除资源
+    _BeforeClose();
+
+    // 关闭接受连接
+    for(auto &acceptor : _acceptors)
+        acceptor->Close();
+
+    // 移除服务器核心模块
+    _connector->Close();
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->Close();
+
+    for(auto &dispatcher : _msgDispatchers)
+        dispatcher->Close();
+
+    _concurrentMq->BeforeClose();
+    _concurrentMq->Close();
+
+    STLUtil::DelVectorContainer(_compConsumerMq);
+    Fs_SafeFree(_concurrentMq);
+
+    _pool->Close();
+
+    // 最后一刻扫描
+    TimeSlice timeSlice;
+    timeSlice = Time::_microSecondPerSecond;
+    _PrintInfo(timeSlice);
+
+    // 最后处理
+    _AfterClose();
+
+    SocketUtil::ClearSocketEnv();
+
+    Fs_SafeFree(_pool);
+    Fs_SafeFree(_connector);
+    STLUtil::DelVectorContainer(_msgDispatchers);
+    STLUtil::DelVectorContainer(_msgTransfers);
+    Fs_SafeFree(_cpuInfo);
+
+    // 当前日志全部着盘
+    g_MemleakMonitor->Finish();
+    g_MemoryHelper->Finish();
+    g_Log->FlushAllFile();
+    g_Log->FinishModule();
+    g_MemoryPool->FinishPool();
+
+    Fs_SafeFree(_totalCfgs);
 }
 
 void IFS_NetEngine::_HandleCompEv_WillConnect(BriefSessionInfo *newSessionInfo)
@@ -287,7 +338,7 @@ Int32 IFS_NetEngine::_ReadConfig()
     auto ret = _OnReadCfgs();
     if(ret != StatusDefs::Success)
     {
-        g_Log->e<FS_NetEngine>(_LOGFMT_("FS_NetEngine _OnReadCfgs fail ret[%d]"), ret);
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("FS_NetEngine _OnReadCfgs fail ret[%d]"), ret);
         return ret;
     }
 
@@ -305,22 +356,27 @@ Int32 IFS_NetEngine::_CreateNetModules()
     _concurrentMq = new ConcurrentMessageQueueNoThread(generatorQuatity, consumerQuatity);
 
     // 连接器
-    _connector = FS_ConnectorFactory::Create(_sessionlocker
+    _connector = FS_ConnectorFactory::Create(this
+                                             , _GenerateCompId()
+                                             , _sessionlocker
                                              , _curSessionCnt
                                              , _totalCfgs->_commonCfgs._maxSessionQuantityLimit
                                              , _curMaxSessionId);
+    _AddNewComp(_connector->GetCompId(), _connector);
 
-    // 接受连接
+    // 监听器
     const UInt32 acceptorQuantity = _totalCfgs->_commonCfgs._acceptorQuantityLimit;
     _acceptors.resize(acceptorQuantity);
     for(UInt32 i = 0; i < acceptorQuantity; ++i)
     {
-         _acceptors[i] = FS_AcceptorFactory::Create(_GenerateCompId(),
+         auto newAcceptor = FS_AcceptorFactory::Create(_GenerateCompId(),
                                                    _sessionlocker
                                                    , _curSessionCnt
                                                    , _totalCfgs->_commonCfgs._maxSessionQuantityLimit
                                                    , _curMaxSessionId
                                                    , this);
+         _AddNewComp(newAcceptor->GetCompId(), newAcceptor);
+         _acceptors[i] = newAcceptor;
     }
 
     //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
@@ -330,29 +386,35 @@ Int32 IFS_NetEngine::_CreateNetModules()
     const auto dispatcherQuatity = _totalCfgs->_commonCfgs._dispatcherQuantity;
     if((transferQuatity % dispatcherQuatity) != 0)
     {
-        g_Log->w<FS_NetEngine>(_LOGFMT_("transfer cnt[%u] cant divide by dispatcher cnt[%u], it will break balance!")
+        g_Log->w<IFS_NetEngine>(_LOGFMT_("transfer cnt[%u] cant divide by dispatcher cnt[%u], it will break balance!")
                                , transferQuatity, dispatcherQuatity);
     }
 
+    // 数据传输层
     _msgTransfers.resize(transferQuatity);
     for(UInt32 i = 0; i < transferQuatity; ++i)
     {
         auto newTransfer = FS_MsgTransferFactory::Create(_GenerateCompId(), this);
         newTransfer->BindConcurrentParams(_concurrentMq->GenerateGeneratorId(), 0, _concurrentMq);
+        _AddNewComp(newTransfer->GetCompId(), newTransfer);
         _msgTransfers[i] = newTransfer;
     }
 
     // 业务层
     std::vector<IFS_BusinessLogic *> logics;
     _GetLogics(logics);
+
+    // 消息转发层
     _msgDispatchers.resize(dispatcherQuatity);
     for(UInt32 i = 0; i < dispatcherQuatity; ++i)
     {
-        _msgDispatchers[i] = FS_MsgDispatcherFactory::Create(i, this);
-        _msgDispatchers[i]->AttachRecvMessageQueue(_messageQueue);
+        auto newDispatcher = FS_MsgDispatcherFactory::Create(_GenerateCompId(), this);
+        _msgDispatchers[i] = newDispatcher;
+        newDispatcher->BindConcurrentParams(0, _concurrentMq->GenerateConsumerId(), _concurrentMq);
+        _AddNewComp(newDispatcher->GetCompId(), newDispatcher);
 
         if(!logics.empty() && i < logics.size())
-            _msgDispatchers[i]->BindBusinessLogic(logics[i]);
+            newDispatcher->BindBusinessLogic(logics[i]);
     }
 
     // 组件消息队列 可当作组件邮箱
@@ -360,11 +422,207 @@ Int32 IFS_NetEngine::_CreateNetModules()
     const UInt32 compConsumerMqSize = static_cast<UInt32>(_compConsumerMq.size());
     for(UInt32 i = 1; i < compConsumerMqSize; ++i)
     {
-        _compConsumerMq[i] = new MessageQueueNoThread();
-        
+        auto newCompMq = new MessageQueueNoThread();
+        auto comp = _GetComp(i);
+        _compConsumerMq[i] = newCompMq;
+        comp->BindCompMq(newCompMq);
+        comp->AttachAllCompMq(&_compConsumerMq);
     }
 
     return StatusDefs::Success;
+}
+
+Int32 IFS_NetEngine::_StartModules()
+{
+    Int32 ret = StatusDefs::Success;
+    ret = _concurrentMq->Start();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_concurrentMq start fail ret[%d]"), ret);
+        return ret;
+    }
+
+//     const Int32 compMqSize = static_cast<Int32>(_compConsumerMq.size());
+//     for(Int32 i = 1; i < compMqSize; ++i)
+//     {
+//         ret = _compConsumerMq[i]->Start();
+//         if(ret != StatusDefs::Success)
+//         {
+//             g_Log->e<IFS_NetEngine>(_LOGFMT_("_compConsumerMq BeforeStart fail i[%d] ret[%d]"), i, ret);
+//             return ret;
+//         }
+//     }
+
+    ret = _connector->Start();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("connector start fail ret[%d]"), ret);
+        return ret;
+    }
+
+    const auto acceptoreQuantity = static_cast<Int32>(_acceptors.size());
+    for(Int32 i = 0; i < acceptoreQuantity; ++i)
+    {
+        ret = _acceptors[i]->Start();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<IFS_NetEngine>(_LOGFMT_("_acceptors start fail i[%u] ret[%d]"), i, ret);
+            return ret;
+        }
+    }
+
+    for(auto &msgTransfer : _msgTransfers)
+    {
+        ret = msgTransfer->Start();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<IFS_NetEngine>(_LOGFMT_("msgTransfer start fail ret[%d]"), ret);
+            return ret;
+        }
+    }
+
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+    {
+        ret = _msgDispatchers[i]->Start();
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<IFS_NetEngine>(_LOGFMT_("msgHandler start fail ret[%d] i[%d]"), ret, i);
+            return ret;
+        }
+    }
+
+    return ret;
+}
+
+Int32 IFS_NetEngine::_BeforeStart()
+{
+    Int32 ret = StatusDefs::Success;
+    ret = _concurrentMq->BeforeStart();
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_concurrentMq BeforeStart fail ret[%d]"), ret);
+        return ret;
+    }
+
+//     const Int32 compMqSize = static_cast<Int32>(_compConsumerMq.size());
+//     for(Int32 i = 1; i < compMqSize; ++i)
+//     {
+//         ret = _compConsumerMq[i]->BeforeStart();
+//         if(ret != StatusDefs::Success)
+//         {
+//             g_Log->e<IFS_NetEngine>(_LOGFMT_("_compConsumerMq BeforeStart fail i[%d] ret[%d]"), i,  ret);
+//             return ret;
+//         }
+//     }
+
+    const Int32 acceptorQuatity = static_cast<Int32>(_acceptors.size());
+    for(Int32 i = 0; i < acceptorQuatity; ++i)
+    {
+        ret = _acceptors[i]->BeforeStart(*_totalCfgs);
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<IFS_NetEngine>(_LOGFMT_("_acceptors BeforeStart fail i[%d] ret[%d]"), i, ret);
+            return ret;
+        }
+    }
+
+    ret = _connector->BeforeStart(*_totalCfgs);
+    if(ret != StatusDefs::Success)
+    {
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("connector BeforeStart fail ret[%d]"), ret);
+        return ret;
+    }
+
+    for(auto &msgTransfer : _msgTransfers)
+    {
+        ret = msgTransfer->BeforeStart(*_totalCfgs);
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<IFS_NetEngine>(_LOGFMT_("msgTransfer BeforeStart fail ret[%d]"), ret);
+            return ret;
+        }
+    }
+
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+    {
+        ret = _msgDispatchers[i]->BeforeStart(*_totalCfgs);
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<IFS_NetEngine>(_LOGFMT_("msgHandler BeforeStart fail ret[%d] i[%d]"), ret, i);
+            return ret;
+        }
+    }
+
+    return ret;
+}
+
+Int32 IFS_NetEngine::_OnStart()
+{
+    return StatusDefs::Success;
+}
+
+void IFS_NetEngine::_AfterStart()
+{
+    const Int32 acceptorQuatity = static_cast<Int32>(_acceptors.size());
+    for(Int32 i = 0; i < acceptorQuatity; ++i)
+        _acceptors[i]->AfterStart();
+
+    _connector->AfterStart();
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->AfterStart();
+
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+        _msgDispatchers[i]->AfterStart();
+}
+
+void IFS_NetEngine::_WillClose()
+{
+    // 关闭接受连接
+    for(auto &acceptor : _acceptors)
+        acceptor->WillClose();
+
+    _connector->WillClose();
+
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->WillClose();
+
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+        _msgDispatchers[i]->WillClose();
+}
+
+void IFS_NetEngine::_BeforeClose()
+{
+    // 关闭接受连接
+    for(auto &acceptor : _acceptors)
+        acceptor->BeforeClose();
+
+    _connector->BeforeClose();
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->BeforeClose();
+
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+        _msgDispatchers[i]->BeforeClose();
+}
+
+void IFS_NetEngine::_AfterClose()
+{
+    // 关闭接受连接
+    for(auto &acceptor : _acceptors)
+        acceptor->AfterClose();
+
+    _connector->AfterClose();
+
+    for(auto &msgTransfer : _msgTransfers)
+        msgTransfer->AfterClose();
+
+    const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
+    for(Int32 i = 0; i < dispatcherSize; ++i)
+        _msgDispatchers[i]->AfterClose();
 }
 
 FS_NAMESPACE_END

@@ -53,6 +53,8 @@ class MessageQueueNoThread;
 class FS_CpuInfo;
 struct BriefSessionInfo;
 class IFS_MsgDispatcher;
+class IFS_EngineComp;
+class IFS_BusinessLogic;
 
 class BASE_EXPORT IFS_NetEngine
 {
@@ -70,6 +72,11 @@ public:
     /* 组件事件 */
 protected:
     virtual void _HandleCompEv_WillConnect(BriefSessionInfo *newSessionInfo);
+    virtual void _HandleCompEv_Disconnected(UInt64 sessionId);
+    virtual void _HandleCompEv_HeartBeatTimeOut();
+    virtual void _HandleCompEv_RecvMsg(Int64 transferBytes);
+    virtual void _HandleCompEv_RecvMsgAmount();
+    virtual void _HandleCompEv_SendMsg(Int64 transferBytes);
 
 protected:
     virtual void _Monitor(FS_ThreadPool *threadPool);
@@ -83,7 +90,7 @@ protected:
 
     Int32 _BeforeStart();
     Int32 _OnStart();
-    Int32 _AfterStart();
+    void _AfterStart();
 
     void _WillClose();
     void _BeforeClose();
@@ -95,6 +102,8 @@ protected:
     virtual Int32 _OnReadCfgs() = 0;
     // 初始化结束时
     virtual Int32 _OnInitFinish() { return StatusDefs::Success; }
+    // 获取业务层,以便绑定到dispatcher上
+    virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics) {}
 
     /* 辅助 */
 protected:
@@ -104,6 +113,7 @@ protected:
     ConcurrentMessageQueueNoThread *_GetConcurrentMQ();
 
     void _AddNewComp(UInt32 compId, IFS_EngineComp *newComp);
+    IFS_EngineComp *_GetComp(UInt32 compId);
 
 protected:
     /* 友元 */

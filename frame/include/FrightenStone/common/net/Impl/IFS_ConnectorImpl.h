@@ -33,7 +33,14 @@
 
 #ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_Connector_H__
 FS_NAMESPACE_BEGIN
+inline IFS_Connector::IFS_Connector(IFS_NetEngine *netEngine, UInt32 compId)
+    :IFS_EngineComp(netEngine, compId)
+{
+}
 
+inline IFS_Connector::~IFS_Connector()
+{
+}
 FS_NAMESPACE_END
 #endif
 

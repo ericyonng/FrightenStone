@@ -21,45 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_MsgTransferImpl.h
+ * @file  : IFS_NetModuleImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/07
+ * @date  : 2020/01/05
  * @brief :
- * 
- *
- * 
  */
+#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_NetModule_H__
 
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_MsgTransfer_H__
 #pragma once
 FS_NAMESPACE_BEGIN
-inline IFS_MsgTransfer::IFS_MsgTransfer(UInt32 compId, IFS_NetEngine *engine)
-    :IFS_EngineComp(engine, compId)
-    ,_generatorId(0)
-    ,_consumerId(0)
-    ,_concurrentMq(NULL)
+inline IFS_NetModule::IFS_NetModule()
 {
 }
 
-inline IFS_MsgTransfer::~IFS_MsgTransfer()
+inline IFS_NetModule::~IFS_NetModule()
 {
-}
-
-inline UInt32 IFS_MsgTransfer::GetGeneratorId() const
-{
-    return _generatorId;
-}
-
-inline UInt32 IFS_MsgTransfer::GetConsumerId() const
-{
-    return _consumerId;
-}
-
-inline void IFS_MsgTransfer::BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq)
-{
-    _generatorId = generatorId;
-    _consumerId = consumerId;
-    _concurrentMq = concurrentMq;
 }
 
 FS_NAMESPACE_END

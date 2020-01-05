@@ -76,7 +76,6 @@ public:
     virtual void Close();
     virtual void AfterClose();
 
-
     /* TCP ³£¹æ²Ù×÷ */
     #pragma region tcp normal operate
     /*

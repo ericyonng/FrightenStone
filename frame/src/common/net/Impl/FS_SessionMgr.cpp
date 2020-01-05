@@ -32,7 +32,6 @@
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/FS_SessionMgr.h"
 #include "FrightenStone/common/net/Impl/IFS_Session.h"
-#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/assist/utils/utils.h"

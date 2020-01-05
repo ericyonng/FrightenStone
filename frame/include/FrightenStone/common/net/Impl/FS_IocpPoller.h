@@ -53,7 +53,7 @@ class IFS_NetEngine;
 class BASE_EXPORT FS_IocpPoller : public IFS_BasePoller
 {
 public:
-    FS_IocpPoller(IFS_EngineComp *engineComp, Int32 pollerSubType);
+    FS_IocpPoller(IFS_EngineComp *engineComp, Int32 monitorType);
     ~FS_IocpPoller();
 
 public:
@@ -70,6 +70,9 @@ public:
                              , UInt64 *curMaxSessionId);
 
     virtual void OnAcceptorDisconnected(UInt64 sessionId);
+
+    // ÍøÂçÄ£ÐÍiocp,epoll
+    virtual IFS_NetModule *GetNetModuleObj();
 
     /* ¼àÌý */
 private:

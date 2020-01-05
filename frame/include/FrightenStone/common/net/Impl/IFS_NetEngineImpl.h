@@ -63,6 +63,36 @@ inline void IFS_NetEngine::Sinal()
     _waitForClose.Unlock();
 }
 
+inline void IFS_NetEngine::_HandleCompEv_Disconnected(UInt64 sessionId)
+{
+    --_curSessionConnecting;
+    ++_sessionDisconnectedCnt;
+
+    // 关闭接受连接
+    for(auto &acceptor : _acceptors)
+        acceptor->OnDisconnected(sessionId);
+}
+
+inline void IFS_NetEngine::_HandleCompEv_HeartBeatTimeOut()
+{
+    ++_heartbeatTimeOutDisconnected;
+}
+
+inline void IFS_NetEngine::_HandleCompEv_RecvMsg(Int64 transferBytes)
+{
+    _recvMsgBytesPerSecond += transferBytes;
+}
+
+inline void IFS_NetEngine::_HandleCompEv_RecvMsgAmount()
+{
+    ++_recvMsgCountPerSecond;
+}
+
+inline void IFS_NetEngine::_HandleCompEv_SendMsg(Int64 transferBytes)
+{
+    ++_recvMsgCountPerSecond;
+}
+
 inline UInt32 IFS_NetEngine::_GenerateCompId()
 {
     return ++_curMaxCompId;
@@ -75,6 +105,13 @@ inline ConcurrentMessageQueueNoThread *IFS_NetEngine::_GetConcurrentMQ()
 
 inline void IFS_NetEngine::_AddNewComp(UInt32 compId, IFS_EngineComp *newComp)
 {
+    _compIdRefComps.insert(std::make_pair(compId, newComp));
+}
+
+inline IFS_EngineComp *IFS_NetEngine::_GetComp(UInt32 compId)
+{
+    auto iterComp = _compIdRefComps.find(compId);
+    return iterComp->second;
 }
 
 FS_NAMESPACE_END

@@ -66,6 +66,7 @@ inline FS_NetSessionWillConnectMsg::FS_NetSessionWillConnectMsg()
     ,_addrInfo{0}
     ,_onNewUserRes(NULL)
     ,_onUserDisconnectedRes(NULL)
+    ,_netModule(NULL)
 {
     _netMessageBlockType = NetMessageBlockType::Met_NetSessionConnected;
 }

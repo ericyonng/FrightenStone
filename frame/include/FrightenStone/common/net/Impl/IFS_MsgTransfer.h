@@ -61,10 +61,21 @@ public:
     /* 属性方法 */
 public:
     virtual Int32 GetSessionCnt() = 0;
+    // 获取生产者id
+    virtual UInt32 GetGeneratorId() const;
+    // 获取消费者id
+    virtual UInt32 GetConsumerId() const;
+    // 并发消息队列参数绑定
+    virtual void BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
+
+protected:
+    UInt32 _generatorId;            // engine中concurrentmq指定的生产者id
+    UInt32 _consumerId;             // 指定的，并发消息队列中对应的消费者id
+    ConcurrentMessageQueueNoThread *_concurrentMq;  // 单向的消息队列,当组件是生产者时只能push不能pop,只能generatiorId
 };
 
 FS_NAMESPACE_END

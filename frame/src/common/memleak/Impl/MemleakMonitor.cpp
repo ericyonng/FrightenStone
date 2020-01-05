@@ -54,7 +54,7 @@ MemleakMonitor::~MemleakMonitor()
     _printInfoPool->Close();
     Fs_SafeFree(_printInfoPool);
     STLUtil::DelMapContainer(_objNameRefPrintCallback);
-    _threadIdRefMemPoolPrintCallback.clear();
+    _threadIdRefMemPoolPrintCallbacks.clear();
 }
 
 MemleakMonitor *MemleakMonitor::GetInstance()
@@ -68,13 +68,14 @@ MemleakMonitor *MemleakMonitor::GetInstance()
     return g_MemleakMonitor;
 }
 
-Int32 MemleakMonitor::BeforeStart(UInt64 maxAllowObjPoolBytes, UInt64 maxAllowMemoryPoolBytes)
+Int32 MemleakMonitor::BeforeStart()
 {
     // TODO:monitor是通用的对象不可与服务端配置耦合
-    for(auto &setInvoke : _objPoolSetMaxAllowOccupiedBytes)
-        setInvoke->Invoke(maxAllowObjPoolBytes);
-
-    g_MemoryPool->SetMaxAllowOccupiedBytes(maxAllowMemoryPoolBytes);
+//     for(auto &setInvoke : _objPoolSetMaxAllowOccupiedBytes)
+//         setInvoke->Invoke(maxAllowObjPoolBytes);
+// 
+//     g_MemoryPool->SetMaxAllowOccupiedBytes(maxAllowMemoryPoolBytes);
+    return StatusDefs::Success;
 }
 
 void MemleakMonitor::Start()
@@ -88,7 +89,7 @@ void MemleakMonitor::Finish()
     Fs_SafeFree(_printInfoPool);
     STLUtil::DelMapContainer(_objNameRefPrintCallback);
     STLUtil::DelListContainer(_objPoolSetMaxAllowOccupiedBytes);
-    _threadIdRefMemPoolPrintCallback.clear();
+    _threadIdRefMemPoolPrintCallbacks.clear();
 }
 
 void MemleakMonitor::RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback)
@@ -122,14 +123,19 @@ void MemleakMonitor::UnRegisterObjPool(const char *name)
 void MemleakMonitor::RegisterMemPoolPrintCallback(UInt64 threadId, const IDelegate<void> *callback)
 {
     _locker.Lock();
-    _threadIdRefMemPoolPrintCallback.insert(std::make_pair(threadId, callback));
+    auto iterCallbacks = _threadIdRefMemPoolPrintCallbacks.find(threadId);
+    if(iterCallbacks == _threadIdRefMemPoolPrintCallbacks.end())
+        iterCallbacks = _threadIdRefMemPoolPrintCallbacks.insert(std::make_pair(threadId, std::set<const IDelegate<void> *>())).first;
+    iterCallbacks->second.insert(callback);
     _locker.Unlock();
 }
 
-void MemleakMonitor::UnRegisterMemPoolPrintCallback(UInt64 threadId)
+void MemleakMonitor::UnRegisterMemPoolPrintCallback(UInt64 threadId, const IDelegate<void> *callback)
 {
     _locker.Lock();
-    _threadIdRefMemPoolPrintCallback.erase(threadId);
+    auto iterCallbacks = _threadIdRefMemPoolPrintCallbacks.find(threadId);
+    if(iterCallbacks != _threadIdRefMemPoolPrintCallbacks.end())
+        iterCallbacks->second.erase(callback);
     _locker.Unlock();
 }
 
@@ -240,10 +246,11 @@ void MemleakMonitor::PrintPoolAll() const
     // 系统内存信息
     PrintSysMemoryInfo();
     // 内存池信息
-    for(auto &iterCallback : _threadIdRefMemPoolPrintCallback)
+    for(auto &iterCallback : _threadIdRefMemPoolPrintCallbacks)
     {
-        auto callback = iterCallback.second;
-        callback->Invoke();
+        auto &callbacks = iterCallback.second;
+        for(auto &callback : callbacks)
+            callback->Invoke();
     }
 
     // 打印对象池

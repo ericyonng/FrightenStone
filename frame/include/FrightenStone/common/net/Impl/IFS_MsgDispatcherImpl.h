@@ -21,19 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_MsgTransferImpl.h
+ * @file  : IFS_MsgDispatcherImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/07
+ * @date  : 2020/01/05
  * @brief :
- * 
- *
- * 
  */
-
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_MsgTransfer_H__
+#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_MsgDispatcher_H__
 #pragma once
+
 FS_NAMESPACE_BEGIN
-inline IFS_MsgTransfer::IFS_MsgTransfer(UInt32 compId, IFS_NetEngine *engine)
+inline IFS_MsgDispatcher::IFS_MsgDispatcher(IFS_NetEngine *engine, UInt32 compId)
     :IFS_EngineComp(engine, compId)
     ,_generatorId(0)
     ,_consumerId(0)
@@ -41,21 +38,22 @@ inline IFS_MsgTransfer::IFS_MsgTransfer(UInt32 compId, IFS_NetEngine *engine)
 {
 }
 
-inline IFS_MsgTransfer::~IFS_MsgTransfer()
+inline IFS_MsgDispatcher::~IFS_MsgDispatcher()
 {
+
 }
 
-inline UInt32 IFS_MsgTransfer::GetGeneratorId() const
+inline UInt32 IFS_MsgDispatcher::GetGeneratorId() const
 {
     return _generatorId;
 }
 
-inline UInt32 IFS_MsgTransfer::GetConsumerId() const
+inline UInt32 IFS_MsgDispatcher::GetConsumerId() const
 {
     return _consumerId;
 }
 
-inline void IFS_MsgTransfer::BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq)
+inline void IFS_MsgDispatcher::BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq)
 {
     _generatorId = generatorId;
     _consumerId = consumerId;
@@ -63,4 +61,5 @@ inline void IFS_MsgTransfer::BindConcurrentParams(UInt32 generatorId, UInt32 con
 }
 
 FS_NAMESPACE_END
+
 #endif

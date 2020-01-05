@@ -46,7 +46,7 @@ class IFS_NetEngine;
 class BASE_EXPORT FS_MsgTransferFactory
 {
 public:
-    static IFS_MsgTransfer *Create(UInt32 id, IFS_NetEngine *netEngine);
+    static IFS_MsgTransfer *Create(UInt32 compId, IFS_NetEngine *netEngine);
 };
 
 FS_NAMESPACE_END

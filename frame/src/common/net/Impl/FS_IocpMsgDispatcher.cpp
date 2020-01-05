@@ -35,9 +35,9 @@
 #include "FrightenStone/common/net/Defs/FS_IocpBuffer.h"
 #include "FrightenStone/common/net/Impl/IFS_MsgTransfer.h"
 #include "FrightenStone/common/net/Impl/IFS_BusinessLogic.h"
-#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 #include "FrightenStone/common/net/Defs/NetCfgDefs.h"
+#include "FrightenStone/common/net/Defs/FS_NetMessageBlock.h"
 
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/status/status.h"
@@ -52,16 +52,15 @@
 
 FS_NAMESPACE_BEGIN
 
-FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(UInt32 id, FS_NetEngine *netEngine)
-    :_pool(NULL)
+FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(IFS_NetEngine *netEngine, UInt32 compId)
+    :IFS_MsgDispatcher(netEngine, compId)
+    , _pool(NULL)
     , _isClose{false}
     ,_timeWheel(NULL)
     ,_logic(NULL)
     ,_messgeQueue(NULL)
-    ,_id(id)
     ,_recvMsgBlocks(NULL)
     ,_cfgs(NULL)
-    ,_netEngine(netEngine)
 {
 }
 
@@ -76,19 +75,20 @@ FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
 //         _CrtMemDumpStatistics(&s3);
 }
 
-Int32 FS_IocpMsgDispatcher::BeforeStart(const DispatcherCfgs &cfgs)
+Int32 FS_IocpMsgDispatcher::BeforeStart(const NetEngineTotalCfgs &cfgs)
 {
     _cfgs = new DispatcherCfgs;
-    *_cfgs = cfgs;
+    *_cfgs = cfgs._dispatcherCfgs;
     _timeWheel = new TimeWheel(_cfgs->_dispatcherResolutionInterval);
-    // g_BusinessTimeWheel = _timeWheel;
     _pool = new FS_ThreadPool(0, 1);
+
     _recvMsgBlocks = new std::vector<std::list<FS_MessageBlock *> *>;
-    auto generatorQuatity = _messgeQueue->GetGeneratorQuality();
+    auto generatorQuatity = _concurrentMq->GetGeneratorQuality();
     _recvMsgBlocks->resize(generatorQuatity);
     for(UInt32 i = 0; i < generatorQuatity; ++i)
         (*_recvMsgBlocks)[i] = new std::list<FS_MessageBlock *>;
 
+    /////////////////////////////////////////////////////////////////////////////////旧代码
     if(_logic)
     {
         _logic->SetDispatcher(this);
@@ -106,13 +106,6 @@ Int32 FS_IocpMsgDispatcher::BeforeStart(const DispatcherCfgs &cfgs)
 
 Int32 FS_IocpMsgDispatcher::Start()
 {
-    auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_OnBusinessProcessThread);
-    if(!_pool->AddTask(task, true))
-    {
-        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("add task fail"));
-        return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
-    }
-
     if(_logic)
     {
         auto st = _logic->Start();
@@ -123,6 +116,13 @@ Int32 FS_IocpMsgDispatcher::Start()
         }
     }
 
+    auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_OnBusinessProcessThread);
+    if(!_pool->AddTask(task, true))
+    {
+        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("add task fail"));
+        return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
+    }
+
     return StatusDefs::Success;
 }
 
@@ -131,7 +131,7 @@ void FS_IocpMsgDispatcher::BeforeClose()
     if(_isClose)
         return;
 
-    _messgeQueue->NotifyConsumerByGenerator(_id);
+    _concurrentMq->NotifyConsumerByGenerator(_consumerId);
 
     if(_logic)
         _logic->BeforeClose();
@@ -163,19 +163,17 @@ void FS_IocpMsgDispatcher::Close()
             for(auto &recvMsgBlock : *msgQueue)
             {
                 FS_NetMsgBufferBlock *netMsg = recvMsgBlock->CastTo<FS_NetMsgBufferBlock>();
-                NetMsg_DataHeader *header = netMsg->CastBufferTo<NetMsg_DataHeader>();
-                g_Log->net<FS_IocpMsgDispatcher>("net msg[%hu] data size[%hu] generatorid[%d] sessionId[%llu] is unhandled"
-                                                 , header->_cmd
-                                                 , header->_packetLength
+                g_Log->net<FS_IocpMsgDispatcher>("netmsg _compId[%u] _generatorId[%u] _netMessageBlockType[%d]is unhandled"
+                                                 , netMsg->_compId
                                                  , netMsg->_generatorId
-                                                 , netMsg->_sessionId);
+                                                 , netMsg->_netMessageBlockType);
                 ++blockCount;
                 Fs_SafeFree(recvMsgBlock);
             }
             msgQueue->clear();
         }
 
-        g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("recv msg block queue has unhandled msgs[%llu]"), blockCount);
+        g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("msg block queue has unhandled msgs[%llu]"), blockCount);
     }
 
     STLUtil::DelListContainer(*_recvMsgBlocks);
@@ -280,9 +278,8 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
     bool hasMsg = false;
     while(pool->IsPoolWorking())
     {
-        _messgeQueue->WaitForPoping(_id, _recvMsgBlocks, hasMsg, static_cast<ULong>(resolutionIntervalSlice.GetTotalMilliSeconds()));
+        _concurrentMq->WaitForPoping(_consumerId, _recvMsgBlocks, hasMsg, static_cast<ULong>(resolutionIntervalSlice.GetTotalMilliSeconds()));
 
-        // Sleep(100);
         // 先执行定时器事件
         _timeWheel->RotateWheel();
 
@@ -308,7 +305,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing(bool hasMsg)
         UInt64 sessionId = 0;
         for(auto iterGeneratorQueue = _recvMsgBlocks->begin(); iterGeneratorQueue != _recvMsgBlocks->end();++iterGeneratorQueue)
         {
-            auto blockQueue = *iterGeneratorQueue;
+            auto *blockQueue = *iterGeneratorQueue;
             if(blockQueue->empty())
                 continue;
 
@@ -316,16 +313,16 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing(bool hasMsg)
             {
                 netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
                 sessionId = netMsgBlock->_sessionId;
-                if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionDisconnect)
+                if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetSessionDisconnect)
                 {// 会话断开
                     _delayDisconnectedSessions.insert(sessionId);
                 }
-                else if(netMsgBlock->_mbType == MessageBlockType::MB_NetMsgArrived)
+                else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetMsgArrived)
                 {// 收到网络包
                     auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
                     _DoBusinessProcess(sessionId, netMsgBlock->_generatorId, netMsg);
                 }
-                else if(netMsgBlock->_mbType == MessageBlockType::MB_NetSessionConnected)
+                else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Met_NetSessionConnected)
                 {// 会话连入
                     auto newUser = _logic->OnSessionConnected(sessionId, netMsgBlock->_generatorId);
                     auto newUserRes = netMsgBlock->_newUserRes;

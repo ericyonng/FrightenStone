@@ -47,10 +47,6 @@ inline void FS_IocpMsgDispatcher::AttachRecvMessageQueue(ConcurrentMessageQueueN
     _messgeQueue = messageQueue;
 }
 
-inline Int32 FS_IocpMsgDispatcher::GetId() const
-{
-    return static_cast<Int32>(_id);
-}
 
 FS_NAMESPACE_END
 

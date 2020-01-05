@@ -39,6 +39,7 @@ FS_NAMESPACE_BEGIN
 struct FS_MessageBlock;
 struct BriefSessionInfo;
 struct IoEvent;
+class IFS_NetModule;
 
 class BASE_EXPORT MessageBlockUtil
 {
@@ -46,6 +47,7 @@ public:
     static FS_MessageBlock *BuildTransferMonitorArrivedMessageBlock(UInt32 compId, UInt32 generatorId, IoEvent *ev, Int32 transferReason);
     static FS_MessageBlock *BuildTransferWillConnectMessageBlock(UInt32 compId
                                                                  , UInt32 generatorId
+                                                                 , IFS_NetModule *netModule
                                                                  , BriefSessionInfo *newSessionInfo);
 };
 

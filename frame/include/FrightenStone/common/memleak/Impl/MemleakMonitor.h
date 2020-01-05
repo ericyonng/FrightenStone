@@ -50,14 +50,14 @@ public:
     virtual ~MemleakMonitor();
 
     static MemleakMonitor *GetInstance();
-    Int32 BeforeStart(UInt64 maxAllowObjPoolBytes, UInt64 maxAllowMemoryPoolBytes);
+    Int32 BeforeStart();
     void Start();
     void Finish();
 
     void RegisterObjPoolCallback(const char *name, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback);
     void UnRegisterObjPool(const char *name);
     void RegisterMemPoolPrintCallback(UInt64 threadId, const IDelegate<void> *callback);
-    void UnRegisterMemPoolPrintCallback(UInt64 threadId);
+    void UnRegisterMemPoolPrintCallback(UInt64 threadId, const IDelegate<void> *callback);
 
     void RegisterObjPoolModifyMaxAllowBytesCallback(IDelegate<void, UInt64> *callback);
 
@@ -77,7 +77,7 @@ private:
     static Locker _locker;
     std::map<FS_String, std::vector<IDelegate<size_t, Int64 &, Int64 &, const char *> *> *> _objNameRefPrintCallback;
     std::list<IDelegate<void, UInt64> *> _objPoolSetMaxAllowOccupiedBytes;
-    std::map<UInt64, const IDelegate<void> *> _threadIdRefMemPoolPrintCallback;
+    std::map<UInt64, std::set<const IDelegate<void> *>> _threadIdRefMemPoolPrintCallbacks;
 
     FS_ThreadPool *_printInfoPool;
 };

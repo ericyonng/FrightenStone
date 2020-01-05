@@ -37,6 +37,7 @@
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/net/Impl/IFS_NetModule.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
@@ -44,7 +45,8 @@ FS_NAMESPACE_BEGIN
 struct IoDataBase;
 struct IoEvent;
 
-class BASE_EXPORT FS_Iocp
+// 请保证同时在一个线程读写iocp,读,写在不同线程是安全的,因为读写在不同的内核缓冲区
+class BASE_EXPORT FS_Iocp : public IFS_NetModule
 {
 public:
     FS_Iocp();

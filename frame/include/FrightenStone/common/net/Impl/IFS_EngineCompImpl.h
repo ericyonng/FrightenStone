@@ -31,8 +31,6 @@
 FS_NAMESPACE_BEGIN
 inline IFS_EngineComp::IFS_EngineComp(IFS_NetEngine *engine, UInt32 compId)
     :_compId(compId)
-    ,_generatorId(0)
-    ,_consumerId(0)
     ,_engine(engine)
 {
 }
@@ -40,23 +38,6 @@ inline IFS_EngineComp::IFS_EngineComp(IFS_NetEngine *engine, UInt32 compId)
 inline UInt32 IFS_EngineComp::GetCompId() const
 {
     return _compId;
-}
-
-inline UInt32 IFS_EngineComp::GetGeneratorId() const
-{
-    return _generatorId;
-}
-
-inline UInt32 IFS_EngineComp::GetConsumerId() const
-{
-    return _consumerId;
-}
-
-inline void IFS_EngineComp::BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq)
-{
-    _generatorId = generatorId;
-    _consumerId = consumerId;
-    _concurrentMq = concurrentMq;
 }
 
 inline void IFS_EngineComp::BindCompMq(MessageQueueNoThread *compMq)

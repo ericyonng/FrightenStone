@@ -38,6 +38,7 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
+#include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,33 +48,37 @@ class  IFS_BusinessLogic;
 class  ConcurrentMessageQueueNoThread;
 struct DispatcherCfgs;
 
-class BASE_EXPORT IFS_MsgDispatcher
+class BASE_EXPORT IFS_MsgDispatcher : public IFS_EngineComp
 {
 public:
-    IFS_MsgDispatcher();
+    IFS_MsgDispatcher(IFS_NetEngine *engine, UInt32 compId);
     virtual ~IFS_MsgDispatcher();
 
 public:
-    virtual Int32 BeforeStart(const DispatcherCfgs &cfgs) { return StatusDefs::Success; }
-    virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}
-    virtual void Close() = 0;
-    virtual void AfterClose() {}
-
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut() = 0;
 
     // consumerId 网络消息消费者id
     virtual void SendData(UInt64 sessionId, UInt64 consumerId, NetMsg_DataHeader *msg) = 0;
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic) = 0;
-    virtual void AttachRecvMessageQueue(ConcurrentMessageQueueNoThread *messageQueue) = 0;
 
-    virtual Int32 GetId() const = 0;
     virtual void CloseSession(UInt64 sessionId, UInt64 consumerId) = 0;
+
+    // 获取生产者id
+    virtual UInt32 GetGeneratorId() const;
+    // 获取消费者id
+    virtual UInt32 GetConsumerId() const;
+    // 并发消息队列参数绑定
+    virtual void BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq);
+
+protected:
+    UInt32 _generatorId;            // engine中concurrentmq指定的生产者id
+    UInt32 _consumerId;             // 指定的，并发消息队列中对应的消费者id
+    ConcurrentMessageQueueNoThread *_concurrentMq;  // 单向的消息队列,当组件是生产者时只能push不能pop,只能generatiorId
 };
 
 FS_NAMESPACE_END
+
+#include "FrightenStone/common/net/Impl/IFS_MsgDispatcherImpl.h"
 
 #endif

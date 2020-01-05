@@ -44,7 +44,9 @@
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 #include "FrightenStone/common/net/Impl/IFS_NetEngine.h"'
-#include "FrightenStone/common/net/Defs/NetCfgDefs"
+#include "FrightenStone/common/net/Defs/NetCfgDefs.h"
+#include "FrightenStone/common/net/Impl/FS_IocpPoller.h"
+#include "FrightenStone/common/net/Defs/PollerDefs.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
@@ -112,40 +114,54 @@ Int32 FS_IocpMsgTransfer::BeforeStart(const NetEngineTotalCfgs &totalCfgs)
         return StatusDefs::IocpMsgTransfer_CfgError;
     }
 
-    auto updateAlloctorOccupied = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor);
-    _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, updateAlloctorOccupied, &_canCreateNewNodeForAlloctor);
-    _sessionBufferAlloctor->InitMemory();
-    _printAlloctorOccupiedInfo = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_PrintAlloctorOccupiedInfo);
+    _poller = new FS_IocpPoller(this, PollerDefs::MonitorType_Transfer);
+    _poller->AttachMessageQueue(_concurrentMq);
 
-    _threadPool = new FS_ThreadPool(0, 1);
-    _iocp = new FS_Iocp;
-    _ioEvent = new IO_EVENT;
-    _msgsFromDispatcher = new std::list<FS_MessageBlock *>;
-    _recvMsgList = new std::list<FS_MessageBlock *>;
-    const Int32 st = _iocp->Create();
+    Int32 st = _poller->BeforeStart();
     if(st != StatusDefs::Success)
     {
-        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("create iocp fail st[%d]"), st);
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("_poller->BeforeStart fail st[%d]"), st);
         return st;
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// 旧模块
+//     auto updateAlloctorOccupied = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_UpdateCanCreateNewNodeForAlloctor);
+//     _sessionBufferAlloctor = new MemoryAlloctor(FS_BUFF_SIZE_DEF, blockAmount, updateAlloctorOccupied, &_canCreateNewNodeForAlloctor);
+//     _sessionBufferAlloctor->InitMemory();
+//     _printAlloctorOccupiedInfo = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_PrintAlloctorOccupiedInfo);
+// 
+//     _threadPool = new FS_ThreadPool(0, 1);
+//     _iocp = new FS_Iocp;
+//     _ioEvent = new IO_EVENT;
+//     _msgsFromDispatcher = new std::list<FS_MessageBlock *>;
+//     _recvMsgList = new std::list<FS_MessageBlock *>;
+//     const Int32 st = _iocp->Create();
+//     if(st != StatusDefs::Success)
+//     {
+//         g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("create iocp fail st[%d]"), st);
+//         return st;
+//     }
 
     return StatusDefs::Success;
 }
 
 Int32 FS_IocpMsgTransfer::Start()
 {
-    auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgTransfer::_OnMoniterMsg);
-    if(!_threadPool->AddTask(task, true))
+    Int32 st = _poller->Start();
+    if(st != StatusDefs::Success)
     {
-        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("addtask fail"));
-        return StatusDefs::IocpMsgTransfer_StartFailOfMoniterMsgFailure;
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("_poller->Start fail st[%d]"), st);
+        return st;
     }
-
+    
     return StatusDefs::Success;
 }
 
 void FS_IocpMsgTransfer::BeforeClose()
 {
+    _poller->BeforeClose();
+    ////////////////////////////////////////////////////////旧的模块
     // close所有会话，使得投递的消息马上返回
     for(auto &session : _sessions)
     {
@@ -156,6 +172,8 @@ void FS_IocpMsgTransfer::BeforeClose()
 
 void FS_IocpMsgTransfer::Close()
 {
+    _poller->Close();
+    ////////////////////////////////////////////////////////////////////////////旧的模块
     // 等待所有会话被移除
     while(true)
     {
@@ -185,6 +203,8 @@ void FS_IocpMsgTransfer::Close()
 
 void FS_IocpMsgTransfer::AfterClose()
 {
+    _poller->AfterClose();
+    ////////////////////////////////////////////////////////////////////////////旧的模块
     // 内存分配器占用情况打印结束
     g_MemleakMonitor->UnRegisterMemPoolPrintCallback(_transferThreadId);
 
@@ -192,19 +212,19 @@ void FS_IocpMsgTransfer::AfterClose()
         _sessionBufferAlloctor->FinishMemory();
 }
 
-void FS_IocpMsgTransfer::OnConnect(BriefSessionInfo *sessionInfo)
-{
-    _connectorGuard.Lock();
-    _pendingNewSessionInfos.push_back(sessionInfo);
-    _hasNewSessionLinkin = true;
-    ++_sessionCnt;
-    _connectorGuard.Unlock();
-}
+// void FS_IocpMsgTransfer::OnConnect(BriefSessionInfo *sessionInfo)
+// {
+//     _connectorGuard.Lock();
+//     _pendingNewSessionInfos.push_back(sessionInfo);
+//     _hasNewSessionLinkin = true;
+//     ++_sessionCnt;
+//     _connectorGuard.Unlock();
+// }
 
 void FS_IocpMsgTransfer::OnWillConnect(BriefSessionInfo *newSessionInfo)
 {
     // TODO:连接消息消息
-    auto newMessageBlock = MessageBlockUtil::BuildTransferWillConnectMessageBlock(_compId, _generatorId, newSessionInfo);
+    auto newMessageBlock = MessageBlockUtil::BuildTransferWillConnectMessageBlock(_compId, _generatorId, _poller->GetNetModuleObj(), newSessionInfo);
     ++_sessionCnt;
 #ifdef _DEBUG
     if(!_concurrentMq->Push(_generatorId, newMessageBlock))

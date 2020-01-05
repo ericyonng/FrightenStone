@@ -52,7 +52,7 @@ struct ConnectorCfgs;
 class BASE_EXPORT IFS_Connector : public IFS_EngineComp
 {
 public:
-    IFS_Connector();
+    IFS_Connector(IFS_NetEngine *netEngine, UInt32 compId);
     virtual ~IFS_Connector();
 
 public:

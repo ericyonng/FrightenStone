@@ -34,12 +34,4 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_MsgTransfer::IFS_MsgTransfer()
-{
-}
-
-IFS_MsgTransfer::~IFS_MsgTransfer()
-{
-}
-
 FS_NAMESPACE_END

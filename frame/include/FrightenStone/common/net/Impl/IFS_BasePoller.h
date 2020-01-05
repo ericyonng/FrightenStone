@@ -38,6 +38,7 @@ FS_NAMESPACE_BEGIN
 
 class ConcurrentMessageQueueNoThread;
 class IFS_Session;
+class IFS_NetModule;
 
 class BASE_EXPORT IFS_BasePoller
 {
@@ -57,6 +58,9 @@ public:
     virtual void AttachMessageQueue(ConcurrentMessageQueueNoThread *mq) = 0;
 
     virtual void OnAcceptorDisconnected(UInt64 sessionId) = 0;
+
+    // ÍøÂçÄ£ÐÍiocp,epoll
+    virtual IFS_NetModule *GetNetModuleObj() = 0;
 };
 
 FS_NAMESPACE_END

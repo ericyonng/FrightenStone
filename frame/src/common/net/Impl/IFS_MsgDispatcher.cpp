@@ -32,17 +32,9 @@
 
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/IFS_MsgDispatcher.h"
-#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 
 FS_NAMESPACE_BEGIN
 
-IFS_MsgDispatcher::IFS_MsgDispatcher()
-{
-}
 
-IFS_MsgDispatcher::~IFS_MsgDispatcher()
-{
-
-}
 
 FS_NAMESPACE_END

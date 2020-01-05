@@ -60,12 +60,6 @@ public:
 public:
     // 获取组件id
     virtual UInt32 GetCompId() const;
-    // 获取生产者id
-    virtual UInt32 GetGeneratorId() const;
-    // 获取消费者id
-    virtual UInt32 GetConsumerId() const;
-    // 并发消息队列参数绑定
-    virtual void BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq);
     // 绑定消息队列（用于指向性目标只有单一的消息队列），对组件自己本身来说只能pop不能push
     virtual void BindCompMq(MessageQueueNoThread *compMq);
     // 附加所有组件的消息队列
@@ -76,9 +70,6 @@ public:
     
 protected:
     UInt32 _compId;
-    UInt32 _generatorId;            // engine中concurrentmq指定的生产者id
-    UInt32 _consumerId;             // 指定的，并发消息队列中对应的消费者id
-    ConcurrentMessageQueueNoThread *_concurrentMq;  // 单向的消息队列,当组件是生产者时只能push不能pop,只能generatiorId
     IFS_NetEngine *_engine;
     MessageQueueNoThread *_myCompMq;  // 对于组件自己本身来说组件自己是消费者,组件不可进行push操作，只能pop
     std::vector<MessageQueueNoThread *> *_allCompMq;    // 所有组件的单一消息队列,使用组件id进行索引

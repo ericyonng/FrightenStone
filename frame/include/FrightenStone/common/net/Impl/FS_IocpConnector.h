@@ -49,7 +49,9 @@ struct ConnectorCfgs;
 class BASE_EXPORT FS_IocpConnector : public IFS_Connector
 {
 public:
-    FS_IocpConnector(Locker &locker
+    FS_IocpConnector(IFS_NetEngine *netEngine
+                     , UInt32 compId
+                     , Locker &locker
                      , Int32 &curSessionCnt
                      , Int32 &maxSessionQuantityLimit
                      ,UInt64 &curMaxSessionId);

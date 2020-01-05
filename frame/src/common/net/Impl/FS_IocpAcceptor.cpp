@@ -31,7 +31,6 @@
  */
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/FS_IocpAcceptor.h"
-#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 #include "FrightenStone/common/net/Impl/FS_Iocp.h"
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Impl/FS_Addr.h"
@@ -120,7 +119,6 @@ Int32 FS_IocpAcceptor::BeforeStart(const NetEngineTotalCfgs &totalCfgs)
     }
 
     auto netEngine = GetEngine();
-    _poller->AttachMessageQueue(netEngine->_GetConcurrentMQ());
     _poller->AttachAcceptorParam(_sock, _maxSessionQuantityLimit, &_locker, &_curSessionCnt, &_curMaxSessionId);
 
     st = _poller->BeforeStart();

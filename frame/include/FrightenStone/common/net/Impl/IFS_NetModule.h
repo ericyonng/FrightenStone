@@ -21,32 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_NetEngineImpl.h
+ * @file  : IFS_NetModule.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/10
+ * @date  : 2020/01/05
  * @brief :
- * 
- *
- * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_NetEngine_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_NetModule_H__
+#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_NetModule_H__
+
 #pragma once
 
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
+
 FS_NAMESPACE_BEGIN
-inline void FS_NetEngine::_OnSendMsg(IFS_Session *session, Int64 transferBytes)
-{
-    _sendMsgBytesPerSecond += transferBytes;
-}
 
-inline void FS_NetEngine::_OnRecvMsgAmount(NetMsg_DataHeader *msgArrived)
+class BASE_EXPORT IFS_NetModule
 {
-    ++_recvMsgCountPerSecond;
-}
+public:
+    IFS_NetModule();
+    virtual ~IFS_NetModule();
+};
 
-inline std::vector<MessageQueueNoThread *> &FS_NetEngine::_GetSenderMq()
-{
-    return _senderMessageQueue;
-}
 FS_NAMESPACE_END
 
+#include "FrightenStone/common/net/Impl/IFS_NetModuleImpl.h"
 #endif

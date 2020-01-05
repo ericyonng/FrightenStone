@@ -47,14 +47,9 @@
 
 FS_NAMESPACE_BEGIN
 
-class  FS_ThreadPool;
-class  FS_Iocp;
-struct IO_EVENT;
-class  FS_IocpSession;
-struct NetMsg_DataHeader;
-struct FS_MessageBlock;
 struct BriefSessionInfo;
 class IFS_NetEngine;
+class FS_IocpPoller;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
@@ -76,12 +71,12 @@ public:
 public:
     virtual void OnWillConnect(BriefSessionInfo *newSessionInfo);
 
+public:
+    virtual Int32 GetSessionCnt();
 
 // TODO:以下旧接口/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut(IFS_Session *session);
-
-    virtual Int32 GetSessionCnt();
 
 private:
     void _OnMoniterMsg(FS_ThreadPool *pool);
@@ -124,13 +119,14 @@ private:
 private:
      TransferCfgs *_cfgs;
      UInt64 _transferThreadId;
+     std::atomic<Int32> _sessionCnt;             // transfer处理的会话个数
+     FS_IocpPoller *_poller;
 
 //     IMemoryAlloctor *_sessionBufferAlloctor;
 //     std::atomic<size_t> _curAlloctorOccupiedBytes;
 //     std::atomic_bool _canCreateNewNodeForAlloctor;
 //     IDelegate<void> *_printAlloctorOccupiedInfo;
 // 
-     std::atomic<Int32> _sessionCnt;             // transfer处理的会话个数
 //     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
 //     Time _curTime;
 //     std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列

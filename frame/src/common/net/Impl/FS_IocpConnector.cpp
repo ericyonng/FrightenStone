@@ -44,11 +44,13 @@
 #ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
-FS_IocpConnector::FS_IocpConnector(Locker &locker
+FS_IocpConnector::FS_IocpConnector(IFS_NetEngine *netEngine, UInt32 compId
+                                   , Locker &locker
                                    , Int32 &curSessionCnt
                                    , Int32 &maxSessionQuantityLimit
                                    , UInt64 &curMaxSessionId)
-    :_locker(locker)
+    :IFS_Connector(netEngine, compId)
+    ,  _locker(locker)
     ,_curSessionCnt(curSessionCnt)
     ,_maxSessionQuantityLimit(maxSessionQuantityLimit)
     ,_curMaxSessionId(curMaxSessionId)

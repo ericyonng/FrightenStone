@@ -33,10 +33,10 @@
 FS_NAMESPACE_BEGIN
 
 inline FS_IocpPoller::FS_IocpPoller(IFS_EngineComp *engineComp
-                                    , Int32 pollerSubType)
+                                    , Int32 monitorType)
     :_engineComp(engineComp)
     ,_mainType(PollerDefs::MainType_Iocp)
-    ,_monitorType(pollerSubType)
+    ,_monitorType(monitorType)
     ,_acceptorSock(INVALID_SOCKET)
     ,_pool(NULL)
     ,_iocp(NULL)
@@ -73,6 +73,12 @@ inline void FS_IocpPoller::AttachAcceptorParam(SOCKET sock
     _locker = locker;
     _curSessionCnt = curSessionCnt;
     _curMaxSessionId = curMaxSessionId;
+}
+
+// ÍøÂçÄ£ÐÍiocp,epoll
+inline IFS_NetModule *FS_IocpPoller::GetNetModuleObj()
+{
+    return _iocp;
 }
 
 FS_NAMESPACE_END

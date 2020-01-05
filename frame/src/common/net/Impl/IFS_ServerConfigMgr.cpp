@@ -32,7 +32,6 @@
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
 #include "FrightenStone/common/net/Defs/FS_NetDefs.h"
-#include "FrightenStone/common/net/Impl/FS_NetEngine.h"
 
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_CpuInfo.h"
