@@ -55,6 +55,7 @@ class ConcurrentMessageQueueNoThread;
 struct FS_MessageBlock;
 class IUser;
 class IFS_NetEngine;
+class FS_IocpSession;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
@@ -71,6 +72,18 @@ public:
     virtual void Close();
     virtual void AfterClose() {}
 
+
+private:
+    void _OnBusinessProcessThread(FS_ThreadPool *pool);
+
+    void _CheckHeartbeat();
+    void _OnBusinessProcessing();
+    void _PostEvents();
+    void _DelayRemoveSessions();
+
+    bool _DoPostRecv(FS_IocpSession *session);
+    bool _DoPostSend(FS_IocpSession *session);
+
     /////////////////////////////////////////////////////////////////////////旧的接口
     virtual void OnDestroy();
     virtual void OnHeartBeatTimeOut();
@@ -82,9 +95,6 @@ public:
 
 private:
     // msgData会拷贝到内存池创建的缓冲区中 线程不安全，外部需要加锁
-    void _OnBusinessProcessThread(FS_ThreadPool *pool);
-    void _OnBusinessProcessing(bool hasMsg);
-
     void _DoBusinessProcess(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData);
     void _OnDelaySessionDisconnect(UInt64 sessionId);
 
@@ -112,6 +122,9 @@ private:
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;
     std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列
+    std::set<FS_IocpSession *> _toPostRecv;
+    std::set<FS_IocpSession *> _toPostSend;
+    std::set<FS_IocpSession *> _toRemove;
 
     // TODO:订阅网络协议的facade开发，使用委托方式，各个系统关注各自的协议，注册到本系统
 

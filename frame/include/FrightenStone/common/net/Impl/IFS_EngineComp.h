@@ -53,8 +53,8 @@ public:
     virtual Int32 Start();
     virtual void AfterStart() = 0;
     virtual void WillClose() = 0;         // 断开与模块之间的依赖
-    virtual void BeforeClose() = 0;       // 处理未决数据，初步的清理
-    virtual void Close() = 0;
+    virtual void BeforeClose();
+    virtual void Close();
     virtual void AfterClose() = 0;
 
 public:

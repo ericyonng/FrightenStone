@@ -341,7 +341,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
 
-             session->ResetPostRecvMask();
+             session->_ResetPostRecvMask();
              _OnDelayDisconnected(session);
              _toRemove.insert(session);
             return StatusDefs::Success;
@@ -368,7 +368,7 @@ Int32 FS_IocpMsgTransfer::_HandleNetEvent()
                                            , session->GetSessionId()
                                            , session->GetSocket(),
                                            _ioEvent->_bytesTrans);
-             session->ResetPostSendMask();
+             session->_ResetPostSendMask();
              _OnDelayDisconnected(session);
              _toRemove.insert(session);
             return StatusDefs::Success;
@@ -532,7 +532,7 @@ bool FS_IocpMsgTransfer::_DoPostSend(FS_IocpSession *session)
         Int32 st = _iocp->PostSend(session->GetSocket(), ioData);
         if(st != StatusDefs::Success)
         {
-            session->ResetPostSendMask();
+            session->_ResetPostSendMask();
             _OnDelayDisconnected(session);
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
@@ -556,7 +556,7 @@ bool FS_IocpMsgTransfer::_DoPostRecv(FS_IocpSession *session)
         Int32 st = _iocp->PostRecv(session->GetSocket(), ioData);
         if(st != StatusDefs::Success)
         {
-            session->ResetPostRecvMask();
+            session->_ResetPostRecvMask();
             _OnDelayDisconnected(session);
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {

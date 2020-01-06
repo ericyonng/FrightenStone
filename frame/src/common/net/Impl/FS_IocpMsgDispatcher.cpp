@@ -38,6 +38,7 @@
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 #include "FrightenStone/common/net/Defs/NetCfgDefs.h"
 #include "FrightenStone/common/net/Defs/FS_NetMessageBlock.h"
+#include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
 
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/status/status.h"
@@ -77,6 +78,13 @@ FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
 
 Int32 FS_IocpMsgDispatcher::BeforeStart(const NetEngineTotalCfgs &cfgs)
 {
+    Int32 st = IFS_EngineComp::BeforeStart(cfgs);
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("IFS_EngineComp::BeforeStart fail st[%d]"), st);
+        return st;
+    }
+
     _cfgs = new DispatcherCfgs;
     *_cfgs = cfgs._dispatcherCfgs;
     _timeWheel = new TimeWheel(_cfgs->_dispatcherResolutionInterval);
@@ -106,6 +114,13 @@ Int32 FS_IocpMsgDispatcher::BeforeStart(const NetEngineTotalCfgs &cfgs)
 
 Int32 FS_IocpMsgDispatcher::Start()
 {
+    Int32 st = IFS_EngineComp::Start();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("IFS_EngineComp::Start fail st[%d]"), st);
+        return st;
+    }
+
     if(_logic)
     {
         auto st = _logic->Start();
@@ -135,6 +150,8 @@ void FS_IocpMsgDispatcher::BeforeClose()
 
     if(_logic)
         _logic->BeforeClose();
+
+    IFS_EngineComp::BeforeClose();
 }
 
 void FS_IocpMsgDispatcher::Close()
@@ -181,7 +198,176 @@ void FS_IocpMsgDispatcher::Close()
     for(auto &iterDelegateInfo : _sessionIdRefUserDisconnected)
         STLUtil::DelListContainer(iterDelegateInfo.second);
     _sessionIdRefUserDisconnected.clear();
+
+    IFS_EngineComp::Close();
 }
+
+
+void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
+{// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
+
+    // _timeWheel->GetModifiedResolution(_resolutionInterval);
+    const auto &resolutionIntervalSlice = _cfgs->_dispatcherResolutionInterval;
+    bool hasMsg = false;
+    while(pool->IsPoolWorking())
+    {
+        // 1.等待消息队列
+        _concurrentMq->WaitForPoping(_consumerId, _recvMsgBlocks, hasMsg, static_cast<ULong>(resolutionIntervalSlice.GetTotalMilliSeconds()));
+
+        // 2.先执行定时器事件
+        _timeWheel->RotateWheel();
+
+        // 3.检查心跳
+        _CheckHeartbeat();
+
+        // 从异步消息队列取得异步处理完成返回事件 TODO: 需要有异步处理队列，其他线程塞入
+        // 清理完成的异步事件 TODO:
+
+        // 4.再执行业务事件
+        if(hasMsg)
+            _OnBusinessProcessing();
+
+        // 5. 投递消息
+        _PostEvents();
+
+        // 6.移除sessions
+        _DelayRemoveSessions();
+
+        // 投递业务产生的异步处理事件 TODO: 不合适修正，因为可能会错过跨天等重要节点
+        // _timeWheel->GetModifiedResolution(_resolutionInterval);
+    }
+
+    g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end"));
+}
+
+void FS_IocpMsgDispatcher::_CheckHeartbeat()
+{
+    _curTime.FlushTime();
+    for(auto iterSession = _sessionHeartbeatQueue.begin(); iterSession != _sessionHeartbeatQueue.end();)
+    {
+        auto session = *iterSession;
+        if(session->GetHeartBeatExpiredTime() > _curTime)
+            break;
+
+        _engine->_HandleCompEv_HeartBeatTimeOut();
+        iterSession = _sessionHeartbeatQueue.erase(iterSession);
+        session->MaskClose();
+        _toRemove.insert(session);
+    }
+}
+
+
+void FS_IocpMsgDispatcher::_OnBusinessProcessing()
+{
+    // 将网络数据转移到缓冲区
+    FS_NetMsgBufferBlock *netMsgBlock = NULL;
+    UInt64 sessionId = 0;
+    for(auto iterGeneratorQueue = _recvMsgBlocks->begin(); iterGeneratorQueue != _recvMsgBlocks->end(); ++iterGeneratorQueue)
+    {
+        auto *blockQueue = *iterGeneratorQueue;
+        if(blockQueue->empty())
+            continue;
+
+        for(auto iterBlock = blockQueue->begin(); iterBlock != blockQueue->end();)
+        {
+            netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
+            sessionId = netMsgBlock->_sessionId;
+            if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetSessionDisconnect)
+            {// 会话断开
+                _delayDisconnectedSessions.insert(sessionId);
+            }
+            else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetMsgArrived)
+            {// 收到网络包
+                auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
+                _DoBusinessProcess(sessionId, netMsgBlock->_generatorId, netMsg);
+            }
+            else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Met_NetSessionConnected)
+            {// 会话连入
+                auto newUser = _logic->OnSessionConnected(sessionId, netMsgBlock->_generatorId);
+                auto newUserRes = netMsgBlock->_newUserRes;
+                if(newUserRes)
+                    newUserRes->Invoke(newUser);
+
+                auto userDisconnectedDelegates = netMsgBlock->_userDisconnected;
+                if(userDisconnectedDelegates)
+                {
+                    auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
+                    if(iterDisconnected == _sessionIdRefUserDisconnected.end())
+                        iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
+                    iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
+                    netMsgBlock->_userDisconnected = NULL;
+                }
+            }
+
+            Fs_SafeFree(netMsgBlock);
+            iterBlock = blockQueue->erase(iterBlock);
+        }
+    }
+
+    // 延迟断开连接
+    for(auto iterSession = _delayDisconnectedSessions.begin();
+        iterSession != _delayDisconnectedSessions.end();)
+    {
+        _OnDelaySessionDisconnect(*iterSession);
+        iterSession = _delayDisconnectedSessions.erase(iterSession);
+    }
+}
+
+void FS_IocpMsgDispatcher::_PostEvents()
+{
+    // post recv
+    for(auto iterRecv = _toPostRecv.begin(); iterRecv != _toPostRecv.end();)
+    {
+        _DoPostRecv( *iterRecv);
+        iterRecv = _toPostRecv.erase(iterRecv);
+    }
+
+    // post send
+    for(auto iterSend = _toPostSend.begin(); iterSend != _toPostSend.end();)
+    {
+        _DoPostSend(*iterSend);
+        iterSend = _toPostSend.erase(iterSend);
+    }
+}
+
+void FS_IocpMsgDispatcher::_DelayRemoveSessions()
+{
+}
+
+bool FS_IocpMsgDispatcher::_DoPostRecv(FS_IocpSession *session)
+{
+    // session不可post或者已经post完成不可重复post
+    if(!session->CanPost() || session->IsPostRecv())
+        return true;
+
+    Int32 st = session->PostRecv();
+    if(st != StatusDefs::Success)
+    {
+        _toRemove.insert(session);
+        return false;
+    }
+
+    return true;
+}
+
+bool FS_IocpMsgDispatcher::_DoPostSend(FS_IocpSession *session)
+{
+    // 判断是否可以post,是否已经postsend,是否有消息发送
+    if(!session->CanPost()
+       || session->IsPostSend()
+       || !session->HasMsgToSend())
+        return true;
+
+    Int32 st = session->PostSend();
+    if(st != StatusDefs::Success)
+    {
+        _toRemove.insert(session);
+        return false;
+    }
+
+    return true;
+}
+
 // 
 // void FS_IocpMsgDispatcher::OnRecv(std::list<IFS_Session *> &sessions, Int64 &incPacketsCnt)
 // {
@@ -270,90 +456,7 @@ void FS_IocpMsgDispatcher::CloseSession(UInt64 sessionId, UInt64 consumerId)
         Fs_SafeFree(newMsgBlock);
 }
 
-void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
-{// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
 
-    // _timeWheel->GetModifiedResolution(_resolutionInterval);
-    const auto &resolutionIntervalSlice = _cfgs->_dispatcherResolutionInterval;
-    bool hasMsg = false;
-    while(pool->IsPoolWorking())
-    {
-        _concurrentMq->WaitForPoping(_consumerId, _recvMsgBlocks, hasMsg, static_cast<ULong>(resolutionIntervalSlice.GetTotalMilliSeconds()));
-
-        // 先执行定时器事件
-        _timeWheel->RotateWheel();
-
-        // 从异步消息队列取得异步处理完成返回事件 TODO: 需要有异步处理队列，其他线程塞入
-        // 清理完成的异步事件 TODO:
-
-        // 再执行业务事件
-        _OnBusinessProcessing(hasMsg);
-
-        // 投递业务产生的异步处理事件 TODO: 不合适修正，因为可能会错过跨天等重要节点
-        // _timeWheel->GetModifiedResolution(_resolutionInterval);
-    }
-
-    g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end"));
-}
-
-void FS_IocpMsgDispatcher::_OnBusinessProcessing(bool hasMsg)
-{
-    // 将网络数据转移到缓冲区
-    if(hasMsg)
-    {
-        FS_NetMsgBufferBlock *netMsgBlock = NULL;
-        UInt64 sessionId = 0;
-        for(auto iterGeneratorQueue = _recvMsgBlocks->begin(); iterGeneratorQueue != _recvMsgBlocks->end();++iterGeneratorQueue)
-        {
-            auto *blockQueue = *iterGeneratorQueue;
-            if(blockQueue->empty())
-                continue;
-
-            for(auto iterBlock = blockQueue->begin(); iterBlock != blockQueue->end();)
-            {
-                netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
-                sessionId = netMsgBlock->_sessionId;
-                if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetSessionDisconnect)
-                {// 会话断开
-                    _delayDisconnectedSessions.insert(sessionId);
-                }
-                else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetMsgArrived)
-                {// 收到网络包
-                    auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
-                    _DoBusinessProcess(sessionId, netMsgBlock->_generatorId, netMsg);
-                }
-                else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Met_NetSessionConnected)
-                {// 会话连入
-                    auto newUser = _logic->OnSessionConnected(sessionId, netMsgBlock->_generatorId);
-                    auto newUserRes = netMsgBlock->_newUserRes;
-                    if(newUserRes)
-                        newUserRes->Invoke(newUser);
-
-                    auto userDisconnectedDelegates = netMsgBlock->_userDisconnected;
-                    if(userDisconnectedDelegates)
-                    {
-                        auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
-                        if(iterDisconnected == _sessionIdRefUserDisconnected.end())
-                            iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
-                        iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
-                        netMsgBlock->_userDisconnected = NULL;
-                    }
-                }
-
-                Fs_SafeFree(netMsgBlock);
-                iterBlock = blockQueue->erase(iterBlock);
-            }
-        }
-    }
-
-    // 延迟断开连接
-    for(auto iterSession = _delayDisconnectedSessions.begin(); 
-        iterSession != _delayDisconnectedSessions.end();)
-    {
-        _OnDelaySessionDisconnect(*iterSession);
-        iterSession = _delayDisconnectedSessions.erase(iterSession);
-    }
-}
 
 void FS_IocpMsgDispatcher::_DoBusinessProcess(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
 {

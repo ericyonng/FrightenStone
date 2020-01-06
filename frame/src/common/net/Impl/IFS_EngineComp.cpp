@@ -55,4 +55,14 @@ Int32 IFS_EngineComp::Start()
     return StatusDefs::Success;
 }
 
+void IFS_EngineComp::BeforeClose()
+{
+    _myCompMq->BeforeClose();
+}
+
+void IFS_EngineComp::Close()
+{
+    _myCompMq->Close();
+}
+
 FS_NAMESPACE_END

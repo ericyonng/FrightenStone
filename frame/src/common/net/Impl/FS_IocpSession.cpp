@@ -32,6 +32,8 @@
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/FS_IocpBuffer.h"
+#include "FrightenStone/common/net/Impl/FS_Iocp.h"
+#include "FrightenStone/common/log/Log.h"
 
 #ifdef _WIN32
 
@@ -56,18 +58,6 @@ void FS_IocpSession::PopFrontRecvMsg()
         _recvBuffer->PopFront(FrontRecvMsg()->_packetLength);
 }
 
-IoDataBase *FS_IocpSession::MakeRecvIoData()
-{
-    if(!CanPost())
-        return NULL;
-
-    if(_isPostRecv)
-        return NULL;
-
-    _isPostRecv = true;
-    return _recvBuffer->CastToBuffer<FS_IocpBuffer>()->MakeRecvIoData();
-}
-
 IoDataBase *FS_IocpSession::MakeSendIoData()
 {
     if(!CanPost())
@@ -89,6 +79,68 @@ IoDataBase *FS_IocpSession::MakeSendIoData()
     node->_isPost = true;
     node->_iterNode = _toSend.begin();
     return ioData;
+}
+
+Int32 FS_IocpSession::PostRecv()
+{
+    _isPostRecv = true;
+    auto ioData = _recvBuffer->CastToBuffer<FS_IocpBuffer>()->MakeRecvIoData();
+    if(ioData)
+    {
+        Int32 st = _iocp->PostRecv(_sock, ioData);
+        if(st != StatusDefs::Success)
+        {
+            _ResetPostRecvMask();
+            if(st != StatusDefs::IOCP_ClientForciblyClosed)
+            {
+                g_Log->e<FS_IocpSession>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
+                                             , _sessionId, _sock, st);
+            }
+
+            // 这个时候也有可能post刚好完成，所以不宜用closesocket，而是cacelio，使得已完成的不会被取消，且到此session即将关闭
+            MaskClose();
+            CancelIoEx(HANDLE(_sock), NULL);
+            return st;
+        }
+    }
+
+    return StatusDefs::Success;
+}
+
+Int32 FS_IocpSession::PostSend()
+{
+    _isPostSend = true;
+    auto buffer = _toSend.front()->CastToBuffer<FS_IocpBuffer>();
+    auto ioData = buffer->MakeSendIoData();
+    if(!ioData)
+    {
+        _ResetPostSendMask();
+        return StatusDefs::Success;
+    }
+
+    if(!ioData->_node)
+        ioData->_node = new BufferQueueNode;
+
+    auto node = ioData->_node;
+    node->_isPost = true;
+    node->_iterNode = _toSend.begin();
+    Int32 st = _iocp->PostSend(_sock, ioData);
+    if(st != StatusDefs::Success)
+    {
+        _ResetPostSendMask();
+        if(st != StatusDefs::IOCP_ClientForciblyClosed)
+        {
+            g_Log->e<FS_IocpSession>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
+                                         , _sessionId, _sock, st);
+        }
+
+        // 这个时候也有可能post刚好完成，所以不宜用closesocket，而是cacelio，使得已完成的不会被取消，且到此session即将关闭
+        MaskClose();
+        CancelIoEx(HANDLE(_sock), NULL);
+        return st;
+    }
+    
+    return StatusDefs::Success;
 }
 
 FS_NAMESPACE_END

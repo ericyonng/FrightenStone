@@ -47,11 +47,16 @@
 FS_NAMESPACE_BEGIN
 
 class FS_IocpBuffer;
+class FS_Iocp;
 
 class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
 public:
-    FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds);
+    FS_IocpSession(UInt64 sessionId
+                   , SOCKET sock
+                   , const sockaddr_in *addrInfo
+                   , IMemoryAlloctor *memAlloctor
+                   , Int64 heartbeatIntervalMicroSeconds);
     virtual ~FS_IocpSession();
 
     // 操作
@@ -59,14 +64,16 @@ public:
     NetMsg_DataHeader *FrontRecvMsg();
     void PopFrontRecvMsg();
 
-    IoDataBase *MakeRecvIoData();
     IoDataBase *MakeSendIoData();
-    void ResetPostRecvMask();
-    void ResetPostSendMask();
-    void ResetAllIoMask();
+
     void EnableDisconnect();
+    void Bind(FS_Iocp *iocp);
 
     FS_IocpBuffer *CastToRecvBuffer();
+
+    // post
+    Int32 PostRecv();   // 需要判断canpost,以及ispostrecv
+    Int32 PostSend();
 
     // 状态
 public:
@@ -84,8 +91,13 @@ public:
     void OnRecvSuc(size_t transferBytes, IoDataBase *ioData);
 
 private:
+    void _ResetPostRecvMask();
+    void _ResetPostSendMask();
+
+private:
     bool _isPostRecv;
     bool _isPostSend;
+    FS_Iocp *_iocp;
 };
 
 FS_NAMESPACE_END

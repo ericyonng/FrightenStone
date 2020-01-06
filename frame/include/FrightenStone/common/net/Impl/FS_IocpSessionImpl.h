@@ -41,28 +41,20 @@ inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const socka
     :IFS_Session(sessionId, sock, addrInfo, memAlloctor, heartbeatIntervalMicroSeconds)
     ,_isPostRecv(false)
     ,_isPostSend(false)
+    ,_iocp(NULL)
 {
 }
 
-inline void FS_IocpSession::ResetPostRecvMask()
-{
-    _isPostRecv = false;
-}
-
-inline void FS_IocpSession::ResetPostSendMask()
-{
-    _isPostSend = false;
-}
-
-inline void FS_IocpSession::ResetAllIoMask()
-{
-    _isPostSend = false;
-    _isPostRecv = false;
-}
 
 inline void FS_IocpSession::EnableDisconnect()
 {
-    ResetAllIoMask();
+    _isPostSend = false;
+    _isPostRecv = false;
+}
+
+inline void FS_IocpSession::Bind(FS_Iocp *iocp)
+{
+    _iocp = iocp;
 }
 
 inline FS_IocpBuffer *FS_IocpSession::CastToRecvBuffer()
@@ -117,6 +109,16 @@ inline void FS_IocpSession::OnRecvSuc(size_t transferBytes, IoDataBase *ioData)
 {
     _isPostRecv = false;
     ioData->_callback->Invoke(transferBytes);
+}
+
+inline void FS_IocpSession::_ResetPostRecvMask()
+{
+    _isPostRecv = false;
+}
+
+inline void FS_IocpSession::_ResetPostSendMask()
+{
+    _isPostSend = false;
 }
 FS_NAMESPACE_END
 

@@ -120,6 +120,7 @@ protected:
     friend class FS_IocpPoller;
     friend class FS_IocpConnector;
     friend class FS_IocpAcceptor;
+    friend class FS_IocpMsgDispatcher;
     
     NetEngineTotalCfgs *_totalCfgs;
     FS_CpuInfo *_cpuInfo;
