@@ -49,8 +49,8 @@ public:
     virtual ~IFS_EngineComp() {}
 
 public:
-    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs) = 0;
-    virtual Int32 Start() = 0;
+    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs);
+    virtual Int32 Start();
     virtual void AfterStart() = 0;
     virtual void WillClose() = 0;         // 断开与模块之间的依赖
     virtual void BeforeClose() = 0;       // 处理未决数据，初步的清理
