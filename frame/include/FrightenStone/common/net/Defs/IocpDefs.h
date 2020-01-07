@@ -86,7 +86,7 @@ public:
     {
         BufferQueueNode *_node;         // packet所在的队列节点
     };
-    IDelegate<void, size_t> *_callback = NULL; // 完成时的回调
+    IDelegate<void, Int64> *_callback = NULL; // 完成时的回调
 
     // 没必要每个客户端指定一个缓冲，太大了，
     // 因为iocp取数据 时候数据是从队列中先进先出的方式被拷贝出来，

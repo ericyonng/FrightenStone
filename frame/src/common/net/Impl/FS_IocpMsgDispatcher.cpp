@@ -39,6 +39,8 @@
 #include "FrightenStone/common/net/Defs/NetCfgDefs.h"
 #include "FrightenStone/common/net/Defs/FS_NetMessageBlock.h"
 #include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
+#include "FrightenStone/common/net/Impl/FS_Addr.h"
+#include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/status/status.h"
@@ -252,7 +254,7 @@ void FS_IocpMsgDispatcher::_CheckHeartbeat()
         _engine->_HandleCompEv_HeartBeatTimeOut();
         iterSession = _sessionHeartbeatQueue.erase(iterSession);
         session->MaskClose();
-        _toRemove.insert(session);
+        _toRemove.insert(session->CastTo<FS_IocpSession>());
     }
 }
 
@@ -278,25 +280,13 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
             }
             else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetMsgArrived)
             {// 收到网络包
-                auto netMsg = netMsgBlock->CastBufferTo<NetMsg_DataHeader>();
+                auto arrivedMsg = netMsgBlock->CastTo<FS_NetArrivedMsg>();
                 _DoBusinessProcess(sessionId, netMsgBlock->_generatorId, netMsg);
             }
             else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Met_NetSessionConnected)
             {// 会话连入
-                auto newUser = _logic->OnSessionConnected(sessionId, netMsgBlock->_generatorId);
-                auto newUserRes = netMsgBlock->_newUserRes;
-                if(newUserRes)
-                    newUserRes->Invoke(newUser);
-
-                auto userDisconnectedDelegates = netMsgBlock->_userDisconnected;
-                if(userDisconnectedDelegates)
-                {
-                    auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
-                    if(iterDisconnected == _sessionIdRefUserDisconnected.end())
-                        iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
-                    iterDisconnected->second.push_back(netMsgBlock->_userDisconnected);
-                    netMsgBlock->_userDisconnected = NULL;
-                }
+                auto connectedMsgBlock = netMsgBlock->CastTo<FS_NetSessionWillConnectMsg>();
+                _OnSessionConnected(connectedMsgBlock);
             }
 
             Fs_SafeFree(netMsgBlock);
@@ -332,6 +322,17 @@ void FS_IocpMsgDispatcher::_PostEvents()
 
 void FS_IocpMsgDispatcher::_DelayRemoveSessions()
 {
+    FS_IocpSession *session = NULL;
+    for(auto iterSession = _toRemove.begin(); iterSession!=_toRemove.end();)
+    {
+        session = *iterSession;
+        _RemoveFromPostRecvQueue(session);
+        _RemoveFromPostSendQueue(session);
+
+        // 准备移除,等待transfer返回正式移除session
+        _PrepareRemoveSession(session);
+        iterSession = _toRemove.erase(iterSession);
+    }
 }
 
 bool FS_IocpMsgDispatcher::_DoPostRecv(FS_IocpSession *session)
@@ -366,6 +367,176 @@ bool FS_IocpMsgDispatcher::_DoPostSend(FS_IocpSession *session)
     }
 
     return true;
+}
+
+void FS_IocpMsgDispatcher::_PrepareRemoveSession(FS_IocpSession *session)
+{// 仅仅close掉socket，并等待transfer返回,ondisconnected才是真正的断开
+    const auto sessionId = session->GetSessionId();
+    g_Log->net<FS_IocpMsgDispatcher>("sessionId[%llu] sock[%llu] disconnected address<%s> prepare remove"
+                                     , sessionId
+                                     , session->GetSocket(), session->GetAddr()->ToString().c_str());
+
+    session->MaskClose();
+    if(!session->CanDisconnect())
+    {// 还有post event还没返回不可立即关闭应该先cancel,保证已经完成的io事件正常返回
+        session->CancelPostedEventsAndMaskClose();
+    }
+    else
+    {
+        // close会把在缓冲完全清除,若有post还未返回则会出现丢数据情况
+        session->Close();
+    }
+}
+
+void FS_IocpMsgDispatcher::_OnSessionDisconnected(FS_IocpSession *session)
+{
+    // 从session返回正式移除session
+    const auto sessionId = session->GetSessionId();
+    g_Log->net<FS_IocpMsgDispatcher>("sessionId[%llu] sock[%llu] disconnected address<%s>"
+                                   , sessionId
+                                   , session->GetSocket(), session->GetAddr()->ToString().c_str());
+
+    _sessionHeartbeatQueue.erase(session);
+    _engine->_HandleCompEv_Disconnected(sessionId);
+    _sessions.erase(sessionId);
+    _toPostRecv.erase(session);
+    _toPostSend.erase(session);
+
+    session->Close();
+    session->OnDisconnect();
+    session->OnDestroy();
+    Fs_SafeFree(session);
+}
+
+void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *connectedMsg)
+{
+    const UInt64 sessionId = connectedMsg->_sessionId;
+
+    // 创建session对象并初始化
+    auto newSession = FS_SessionFactory::Create(sessionId, connectedMsg->_sock, &connectedMsg->_addrInfo, _sessionBufferAlloctor, _cfgs->_heartbeatDeadTimeMsInterval * Time::_microSecondPerMilliSecond)->CastTo<FS_IocpSession>();
+    _sessions.insert(std::make_pair(sessionId, newSession));
+    newSession->Bind(reinterpret_cast<FS_Iocp *>(connectedMsg->_netModule));
+    newSession->OnConnect();
+    auto addr = newSession->GetAddr();
+    g_Log->net<FS_IocpMsgDispatcher>("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
+                                   , sessionId
+                                   , newSession->GetSocket()
+                                   , addr->GetAddr().c_str()
+                                   , addr->GetPort());
+
+    auto newUser = _logic->OnSessionConnected(sessionId, connectedMsg->_generatorId);
+    auto newUserRes = connectedMsg->_onNewUserRes;
+    if(newUserRes)
+        newUserRes->Invoke(newUser);
+
+    auto userDisconnectedDelegates = connectedMsg->_onUserDisconnectedRes;
+    if(userDisconnectedDelegates)
+    {
+        auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
+        if(iterDisconnected == _sessionIdRefUserDisconnected.end())
+            iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
+        iterDisconnected->second.push_back(userDisconnectedDelegates);
+        connectedMsg->_onUserDisconnectedRes = NULL;
+    }
+
+    // post recv 刷新心跳时间
+    if(_DoPostRecv(newSession))
+        newSession->UpdateHeartBeatExpiredTime();
+}
+
+void FS_IocpMsgDispatcher::_OnMsgArrived(FS_NetArrivedMsg *arrivedMsg)
+{
+    IoEvent *ioEv = arrivedMsg->_ioEv;
+    IoDataBase *ioData = reinterpret_cast<IoDataBase *>(ioEv->_ioData);
+    Int32 errorCode = arrivedMsg->_errorCode;
+    const Int64 transferBytes = ioEv->_bytesTrans;
+    if(errorCode != StatusDefs::Success)
+    {
+        g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("arrived msg errorCode[%d]"), errorCode);
+        return;
+    }
+
+    if(ioData->_sessionId == static_cast<UInt64>(IocpDefs::IO_QUIT))
+    {// transfer程序退出
+        return;
+    }
+
+    const UInt64 sessionId = ioEv->_sessionId;
+    auto session = _GetSession(sessionId);
+    if(!session)
+    {// 数据丢失,最大可能是已经断开链接了！！！！
+//         g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] is removed before.\n stack trace back:\n%s"
+//                                      , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+        return;
+    }
+
+
+    // 2.处理接收与发送
+    if(IocpDefs::IO_RECV == ioData->_ioType)
+    {
+        if(transferBytes <= 0)
+        {// 客户端断开处理
+            g_Log->net<FS_IocpMsgDispatcher>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%llu] will disconnect"
+                                             , session->GetSessionId()
+                                             , session->GetSocket(),
+                                             transferBytes);
+
+            session->ResetPostRecvMask();
+            session->CancelPostedEventsAndMaskClose();
+
+            _toRemove.insert(session);
+            return;
+        }
+
+        session->OnRecvSuc(transferBytes, ioData);
+
+        // 消息接收回调
+        _engine->_HandleCompEv_RecvMsg(transferBytes);
+        // _OnMsgArrived(session);
+
+        _msgArriviedSessions.push_back(session);
+        _UpdateSessionHeartbeat(session);
+
+        // 重新接收数据
+        if(session->CanPost())
+            _toPostRecv.insert(session);
+    }
+    else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
+    {
+        if(_ioEvent->_bytesTrans <= 0)
+        {// 客户端断开处理
+            g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::IO_SEND bytesTrans[%lu] disconnected"
+                                           , session->GetSessionId()
+                                           , session->GetSocket(),
+                                           _ioEvent->_bytesTrans);
+            session->ResetPostSendMask();
+            session->CancelPostedEventsAndMaskClose();
+            _OnDelayDisconnected(session);
+            _toRemove.insert(session);
+            return StatusDefs::Success;
+        }
+
+        session->OnSendSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
+
+        // 消息发送回调
+        _netEngine->_OnSendMsg(session, _ioEvent->_bytesTrans);
+
+        // TODO:有被疯狂发包的风险，解决方案：心跳包协议+频繁发包计数+发包成功时更新时间戳
+        _UpdateSessionHeartbeat(session);
+
+        // 重新投递接收
+        if(session->CanPost() &&
+           !session->IsPostSend() &&
+           session->HasMsgToSend())
+            _toPostSend.insert(session);
+    }
+    else
+    {
+        session->EnableDisconnect();
+        session->Close();
+        _toRemove.insert(session);
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
+    }
 }
 
 // 

@@ -40,7 +40,7 @@ struct BASE_EXPORT IoEvent
     IoEvent();
     UInt64 _sessionId;       // 会话id
     void *_ioData;          // 网络数据信息由dispatcher进行解析 iocp 是IoDataBase
-    UInt64 _bytesTrans;     // 传输的字节数
+    Int64 _bytesTrans;     // 传输的字节数
 };
 
 FS_NAMESPACE_END

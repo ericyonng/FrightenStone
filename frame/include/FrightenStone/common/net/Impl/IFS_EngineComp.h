@@ -58,6 +58,10 @@ public:
     virtual void AfterClose() = 0;
 
 public:
+    // 类型转换
+    template<typename CompType>
+    CompType *CastTo();
+
     // 获取组件id
     virtual UInt32 GetCompId() const;
     // 绑定消息队列（用于指向性目标只有单一的消息队列），对组件自己本身来说只能pop不能push

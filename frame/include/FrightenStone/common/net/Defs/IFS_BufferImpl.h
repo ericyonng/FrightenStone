@@ -136,17 +136,17 @@ inline bool IFS_Buffer::IsFull() const
     return _bufferSize == _curPos;
 }
 
-inline size_t IFS_Buffer::GetLength() const
+inline Int64 IFS_Buffer::GetLength() const
 {
     return _curPos;
 }
 
-inline size_t IFS_Buffer::GetTotalSize() const
+inline Int64 IFS_Buffer::GetTotalSize() const
 {
     return _bufferSize;
 }
 
-inline size_t IFS_Buffer::GetRest() const
+inline Int64 IFS_Buffer::GetRest() const
 {
     return _bufferSize - _curPos;
 }
@@ -185,7 +185,7 @@ inline const ObjType *IFS_Buffer::CastToBuffer() const
     return static_cast<ObjType *>(this);
 }
 
-inline size_t &IFS_Buffer::_GetCurPos()
+inline Int64 &IFS_Buffer::_GetCurPos()
 {
     return _curPos;
 }

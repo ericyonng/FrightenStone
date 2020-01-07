@@ -56,6 +56,8 @@ struct FS_MessageBlock;
 class IUser;
 class IFS_NetEngine;
 class FS_IocpSession;
+struct FS_NetSessionWillConnectMsg;
+struct FS_NetArrivedMsg;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
@@ -72,7 +74,6 @@ public:
     virtual void Close();
     virtual void AfterClose() {}
 
-
 private:
     void _OnBusinessProcessThread(FS_ThreadPool *pool);
 
@@ -83,6 +84,17 @@ private:
 
     bool _DoPostRecv(FS_IocpSession *session);
     bool _DoPostSend(FS_IocpSession *session);
+    void _PrepareRemoveSession(FS_IocpSession *session);
+    void _RemoveFromPostRecvQueue(FS_IocpSession *session);
+    void _RemoveFromPostSendQueue(FS_IocpSession *session);
+
+    FS_IocpSession *_GetSession(UInt64 sessionId);
+    
+    /* 网络事件 */
+private:
+    void _OnSessionDisconnected(FS_IocpSession *session);
+    void _OnSessionConnected(FS_NetSessionWillConnectMsg *connectedMsg);
+    void _OnMsgArrived(FS_NetArrivedMsg *arrivedMsg);
 
     /////////////////////////////////////////////////////////////////////////旧的接口
     virtual void OnDestroy();
@@ -99,12 +111,12 @@ private:
     void _OnDelaySessionDisconnect(UInt64 sessionId);
 
 private:
-    DispatcherCfgs * _cfgs;
+    DispatcherCfgs *_cfgs;
     std::atomic<bool> _isClose;
     FS_ThreadPool *_pool;
 
     // 数据在线程结束时清理
-    std::set<UInt64> _delayDisconnectedSessions;
+    // std::set<UInt64> _delayDisconnectedSessions;
 
     // 业务层资源
     TimeWheel *_timeWheel;

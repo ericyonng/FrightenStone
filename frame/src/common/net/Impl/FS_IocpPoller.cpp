@@ -36,6 +36,7 @@
 #include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
 #include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
+#include "FrightenStone/common/net/Impl/IFS_MsgTransfer.h"
 
 #include <FrightenStone/common/component/Impl/FS_ThreadPool.h>
 #include "FrightenStone/common/log/Log.h"
@@ -119,7 +120,7 @@ void FS_IocpPoller::OnAcceptorDisconnected(UInt64 sessionId)
 void FS_IocpPoller::_TransferMonitor(FS_ThreadPool *pool)
 {
     Int32 st = StatusDefs::Success;
-    const UInt32 generatorId = _engineComp->GetGeneratorId();
+    const UInt32 generatorId = _engineComp->CastTo<IFS_MsgTransfer>()->GetGeneratorId();
     const UInt32 compId = _engineComp->GetCompId();
     while(pool->IsPoolWorking())
     {

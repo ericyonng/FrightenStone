@@ -47,6 +47,25 @@ inline void FS_IocpMsgDispatcher::AttachRecvMessageQueue(ConcurrentMessageQueueN
     _messgeQueue = messageQueue;
 }
 
+inline void FS_IocpMsgDispatcher::_RemoveFromPostRecvQueue(FS_IocpSession *session)
+{
+    _toPostRecv.erase(session);
+}
+
+inline void FS_IocpMsgDispatcher::_RemoveFromPostSendQueue(FS_IocpSession *session)
+{
+    _toPostSend.erase(session);
+}
+
+inline FS_IocpSession *FS_IocpMsgDispatcher::_GetSession(UInt64 sessionId)
+{
+    auto iterSession = _sessions.find(sessionId);
+    if(iterSession == _sessions.end())
+        return NULL;
+
+    return iterSession->second;
+}
+
 
 FS_NAMESPACE_END
 

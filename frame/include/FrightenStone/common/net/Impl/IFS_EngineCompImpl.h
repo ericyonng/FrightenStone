@@ -34,6 +34,11 @@ inline IFS_EngineComp::IFS_EngineComp(IFS_NetEngine *engine, UInt32 compId)
     ,_engine(engine)
 {
 }
+template<typename CompType>
+CompType *IFS_EngineComp::CastTo()
+{
+    return reinterpret_cast<CompType *>(this);
+}
 
 inline UInt32 IFS_EngineComp::GetCompId() const
 {

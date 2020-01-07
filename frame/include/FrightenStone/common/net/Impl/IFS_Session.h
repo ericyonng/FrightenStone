@@ -90,7 +90,7 @@ public:
     // 客户端销毁
     void OnDestroy();
     // 客户端连入
-    void OnConnect();
+    virtual void OnConnect();
     void OnDisconnect();
     // 心跳连接超时
     void OnHeartBeatTimeOut();

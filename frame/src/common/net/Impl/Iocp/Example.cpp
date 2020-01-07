@@ -264,7 +264,7 @@ int Example::Run()
             {
                 // 客户端断开
                 // g_Log->e<Example>(_LOGFMT_("recv error socket[%llu], bytesTrans[%d]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
-                g_Log->sys<Example>(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
+                g_Log->sys<Example>(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lld]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
                 closesocket(ioEvent._ioData->_sock);
                 iocp.PostAccept(sockServer, ioEvent._ioData);
                 continue;

@@ -64,8 +64,10 @@ public:
     NetMsg_DataHeader *FrontRecvMsg();
     void PopFrontRecvMsg();
 
-    IoDataBase *MakeSendIoData();
+    // IoDataBase *MakeSendIoData();
 
+    void ResetPostRecvMask();
+    void ResetPostSendMask();
     void EnableDisconnect();
     void Bind(FS_Iocp *iocp);
 
@@ -74,6 +76,10 @@ public:
     // post
     Int32 PostRecv();   // 需要判断canpost,以及ispostrecv
     Int32 PostSend();
+    void CancelPostedEventsAndMaskClose();
+
+    // 客户端连入
+    virtual void OnConnect();
 
     // 状态
 public:
@@ -87,12 +93,11 @@ public:
 
     // 事件
 public:
-    void OnSendSuc(size_t transferBytes, IoDataBase *ioData);
-    void OnRecvSuc(size_t transferBytes, IoDataBase *ioData);
+    void OnSendSuc(Int64 transferBytes, IoDataBase *ioData);
+    void OnRecvSuc(Int64 transferBytes, IoDataBase *ioData);
 
 private:
-    void _ResetPostRecvMask();
-    void _ResetPostSendMask();
+
 
 private:
     bool _isPostRecv;

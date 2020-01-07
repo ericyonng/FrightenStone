@@ -33,6 +33,8 @@
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/FS_IocpBuffer.h"
 #include "FrightenStone/common/net/Impl/FS_Iocp.h"
+#include "FrightenStone/common/net/Impl/FS_Addr.h"
+
 #include "FrightenStone/common/log/Log.h"
 
 #ifdef _WIN32
@@ -57,29 +59,29 @@ void FS_IocpSession::PopFrontRecvMsg()
     if(HasMsgToRead())
         _recvBuffer->PopFront(FrontRecvMsg()->_packetLength);
 }
-
-IoDataBase *FS_IocpSession::MakeSendIoData()
-{
-    if(!CanPost())
-        return NULL;
-
-    if(_isPostSend || _toSend.empty())
-        return NULL;
-
-    _isPostSend = true;
-    auto buffer = _toSend.front()->CastToBuffer<FS_IocpBuffer>();
-    auto ioData = buffer->MakeSendIoData();
-    if(!ioData)
-        return NULL;
-    
-    if(!ioData->_node)
-        ioData->_node = new BufferQueueNode;
-
-    auto node = ioData->_node;
-    node->_isPost = true;
-    node->_iterNode = _toSend.begin();
-    return ioData;
-}
+// 
+// IoDataBase *FS_IocpSession::MakeSendIoData()
+// {
+//     if(!CanPost())
+//         return NULL;
+// 
+//     if(_isPostSend || _toSend.empty())
+//         return NULL;
+// 
+//     _isPostSend = true;
+//     auto buffer = _toSend.front()->CastToBuffer<FS_IocpBuffer>();
+//     auto ioData = buffer->MakeSendIoData();
+//     if(!ioData)
+//         return NULL;
+//     
+//     if(!ioData->_node)
+//         ioData->_node = new BufferQueueNode;
+// 
+//     auto node = ioData->_node;
+//     node->_isPost = true;
+//     node->_iterNode = _toSend.begin();
+//     return ioData;
+// }
 
 Int32 FS_IocpSession::PostRecv()
 {
@@ -90,7 +92,7 @@ Int32 FS_IocpSession::PostRecv()
         Int32 st = _iocp->PostRecv(_sock, ioData);
         if(st != StatusDefs::Success)
         {
-            _ResetPostRecvMask();
+            ResetPostRecvMask();
             if(st != StatusDefs::IOCP_ClientForciblyClosed)
             {
                 g_Log->e<FS_IocpSession>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
@@ -114,7 +116,7 @@ Int32 FS_IocpSession::PostSend()
     auto ioData = buffer->MakeSendIoData();
     if(!ioData)
     {
-        _ResetPostSendMask();
+        ResetPostSendMask();
         return StatusDefs::Success;
     }
 
@@ -127,7 +129,7 @@ Int32 FS_IocpSession::PostSend()
     Int32 st = _iocp->PostSend(_sock, ioData);
     if(st != StatusDefs::Success)
     {
-        _ResetPostSendMask();
+        ResetPostSendMask();
         if(st != StatusDefs::IOCP_ClientForciblyClosed)
         {
             g_Log->e<FS_IocpSession>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
@@ -141,6 +143,27 @@ Int32 FS_IocpSession::PostSend()
     }
     
     return StatusDefs::Success;
+}
+
+void FS_IocpSession::CancelPostedEventsAndMaskClose()
+{
+    // 不用closesocket，而是cacelio，使得已完成的不会被取消，且到此session即将关闭
+    MaskClose();
+    CancelIoEx(HANDLE(_sock), NULL);
+}
+
+// 客户端连入
+void FS_IocpSession::OnConnect()
+{
+    IFS_Session::OnConnect();
+
+    // 绑定iocp
+    Int32 st = _iocp->Reg(_sock, _sessionId);
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<FS_IocpSession>(_LOGFMT_("iocp reg sock[%llu] sessionId[%llu] addr<%s> fail st[%d]")
+                                 , _sock, _sessionId, _addr->ToString().c_str(), st);
+    }
 }
 
 FS_NAMESPACE_END

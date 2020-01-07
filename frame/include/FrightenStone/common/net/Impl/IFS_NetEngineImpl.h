@@ -90,7 +90,7 @@ inline void IFS_NetEngine::_HandleCompEv_RecvMsgAmount()
 
 inline void IFS_NetEngine::_HandleCompEv_SendMsg(Int64 transferBytes)
 {
-    ++_recvMsgCountPerSecond;
+    _sendMsgBytesPerSecond += transferBytes;
 }
 
 inline UInt32 IFS_NetEngine::_GenerateCompId()

@@ -137,6 +137,9 @@
 #define SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED            "2048"                           // 默认大小2GB
 #pragma endregion
 
+#pragma region sessioninfo
+#define INVALID_SESSION_ID  UInt64(-1)
+#pragma endregion
 // 心跳队列排序
 // class FS_ClientComp
 // {

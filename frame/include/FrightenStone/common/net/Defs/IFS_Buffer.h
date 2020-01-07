@@ -61,9 +61,9 @@ public:
     void Clear();
     bool IsEmpty() const;
     bool IsFull() const;
-    size_t GetLength() const;
-    size_t GetTotalSize() const;
-    size_t GetRest() const;
+    Int64 GetLength() const;
+    Int64 GetTotalSize() const;
+    Int64 GetRest() const;
     char *GetData();
     const char *GetData() const;
 
@@ -77,7 +77,7 @@ public:
     const ObjType *CastToBuffer() const;
     
 protected:
-    size_t &_GetCurPos();
+    Int64 &_GetCurPos();
 
 private:
     void _Init();
@@ -89,9 +89,9 @@ protected:
 
 private:
     IMemoryAlloctor *_alloctor;
-    size_t _bufferSize;
+    Int64 _bufferSize;
     char *_buff;
-    size_t _curPos;     // 当前数据末尾位置
+    Int64 _curPos;     // 当前数据末尾位置
 };
 
 FS_NAMESPACE_END

@@ -112,13 +112,13 @@ inline bool FS_IocpBuffer::NeedWrite() const
     return GetLength() > 0;
 }
 
-inline void FS_IocpBuffer::_OnSendSucCallback(size_t transferBytes)
+inline void FS_IocpBuffer::_OnSendSucCallback(Int64 transferBytes)
 {
     // 写入iocp完成多少字节则buffer响应减少多少字节
     auto curPos = GetLength();
     if(curPos < transferBytes)
     {
-        g_Log->e<FS_IocpBuffer>(_LOGFMT_("sessionId[%llu] bufferSize<%llu> curPos<%llu> transferBytes<%llu>")
+        g_Log->e<FS_IocpBuffer>(_LOGFMT_("sessionId[%llu] bufferSize<%llu> curPos<%llu> transferBytes<%lld>")
                              , _ioData._sessionId, GetTotalSize(), curPos, transferBytes);
         return;
     }
@@ -134,7 +134,7 @@ inline void FS_IocpBuffer::_OnSendSucCallback(size_t transferBytes)
     }
 }
 
-inline void FS_IocpBuffer::_OnRecvSucCallback(size_t transferBytes)
+inline void FS_IocpBuffer::_OnRecvSucCallback(Int64 transferBytes)
 {
     // 从iocp读入buffer则buffer数据增加相应字节
     if(transferBytes > 0 && GetRest() >= transferBytes)

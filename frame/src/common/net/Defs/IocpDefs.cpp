@@ -52,12 +52,12 @@ IoDataBase::~IoDataBase()
     Fs_SafeFree(_node);
 }
 
-IO_EVENT::IO_EVENT()
-    :_data{NULL}
-    , _ioData(NULL)
-    , _bytesTrans(0)
-{
-}
+// IO_EVENT::IO_EVENT()
+//     :_data{NULL}
+//     , _ioData(NULL)
+//     , _bytesTrans(0)
+// {
+// }
 FS_NAMESPACE_END
 
 #endif

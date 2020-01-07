@@ -59,8 +59,8 @@ public:
     bool NeedWrite() const;
 
 private:
-    void _OnSendSucCallback(size_t transferBytes);
-    void _OnRecvSucCallback(size_t transferBytes);
+    void _OnSendSucCallback(Int64 transferBytes);
+    void _OnRecvSucCallback(Int64 transferBytes);
 
 private:
     IoDataBase _ioData;

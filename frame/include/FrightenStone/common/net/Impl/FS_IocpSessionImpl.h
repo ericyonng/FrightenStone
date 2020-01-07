@@ -45,6 +45,15 @@ inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const socka
 {
 }
 
+inline void FS_IocpSession::ResetPostRecvMask()
+{
+    _isPostRecv = false;
+}
+
+inline void FS_IocpSession::ResetPostSendMask()
+{
+    _isPostSend = false;
+}
 
 inline void FS_IocpSession::EnableDisconnect()
 {
@@ -92,7 +101,7 @@ inline bool FS_IocpSession::CanDisconnect() const
     return !IsPostIoChange();
 }
 
-inline void FS_IocpSession::OnSendSuc(size_t transferBytes, IoDataBase *ioData)
+inline void FS_IocpSession::OnSendSuc(Int64 transferBytes, IoDataBase *ioData)
 {// 注意 _node 属于ioData，而ioData是buffer的数据成员，故若先释放buffer就会直接释放ioData， node就会被直接释放，所以应该先移除list中的节点再释放buffer
     _isPostSend = false;
     ioData->_callback->Invoke(transferBytes);
@@ -105,21 +114,12 @@ inline void FS_IocpSession::OnSendSuc(size_t transferBytes, IoDataBase *ioData)
     }
 }
 
-inline void FS_IocpSession::OnRecvSuc(size_t transferBytes, IoDataBase *ioData)
+inline void FS_IocpSession::OnRecvSuc(Int64 transferBytes, IoDataBase *ioData)
 {
     _isPostRecv = false;
     ioData->_callback->Invoke(transferBytes);
 }
 
-inline void FS_IocpSession::_ResetPostRecvMask()
-{
-    _isPostRecv = false;
-}
-
-inline void FS_IocpSession::_ResetPostSendMask()
-{
-    _isPostSend = false;
-}
 FS_NAMESPACE_END
 
 #endif
