@@ -54,18 +54,20 @@ class  FS_IocpSession;
 struct NetMsg_DataHeader;
 struct FS_MessageBlock;
 struct BriefSessionInfo;
-class FS_NetEngine;
+class IFS_NetEngine;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
 
 public:
-    FS_IocpMsgTransfer(FS_NetEngine *netEngine, Int32 id);
+    FS_IocpMsgTransfer(UInt32 compId, IFS_NetEngine *netEngine);
     virtual ~FS_IocpMsgTransfer();
 
 public:
-    virtual Int32 BeforeStart(const TransferCfgs &transferCfgs);
+    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs);
     virtual Int32 Start();
+    virtual void AfterStart() {}
+    virtual void WillClose() {}         // 断开与模块之间的依赖
     virtual void BeforeClose();
     virtual void Close();
     virtual void AfterClose();
@@ -80,10 +82,6 @@ public:
     virtual void OnHeartBeatTimeOut(IFS_Session *session);
 
     virtual Int32 GetSessionCnt();
-
-    // 消息队列
-    virtual void AttachMsgQueue(ConcurrentMessageQueueNoThread *messageQueue, Int32 generatorId);
-    virtual void AttachSenderMsgQueue(MessageQueueNoThread *messageQueue);
 
 private:
     void _OnMoniterMsg(FS_ThreadPool *pool);
@@ -139,10 +137,8 @@ private:
 //     FS_ThreadPool *_threadPool;
 //     FS_Iocp *_iocp;
 //     IO_EVENT *_ioEvent;
-//     ConcurrentMessageQueueNoThread *_messageQueue;
 //     std::list<FS_MessageBlock *> *_msgsFromDispatcher;
 //     std::list<FS_MessageBlock *> *_recvMsgList;
-//     MessageQueueNoThread *_senderMessageQueue;
 // 
 //     // 缓冲区
 //     Locker _connectorGuard;

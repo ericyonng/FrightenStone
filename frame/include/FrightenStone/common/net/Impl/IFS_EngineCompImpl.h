@@ -52,14 +52,22 @@ inline UInt32 IFS_EngineComp::GetConsumerId() const
     return _consumerId;
 }
 
-inline void IFS_EngineComp::BindGeneratorId(UInt32 generatorId)
+inline void IFS_EngineComp::BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq)
 {
     _generatorId = generatorId;
+    _consumerId = consumerId;
+    _concurrentMq = concurrentMq;
 }
 
-inline void IFS_EngineComp::BindConsumerId(UInt32 consumerId)
+inline void IFS_EngineComp::BindCompMq(MessageQueueNoThread *compMq)
 {
-    _consumerId = consumerId;
+    _myCompMq = compMq;
+}
+
+// 附加所有组件的消息队列
+inline void IFS_EngineComp::AttachAllCompMq(std::vector<MessageQueueNoThread *> *allCompMq)
+{
+    _allCompMq = allCompMq;
 }
 
 inline IFS_NetEngine *IFS_EngineComp::GetEngine()

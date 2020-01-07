@@ -61,7 +61,6 @@ FS_IocpAcceptor::FS_IocpAcceptor(UInt32 compId
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
                                  , UInt64 &curMaxSessionId
-                                 , const UInt64 &maxSessionIdLimit
                                  , IFS_NetEngine *netEngine)
     :IFS_Acceptor(compId, netEngine)
     , _sock(INVALID_SOCKET)
@@ -70,7 +69,6 @@ FS_IocpAcceptor::FS_IocpAcceptor(UInt32 compId
     , _curSessionCnt(curSessionCnt)
     , _maxSessionQuantityLimit(maxSessionQuantityLimit)
     , _curMaxSessionId(curMaxSessionId)
-    , _maxSessionIdLimit(maxSessionIdLimit)
     ,_cfgs(NULL)
     ,_poller(NULL)
 {

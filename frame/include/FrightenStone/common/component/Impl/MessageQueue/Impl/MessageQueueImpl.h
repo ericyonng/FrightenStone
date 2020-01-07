@@ -313,6 +313,16 @@ inline UInt32 ConcurrentMessageQueueNoThread::GenerateConsumerId()
     return id;
 }
 
+inline bool ConcurrentMessageQueueNoThread::CanGenerateGeneratiroId() const
+{
+    return _generatorMaxId < _generatorQuantity;
+}
+
+inline bool ConcurrentMessageQueueNoThread::CanGenerateConsumerId() const
+{
+    return _consumerMaxId < _consumerQuantity;
+}
+
 inline bool ConcurrentMessageQueueNoThread::Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs)
 {
     if(UNLIKELY(!_isWorking))

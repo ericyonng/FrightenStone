@@ -51,12 +51,12 @@ struct TransferCfgs;
 class BASE_EXPORT IFS_MsgTransfer : public IFS_EngineComp
 {
 public:
-    IFS_MsgTransfer(IFS_NetEngine *engine, Int32 compId);
+    IFS_MsgTransfer(UInt32 compId, IFS_NetEngine *engine);
     virtual ~IFS_MsgTransfer();
 
     /* 网络事件 */
 public:
-    virtual void OnWillConnect(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IDelegate) = 0;
+    virtual void OnWillConnect(BriefSessionInfo *newSessionInfo) = 0;
 
     /* 属性方法 */
 public:
@@ -65,10 +65,6 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnDestroy() = 0;
     virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
-
-    // 消息队列
-    virtual void AttachMsgQueue(ConcurrentMessageQueueNoThread *messageQueue, Int32 generatorId) = 0;
-    virtual void AttachSenderMsgQueue(MessageQueueNoThread *messageQueue) = 0;
 };
 
 FS_NAMESPACE_END

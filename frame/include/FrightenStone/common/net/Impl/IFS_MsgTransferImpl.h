@@ -33,7 +33,7 @@
 #ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_MsgTransfer_H__
 #pragma once
 FS_NAMESPACE_BEGIN
-inline IFS_MsgTransfer::IFS_MsgTransfer(IFS_NetEngine *engine, Int32 compId)
+inline IFS_MsgTransfer::IFS_MsgTransfer(UInt32 compId, IFS_NetEngine *engine)
     :IFS_EngineComp(engine, compId)
 {
 }

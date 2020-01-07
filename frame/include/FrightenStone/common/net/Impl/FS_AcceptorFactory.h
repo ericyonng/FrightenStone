@@ -51,7 +51,6 @@ public:
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
                                  , UInt64 &curMaxSessionId
-                                 , const UInt64 &maxSessionIdLimit
                                  , IFS_NetEngine *netEngine);
 };
 

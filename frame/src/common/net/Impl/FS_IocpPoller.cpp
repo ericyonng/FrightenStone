@@ -132,7 +132,8 @@ void FS_IocpPoller::_TransferMonitor(FS_ThreadPool *pool)
     }
 
     _iocp->Destroy();
-    g_Log->sys<FS_IocpPoller>(_LOGFMT_("FS_IocpPoller compId[%u] generatorId[%u] threadId[%llu] end"),_compId, _generatorId, SystemUtil::GetCurrentThreadId());
+    g_Log->sys<FS_IocpPoller>(_LOGFMT_("FS_IocpPoller compId[%u] generatorId[%u] threadId[%llu] end")
+                              ,compId ,generatorId, SystemUtil::GetCurrentThreadId());
 }
 
 void FS_IocpPoller::_AcceptorMonitor(FS_ThreadPool *pool)

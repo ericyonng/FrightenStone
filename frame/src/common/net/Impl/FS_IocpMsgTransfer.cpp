@@ -58,8 +58,9 @@
 #ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
-FS_IocpMsgTransfer::FS_IocpMsgTransfer(FS_NetEngine *netEngine, Int32 id)
-    :_threadPool(NULL)
+FS_IocpMsgTransfer::FS_IocpMsgTransfer(UInt32 compId, IFS_NetEngine *netEngine)
+    :IFS_MsgTransfer(compId, netEngine)
+    , _threadPool(NULL)
     ,_netEngine(netEngine)
     ,_iocp(NULL)
     ,_ioEvent(NULL)
@@ -100,10 +101,10 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
 //         _CrtMemDumpStatistics(&s3);
 }
 
-Int32 FS_IocpMsgTransfer::BeforeStart(const TransferCfgs &transferCfgs)
+Int32 FS_IocpMsgTransfer::BeforeStart(const NetEngineTotalCfgs &totalCfgs)
 {
     _cfgs = new TransferCfgs;
-    *_cfgs = transferCfgs;
+    *_cfgs = totalCfgs._transferCfgs;
     size_t blockAmount = static_cast<size_t>(_cfgs->_prepareBufferPoolCnt);
     if(blockAmount <= 0)
     {
@@ -203,8 +204,17 @@ void FS_IocpMsgTransfer::OnConnect(BriefSessionInfo *sessionInfo)
 void FS_IocpMsgTransfer::OnWillConnect(BriefSessionInfo *newSessionInfo)
 {
     // TODO:连接消息消息
-    MessageBlockUtil::BuildTransferWillConnectMessageBlock(_compId, _generatorId, newSessionInfo);
-    ++_sessionCnt; 
+    auto newMessageBlock = MessageBlockUtil::BuildTransferWillConnectMessageBlock(_compId, _generatorId, newSessionInfo);
+    ++_sessionCnt;
+#ifdef _DEBUG
+    if(!_concurrentMq->Push(_generatorId, newMessageBlock))
+    {
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("concurrentmq push fail generatorId[%u] compid[%u] newSessionId[%llu] sock[%llu]")
+                                     , _generatorId, _compId, newSessionInfo->_sessionId, newSessionInfo->_sock);
+    }
+#else
+    _concurrentMq->Push(_generatorId, newMessageBlock);
+#endif
 }
 
 void FS_IocpMsgTransfer::OnDestroy()

@@ -64,7 +64,6 @@ public:
                     ,Int32 &curSessionCnt
                     ,Int32 &maxSessionQuantityLimit
                     ,UInt64 &curMaxSessionId
-                    ,const UInt64 &maxSessionIdLimit
                     , IFS_NetEngine *netEngine);
     virtual ~FS_IocpAcceptor();
 
@@ -111,7 +110,6 @@ private:
     Int32 &_curSessionCnt;
     Int32 &_maxSessionQuantityLimit;
     UInt64 &_curMaxSessionId;
-    const UInt64 &_maxSessionIdLimit;
 #pragma endregion
 };
 

@@ -174,8 +174,10 @@ public:
     void Close();
     bool IsWorking() const;
     UInt32 GetGeneratorQuality() const;
-    UInt32 GenerateGeneratorId();
-    UInt32 GenerateConsumerId();
+    UInt32 GenerateGeneratorId();       // generatorid不可超过或等于 generatorQuantity
+    UInt32 GenerateConsumerId();        // ConsumerId 不可超过或等于 consumerQuantity
+    bool CanGenerateGeneratiroId() const;
+    bool CanGenerateConsumerId() const;
 
 public:
     bool Push(UInt32 generatorQueueId, std::list<FS_MessageBlock *> *&msgs);

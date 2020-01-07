@@ -103,6 +103,8 @@ protected:
     // 获取transfer->dispatcher并发消息队列
     ConcurrentMessageQueueNoThread *_GetConcurrentMQ();
 
+    void _AddNewComp(UInt32 compId, IFS_EngineComp *newComp);
+
 protected:
     /* 友元 */
     friend class FS_IocpPoller;
@@ -118,10 +120,11 @@ protected:
     std::vector<IFS_Acceptor *> _acceptors;             // 支持监听多端口，具体看派生类对象的配置
     std::vector<IFS_MsgTransfer *> _msgTransfers;       // 多线程消息收发器
     std::vector<IFS_MsgDispatcher *> _msgDispatchers;   // 业务消息处理器 业务线程处理,支持多线程并发处理
-    UInt32 _curMaxCompId;                                // 组件id最大值
+    UInt32 _curMaxCompId;                                // 组件id最大值 最小值从1开始
+    std::map<UInt32, IFS_EngineComp *> _compIdRefComps; // 组件
 
     ConcurrentMessageQueueNoThread *_concurrentMq;                // 单向,只能从生产者到消费者 generatorid 与consumerId需要特殊生成
-    std::map<UInt32, MessageQueueNoThread *> _compIdRefConsumerMq;       // 组件对应消费者消息队列
+    std::vector<MessageQueueNoThread *> _compConsumerMq;            // 用compId做下表索引
     
     /* 统计数据 */ 
     ConditionLocker _waitForClose;                  // 一般在主线程，用于阻塞等待程序结束
