@@ -61,82 +61,82 @@ bool FS_IocpTcpClient::OnRun(int microseconds)
     if(IsRun())
     {
         // 需要写数据的客户端,才postSend
-        auto iocpSession = _session->CastTo<FS_IocpSession>();
-        if(iocpSession->HasMsgToSend())
-        {
-            auto ioData = iocpSession->MakeSendIoData();
-            if(ioData)
-            {
-                auto st = _iocp.PostSend(iocpSession->GetSocket(), ioData);
-                if(st != StatusDefs::Success)
-                {
-                    iocpSession->ResetPostSendMask();
-                    if(st != StatusDefs::IOCP_ClientForciblyClosed)
-                    {
-                        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
-                                                   , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
-                    }
-
-                    Close();
-                    return false;
-                }
-            }
-
-            // --
-            ioData = iocpSession->MakeRecvIoData();
-            if(ioData)
-            {
-                auto st = _iocp.PostRecv(iocpSession->GetSocket(), ioData);
-                if(st != StatusDefs::Success)
-                {
-                    iocpSession->ResetPostRecvMask();
-                    if(st != StatusDefs::IOCP_ClientForciblyClosed)
-                    {
-                        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
-                                                   , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
-                    }
-
-                    Close();
-                    return false;
-                }
-            }
-        }
-        else {
-            // --
-            auto ioData = iocpSession->MakeRecvIoData();
-            if(ioData)
-            {
-                Int32 st = _iocp.PostRecv(iocpSession->GetSocket(), ioData);
-                if(st != StatusDefs::Success)
-                {
-                    iocpSession->ResetPostRecvMask();
-                    if(st != StatusDefs::IOCP_ClientForciblyClosed)
-                    {
-                        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
-                                                   , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
-                    }
-
-                    Close();
-                    return false;
-                }
-            }
-        }
-
-        //---
-        Int32 ret = StatusDefs::Success;
-        while(true)
-        {
-            ret = DoIocpNetEvents(microseconds);
-            if(ret == StatusDefs::IOCP_WaitTimeOut)
-            {// 超时才处理消息
-                DoMsg();
-                return true;
-            }
-            else if(ret != StatusDefs::Success)
-            {
-                return false;
-            }
-        }
+//         auto iocpSession = _session->CastTo<FS_IocpSession>();
+//         if(iocpSession->HasMsgToSend())
+//         {
+//             auto ioData = iocpSession->MakeSendIoData();
+//             if(ioData)
+//             {
+//                 auto st = _iocp.PostSend(iocpSession->GetSocket(), ioData);
+//                 if(st != StatusDefs::Success)
+//                 {
+//                     iocpSession->ResetPostSendMask();
+//                     if(st != StatusDefs::IOCP_ClientForciblyClosed)
+//                     {
+//                         g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post send fail st[%d]")
+//                                                    , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
+//                     }
+// 
+//                     Close();
+//                     return false;
+//                 }
+//             }
+// 
+//             // --
+//             ioData = iocpSession->MakeRecvIoData();
+//             if(ioData)
+//             {
+//                 auto st = _iocp.PostRecv(iocpSession->GetSocket(), ioData);
+//                 if(st != StatusDefs::Success)
+//                 {
+//                     iocpSession->ResetPostRecvMask();
+//                     if(st != StatusDefs::IOCP_ClientForciblyClosed)
+//                     {
+//                         g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
+//                                                    , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
+//                     }
+// 
+//                     Close();
+//                     return false;
+//                 }
+//             }
+//         }
+//         else {
+//             // --
+//             auto ioData = iocpSession->MakeRecvIoData();
+//             if(ioData)
+//             {
+//                 Int32 st = _iocp.PostRecv(iocpSession->GetSocket(), ioData);
+//                 if(st != StatusDefs::Success)
+//                 {
+//                     iocpSession->ResetPostRecvMask();
+//                     if(st != StatusDefs::IOCP_ClientForciblyClosed)
+//                     {
+//                         g_Log->e<FS_IocpTcpClient>(_LOGFMT_("sessionId[%llu] socket[%llu] post recv fail st[%d]")
+//                                                    , iocpSession->GetSessionId(), iocpSession->GetSocket(), st);
+//                     }
+// 
+//                     Close();
+//                     return false;
+//                 }
+//             }
+//         }
+// 
+//         //---
+//         Int32 ret = StatusDefs::Success;
+//         while(true)
+//         {
+//             ret = DoIocpNetEvents(microseconds);
+//             if(ret == StatusDefs::IOCP_WaitTimeOut)
+//             {// 超时才处理消息
+//                 DoMsg();
+//                 return true;
+//             }
+//             else if(ret != StatusDefs::Success)
+//             {
+//                 return false;
+//             }
+//         }
 
         //---
         return true;
@@ -152,76 +152,76 @@ Int32 FS_IocpTcpClient::DoIocpNetEvents(int microseconds)
         return ret;
 
     // 处理iocp退出
-    if(_ev._data._code == IocpDefs::IO_QUIT)
-    {
-        g_Log->sys<FS_IocpTcpClient>(_LOGFMT_("FS_IocpMsgTransfer iocp退出 threadId<%llu> code=%lld")
-                                       , SystemUtil::GetCurrentThreadId(), _ev._data._code);
-        return StatusDefs::IocpMsgTransfer_IocpQuit;
-    }
-
-    // 1.判断会话是否存在
-    const UInt64 sessionId = _ev._data._sessionId;
-    if(!_session)
-    {
-        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("session not exists sessionId[%llu]"), sessionId);
-        Close();
-        return StatusDefs::Error;
-    }
-    if(_session->IsClose())
-    {
-        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("session is close sessionId[%llu]"), sessionId);
-        Close();
-        return StatusDefs::Error;
-    }
-    if(_session->GetSessionId() != sessionId)
-    {
-        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("session is wrong sessionId[%llu] local sessionId[%llu]")
-                                   , sessionId, _session->GetSessionId());
-        Close();
-        return StatusDefs::Error;
-    }
-
-    auto iocpSession = _session->CastTo<FS_IocpSession>();
-
-    // 2.处理接收与发送
-    if(IocpDefs::IO_RECV == _ev._ioData->_ioType)
-    {
-        if(_ev._bytesTrans <= 0)
-        {// 客户端断开处理
-            g_Log->net<FS_IocpTcpClient>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lu] will disconnect"
-                                           , _session->GetSessionId()
-                                           , _session->GetSocket(),
-                                           _ev._bytesTrans);
-
-            iocpSession->ResetAllIoMask();
-            Close();
-            return StatusDefs::Success;
-        }
-
-        iocpSession->OnRecvSuc(_ev._bytesTrans, _ev._ioData);
-    }
-    else if(IocpDefs::IO_SEND == _ev._ioData->_ioType)
-    {
-        if(_ev._bytesTrans <= 0)
-        {// 客户端断开处理
-            g_Log->net<FS_IocpTcpClient>("sessionId[%llu] sock[%llu] IO_TYPE::IO_SEND bytesTrans[%lu] disconnected"
-                                           , iocpSession->GetSessionId()
-                                           , iocpSession->GetSocket(),
-                                           _ev._bytesTrans);
-            iocpSession->ResetAllIoMask();
-            Close();
-            return StatusDefs::Success;
-        }
-
-        iocpSession->OnSendSuc(_ev._bytesTrans, _ev._ioData);
-    }
-    else
-    {
-        iocpSession->EnableDisconnect();
-        iocpSession->Close();
-        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("undefine io type[%d]."), _ev._ioData->_ioType);
-        return StatusDefs::Error;
-    }
+//     if(_ev._data._code == IocpDefs::IO_QUIT)
+//     {
+//         g_Log->sys<FS_IocpTcpClient>(_LOGFMT_("FS_IocpMsgTransfer iocp退出 threadId<%llu> code=%lld")
+//                                        , SystemUtil::GetCurrentThreadId(), _ev._data._code);
+//         return StatusDefs::IocpMsgTransfer_IocpQuit;
+//     }
+// 
+//     // 1.判断会话是否存在
+//     const UInt64 sessionId = _ev._data._sessionId;
+//     if(!_session)
+//     {
+//         g_Log->e<FS_IocpTcpClient>(_LOGFMT_("session not exists sessionId[%llu]"), sessionId);
+//         Close();
+//         return StatusDefs::Error;
+//     }
+//     if(_session->IsClose())
+//     {
+//         g_Log->e<FS_IocpTcpClient>(_LOGFMT_("session is close sessionId[%llu]"), sessionId);
+//         Close();
+//         return StatusDefs::Error;
+//     }
+//     if(_session->GetSessionId() != sessionId)
+//     {
+//         g_Log->e<FS_IocpTcpClient>(_LOGFMT_("session is wrong sessionId[%llu] local sessionId[%llu]")
+//                                    , sessionId, _session->GetSessionId());
+//         Close();
+//         return StatusDefs::Error;
+//     }
+// 
+//     auto iocpSession = _session->CastTo<FS_IocpSession>();
+// 
+//     // 2.处理接收与发送
+//     if(IocpDefs::IO_RECV == _ev._ioData->_ioType)
+//     {
+//         if(_ev._bytesTrans <= 0)
+//         {// 客户端断开处理
+//             g_Log->net<FS_IocpTcpClient>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%lld] will disconnect"
+//                                            , _session->GetSessionId()
+//                                            , _session->GetSocket(),
+//                                            _ev._bytesTrans);
+// 
+//             iocpSession->ResetAllIoMask();
+//             Close();
+//             return StatusDefs::Success;
+//         }
+// 
+//         iocpSession->OnRecvSuc(_ev._bytesTrans, _ev._ioData);
+//     }
+//     else if(IocpDefs::IO_SEND == _ev._ioData->_ioType)
+//     {
+//         if(_ev._bytesTrans <= 0)
+//         {// 客户端断开处理
+//             g_Log->net<FS_IocpTcpClient>("sessionId[%llu] sock[%llu] IO_TYPE::IO_SEND bytesTrans[%lld] disconnected"
+//                                            , iocpSession->GetSessionId()
+//                                            , iocpSession->GetSocket(),
+//                                            _ev._bytesTrans);
+//             iocpSession->ResetAllIoMask();
+//             Close();
+//             return StatusDefs::Success;
+//         }
+// 
+//         iocpSession->OnSendSuc(_ev._bytesTrans, _ev._ioData);
+//     }
+//     else
+//     {
+//         iocpSession->EnableDisconnect();
+//         iocpSession->Close();
+//         g_Log->e<FS_IocpTcpClient>(_LOGFMT_("undefine io type[%d]."), _ev._ioData->_ioType);
+//         return StatusDefs::Error;
+//     }
 
     return StatusDefs::Success;
 }

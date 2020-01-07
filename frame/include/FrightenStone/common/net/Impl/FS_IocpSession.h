@@ -53,6 +53,8 @@ class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
 public:
     FS_IocpSession(UInt64 sessionId
+                   , UInt32 transferCompId
+                   , UInt32 acceptorCompId
                    , SOCKET sock
                    , const sockaddr_in *addrInfo
                    , IMemoryAlloctor *memAlloctor

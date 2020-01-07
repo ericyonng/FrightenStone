@@ -37,10 +37,16 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds)
+IFS_Session *FS_SessionFactory::Create(UInt64 sessionId
+                                       , UInt32 transferCompId
+                                       , UInt32 acceptorCompId
+                                       , SOCKET sock
+                                       , const sockaddr_in *addrInfo
+                                       , IMemoryAlloctor *memAlloctor
+                                       , Int64 heartbeatIntervalMicroSeconds)
 {
 #ifdef _WIN32
-    return new FS_IocpSession(sessionId, sock, addrInfo, memAlloctor, heartbeatIntervalMicroSeconds);
+    return new FS_IocpSession(sessionId, transferCompId, acceptorCompId, sock, addrInfo, memAlloctor, heartbeatIntervalMicroSeconds);
 #else
     // TODO:linux
     return NULL;
@@ -48,15 +54,15 @@ IFS_Session *FS_SessionFactory::Create(UInt64 sessionId, SOCKET sock, const sock
 }
 
 
-IFS_Session *FS_SessionFactory::Create(const BriefSessionInfo &sessionInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds)
-{
-#ifdef _WIN32
-    return new FS_IocpSession(sessionInfo._sessionId, sessionInfo._sock, &(sessionInfo._addrInfo), memAlloctor, heartbeatIntervalMicroSeconds);
-#else
-    // TODO:linux
-    return NULL;
-#endif
-}
+// IFS_Session *FS_SessionFactory::Create(const BriefSessionInfo &sessionInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds)
+// {
+// #ifdef _WIN32
+//     return new FS_IocpSession(sessionInfo._sessionId, sessionInfo._sock, &(sessionInfo._addrInfo), memAlloctor, heartbeatIntervalMicroSeconds);
+// #else
+//     // TODO:linux
+//     return NULL;
+// #endif
+// }
 
 FS_NAMESPACE_END
 

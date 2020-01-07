@@ -50,6 +50,7 @@ struct BASE_EXPORT BriefSessionInfo
 
     UInt64 _sessionId;
     SOCKET _sock;
+    UInt32 _acceptorCompId;
     const sockaddr_in *_addrInfo;
     IDelegate<void, IUser *> *_newUserRes;      // 当发生转移时需要创建一个新_newUserRes Copy
     IDelegate<void, IUser *> *_userDisconnectedRes; // 当发生转移时需要创建一个新_userDisconnectedRes Copy

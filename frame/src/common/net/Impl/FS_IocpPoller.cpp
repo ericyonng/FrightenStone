@@ -229,6 +229,7 @@ void FS_IocpPoller::_HandleSessionWillConnect(IFS_NetEngine *netEngine, SOCKET s
         newSessionInfo._addrInfo = addrInfo;
         newSessionInfo._sessionId = curMaxSession;
         newSessionInfo._sock = sock;
+        newSessionInfo._acceptorCompId = _engineComp->GetCompId();
         netEngine->_HandleCompEv_WillConnect(&newSessionInfo);
     }
     else {
@@ -240,4 +241,9 @@ void FS_IocpPoller::_HandleSessionWillConnect(IFS_NetEngine *netEngine, SOCKET s
     }
 }
 
+// ÍøÂçÄ£ÐÍiocp,epoll
+IFS_NetModule *FS_IocpPoller::GetNetModuleObj()
+{
+    return _iocp;
+}
 FS_NAMESPACE_END

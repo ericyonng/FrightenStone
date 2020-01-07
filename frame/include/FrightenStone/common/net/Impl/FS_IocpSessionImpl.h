@@ -37,8 +37,14 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_IocpSession::FS_IocpSession(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds)
-    :IFS_Session(sessionId, sock, addrInfo, memAlloctor, heartbeatIntervalMicroSeconds)
+inline FS_IocpSession::FS_IocpSession(UInt64 sessionId
+                                      , UInt32 transferCompId
+                                      , UInt32 acceptorCompId
+                                      , SOCKET sock
+                                      , const sockaddr_in *addrInfo
+                                      , IMemoryAlloctor *memAlloctor
+                                      , Int64 heartbeatIntervalMicroSeconds)
+    :IFS_Session(sessionId, transferCompId, acceptorCompId,  sock, addrInfo, memAlloctor, heartbeatIntervalMicroSeconds)
     ,_isPostRecv(false)
     ,_isPostSend(false)
     ,_iocp(NULL)

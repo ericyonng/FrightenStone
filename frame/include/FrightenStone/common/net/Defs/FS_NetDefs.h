@@ -107,20 +107,19 @@
 
 #pragma region Transfer default config
 #define SVR_CFG_TRANSFER_SEG                            "Transfer"                      // 数据传输配置
-
-#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY        "HeartbeatDeadTimeInterval"     // 心跳死亡时间间隔
-#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "30000"                         // 默认30s心跳
-#define SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY             "PreparePoolBufferCnt"          // 预先准备的网络buffer缓冲池的buffer个数
-#define SVR_CFG_PREPARE_POOL_BUFFER_CNT                 "1024"                          // 预先准备的网络buffer缓冲池的buffer个数
-#define SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY         "MaxMemPoolMBPerTransfer"       // 每个数据传输器内存池大小
-#define SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER             "1024"                          // MB为单位
 #pragma endregion
 
 #pragma region Dispatcher default config
 #define SVR_CFG_DISPATCHER_SEG                          "Dispatcher"                      // 消息分发配置
 
+#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY        "HeartbeatDeadTimeInterval"     // 心跳死亡时间间隔
+#define SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL            "30000"                         // 默认30s心跳
 #define SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY      "DispatecherResolutionInterval"   // 消息分发器时钟间隔默认1ms
 #define SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL          "1"                               // 单位ms
+#define SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY             "PreparePoolBufferCnt"          // 预先准备的网络buffer缓冲池的buffer个数
+#define SVR_CFG_PREPARE_POOL_BUFFER_CNT                 "1024"                          // 预先准备的网络buffer缓冲池的buffer个数
+#define SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER_KEY       "MaxMemPoolMBPerTransfer"       // 每个数据传输器内存池大小
+#define SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER           "1024"                          // MB为单位
 #pragma endregion
 
 #pragma region objpool default config

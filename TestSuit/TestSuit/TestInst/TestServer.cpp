@@ -410,13 +410,13 @@ public:
     virtual void Close()
     {
         // TODO:抛一个断开session的消息到transfer 通过dispatcher
-        _dispatcher->CloseSession(_sessionId, _belongTransferId);
+        // _dispatcher->CloseSession(_sessionId, _belongTransferId);
     }
 
     // NetMsg_DataHeader 必须是堆区创建的
     void SendData(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
     {
-        _dispatcher->SendData(sessionId, generatorId, msgData);
+        // _dispatcher->SendData(sessionId, generatorId, msgData);
     }
 
     void OnDisconnect()
@@ -625,82 +625,82 @@ public:
         return;
     }
 };
-
-class FS_ServerEngine : public FS_NetEngine
-{
-public:
-    FS_ServerEngine()
-    {
-        _config = new IFS_ServerConfigMgr;
-    }
-    ~FS_ServerEngine()
-    {
-        STLUtil::DelVectorContainer(_logics);
-        Fs_SafeFree(_config);
-    }
-
-protected:
-    // 读取配置位置
-    virtual Int32 _OnReadCfgs()
-    {
-        auto ret = _config->Init();
-        if(ret != StatusDefs::Success)
-        {
-            g_Log->e<FS_ServerEngine>(_LOGFMT_("config Init fail ret[%d]"), ret);
-            return ret;
-        }
-
-        // TODO:
-        _totalCfgs = new NetEngineTotalCfgs;
-        auto &commonConfig = _totalCfgs->_commonCfgs;
-        commonConfig._maxSessionQuantityLimit = _config->GetMaxSessionQuantityLimit();
-        commonConfig._acceptorQuantityLimit = _config->GetAcceptorQuantity();
-        commonConfig._dispatcherQuantity = _config->GetDispatcherCnt();
-        commonConfig._transferQuantity = _config->GetTransferCnt();
-
-        auto &connectorCfg = _totalCfgs->_connectorCfgs;
-        connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
-
-        auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
-        acceptorCfg._ip = _config->GetListenIp();
-        acceptorCfg._port = _config->GetListenPort();
-
-        auto &transferCfg = _totalCfgs->_transferCfgs;
-        transferCfg._heartbeatDeadTimeMsInterval = _config->GetHeartbeatDeadTimeIntervalMs();
-        transferCfg._maxAlloctorBytesPerTransfer = _config->GetMaxAllowAlloctorBytesPerTransfer();
-        transferCfg._prepareBufferPoolCnt = _config->GetPrepareBufferCnt();
-
-        auto &dispatcherCfg = _totalCfgs->_dispatcherCfgs;
-        dispatcherCfg._dispatcherResolutionInterval = _config->GetDispatcherResolutionIntervalMs()*Time::_microSecondPerMilliSecond;
-
-        auto &objPoolCfgs = _totalCfgs->_objPoolCfgs;
-        objPoolCfgs._maxAllowObjPoolBytesOccupied = _config->GetMaxAllowObjPoolBytesOccupied();
-
-        auto &mempoolCfgs = _totalCfgs->_mempoolCfgs;
-        mempoolCfgs._maxAllowMemPoolBytesOccupied = _config->GetMaxAllowMemPoolBytesOccupied();
-        return StatusDefs::Success;
-    }
-
-    // 初始化结束时
-    virtual Int32 _OnInitFinish() 
-    { 
-        _logics.resize(_totalCfgs->_commonCfgs._dispatcherQuantity);
-        Int32 quantity = static_cast<Int32>(_logics.size());
-        for(Int32 i = 0; i < quantity; ++i)
-            _logics[i] = new fs::MyLogic;
-
-        return StatusDefs::Success; 
-    }
-    // 获取业务层,以便绑定到dispatcher上
-    virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics)
-    {
-        logics = _logics;
-    }
-
-private:
-    IFS_ServerConfigMgr * _config;
-    std::vector<fs::IFS_BusinessLogic *> _logics;
-};
+// 
+// class FS_ServerEngine : public FS_NetEngine
+// {
+// public:
+//     FS_ServerEngine()
+//     {
+//         _config = new IFS_ServerConfigMgr;
+//     }
+//     ~FS_ServerEngine()
+//     {
+//         STLUtil::DelVectorContainer(_logics);
+//         Fs_SafeFree(_config);
+//     }
+// 
+// protected:
+//     // 读取配置位置
+//     virtual Int32 _OnReadCfgs()
+//     {
+//         auto ret = _config->Init();
+//         if(ret != StatusDefs::Success)
+//         {
+//             g_Log->e<FS_ServerEngine>(_LOGFMT_("config Init fail ret[%d]"), ret);
+//             return ret;
+//         }
+// 
+//         // TODO:
+//         _totalCfgs = new NetEngineTotalCfgs;
+//         auto &commonConfig = _totalCfgs->_commonCfgs;
+//         commonConfig._maxSessionQuantityLimit = _config->GetMaxSessionQuantityLimit();
+//         commonConfig._acceptorQuantityLimit = _config->GetAcceptorQuantity();
+//         commonConfig._dispatcherQuantity = _config->GetDispatcherCnt();
+//         commonConfig._transferQuantity = _config->GetTransferCnt();
+// 
+//         auto &connectorCfg = _totalCfgs->_connectorCfgs;
+//         connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
+// 
+//         auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
+//         acceptorCfg._ip = _config->GetListenIp();
+//         acceptorCfg._port = _config->GetListenPort();
+// 
+//         auto &transferCfg = _totalCfgs->_transferCfgs;
+// 
+//         auto &dispatcherCfg = _totalCfgs->_dispatcherCfgs;
+//         dispatcherCfg._heartbeatDeadTimeMsInterval = _config->GetHeartbeatDeadTimeIntervalMs();
+//         dispatcherCfg._dispatcherResolutionInterval = _config->GetDispatcherResolutionIntervalMs()*Time::_microSecondPerMilliSecond;
+//         dispatcherCfg._maxAlloctorBytesPerDispatcher = _config->GetMaxAllowAlloctorBytesPerDispatcher();
+//         dispatcherCfg._prepareBufferPoolCnt = _config->GetPrepareBufferCnt();
+// 
+//         auto &objPoolCfgs = _totalCfgs->_objPoolCfgs;
+//         objPoolCfgs._maxAllowObjPoolBytesOccupied = _config->GetMaxAllowObjPoolBytesOccupied();
+// 
+//         auto &mempoolCfgs = _totalCfgs->_mempoolCfgs;
+//         mempoolCfgs._maxAllowMemPoolBytesOccupied = _config->GetMaxAllowMemPoolBytesOccupied();
+//         return StatusDefs::Success;
+//     }
+// 
+//     // 初始化结束时
+//     virtual Int32 _OnInitFinish() 
+//     { 
+//         _logics.resize(_totalCfgs->_commonCfgs._dispatcherQuantity);
+//         Int32 quantity = static_cast<Int32>(_logics.size());
+//         for(Int32 i = 0; i < quantity; ++i)
+//             _logics[i] = new fs::MyLogic;
+// 
+//         return StatusDefs::Success; 
+//     }
+//     // 获取业务层,以便绑定到dispatcher上
+//     virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics)
+//     {
+//         logics = _logics;
+//     }
+// 
+// private:
+//     IFS_ServerConfigMgr * _config;
+//     std::vector<fs::IFS_BusinessLogic *> _logics;
+// };
 
 FS_NAMESPACE_END
 
@@ -712,43 +712,43 @@ static union {
 
 void TestServer::Run()
 {
-    endian_test;
-    if((char)(endian_test.l) == 'b')
-    {
-        printf("big endian\n");
-    }
-    else
-    {
-        printf("little endian\n");
-    }
-
-    fs::FS_NetEngine *serverCore = new fs::FS_ServerEngine();
-    auto st = serverCore->Init();
-
-    if(st == StatusDefs::Success)
-    {
-        // 并发业务逻辑
-        //auto dispatcherCnt = g_SvrCfg->GetDispatcherCnt();
-        auto st = serverCore->Start();
-        if(st == StatusDefs::Success)
-        {
-            std::cout << "server suc start" << std::endl;
-            getchar();
-        }
-        else
-        {
-            g_Log->e<TestServer>(_LOGFMT_("Start server fail st[%d] server will close now. please check! "));
-        }
-    }
-    else
-    {
-        std::cout << "server core init fail." << std::endl;
-    }
-
-    //serverCore->Wait();
-    serverCore->Close();
-    Fs_SafeFree(serverCore);
-    g_Log->FinishModule();
-    std::cout << "free server core" << std::endl;
+//     endian_test;
+//     if((char)(endian_test.l) == 'b')
+//     {
+//         printf("big endian\n");
+//     }
+//     else
+//     {
+//         printf("little endian\n");
+//     }
+// 
+//     fs::FS_NetEngine *serverCore = new fs::FS_ServerEngine();
+//     auto st = serverCore->Init();
+// 
+//     if(st == StatusDefs::Success)
+//     {
+//         // 并发业务逻辑
+//         //auto dispatcherCnt = g_SvrCfg->GetDispatcherCnt();
+//         auto st = serverCore->Start();
+//         if(st == StatusDefs::Success)
+//         {
+//             std::cout << "server suc start" << std::endl;
+//             getchar();
+//         }
+//         else
+//         {
+//             g_Log->e<TestServer>(_LOGFMT_("Start server fail st[%d] server will close now. please check! "));
+//         }
+//     }
+//     else
+//     {
+//         std::cout << "server core init fail." << std::endl;
+//     }
+// 
+//     //serverCore->Wait();
+//     serverCore->Close();
+//     Fs_SafeFree(serverCore);
+//     g_Log->FinishModule();
+//     std::cout << "free server core" << std::endl;
     getchar();
 }

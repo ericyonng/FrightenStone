@@ -75,12 +75,6 @@ inline void FS_IocpPoller::AttachAcceptorParam(SOCKET sock
     _curMaxSessionId = curMaxSessionId;
 }
 
-// ÍøÂçÄ£ÐÍiocp,epoll
-inline IFS_NetModule *FS_IocpPoller::GetNetModuleObj()
-{
-    return _iocp;
-}
-
 FS_NAMESPACE_END
 
 #endif

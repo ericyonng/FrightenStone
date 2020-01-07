@@ -50,6 +50,7 @@
 #include "FrightenStone/common/component/Impl/Time.h"
 #include "FrightenStone/common/component/Impl/TimeWheel/FS_Timer.h"
 #include "FrightenStone/common/assist/utils/utils.h"
+#include "FrightenStone/common/memleak/memleak.h"
 
 #ifdef _WIN32
 
@@ -61,17 +62,28 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(IFS_NetEngine *netEngine, UInt32 comp
     , _isClose{false}
     ,_timeWheel(NULL)
     ,_logic(NULL)
-    ,_messgeQueue(NULL)
     ,_recvMsgBlocks(NULL)
     ,_cfgs(NULL)
+    ,_transferThreadId(0)
+    ,_sessionBufferAlloctor(NULL)
+    ,_printAlloctorOccupiedInfo(NULL)
 {
 }
 
 FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
 {
+    STLUtil::DelMapContainer(_sessions);
     Fs_SafeFree(_pool);
     Fs_SafeFree(_timeWheel);
     Fs_SafeFree(_cfgs);
+    Fs_SafeFree(_printAlloctorOccupiedInfo);
+    Fs_SafeFree(_sessionBufferAlloctor);
+    STLUtil::DelListContainer(*_recvMsgBlocks);
+    Fs_SafeFree(_recvMsgBlocks);
+
+    for(auto &iterDelegateInfo : _sessionIdRefUserDisconnected)
+        STLUtil::DelListContainer(iterDelegateInfo.second);
+    _sessionIdRefUserDisconnected.clear();
 
 //     _CrtMemCheckpoint(&s2);
 //     if(_CrtMemDifference(&s3, &s1, &s2))
@@ -91,6 +103,11 @@ Int32 FS_IocpMsgDispatcher::BeforeStart(const NetEngineTotalCfgs &cfgs)
     *_cfgs = cfgs._dispatcherCfgs;
     _timeWheel = new TimeWheel(_cfgs->_dispatcherResolutionInterval);
     _pool = new FS_ThreadPool(0, 1);
+
+    // 缓存分配器
+    _sessionBufferAlloctor = new MemoryAlloctorWithLimit(FS_BUFF_SIZE_DEF, _cfgs->_prepareBufferPoolCnt, _cfgs->_maxAlloctorBytesPerDispatcher);
+    _sessionBufferAlloctor->InitMemory();
+    _printAlloctorOccupiedInfo = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_PrintAlloctorOccupiedInfo);
 
     _recvMsgBlocks = new std::vector<std::list<FS_MessageBlock *> *>;
     auto generatorQuatity = _concurrentMq->GetGeneratorQuality();
@@ -143,6 +160,10 @@ Int32 FS_IocpMsgDispatcher::Start()
     return StatusDefs::Success;
 }
 
+void FS_IocpMsgDispatcher::WillClose()
+{
+}
+
 void FS_IocpMsgDispatcher::BeforeClose()
 {
     if(_isClose)
@@ -150,6 +171,7 @@ void FS_IocpMsgDispatcher::BeforeClose()
 
     _concurrentMq->NotifyConsumerByGenerator(_consumerId);
 
+    // 需要清理sessions
     if(_logic)
         _logic->BeforeClose();
 
@@ -204,6 +226,34 @@ void FS_IocpMsgDispatcher::Close()
     IFS_EngineComp::Close();
 }
 
+void FS_IocpMsgDispatcher::AfterClose()
+{
+    // 内存分配器占用情况打印结束
+    g_MemleakMonitor->UnRegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
+
+    if(_sessionBufferAlloctor)
+        _sessionBufferAlloctor->FinishMemory();
+}
+
+void FS_IocpMsgDispatcher::SendData(UInt64 sessionId, NetMsg_DataHeader *msg)
+{
+    if(_isClose)
+        return;
+
+    auto session = _GetSession(sessionId);
+    if(!session || !session->CanPost())
+        return;
+
+    if(!session->PushMsgToSend(msg))
+    {
+        g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("sessionid[%llu] send msg cmd[%hu] len[%hu] fail")
+                                     , sessionId
+                                     , msg->_cmd, msg->_packetLength);
+    }
+
+    if(_DoPostSend(session))
+        _toPostSend.insert(session);
+}
 
 void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 {// 业务层可以不用很频繁唤醒，只等待网络层推送消息过来
@@ -211,7 +261,12 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
     // _timeWheel->GetModifiedResolution(_resolutionInterval);
     const auto &resolutionIntervalSlice = _cfgs->_dispatcherResolutionInterval;
     bool hasMsg = false;
-    while(pool->IsPoolWorking())
+
+    // 初始化配置
+    _transferThreadId = SystemUtil::GetCurrentThreadId();
+    g_MemleakMonitor->RegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
+
+    while(pool->IsPoolWorking() || hasMsg)
     {
         // 1.等待消息队列
         _concurrentMq->WaitForPoping(_consumerId, _recvMsgBlocks, hasMsg, static_cast<ULong>(resolutionIntervalSlice.GetTotalMilliSeconds()));
@@ -233,12 +288,13 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
         _PostEvents();
 
         // 6.移除sessions
-        _DelayRemoveSessions();
+        _WillRemoveSessions();
 
         // 投递业务产生的异步处理事件 TODO: 不合适修正，因为可能会错过跨天等重要节点
         // _timeWheel->GetModifiedResolution(_resolutionInterval);
     }
-
+    
+    _ClearAllSessions();
     g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end"));
 }
 
@@ -264,6 +320,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
     // 将网络数据转移到缓冲区
     FS_NetMsgBufferBlock *netMsgBlock = NULL;
     UInt64 sessionId = 0;
+    Int32 messageBlockType = NetMessageBlockType::Net_None;
     for(auto iterGeneratorQueue = _recvMsgBlocks->begin(); iterGeneratorQueue != _recvMsgBlocks->end(); ++iterGeneratorQueue)
     {
         auto *blockQueue = *iterGeneratorQueue;
@@ -273,17 +330,13 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
         for(auto iterBlock = blockQueue->begin(); iterBlock != blockQueue->end();)
         {
             netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
-            sessionId = netMsgBlock->_sessionId;
-            if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetSessionDisconnect)
-            {// 会话断开
-                _delayDisconnectedSessions.insert(sessionId);
-            }
-            else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Net_NetMsgArrived)
+            messageBlockType = netMsgBlock->_netMessageBlockType;
+            if(messageBlockType == NetMessageBlockType::Net_NetMsgArrived)
             {// 收到网络包
                 auto arrivedMsg = netMsgBlock->CastTo<FS_NetArrivedMsg>();
-                _DoBusinessProcess(sessionId, netMsgBlock->_generatorId, netMsg);
+                _OnMsgArrived(arrivedMsg);
             }
-            else if(netMsgBlock->_netMessageBlockType == NetMessageBlockType::Met_NetSessionConnected)
+            else if(messageBlockType == NetMessageBlockType::Met_NetSessionConnected)
             {// 会话连入
                 auto connectedMsgBlock = netMsgBlock->CastTo<FS_NetSessionWillConnectMsg>();
                 _OnSessionConnected(connectedMsgBlock);
@@ -292,14 +345,6 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
             Fs_SafeFree(netMsgBlock);
             iterBlock = blockQueue->erase(iterBlock);
         }
-    }
-
-    // 延迟断开连接
-    for(auto iterSession = _delayDisconnectedSessions.begin();
-        iterSession != _delayDisconnectedSessions.end();)
-    {
-        _OnDelaySessionDisconnect(*iterSession);
-        iterSession = _delayDisconnectedSessions.erase(iterSession);
     }
 }
 
@@ -320,7 +365,7 @@ void FS_IocpMsgDispatcher::_PostEvents()
     }
 }
 
-void FS_IocpMsgDispatcher::_DelayRemoveSessions()
+void FS_IocpMsgDispatcher::_WillRemoveSessions()
 {
     FS_IocpSession *session = NULL;
     for(auto iterSession = _toRemove.begin(); iterSession!=_toRemove.end();)
@@ -330,8 +375,19 @@ void FS_IocpMsgDispatcher::_DelayRemoveSessions()
         _RemoveFromPostSendQueue(session);
 
         // 准备移除,等待transfer返回正式移除session
-        _PrepareRemoveSession(session);
+        _RemoveSessionGracefully(session);
         iterSession = _toRemove.erase(iterSession);
+    }
+}
+
+void FS_IocpMsgDispatcher::_ClearAllSessions()
+{
+    for(auto iterSession = _sessions.begin(); iterSession != _sessions.end();)
+    {
+        auto session = iterSession->second;
+        _OnSessionDisconnected(session);
+        Fs_SafeFree(session);
+        iterSession = _sessions.erase(iterSession);
     }
 }
 
@@ -369,7 +425,7 @@ bool FS_IocpMsgDispatcher::_DoPostSend(FS_IocpSession *session)
     return true;
 }
 
-void FS_IocpMsgDispatcher::_PrepareRemoveSession(FS_IocpSession *session)
+void FS_IocpMsgDispatcher::_RemoveSessionGracefully(FS_IocpSession *session)
 {// 仅仅close掉socket，并等待transfer返回,ondisconnected才是真正的断开
     const auto sessionId = session->GetSessionId();
     g_Log->net<FS_IocpMsgDispatcher>("sessionId[%llu] sock[%llu] disconnected address<%s> prepare remove"
@@ -384,8 +440,24 @@ void FS_IocpMsgDispatcher::_PrepareRemoveSession(FS_IocpSession *session)
     else
     {
         // close会把在缓冲完全清除,若有post还未返回则会出现丢数据情况
-        session->Close();
+        _OnSessionDisconnected(session);
+        _sessions.erase(sessionId);
+        Fs_SafeFree(session);
     }
+}
+
+void FS_IocpMsgDispatcher::_PrintAlloctorOccupiedInfo()
+{
+    FS_String memInfo;
+    memInfo.AppendFormat("\n【iocp dispatcher alloctor occupied info】\n");
+    memInfo.AppendFormat("dispatcher compId[%u] threadId[%llu] alloctor occupied info:[", _compId, _transferThreadId);
+    _sessionBufferAlloctor->MemInfoToString(memInfo);
+    memInfo.AppendFormat("total occupied bytes[%llu], in used bytes[%llu]."
+                         , _sessionBufferAlloctor->GetOccupiedBytes()
+                         , _sessionBufferAlloctor->GetInUsedBytes());
+    memInfo.AppendFormat(" ]");
+    memInfo.AppendFormat("\n【+++++++++++++++++++++++++ End ++++++++++++++++++++++++++】\n");
+    g_Log->mempool("%s", memInfo.c_str());
 }
 
 void FS_IocpMsgDispatcher::_OnSessionDisconnected(FS_IocpSession *session)
@@ -396,15 +468,33 @@ void FS_IocpMsgDispatcher::_OnSessionDisconnected(FS_IocpSession *session)
                                    , sessionId
                                    , session->GetSocket(), session->GetAddr()->ToString().c_str());
 
-    _sessionHeartbeatQueue.erase(session);
-    _engine->_HandleCompEv_Disconnected(sessionId);
-    _sessions.erase(sessionId);
-    _toPostRecv.erase(session);
-    _toPostSend.erase(session);
+    // 断连回调
+    std::list<IDelegate<void, IUser *> *> *delagates = NULL;
+    auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
+    if(iterDisconnected != _sessionIdRefUserDisconnected.end())
+        delagates = &iterDisconnected->second;
 
+    // 业务层断开会话
+    if(_logic)
+        _logic->OnSessionDisconnected(sessionId, delagates);
+
+    if(delagates)
+    {
+        if(!delagates->empty())
+            STLUtil::DelListContainer(*delagates);
+
+        _sessionIdRefUserDisconnected.erase(iterDisconnected);
+    }
+
+    _engine->_HandleCompEv_Disconnected(sessionId
+                                        , session->GetAcceptorCompId()
+                                        , session->GetTransferCompId());
     session->Close();
     session->OnDisconnect();
     session->OnDestroy();
+    _sessionHeartbeatQueue.erase(session);
+    _toPostRecv.erase(session);
+    _toPostSend.erase(session);
     Fs_SafeFree(session);
 }
 
@@ -413,7 +503,14 @@ void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *conn
     const UInt64 sessionId = connectedMsg->_sessionId;
 
     // 创建session对象并初始化
-    auto newSession = FS_SessionFactory::Create(sessionId, connectedMsg->_sock, &connectedMsg->_addrInfo, _sessionBufferAlloctor, _cfgs->_heartbeatDeadTimeMsInterval * Time::_microSecondPerMilliSecond)->CastTo<FS_IocpSession>();
+    auto newSession = FS_SessionFactory::Create(sessionId
+                                                ,connectedMsg->_compId
+                                                ,connectedMsg->_acceptorCompId
+                                                , connectedMsg->_sock
+                                                , &connectedMsg->_addrInfo
+                                                , _sessionBufferAlloctor
+                                                , _cfgs->_heartbeatDeadTimeMsInterval * Time::_microSecondPerMilliSecond)->CastTo<FS_IocpSession>();
+    
     _sessions.insert(std::make_pair(sessionId, newSession));
     newSession->Bind(reinterpret_cast<FS_Iocp *>(connectedMsg->_netModule));
     newSession->OnConnect();
@@ -424,7 +521,7 @@ void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *conn
                                    , addr->GetAddr().c_str()
                                    , addr->GetPort());
 
-    auto newUser = _logic->OnSessionConnected(sessionId, connectedMsg->_generatorId);
+    auto newUser = _logic->OnSessionConnected(sessionId);
     auto newUserRes = connectedMsg->_onNewUserRes;
     if(newUserRes)
         newUserRes->Invoke(newUser);
@@ -470,61 +567,56 @@ void FS_IocpMsgDispatcher::_OnMsgArrived(FS_NetArrivedMsg *arrivedMsg)
         return;
     }
 
-
     // 2.处理接收与发送
-    if(IocpDefs::IO_RECV == ioData->_ioType)
+    const Int32 ioType = ioData->_ioType;
+    if(IocpDefs::IO_RECV == ioType)
     {
         if(transferBytes <= 0)
         {// 客户端断开处理
             g_Log->net<FS_IocpMsgDispatcher>("sessionId[%llu] sock[%llu] IO_TYPE::RECV bytesTrans[%llu] will disconnect"
-                                             , session->GetSessionId()
+                                             , sessionId
                                              , session->GetSocket(),
                                              transferBytes);
 
             session->ResetPostRecvMask();
             session->CancelPostedEventsAndMaskClose();
-
             _toRemove.insert(session);
             return;
         }
 
         session->OnRecvSuc(transferBytes, ioData);
 
-        // 消息接收回调
+        // 收到消息回调
         _engine->_HandleCompEv_RecvMsg(transferBytes);
-        // _OnMsgArrived(session);
-
-        _msgArriviedSessions.push_back(session);
+        _OnSessionMsgHandle(session);
         _UpdateSessionHeartbeat(session);
 
         // 重新接收数据
         if(session->CanPost())
             _toPostRecv.insert(session);
     }
-    else if(IocpDefs::IO_SEND == _ioEvent->_ioData->_ioType)
+    else if(IocpDefs::IO_SEND == ioType)
     {
-        if(_ioEvent->_bytesTrans <= 0)
+        if(transferBytes <= 0)
         {// 客户端断开处理
-            g_Log->net<FS_IocpMsgTransfer>("sessionId[%llu] sock[%llu] IO_TYPE::IO_SEND bytesTrans[%lu] disconnected"
-                                           , session->GetSessionId()
-                                           , session->GetSocket(),
-                                           _ioEvent->_bytesTrans);
+            g_Log->net<FS_IocpMsgDispatcher>("sessionId[%llu] sock[%llu] IO_TYPE::IO_SEND bytesTrans[%lld] disconnected"
+                                             , sessionId
+                                             , session->GetSocket(),
+                                             transferBytes);
             session->ResetPostSendMask();
             session->CancelPostedEventsAndMaskClose();
-            _OnDelayDisconnected(session);
             _toRemove.insert(session);
-            return StatusDefs::Success;
+            return;
         }
 
-        session->OnSendSuc(_ioEvent->_bytesTrans, _ioEvent->_ioData);
+        session->OnSendSuc(transferBytes, ioData);
 
         // 消息发送回调
-        _netEngine->_OnSendMsg(session, _ioEvent->_bytesTrans);
-
+        _engine->_HandleCompEv_SendMsg(transferBytes);
         // TODO:有被疯狂发包的风险，解决方案：心跳包协议+频繁发包计数+发包成功时更新时间戳
         _UpdateSessionHeartbeat(session);
 
-        // 重新投递接收
+        // 重新投递发送
         if(session->CanPost() &&
            !session->IsPostSend() &&
            session->HasMsgToSend())
@@ -535,124 +627,24 @@ void FS_IocpMsgDispatcher::_OnMsgArrived(FS_NetArrivedMsg *arrivedMsg)
         session->EnableDisconnect();
         session->Close();
         _toRemove.insert(session);
-        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("undefine io type[%d]."), _ioEvent->_ioData->_ioType);
+        g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("undefine io type[%d]."), ioType);
     }
 }
 
-// 
-// void FS_IocpMsgDispatcher::OnRecv(std::list<IFS_Session *> &sessions, Int64 &incPacketsCnt)
-// {
-//     incPacketsCnt = 0;
-// 
-//     _locker.Lock();
-//     if(!_isClose)
-//     {
-//         IFS_Session *session = NULL;
-//         bool hasMsg = false;
-//         for(auto iterSession = sessions.begin(); iterSession != sessions.end();)
-//         {
-//             session = *iterSession;
-//             auto iocpSession = session->CastTo<FS_IocpSession>();
-//             auto recvBuffer = iocpSession->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
-//             
-//             hasMsg |= recvBuffer->HasMsg();
-//             while(recvBuffer->HasMsg())
-//             {
-//                 auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
-//                 _MoveToBusinessLayer(session, frontMsg);
-//                 recvBuffer->PopFront(frontMsg->_packetLength);
-//                 ++incPacketsCnt;
-//             }
-// 
-//             iterSession = sessions.erase(iterSession);
-//         }
-// 
-//         if(hasMsg)
-//         {
-//             _isDataDirtied = true;
-//             _locker.Sinal();
-//         }
-//     }    
-//     _locker.Unlock();
-// }
-
-void FS_IocpMsgDispatcher::OnDestroy()
+void FS_IocpMsgDispatcher::_OnSessionMsgHandle(FS_IocpSession *session)
 {
-}
-
-void FS_IocpMsgDispatcher::OnHeartBeatTimeOut()
-{
-
-}
-
-void FS_IocpMsgDispatcher::SendData(UInt64 sessionId,  UInt64 consumerId,  NetMsg_DataHeader *msg)
-{
-    if(_isClose)
-        return;
-
-    // sender是一对一的需要找到对应的收到网络包的那个transfer 的id
-    auto &senderMq = _netEngine->_GetSenderMq();
-
-    // 新的待发送的消息
-    FS_NetMsgBufferBlock *newMsgBlock = new FS_NetMsgBufferBlock;
-    newMsgBlock->_mbType = MessageBlockType::MB_NetMsgSended;
-    g_MemoryPool->Lock();
-    newMsgBlock->_buffer = g_MemoryPool->Alloc<Byte8>(msg->_packetLength);
-    g_MemoryPool->Unlock();
-    ::memcpy(newMsgBlock->_buffer, msg, msg->_packetLength);
-    newMsgBlock->_generatorId = 0;
-    newMsgBlock->_sessionId = sessionId;
-
-    // 送入消息队列
-    if(!senderMq[consumerId]->Push(newMsgBlock))
-        Fs_SafeFree(newMsgBlock);
-}
-
-void FS_IocpMsgDispatcher::CloseSession(UInt64 sessionId, UInt64 consumerId)
-{
-    if(_isClose)
-        return;
-
-    // sender是一对一的需要找到对应的收到网络包的那个transfer 的id
-    auto &senderMq = _netEngine->_GetSenderMq();
-
-    // 新的待发送的消息
-    FS_NetMsgBufferBlock *newMsgBlock = new FS_NetMsgBufferBlock;
-    newMsgBlock->_mbType = MessageBlockType::MB_NetCloseSession;
-    newMsgBlock->_generatorId = 0;
-    newMsgBlock->_sessionId = sessionId;
-
-    // 送入消息队列
-    if(!senderMq[consumerId]->Push(newMsgBlock))
-        Fs_SafeFree(newMsgBlock);
-}
-
-
-
-void FS_IocpMsgDispatcher::_DoBusinessProcess(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
-{
-    // TODO:处理单一消息业务逻辑部分
-    if(_logic)
-        _logic->OnMsgDispatch(sessionId, generatorId, msgData);
-}
-
-void FS_IocpMsgDispatcher::_OnDelaySessionDisconnect(UInt64 sessionId)
-{
-    std::list<IDelegate<void, IUser *> *> *delagates = NULL;
-    auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
-    if(iterDisconnected != _sessionIdRefUserDisconnected.end())
-        delagates = &iterDisconnected->second;
-
-    // TODO:真实的session断开
-    if(_logic)
-        _logic->OnSessionDisconnected(sessionId, delagates);
-
-    if(delagates)
+    auto recvBuffer = session->CastToRecvBuffer();
+    NetMsg_DataHeader *frontMsg = NULL;
+    const UInt64 sessionId = session->GetSessionId();
+    while(recvBuffer->HasMsg())
     {
-        if(!delagates->empty())
-            STLUtil::DelListContainer(*delagates);
+        frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
+        // TODO:处理单一消息业务逻辑部分
+        if(_logic)
+            _logic->OnMsgDispatch(sessionId, frontMsg);
 
-        _sessionIdRefUserDisconnected.erase(iterDisconnected);
+        _engine->_HandleCompEv_RecvMsgAmount();
+        recvBuffer->PopFront(frontMsg->_packetLength);
     }
 }
 

@@ -94,7 +94,7 @@ SOCKET FS_TcpClient::InitSocket()
     else {
         SocketUtil::MakeReUseAddr(sock);
 
-        _session = FS_SessionFactory::Create(++_maxSessionId, sock, NULL, _sessionBufferAlloctor, g_ClientCfgMgr->GetHeartbeatDeadTimeInterval());
+        // _session = FS_SessionFactory::Create(++_maxSessionId, sock, NULL, _sessionBufferAlloctor, g_ClientCfgMgr->GetHeartbeatDeadTimeInterval());
         OnInitSocket();
     }
     return sock;

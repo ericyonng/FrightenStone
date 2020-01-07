@@ -68,10 +68,6 @@ public:
     // 并发消息队列参数绑定
     virtual void BindConcurrentParams(UInt32 generatorId, UInt32 consumerId, ConcurrentMessageQueueNoThread *concurrentMq);
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnDestroy() = 0;
-    virtual void OnHeartBeatTimeOut(IFS_Session *session) = 0;
-
 protected:
     UInt32 _generatorId;            // engine中concurrentmq指定的生产者id
     UInt32 _consumerId;             // 指定的，并发消息队列中对应的消费者id

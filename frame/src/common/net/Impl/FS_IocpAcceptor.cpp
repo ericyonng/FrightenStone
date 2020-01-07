@@ -261,7 +261,7 @@ Int32 FS_IocpAcceptor::_Listen(Int32 unconnectQueueLen)
     return StatusDefs::Success;
 }
 
-void FS_IocpAcceptor::OnDisconnected(UInt64 sessionId)
+void FS_IocpAcceptor::OnSessionDisconnected(UInt64 sessionId)
 {
     _poller->OnAcceptorDisconnected(sessionId);
 }

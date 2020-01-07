@@ -32,7 +32,10 @@
 #include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
 
+fs::MemoryHelper *g_MemoryHelper = NULL;
+
 FS_NAMESPACE_BEGIN
+Locker MemoryHelper::_locker;
 MemoryHelper::~MemoryHelper()
 {
     Finish();

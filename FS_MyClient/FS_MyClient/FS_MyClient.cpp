@@ -308,13 +308,13 @@ public:
     virtual void Close()
     {
         // TODO:抛一个断开session的消息到transfer 通过dispatcher
-        _dispatcher->CloseSession(_sessionId, _belongTransferId);
+        // _dispatcher->CloseSession(_sessionId, _belongTransferId);
     }
 
     // NetMsg_DataHeader 必须是堆区创建的
     void SendData(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData)
     {
-        _dispatcher->SendData(sessionId, generatorId, msgData);
+        // _dispatcher->SendData(sessionId, generatorId, msgData);
     }
 
     void OnDisconnect()
@@ -527,163 +527,169 @@ public:
         return;
     }
 };
-
-class FS_MyClient : public FS_NetEngine
-{
-public:
-    FS_MyClient()
-    {
-        _config = new FS_ClientCfgMgr;
-    }
-    ~FS_MyClient()
-    {
-        STLUtil::DelVectorContainer(_logics);
-        Fs_SafeFree(_config);
-    }
-
-protected:
-    // 读取配置位置
-    virtual Int32 _OnReadCfgs()
-    {
-        auto ret = _config->Init();
-        if(ret != StatusDefs::Success)
-        {
-            g_Log->e<FS_MyClient>(_LOGFMT_("config Init fail ret[%d]"), ret);
-            return ret;
-        }
-
-        // TODO:
-        _totalCfgs = new NetEngineTotalCfgs;
-        auto &commonConfig = _totalCfgs->_commonCfgs;
-        commonConfig._maxSessionQuantityLimit = _config->GetMaxSessionQuantityLimit();
-        commonConfig._acceptorQuantityLimit = _config->GetAcceptorQuantity();
-        commonConfig._dispatcherQuantity = _config->GetDispatcherCnt();
-        commonConfig._transferQuantity = _config->GetTransferCnt();
-
-        auto &connectorCfg = _totalCfgs->_connectorCfgs;
-        connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
-
-        auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
-        acceptorCfg._ip = _config->GetListenIp();
-        acceptorCfg._port = _config->GetListenPort();
-
-        auto &transferCfg = _totalCfgs->_transferCfgs;
-        transferCfg._heartbeatDeadTimeMsInterval = _config->GetHeartbeatDeadTimeIntervalMs();
-        transferCfg._maxAlloctorBytesPerTransfer = _config->GetMaxAllowAlloctorBytesPerTransfer();
-        transferCfg._prepareBufferPoolCnt = _config->GetPrepareBufferCnt();
-
-        auto &dispatcherCfg = _totalCfgs->_dispatcherCfgs;
-        dispatcherCfg._dispatcherResolutionInterval = _config->GetDispatcherResolutionIntervalMs()*Time::_microSecondPerMilliSecond;
-
-        auto &objPoolCfgs = _totalCfgs->_objPoolCfgs;
-        objPoolCfgs._maxAllowObjPoolBytesOccupied = _config->GetMaxAllowObjPoolBytesOccupied();
-
-        auto &mempoolCfgs = _totalCfgs->_mempoolCfgs;
-        mempoolCfgs._maxAllowMemPoolBytesOccupied = _config->GetMaxAllowMemPoolBytesOccupied();
-        return StatusDefs::Success;
-    }
-
-    // 初始化结束时
-    virtual Int32 _OnInitFinish()
-    {
-        _logics.resize(_totalCfgs->_commonCfgs._dispatcherQuantity);
-        Int32 quantity = static_cast<Int32>(_logics.size());
-        for(Int32 i = 0; i < quantity; ++i)
-            _logics[i] = new fs::MyLogic;
-
-        return StatusDefs::Success;
-    }
-    // 获取业务层,以便绑定到dispatcher上
-    virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics)
-    {
-        logics = _logics;
-    }
-
-private:
-    FS_ClientCfgMgr * _config;
-    std::vector<fs::IFS_BusinessLogic *> _logics;
-};
+// 
+// class FS_MyClient : public FS_NetEngine
+// {
+// public:
+//     FS_MyClient()
+//     {
+//         _config = new FS_ClientCfgMgr;
+//     }
+//     ~FS_MyClient()
+//     {
+//         STLUtil::DelVectorContainer(_logics);
+//         Fs_SafeFree(_config);
+//     }
+// 
+// protected:
+//     // 读取配置位置
+//     virtual Int32 _OnReadCfgs()
+//     {
+//         auto ret = _config->Init();
+//         if(ret != StatusDefs::Success)
+//         {
+//             g_Log->e<FS_MyClient>(_LOGFMT_("config Init fail ret[%d]"), ret);
+//             return ret;
+//         }
+// 
+//         // TODO:
+//         _totalCfgs = new NetEngineTotalCfgs;
+//         auto &commonConfig = _totalCfgs->_commonCfgs;
+//         commonConfig._maxSessionQuantityLimit = _config->GetMaxSessionQuantityLimit();
+//         commonConfig._acceptorQuantityLimit = _config->GetAcceptorQuantity();
+//         commonConfig._dispatcherQuantity = _config->GetDispatcherCnt();
+//         commonConfig._transferQuantity = _config->GetTransferCnt();
+// 
+//         auto &connectorCfg = _totalCfgs->_connectorCfgs;
+//         connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
+// 
+//         auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
+//         acceptorCfg._ip = _config->GetListenIp();
+//         acceptorCfg._port = _config->GetListenPort();
+// 
+//         auto &transferCfg = _totalCfgs->_transferCfgs;
+//         transferCfg._maxAlloctorBytesPerTransfer = _config->GetMaxAllowAlloctorBytesPerDispatcher();
+//         transferCfg._prepareBufferPoolCnt = _config->GetPrepareBufferCnt();
+// 
+//         auto &dispatcherCfg = _totalCfgs->_dispatcherCfgs;
+//         dispatcherCfg._heartbeatDeadTimeMsInterval = _config->GetHeartbeatDeadTimeIntervalMs();
+//         dispatcherCfg._dispatcherResolutionInterval = _config->GetDispatcherResolutionIntervalMs()*Time::_microSecondPerMilliSecond;
+// 
+//         auto &objPoolCfgs = _totalCfgs->_objPoolCfgs;
+//         objPoolCfgs._maxAllowObjPoolBytesOccupied = _config->GetMaxAllowObjPoolBytesOccupied();
+// 
+//         auto &mempoolCfgs = _totalCfgs->_mempoolCfgs;
+//         mempoolCfgs._maxAllowMemPoolBytesOccupied = _config->GetMaxAllowMemPoolBytesOccupied();
+//         return StatusDefs::Success;
+//     }
+// 
+//     // 初始化结束时
+//     virtual Int32 _OnInitFinish()
+//     {
+//         _logics.resize(_totalCfgs->_commonCfgs._dispatcherQuantity);
+//         Int32 quantity = static_cast<Int32>(_logics.size());
+//         for(Int32 i = 0; i < quantity; ++i)
+//             _logics[i] = new fs::MyLogic;
+// 
+//         return StatusDefs::Success;
+//     }
+//     // 获取业务层,以便绑定到dispatcher上
+//     virtual void _GetLogics(std::vector<IFS_BusinessLogic *> &logics)
+//     {
+//         logics = _logics;
+//     }
+// 
+// private:
+//     FS_ClientCfgMgr * _config;
+//     std::vector<fs::IFS_BusinessLogic *> _logics;
+// };
+// 
+// FS_NAMESPACE_END
+// 
+// void FS_ClientRun::Run()
+// {
+//     // 1.时区
+//     fs::TimeUtil::SetTimeZone();
+// 
+//     // 2.智能变量的类型识别
+//     fs::SmartVarRtti::InitRttiTypeNames();
+// 
+//     // 3.初始化线程局部存储句柄
+//     Int32 ret = fs::FS_TlsUtil::CreateUtilTlsHandle();
+//     if(ret != StatusDefs::Success)
+//     {
+//         std::cout << "error:" << ret << std::endl;
+//         return;
+//     }
+// 
+//     // 4.log初始化 NULL默认以程序名为基准创建目录
+//     ret = g_Log->InitModule(NULL);
+//     if(ret != StatusDefs::Success)
+//     {
+//         std::cout << "error:" << ret << std::endl;
+//         return;
+//     }
+// 
+//     // 5. crash dump switch start
+//     ret = fs::CrashHandleUtil::InitCrashHandleParams();
+//     if(ret != StatusDefs::Success)
+//     {
+//         g_Log->e<FS_ClientRun>(_LOGFMT_("init crash handle params fail ret[%d]"), ret);
+//         return;
+//     }
+// 
+//     // 6.大小端判断，服务器只支持x86等小端字节序的cpu
+//     if(!fs::SystemUtil::IsLittleEndian())
+//     {
+//         ret = StatusDefs::SystemUtil_NotLittleEndian;
+//         g_Log->e<FS_ClientRun>(_LOGFMT_("not little endian ret[%d]"), ret);
+//         return;
+//     }
+// 
+//     // 初始化配置
+//     g_CfgMgr.Init();
+// 
+//     // 启动终端命令线程
+//     // 用于接收运行时用户输入的指令
+//     const auto threadQuantity = g_CfgMgr.GetThreadQuantity();
+//     fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, threadQuantity + 1);
+// 
+//     //启动模拟客户端线程
+//     for(int n = 0; n < threadQuantity; n++)
+//     {
+//         fs::ITask *t = new ClientTask(pool, n);
+//         pool->AddTask(*t, true, 1);
+//     }
+// 
+//     // 每秒数据统计
+//     fs::Time lastTime;
+//     fs::Time nowTime;
+//     nowTime.FlushTime();
+//     lastTime.FlushTime();
+//     fs::TimeSlice diff(1);
+//     const auto clientQuantity = g_CfgMgr.GetClientQuantity();
+//     while(true)
+//     {
+//         auto t = nowTime.FlushTime() - lastTime;
+//         if(t >= diff)
+//         {
+//             g_Log->custom("thread<%d>,clients<%d>,connect<%d>,time<%d>,send<%d>"
+//                           , threadQuantity, clientQuantity, (int)g_ConnectNum, t.GetTotalSeconds(), (int)g_SendCount);
+//             g_SendCount = 0;
+//             lastTime.FlushTime();
+//         }
+//         fs::SystemUtil::Sleep(1);
+//     }
+// 
+//     //
+//     pool->Close();
+//     g_Log->custom("。。已退出。。");
+//     return;
+// }
 
 FS_NAMESPACE_END
 
 void FS_ClientRun::Run()
 {
-    // 1.时区
-    fs::TimeUtil::SetTimeZone();
-
-    // 2.智能变量的类型识别
-    fs::SmartVarRtti::InitRttiTypeNames();
-
-    // 3.初始化线程局部存储句柄
-    Int32 ret = fs::FS_TlsUtil::CreateUtilTlsHandle();
-    if(ret != StatusDefs::Success)
-    {
-        std::cout << "error:" << ret << std::endl;
-        return;
-    }
-
-    // 4.log初始化 NULL默认以程序名为基准创建目录
-    ret = g_Log->InitModule(NULL);
-    if(ret != StatusDefs::Success)
-    {
-        std::cout << "error:" << ret << std::endl;
-        return;
-    }
-
-    // 5. crash dump switch start
-    ret = fs::CrashHandleUtil::InitCrashHandleParams();
-    if(ret != StatusDefs::Success)
-    {
-        g_Log->e<FS_ClientRun>(_LOGFMT_("init crash handle params fail ret[%d]"), ret);
-        return;
-    }
-
-    // 6.大小端判断，服务器只支持x86等小端字节序的cpu
-    if(!fs::SystemUtil::IsLittleEndian())
-    {
-        ret = StatusDefs::SystemUtil_NotLittleEndian;
-        g_Log->e<FS_ClientRun>(_LOGFMT_("not little endian ret[%d]"), ret);
-        return;
-    }
-
-    // 初始化配置
-    g_CfgMgr.Init();
-
-    // 启动终端命令线程
-    // 用于接收运行时用户输入的指令
-    const auto threadQuantity = g_CfgMgr.GetThreadQuantity();
-    fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, threadQuantity + 1);
-
-    //启动模拟客户端线程
-    for(int n = 0; n < threadQuantity; n++)
-    {
-        fs::ITask *t = new ClientTask(pool, n);
-        pool->AddTask(*t, true, 1);
-    }
-
-    // 每秒数据统计
-    fs::Time lastTime;
-    fs::Time nowTime;
-    nowTime.FlushTime();
-    lastTime.FlushTime();
-    fs::TimeSlice diff(1);
-    const auto clientQuantity = g_CfgMgr.GetClientQuantity();
-    while(true)
-    {
-        auto t = nowTime.FlushTime() - lastTime;
-        if(t >= diff)
-        {
-            g_Log->custom("thread<%d>,clients<%d>,connect<%d>,time<%d>,send<%d>"
-                          , threadQuantity, clientQuantity, (int)g_ConnectNum, t.GetTotalSeconds(), (int)g_SendCount);
-            g_SendCount = 0;
-            lastTime.FlushTime();
-        }
-        fs::SystemUtil::Sleep(1);
-    }
-
-    //
-    pool->Close();
-    g_Log->custom("。。已退出。。");
-    return;
 }
 #endif

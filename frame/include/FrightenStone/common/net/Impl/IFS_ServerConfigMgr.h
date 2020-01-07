@@ -58,12 +58,12 @@ public:
 
     /* transfer */
     Int32 GetTransferCnt() const;
-    Int64 GetHeartbeatDeadTimeIntervalMs() const;
-    Int32 GetPrepareBufferCnt() const;
-    UInt64 GetMaxAllowAlloctorBytesPerTransfer() const;
 
     /* dispatcher */
+    Int64 GetHeartbeatDeadTimeIntervalMs() const;
     Int32 GetDispatcherCnt() const;
+    Int32 GetPrepareBufferCnt() const;
+    UInt64 GetMaxAllowAlloctorBytesPerDispatcher() const;
 
     /* 对象池 */
     UInt64 GetMaxAllowObjPoolBytesOccupied() const;
@@ -91,7 +91,7 @@ private:
     Int32 _transferCnt;
     Int64 _heartbeatDeadTimeIntervalMs;
     Int32 _prepareBufferCnt;
-    UInt64 _maxAlloctorBytesPerTransfer;
+    UInt64 _maxAlloctorBytesPerDispatcher;
 
     Int32 _dispatcherCnt;
 

@@ -35,6 +35,7 @@
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/net/Defs/IocpDefs.h"
+#include "FrightenStone/common/net/Defs/IoEvDefs.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -218,7 +219,7 @@ int Example::Run()
         iocp.PostAccept(sockServer, &ioData[i]);
 
     Int32 msgCount = 0;
-    IO_EVENT ioEvent = {};
+    IoEvent ioEvent = {};
     while(true)
     {
         // 等待io完成
@@ -231,84 +232,85 @@ int Example::Run()
         }
 
         // 处理iocp退出
-        if(ioEvent._data._code == IocpDefs::IO_QUIT)
+        if(ioEvent._sessionId == static_cast<UInt64>(IocpDefs::IO_QUIT))
         {
-            g_Log->sys<Example>(_LOGFMT_("iocp退出 code=%lld"), ioEvent._data._code);
+            g_Log->sys<Example>(_LOGFMT_("iocp退出 code=%llu"), ioEvent._sessionId);
             break;
         }
 
         // 有连接连入
-        if(ioEvent._ioData->_ioType == IocpDefs::IO_ACCEPT)
+        IoDataBase *ioData = reinterpret_cast<IoDataBase *>(ioEvent._ioData);
+        if(ioData->_ioType == IocpDefs::IO_ACCEPT)
         {
-            g_Log->sys<Example>(_LOGFMT_("新客户端连入 sockfd=%llu"), ioEvent._ioData->_sock);
+            g_Log->sys<Example>(_LOGFMT_("新客户端连入 sockfd=%llu"), ioData->_sock);
 
             // 新客户端关联完成端口
-            if(StatusDefs::Success != iocp.Reg(ioEvent._ioData->_sock))
+            if(StatusDefs::Success != iocp.Reg(ioData->_sock))
                 continue;
 
             // 投递接收数据
-            if(StatusDefs::Success != iocp.PostRecv(ioEvent._ioData->_sock, ioEvent._ioData))
+            if(StatusDefs::Success != iocp.PostRecv(ioData->_sock, ioData))
             {
-                g_Log->e<Example>(_LOGFMT_("post recv fail sock[%llu]"), ioEvent._ioData->_sock);
-                closesocket(ioEvent._ioData->_sock);
-                iocp.PostAccept(sockServer, ioEvent._ioData);
+                g_Log->e<Example>(_LOGFMT_("post recv fail sock[%llu]"), ioData->_sock);
+                closesocket(ioData->_sock);
+                iocp.PostAccept(sockServer, ioData);
                 continue;
             }
 
             // 继续接受下一个连接 并判断已投递的连接不可大于限制
             // iocp.PostAccept(sockServer, )
         }
-        else if(ioEvent._ioData->_ioType == IocpDefs::IO_RECV)
+        else if(ioData->_ioType == IocpDefs::IO_RECV)
         {
             if(ioEvent._bytesTrans <= 0)
             {
                 // 客户端断开
                 // g_Log->e<Example>(_LOGFMT_("recv error socket[%llu], bytesTrans[%d]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
-                g_Log->sys<Example>(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lld]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
-                closesocket(ioEvent._ioData->_sock);
-                iocp.PostAccept(sockServer, ioEvent._ioData);
+                g_Log->sys<Example>(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lld]"), ioData->_sock, ioEvent._bytesTrans);
+                closesocket(ioData->_sock);
+                iocp.PostAccept(sockServer, ioData);
                 continue;
             }
 
             // 打印接收到的数据
-            g_Log->sys<Example>(_LOGFMT_("recv data :socket[%llu], bytesTrans[%d] msgCount[%d]")
-                       , ioEvent._ioData->_sock, ioEvent._bytesTrans, ++msgCount);
+            g_Log->sys<Example>(_LOGFMT_("recv data :socket[%llu], bytesTrans[%lld] msgCount[%d]")
+                       , ioData->_sock, ioEvent._bytesTrans, ++msgCount);
 
             // 不停的接收数据
-            ioEvent._ioData->_wsaBuff.len = ioEvent._bytesTrans;
-            auto st = iocp.PostSend(ioEvent._ioData->_sock, ioEvent._ioData);
+            ioData->_wsaBuff.len = static_cast<ULong>(ioEvent._bytesTrans);
+            auto st = iocp.PostSend(ioData->_sock, ioData);
             if(st == StatusDefs::IOCP_ClientForciblyClosed)
             {// 远端关闭
-                closesocket(ioEvent._ioData->_sock);
-                iocp.PostAccept(sockServer, ioEvent._ioData);
+                closesocket(ioData->_sock);
+                iocp.PostAccept(sockServer, ioData);
             }
         }
-        else if(ioEvent._ioData->_ioType == IocpDefs::IO_SEND)
+        else if(ioData->_ioType == IocpDefs::IO_SEND)
         {
             // 客户端断开处理
             if(ioEvent._bytesTrans <= 0)
             {
-                g_Log->sys<Example>(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lu]"), ioEvent._ioData->_sock, ioEvent._bytesTrans);
-                closesocket(ioEvent._ioData->_sock);
-                iocp.PostAccept(sockServer, ioEvent._ioData);
+                g_Log->sys<Example>(_LOGFMT_("客户端断开链接 sockfd=%llu bytestrans[%lld]"), ioData->_sock, ioEvent._bytesTrans);
+                closesocket(ioData->_sock);
+                iocp.PostAccept(sockServer, ioData);
                 continue;
             }
 
             // 打印发送的数据
-            g_Log->sys<Example>(_LOGFMT_("send data :socket[%llu], bytesTrans[%d] msgCount[%d]")
-                       , ioEvent._ioData->_sock, ioEvent._bytesTrans, msgCount);
+            g_Log->sys<Example>(_LOGFMT_("send data :socket[%llu], bytesTrans[%lld] msgCount[%d]")
+                       , ioData->_sock, ioEvent._bytesTrans, msgCount);
 
             // ioEvent._ioData->_wsaBuff.len = 
-            auto st = iocp.PostRecv(ioEvent._ioData->_sock, ioEvent._ioData);
+            auto st = iocp.PostRecv(ioData->_sock, ioData);
             if(st == StatusDefs::IOCP_ClientForciblyClosed)
             {// 远端关闭
-                closesocket(ioEvent._ioData->_sock);
-                iocp.PostAccept(sockServer, ioEvent._ioData);
+                closesocket(ioData->_sock);
+                iocp.PostAccept(sockServer, ioData);
             }
         }
         else
         {
-            g_Log->e<Example>(_LOGFMT_("未定义行为 sockefd=%llu"), ioEvent._data._socket);
+            g_Log->e<Example>(_LOGFMT_("未定义行为 sockefd=%llu"), ioData->_sock);
         }
         // 检查是否有事件发生，和selet,epoll_wait类似
         // 接受连接 完成

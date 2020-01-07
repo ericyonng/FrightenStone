@@ -57,6 +57,7 @@ FS_MessageBlock *MessageBlockUtil::BuildTransferWillConnectMessageBlock(UInt32 c
 {
     FS_NetSessionWillConnectMsg *block = new FS_NetSessionWillConnectMsg;
     block->_compId = compId;
+    block->_acceptorCompId = newSessionInfo->_acceptorCompId;
     block->_generatorId = generatorId;
     block->_sessionId = newSessionInfo->_sessionId;
     block->_sock = newSessionInfo->_sock;

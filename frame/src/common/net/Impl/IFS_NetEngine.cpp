@@ -296,6 +296,18 @@ void IFS_NetEngine::_HandleCompEv_WillConnect(BriefSessionInfo *newSessionInfo)
     minTransfer->OnWillConnect(newSessionInfo);
 }
 
+void IFS_NetEngine::_HandleCompEv_Disconnected(UInt64 sessionId,  UInt32 acceptorCompId, UInt32 transferCompId)
+{
+    --_curSessionConnecting;
+    ++_sessionDisconnectedCnt;
+
+    // Á¬½Ó¶Ï¿ª
+    auto acceptorComp = _GetComp(acceptorCompId);
+    acceptorComp->OnSessionDisconnected(sessionId);
+    auto transferComp = _GetComp(transferCompId);
+    transferComp->OnSessionDisconnected(sessionId);
+}
+
 void IFS_NetEngine::_Monitor(FS_ThreadPool *threadPool)
 {
     Time nowTime;

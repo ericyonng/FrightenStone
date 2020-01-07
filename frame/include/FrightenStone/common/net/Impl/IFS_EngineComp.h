@@ -58,6 +58,9 @@ public:
     virtual void AfterClose() = 0;
 
 public:
+    virtual void OnSessionDisconnected(UInt64 sessionId) {}
+
+public:
     // ÀàÐÍ×ª»»
     template<typename CompType>
     CompType *CastTo();

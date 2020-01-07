@@ -215,7 +215,7 @@ void MemoryPoolMgr::_RegisterPrintCallback()
 
 void MemoryPoolMgr::_UnRegisterPrintCallback(UInt64 threadId)
 {
-    g_MemleakMonitor->UnRegisterMemPoolPrintCallback(threadId);
+    g_MemleakMonitor->UnRegisterMemPoolPrintCallback(threadId, _printCallback);
     FS_Release(_printCallback);
 }
 

@@ -55,14 +55,9 @@ public:
     virtual ~IFS_MsgDispatcher();
 
 public:
-    virtual void OnDestroy() = 0;
-    virtual void OnHeartBeatTimeOut() = 0;
-
-    // consumerId 网络消息消费者id
-    virtual void SendData(UInt64 sessionId, UInt64 consumerId, NetMsg_DataHeader *msg) = 0;
+    // 发送消息msg在内部会被拷贝到缓冲区
+    virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic) = 0;
-
-    virtual void CloseSession(UInt64 sessionId, UInt64 consumerId) = 0;
 
     // 获取生产者id
     virtual UInt32 GetGeneratorId() const;

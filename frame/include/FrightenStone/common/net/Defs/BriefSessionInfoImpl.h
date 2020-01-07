@@ -38,6 +38,7 @@ FS_NAMESPACE_BEGIN
 inline BriefSessionInfo::BriefSessionInfo()
     :_sessionId(0)
     ,_sock(INVALID_SOCKET)
+    ,_acceptorCompId(0)
     ,_addrInfo{0}
     ,_newUserRes(NULL)
     ,_userDisconnectedRes(NULL)

@@ -60,19 +60,19 @@ inline Int64 IFS_ServerConfigMgr::GetHeartbeatDeadTimeIntervalMs() const
     return _heartbeatDeadTimeIntervalMs;
 }
 
+inline Int32 IFS_ServerConfigMgr::GetDispatcherCnt() const
+{
+    return _dispatcherCnt;
+}
+
 inline Int32 IFS_ServerConfigMgr::GetPrepareBufferCnt() const
 {
     return _prepareBufferCnt;
 }
 
-inline UInt64 IFS_ServerConfigMgr::GetMaxAllowAlloctorBytesPerTransfer() const
+inline UInt64 IFS_ServerConfigMgr::GetMaxAllowAlloctorBytesPerDispatcher() const
 {
-    return _maxAlloctorBytesPerTransfer;
-}
-
-inline Int32 IFS_ServerConfigMgr::GetDispatcherCnt() const
-{
-    return _dispatcherCnt;
+    return _maxAlloctorBytesPerDispatcher;
 }
 
 inline UInt64 IFS_ServerConfigMgr::GetMaxAllowObjPoolBytesOccupied() const

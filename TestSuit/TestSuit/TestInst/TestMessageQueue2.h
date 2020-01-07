@@ -250,7 +250,7 @@ public:
 #ifdef _WIN32
         fs::CrashHandleUtil::InitCrashHandleParams();
 #endif
-        g_MemleakMonitor->Start(1000000, 1000000);
+        g_MemleakMonitor->Start();
 
         g_testMsgQueue.BeforeStart();
         g_testMsgQueue.Start();

@@ -44,9 +44,17 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_Session::IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds)
+IFS_Session::IFS_Session(UInt64 sessionId
+                         , UInt32 transferCompId
+                         , UInt32 acceptorCompId
+                         , SOCKET sock
+                         , const sockaddr_in *addrInfo
+                         , IMemoryAlloctor *memAlloctor
+                         , Int64 heartbeatIntervalMicroSeconds)
     :_isDestroy(false)
     ,_sessionId(sessionId)
+    ,_transferCompId(transferCompId)
+    ,_acceptorCompId(acceptorCompId)
     ,_sock(sock)
     ,_isListen(false)
     ,_recvBuffer(NULL)

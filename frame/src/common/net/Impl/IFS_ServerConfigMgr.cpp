@@ -48,7 +48,7 @@ IFS_ServerConfigMgr::IFS_ServerConfigMgr()
     ,_transferCnt(0)
     ,_heartbeatDeadTimeIntervalMs(0)
     ,_prepareBufferCnt(0)
-    ,_maxAlloctorBytesPerTransfer(0)
+    ,_maxAlloctorBytesPerDispatcher(0)
     ,_dispatcherCnt(0)
     ,_maxAllowObjPoolBytesOccupied(0)
     ,_maxAllowMemPoolBytesOccupied(0)
@@ -97,9 +97,9 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     #pragma region transfer
     // 数据传输线程数
     _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY, SVR_CFG_COMMONCFG_TRANSFER_QUANTITY);
-    _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL);
-    _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, SVR_CFG_PREPARE_POOL_BUFFER_CNT);
-    _ini->WriteStr(SVR_CFG_TRANSFER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY, SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER);
+    _ini->WriteStr(SVR_CFG_DISPATCHER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL);
+    _ini->WriteStr(SVR_CFG_DISPATCHER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, SVR_CFG_PREPARE_POOL_BUFFER_CNT);
+    _ini->WriteStr(SVR_CFG_DISPATCHER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER_KEY, SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER);
     #pragma endregion
 
     #pragma region dispatcher
@@ -157,7 +157,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
-    auto heartbeatTime = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0);
+    auto heartbeatTime = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0);
     if(heartbeatTime != atoll(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%lld] not match SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] default")
@@ -165,7 +165,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
-    auto preBufferCnt = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, 0);
+    auto preBufferCnt = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, 0);
     if(preBufferCnt != atoi(SVR_CFG_PREPARE_POOL_BUFFER_CNT))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_PREPARE_POOL_BUFFER_CNT[%lld] not match SVR_CFG_PREPARE_POOL_BUFFER_CNT[%u] default")
@@ -173,11 +173,11 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
-    auto memPoolMBPerTransfer = _ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY, 0);
-    if(memPoolMBPerTransfer != atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER))
+    auto memPoolMBPerDispatcher = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER_KEY, 0);
+    if(memPoolMBPerDispatcher != atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER))
     {
         g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%lld] not match SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%u] default")
-                                      , memPoolMBPerTransfer, static_cast<UInt32>(atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER)));
+                                      , memPoolMBPerDispatcher, static_cast<UInt32>(atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
@@ -231,9 +231,9 @@ void IFS_ServerConfigMgr::_ReadCfgs()
     _maxSessionQuantityLimit = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0));
 
     _transferCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY, 0));
-    _heartbeatDeadTimeIntervalMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0));
-    _prepareBufferCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, 0));
-    _maxAlloctorBytesPerTransfer = static_cast<UInt64>((_ini->ReadInt(SVR_CFG_TRANSFER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER_KEY, 0))) * 1024 * 1024;
+    _heartbeatDeadTimeIntervalMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0));
+    _prepareBufferCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, 0));
+    _maxAlloctorBytesPerDispatcher = static_cast<UInt64>((_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER_KEY, 0))) * 1024 * 1024;
 
     _dispatcherCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY_KEY, 0));
 

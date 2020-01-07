@@ -51,12 +51,20 @@ class  IFS_Buffer;
 class BASE_EXPORT IFS_Session
 {
 public:
-    explicit IFS_Session(UInt64 sessionId, SOCKET sock, const sockaddr_in *addrInfo, IMemoryAlloctor *memAlloctor, Int64 heartbeatIntervalMicroSeconds);
+    explicit IFS_Session(UInt64 sessionId
+                         , UInt32 transferCompId
+                         , UInt32 acceptorCompId
+                         , SOCKET sock
+                         , const sockaddr_in *addrInfo
+                         , IMemoryAlloctor *memAlloctor
+                         , Int64 heartbeatIntervalMicroSeconds);
     virtual ~IFS_Session();
 
     // 获取属性与状态
 public:
     UInt64 GetSessionId() const;
+    UInt32 GetTransferCompId() const;
+    UInt32 GetAcceptorCompId() const;
     SOCKET GetSocket() const;
     const FS_Addr *GetAddr() const;
     bool HasMsgToRead() const;      // 要等待消息接收完才能销毁
@@ -105,6 +113,8 @@ protected:
     bool _maskClose;
     // Locker _lock;
     UInt64 _sessionId;
+    UInt32 _transferCompId;
+    UInt32 _acceptorCompId;
     FS_Addr *_addr;
     SOCKET _sock;
     std::atomic<Int32> _lastErrorReason;

@@ -63,16 +63,6 @@ inline void IFS_NetEngine::Sinal()
     _waitForClose.Unlock();
 }
 
-inline void IFS_NetEngine::_HandleCompEv_Disconnected(UInt64 sessionId)
-{
-    --_curSessionConnecting;
-    ++_sessionDisconnectedCnt;
-
-    // 关闭接受连接
-    for(auto &acceptor : _acceptors)
-        acceptor->OnDisconnected(sessionId);
-}
-
 inline void IFS_NetEngine::_HandleCompEv_HeartBeatTimeOut()
 {
     ++_heartbeatTimeOutDisconnected;

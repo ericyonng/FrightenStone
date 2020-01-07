@@ -55,7 +55,7 @@ public:
     UInt64 GetSessionId() const;
     SOCKET GetSocket() const;
 
-    void PopFront(size_t bytesLen);
+    void PopFront(Int64 bytesLen);
     bool PushBack(const Byte8 *data, size_t len);
     bool CanPush(size_t len);
     void Clear();

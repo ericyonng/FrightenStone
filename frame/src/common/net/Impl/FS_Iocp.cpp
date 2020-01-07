@@ -309,7 +309,7 @@ Int32 FS_Iocp::WaitForCompletion(IoEvent &ioEvent, ULong millisec)    // clientI
 
         if(ERROR_NETNAME_DELETED == error)
         {
-//             g_Log->net<FS_Iocp>("WaitForMessage session closed sessionId[%llu] bytesTrans<%lu> error<%d> status[%d]"
+//             g_Log->net<FS_Iocp>("WaitForMessage session closed sessionId[%llu] bytesTrans<%lld> error<%d> status[%d]"
 //                        , ioEvent._data._sessionId,ioEvent._bytesTrans, error, StatusDefs::IOCP_IODisconnect);
 //             g_Log->any<FS_Iocp>("WaitForMessage client closed sockfd=%llu\n error<%d> status[%d]"
 //                                 , ioEvent._ioData->_sock, error, StatusDefs::IOCP_IODisconnect);
@@ -321,7 +321,7 @@ Int32 FS_Iocp::WaitForCompletion(IoEvent &ioEvent, ULong millisec)    // clientI
 
         if(ERROR_CONNECTION_ABORTED == error)
         {// TODO:这个错误码要不要处理 本系统终止网络连接
-//             g_Log->net<FS_Iocp>("local system closesocket sessionId[%llu] bytesTrans<%lu>. WaitForMessage invalid client socket error<%d> status<%d>"
+//             g_Log->net<FS_Iocp>("local system closesocket sessionId[%llu] bytesTrans<%lld>. WaitForMessage invalid client socket error<%d> status<%d>"
 //                               , ioEvent._data._sessionId, ioEvent._bytesTrans, error, StatusDefs::Unknown);
             return StatusDefs::Success;
         }
@@ -331,7 +331,7 @@ Int32 FS_Iocp::WaitForCompletion(IoEvent &ioEvent, ULong millisec)    // clientI
 //             g_Log->w<FS_Iocp>(_LOGFMT_("pressure is too large for this machine."
 //                                        " please improve machine performance or "
 //                                        "expand net card bandwidth error<%d> status<%d>"
-//                                        "sessionId<%llu> bytesTrans<%lu>")
+//                                        "sessionId<%llu> bytesTrans<%lld>")
 //                               , error
 //                               , StatusDefs::Unknown
 //                               , ioEvent._data._sessionId
@@ -341,13 +341,13 @@ Int32 FS_Iocp::WaitForCompletion(IoEvent &ioEvent, ULong millisec)    // clientI
 
         if(ERROR_OPERATION_ABORTED == error)
         {// 由于其他原因或者调用CancelIo，CancelIoEx等导致io被取消 此时bytestransfer为0 可以断开session连接
-//             g_Log->net<FS_Iocp>("windows error<%d> sessionId[%llu] bytesTrans[%lu] io data has be abort. check if invoke CancelIo or CancelIoEx, or other reason."
+//             g_Log->net<FS_Iocp>("windows error<%d> sessionId[%llu] bytesTrans[%lld] io data has be abort. check if invoke CancelIo or CancelIoEx, or other reason."
 //                               , error, ioEvent._data._sessionId, ioEvent._bytesTrans);
             return StatusDefs::Success;
         }
 
 //         const auto &stackBackTrace = CrashHandleUtil::FS_CaptureStackBackTrace();
-//         g_Log->e<FS_Iocp>(_LOGFMT_("sessionId[%llu] _bytesTrans[%lu] WaitForMessage other error error<%d> status[%d]\n"
+//         g_Log->e<FS_Iocp>(_LOGFMT_("sessionId[%llu] _bytesTrans[%lld] WaitForMessage other error error<%d> status[%d]\n"
 //                                    "StackBackTrace:\n%s")
 //                           , ioEvent._data._sessionId
 //                           , ioEvent._bytesTrans

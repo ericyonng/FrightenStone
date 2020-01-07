@@ -52,14 +52,14 @@ ConnectorCfgs::ConnectorCfgs()
 }
 
 TransferCfgs::TransferCfgs()
-    :_heartbeatDeadTimeMsInterval(StringUtil::StringToInt64(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL))
-    ,_prepareBufferPoolCnt(StringUtil::StringToInt32(SVR_CFG_PREPARE_POOL_BUFFER_CNT))
-    ,_maxAlloctorBytesPerTransfer(StringUtil::StringToUInt64(SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER)*1024*1024)
 {
 }
 
 DispatcherCfgs::DispatcherCfgs()
-    :_dispatcherResolutionInterval(0, StringUtil::StringToInt64(SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL), 0)
+    :_heartbeatDeadTimeMsInterval(StringUtil::StringToInt64(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL))
+    , _prepareBufferPoolCnt(StringUtil::StringToInt32(SVR_CFG_PREPARE_POOL_BUFFER_CNT))
+    , _maxAlloctorBytesPerDispatcher(StringUtil::StringToUInt64(SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER)*1024*1024)
+    ,_dispatcherResolutionInterval(0, StringUtil::StringToInt64(SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL), 0)
 {
 }
 

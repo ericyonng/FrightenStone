@@ -38,6 +38,16 @@ inline UInt64 IFS_Session::GetSessionId() const
     return _sessionId;
 }
 
+inline UInt32 IFS_Session::GetTransferCompId() const
+{
+    return _transferCompId;
+}
+
+inline UInt32 IFS_Session::GetAcceptorCompId() const
+{
+    return _acceptorCompId;
+}
+
 inline SOCKET IFS_Session::GetSocket() const
 {
     return _sock;

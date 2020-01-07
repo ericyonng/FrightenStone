@@ -42,9 +42,9 @@ inline void FS_IocpMsgDispatcher::BindBusinessLogic(IFS_BusinessLogic *businessL
     _logic = businessLogic;
 }
 
-inline void FS_IocpMsgDispatcher::AttachRecvMessageQueue(ConcurrentMessageQueueNoThread *messageQueue)
+inline void FS_IocpMsgDispatcher::_RunAFrame(bool hasMsg)
 {
-    _messgeQueue = messageQueue;
+
 }
 
 inline void FS_IocpMsgDispatcher::_RemoveFromPostRecvQueue(FS_IocpSession *session)
@@ -57,6 +57,13 @@ inline void FS_IocpMsgDispatcher::_RemoveFromPostSendQueue(FS_IocpSession *sessi
     _toPostSend.erase(session);
 }
 
+inline void FS_IocpMsgDispatcher::_UpdateSessionHeartbeat(IFS_Session *session)
+{
+    _sessionHeartbeatQueue.erase(session);
+    session->UpdateHeartBeatExpiredTime();
+    _sessionHeartbeatQueue.insert(session);
+}
+
 inline FS_IocpSession *FS_IocpMsgDispatcher::_GetSession(UInt64 sessionId)
 {
     auto iterSession = _sessions.find(sessionId);
@@ -65,7 +72,6 @@ inline FS_IocpSession *FS_IocpMsgDispatcher::_GetSession(UInt64 sessionId)
 
     return iterSession->second;
 }
-
 
 FS_NAMESPACE_END
 

@@ -69,67 +69,68 @@ public:
     virtual Int32 BeforeStart(const NetEngineTotalCfgs &cfgs);
     virtual Int32 Start();
     virtual void AfterStart() {}
-    virtual void WillClose() {}
+    virtual void WillClose();
     virtual void BeforeClose();
     virtual void Close();
-    virtual void AfterClose() {}
+    virtual void AfterClose();
+    virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
+    // 发送消息msg在内部会被拷贝到缓冲区
+    virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg);
 
 private:
+    // 业务线程
     void _OnBusinessProcessThread(FS_ThreadPool *pool);
-
+    void _RunAFrame(bool hasMsg);
+    // 心跳检查
     void _CheckHeartbeat();
+    // 业务消息处理
     void _OnBusinessProcessing();
+    // 统一推送投递消息
     void _PostEvents();
-    void _DelayRemoveSessions();
+    // 延迟移除断开的会话
+    void _WillRemoveSessions();
+    // 清除所有会话
+    void _ClearAllSessions();
 
+    /* 操作会话 */
     bool _DoPostRecv(FS_IocpSession *session);
     bool _DoPostSend(FS_IocpSession *session);
-    void _PrepareRemoveSession(FS_IocpSession *session);
+    void _RemoveSessionGracefully(FS_IocpSession *session);
     void _RemoveFromPostRecvQueue(FS_IocpSession *session);
     void _RemoveFromPostSendQueue(FS_IocpSession *session);
+    void _UpdateSessionHeartbeat(IFS_Session *session);
 
+    /* 杂项 */
+private:
     FS_IocpSession *_GetSession(UInt64 sessionId);
+    void _PrintAlloctorOccupiedInfo();
     
     /* 网络事件 */
 private:
+    // 会话断开
     void _OnSessionDisconnected(FS_IocpSession *session);
+    // 会话连入
     void _OnSessionConnected(FS_NetSessionWillConnectMsg *connectedMsg);
+    // 远端会话消息到达
     void _OnMsgArrived(FS_NetArrivedMsg *arrivedMsg);
-
-    /////////////////////////////////////////////////////////////////////////旧的接口
-    virtual void OnDestroy();
-    virtual void OnHeartBeatTimeOut();
-
-    virtual void SendData(UInt64 sessionId,  UInt64 consumerId, NetMsg_DataHeader *msg);// 线程安全
-    virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
-    virtual void AttachRecvMessageQueue(ConcurrentMessageQueueNoThread *messageQueue);
-    virtual void CloseSession(UInt64 sessionId, UInt64 consumerId);
-
-private:
-    // msgData会拷贝到内存池创建的缓冲区中 线程不安全，外部需要加锁
-    void _DoBusinessProcess(UInt64 sessionId, UInt64 generatorId, NetMsg_DataHeader *msgData);
-    void _OnDelaySessionDisconnect(UInt64 sessionId);
+    // 会话消息处理
+    void _OnSessionMsgHandle(FS_IocpSession *session);
 
 private:
     DispatcherCfgs *_cfgs;
     std::atomic<bool> _isClose;
     FS_ThreadPool *_pool;
 
-    // 数据在线程结束时清理
-    // std::set<UInt64> _delayDisconnectedSessions;
-
-    // 业务层资源
+    /* 业务层资源 */
     TimeWheel *_timeWheel;
     IFS_BusinessLogic *_logic;
     std::map<UInt64, std::list<IDelegate<void, IUser *> *>> _sessionIdRefUserDisconnected;
-
     std::vector<std::list<FS_MessageBlock *> *> *_recvMsgBlocks;       // 需要转换成 FS_NetMsgBufferBlock
 
     /* 会话 */ 
     IMemoryAlloctor *_sessionBufferAlloctor;
-    std::atomic<size_t> _curAlloctorOccupiedBytes;
-    std::atomic_bool _canCreateNewNodeForAlloctor;
     IDelegate<void> *_printAlloctorOccupiedInfo;
+    UInt64 _transferThreadId;
 
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;

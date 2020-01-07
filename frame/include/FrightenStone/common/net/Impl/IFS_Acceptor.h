@@ -51,10 +51,6 @@ class BASE_EXPORT IFS_Acceptor : public IFS_EngineComp
 public:
     IFS_Acceptor(UInt32 compId, IFS_NetEngine *netEngine);
     virtual ~IFS_Acceptor();
-
-    /* ÍøÂçÊÂ¼þ */
-public:
-    virtual void OnDisconnected(UInt64 sessionId) = 0;
 };
 
 #pragma region inline

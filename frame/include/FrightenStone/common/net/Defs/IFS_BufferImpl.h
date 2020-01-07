@@ -73,7 +73,7 @@ inline SOCKET IFS_Buffer::GetSocket() const
     return _socket;
 }
 
-inline void IFS_Buffer::PopFront(size_t bytesLen)
+inline void IFS_Buffer::PopFront(Int64 bytesLen)
 {
     if(bytesLen > _curPos)
     {

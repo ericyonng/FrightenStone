@@ -67,10 +67,10 @@ struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
     FS_NetMsgBufferBlock();
     ~FS_NetMsgBufferBlock();
 
-    UInt32 _compId;                     // 组件id
+    UInt32 _compId;                     // 组件id 一般是transfercompId(消息产生者)
     UInt32 _generatorId;                // 生产者id
     Int32 _netMessageBlockType;         // NetMessageBlockType
-
+    UInt32 _acceptorCompId;             // 监听compId
 
 //     Byte8 *_buffer; // NetMsg_DataHeader *
 //     UInt64 _sessionId;

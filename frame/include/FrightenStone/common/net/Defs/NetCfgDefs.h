@@ -65,15 +65,15 @@ struct BASE_EXPORT AcceptorCfgs
 struct BASE_EXPORT TransferCfgs
 {
     TransferCfgs();
-    Int64 _heartbeatDeadTimeMsInterval;                  // 每个session的心跳间隔时间 单位ms
-    Int32 _prepareBufferPoolCnt;                         // 预创建的buffer数量
-    UInt64 _maxAlloctorBytesPerTransfer;                 // 每个收发器buffer 分配器最大占用
 };
 
 struct BASE_EXPORT DispatcherCfgs
 {
     DispatcherCfgs();
-    TimeSlice _dispatcherResolutionInterval;                // 消息分配器的时间轮盘精度 microseconds 默认1ms
+    Int64 _heartbeatDeadTimeMsInterval;                  // 每个session的心跳间隔时间 单位ms
+    Int32 _prepareBufferPoolCnt;                         // 预创建的buffer数量
+    UInt64 _maxAlloctorBytesPerDispatcher;               // 每个业务层消息缓冲 分配器最大占用
+    TimeSlice _dispatcherResolutionInterval;             // 消息分配器的时间轮盘精度 microseconds 默认1ms
 };
 
 struct BASE_EXPORT ObjPoolCfgs

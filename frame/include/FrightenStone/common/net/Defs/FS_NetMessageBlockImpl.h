@@ -35,6 +35,7 @@ inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
     : _compId(0)
     , _generatorId(0)
     , _netMessageBlockType(NetMessageBlockType::Net_None)
+    ,_acceptorCompId(0)
 {
 }
 

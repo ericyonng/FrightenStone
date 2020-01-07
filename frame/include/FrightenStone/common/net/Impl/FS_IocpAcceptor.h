@@ -92,7 +92,7 @@ private:
 
     /* 网络事件 */
 private:
-    virtual void OnDisconnected(UInt64 sessionId);
+    virtual void OnSessionDisconnected(UInt64 sessionId);
 
     /* 数据成员 */
     #pragma region data member

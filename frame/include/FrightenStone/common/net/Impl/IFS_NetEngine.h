@@ -72,7 +72,7 @@ public:
     /* 组件事件 */
 protected:
     virtual void _HandleCompEv_WillConnect(BriefSessionInfo *newSessionInfo);
-    virtual void _HandleCompEv_Disconnected(UInt64 sessionId);
+    virtual void _HandleCompEv_Disconnected(UInt64 sessionId, UInt32 acceptorCompId, UInt32 transferCompId);
     virtual void _HandleCompEv_HeartBeatTimeOut();
     virtual void _HandleCompEv_RecvMsg(Int64 transferBytes);
     virtual void _HandleCompEv_RecvMsgAmount();
