@@ -62,7 +62,7 @@ public:
     virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs);
     virtual Int32 Start();
     virtual void AfterStart();
-    virtual void WillClose() {}         // 断开与模块之间的依赖
+    virtual void WillClose();
     virtual void BeforeClose();
     virtual void Close();
     virtual void AfterClose();
@@ -76,6 +76,7 @@ public:
     virtual Int32 GetSessionCnt();
 
 private:
+    std::atomic_bool _isInit;
      TransferCfgs *_cfgs;
      std::atomic<Int32> _sessionCnt;             // transfer处理的会话个数
      FS_IocpPoller *_poller;

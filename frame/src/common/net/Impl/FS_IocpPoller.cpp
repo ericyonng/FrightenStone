@@ -92,13 +92,21 @@ void FS_IocpPoller::AfterStart()
     _isInit = true;
 }
 
-void FS_IocpPoller::BeforeClose()
+void FS_IocpPoller::WillClose()
 {
     if(!_isInit)
         return;
 
     if(_quitIocpMonitor)
         _quitIocpMonitor->Invoke();
+
+    _pool->Close();
+}
+
+void FS_IocpPoller::BeforeClose()
+{
+    if(!_isInit)
+        return;
 }
 
 void FS_IocpPoller::Close()
@@ -107,7 +115,6 @@ void FS_IocpPoller::Close()
         return;
 
     _isInit = false;
-    _pool->Close();
     FS_Release(_pool);
     Fs_SafeFree(_iocp);
     Fs_SafeFree(_ioEv);

@@ -42,11 +42,6 @@ inline void FS_IocpMsgDispatcher::BindBusinessLogic(IFS_BusinessLogic *businessL
     _logic = businessLogic;
 }
 
-inline void FS_IocpMsgDispatcher::_RunAFrame(bool hasMsg)
-{
-
-}
-
 inline void FS_IocpMsgDispatcher::_RemoveFromPostRecvQueue(FS_IocpSession *session)
 {
     _toPostRecv.erase(session);

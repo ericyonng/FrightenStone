@@ -65,6 +65,7 @@ FS_IocpMsgTransfer::FS_IocpMsgTransfer(UInt32 compId, IFS_NetEngine *netEngine)
     ,_sessionCnt{0}
     ,_cfgs(NULL)
     ,_poller(NULL)
+    ,_isInit(false)
 {
 /*        _CrtMemCheckpoint(&s1);*/
 }
@@ -81,6 +82,9 @@ FS_IocpMsgTransfer::~FS_IocpMsgTransfer()
 
 Int32 FS_IocpMsgTransfer::BeforeStart(const NetEngineTotalCfgs &totalCfgs)
 {
+    if(_isInit)
+        return StatusDefs::Success;
+
     _cfgs = new TransferCfgs;
     *_cfgs = totalCfgs._transferCfgs;
 
@@ -99,6 +103,9 @@ Int32 FS_IocpMsgTransfer::BeforeStart(const NetEngineTotalCfgs &totalCfgs)
 
 Int32 FS_IocpMsgTransfer::Start()
 {
+    if(_isInit)
+        return StatusDefs::Success;
+
     Int32 st = _poller->Start();
     if(st != StatusDefs::Success)
     {
@@ -111,22 +118,44 @@ Int32 FS_IocpMsgTransfer::Start()
 
 void FS_IocpMsgTransfer::AfterStart()
 {
+    if(_isInit)
+        return;
+
     _poller->AfterStart();
+    _isInit = true;
+}
+
+void FS_IocpMsgTransfer::WillClose()
+{
+    if(!_isInit)
+        return;
+
+    _poller->WillClose();
 }
 
 void FS_IocpMsgTransfer::BeforeClose()
 {
+    if(!_isInit)
+        return;
+
     _poller->BeforeClose();
 }
 
 void FS_IocpMsgTransfer::Close()
 {
+    if(!_isInit)
+        return;
+
     _poller->Close();
 }
 
 void FS_IocpMsgTransfer::AfterClose()
 {
+    if(!_isInit)
+        return;
+
     _poller->AfterClose();
+    _isInit = false;
 }
 
 void FS_IocpMsgTransfer::OnWillConnect(BriefSessionInfo *newSessionInfo)

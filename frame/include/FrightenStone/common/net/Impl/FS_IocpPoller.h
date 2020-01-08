@@ -60,6 +60,7 @@ public:
     virtual Int32 BeforeStart();
     virtual Int32 Start();
     virtual void AfterStart();
+    virtual void WillClose();
     virtual void BeforeClose();
     virtual void Close();
 

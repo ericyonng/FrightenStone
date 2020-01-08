@@ -165,6 +165,13 @@ void FS_IocpMsgDispatcher::AfterStart()
 
 void FS_IocpMsgDispatcher::WillClose()
 {
+    if(_isClose)
+        return;
+
+    _concurrentMq->NotifyConsumerByGenerator(_consumerId);
+
+    // 线程退出
+    _pool->Close();
 }
 
 void FS_IocpMsgDispatcher::BeforeClose()
@@ -172,11 +179,12 @@ void FS_IocpMsgDispatcher::BeforeClose()
     if(_isClose)
         return;
 
-    _concurrentMq->NotifyConsumerByGenerator(_consumerId);
-
     // 需要清理sessions
     if(_logic)
+    {
+        _logic->WillClose();
         _logic->BeforeClose();
+    }
 
     IFS_EngineComp::BeforeClose();
 }
@@ -187,9 +195,6 @@ void FS_IocpMsgDispatcher::Close()
         return;
 
     _isClose = true;
-
-    // 线程退出
-    _pool->Close();
 
     if(_logic)
         _logic->Close();
@@ -303,8 +308,33 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
         // _timeWheel->GetModifiedResolution(_resolutionInterval);
     }
     
+    _concurrentMq->PopImmediately(_consumerId, _recvMsgBlocks, hasMsg);
+    _RunAFrame(hasMsg);
+
     _ClearAllSessions();
     g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end"));
+}
+
+void FS_IocpMsgDispatcher::_RunAFrame(bool hasMsg)
+{
+    // 2.先执行定时器事件
+    _timeWheel->RotateWheel();
+
+    // 3.检查心跳
+    _CheckHeartbeat();
+
+    // 从异步消息队列取得异步处理完成返回事件 TODO: 需要有异步处理队列，其他线程塞入
+    // 清理完成的异步事件 TODO:
+
+    // 4.再执行业务事件
+    if(hasMsg)
+        _OnBusinessProcessing();
+
+    // 5. 投递消息
+    _PostEvents();
+
+    // 6.移除sessions
+    _WillRemoveSessions();
 }
 
 void FS_IocpMsgDispatcher::_CheckHeartbeat()
@@ -394,8 +424,8 @@ void FS_IocpMsgDispatcher::_ClearAllSessions()
     for(auto iterSession = _sessions.begin(); iterSession != _sessions.end();)
     {
         auto session = iterSession->second;
+        session->EnableDisconnect();
         _OnSessionDisconnected(session);
-        Fs_SafeFree(session);
         iterSession = _sessions.erase(iterSession);
     }
 }
