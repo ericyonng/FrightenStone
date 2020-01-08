@@ -285,7 +285,7 @@ Int32 ClientTask::Run()
 
 
 FS_NAMESPACE_BEGIN
-class User : public IUser
+class User : public IUserSys
 {
 public:
     User(UInt64 sessionId, UInt64 generatorId, IFS_MsgDispatcher *dispatcher)
@@ -401,7 +401,7 @@ public:
     {
     }
 
-    virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, IUser *> *> *disconnectedDelegate)
+    virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, UInt64> *> *disconnectedDelegate)
     {
         auto user = GetUser(sessionId);
         if(user)
@@ -411,7 +411,7 @@ public:
                 for(auto iterDelegate = disconnectedDelegate->begin(); iterDelegate != disconnectedDelegate->end(); )
                 {
                     auto item = *iterDelegate;
-                    item->Invoke(user);
+                    item->Invoke(sessionId);
                     FS_Release(item);
                     iterDelegate = disconnectedDelegate->erase(iterDelegate);
                 }
@@ -424,7 +424,7 @@ public:
         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }
 
-    virtual fs::IUser *OnSessionConnected(UInt64 sessionId, UInt64 generatorId)
+    virtual fs::IUserSys *OnSessionConnected(UInt64 sessionId, UInt64 generatorId)
     {
         return NewUser(sessionId, generatorId);
     }

@@ -45,7 +45,6 @@
 
 FS_NAMESPACE_BEGIN
 
-class IUser;
 class IFS_NetModule;
 
 class BASE_EXPORT NetMessageBlockType
@@ -102,8 +101,7 @@ struct BASE_EXPORT FS_NetSessionWillConnectMsg : public FS_NetMsgBufferBlock
     IFS_NetModule *_netModule;          // 兼容iocp,epoll
 
     /* 连接器的额外参数 */
-    IDelegate<void, IUser *> *_onNewUserRes;
-    IDelegate<void, IUser *> *_onUserDisconnectedRes;
+    IDelegate<void, UInt64> *_onUserDisconnectedRes;    // UInt64 :sessionId
 };
 
 FS_NAMESPACE_END

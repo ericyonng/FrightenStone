@@ -21,60 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_NetMessageBlockImpl.h
+ * @file  : UserMgrFactory.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/29
+ * @date  : 2020/1/9
  * @brief :
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Defs_FS_NetMessageBlock_H__
-#pragma once
+#include "stdafx.h"
+#include "TestInst/TestServer/User/UserMgrFactory.h"
+#include "TestInst/TestServer/User/UserMgr.h"
 
-FS_NAMESPACE_BEGIN
-
-inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
-    : _compId(0)
-    , _generatorId(0)
-    , _netMessageBlockType(NetMessageBlockType::Net_None)
-    ,_acceptorCompId(0)
+fs::IFS_Facade * UserMgrFactory::Create()
 {
+    return new UserMgr();
 }
-
-inline FS_NetMsgBufferBlock::~FS_NetMsgBufferBlock()
-{
-
-}
-
-inline FS_NetArrivedMsg::FS_NetArrivedMsg()
-    :_ioEv(NULL)
-    ,_errorCode(StatusDefs::Success)
-{
-    _netMessageBlockType = NetMessageBlockType::Net_NetMsgArrived;
-}
-
-inline FS_NetArrivedMsg::~FS_NetArrivedMsg()
-{
-    if(_ioEv)
-    {
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(_ioEv);
-        g_MemoryPool->Unlock();
-    }
-}
-
-inline FS_NetSessionWillConnectMsg::FS_NetSessionWillConnectMsg()
-    :_sessionId(0)
-    ,_sock(INVALID_SOCKET)
-    ,_addrInfo{0}
-    ,_onUserDisconnectedRes(NULL)
-    ,_netModule(NULL)
-{
-    _netMessageBlockType = NetMessageBlockType::Met_NetSessionConnected;
-}
-
-inline FS_NetSessionWillConnectMsg::~FS_NetSessionWillConnectMsg()
-{
-    FS_Release(_onUserDisconnectedRes);
-}
-
-FS_NAMESPACE_END
-#endif

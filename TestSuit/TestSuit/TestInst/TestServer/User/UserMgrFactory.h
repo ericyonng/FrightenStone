@@ -21,37 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IUser.h
+ * @file  : UserMgrFactory.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/09
+ * @date  : 2020/1/9
  * @brief :
- * 
- *
- * 
  */
-
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IUser_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_IUser_H__
 
 #pragma once
 
-#include <FrightenStone/exportbase.h>
-#include <FrightenStone/common/basedefs/BaseDefs.h>
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
 
-FS_NAMESPACE_BEGIN
-
-class BASE_EXPORT IUser
+class UserMgrFactory : public fs::IFS_FacadeFactory
 {
 public:
-    IUser() {}
-    virtual ~IUser() {}
-    virtual void Release() { delete this; }
-
-public:
-    virtual UInt64 GetSessionId() const = 0;
-    virtual void Close() = 0;
+    virtual fs::IFS_Facade *Create();
 };
-
-FS_NAMESPACE_END
-
-#endif

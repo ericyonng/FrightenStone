@@ -32,18 +32,27 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 
-class User : public fs::IUser
+class User : public fs::IUserSys
 {
 public:
     User(UInt64 sessionId, UInt64 userId, fs::IFS_MsgDispatcher *dispatcher);
     ~User();
 
+public:
+    Int32 Login(fs::LoginData *loginData);
+    Int32 Logout();
+    void CheckHeart();
+    void SucRecvMsg();
+
+public:
     virtual UInt64 GetSessionId() const;
     virtual UInt64 GetUseId() const;
+    Int32 GetRecvMsgId() const;
+    Int32 GetSendMsgId() const;
 
     virtual void Close();
     // NetMsg_DataHeader内部会拷贝到缓冲区
-    void SendData(UInt64 sessionId, fs::NetMsg_DataHeader *msgData);
+    void SendData(fs::NetMsg_DataHeader *msgData);
     void OnDisconnect();
 
 private:
@@ -56,3 +65,5 @@ private:
     Int32 _sendMsgId = 1;
     fs::IFS_MsgDispatcher *_dispatcher;
 };
+
+#include "TestInst/TestServer/User/UserImpl.h"

@@ -61,7 +61,7 @@ public:
 public:
     virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs);
     virtual Int32 Start();
-    virtual void AfterStart() {}
+    virtual void AfterStart();
     virtual void WillClose() {}         // 断开与模块之间的依赖
     virtual void BeforeClose();
     virtual void Close();

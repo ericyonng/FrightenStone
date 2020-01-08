@@ -109,6 +109,11 @@ Int32 FS_IocpMsgTransfer::Start()
     return StatusDefs::Success;
 }
 
+void FS_IocpMsgTransfer::AfterStart()
+{
+    _poller->AfterStart();
+}
+
 void FS_IocpMsgTransfer::BeforeClose()
 {
     _poller->BeforeClose();

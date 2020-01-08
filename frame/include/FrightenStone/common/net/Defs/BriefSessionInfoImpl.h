@@ -40,14 +40,12 @@ inline BriefSessionInfo::BriefSessionInfo()
     ,_sock(INVALID_SOCKET)
     ,_acceptorCompId(0)
     ,_addrInfo{0}
-    ,_newUserRes(NULL)
     ,_userDisconnectedRes(NULL)
 {
 }
 
 inline BriefSessionInfo::~BriefSessionInfo()
 {
-    FS_Release(_newUserRes);
     FS_Release(_userDisconnectedRes);
 }
 

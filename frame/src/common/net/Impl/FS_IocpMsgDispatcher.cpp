@@ -78,7 +78,8 @@ FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
     Fs_SafeFree(_cfgs);
     Fs_SafeFree(_printAlloctorOccupiedInfo);
     Fs_SafeFree(_sessionBufferAlloctor);
-    STLUtil::DelListContainer(*_recvMsgBlocks);
+    if(_recvMsgBlocks)
+        STLUtil::DelListContainer(*_recvMsgBlocks);
     Fs_SafeFree(_recvMsgBlocks);
 
     for(auto &iterDelegateInfo : _sessionIdRefUserDisconnected)
@@ -150,14 +151,16 @@ Int32 FS_IocpMsgDispatcher::Start()
         }
     }
 
+    return StatusDefs::Success;
+}
+
+void FS_IocpMsgDispatcher::AfterStart()
+{
     auto task = DelegatePlusFactory::Create(this, &FS_IocpMsgDispatcher::_OnBusinessProcessThread);
     if(!_pool->AddTask(task, true))
     {
         g_Log->e<FS_IocpMsgDispatcher>(_LOGFMT_("add task fail"));
-        return StatusDefs::FS_IocpMsgHandler_StartFailOfBusinessProcessThreadFailure;
     }
-
-    return StatusDefs::Success;
 }
 
 void FS_IocpMsgDispatcher::WillClose()
@@ -448,7 +451,6 @@ void FS_IocpMsgDispatcher::_RemoveSessionGracefully(FS_IocpSession *session)
         // close会把在缓冲完全清除,若有post还未返回则会出现丢数据情况
         _OnSessionDisconnected(session);
         _sessions.erase(sessionId);
-        Fs_SafeFree(session);
     }
 }
 
@@ -475,7 +477,7 @@ void FS_IocpMsgDispatcher::_OnSessionDisconnected(FS_IocpSession *session)
                                    , session->GetSocket(), session->GetAddr()->ToString().c_str());
 
     // 断连回调
-    std::list<IDelegate<void, IUser *> *> *delagates = NULL;
+    std::list<IDelegate<void, UInt64> *> *delagates = NULL;
     auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
     if(iterDisconnected != _sessionIdRefUserDisconnected.end())
         delagates = &iterDisconnected->second;
@@ -528,16 +530,12 @@ void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *conn
                                    , addr->GetPort());
 
     auto newUser = _logic->OnSessionConnected(sessionId);
-    auto newUserRes = connectedMsg->_onNewUserRes;
-    if(newUserRes)
-        newUserRes->Invoke(newUser);
-
     auto userDisconnectedDelegates = connectedMsg->_onUserDisconnectedRes;
     if(userDisconnectedDelegates)
     {
         auto iterDisconnected = _sessionIdRefUserDisconnected.find(sessionId);
         if(iterDisconnected == _sessionIdRefUserDisconnected.end())
-            iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, IUser *>*>())).first;
+            iterDisconnected = _sessionIdRefUserDisconnected.insert(std::make_pair(sessionId, std::list<IDelegate<void, UInt64>*>())).first;
         iterDisconnected->second.push_back(userDisconnectedDelegates);
         connectedMsg->_onUserDisconnectedRes = NULL;
     }

@@ -109,12 +109,19 @@ const char * ProtocolCmd::GetStr(UInt16 cmd)
 // {
 // }
 
+LoginData::LoginData()
+    :_data{0}
+    ,_msgId(0)
+{
+    memset(_userName, 0, sizeof(_userName));
+    memset(_pwd, 0, sizeof(_pwd));
+}
+
 LoginReq::LoginReq()
 {
     _packetLength = sizeof(LoginReq);
     _cmd = ProtocolCmd::LoginReq;
-    memset(_userName, 0, sizeof(_userName));
-    memset(_pwd, 0, sizeof(_pwd));
+
 }
 
 LoginRes::LoginRes()

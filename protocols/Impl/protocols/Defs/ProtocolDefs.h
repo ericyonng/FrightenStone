@@ -86,13 +86,19 @@ public:
 //     char _buffer[0];
 // };
 
-struct LoginReq : public NetMsg_DataHeader
+struct LoginData
 {
-    LoginReq();
+    LoginData();
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
     char _data[28];
     Int32 _msgId;
+};
+
+struct LoginReq : public NetMsg_DataHeader
+{
+    LoginReq();
+    LoginData _loginData;
 };
 
 struct LoginRes : public NetMsg_DataHeader

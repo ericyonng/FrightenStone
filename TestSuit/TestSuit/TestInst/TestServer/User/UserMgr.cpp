@@ -28,3 +28,117 @@
  */
 #include "stdafx.h"
 #include "TestInst/TestServer/User/UserMgr.h"
+#include "TestInst/TestServer/User/User.h"
+#include "TestInst/TestServer/User/UserFacade.h"
+
+UserMgr *g_UserMgr = NULL;
+
+UserMgr::UserMgr()
+    :_curMaxUserId(0)
+    ,_dispatcher(NULL)
+{
+    _userFacade = new UserFacade;
+    g_UserMgr = this;
+}
+
+UserMgr::~UserMgr()
+{
+    Fs_SafeFree(_userFacade);
+}
+
+Int32 UserMgr::OnInitialize()
+{
+    _dispatcher = _logic->GetDispatcher();
+    _userFacade->BindLogic(_logic);
+
+    Int32 st = _userFacade->OnInitialize();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<UserMgr>(_LOGFMT_("_userFacade->OnInitialize fail st[%d]"), st);
+        return st;
+    }
+
+    return StatusDefs::Success;
+}
+
+Int32 UserMgr::BeforeStart()
+{
+    Int32 st = _userFacade->BeforeStart();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<UserMgr>(_LOGFMT_("_userFacade->BeforeStart fail st[%d]"), st);
+        return st;
+    }
+
+    return StatusDefs::Success;
+}
+
+Int32 UserMgr::Start()
+{
+    Int32 st = _userFacade->Start();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<UserMgr>(_LOGFMT_("_userFacade->Start fail st[%d]"), st);
+        return st;
+    }
+
+    return StatusDefs::Success;
+}
+
+void UserMgr::BeforeClose()
+{
+    _userFacade->BeforeClose();
+}
+
+void UserMgr::Close()
+{
+    _userFacade->Close();
+}
+
+void UserMgr::WillClose()
+{
+    for(auto &iterUser : _sessionIdRefUsers)
+    {
+        auto user = iterUser.second;
+        user->OnDisconnect();
+        user->Close();
+    }
+}
+
+User *UserMgr::GetUserBySessionId(UInt64 sessionId)
+{
+    auto iterUser = _sessionIdRefUsers.find(sessionId);
+    if(iterUser == _sessionIdRefUsers.end())
+        return NULL;
+
+    return iterUser->second;
+}
+
+User *UserMgr::GetUserByUserId(UInt64 userId)
+{
+    auto iterUser = _userIdRefUsers.find(userId);
+    if(iterUser == _userIdRefUsers.end())
+        return NULL;
+
+    return iterUser->second;
+}
+
+void UserMgr::RemoveUser(UInt64 sessionId)
+{
+    auto iterUser = _sessionIdRefUsers.find(sessionId);
+    if(iterUser == _sessionIdRefUsers.end())
+        return;
+
+    const UInt64 userId = iterUser->second->GetUseId();
+    FS_Release(iterUser->second);
+    _sessionIdRefUsers.erase(iterUser);
+    _userIdRefUsers.erase(userId);
+}
+
+User *UserMgr::NewUser(UInt64 sessionId)
+{
+    auto user = new User(sessionId, ++_curMaxUserId, _dispatcher);
+    _sessionIdRefUsers.insert(std::make_pair(sessionId, user));
+    _userIdRefUsers.insert(std::make_pair(_curMaxUserId, user));
+    return user;
+}

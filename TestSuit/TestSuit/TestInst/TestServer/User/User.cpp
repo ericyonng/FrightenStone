@@ -44,14 +44,33 @@ User::~User()
 
 }
 
-UInt64 User::GetSessionId() const
+Int32 User::Login(fs::LoginData *loginData)
 {
-    return _sessionId;
+    if(loginData->_msgId != _recvMsgId)
+    {// 当前消息ID和本地收消息次数不匹配
+        g_Log->custom("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>"
+                      , _sessionId, loginData->_msgId
+                      , _recvMsgId, loginData->_msgId - _recvMsgId);
+    }
+
+    // 打印
+//     g_Log->custom("user[%s]-pwd[%s]-msgid[%d] login suc", 
+//                   loginData->_userName
+//                   , loginData->_pwd
+//                   , loginData->_msgId);
+
+    return StatusDefs::Success;
 }
 
-UInt64 User::GetUseId() const
+Int32 User::Logout()
 {
-    return _userId;
+    g_Log->custom("userId[%llu] sessionId[%llu] logout", _userId, _sessionId);
+    return StatusDefs::Success;
+}
+
+void User::CheckHeart()
+{
+
 }
 
 void User::Close()
@@ -61,9 +80,12 @@ void User::Close()
 }
 
 // NetMsg_DataHeader内部会拷贝到缓冲区
-void User::SendData(UInt64 sessionId, fs::NetMsg_DataHeader *msgData)
+void User::SendData(fs::NetMsg_DataHeader *msgData)
 {
-    _dispatcher->SendData(sessionId, msgData);
+    _dispatcher->SendData(_sessionId, msgData);
+
+    // 为了校验是否存在丢包,校验消息的连续性
+    ++_sendMsgId;
 }
 
 void User::OnDisconnect()

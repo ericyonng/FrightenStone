@@ -21,60 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_NetMessageBlockImpl.h
+ * @file  : IBaseLogicSysMgr.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/29
+ * @date  : 2020/1/8
  * @brief :
+            业务逻辑管理类基类
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Defs_FS_NetMessageBlock_H__
+#ifndef __Frame_Include_FrightenStone_Common_Logicsys_Impl_IBaseLogicSysMgr_H__
+#define __Frame_Include_FrightenStone_Common_Logicsys_Impl_IBaseLogicSysMgr_H__
+
 #pragma once
+
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/logicsys/Impl/IFS_Facade.h"
+#include "FrightenStone/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
-inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
-    : _compId(0)
-    , _generatorId(0)
-    , _netMessageBlockType(NetMessageBlockType::Net_None)
-    ,_acceptorCompId(0)
+class BASE_EXPORT IBaseLogicSysMgr : public IFS_Facade
 {
-}
-
-inline FS_NetMsgBufferBlock::~FS_NetMsgBufferBlock()
-{
-
-}
-
-inline FS_NetArrivedMsg::FS_NetArrivedMsg()
-    :_ioEv(NULL)
-    ,_errorCode(StatusDefs::Success)
-{
-    _netMessageBlockType = NetMessageBlockType::Net_NetMsgArrived;
-}
-
-inline FS_NetArrivedMsg::~FS_NetArrivedMsg()
-{
-    if(_ioEv)
-    {
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(_ioEv);
-        g_MemoryPool->Unlock();
-    }
-}
-
-inline FS_NetSessionWillConnectMsg::FS_NetSessionWillConnectMsg()
-    :_sessionId(0)
-    ,_sock(INVALID_SOCKET)
-    ,_addrInfo{0}
-    ,_onUserDisconnectedRes(NULL)
-    ,_netModule(NULL)
-{
-    _netMessageBlockType = NetMessageBlockType::Met_NetSessionConnected;
-}
-
-inline FS_NetSessionWillConnectMsg::~FS_NetSessionWillConnectMsg()
-{
-    FS_Release(_onUserDisconnectedRes);
-}
+public:
+    virtual Int32 BeforeStart() { return StatusDefs::Success; }
+    virtual Int32 Start() { return StatusDefs::Success; }
+    virtual void BeforeClose() {}
+    virtual void Close() {}
+};
 
 FS_NAMESPACE_END
+
+#include "FrightenStone/common/logicsys/Impl/IBaseLogicSysMgrImpl.h"
+
 #endif

@@ -62,8 +62,6 @@ FS_MessageBlock *MessageBlockUtil::BuildTransferWillConnectMessageBlock(UInt32 c
     block->_sessionId = newSessionInfo->_sessionId;
     block->_sock = newSessionInfo->_sock;
     block->_addrInfo = *newSessionInfo->_addrInfo;
-    block->_onNewUserRes = newSessionInfo->_newUserRes;
-    newSessionInfo->_newUserRes = NULL;
     block->_onUserDisconnectedRes = newSessionInfo->_userDisconnectedRes;
     newSessionInfo->_userDisconnectedRes = NULL;
     block->_netModule = netModule;

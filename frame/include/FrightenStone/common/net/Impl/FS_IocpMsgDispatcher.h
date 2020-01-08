@@ -53,7 +53,6 @@ class IFS_MsgTransfer;
 class IFS_BusinessLogic;
 class ConcurrentMessageQueueNoThread;
 struct FS_MessageBlock;
-class IUser;
 class IFS_NetEngine;
 class FS_IocpSession;
 struct FS_NetSessionWillConnectMsg;
@@ -68,7 +67,7 @@ public:
 public:
     virtual Int32 BeforeStart(const NetEngineTotalCfgs &cfgs);
     virtual Int32 Start();
-    virtual void AfterStart() {}
+    virtual void AfterStart();
     virtual void WillClose();
     virtual void BeforeClose();
     virtual void Close();
@@ -125,7 +124,7 @@ private:
     /* 业务层资源 */
     TimeWheel *_timeWheel;
     IFS_BusinessLogic *_logic;
-    std::map<UInt64, std::list<IDelegate<void, IUser *> *>> _sessionIdRefUserDisconnected;
+    std::map<UInt64, std::list<IDelegate<void, UInt64> *>> _sessionIdRefUserDisconnected;
     std::vector<std::list<FS_MessageBlock *> *> *_recvMsgBlocks;       // 需要转换成 FS_NetMsgBufferBlock
 
     /* 会话 */ 

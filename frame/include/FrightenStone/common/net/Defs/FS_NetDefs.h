@@ -118,7 +118,7 @@
 #define SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL          "1"                               // 单位ms
 #define SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY             "PreparePoolBufferCnt"          // 预先准备的网络buffer缓冲池的buffer个数
 #define SVR_CFG_PREPARE_POOL_BUFFER_CNT                 "1024"                          // 预先准备的网络buffer缓冲池的buffer个数
-#define SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER_KEY       "MaxMemPoolMBPerTransfer"       // 每个数据传输器内存池大小
+#define SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER_KEY       "MaxMemPoolMBPerDispatcher"       // 每个消息分发器器内存池大小
 #define SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER           "1024"                          // MB为单位
 #pragma endregion
 

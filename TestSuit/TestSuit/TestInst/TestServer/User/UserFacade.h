@@ -35,6 +35,15 @@
 class UserFacade : public fs::IFS_Facade
 {
 public:
+    virtual Int32 OnInitialize();
+    virtual Int32 BeforeStart();
+    virtual Int32 Start();
+    virtual void BeforeClose();
+    virtual void Close();
 
 private:
+    void _RegisterProtocols();
+    void _OnUserLoginReq(UInt64 userId, fs::NetMsg_DataHeader *msgData);
+    void _OnUserLogoutReq(UInt64 userId, fs::NetMsg_DataHeader *msgData);
+    void _OnUserCheckHeartReq(UInt64 userId, fs::NetMsg_DataHeader *msgData);
 };

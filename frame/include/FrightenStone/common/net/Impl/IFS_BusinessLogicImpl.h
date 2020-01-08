@@ -37,6 +37,7 @@ FS_NAMESPACE_BEGIN
 inline IFS_BusinessLogic::IFS_BusinessLogic()
     :_dispatcher(NULL)
     ,_timeWheel(NULL)
+    ,_isInit(false)
 {
 
 }
@@ -46,9 +47,28 @@ inline void IFS_BusinessLogic::SetDispatcher(IFS_MsgDispatcher *dispatcher)
     _dispatcher = dispatcher;
 }
 
+inline IFS_MsgDispatcher *IFS_BusinessLogic::GetDispatcher()
+{
+    return _dispatcher;
+}
+
 inline void IFS_BusinessLogic::SetTimeWheel(TimeWheel *timeWheel)
 {
     _timeWheel = timeWheel;
+}
+
+template <typename FacadeFactoryType>
+inline Int32 IFS_BusinessLogic::RegisterFacade()
+{
+    FacadeFactoryType *facadeFactory = new (FacadeFactoryType);
+    Int32 ret = RegisterFacade(facadeFactory);
+    if(ret != StatusDefs::Success)
+    {
+        Fs_SafeFree(facadeFactory);
+        return StatusDefs::Failed;
+    }
+
+    return StatusDefs::Success;
 }
 
 FS_NAMESPACE_END

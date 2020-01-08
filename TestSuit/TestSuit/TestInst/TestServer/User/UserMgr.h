@@ -32,3 +32,35 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 
+class User;
+class UserFacade;
+
+class UserMgr : public fs::IBaseLogicSysMgr
+{
+public:
+    UserMgr();
+    ~UserMgr();
+
+public:
+    virtual Int32 OnInitialize();
+    virtual Int32 BeforeStart();
+    virtual Int32 Start();
+    virtual void BeforeClose();
+    virtual void Close();
+    void WillClose();
+
+public:
+    User *GetUserBySessionId(UInt64 sessionId);
+    User *GetUserByUserId(UInt64 userId);
+    void RemoveUser(UInt64 sessionId);
+    User *NewUser(UInt64 sessionId);
+
+private:
+    UInt64 _curMaxUserId;
+    std::map<UInt64, User *> _sessionIdRefUsers;
+    std::map<UInt64, User *> _userIdRefUsers;
+    fs::IFS_MsgDispatcher *_dispatcher;             // 消息分发
+    UserFacade *_userFacade;
+};
+
+extern UserMgr *g_UserMgr;

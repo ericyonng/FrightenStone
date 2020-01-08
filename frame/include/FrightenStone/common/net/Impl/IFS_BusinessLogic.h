@@ -44,12 +44,15 @@
 #include "FrightenStone/common/net/Impl/FS_MsgReadStream.h"
 #include "FrightenStone/common/net/Impl/FS_MsgWriteStream.h"
 #include <FrightenStone/common/component/Impl/FS_Delegate.h>
+#include "FrightenStone/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 
 struct NetMsg_DataHeader;
 class  IFS_MsgDispatcher;
-class IUser;
+class IUserSys;
+class IFS_FacadeFactory;
+class IFS_Facade;
 
 class BASE_EXPORT IFS_BusinessLogic
 {
@@ -59,26 +62,67 @@ public:
     virtual void Release() = 0;
 
 public:
-    virtual Int32 BeforeStart() { return StatusDefs::Success; }
-    virtual Int32 Start() = 0;
-    virtual Int32 AfterStart() { return StatusDefs::Success; }
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    virtual void BeforeClose() {}
-    virtual void Close() = 0;
+    virtual void OnRegisterFacades() = 0;
+    // 注册facades
+    virtual Int32 BeforeStart();
+    // 启动facades
+    virtual Int32 Start();
+    virtual void AfterStart() { _isInit = true;}
+    virtual void WillClose();
+    virtual void BeforeClose();
+    virtual void Close();
     virtual void AfterClose() {}
 
+    /* 网络事件 */
 public:
     virtual void OnMsgDispatch(UInt64 sessionId, NetMsg_DataHeader *msgData) = 0;
-    virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, IUser *> *> *disconnectedDelegate) = 0;
-    virtual IUser *OnSessionConnected(UInt64 sessionId) = 0;
+    virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, UInt64> *> *disconnectedDelegate) = 0;
+    virtual IUserSys *OnSessionConnected(UInt64 sessionId) = 0;
 
+public:
     void SetDispatcher(IFS_MsgDispatcher *dispatcher);
+    IFS_MsgDispatcher *GetDispatcher();
     void SetTimeWheel(TimeWheel *timeWheel);
     // 订阅协议
     virtual void SubscribeProtocol(Int32 protocolCmd, IDelegate<void, UInt64, NetMsg_DataHeader *> *handler);
     virtual void InvokeProtocolHandler(Int32 protocolCmd, UInt64 userId, NetMsg_DataHeader *msgData);
+    template <typename FacadeFactoryType>
+    Int32 RegisterFacade();
+    virtual Int32 RegisterFacade(IFS_FacadeFactory *facadeFactory);
+    virtual Int32 RegisterFacade(IFS_Facade *facade);
+    virtual IFS_Facade *GetFacade(const FS_String &facadeName);
+    virtual std::vector<IFS_Facade *> GetFacades(const FS_String &facadeName);
 
 protected:
+    Int32 _InitFacades();
+    Int32 _StartFacades();
+    void _BeforeFacadesClose();
+    void _CloseFacades();
+    void _DestroyWillRegFacades();
+    void _AddFacade(IFS_Facade *facade);
+
+protected:
+
+    // 注册facade
+    class _WillRegFacade
+    {
+    public:
+        IFS_Facade * facade;
+        IFS_FacadeFactory *facadeFactory;
+
+        _WillRegFacade(IFS_Facade *facade);
+        _WillRegFacade(IFS_FacadeFactory *facadeFactory);
+    };
+    typedef std::vector<_WillRegFacade> _WillRegFacades;
+    _WillRegFacades _willRegFacades;
+
+    // facade对象
+    typedef std::vector<IFS_Facade *> _Facades;
+    _Facades _facades;
+    typedef std::map<FS_String, _Facades> _Facades2;
+    _Facades2 _facades2;
+
+    std::atomic_bool _isInit;
     IFS_MsgDispatcher *_dispatcher;     // 消息分发
     TimeWheel *_timeWheel;              // 时间轮盘
     std::map<Int32, IDelegate<void, UInt64, NetMsg_DataHeader *> *> _protocolCmdRefHandlers;

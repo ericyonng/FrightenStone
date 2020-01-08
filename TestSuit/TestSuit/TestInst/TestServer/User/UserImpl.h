@@ -21,60 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_NetMessageBlockImpl.h
+ * @file  : UserImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/29
+ * @date  : 2020/1/8
  * @brief :
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Defs_FS_NetMessageBlock_H__
+
 #pragma once
-
-FS_NAMESPACE_BEGIN
-
-inline FS_NetMsgBufferBlock::FS_NetMsgBufferBlock()
-    : _compId(0)
-    , _generatorId(0)
-    , _netMessageBlockType(NetMessageBlockType::Net_None)
-    ,_acceptorCompId(0)
+inline void User::SucRecvMsg()
 {
+    ++_recvMsgId;
 }
 
-inline FS_NetMsgBufferBlock::~FS_NetMsgBufferBlock()
+inline UInt64 User::GetSessionId() const
 {
-
+    return _sessionId;
 }
 
-inline FS_NetArrivedMsg::FS_NetArrivedMsg()
-    :_ioEv(NULL)
-    ,_errorCode(StatusDefs::Success)
+inline UInt64 User::GetUseId() const
 {
-    _netMessageBlockType = NetMessageBlockType::Net_NetMsgArrived;
+    return _userId;
 }
 
-inline FS_NetArrivedMsg::~FS_NetArrivedMsg()
+inline Int32 User::GetRecvMsgId() const
 {
-    if(_ioEv)
-    {
-        g_MemoryPool->Lock();
-        g_MemoryPool->Free(_ioEv);
-        g_MemoryPool->Unlock();
-    }
+    return _recvMsgId;
 }
 
-inline FS_NetSessionWillConnectMsg::FS_NetSessionWillConnectMsg()
-    :_sessionId(0)
-    ,_sock(INVALID_SOCKET)
-    ,_addrInfo{0}
-    ,_onUserDisconnectedRes(NULL)
-    ,_netModule(NULL)
+inline Int32 User::GetSendMsgId() const
 {
-    _netMessageBlockType = NetMessageBlockType::Met_NetSessionConnected;
+    return _sendMsgId;
 }
-
-inline FS_NetSessionWillConnectMsg::~FS_NetSessionWillConnectMsg()
-{
-    FS_Release(_onUserDisconnectedRes);
-}
-
-FS_NAMESPACE_END
-#endif

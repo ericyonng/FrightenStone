@@ -48,8 +48,8 @@ FS_NAMESPACE_BEGIN
 // poller¼àÊÓÆ÷·½·¨
 FS_IocpPoller::MonitorHandler FS_IocpPoller::_monitorHandler[PollerDefs::MonitorType_End] = {
 NULL
-, &FS_IocpPoller::_TransferMonitor
 , &FS_IocpPoller::_AcceptorMonitor
+, &FS_IocpPoller::_TransferMonitor
 };
 Int32 FS_IocpPoller::BeforeStart()
 {
@@ -75,19 +75,28 @@ Int32 FS_IocpPoller::Start()
     if(_isInit)
         return StatusDefs::Success;
 
+    return StatusDefs::Success;
+}
+
+void FS_IocpPoller::AfterStart()
+{
+    if(_isInit)
+        return;
+
     auto task = DelegatePlusFactory::Create(this, _monitorHandler[_monitorType]);
     if(!_pool->AddTask(task, true))
     {
         g_Log->e<FS_IocpPoller>(_LOGFMT_("addtask fail"));
-        return StatusDefs::IocpMsgTransfer_StartFailOfMoniterMsgFailure;
     }
 
     _isInit = true;
-    return StatusDefs::Success;
 }
 
 void FS_IocpPoller::BeforeClose()
 {
+    if(!_isInit)
+        return;
+
     if(_quitIocpMonitor)
         _quitIocpMonitor->Invoke();
 }
@@ -97,7 +106,7 @@ void FS_IocpPoller::Close()
     if(!_isInit)
         return;
 
-    _isInit = true;
+    _isInit = false;
     _pool->Close();
     FS_Release(_pool);
     Fs_SafeFree(_iocp);

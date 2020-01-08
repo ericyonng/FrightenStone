@@ -59,6 +59,7 @@ public:
 public:
     virtual Int32 BeforeStart();
     virtual Int32 Start();
+    virtual void AfterStart();
     virtual void BeforeClose();
     virtual void Close();
 

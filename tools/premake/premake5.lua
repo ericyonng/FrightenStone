@@ -59,9 +59,9 @@ function include_libfs(do_post_build)
     }
 
     -- files
-    files {
-        FS_ROOT_DIR .. "/frame/include/**.h",
-    }
+    -- files {
+    --    FS_ROOT_DIR .. "/frame/include/**.h",
+    -- }
 
     -- libdirs(linux)
     filter { "system:linux"}

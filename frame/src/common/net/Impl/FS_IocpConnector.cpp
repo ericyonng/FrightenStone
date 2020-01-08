@@ -33,7 +33,6 @@
 #include "FrightenStone/common/net/Impl/FS_IocpConnector.h"
 #include <FrightenStone/common/net/Defs/FS_ConnectInfo.h>
 #include <FrightenStone/common/net/Defs/BriefSessionInfo.h>
-#include <FrightenStone/common/net/Impl/IUser.h>
 #include "FrightenStone/common/net/Defs/NetCfgDefs.h"
 #include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
 
@@ -131,7 +130,6 @@ Int32 FS_IocpConnector::Connect(const FS_ConnectInfo &connectInfo)
         auto netEngine = GetEngine();
         BriefSessionInfo newSessionInfo;
         newSessionInfo._addrInfo = &addr_in;
-        newSessionInfo._newUserRes = DelegatePlusFactory::Create(this, &FS_IocpConnector::_OnNewUserRes);
         newSessionInfo._sessionId = curMaxSessionId;
         newSessionInfo._sock = sock;
         newSessionInfo._userDisconnectedRes = DelegatePlusFactory::Create(this, &FS_IocpConnector::_OnUserDisconnected);
@@ -146,17 +144,9 @@ Int32 FS_IocpConnector::Connect(const FS_ConnectInfo &connectInfo)
     return ret;
 }
 
-void FS_IocpConnector::_OnNewUserRes(IUser *user)
+void FS_IocpConnector::_OnUserDisconnected(UInt64 sessionId)
 {
     _locker.Lock();
-    _sessionIdRefUser.insert(std::make_pair(user->GetSessionId(), user));
-    _locker.Unlock();
-}
-
-void FS_IocpConnector::_OnUserDisconnected(IUser *user)
-{
-    _locker.Lock();
-    auto sessionId = user->GetSessionId();
     _sucConnectedSessionIds.erase(sessionId);
     --_curSessionCnt;
     _locker.Unlock();

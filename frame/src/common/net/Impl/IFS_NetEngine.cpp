@@ -167,19 +167,14 @@ Int32 IFS_NetEngine::Start()
         return StatusDefs::NotInit;
 
     // 1.内存助手
+    g_MemoryHelper = MemoryHelper::GetInstance();
     g_MemoryHelper->Start(_totalCfgs->_objPoolCfgs._maxAllowObjPoolBytesOccupied, _totalCfgs->_mempoolCfgs._maxAllowMemPoolBytesOccupied);
     // 2.内存监控
     if(_totalCfgs->_commonCfgs._isOpenMemoryMonitor)
         g_MemleakMonitor->Start();
 
-    // 3.启动监控器
+    // 3.初始化线程对象
     _pool = new FS_ThreadPool(0, 1);
-    auto task = DelegatePlusFactory::Create(this, &IFS_NetEngine::_Monitor);
-    if(!_pool->AddTask(task, true))
-    {
-        g_Log->e<IFS_NetEngine>(_LOGFMT_("add task fail"));
-        return StatusDefs::FS_ServerCore_StartFailOfSvrRuningTaskFailure;
-    }
 
     // 4.创建服务器模块
     Int32 ret = _CreateNetModules();
@@ -215,6 +210,14 @@ Int32 IFS_NetEngine::Start()
 
     // 9._AfterStart
     _AfterStart();
+
+    // 10.启动线程监视器
+    auto task = DelegatePlusFactory::Create(this, &IFS_NetEngine::_Monitor);
+    if(!_pool->AddTask(task, true))
+    {
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("add task fail"));
+        return StatusDefs::FS_ServerCore_StartFailOfSvrRuningTaskFailure;
+    }
 
     return StatusDefs::Success;
 }

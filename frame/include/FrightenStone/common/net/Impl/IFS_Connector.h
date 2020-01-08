@@ -45,7 +45,6 @@ FS_NAMESPACE_BEGIN
 
 class IFS_Session;
 struct BriefSessionInfo;
-class IUser;
 struct FS_ConnectInfo;
 struct ConnectorCfgs;
 
@@ -58,7 +57,6 @@ public:
 public:
     // 连接
     virtual Int32 Connect(const FS_ConnectInfo &connectInfo) = 0;
-    virtual std::map<UInt64, IUser *> &GetUsers() = 0;
 };
 
 FS_NAMESPACE_END

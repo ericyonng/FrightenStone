@@ -69,13 +69,10 @@ public:
 public:
     // 连接
     virtual Int32 Connect(const FS_ConnectInfo &connectInfo);
-    virtual std::map<UInt64, IUser *> &GetUsers();  // 可以在user中启动定时器
 
 private:
-    // 连入成功 从dispatcher调用委托回调
-    void _OnNewUserRes(IUser *user);
     // 断开 从dispatcher调用委托回调
-    void _OnUserDisconnected(IUser *user);
+    void _OnUserDisconnected(UInt64 sessionId);
 
     Int32 _CheckConnect(const FS_ConnectInfo &connectInfo, FS_String &addrInfoOut) const;
     void _MakeAddrInfo(const FS_String &ip, UInt64 port, FS_String &addrInfo) const;
@@ -90,7 +87,6 @@ private:
     Int32 &_maxSessionQuantityLimit;
     UInt64 &_curMaxSessionId;
     std::set<UInt64> _sucConnectedSessionIds;
-    std::map<UInt64, IUser *> _sessionIdRefUser;
 };
 
 #pragma region inline
@@ -98,12 +94,6 @@ inline void FS_IocpConnector::_MakeAddrInfo(const FS_String &ip, UInt64 port, FS
 {
     addrInfo.AppendFormat("%s%hu", ip.c_str(), port);
 }
-
-inline std::map<UInt64, IUser *> &FS_IocpConnector::GetUsers()
-{
-    return _sessionIdRefUser;
-}
-
 #pragma endregion
 FS_NAMESPACE_END
 

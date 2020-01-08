@@ -30,6 +30,7 @@
 #define __Frame_Include_FrightenStone_Common_Logicsys_logicsys_H__
 #pragma once
 
+#include "FrightenStone/common/logicsys/Impl/IBaseLogicSysMgr.h"
 #include "FrightenStone/common/logicsys/Impl/IFS_Facade.h"
 #include "FrightenStone/common/logicsys/Impl/IFS_FacadeFactory.h"
 #include "FrightenStone/common/logicsys/Impl/IFS_LogicSys.h"

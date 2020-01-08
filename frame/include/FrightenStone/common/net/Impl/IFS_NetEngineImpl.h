@@ -46,6 +46,9 @@ inline IFS_NetEngine::IFS_NetEngine()
     ,_recvMsgBytesPerSecond(0)
     ,_sendMsgBytesPerSecond(0)
     ,_heartbeatTimeOutDisconnected(0)
+    ,_curSessionCnt(0)
+    ,_curMaxSessionId(0)
+    ,_pool(NULL)
 {
 }
 

@@ -40,12 +40,22 @@ class IFS_BusinessLogic;
 class BASE_EXPORT IFS_Facade
 {
 public:
-    IFS_Facade() {}
+    IFS_Facade();
     virtual ~IFS_Facade() {}
+    // initialize在businesslogic的beforestart做
+    virtual Int32 OnInitialize() = 0;
+    // BeforeStart与Start在businesslogic的Start做
+    virtual Int32 BeforeStart() = 0;
     virtual Int32 Start() = 0;
+    virtual void BeforeClose() = 0;
+    virtual void Close() = 0;
     virtual void BindLogic(IFS_BusinessLogic *logic);
     
 protected:
+    friend class IFS_BusinessLogic;
+
+    bool _inited;
+    bool _started;
     IFS_BusinessLogic * _logic;
 };
 

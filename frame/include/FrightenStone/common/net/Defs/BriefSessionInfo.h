@@ -42,7 +42,6 @@
 
 FS_NAMESPACE_BEGIN
 
-class IUser;
 struct BASE_EXPORT BriefSessionInfo
 {
     BriefSessionInfo();
@@ -52,8 +51,7 @@ struct BASE_EXPORT BriefSessionInfo
     SOCKET _sock;
     UInt32 _acceptorCompId;
     const sockaddr_in *_addrInfo;
-    IDelegate<void, IUser *> *_newUserRes;      // 当发生转移时需要创建一个新_newUserRes Copy
-    IDelegate<void, IUser *> *_userDisconnectedRes; // 当发生转移时需要创建一个新_userDisconnectedRes Copy
+    IDelegate<void, UInt64> *_userDisconnectedRes; // 当发生转移时需要创建一个新_userDisconnectedRes Copy UInt64:sessionId
 };
 
 FS_NAMESPACE_END

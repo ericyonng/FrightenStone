@@ -41,6 +41,11 @@ class BASE_EXPORT IUserSys : public IFS_LogicSys
 public:
     IUserSys() {}
     ~IUserSys() {}
+    virtual void Release() { delete this; }
+
+public:
+    virtual UInt64 GetSessionId() const = 0;
+    virtual void Close() = 0;
 };
 
 FS_NAMESPACE_END
