@@ -21,36 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_BusinessLogicImpl.h
+ * @file  : IFS_Facade.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/20
+ * @date  : 2020/1/8
  * @brief :
- * 
- *
- * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_BusinessLogic_H__
+#ifndef __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_Facade_H__
+#define __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_Facade_H__
 
 #pragma once
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
 
 FS_NAMESPACE_BEGIN
-inline IFS_BusinessLogic::IFS_BusinessLogic()
-    :_dispatcher(NULL)
-    ,_timeWheel(NULL)
-{
 
-}
+class IFS_BusinessLogic;
 
-inline void IFS_BusinessLogic::SetDispatcher(IFS_MsgDispatcher *dispatcher)
+class BASE_EXPORT IFS_Facade
 {
-    _dispatcher = dispatcher;
-}
-
-inline void IFS_BusinessLogic::SetTimeWheel(TimeWheel *timeWheel)
-{
-    _timeWheel = timeWheel;
-}
+public:
+    IFS_Facade() {}
+    virtual ~IFS_Facade() {}
+    virtual Int32 Start() = 0;
+    virtual void BindLogic(IFS_BusinessLogic *logic);
+    
+protected:
+    IFS_BusinessLogic * _logic;
+};
 
 FS_NAMESPACE_END
+
+#include "FrightenStone/common/logicsys/Impl/IFS_FacadeImpl.h"
 
 #endif

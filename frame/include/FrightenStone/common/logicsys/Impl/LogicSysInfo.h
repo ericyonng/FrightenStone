@@ -21,36 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_BusinessLogicImpl.h
+ * @file  : LogicSysInfo.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/20
+ * @date  : 2020/1/8
  * @brief :
- * 
- *
- * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_BusinessLogic_H__
+#ifndef __Frame_Include_FrightenStone_Common_Logicsys_Impl_LogicSysInfo_H__
+#define __Frame_Include_FrightenStone_Common_Logicsys_Impl_LogicSysInfo_H__
 
 #pragma once
 
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/logicsys/Impl/ILogicSysInfo.h"
+
 FS_NAMESPACE_BEGIN
-inline IFS_BusinessLogic::IFS_BusinessLogic()
-    :_dispatcher(NULL)
-    ,_timeWheel(NULL)
-{
 
-}
-
-inline void IFS_BusinessLogic::SetDispatcher(IFS_MsgDispatcher *dispatcher)
+template<typename LogicSysType>
+class LogicSysInfo : public ILogicSysInfo
 {
-    _dispatcher = dispatcher;
-}
-
-inline void IFS_BusinessLogic::SetTimeWheel(TimeWheel *timeWheel)
-{
-    _timeWheel = timeWheel;
-}
+public:
+    LogicSysInfo();
+    ~LogicSysInfo();
+};
 
 FS_NAMESPACE_END
+
+#include "FrightenStone/common/logicsys/Impl/LogicSysInfoImpl.h"
 
 #endif

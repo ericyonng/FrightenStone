@@ -76,6 +76,7 @@ public:
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
     // 发送消息msg在内部会被拷贝到缓冲区
     virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg);
+    virtual void CloseSession(UInt64 sessionId);
 
 private:
     // 业务线程

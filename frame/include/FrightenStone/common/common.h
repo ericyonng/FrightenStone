@@ -60,6 +60,7 @@
 #include <FrightenStone/common/memorypool/memorypool.h>
 #include <FrightenStone/common/memoryhelper/MemoryHelper.h>
 #include <FrightenStone/common/net/net.h>
+#include <FrightenStone/common/logicsys/logicsys.h>
 #endif
 #pragma endregion
 

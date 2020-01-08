@@ -57,6 +57,7 @@ public:
 public:
     // 发送消息msg在内部会被拷贝到缓冲区
     virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
+    virtual void CloseSession(UInt64 sessionId) = 0;
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic) = 0;
 
     // 获取生产者id

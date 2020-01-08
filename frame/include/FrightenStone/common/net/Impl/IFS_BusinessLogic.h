@@ -74,10 +74,14 @@ public:
 
     void SetDispatcher(IFS_MsgDispatcher *dispatcher);
     void SetTimeWheel(TimeWheel *timeWheel);
+    // 订阅协议
+    virtual void SubscribeProtocol(Int32 protocolCmd, IDelegate<void, UInt64, NetMsg_DataHeader *> *handler);
+    virtual void InvokeProtocolHandler(Int32 protocolCmd, UInt64 userId, NetMsg_DataHeader *msgData);
 
 protected:
     IFS_MsgDispatcher *_dispatcher;     // 消息分发
     TimeWheel *_timeWheel;              // 时间轮盘
+    std::map<Int32, IDelegate<void, UInt64, NetMsg_DataHeader *> *> _protocolCmdRefHandlers;
 };
 
 

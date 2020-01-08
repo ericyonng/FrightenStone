@@ -21,36 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_BusinessLogicImpl.h
+ * @file  : User.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/20
+ * @date  : 2020/1/8
  * @brief :
- * 
- *
- * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_BusinessLogic_H__
+#include "stdafx.h"
+#include "TestInst/TestServer/User/User.h"
 
-#pragma once
-
-FS_NAMESPACE_BEGIN
-inline IFS_BusinessLogic::IFS_BusinessLogic()
-    :_dispatcher(NULL)
-    ,_timeWheel(NULL)
+User::User(UInt64 sessionId, UInt64 userId, fs::IFS_MsgDispatcher *dispatcher)
+    :_sessionId(sessionId)
+    , _userId(userId)
+    , _recvMsgId(1)
+    , _sendMsgId(1)
+    , _dispatcher(dispatcher)
 {
 
 }
 
-inline void IFS_BusinessLogic::SetDispatcher(IFS_MsgDispatcher *dispatcher)
+User::~User()
 {
-    _dispatcher = dispatcher;
+
 }
 
-inline void IFS_BusinessLogic::SetTimeWheel(TimeWheel *timeWheel)
+UInt64 User::GetSessionId() const
 {
-    _timeWheel = timeWheel;
+    return _sessionId;
 }
 
-FS_NAMESPACE_END
+UInt64 User::GetUseId() const
+{
+    return _userId;
+}
 
-#endif
+void User::Close()
+{
+    // TODO:抛一个断开session的消息到transfer 通过dispatcher
+    _dispatcher->CloseSession(_sessionId);
+}
+
+// NetMsg_DataHeader内部会拷贝到缓冲区
+void User::SendData(UInt64 sessionId, fs::NetMsg_DataHeader *msgData)
+{
+    _dispatcher->SendData(sessionId, msgData);
+}
+
+void User::OnDisconnect()
+{
+    g_Log->net<User>(" session id[%llu] user disconnect", _sessionId);
+}

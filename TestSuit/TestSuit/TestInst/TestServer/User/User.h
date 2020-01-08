@@ -21,36 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_BusinessLogicImpl.h
+ * @file  : User.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/20
+ * @date  : 2020/1/8
  * @brief :
- * 
- *
- * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_BusinessLogic_H__
 
 #pragma once
 
-FS_NAMESPACE_BEGIN
-inline IFS_BusinessLogic::IFS_BusinessLogic()
-    :_dispatcher(NULL)
-    ,_timeWheel(NULL)
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
+
+class User : public fs::IUser
 {
+public:
+    User(UInt64 sessionId, UInt64 userId, fs::IFS_MsgDispatcher *dispatcher);
+    ~User();
 
-}
+    virtual UInt64 GetSessionId() const;
+    virtual UInt64 GetUseId() const;
 
-inline void IFS_BusinessLogic::SetDispatcher(IFS_MsgDispatcher *dispatcher)
-{
-    _dispatcher = dispatcher;
-}
+    virtual void Close();
+    // NetMsg_DataHeader内部会拷贝到缓冲区
+    void SendData(UInt64 sessionId, fs::NetMsg_DataHeader *msgData);
+    void OnDisconnect();
 
-inline void IFS_BusinessLogic::SetTimeWheel(TimeWheel *timeWheel)
-{
-    _timeWheel = timeWheel;
-}
-
-FS_NAMESPACE_END
-
-#endif
+private:
+    UInt64 _sessionId;
+    UInt64 _userId;
+    // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
+    Int32 _recvMsgId = 1;
+    // 测试接收发逻辑用
+    // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
+    Int32 _sendMsgId = 1;
+    fs::IFS_MsgDispatcher *_dispatcher;
+};
