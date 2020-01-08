@@ -301,33 +301,26 @@ Int32 IFS_NetEngine::_CreateNetModules()
     const auto generatorQuatity = _totalCfgs->_commonCfgs._transferQuantity;
     const auto consumerQuatity = _totalCfgs->_commonCfgs._dispatcherQuantity;
 
-    // 并发消息队列
+    // 并发消息队列 在transfer=>dispatcher之间通信
     _concurrentMq = new ConcurrentMessageQueueNoThread(generatorQuatity, consumerQuatity);
 
     // 连接器
     _connector = FS_ConnectorFactory::Create(_sessionlocker
                                              , _curSessionCnt
                                              , _totalCfgs->_commonCfgs._maxSessionQuantityLimit
-                                             , _curMaxSessionId
-                                             , _maxSessionIdLimit);
-
-    // 连接成功回调
-    auto connectSucCallback = DelegatePlusFactory::Create(this, &FS_NetEngine::_OnConnected);
-    _connector->RegOnSucConnect(connectSucCallback);
+                                             , _curMaxSessionId);
 
     // 接受连接
     const UInt32 acceptorQuantity = _totalCfgs->_commonCfgs._acceptorQuantityLimit;
     _acceptors.resize(acceptorQuantity);
     for(UInt32 i = 0; i < acceptorQuantity; ++i)
     {
-         auto newAcceptor = FS_AcceptorFactory::Create(_GenerateCompId(),
+         _acceptors[i] = FS_AcceptorFactory::Create(_GenerateCompId(),
                                                    _sessionlocker
                                                    , _curSessionCnt
                                                    , _totalCfgs->_commonCfgs._maxSessionQuantityLimit
                                                    , _curMaxSessionId
-                                                   , _maxSessionIdLimit
                                                    , this);
-         _acceptors[i] = newAcceptor;
     }
 
     //const Int32 cpuCnt = _cpuInfo->GetCpuCoreCnt();
@@ -341,15 +334,12 @@ Int32 IFS_NetEngine::_CreateNetModules()
                                , transferQuatity, dispatcherQuatity);
     }
 
-    _msgTransfers.resize(_totalCfgs->_commonCfgs._transferQuantity);
-    _messageQueue = new ConcurrentMessageQueueNoThread(transferQuatity, dispatcherQuatity);
-    _senderMessageQueue.resize(transferQuatity);
+    _msgTransfers.resize(transferQuatity);
     for(UInt32 i = 0; i < transferQuatity; ++i)
     {
-        _senderMessageQueue[i] = new MessageQueueNoThread;
-        _msgTransfers[i] = FS_MsgTransferFactory::Create(i, this);
-        _msgTransfers[i]->AttachMsgQueue(_messageQueue, i);
-        _msgTransfers[i]->AttachSenderMsgQueue(_senderMessageQueue[i]);
+        auto newTransfer = FS_MsgTransferFactory::Create(_GenerateCompId(), this);
+        newTransfer->BindConcurrentParams(_concurrentMq->GenerateGeneratorId(), 0, _concurrentMq);
+        _msgTransfers[i] = newTransfer;
     }
 
     // 业务层
@@ -363,6 +353,15 @@ Int32 IFS_NetEngine::_CreateNetModules()
 
         if(!logics.empty() && i < logics.size())
             _msgDispatchers[i]->BindBusinessLogic(logics[i]);
+    }
+
+    // 组件消息队列 可当作组件邮箱
+    _compConsumerMq.resize(_curMaxCompId + 1);  // 将compid做索引，但compId从1开始故多一个空间0索引位为NULL
+    const UInt32 compConsumerMqSize = static_cast<UInt32>(_compConsumerMq.size());
+    for(UInt32 i = 1; i < compConsumerMqSize; ++i)
+    {
+        _compConsumerMq[i] = new MessageQueueNoThread();
+        
     }
 
     return StatusDefs::Success;
