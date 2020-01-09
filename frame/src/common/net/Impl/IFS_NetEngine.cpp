@@ -40,6 +40,7 @@
 #include "FrightenStone/common/net/Impl/FS_MsgDispatcherFactory.h"
 #include "FrightenStone/common/net/Impl/FS_MsgTransferFactory.h"
 #include "FrightenStone/common/net/Impl/FS_ConfigMgrFactory.h"
+#include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 
 #include "FrightenStone/common/component/Impl/SmartVar/SmartVar.h"
 #include "FrightenStone/common/assist/utils/Impl/FS_TlsUtil.h"
@@ -650,6 +651,72 @@ void IFS_NetEngine::_AfterClose()
     const Int32 dispatcherSize = static_cast<Int32>(_msgDispatchers.size());
     for(Int32 i = 0; i < dispatcherSize; ++i)
         _msgDispatchers[i]->AfterClose();
+}
+
+Int32 IFS_NetEngine::_ReadBaseCfgs(IFS_ConfigMgr *cfgMgr)
+{
+    _totalCfgs = new fs::NetEngineTotalCfgs;
+    auto &commonConfig = _totalCfgs->_commonCfgs;
+    commonConfig._maxSessionQuantityLimit = cfgMgr->GetMaxSessionQuantityLimit();
+    commonConfig._acceptorQuantityLimit = cfgMgr->GetAcceptorQuantity();
+    commonConfig._dispatcherQuantity = cfgMgr->GetDispatcherCnt();
+    commonConfig._transferQuantity = cfgMgr->GetTransferCnt();
+
+    auto &connectorCfg = _totalCfgs->_connectorCfgs;
+    connectorCfg._connectTimeOutMs = cfgMgr->GetConnectorConnectTimeOutMs();
+
+    // Ò»×é¼àÊÓÆ÷
+    _totalCfgs->_acceptorCfgs = new fs::AcceptorCfgs[commonConfig._acceptorQuantityLimit];
+    auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
+    std::vector<std::pair<fs::FS_String, UInt16>> addrInfos;
+    cfgMgr->GetListenAddr(addrInfos);
+    for(UInt32 i = 0; i < commonConfig._acceptorQuantityLimit; ++i)
+    {
+        acceptorCfg[i]._ip = addrInfos[i].first;
+        acceptorCfg[i]._port = addrInfos[i].second;
+    }
+
+    auto &transferCfg = _totalCfgs->_transferCfgs;
+
+    auto &dispatcherCfg = _totalCfgs->_dispatcherCfgs;
+    dispatcherCfg._heartbeatDeadTimeMsInterval = cfgMgr->GetHeartbeatDeadTimeIntervalMs();
+    dispatcherCfg._dispatcherResolutionInterval = cfgMgr->GetDispatcherResolutionIntervalMs()*fs::Time::_microSecondPerMilliSecond;
+    dispatcherCfg._maxAlloctorBytesPerDispatcher = cfgMgr->GetMaxAllowAlloctorBytesPerDispatcher();
+    dispatcherCfg._prepareBufferPoolCnt = cfgMgr->GetPrepareBufferCnt();
+
+    auto &objPoolCfgs = _totalCfgs->_objPoolCfgs;
+    objPoolCfgs._maxAllowObjPoolBytesOccupied = cfgMgr->GetMaxAllowObjPoolBytesOccupied();
+
+    auto &mempoolCfgs = _totalCfgs->_mempoolCfgs;
+    mempoolCfgs._maxAllowMemPoolBytesOccupied = cfgMgr->GetMaxAllowMemPoolBytesOccupied();
+
+    return StatusDefs::Success;
+}
+
+Int32 IFS_NetEngine::_OnReadCfgs()
+{
+    auto cfgMgr = _PreparConfigFile();
+    if(!cfgMgr)
+    {
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_PreparConfigFile fail"));
+        return StatusDefs::Failed;
+    }
+
+    Int32 st = _ReadBaseCfgs(cfgMgr);
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_ReadBaseCfgs fail st[%d]"), st);
+        return st;
+    }
+
+    st = _ReadCustomCfgs();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<IFS_NetEngine>(_LOGFMT_("_ReadCustomCfgs fail st[%d]"), st);
+        return st;
+    }
+
+    return StatusDefs::Success;
 }
 
 FS_NAMESPACE_END

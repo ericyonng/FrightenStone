@@ -122,53 +122,22 @@ public:
     }
 
 protected:
-    // 读取配置位置
-    virtual Int32 _OnReadCfgs()
+    virtual fs::IFS_ConfigMgr *_PreparConfigFile() const
     {
         auto ret = _config->Init("./ClientCfg.ini");
         if(ret != StatusDefs::Success)
         {
             g_Log->e<FS_MyClient>(_LOGFMT_("config Init fail ret[%d]"), ret);
-            return ret;
         }
 
-        // TODO:
-        _totalCfgs = new fs::NetEngineTotalCfgs;
-        auto &commonConfig = _totalCfgs->_commonCfgs;
-        commonConfig._maxSessionQuantityLimit = _config->GetMaxSessionQuantityLimit();
-        commonConfig._acceptorQuantityLimit = _config->GetAcceptorQuantity();
-        commonConfig._dispatcherQuantity = _config->GetDispatcherCnt();
-        commonConfig._transferQuantity = _config->GetTransferCnt();
-
-        auto &connectorCfg = _totalCfgs->_connectorCfgs;
-        connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
-
-        // 一组监视器
-        _totalCfgs->_acceptorCfgs = new fs::AcceptorCfgs[commonConfig._acceptorQuantityLimit];
-        auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
-        std::vector<std::pair<fs::FS_String, UInt16>> addrInfos;
-        _config->GetListenAddr(addrInfos);
-        for(UInt32 i = 0; i < commonConfig._acceptorQuantityLimit; ++i)
-        {
-            acceptorCfg[i]._ip = addrInfos[i].first;
-            acceptorCfg[i]._port = addrInfos[i].second;
-        }
-
-        auto &transferCfg = _totalCfgs->_transferCfgs;
-
-        auto &dispatcherCfg = _totalCfgs->_dispatcherCfgs;
-        dispatcherCfg._heartbeatDeadTimeMsInterval = _config->GetHeartbeatDeadTimeIntervalMs();
-        dispatcherCfg._dispatcherResolutionInterval = _config->GetDispatcherResolutionIntervalMs()*fs::Time::_microSecondPerMilliSecond;
-        dispatcherCfg._maxAlloctorBytesPerDispatcher = _config->GetMaxAllowAlloctorBytesPerDispatcher();
-        dispatcherCfg._prepareBufferPoolCnt = _config->GetPrepareBufferCnt();
-
-        auto &objPoolCfgs = _totalCfgs->_objPoolCfgs;
-        objPoolCfgs._maxAllowObjPoolBytesOccupied = _config->GetMaxAllowObjPoolBytesOccupied();
-
-        auto &mempoolCfgs = _totalCfgs->_mempoolCfgs;
-        mempoolCfgs._maxAllowMemPoolBytesOccupied = _config->GetMaxAllowMemPoolBytesOccupied();
-        return StatusDefs::Success;
+        return _config;
     }
+
+    // 自定义的配置
+    virtual Int32 _ReadCustomCfgs() 
+    { 
+        return StatusDefs::Success;
+    } 
 
     // 初始化结束时
     virtual Int32 _OnInitFinish()

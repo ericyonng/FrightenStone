@@ -55,6 +55,7 @@ struct BriefSessionInfo;
 class IFS_MsgDispatcher;
 class IFS_EngineComp;
 class IFS_BusinessLogic;
+class IFS_ConfigMgr;
 
 // 注意:各个模块启线程应该放到after start做，所有的数据准备不应该在afeterstart做
 class BASE_EXPORT IFS_NetEngine
@@ -99,8 +100,11 @@ protected:
 
     /* 配置 */
 protected:
-    // 读取配置位置
-    virtual Int32 _OnReadCfgs() = 0;
+    // 准备配置文件
+    virtual IFS_ConfigMgr *_PreparConfigFile() const = 0;
+    virtual Int32 _ReadBaseCfgs(IFS_ConfigMgr *cfgMgr);
+    virtual Int32 _ReadCustomCfgs() { return StatusDefs::Success; } // 自定义的配置
+    virtual Int32 _OnReadCfgs();
     // 初始化结束时
     virtual Int32 _OnInitFinish() { return StatusDefs::Success; }
     // 获取业务层,以便绑定到dispatcher上
