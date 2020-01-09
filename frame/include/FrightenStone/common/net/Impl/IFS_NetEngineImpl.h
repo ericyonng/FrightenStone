@@ -73,6 +73,10 @@ inline ConcurrentMessageQueueNoThread *IFS_NetEngine::_GetConcurrentMQ()
     return _concurrentMq;
 }
 
+inline void IFS_NetEngine::_AddNewComp(UInt32 compId, IFS_EngineComp *newComp)
+{
+}
+
 FS_NAMESPACE_END
 
 #endif
