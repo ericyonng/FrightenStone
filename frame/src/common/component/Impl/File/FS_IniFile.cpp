@@ -343,6 +343,7 @@ bool FS_IniFile::_InsertNewLineData(Int32 line, const FS_String &segment, const 
     FS_String keyValue;
     IniFileMethods::MakeKeyValuePairStr(key, value, keyValue);
     _InsertNewLineData(line, keyValue);
+    return true;
 }
 
 bool FS_IniFile::_InsertNewLineData(Int32 line, const FS_String &content)

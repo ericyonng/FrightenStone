@@ -45,7 +45,7 @@
 #include "FrightenStone/common/net/Impl/FS_MsgWriteStream.h"
 #include "FrightenStone/common/net/Impl/IFS_BusinessLogic.h"
 #include "FrightenStone/common/net/Impl/IFS_MsgDispatcher.h"
-#include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
+#include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 #include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
 
 #include "FrightenStone/common/net/Impl/FS_ClientCfgMgr.h"

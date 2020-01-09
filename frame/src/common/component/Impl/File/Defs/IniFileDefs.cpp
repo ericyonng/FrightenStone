@@ -35,13 +35,14 @@
 
 FS_NAMESPACE_BEGIN
 
-char IniFileDefs::_annotationFlag = ';';
-char IniFileDefs::_leftSegmentFlag = '[';
-char IniFileDefs::_rightSegmentFlag = ']';
-char IniFileDefs::_keyValueJoinerFlag = '=';
-char IniFileDefs::_changeLineFlag = '\n';
-char IniFileDefs::_segKeyJoinerFlag = '-';
+const char IniFileDefs::_annotationFlag = ';';
+const char IniFileDefs::_leftSegmentFlag = '[';
+const char IniFileDefs::_rightSegmentFlag = ']';
+const char IniFileDefs::_keyValueJoinerFlag = '=';
+const char IniFileDefs::_changeLineFlag = '\n';
+const char IniFileDefs::_segKeyJoinerFlag = '-';
 const char *IniFileDefs::_annotationSpaceStr = "\t\t\t\t";
+const char IniFileDefs::_groupDataSeparateFlag = ',';
 
 bool IniFileMethods::IsSegment(const FS_String &content, FS_String &segmentOut)
 {

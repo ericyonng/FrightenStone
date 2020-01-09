@@ -113,7 +113,7 @@ class FS_MyClient : public fs::IFS_NetEngine
 public:
     FS_MyClient()
     {
-        _config = new fs::IFS_ServerConfigMgr;
+        _config = new fs::IFS_ConfigMgr;
     }
     ~FS_MyClient()
     {
@@ -180,7 +180,7 @@ protected:
     }
 
 private:
-    fs::IFS_ServerConfigMgr * _config;
+    fs::IFS_ConfigMgr * _config;
     std::vector<fs::IFS_BusinessLogic *> _logics;
 };
 // 

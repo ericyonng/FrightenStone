@@ -92,7 +92,7 @@ struct BASE_EXPORT NetEngineTotalCfgs
 {
     CommonCfgs _commonCfgs;
     ConnectorCfgs _connectorCfgs;
-    AcceptorCfgs _acceptorCfgs;
+    AcceptorCfgs *_acceptorCfgs;        // 监视器是一组配置,数量配置在CommonCfgs中
     TransferCfgs _transferCfgs;
     DispatcherCfgs _dispatcherCfgs;
     ObjPoolCfgs _objPoolCfgs;

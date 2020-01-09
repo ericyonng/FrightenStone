@@ -36,7 +36,7 @@
 #include "FrightenStone/common/net/Impl/FS_Addr.h"
 #include "FrightenStone/common/net/Defs/IocpDefs.h"
 #include "FrightenStone/common/net/Defs/FS_IocpBuffer.h"
-#include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
+#include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 #include "FrightenStone/common/net/Defs/BriefListenAddrInfo.h"
@@ -60,6 +60,7 @@ FS_IocpAcceptor::FS_IocpAcceptor(UInt32 compId
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
                                  , UInt64 &curMaxSessionId
+                                 , const AcceptorCfgs &cfg
                                  , IFS_NetEngine *netEngine)
     :IFS_Acceptor(compId, netEngine)
     , _sock(INVALID_SOCKET)
@@ -72,6 +73,8 @@ FS_IocpAcceptor::FS_IocpAcceptor(UInt32 compId
     ,_poller(NULL)
 {
     /*     _CrtMemCheckpoint(&s1);*/
+    _cfgs = new AcceptorCfgs;
+    *_cfgs = cfg;
 }
 
 FS_IocpAcceptor::~FS_IocpAcceptor()
@@ -89,8 +92,7 @@ Int32 FS_IocpAcceptor::BeforeStart(const NetEngineTotalCfgs &totalCfgs)
     if(_isInit)
         return StatusDefs::Success;
 
-    _cfgs = new AcceptorCfgs;
-    *_cfgs = totalCfgs._acceptorCfgs;
+    // _cfg在构造中已经初始化这里不必再初始化
     _poller = new FS_IocpPoller(this, PollerDefs::MonitorType_Acceptor);
 
     // 初始化
@@ -102,7 +104,9 @@ Int32 FS_IocpAcceptor::BeforeStart(const NetEngineTotalCfgs &totalCfgs)
     }
 
     auto &ip = _cfgs->_ip;
-    Int32 st = _Bind(ip.GetLength() == 0 ? NULL : ip.c_str(), _cfgs->_port);
+    const Byte8 *realIp = NULL;
+    _GetRealIp(ip, realIp);
+    Int32 st = _Bind(realIp, _cfgs->_port);
     if(st != StatusDefs::Success)
     {
         g_Log->e<FS_IocpAcceptor>(_LOGFMT_("listen sock[%llu] bind ip[%s:%hu] fail st[%d]")
@@ -225,7 +229,7 @@ Int32 FS_IocpAcceptor::_Bind(const Byte8 *ip, UInt16 port)
         inet_pton(sin.sin_family, ip, &(sin.sin_addr));// 比较新的函数对比inet_addr
     }
     else {
-        sin.sin_addr.S_un.S_addr = INADDR_ANY;
+        sin.sin_addr.S_un.S_addr = INADDR_ANY;  // 绑定任意网卡
     }
 #else
     if(ip) {
@@ -259,6 +263,23 @@ Int32 FS_IocpAcceptor::_Listen(Int32 unconnectQueueLen)
 
     g_Log->net<FS_IocpAcceptor>("listen port socket<%llu> success... %s:%hu", _sock, _cfgs->_ip.c_str(), _cfgs->_port);
     return StatusDefs::Success;
+}
+
+void FS_IocpAcceptor::_GetRealIp(const FS_String &cfgIp, const Byte8 *&realIp)
+{
+    if(cfgIp.GetLength() == 0)
+    {
+        realIp = NULL;
+        return;
+    }
+
+    if(cfgIp == IFS_ConfigMgr::_bindAnyIp)
+    {
+        realIp = NULL;
+        return;
+    }
+
+    realIp = cfgIp.c_str();
 }
 
 void FS_IocpAcceptor::OnSessionDisconnected(UInt64 sessionId)

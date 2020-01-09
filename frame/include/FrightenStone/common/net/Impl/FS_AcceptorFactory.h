@@ -42,6 +42,7 @@ FS_NAMESPACE_BEGIN
 class IFS_Acceptor;
 class Locker;
 class IFS_NetEngine;
+struct AcceptorCfgs;
 
 class BASE_EXPORT FS_AcceptorFactory
 {
@@ -51,6 +52,7 @@ public:
                                  , Int32 &curSessionCnt
                                  , Int32 &maxSessionQuantityLimit
                                  , UInt64 &curMaxSessionId
+                                 , const AcceptorCfgs &cfg
                                  , IFS_NetEngine *netEngine);
 };
 

@@ -37,7 +37,7 @@
 #include "FrightenStone/exportbase.h"
 #include <FrightenStone/common/basedefs/BaseDefs.h>
 #include <FrightenStone/common/component/Impl/FS_String.h>
-#include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
+#include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 
 FS_NAMESPACE_BEGIN
 

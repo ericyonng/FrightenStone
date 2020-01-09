@@ -39,7 +39,7 @@
 #include "FrightenStone/common/net/Impl/FS_ConnectorFactory.h"
 #include "FrightenStone/common/net/Impl/FS_MsgDispatcherFactory.h"
 #include "FrightenStone/common/net/Impl/FS_MsgTransferFactory.h"
-#include "FrightenStone/common/net/Impl/FS_ServerConfigMgrFactory.h"
+#include "FrightenStone/common/net/Impl/FS_ConfigMgrFactory.h"
 
 #include "FrightenStone/common/component/Impl/SmartVar/SmartVar.h"
 #include "FrightenStone/common/assist/utils/Impl/FS_TlsUtil.h"
@@ -392,6 +392,7 @@ Int32 IFS_NetEngine::_CreateNetModules()
     // ¼àÌýÆ÷
     const UInt32 acceptorQuantity = _totalCfgs->_commonCfgs._acceptorQuantityLimit;
     _acceptors.resize(acceptorQuantity);
+    const auto &acceptorCfgs = _totalCfgs->_acceptorCfgs;
     for(UInt32 i = 0; i < acceptorQuantity; ++i)
     {
          auto newAcceptor = FS_AcceptorFactory::Create(_GenerateCompId(),
@@ -399,6 +400,7 @@ Int32 IFS_NetEngine::_CreateNetModules()
                                                    , _curSessionCnt
                                                    , _totalCfgs->_commonCfgs._maxSessionQuantityLimit
                                                    , _curMaxSessionId
+                                                   , acceptorCfgs[i]
                                                    , this);
          _AddNewComp(newAcceptor->GetCompId(), newAcceptor);
          _acceptors[i] = newAcceptor;

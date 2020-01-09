@@ -83,8 +83,8 @@
 #define SVR_CFG_COMMONCFG_TRANSFER_QUANTITY                "8"                          // 数据传输支持8线程
 #define SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY_KEY          "DispatcherQuantity"         // 消息分发器数量
 #define SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY              "1"                          // 消息分发器数量
-#define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY            "AcceptorQuantity"           // 监听器数量
-#define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY                 "1"                         // 监听器数量
+// #define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY            "AcceptorQuantity"           // 监听器数量
+// #define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY                 "1"                         // 监听器数量
 #define SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY        "IsOpenMemoryMonitor"       // 是否开启内存监控
 #define SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR            "1"                         // 默认开启内存监控
 #pragma endregion
@@ -93,7 +93,7 @@
 #define SVR_CFG_ACCEPTOR_SEG                "Acceptor"
 
 #define SVR_CFG_ACCEPTOR_IP_KEY             "ip"
-#define SVR_CFG_ACCEPTOR_IP                 "127.0.0.1"
+#define SVR_CFG_ACCEPTOR_IP                 "Any"
 #define SVR_CFG_ACCEPTOR_PORT_KEY           "port"
 #define SVR_CFG_ACCEPTOR_PORT               "4567"
 #pragma endregion

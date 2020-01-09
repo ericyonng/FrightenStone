@@ -109,7 +109,7 @@ class FS_ServerEngine : public fs::IFS_NetEngine
 public:
     FS_ServerEngine()
     {
-        _config = new fs::IFS_ServerConfigMgr;
+        _config = new fs::IFS_ConfigMgr;
     }
     ~FS_ServerEngine()
     {
@@ -139,9 +139,16 @@ protected:
         auto &connectorCfg = _totalCfgs->_connectorCfgs;
         connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
 
+        // 一组监视器
+        _totalCfgs->_acceptorCfgs = new fs::AcceptorCfgs[commonConfig._acceptorQuantityLimit];
         auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
-        acceptorCfg._ip = _config->GetListenIp();
-        acceptorCfg._port = _config->GetListenPort();
+        std::vector<std::pair<fs::FS_String, UInt16>> addrInfos;
+        _config->GetListenAddr(addrInfos);
+        for(UInt32 i = 0; i < commonConfig._acceptorQuantityLimit; ++i)
+        {
+            acceptorCfg[i]._ip = addrInfos[i].first;
+            acceptorCfg[i]._port = addrInfos[i].second;
+        }
 
         auto &transferCfg = _totalCfgs->_transferCfgs;
 
@@ -176,7 +183,7 @@ protected:
     }
 
 private:
-    fs::IFS_ServerConfigMgr * _config;
+    fs::IFS_ConfigMgr * _config;
     std::vector<fs::IFS_BusinessLogic *> _logics;
 };
 

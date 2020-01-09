@@ -64,11 +64,12 @@ public:
                     ,Int32 &curSessionCnt
                     ,Int32 &maxSessionQuantityLimit
                     ,UInt64 &curMaxSessionId
+                    , const AcceptorCfgs &cfg
                     , IFS_NetEngine *netEngine);
     virtual ~FS_IocpAcceptor();
 
 public:    
-    virtual Int32 BeforeStart();
+    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs);
     virtual Int32 Start();
     virtual void AfterStart();
     virtual void WillClose();
@@ -88,6 +89,7 @@ private:
     SOCKET _InitSocket();
     Int32 _Bind(const Byte8 *ip, UInt16 port);
     Int32 _Listen(Int32 unconnectQueueLen = SOMAXCONN);
+    void _GetRealIp(const FS_String &cfgIp, const Byte8 *&realIp);
     #pragma endregion
 
     /* ÍøÂçÊÂ¼þ */

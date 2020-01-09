@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_ServerConfigMgr.cpp
+ * @file  : IFS_ConfigMgr.cpp
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/07
  * @brief :
@@ -36,14 +36,17 @@
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_CpuInfo.h"
 #include "FrightenStone/common/log/Log.h"
+#include "FrightenStone/common/component/Impl/File/Defs/IniFileDefs.h"
 #include "FrightenStone/common/component/Impl/File/FS_IniFile.h"
+#include "FrightenStone/common/assist/utils/Impl/StringUtil.h"
 
 
 FS_NAMESPACE_BEGIN
 
+FS_String IFS_ConfigMgr::_bindAnyIp = "Any";
+
 IFS_ConfigMgr::IFS_ConfigMgr()
     :_ini(NULL)
-    ,_port(0)
     ,_maxSessionQuantityLimit(0)
     ,_transferCnt(0)
     ,_heartbeatDeadTimeIntervalMs(0)
@@ -110,7 +113,7 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
     #pragma endregion
 
     #pragma region acceptor
-    _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY);
+    //_ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY);
     #pragma endregion
 
     #pragma region connector
@@ -132,7 +135,7 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
     // 检查是否写入正确
     FS_String buffer;
     _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "", buffer);
-    if(strcmp(buffer.c_str(), "127.0.0.1") != 0)
+    if(strcmp(buffer.c_str(), SVR_CFG_ACCEPTOR_IP) != 0)
     {
         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail ip not match"));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
@@ -207,13 +210,13 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
-    auto acceptorQuatity = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, 0);
-    if(acceptorQuatity != atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY))
-    {
-        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%u] default")
-                                      , acceptorQuatity, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY)));
-        return StatusDefs::IocpAcceptor_InitDefIniFail;
-    }
+//     auto acceptorQuatity = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, 0);
+//     if(acceptorQuatity != atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY))
+//     {
+//         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%u] default")
+//                                       , acceptorQuatity, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY)));
+//         return StatusDefs::IocpAcceptor_InitDefIniFail;
+//     }
 
     auto isOpenMonitor = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, 0);
     if(isOpenMonitor != atoi(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR))
@@ -232,14 +235,18 @@ void IFS_ConfigMgr::_ReadCfgs()
     FS_String ips, ports;
     _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "",ips);
     _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, "", ports);
-    auto multiIp = ips.Split(',');
-    auto multiPort = ports.Split(',');
-    const Int32 groupCnt = static_cast<Int32>(multiIp.size());
-    for(Int32 i = 0; i < groupCnt; ++i)
+    auto multiIp = ips.Split(IniFileDefs::_groupDataSeparateFlag);
+    auto multiPort = ports.Split(IniFileDefs::_groupDataSeparateFlag);
+    const Int32 acceptorQuantity = static_cast<Int32>(multiIp.size());
+    for(Int32 i = 0; i < acceptorQuantity; ++i)
     {
+        const UInt16 port = static_cast<UInt16>(StringUtil::StringToInt32(multiPort[i].c_str()));
+        std::pair<FS_String, UInt16> ipportPair;
+        ipportPair.first = multiIp[i];
+        ipportPair.second = port;
+        _ipPortVec.push_back(ipportPair);
     }
 
-    _port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, 0));
     _maxSessionQuantityLimit = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0));
 
     _transferCnt = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY, 0));
@@ -252,7 +259,7 @@ void IFS_ConfigMgr::_ReadCfgs()
     _maxAllowObjPoolBytesOccupied = static_cast<UInt64>(_ini->ReadInt(SVR_CFG_OBJPOOL_SEG, SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED_KEY, 0)) * 1024 * 1024;
     _maxAllowMemPoolBytesOccupied = static_cast<UInt64>(_ini->ReadInt(SVR_CFG_MEMORY_POOL_SEG, SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY, 0)) * 1024 * 1024;
 
-    _acceptorQuantity = static_cast<UInt32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, 0));
+    _acceptorQuantity = static_cast<UInt32>(acceptorQuantity);
     _connectorConnectTimeOutMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_CONNECTOR_SEG, SVR_CFG_CONNECTOR_CONNECT_TIME_OUT_KEY, 0));
     
     _dispatcherResolutionIntervalMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY, 0));
@@ -267,17 +274,18 @@ void IFS_ConfigMgr::_ChangeLineBetweenSegs()
 void IFS_ConfigMgr::_WriteIniHeaderAnnotation()
 {
     FS_String content;
-    content.AppendFormat("@author:ericyonng<120453674@qq.com>\n"
-                         "@brief:\n"
-                         "跨平台ini配置文件,支持linux,windows读写,不使用平台api实现\n"
-                         "格式说明:\n"
-                         "配置文件有指定多组数据的,请以\',\'间隔开,\n"
-                         "字符组合规则    : 除了英文数字组合(收个字符不可为数字),不支持其他字符,键值除外（可为任意除注释符外的字符）\n"
-                         "段名(segment)   : 是指[]括起来的字符串,遵守字符组合规则\n"
-                         "键名(key)       : 是指段名下具体的配置字符串,段名下的键不可重名,跨段间键名可以重名,遵守字符组合规则\n"
-                         "键值(value)     : 是键名对应的值,可以不遵守字符组合规则,但字符中间不可包含注释符,因为注释符后的内容都会被视为注释,避免值被截断\n"
-                         "键名与键值以'='连接\n"
-                         "注释统一使用\';\'进行注释\n");
+    content.AppendFormat(" @author:ericyonng<120453674@qq.com>\n"
+                         " @brief:\n"
+                         " 跨平台ini配置文件, 支持linux, windows读写, 不使用平台api实现\n"
+                         " 格式说明 : 请不要使用全角字符编辑本文件\n"
+                         " 配置文件有指定多组数据的, 请以','间隔开,\n"
+                         " 字符组合规则 : 除了英文数字组合 < 首个字符不可为数字, 不支持其他字字符, <键值除外可为任意除注释符外的字符>\n"
+                         " 段名<segment> : 是指[]括起来的字符, 遵守字符组合规则\n"
+                         " 键名<key> : 是指段名下具体的配置字符, 段名下的键不可重复, 跨段间键名可以重复, 遵守字符组合规则\n"
+                         " 键值<value> : 是键名对应的值, 可以不遵守字符组合规则, 但字符中间不可包含注释符, 因为注释符后的内容都会被视为注释, 避免值被截断\n"
+                         " 键名与键值以'='连接\n"
+                         " 注释统一使用';'进行注释\n"
+                         " 绑定任意ip请使用Any, 请务必保证ip与端口数量的一致\n");
     _ini->WriteFileHeaderAnnotation(content);
 }
 

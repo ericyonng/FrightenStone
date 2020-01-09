@@ -32,9 +32,9 @@
 
 FS_NAMESPACE_BEGIN
 
-inline void IFS_ConfigMgr::GetListenAddr(std::map<FS_String, UInt16> &addrInfo)
+inline void IFS_ConfigMgr::GetListenAddr(std::vector<std::pair<FS_String, UInt16>> &addrInfo)
 {
-    addrInfo = _ipRefPort;
+    addrInfo = _ipPortVec;
 }
 
 inline Int32 IFS_ConfigMgr::GetMaxSessionQuantityLimit() const

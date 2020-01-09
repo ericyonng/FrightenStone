@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_ServerConfigMgrFactory.cpp
+ * @file  : FS_ConfigMgrFactory.cpp
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/10/07
  * @brief :
@@ -31,16 +31,16 @@
  */
 
 #include "stdafx.h"
-#include "FrightenStone/common/net/Impl/FS_ServerConfigMgrFactory.h"
-#include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
+#include "FrightenStone/common/net/Impl/FS_ConfigMgrFactory.h"
+#include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 
 FS_NAMESPACE_BEGIN
 
-IFS_ConfigMgr *FS_ServerConfigMgrFactory::Create()
+IFS_ConfigMgr *FS_ConfigMgrFactory::Create()
 {
     return new IFS_ConfigMgr();
 #ifdef _WIN32
-    //return new IFS_ServerConfigMgr();
+    //return new IFS_ConfigMgr();
 #else
     // TODO:Linux
     return NULL;

@@ -45,6 +45,7 @@
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
 #include "FrightenStone/common/component/Impl/Task/Task.h"
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
+#include "FrightenStone/common/component/Impl/File/Defs/IniFileDefs.h"
 #include "FrightenStone/common/component/Impl/File/FS_File.h"
 #include "FrightenStone/common/component/Impl/File/LogFile.h"
 #include "FrightenStone/common/component/Impl/File/FS_IniFile.h"

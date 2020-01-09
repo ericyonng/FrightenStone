@@ -40,6 +40,9 @@ class FS_IniFile;
 class BASE_EXPORT IFS_ConfigMgr
 {
 public:
+    static FS_String _bindAnyIp;    // 绑定任意ip:"Any"
+
+public:
     IFS_ConfigMgr();
     virtual ~IFS_ConfigMgr();
 
@@ -49,7 +52,7 @@ public:
     // 读配置
 public:
     /* listener */
-    void GetListenAddr(std::map<FS_String, UInt16> &addrInfo);
+    void GetListenAddr(std::vector<std::pair<FS_String, UInt16>> &addrInfo);
     Int32 GetMaxSessionQuantityLimit() const;
 
     /* transfer */
@@ -81,7 +84,7 @@ private:
 private:
     FS_IniFile *_ini;
 
-    std::map<FS_String, UInt16> _ipRefPort;
+    std::vector<std::pair<FS_String, UInt16>> _ipPortVec;
     Int32 _maxSessionQuantityLimit;
     
     Int32 _transferCnt;

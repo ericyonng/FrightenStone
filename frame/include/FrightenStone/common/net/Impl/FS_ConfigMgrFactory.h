@@ -29,8 +29,8 @@
  *
  * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_ServerConfigMgrFactory_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_ServerConfigMgrFactory_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_ConfigMgrFactory_H__
+#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_ConfigMgrFactory_H__
 #pragma once
 
 #include "FrightenStone/exportbase.h"
@@ -40,7 +40,7 @@ FS_NAMESPACE_BEGIN
 
 class IFS_ConfigMgr;
 
-class BASE_EXPORT FS_ServerConfigMgrFactory
+class BASE_EXPORT FS_ConfigMgrFactory
 {
 public:
     static IFS_ConfigMgr *Create();

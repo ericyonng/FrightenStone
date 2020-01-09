@@ -40,6 +40,7 @@ IFS_Acceptor *FS_AcceptorFactory::Create(UInt32 compId,
                                          , Int32 &curSessionCnt
                                          , Int32 &maxSessionQuantityLimit
                                          , UInt64 &curMaxSessionId
+                                         , const AcceptorCfgs &cfg
                                          , IFS_NetEngine *netEngine)
 {
 #ifdef _WIN32
@@ -48,6 +49,7 @@ IFS_Acceptor *FS_AcceptorFactory::Create(UInt32 compId,
                                , curSessionCnt
                                , maxSessionQuantityLimit
                                , curMaxSessionId
+                               , cfg
                                , netEngine);
 #else
     // TODO:Linux
