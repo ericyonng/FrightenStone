@@ -91,7 +91,8 @@ Int32 FS_MyClient::SendTest(fs::LoginReq *login)
     //如果剩余发送次数大于0
     if(_sendCount > 0 && !_isSend)
     {
-        login->_msgId = _sendMsgID;
+        auto &loginData = login->_loginData;
+        loginData._msgId = _sendMsgID;
         ret = SendData(login);
         //CELLLog_Info("%d", _nSendMsgID);
         if(SOCKET_ERROR != ret)
@@ -209,8 +210,9 @@ Int32 ClientTask::Run()
     // 消息
     fs::LoginReq login;
     // 给点有意义的值
-    strcpy(login._userName, "lyd");
-    strcpy(login._pwd, "lydmm");
+    auto &loginData = login._loginData;
+    strcpy(loginData._userName, "lyd");
+    strcpy(loginData._pwd, "lydmm");
 
     //
     // 收发数据都是通过onRun线程
@@ -447,11 +449,12 @@ public:
                                 //     g_Log->any<MyLogic>("sessionid[%llu] login username[%s], pwd[%s] msgId[%d] user recvmsgid"
                                 //                         , sessionId, login->_userName, login->_pwd, login->_msgId, user->_recvMsgId);
                                      // 检查消息ID
-                if(login->_msgId != user->_recvMsgId)
+                auto &loginData = login->_loginData;
+                if(loginData._msgId != user->_recvMsgId)
                 {//当前消息ID和本地收消息次数不匹配
                     g_Log->custom("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>"
-                                  , sessionId, login->_msgId
-                                  , user->_recvMsgId, login->_msgId - user->_recvMsgId);
+                                  , sessionId, loginData._msgId
+                                  , user->_recvMsgId, loginData._msgId - user->_recvMsgId);
                 }
 
                 // 返回包
