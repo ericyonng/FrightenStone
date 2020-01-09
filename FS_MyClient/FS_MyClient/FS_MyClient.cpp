@@ -143,9 +143,16 @@ protected:
         auto &connectorCfg = _totalCfgs->_connectorCfgs;
         connectorCfg._connectTimeOutMs = _config->GetConnectorConnectTimeOutMs();
 
+        // 一组监视器
+        _totalCfgs->_acceptorCfgs = new fs::AcceptorCfgs[commonConfig._acceptorQuantityLimit];
         auto &acceptorCfg = _totalCfgs->_acceptorCfgs;
-        acceptorCfg._ip = _config->GetListenIp();
-        acceptorCfg._port = _config->GetListenPort();
+        std::vector<std::pair<fs::FS_String, UInt16>> addrInfos;
+        _config->GetListenAddr(addrInfos);
+        for(UInt32 i = 0; i < commonConfig._acceptorQuantityLimit; ++i)
+        {
+            acceptorCfg[i]._ip = addrInfos[i].first;
+            acceptorCfg[i]._port = addrInfos[i].second;
+        }
 
         auto &transferCfg = _totalCfgs->_transferCfgs;
 
@@ -219,81 +226,81 @@ void FS_ClientRun::Run()
     getchar();
 
     // 1.时区
-    fs::TimeUtil::SetTimeZone();
-
-    // 2.智能变量的类型识别
-    fs::SmartVarRtti::InitRttiTypeNames();
-
-    // 3.初始化线程局部存储句柄
-    Int32 ret = fs::FS_TlsUtil::CreateUtilTlsHandle();
-    if(ret != StatusDefs::Success)
-    {
-        std::cout << "error:" << ret << std::endl;
-        return;
-    }
-
-    // 4.log初始化 NULL默认以程序名为基准创建目录
-    ret = g_Log->InitModule(NULL);
-    if(ret != StatusDefs::Success)
-    {
-        std::cout << "error:" << ret << std::endl;
-        return;
-    }
-
-    // 5. crash dump switch start
-    ret = fs::CrashHandleUtil::InitCrashHandleParams();
-    if(ret != StatusDefs::Success)
-    {
-        g_Log->e<FS_ClientRun>(_LOGFMT_("init crash handle params fail ret[%d]"), ret);
-        return;
-    }
-
-    // 6.大小端判断，服务器只支持x86等小端字节序的cpu
-    if(!fs::SystemUtil::IsLittleEndian())
-    {
-        ret = StatusDefs::SystemUtil_NotLittleEndian;
-        g_Log->e<FS_ClientRun>(_LOGFMT_("not little endian ret[%d]"), ret);
-        return;
-    }
-
-    // 初始化配置
-    g_CfgMgr.Init();
-
-    // 启动终端命令线程
-    // 用于接收运行时用户输入的指令
-    const auto threadQuantity = g_CfgMgr.GetThreadQuantity();
-    fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, threadQuantity + 1);
-
-    //启动模拟客户端线程
-    for(int n = 0; n < threadQuantity; n++)
-    {
-        fs::ITask *t = new ClientTask(pool, n);
-        pool->AddTask(*t, true, 1);
-    }
-
-    // 每秒数据统计
-    fs::Time lastTime;
-    fs::Time nowTime;
-    nowTime.FlushTime();
-    lastTime.FlushTime();
-    fs::TimeSlice diff(1);
-    const auto clientQuantity = g_CfgMgr.GetClientQuantity();
-    while(true)
-    {
-        auto t = nowTime.FlushTime() - lastTime;
-        if(t >= diff)
-        {
-            g_Log->custom("thread<%d>,clients<%d>,connect<%d>,time<%d>,send<%d>"
-                          , threadQuantity, clientQuantity, (int)g_ConnectNum, t.GetTotalSeconds(), (int)g_SendCount);
-            g_SendCount = 0;
-            lastTime.FlushTime();
-        }
-        fs::SystemUtil::Sleep(1);
-    }
-
-    //
-    pool->Close();
-    g_Log->custom("。。已退出。。");
+//     fs::TimeUtil::SetTimeZone();
+// 
+//     // 2.智能变量的类型识别
+//     fs::SmartVarRtti::InitRttiTypeNames();
+// 
+//     // 3.初始化线程局部存储句柄
+//     Int32 ret = fs::FS_TlsUtil::CreateUtilTlsHandle();
+//     if(ret != StatusDefs::Success)
+//     {
+//         std::cout << "error:" << ret << std::endl;
+//         return;
+//     }
+// 
+//     // 4.log初始化 NULL默认以程序名为基准创建目录
+//     ret = g_Log->InitModule(NULL);
+//     if(ret != StatusDefs::Success)
+//     {
+//         std::cout << "error:" << ret << std::endl;
+//         return;
+//     }
+// 
+//     // 5. crash dump switch start
+//     ret = fs::CrashHandleUtil::InitCrashHandleParams();
+//     if(ret != StatusDefs::Success)
+//     {
+//         g_Log->e<FS_ClientRun>(_LOGFMT_("init crash handle params fail ret[%d]"), ret);
+//         return;
+//     }
+// 
+//     // 6.大小端判断，服务器只支持x86等小端字节序的cpu
+//     if(!fs::SystemUtil::IsLittleEndian())
+//     {
+//         ret = StatusDefs::SystemUtil_NotLittleEndian;
+//         g_Log->e<FS_ClientRun>(_LOGFMT_("not little endian ret[%d]"), ret);
+//         return;
+//     }
+// 
+//     // 初始化配置
+//     g_CfgMgr.Init();
+// 
+//     // 启动终端命令线程
+//     // 用于接收运行时用户输入的指令
+//     const auto threadQuantity = g_CfgMgr.GetThreadQuantity();
+//     fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, threadQuantity + 1);
+// 
+//     //启动模拟客户端线程
+//     for(int n = 0; n < threadQuantity; n++)
+//     {
+//         fs::ITask *t = new ClientTask(pool, n);
+//         pool->AddTask(*t, true, 1);
+//     }
+// 
+//     // 每秒数据统计
+//     fs::Time lastTime;
+//     fs::Time nowTime;
+//     nowTime.FlushTime();
+//     lastTime.FlushTime();
+//     fs::TimeSlice diff(1);
+//     const auto clientQuantity = g_CfgMgr.GetClientQuantity();
+//     while(true)
+//     {
+//         auto t = nowTime.FlushTime() - lastTime;
+//         if(t >= diff)
+//         {
+//             g_Log->custom("thread<%d>,clients<%d>,connect<%d>,time<%d>,send<%d>"
+//                           , threadQuantity, clientQuantity, (int)g_ConnectNum, t.GetTotalSeconds(), (int)g_SendCount);
+//             g_SendCount = 0;
+//             lastTime.FlushTime();
+//         }
+//         fs::SystemUtil::Sleep(1);
+//     }
+// 
+//     //
+//     pool->Close();
+//     g_Log->custom("。。已退出。。");
     return;
 }
 
