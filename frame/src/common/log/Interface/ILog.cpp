@@ -34,7 +34,7 @@
 #include "frame/src/common/log/Impl/FS_Log.h"
 #include "FrightenStone/common/status/status.h"
     
-// fs::ILog *g_LogObj = NULL;
+fs::ILog *g_Log = fs::ILog::GetInstance();
 FS_NAMESPACE_BEGIN
 
 ILog *ILog::GetInstance()

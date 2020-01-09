@@ -67,6 +67,7 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(IFS_NetEngine *netEngine, UInt32 comp
     ,_transferThreadId(0)
     ,_sessionBufferAlloctor(NULL)
     ,_printAlloctorOccupiedInfo(NULL)
+    ,_curSessionQuatity(0)
 {
 }
 
@@ -534,6 +535,7 @@ void FS_IocpMsgDispatcher::_OnSessionDisconnected(FS_IocpSession *session)
     _toPostRecv.erase(session);
     _toPostSend.erase(session);
     Fs_SafeFree(session);
+    --_curSessionQuatity;
 }
 
 void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *connectedMsg)
@@ -573,6 +575,7 @@ void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *conn
     // post recv 刷新心跳时间
     if(_DoPostRecv(newSession))
         newSession->UpdateHeartBeatExpiredTime();
+    ++_curSessionQuatity;
 }
 
 void FS_IocpMsgDispatcher::_OnMsgArrived(FS_NetArrivedMsg *arrivedMsg)

@@ -47,7 +47,7 @@ public:
     virtual ~IFS_ServerConfigMgr();
 
 public:
-    Int32 Init();
+    Int32 Init(const Byte8 *iniPath);
 
     // 读配置
 public:

@@ -59,6 +59,7 @@ public:
     virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg) = 0;
     virtual void CloseSession(UInt64 sessionId) = 0;
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic) = 0;
+    virtual Int32 GetSessionCnt() const = 0;
 
     // 获取生产者id
     virtual UInt32 GetGeneratorId() const;

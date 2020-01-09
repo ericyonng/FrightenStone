@@ -121,7 +121,7 @@ protected:
     // 读取配置位置
     virtual Int32 _OnReadCfgs()
     {
-        auto ret = _config->Init();
+        auto ret = _config->Init(SVR_CONFIG_PATH_NAME);
         if(ret != StatusDefs::Success)
         {
             g_Log->e<FS_ServerEngine>(_LOGFMT_("config Init fail ret[%d]"), ret);

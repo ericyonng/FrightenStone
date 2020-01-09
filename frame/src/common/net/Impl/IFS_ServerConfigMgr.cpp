@@ -65,10 +65,10 @@ IFS_ServerConfigMgr::~IFS_ServerConfigMgr()
     Fs_SafeFree(_ini);
 }
 
-Int32 IFS_ServerConfigMgr::Init()
+Int32 IFS_ServerConfigMgr::Init(const Byte8 *iniPath)
 {
     _ini = new FS_IniFile;
-    _ini->Init(SVR_CONFIG_PATH_NAME);
+    _ini->Init(iniPath);
 
     if(!_ini->HasCfgs(SVR_CFG_COMMONCFG_SEG))
     {

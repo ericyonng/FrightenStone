@@ -73,6 +73,7 @@ public:
     virtual void Close();
     virtual void AfterClose();
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
+    virtual Int32 GetSessionCnt() const;
     // 发送消息msg在内部会被拷贝到缓冲区
     virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg);
     virtual void CloseSession(UInt64 sessionId);
@@ -132,6 +133,7 @@ private:
     IDelegate<void> *_printAlloctorOccupiedInfo;
     UInt64 _transferThreadId;
 
+    std::atomic<Int32> _curSessionQuatity;
     std::map<UInt64, FS_IocpSession *> _sessions;  // key:sessionId
     Time _curTime;
     std::set<IFS_Session *, HeartBeatComp> _sessionHeartbeatQueue;  // 心跳队列

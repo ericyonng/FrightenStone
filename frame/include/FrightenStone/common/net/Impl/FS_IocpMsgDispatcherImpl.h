@@ -42,6 +42,11 @@ inline void FS_IocpMsgDispatcher::BindBusinessLogic(IFS_BusinessLogic *businessL
     _logic = businessLogic;
 }
 
+inline Int32 FS_IocpMsgDispatcher::GetSessionCnt() const
+{
+    return _curSessionQuatity;
+}
+
 inline void FS_IocpMsgDispatcher::_RemoveFromPostRecvQueue(FS_IocpSession *session)
 {
     _toPostRecv.erase(session);

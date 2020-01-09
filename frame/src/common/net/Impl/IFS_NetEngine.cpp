@@ -338,10 +338,20 @@ void IFS_NetEngine::_PrintInfo(const TimeSlice &dis)
 {
     const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond);
     const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond);
-    g_Log->custom("<%lld ms> transfercnt<%d>, dispatcher<%d>, "
+    static FS_String transferBalanceInfo;
+    static FS_String dispatcherBalanceInfo;
+    transferBalanceInfo.Clear();
+    dispatcherBalanceInfo.Clear();
+    for(auto &transfer : _msgTransfers)
+        transferBalanceInfo.AppendFormat("%d,", transfer->GetSessionCnt());
+    for(auto &dispatcher : _msgDispatchers)
+        dispatcherBalanceInfo.AppendFormat("%d,", dispatcher->GetSessionCnt());
+
+    g_Log->custom("<%lld ms> transfercnt<%d,balance info:%s>, dispatcher<%d,balance info:%s>, "
                   "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
                   "Recv[%lld pps], RecvSpeed<%s>, SendSpeed<%s>"
-                  , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size()), (Int32)(_msgDispatchers.size())
+                  , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size()), transferBalanceInfo.c_str()
+                  , (Int32)(_msgDispatchers.size()), dispatcherBalanceInfo.c_str()
                   , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore)
                   , (Int64)(_heartbeatTimeOutDisconnected), (Int64)(_sessionDisconnectedCnt)
                   , Int64(_recvMsgCountPerSecond), recvSpeed.c_str()

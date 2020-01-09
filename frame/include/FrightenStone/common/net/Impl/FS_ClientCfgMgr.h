@@ -43,7 +43,7 @@ FS_NAMESPACE_BEGIN
 
 class FS_IniFile;
 
-class BASE_EXPORT FS_ClientCfgMgr : IFS_ServerConfigMgr
+class BASE_EXPORT FS_ClientCfgMgr : public IFS_ServerConfigMgr
 {
 public:
     FS_ClientCfgMgr();

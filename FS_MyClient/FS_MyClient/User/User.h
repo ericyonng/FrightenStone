@@ -21,69 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_MyClient.h
+ * @file  : User.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/6
+ * @date  : 2020/1/8
  * @brief :
- * 
- *
- * 
  */
-#ifndef __FS_MyClient_FS_MyClient_FS_MyClient_H__
-#define __FS_MyClient_FS_MyClient_FS_MyClient_H__
-
-#include <FrightenStone/exportbase.h>
 
 #pragma once
 
-#ifdef _WIN32
-// 
-// class FS_MyClient : public fs::FS_IocpTcpClient
-// {
-// public:
-//     FS_MyClient();
-//     ~FS_MyClient();
-// 
-// public:
-//     Int32 Init();
-//     virtual void OnNetMsg(fs::NetMsg_DataHeader *header);
-//     Int32 SendTest(fs::LoginReq *login);
-//     bool CheckSend(time_t dt);
-// 
-// public:
-//     // 发送时间计数
-//     time_t _restTime = 0; // 毫秒
-// private:
-//     // 接收消息id计数
-//     int _recvMsgID = 1;
-//     // 发送消息id计数
-//     int _sendMsgID = 1;
-//     // 发送条数计数
-//     int _sendCount = 0;
-//     // 检查接收到的服务端消息ID是否连续
-//     bool _checkMsgID = false;
-//     //
-//     bool _isSend = false;
-// };
-// 
-// class ClientTask : public fs::ITask
-// {
-// public:
-//     ClientTask(fs::FS_ThreadPool *pool, Int32 id);
-//     ~ClientTask();
-// 
-//     virtual Int32 Run();
-// 
-// private:
-//     Int32 _id;
-//     fs::FS_ThreadPool *_pool;
-// };
+#include "FrightenStone/exportbase.h"
+#include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "protocols/protocol.h"
 
-class FS_ClientRun
+class User : public fs::IUserSys
 {
 public:
-    static void Run();
-};
-#endif
+    User(UInt64 sessionId, UInt64 userId, fs::IFS_MsgDispatcher *dispatcher);
+    ~User();
 
-#endif
+public:
+    Int32 Login(fs::LoginData *loginData);
+    Int32 Logout();
+    void CheckHeart();
+    void SucRecvMsg();
+
+public:
+    virtual UInt64 GetSessionId() const;
+    virtual UInt64 GetUseId() const;
+    Int32 GetRecvMsgId() const;
+    Int32 GetSendMsgId() const;
+
+    virtual void Close();
+    // NetMsg_DataHeader内部会拷贝到缓冲区
+    void SendData(fs::NetMsg_DataHeader *msgData);
+    void OnDisconnect();
+
+private:
+    UInt64 _sessionId;
+    UInt64 _userId;
+    // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
+    Int32 _recvMsgId = 1;
+    // 测试接收发逻辑用
+    // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
+    Int32 _sendMsgId = 1;
+    fs::IFS_MsgDispatcher *_dispatcher;
+};
+
+#include "FS_MyClient/FS_MyClient/User/UserImpl.h"
