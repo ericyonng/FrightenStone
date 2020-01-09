@@ -142,9 +142,9 @@ bool FS_IniFile::ChangeLineBetweenSegs()
     for(auto iterLineData = _lineRefContent.begin(); iterLineData != _lineRefContent.end(); ++iterLineData)
     {
         lineData.Clear();
-        lineData = iterLineData->second + "\n";
+        lineData = iterLineData->second + FS_String(IniFileDefs::_changeLineFlag);
         if(IniFileMethods::IsSegment(lineData, seg))
-            FS_FileUtil::WriteFile(*fp, "\n");
+            FS_FileUtil::WriteFile(*fp, FS_String(IniFileDefs::_changeLineFlag));
         FS_FileUtil::WriteFile(*fp, lineData);
     }
 
@@ -154,6 +154,30 @@ bool FS_IniFile::ChangeLineBetweenSegs()
     // 重新load配置
     _isDirtied = false;
     return _LoadAllCfgs();
+}
+
+bool FS_IniFile::WriteFileHeaderAnnotation(const FS_String &content)
+{
+    // 打开并清空文件
+    auto fp = FS_FileUtil::OpenFile(_filePath.c_str(), false, "w");
+    if(!fp)
+        return false;
+    
+    // 1.获取第一个segment的行号在segment前插入
+    const Int32 firstSegLine = _GetSegmentLineByLoop(1);
+    // 2.分离出多行数据
+    auto multiLineContent = content.Split(IniFileDefs::_changeLineFlag);
+    // 3.每一行添加注释符
+    const Int32 contentLine = static_cast<Int32>(multiLineContent.size());
+    for(Int32 i = 0; i < contentLine; ++i)
+        multiLineContent[i] = FS_String(IniFileDefs::_annotationFlag) + multiLineContent[i];
+
+    // 4.多行内容拼接成一个string对象
+    FS_String willWriteContent;
+    for(Int32 i = 0; i < contentLine; ++i)
+        willWriteContent << multiLineContent[i] << FS_String(IniFileDefs::_changeLineFlag);
+
+    return _InsertNewLineData(firstSegLine, willWriteContent);
 }
 
 bool FS_IniFile::_Init()
@@ -241,8 +265,8 @@ bool FS_IniFile::_WriteStr(const char *segmentName, const char *keyName, const c
         iterKeyValue = _segmentRefKeyValues.insert(std::make_pair(segmentName, std::map<FS_String, FS_String>())).first;
         _segOrKeyRefLine.insert(std::make_pair(segmentName, ++_maxLine));
 
-        FS_String segContent = "[";
-        segContent << segmentName << "]";
+        FS_String segContent = FS_String(IniFileDefs::_leftSegmentFlag);
+        segContent << segmentName << FS_String(IniFileDefs::_rightSegmentFlag);
         _lineRefContent.insert(std::make_pair(_maxLine, segContent));
         _isDirtied = true;
     }
@@ -262,10 +286,10 @@ bool FS_IniFile::_WriteStr(const char *segmentName, const char *keyName, const c
         // 更新keyvalue
         keyValue.insert(std::make_pair(keyName, wrStr));
         FS_String keyValueContent = keyName;
-        keyValueContent << "=" << wrStr;
+        keyValueContent << FS_String(IniFileDefs::_keyValueJoinerFlag) << wrStr;
 
         // 为key创建段中唯一索引
-        FS_String segKey = segStr + "-" + keyName;
+        FS_String segKey = segStr + FS_String(IniFileDefs::_segKeyJoinerFlag) + keyName;
 
         // 插入新的行数据
         return _InsertNewLineData(++segMaxValidLine, segStr, keyName, wrStr);
@@ -278,26 +302,26 @@ bool FS_IniFile::_WriteStr(const char *segmentName, const char *keyName, const c
             iterValue->second = wrStr;
 
             // 新的键值对所在行
-            FS_String segKey = iterKeyValue->first + "-" + keyName;
+            FS_String segKey = iterKeyValue->first + FS_String(IniFileDefs::_segKeyJoinerFlag) + keyName;
             auto iterLine = _segOrKeyRefLine.find(segKey);
 
             auto iterContent = _lineRefContent.find(iterLine->second);
             auto &content = iterContent->second;
 
             // 分离
-            const auto &splitStr = content.Split(';', 1);
+            const auto &splitStr = content.Split(IniFileDefs::_annotationFlag, 1);
 
             FS_String comments;
             if(splitStr.size() >= 2)
             {// 含有注释
-                comments << ";";
+                comments << FS_String(IniFileDefs::_annotationFlag);
                 comments << splitStr[1];
             }
 
             content = keyName;
-            content << "=" << iterValue->second;
+            content << FS_String(IniFileDefs::_keyValueJoinerFlag) << iterValue->second;
             if(!comments.empty())
-                content << "\t\t\t\t" << comments;
+                content << IniFileDefs::_annotationSpaceStr << comments;
 
             _isDirtied = true;
         }
@@ -316,6 +340,13 @@ bool FS_IniFile::_InsertNewLineData(Int32 line, const FS_String &segment, const 
     if(iterKeyValue == _segmentRefKeyValues.end())
         return false;
 
+    FS_String keyValue;
+    IniFileMethods::MakeKeyValuePairStr(key, value, keyValue);
+    _InsertNewLineData(line, keyValue);
+}
+
+bool FS_IniFile::_InsertNewLineData(Int32 line, const FS_String &content)
+{
     auto iterContent = _lineRefContent.find(line);
     if(iterContent != _lineRefContent.end())
     {// 已存在则需要挪动行数据
@@ -332,13 +363,11 @@ bool FS_IniFile::_InsertNewLineData(Int32 line, const FS_String &segment, const 
         ++_maxLine;
         _lineRefContent.insert(std::make_pair(_maxLine, frontStr));
         auto iterToModify = _lineRefContent.find(line);
-        IniFileMethods::MakeKeyValuePairStr(key, value, iterToModify->second);
+        iterToModify->second = content;
     }
     else
     {// 不存在则不用挪直接插入
-        FS_String keyValue;
-        IniFileMethods::MakeKeyValuePairStr(key, value, keyValue);
-        _lineRefContent.insert(std::make_pair(line, keyValue));
+        _lineRefContent.insert(std::make_pair(line, content));
     }
 
     // 更新最大行号
@@ -365,7 +394,7 @@ void FS_IniFile::_UpdateIni()
     for(auto iterLineData = _lineRefContent.begin(); iterLineData != _lineRefContent.end(); ++iterLineData)
     {
         lineData.Clear();
-        lineData = iterLineData->second + "\n";
+        lineData = iterLineData->second + FS_String(IniFileDefs::_changeLineFlag);
         FS_FileUtil::WriteFile(*fp, lineData);
     }
 
@@ -408,7 +437,7 @@ void FS_IniFile::_OnReadValidData(const FS_String &validContent
                     curKeyValues->insert(std::make_pair(key, value));
 
                     // 记录键值对所在的行号
-                    FS_String segKey = curSegment + "-" + key;
+                    FS_String segKey = curSegment + FS_String(IniFileDefs::_segKeyJoinerFlag) + key;
                     auto iterLine = _segOrKeyRefLine.find(segKey);
                     if(iterLine != _segOrKeyRefLine.end())
                         perror("segOrKey repeated");
@@ -444,6 +473,29 @@ Int32 FS_IniFile::_GetSegmentKeyValueMaxValidLine(const FS_String &segment) cons
     }
 
     return iterLine->second;
+}
+
+Int32 FS_IniFile::_GetSegmentLineByLoop(Int32 index) const
+{
+    FS_String lineData;
+    FS_String seg;
+    Int32 realLine = 1; // 找不到任何segment则从第1行插入
+    Int32 loopCnt = 0;
+    for(auto iterLineData = _lineRefContent.begin(); iterLineData != _lineRefContent.end(); ++iterLineData)
+    {
+        lineData.Clear();
+        lineData = iterLineData->second;
+        if(IniFileMethods::IsSegment(lineData, seg))
+        {
+            ++loopCnt;
+            realLine = iterLineData->first;
+
+            if(loopCnt >= index)
+                break;
+        }
+    }
+
+    return realLine;
 }
 
 FS_NAMESPACE_END

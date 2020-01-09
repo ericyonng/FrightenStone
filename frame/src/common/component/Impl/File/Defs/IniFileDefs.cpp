@@ -35,6 +35,14 @@
 
 FS_NAMESPACE_BEGIN
 
+char IniFileDefs::_annotationFlag = ';';
+char IniFileDefs::_leftSegmentFlag = '[';
+char IniFileDefs::_rightSegmentFlag = ']';
+char IniFileDefs::_keyValueJoinerFlag = '=';
+char IniFileDefs::_changeLineFlag = '\n';
+char IniFileDefs::_segKeyJoinerFlag = '-';
+const char *IniFileDefs::_annotationSpaceStr = "\t\t\t\t";
+
 bool IniFileMethods::IsSegment(const FS_String &content, FS_String &segmentOut)
 {
     // 包含[] 且[]中间的字符去除左右空后是连续的英文或数值
@@ -43,11 +51,11 @@ bool IniFileMethods::IsSegment(const FS_String &content, FS_String &segmentOut)
     cache.rstrip();
 
     auto &cacheRaw = cache.GetRaw();
-    auto leftBracketsPos = cacheRaw.find('[', 0);
+    auto leftBracketsPos = cacheRaw.find(IniFileDefs::_leftSegmentFlag, 0);
     if(leftBracketsPos == std::string::npos)
         return false;
 
-    auto rightBracketsPos = cacheRaw.find(']', leftBracketsPos);
+    auto rightBracketsPos = cacheRaw.find(IniFileDefs::_rightSegmentFlag, leftBracketsPos);
     if(rightBracketsPos == std::string::npos)
         return false;
 
@@ -80,7 +88,7 @@ bool IniFileMethods::IsSegment(const FS_String &content, FS_String &segmentOut)
 bool IniFileMethods::IfExistKeyValue(const FS_String &content)
 {
     auto &raw = content.GetRaw();
-    return raw.find('=', 0) != std::string::npos;
+    return raw.find(IniFileDefs::_keyValueJoinerFlag, 0) != std::string::npos;
 }
 
 bool IniFileMethods::ExtractValidRawData(const FS_String &content, Int32 &contentTypeOut, FS_String &validRawDataOut)
@@ -90,7 +98,7 @@ bool IniFileMethods::ExtractValidRawData(const FS_String &content, Int32 &conten
         return false;
 
     // 分离注释
-    auto rawData = content.Split(';', 1)[0];
+    auto rawData = content.Split(IniFileDefs::_annotationFlag, 1)[0];
     if(rawData.empty())
         return false;
 
@@ -122,7 +130,7 @@ bool IniFileMethods::SpiltKeyValue(const FS_String &validContent, FS_String &key
 
     // 包含=号，且=左边key值在去除无效符号后第一个为英文其他是连续的英文或者数值
     auto &raw = validContent.GetRaw();
-    auto eqPos = raw.find_first_of('=', 0);
+    auto eqPos = raw.find_first_of(IniFileDefs::_keyValueJoinerFlag, 0);
     if(eqPos == std::string::npos)
         return false;
 
@@ -183,12 +191,12 @@ bool IniFileMethods::IsNumChar(char ch)
 
 void IniFileMethods::MakeSegKey(const FS_String &segment, const FS_String &key, FS_String &segKeyOut)
 {
-    segKeyOut = segment + "-" + key;
+    segKeyOut = segment + FS_String(IniFileDefs::_segKeyJoinerFlag) + key;
 }
 
 void IniFileMethods::MakeKeyValuePairStr(const FS_String &key, const FS_String &value, FS_String &keyValueStrOut)
 {
-    keyValueStrOut = key + "=" + value;
+    keyValueStrOut = key + FS_String(IniFileDefs::_keyValueJoinerFlag) + value;
 }
 FS_NAMESPACE_END
 

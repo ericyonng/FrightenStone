@@ -38,12 +38,12 @@
 
 FS_NAMESPACE_BEGIN
 
-class IFS_ServerConfigMgr;
+class IFS_ConfigMgr;
 
 class BASE_EXPORT FS_ServerConfigMgrFactory
 {
 public:
-    static IFS_ServerConfigMgr *Create();
+    static IFS_ConfigMgr *Create();
 };
 
 FS_NAMESPACE_END

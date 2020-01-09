@@ -52,7 +52,13 @@ public:
     };
 
 public:
-
+    static char _annotationFlag;        // 注释符默认:';'
+    static char _leftSegmentFlag;       // 段名左括符:'['
+    static char _rightSegmentFlag;      // 段名右括符:']'
+    static char _keyValueJoinerFlag;    // 键值对连接符:'='
+    static char _changeLineFlag;        // 换行符:'\n'
+    static char _segKeyJoinerFlag;      // 段与键连接符:'-'用于创建一个segkey的键
+    static const char *_annotationSpaceStr;   // 注释间隔字符串:"\t\t\t\t"
 };
 
 class BASE_EXPORT IniFileMethods

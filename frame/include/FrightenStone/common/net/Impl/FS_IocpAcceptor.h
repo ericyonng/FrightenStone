@@ -68,7 +68,7 @@ public:
     virtual ~FS_IocpAcceptor();
 
 public:    
-    virtual Int32 BeforeStart(const NetEngineTotalCfgs &totalCfgs);
+    virtual Int32 BeforeStart();
     virtual Int32 Start();
     virtual void AfterStart();
     virtual void WillClose();

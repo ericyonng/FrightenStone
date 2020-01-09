@@ -21,16 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_ServerConfigMgr.h
+ * @file  : IFS_ConfigMgr.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/10/07
+ * @date  : 2020/01/09
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_ServerConfigMgr_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_ServerConfigMgr_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_ConfigMgrImpl_H__
+#define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_ConfigMgrImpl_H__
 #pragma once
 
 #include "FrightenStone/exportbase.h"
@@ -40,11 +37,11 @@
 FS_NAMESPACE_BEGIN
 
 class FS_IniFile;
-class BASE_EXPORT IFS_ServerConfigMgr
+class BASE_EXPORT IFS_ConfigMgr
 {
 public:
-    IFS_ServerConfigMgr();
-    virtual ~IFS_ServerConfigMgr();
+    IFS_ConfigMgr();
+    virtual ~IFS_ConfigMgr();
 
 public:
     Int32 Init(const Byte8 *iniPath);
@@ -52,8 +49,7 @@ public:
     // 读配置
 public:
     /* listener */
-    FS_String GetListenIp() const;
-    UInt16 GetListenPort() const;
+    void GetListenAddr(std::map<FS_String, UInt16> &addrInfo);
     Int32 GetMaxSessionQuantityLimit() const;
 
     /* transfer */
@@ -79,13 +75,13 @@ public:
 private:
     Int32 _InitDefCfgs();
     void _ReadCfgs();
+    void _WriteIniHeaderAnnotation();
     void _ChangeLineBetweenSegs();
 
 private:
     FS_IniFile *_ini;
 
-    FS_String _ip;
-    UInt16 _port;
+    std::map<FS_String, UInt16> _ipRefPort;
     Int32 _maxSessionQuantityLimit;
     
     Int32 _transferCnt;
@@ -108,6 +104,6 @@ private:
 
 FS_NAMESPACE_END
 
-#include "FrightenStone/common/net/Impl/IFS_ServerConfigMgrImpl.h"
+#include "FrightenStone/common/net/Impl/IFS_ConfigMgrImpl.h"
 
 #endif

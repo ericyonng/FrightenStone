@@ -38,6 +38,7 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
+#include "FrightenStone/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
 

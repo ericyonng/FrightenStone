@@ -36,9 +36,9 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_ServerConfigMgr *FS_ServerConfigMgrFactory::Create()
+IFS_ConfigMgr *FS_ServerConfigMgrFactory::Create()
 {
-    return new IFS_ServerConfigMgr();
+    return new IFS_ConfigMgr();
 #ifdef _WIN32
     //return new IFS_ServerConfigMgr();
 #else

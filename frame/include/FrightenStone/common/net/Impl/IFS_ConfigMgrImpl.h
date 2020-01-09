@@ -21,86 +21,78 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_ServerConfigMgrImpl.h
+ * @file  : IFS_ConfigMgrImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/11/17
+ * @date  : 2020/01/09
  * @brief :
- * 
- *
- * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_ServerConfigMgr_H__
+#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_ConfigMgrImpl_H__
 
 #pragma once
 
 FS_NAMESPACE_BEGIN
 
-inline FS_String IFS_ServerConfigMgr::GetListenIp() const
+inline void IFS_ConfigMgr::GetListenAddr(std::map<FS_String, UInt16> &addrInfo)
 {
-    return _ip;
+    addrInfo = _ipRefPort;
 }
 
-inline UInt16 IFS_ServerConfigMgr::GetListenPort() const
-{
-    return _port;
-}
-
-inline Int32 IFS_ServerConfigMgr::GetMaxSessionQuantityLimit() const
+inline Int32 IFS_ConfigMgr::GetMaxSessionQuantityLimit() const
 {
     return _maxSessionQuantityLimit;
 }
 
-inline Int32 IFS_ServerConfigMgr::GetTransferCnt() const
+inline Int32 IFS_ConfigMgr::GetTransferCnt() const
 {
     return _transferCnt;
 }
 
-inline Int64 IFS_ServerConfigMgr::GetHeartbeatDeadTimeIntervalMs() const
+inline Int64 IFS_ConfigMgr::GetHeartbeatDeadTimeIntervalMs() const
 {
     return _heartbeatDeadTimeIntervalMs;
 }
 
-inline Int32 IFS_ServerConfigMgr::GetDispatcherCnt() const
+inline Int32 IFS_ConfigMgr::GetDispatcherCnt() const
 {
     return _dispatcherCnt;
 }
 
-inline Int32 IFS_ServerConfigMgr::GetPrepareBufferCnt() const
+inline Int32 IFS_ConfigMgr::GetPrepareBufferCnt() const
 {
     return _prepareBufferCnt;
 }
 
-inline UInt64 IFS_ServerConfigMgr::GetMaxAllowAlloctorBytesPerDispatcher() const
+inline UInt64 IFS_ConfigMgr::GetMaxAllowAlloctorBytesPerDispatcher() const
 {
     return _maxAlloctorBytesPerDispatcher;
 }
 
-inline UInt64 IFS_ServerConfigMgr::GetMaxAllowObjPoolBytesOccupied() const
+inline UInt64 IFS_ConfigMgr::GetMaxAllowObjPoolBytesOccupied() const
 {
     return _maxAllowObjPoolBytesOccupied;
 }
 
-inline UInt64 IFS_ServerConfigMgr::GetMaxAllowMemPoolBytesOccupied() const
+inline UInt64 IFS_ConfigMgr::GetMaxAllowMemPoolBytesOccupied() const
 {
     return _maxAllowMemPoolBytesOccupied;
 }
 
-inline UInt32 IFS_ServerConfigMgr::GetAcceptorQuantity() const
+inline UInt32 IFS_ConfigMgr::GetAcceptorQuantity() const
 {
     return _acceptorQuantity;
 }
 
-inline Int64 IFS_ServerConfigMgr::GetConnectorConnectTimeOutMs() const
+inline Int64 IFS_ConfigMgr::GetConnectorConnectTimeOutMs() const
 {
     return _connectorConnectTimeOutMs;
 }
 
-inline Int64 IFS_ServerConfigMgr::GetDispatcherResolutionIntervalMs() const
+inline Int64 IFS_ConfigMgr::GetDispatcherResolutionIntervalMs() const
 {
     return _dispatcherResolutionIntervalMs;
 }
 
-inline bool IFS_ServerConfigMgr::GetIsOpenMemoryMonitor() const
+inline bool IFS_ConfigMgr::GetIsOpenMemoryMonitor() const
 {
     return _isOpenMemoryMonitor;
 }

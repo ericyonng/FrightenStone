@@ -30,7 +30,7 @@
  * 
  */
 #include "stdafx.h"
-#include "FrightenStone/common/net/Impl/IFS_ServerConfigMgr.h"
+#include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 #include "FrightenStone/common/net/Defs/FS_NetDefs.h"
 
 #include "FrightenStone/common/status/status.h"
@@ -41,7 +41,7 @@
 
 FS_NAMESPACE_BEGIN
 
-IFS_ServerConfigMgr::IFS_ServerConfigMgr()
+IFS_ConfigMgr::IFS_ConfigMgr()
     :_ini(NULL)
     ,_port(0)
     ,_maxSessionQuantityLimit(0)
@@ -60,12 +60,12 @@ IFS_ServerConfigMgr::IFS_ServerConfigMgr()
 
 }
 
-IFS_ServerConfigMgr::~IFS_ServerConfigMgr()
+IFS_ConfigMgr::~IFS_ConfigMgr()
 {
     Fs_SafeFree(_ini);
 }
 
-Int32 IFS_ServerConfigMgr::Init(const Byte8 *iniPath)
+Int32 IFS_ConfigMgr::Init(const Byte8 *iniPath)
 {
     _ini = new FS_IniFile;
     _ini->Init(iniPath);
@@ -74,6 +74,8 @@ Int32 IFS_ServerConfigMgr::Init(const Byte8 *iniPath)
     {
         // 初始化默认配置
         _InitDefCfgs();
+        // 写入文件头注释
+        _WriteIniHeaderAnnotation();
         // 段与段之间需要换行
         _ChangeLineBetweenSegs();
     }
@@ -83,12 +85,12 @@ Int32 IFS_ServerConfigMgr::Init(const Byte8 *iniPath)
     return StatusDefs::Success;
 }
 
-Int32 IFS_ServerConfigMgr::_InitDefCfgs()
+Int32 IFS_ConfigMgr::_InitDefCfgs()
 {
     #pragma region listener
-    // ip
+    // ip 默认只有一组地址
     _ini->WriteStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, SVR_CFG_ACCEPTOR_IP);
-    // port
+    // port 默认只有一个监听端口
     _ini->WriteStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, SVR_CFG_ACCEPTOR_PORT);
     // 最大连接数
     _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT);
@@ -132,35 +134,35 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "", buffer);
     if(strcmp(buffer.c_str(), "127.0.0.1") != 0)
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail ip not match"));
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail ip not match"));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     UInt16 port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, 0));
     if(port != atoi(SVR_CFG_ACCEPTOR_PORT))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail port not match"));
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail port not match"));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto maxConnectQuantity = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0);
     if(maxConnectQuantity != atoi(SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT not match"));
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT not match"));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto cnt = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY, 0);
     if(cnt != atoi(SVR_CFG_COMMONCFG_TRANSFER_QUANTITY))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail transfer cnt not match"));
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail transfer cnt not match"));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
     auto heartbeatTime = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL_KEY, 0);
     if(heartbeatTime != atoll(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%lld] not match SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] default")
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%lld] not match SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] default")
                                       , heartbeatTime, static_cast<UInt32>(atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
@@ -168,7 +170,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     auto preBufferCnt = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_PREPARE_POOL_BUFFER_CNT_KEY, 0);
     if(preBufferCnt != atoi(SVR_CFG_PREPARE_POOL_BUFFER_CNT))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_PREPARE_POOL_BUFFER_CNT[%lld] not match SVR_CFG_PREPARE_POOL_BUFFER_CNT[%u] default")
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_PREPARE_POOL_BUFFER_CNT[%lld] not match SVR_CFG_PREPARE_POOL_BUFFER_CNT[%u] default")
                                       , preBufferCnt, static_cast<UInt32>(atoi(SVR_CFG_PREPARE_POOL_BUFFER_CNT)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
@@ -176,7 +178,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     auto memPoolMBPerDispatcher = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER_KEY, 0);
     if(memPoolMBPerDispatcher != atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%lld] not match SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%u] default")
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%lld] not match SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%u] default")
                                       , memPoolMBPerDispatcher, static_cast<UInt32>(atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
@@ -184,7 +186,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     auto dispatcherCnt = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY_KEY, 0);
     if(dispatcherCnt != atoi(SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY[%u] default")
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY[%u] default")
                                       , dispatcherCnt, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
@@ -192,7 +194,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     auto maxAllowMB = _ini->ReadInt(SVR_CFG_OBJPOOL_SEG, SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED_KEY, 0);
     if(maxAllowMB != atoi(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED[%lld] not match SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED[%u] default")
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED[%lld] not match SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED[%u] default")
                                       , maxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
@@ -200,7 +202,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     auto memPoolMaxAllowMB = _ini->ReadInt(SVR_CFG_MEMORY_POOL_SEG, SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED_KEY, 0);
     if(memPoolMaxAllowMB != atoi(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED[%lld] not match SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED[%u] default")
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED[%lld] not match SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED[%u] default")
                                       , memPoolMaxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
@@ -208,7 +210,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     auto acceptorQuatity = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, 0);
     if(acceptorQuatity != atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%u] default")
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%u] default")
                                       , acceptorQuatity, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
@@ -216,7 +218,7 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     auto isOpenMonitor = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, 0);
     if(isOpenMonitor != atoi(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR))
     {
-        g_Log->e<IFS_ServerConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR[%lld] not match SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR[%u] default")
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR[%lld] not match SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR[%u] default")
                                       , isOpenMonitor, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
@@ -224,9 +226,19 @@ Int32 IFS_ServerConfigMgr::_InitDefCfgs()
     return StatusDefs::Success;
 }
 
-void IFS_ServerConfigMgr::_ReadCfgs()
+void IFS_ConfigMgr::_ReadCfgs()
 {
-    _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "",_ip);
+    // ip与port可能是多组
+    FS_String ips, ports;
+    _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "",ips);
+    _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, "", ports);
+    auto multiIp = ips.Split(',');
+    auto multiPort = ports.Split(',');
+    const Int32 groupCnt = static_cast<Int32>(multiIp.size());
+    for(Int32 i = 0; i < groupCnt; ++i)
+    {
+    }
+
     _port = static_cast<UInt16>(_ini->ReadInt(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, 0));
     _maxSessionQuantityLimit = static_cast<Int32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY, 0));
 
@@ -247,10 +259,28 @@ void IFS_ServerConfigMgr::_ReadCfgs()
     _isOpenMemoryMonitor = static_cast<bool>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, 0));
 }
 
-void fs::IFS_ServerConfigMgr::_ChangeLineBetweenSegs()
+void IFS_ConfigMgr::_ChangeLineBetweenSegs()
 {
     _ini->ChangeLineBetweenSegs();
 }
+
+void IFS_ConfigMgr::_WriteIniHeaderAnnotation()
+{
+    FS_String content;
+    content.AppendFormat("@author:ericyonng<120453674@qq.com>\n"
+                         "@brief:\n"
+                         "跨平台ini配置文件,支持linux,windows读写,不使用平台api实现\n"
+                         "格式说明:\n"
+                         "配置文件有指定多组数据的,请以\',\'间隔开,\n"
+                         "字符组合规则    : 除了英文数字组合(收个字符不可为数字),不支持其他字符,键值除外（可为任意除注释符外的字符）\n"
+                         "段名(segment)   : 是指[]括起来的字符串,遵守字符组合规则\n"
+                         "键名(key)       : 是指段名下具体的配置字符串,段名下的键不可重名,跨段间键名可以重名,遵守字符组合规则\n"
+                         "键值(value)     : 是键名对应的值,可以不遵守字符组合规则,但字符中间不可包含注释符,因为注释符后的内容都会被视为注释,避免值被截断\n"
+                         "键名与键值以'='连接\n"
+                         "注释统一使用\';\'进行注释\n");
+    _ini->WriteFileHeaderAnnotation(content);
+}
+
 
 FS_NAMESPACE_END
 
