@@ -75,6 +75,16 @@ Int32 FS_IocpConnector::Start()
     return StatusDefs::Success;
 }
 
+void FS_IocpConnector::AfterStart()
+{
+    MaskReady(true);
+}
+
+void FS_IocpConnector::WillClose()
+{
+    MaskReady(false);
+}
+
 void FS_IocpConnector::BeforeClose()
 {
 }

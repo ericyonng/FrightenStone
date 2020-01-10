@@ -74,12 +74,15 @@ public:
 
     // 引擎对象
     IFS_NetEngine *GetEngine();
+    void MaskReady(bool isReady);
+    bool IsReady() const;
     
 protected:
     UInt32 _compId;
     IFS_NetEngine *_engine;
     MessageQueueNoThread *_myCompMq;  // 对于组件自己本身来说组件自己是消费者,组件不可进行push操作，只能pop
     std::vector<MessageQueueNoThread *> *_allCompMq;    // 所有组件的单一消息队列,使用组件id进行索引
+    std::atomic_bool _isCompReady;
 };
 
 FS_NAMESPACE_END

@@ -70,6 +70,8 @@ public:
     virtual void Wait();
     virtual void Sinal();
     virtual void Close();
+    bool IsCompAllReady() const;
+    bool IsCompAllFinish() const;
 
     /* 组件事件 */
 protected:

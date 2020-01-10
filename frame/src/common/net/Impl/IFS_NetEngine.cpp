@@ -41,6 +41,7 @@
 #include "FrightenStone/common/net/Impl/FS_MsgTransferFactory.h"
 #include "FrightenStone/common/net/Impl/FS_ConfigMgrFactory.h"
 #include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
+#include "FrightenStone/common/net/Defs/ServerCompsDef.h"
 
 #include "FrightenStone/common/component/Impl/SmartVar/SmartVar.h"
 #include "FrightenStone/common/assist/utils/Impl/FS_TlsUtil.h"
@@ -282,6 +283,28 @@ void IFS_NetEngine::Close()
     Fs_SafeFree(_totalCfgs);
 }
 
+bool IFS_NetEngine::IsCompAllReady() const
+{
+    for(auto &iterComp : _compIdRefComps)
+    {
+        if(!iterComp.second->IsReady())
+            return false;
+    }
+
+    return true;
+}
+
+bool IFS_NetEngine::IsCompAllFinish() const
+{
+    for(auto &iterComp : _compIdRefComps)
+    {
+        if(iterComp.second->IsReady())
+            return false;
+    }
+
+    return true;
+}
+
 void IFS_NetEngine::_HandleCompEv_WillConnect(BriefSessionInfo *newSessionInfo)
 {
     // transfer session¾ùºâ
@@ -314,6 +337,10 @@ void IFS_NetEngine::_HandleCompEv_Disconnected(UInt64 sessionId,  UInt32 accepto
 
 void IFS_NetEngine::_Monitor(FS_ThreadPool *threadPool)
 {
+    g_Log->custom("waiting for all comps ready...");
+    ServerCompsMethods::WaitForAllCompsReady(this);
+    g_Log->custom("all comps ready now!\nserver suc start");
+
     Time nowTime;
     _lastStatisticsTime.FlushTime();
     while(threadPool->IsPoolWorking())

@@ -43,6 +43,7 @@
 #include "FrightenStone/common/component/Impl/MessageQueue/MessageQueue.h"
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
 #include "FrightenStone/common/socket/socket.h"
+#include "FrightenStone/common/net/Defs/EngineCompDefs.h"
 
 FS_NAMESPACE_BEGIN
 // poller监视器方法
@@ -138,6 +139,11 @@ void FS_IocpPoller::_TransferMonitor(FS_ThreadPool *pool)
     Int32 st = StatusDefs::Success;
     const UInt32 generatorId = _engineComp->CastTo<IFS_MsgTransfer>()->GetGeneratorId();
     const UInt32 compId = _engineComp->GetCompId();
+    auto engine = _engineComp->GetEngine();
+
+    // 等待其他组件ready
+    _engineComp->MaskReady(true);
+    EngineCompsMethods::WaitForAllCompsReady(engine);
     while(pool->IsPoolWorking())
     {
         st = _iocp->WaitForCompletion(*_ioEv, __FS_POLLER_MONITOR_TIME_OUT_INTERVAL__);
@@ -148,8 +154,9 @@ void FS_IocpPoller::_TransferMonitor(FS_ThreadPool *pool)
         _mq->Push(generatorId, MessageBlockUtil::BuildTransferMonitorArrivedMessageBlock(compId, generatorId, _ioEv, st));
     }
 
+    _engineComp->MaskReady(false);
     _iocp->Destroy();
-    g_Log->sys<FS_IocpPoller>(_LOGFMT_("FS_IocpPoller compId[%u] generatorId[%u] threadId[%llu] end")
+    g_Log->sys<FS_IocpPoller>(_LOGFMT_("Transfer FS_IocpPoller compId[%u] generatorId[%u] threadId[%llu] end")
                               ,compId ,generatorId, SystemUtil::GetCurrentThreadId());
 }
 
@@ -176,6 +183,12 @@ void FS_IocpPoller::_AcceptorMonitor(FS_ThreadPool *pool)
     // 5.监听网络连入
     UInt64 quitFlag = static_cast<UInt64>(IocpDefs::IO_QUIT);
     IoDataBase *ioData = NULL;
+
+    auto engine = _engineComp->GetEngine();
+
+    // 等待其他组件ready
+    _engineComp->MaskReady(true);
+    EngineCompsMethods::WaitForAllCompsReady(engine);
     while(pool->IsPoolWorking())
     {
         // 监听iocp
@@ -216,9 +229,13 @@ void FS_IocpPoller::_AcceptorMonitor(FS_ThreadPool *pool)
         }
     }
 
+    _engineComp->MaskReady(false);
     SocketUtil::DestroySocket(_acceptorSock);
     _iocp->Destroy();
     NetMethodUtil::FreePrepareAcceptBuffers(bufArray, ioDataArray, _maxSessionQuantityLimit);
+
+    g_Log->sys<FS_IocpPoller>(_LOGFMT_("Acceptor FS_IocpPoller  compId[%u] threadId[%llu] end")
+                              , _engineComp->GetCompId(), SystemUtil::GetCurrentThreadId());
 }
 
 void FS_IocpPoller::_HandleSessionWillConnect(IFS_NetEngine *netEngine, SOCKET sock, const sockaddr_in *addrInfo)

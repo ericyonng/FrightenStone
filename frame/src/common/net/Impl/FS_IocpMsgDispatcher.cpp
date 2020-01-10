@@ -41,6 +41,7 @@
 #include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
 #include "FrightenStone/common/net/Impl/FS_Addr.h"
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
+#include "FrightenStone/common/net/Defs/EngineCompDefs.h"
 
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/status/status.h"
@@ -281,6 +282,10 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
     _transferThreadId = SystemUtil::GetCurrentThreadId();
     g_MemleakMonitor->RegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
 
+    // 等待其他组件ready
+    MaskReady(true);
+    EngineCompsMethods::WaitForAllCompsReady(_engine);
+
     while(pool->IsPoolWorking() || hasMsg)
     {
         // 1.等待消息队列
@@ -309,11 +314,13 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
         // _timeWheel->GetModifiedResolution(_resolutionInterval);
     }
     
+    MaskReady(false);
     _concurrentMq->PopImmediately(_consumerId, _recvMsgBlocks, hasMsg);
     _RunAFrame(hasMsg);
 
     _ClearAllSessions();
-    g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end"));
+    g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end compId[%u],threadId[%llu]")
+                                     , _compId, SystemUtil::GetCurrentThreadId());
 }
 
 void FS_IocpMsgDispatcher::_RunAFrame(bool hasMsg)

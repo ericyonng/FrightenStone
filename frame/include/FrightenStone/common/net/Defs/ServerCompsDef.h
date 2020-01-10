@@ -39,6 +39,8 @@
 
 FS_NAMESPACE_BEGIN
 
+class IFS_NetEngine;
+
 class BASE_EXPORT ServerInterfaceCompsType
 {
 public:
@@ -50,6 +52,12 @@ public:
         OnMsgArrived,           // 消息到达
         End,
     };
+};
+
+class BASE_EXPORT ServerCompsMethods
+{
+public:
+    static void WaitForAllCompsReady(const IFS_NetEngine *engine);
 };
 
 FS_NAMESPACE_END

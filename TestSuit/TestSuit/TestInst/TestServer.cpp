@@ -177,7 +177,7 @@ void TestServer::Run()
         auto st = serverCore->Start();
         if(st == StatusDefs::Success)
         {
-            std::cout << "server suc start" << std::endl;
+            // std::cout << "server suc start" << std::endl;
             getchar();
         }
         else

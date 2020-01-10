@@ -21,57 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_EngineCompImpl.h
+ * @file  : ServerCompsDef.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/30
+ * @date  : 2020/1/10
  * @brief :
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_EngineComp_H__
-#pragma once
+#include "stdafx.h"
+#include "FrightenStone/common/net/Defs/ServerCompsDef.h"
+#include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
+#include "FrightenStone/common/assist/utils/Impl/SystemUtil.h"
+
 FS_NAMESPACE_BEGIN
-inline IFS_EngineComp::IFS_EngineComp(IFS_NetEngine *engine, UInt32 compId)
-    :_compId(compId)
-    ,_engine(engine)
-    ,_isCompReady(false)
-{
-}
-template<typename CompType>
-CompType *IFS_EngineComp::CastTo()
-{
-    return reinterpret_cast<CompType *>(this);
-}
 
-inline UInt32 IFS_EngineComp::GetCompId() const
+void ServerCompsMethods::WaitForAllCompsReady(const IFS_NetEngine *engine)
 {
-    return _compId;
-}
+    while(true)
+    {
+        if(engine->IsCompAllReady())
+            break;
 
-inline void IFS_EngineComp::BindCompMq(MessageQueueNoThread *compMq)
-{
-    _myCompMq = compMq;
-}
-
-// 附加所有组件的消息队列
-inline void IFS_EngineComp::AttachAllCompMq(std::vector<MessageQueueNoThread *> *allCompMq)
-{
-    _allCompMq = allCompMq;
-}
-
-inline IFS_NetEngine *IFS_EngineComp::GetEngine()
-{
-    return _engine;
-}
-
-inline void IFS_EngineComp::MaskReady(bool isReady)
-{
-    _isCompReady = isReady;
-}
-
-inline bool IFS_EngineComp::IsReady() const
-{
-    return _isCompReady;
+        SystemUtil::Sleep(1000);
+    }
 }
 
 FS_NAMESPACE_END
-
-#endif

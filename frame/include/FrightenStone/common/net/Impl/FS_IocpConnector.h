@@ -60,8 +60,8 @@ public:
 public:
     virtual Int32 BeforeStart(const NetEngineTotalCfgs &cfgs);
     virtual Int32 Start();
-    virtual void AfterStart() {};
-    virtual void WillClose() {};
+    virtual void AfterStart();
+    virtual void WillClose();
     virtual void BeforeClose();
     virtual void Close();
     virtual void AfterClose() {}
