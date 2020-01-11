@@ -43,6 +43,7 @@
 #include <set>
 #include "FrightenStone/common/component/Impl/TimeSlice.h"
 #include "FrightenStone/common/net/Defs/HeartBeatComp.h"
+#include "FrightenStone/common/net/Defs/FS_NetMessageBlock.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -57,6 +58,7 @@ class IFS_NetEngine;
 class FS_IocpSession;
 struct FS_NetSessionWillConnectMsg;
 struct FS_NetArrivedMsg;
+struct FS_NetMsgBufferBlock;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
@@ -105,6 +107,13 @@ private:
 private:
     FS_IocpSession *_GetSession(UInt64 sessionId);
     void _PrintAlloctorOccupiedInfo();
+
+    /* 消息队列处理 */
+private:
+    // 收到网络包
+    void _OnMsgBlockNetMsgArrived(FS_NetMsgBufferBlock *msgBlock);
+    // 会话连入
+    void _OnMsgBlockNetSessionConnected(FS_NetMsgBufferBlock *msgBlock);
     
     /* 网络事件 */
 private:
@@ -140,6 +149,10 @@ private:
     std::set<FS_IocpSession *> _toPostRecv;
     std::set<FS_IocpSession *> _toPostSend;
     std::set<FS_IocpSession *> _toRemove;
+    
+    // 消息队列处理器
+    typedef void (FS_IocpMsgDispatcher::*MessageQueueHandler)(FS_NetMsgBufferBlock *msgBlock);
+    static MessageQueueHandler _msgBlockHandler[NetMessageBlockType::End];
 
     // TODO:订阅网络协议的facade开发，使用委托方式，各个系统关注各自的协议，注册到本系统
 

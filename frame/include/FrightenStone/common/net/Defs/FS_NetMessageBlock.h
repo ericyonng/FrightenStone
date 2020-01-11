@@ -58,6 +58,7 @@ public:
         Net_NetSessionDisconnect = 3,    // 会话断开 Transfer to Dispatcher
         Met_NetSessionConnected = 4,     // 会话连入 Transfer to Dispatcher
         Met_NetCloseSession = 5,         // 关闭会话 Dispatcher to Transfer
+        End,
     };
 };
 

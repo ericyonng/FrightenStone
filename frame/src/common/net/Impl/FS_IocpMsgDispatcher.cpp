@@ -57,6 +57,14 @@
 
 FS_NAMESPACE_BEGIN
 
+FS_IocpMsgDispatcher::MessageQueueHandler FS_IocpMsgDispatcher::_msgBlockHandler[NetMessageBlockType::End] = 
+{NULL,
+&FS_IocpMsgDispatcher::_OnMsgBlockNetMsgArrived,
+NULL,
+NULL,
+&FS_IocpMsgDispatcher::_OnMsgBlockNetSessionConnected,
+};
+
 FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(IFS_NetEngine *netEngine, UInt32 compId)
     :IFS_MsgDispatcher(netEngine, compId)
     , _pool(NULL)
@@ -361,7 +369,6 @@ void FS_IocpMsgDispatcher::_CheckHeartbeat()
     }
 }
 
-
 void FS_IocpMsgDispatcher::_OnBusinessProcessing()
 {
     // 将网络数据转移到缓冲区
@@ -378,17 +385,7 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessing()
         {
             netMsgBlock = (*iterBlock)->CastTo<FS_NetMsgBufferBlock>();
             messageBlockType = netMsgBlock->_netMessageBlockType;
-            if(messageBlockType == NetMessageBlockType::Net_NetMsgArrived)
-            {// 收到网络包
-                auto arrivedMsg = netMsgBlock->CastTo<FS_NetArrivedMsg>();
-                _OnMsgArrived(arrivedMsg);
-            }
-            else if(messageBlockType == NetMessageBlockType::Met_NetSessionConnected)
-            {// 会话连入
-                auto connectedMsgBlock = netMsgBlock->CastTo<FS_NetSessionWillConnectMsg>();
-                _OnSessionConnected(connectedMsgBlock);
-            }
-
+            (this->*_msgBlockHandler[messageBlockType])(netMsgBlock);
             Fs_SafeFree(netMsgBlock);
             iterBlock = blockQueue->erase(iterBlock);
         }
@@ -504,6 +501,18 @@ void FS_IocpMsgDispatcher::_PrintAlloctorOccupiedInfo()
     memInfo.AppendFormat(" ]");
     memInfo.AppendFormat("\n【+++++++++++++++++++++++++ End ++++++++++++++++++++++++++】\n");
     g_Log->mempool("%s", memInfo.c_str());
+}
+
+void FS_IocpMsgDispatcher::_OnMsgBlockNetMsgArrived(FS_NetMsgBufferBlock *msgBlock)
+{
+    auto arrivedMsg = msgBlock->CastTo<FS_NetArrivedMsg>();
+    _OnMsgArrived(arrivedMsg);
+}
+
+void FS_IocpMsgDispatcher::_OnMsgBlockNetSessionConnected(FS_NetMsgBufferBlock *msgBlock)
+{
+    auto connectedMsgBlock = msgBlock->CastTo<FS_NetSessionWillConnectMsg>();
+    _OnSessionConnected(connectedMsgBlock);
 }
 
 void FS_IocpMsgDispatcher::_OnSessionDisconnected(FS_IocpSession *session)
