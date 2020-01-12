@@ -68,4 +68,13 @@ FS_MessageBlock *MessageBlockUtil::BuildTransferWillConnectMessageBlock(UInt32 c
     return block;
 }
 
+FS_MessageBlock * MessageBlockUtil::BuildConnectorPostConnectOpFinish(UInt32 compId, UInt32 generatorId)
+{
+    auto block = new FS_NetMsgBufferBlock();
+    block->_compId = compId;
+    block->_generatorId = generatorId;
+    block->_netMessageBlockType = NetMessageBlockType::Net_NetConnectorConnectOpFinish;
+    return block;
+}
+
 FS_NAMESPACE_END

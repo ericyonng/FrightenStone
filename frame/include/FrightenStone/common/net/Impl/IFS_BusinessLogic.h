@@ -79,6 +79,7 @@ public:
 public:
     virtual void OnMsgDispatch(UInt64 sessionId, NetMsgDecoder *msgDecoder) = 0;
     virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, UInt64> *> *disconnectedDelegate) = 0;
+    virtual void OnConnectorConnectOpFinish() = 0;
     virtual IUserSys *OnSessionConnected(UInt64 sessionId) = 0;
 
 public:

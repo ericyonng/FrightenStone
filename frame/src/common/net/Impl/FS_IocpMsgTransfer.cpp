@@ -179,6 +179,23 @@ void FS_IocpMsgTransfer::OnWillConnect(BriefSessionInfo *newSessionInfo)
 #endif
 }
 
+void FS_IocpMsgTransfer::OnPostConnectOpFinish()
+{
+    // TODO:连接消息消息
+    auto newMessageBlock = MessageBlockUtil::BuildConnectorPostConnectOpFinish(_compId, _generatorId);
+#ifdef _DEBUG
+    if(!_concurrentMq->Push(_generatorId, newMessageBlock))
+    {
+        g_Log->e<FS_IocpMsgTransfer>(_LOGFMT_("concurrentmq push fail generatorId[%u] compid[%u] ")
+                                     , _generatorId, _compId);
+    }
+#else
+    _concurrentMq->Push(_generatorId, newMessageBlock);
+#endif
+}
+
 FS_NAMESPACE_END
+
+
 
 #endif

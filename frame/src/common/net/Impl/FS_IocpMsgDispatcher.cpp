@@ -64,6 +64,8 @@ FS_IocpMsgDispatcher::MessageQueueHandler FS_IocpMsgDispatcher::_msgBlockHandler
 NULL,
 NULL,
 &FS_IocpMsgDispatcher::_OnMsgBlockNetSessionConnected,
+NULL,
+&FS_IocpMsgDispatcher::_OnMsgBlockConnectorConnectOpFinish,
 };
 
 FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(IFS_NetEngine *netEngine, UInt32 compId)
@@ -514,6 +516,11 @@ void FS_IocpMsgDispatcher::_OnMsgBlockNetSessionConnected(FS_NetMsgBufferBlock *
 {
     auto connectedMsgBlock = msgBlock->CastTo<FS_NetSessionWillConnectMsg>();
     _OnSessionConnected(connectedMsgBlock);
+}
+
+void FS_IocpMsgDispatcher::_OnMsgBlockConnectorConnectOpFinish(FS_NetMsgBufferBlock *msgBlock)
+{
+    _logic->OnConnectorConnectOpFinish();
 }
 
 void FS_IocpMsgDispatcher::_OnSessionDisconnected(FS_IocpSession *session)

@@ -83,6 +83,7 @@ protected:
     virtual void _HandleCompEv_RecvMsg(Int64 transferBytes);
     virtual void _HandleCompEv_RecvMsgAmount();
     virtual void _HandleCompEv_SendMsg(Int64 transferBytes);
+    virtual void _HandleCompEv_ConnectorPostConnectOpFinish();
 
 protected:
     virtual void _Monitor(FS_ThreadPool *threadPool);

@@ -85,6 +85,11 @@ public:
         return newUser;
     }
 
+    virtual void OnConnectorConnectOpFinish()
+    {
+        // 连接器连接操作完成但不一定代表全部连接成功
+    }
+
     virtual void OnMsgDispatch(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
     {
         auto user = g_UserMgr->GetUserBySessionId(sessionId);

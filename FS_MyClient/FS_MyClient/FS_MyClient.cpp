@@ -91,6 +91,12 @@ public:
         return newUser;
     }
 
+    virtual void OnConnectorConnectOpFinish()
+    {
+        // 连接器连接操作完成但不一定代表全部连接成功
+        // 这个时候抛连接操作完成事件给所有用户,可以启动定时器发送登陆请求
+    }
+
     virtual void OnMsgDispatch(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
     {
         auto user = g_UserMgr->GetUserBySessionId(sessionId);

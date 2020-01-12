@@ -72,6 +72,8 @@ public:
 public:
     // 连接
     virtual Int32 Connect(const FS_ConnectInfo &connectInfo);
+    // 投递消息通知连接操作完成
+    virtual void PostConnectOpFinish();
 
 private:
     // 断开 从dispatcher调用委托回调

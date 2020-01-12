@@ -71,6 +71,7 @@ public:
     // 网络事件
 public:
     virtual void OnWillConnect(BriefSessionInfo *newSessionInfo);
+    virtual void OnPostConnectOpFinish();
     virtual void OnSessionDisconnected(UInt64 sessionId);
 
 public:

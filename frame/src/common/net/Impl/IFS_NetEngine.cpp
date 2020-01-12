@@ -345,6 +345,12 @@ void IFS_NetEngine::_HandleCompEv_Disconnected(UInt64 sessionId,  UInt32 accepto
     transferComp->OnSessionDisconnected(sessionId);
 }
 
+void IFS_NetEngine::_HandleCompEv_ConnectorPostConnectOpFinish()
+{
+    // TODO:这里取第一个transfer，可以考虑下方案或者直接这么做，因为有可能dispatch是多个要不要遍历每个transfer都发一个,貌似又不合理，因为这个消息只要发一次就够了
+    _msgTransfers[0]->OnPostConnectOpFinish();
+}
+
 void IFS_NetEngine::_Monitor(FS_ThreadPool *threadPool)
 {
     g_Log->custom("waiting for all comps ready...");

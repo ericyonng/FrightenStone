@@ -49,6 +49,8 @@ public:
                                                                  , UInt32 generatorId
                                                                  , IFS_NetModule *netModule
                                                                  , BriefSessionInfo *newSessionInfo);
+    static FS_MessageBlock *BuildConnectorPostConnectOpFinish(UInt32 compId
+                                                              , UInt32 generatorId);
 };
 
 FS_NAMESPACE_END

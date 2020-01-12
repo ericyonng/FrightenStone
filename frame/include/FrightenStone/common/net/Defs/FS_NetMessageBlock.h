@@ -57,8 +57,9 @@ public:
         Net_NetMsgArrived = 1,           // 收到网络包 Transfer to Dispatcher
         Net_NetMsgSended = 2,            // 发送网络包 Dispatcher to Transfer
         Net_NetSessionDisconnect = 3,    // 会话断开 Transfer to Dispatcher
-        Met_NetSessionConnected = 4,     // 会话连入 Transfer to Dispatcher
-        Met_NetCloseSession = 5,         // 关闭会话 Dispatcher to Transfer
+        Net_NetSessionConnected = 4,     // 会话连入 Transfer to Dispatcher
+        Net_NetCloseSession = 5,         // 关闭会话 Dispatcher to Transfer
+        Net_NetConnectorConnectOpFinish = 6,    // 连接器连接操作完成,但并不代表成功连入
         End,
     };
 };

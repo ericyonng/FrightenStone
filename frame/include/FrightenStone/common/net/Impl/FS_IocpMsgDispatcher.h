@@ -117,6 +117,8 @@ private:
     void _OnMsgBlockNetMsgArrived(FS_NetMsgBufferBlock *msgBlock);
     // 会话连入
     void _OnMsgBlockNetSessionConnected(FS_NetMsgBufferBlock *msgBlock);
+    // 连接器连接操作完成,但并不代表所有连接都已成功
+    void _OnMsgBlockConnectorConnectOpFinish(FS_NetMsgBufferBlock *msgBlock);
     
     /* 网络事件 */
 private:

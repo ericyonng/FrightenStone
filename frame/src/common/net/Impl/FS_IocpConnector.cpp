@@ -157,6 +157,13 @@ Int32 FS_IocpConnector::Connect(const FS_ConnectInfo &connectInfo)
     return ret;
 }
 
+void FS_IocpConnector::PostConnectOpFinish()
+{
+    // 新会话
+    auto netEngine = GetEngine();
+    netEngine->_HandleCompEv_ConnectorPostConnectOpFinish();
+}
+
 void FS_IocpConnector::_OnUserDisconnected(UInt64 sessionId)
 {
     _locker.Lock();

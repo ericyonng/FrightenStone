@@ -57,6 +57,7 @@ public:
     /* 网络事件 */
 public:
     virtual void OnWillConnect(BriefSessionInfo *newSessionInfo) = 0;
+    virtual void OnPostConnectOpFinish() = 0;
 
     /* 属性方法 */
 public:
