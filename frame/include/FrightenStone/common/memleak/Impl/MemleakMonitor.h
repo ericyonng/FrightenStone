@@ -50,7 +50,7 @@ public:
     virtual ~MemleakMonitor();
 
     static MemleakMonitor *GetInstance();
-    Int32 BeforeStart();
+    Int32 BeforeStart(UInt32 printIntervalSeconds);
     void Start();
     void Finish();
 
@@ -80,6 +80,7 @@ private:
     std::map<UInt64, std::set<const IDelegate<void> *>> _threadIdRefMemPoolPrintCallbacks;
 
     FS_ThreadPool *_printInfoPool;
+    UInt32 _printInfoIntervalMilliSec;
 };
 
 FS_NAMESPACE_END

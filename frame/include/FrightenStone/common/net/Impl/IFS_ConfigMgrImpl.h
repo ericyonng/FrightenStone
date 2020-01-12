@@ -97,6 +97,11 @@ inline bool IFS_ConfigMgr::GetIsOpenMemoryMonitor() const
     return _isOpenMemoryMonitor;
 }
 
+inline UInt32 IFS_ConfigMgr::GetMemoryMonitorPrintIntervalSeconds() const
+{
+    return _memoryMonitorPrintIntervalSeconds;
+}
+
 FS_NAMESPACE_END
 
 #endif

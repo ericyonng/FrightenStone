@@ -76,6 +76,7 @@ public:
     Int64 GetDispatcherResolutionIntervalMs() const;
 
     bool GetIsOpenMemoryMonitor() const;
+    UInt32 GetMemoryMonitorPrintIntervalSeconds() const;
 
 private:
     Int32 _InitDefCfgs();
@@ -105,6 +106,7 @@ private:
     Int64 _dispatcherResolutionIntervalMs;
 
     bool  _isOpenMemoryMonitor;
+    UInt32  _memoryMonitorPrintIntervalSeconds;
 };
 
 FS_NAMESPACE_END

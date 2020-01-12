@@ -51,6 +51,7 @@ struct BASE_EXPORT CommonCfgs
     UInt32 _transferQuantity;                           // 数据传输器数量
     UInt32 _dispatcherQuantity;                         // 业务层消息分配器数量
     bool _isOpenMemoryMonitor;                          // 是否开启内存监控
+    UInt32 _memoryMonitorPrintIntervalSeconds;          // 内存监控打印日志的秒数
 };
 
 struct BASE_EXPORT ConnectorCfgs

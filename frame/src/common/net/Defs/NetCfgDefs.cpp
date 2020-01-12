@@ -52,6 +52,7 @@ CommonCfgs::CommonCfgs()
     , _transferQuantity(StringUtil::StringToUInt32(SVR_CFG_COMMONCFG_TRANSFER_QUANTITY))
     , _dispatcherQuantity(StringUtil::StringToUInt32(SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY))
     ,_isOpenMemoryMonitor(StringUtil::StringToInt32(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR))
+    ,_memoryMonitorPrintIntervalSeconds(StringUtil::StringToUInt32(SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC))
 {
 }
 

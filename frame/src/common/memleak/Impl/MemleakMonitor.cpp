@@ -45,6 +45,7 @@ FS_NAMESPACE_BEGIN
 Locker MemleakMonitor::_locker;
 MemleakMonitor::MemleakMonitor()
     :_printInfoPool(new FS_ThreadPool(0, 1))
+    ,_printInfoIntervalMilliSec(1)
 {
     
 }
@@ -68,13 +69,14 @@ MemleakMonitor *MemleakMonitor::GetInstance()
     return g_MemleakMonitor;
 }
 
-Int32 MemleakMonitor::BeforeStart()
+Int32 MemleakMonitor::BeforeStart(UInt32 printIntervalSeconds)
 {
     // TODO:monitor是通用的对象不可与服务端配置耦合
 //     for(auto &setInvoke : _objPoolSetMaxAllowOccupiedBytes)
 //         setInvoke->Invoke(maxAllowObjPoolBytes);
 // 
 //     g_MemoryPool->SetMaxAllowOccupiedBytes(maxAllowMemoryPoolBytes);
+    _printInfoIntervalMilliSec = printIntervalSeconds * static_cast<UInt32>(Time::_millisecondPerSecond);
     return StatusDefs::Success;
 }
 
@@ -261,7 +263,7 @@ void MemleakMonitor::_PrintInfoPerSeconds(FS_ThreadPool *pool)
 {
     while(pool->IsPoolWorking())
     {
-        SystemUtil::Sleep(1000);
+        SystemUtil::Sleep(_printInfoIntervalMilliSec);
         _locker.Lock();
         PrintPoolAll();
         _locker.Unlock();

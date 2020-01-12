@@ -110,7 +110,7 @@ public:
                 1.serialize NetMsgCoder *coder的外部需要做绑定,start->setcmd,以及finish的工作
                 2.DeserializeFrom  NetMsgDecoder *decoder 的外部需要预先Decode
                 3.每个消息包的len在构造时需要对每个基本类型数据进行计算尺寸,不可直接sizeof包类型
-                ,因为虚表以及内存对齐会导致len长度与包序列化的字节长度不一致
+                ,因为虚表以及内存对齐会导致len长度与包序列化的字节流长度不一致
 */
 
 /////////////////////////////////////////////////////////

@@ -172,9 +172,13 @@ Int32 IFS_NetEngine::Start()
     // 1.内存助手
     g_MemoryHelper = MemoryHelper::GetInstance();
     g_MemoryHelper->Start(_totalCfgs->_objPoolCfgs._maxAllowObjPoolBytesOccupied, _totalCfgs->_mempoolCfgs._maxAllowMemPoolBytesOccupied);
+    g_MemleakMonitor->BeforeStart(_totalCfgs->_commonCfgs._memoryMonitorPrintIntervalSeconds);
+
     // 2.内存监控
     if(_totalCfgs->_commonCfgs._isOpenMemoryMonitor)
+    {
         g_MemleakMonitor->Start();
+    }
 
     // 3.初始化线程对象
     _pool = new FS_ThreadPool(0, 1);
@@ -689,6 +693,8 @@ Int32 IFS_NetEngine::_ReadBaseCfgs(IFS_ConfigMgr *cfgMgr)
     commonConfig._acceptorQuantityLimit = cfgMgr->GetAcceptorQuantity();
     commonConfig._dispatcherQuantity = cfgMgr->GetDispatcherCnt();
     commonConfig._transferQuantity = cfgMgr->GetTransferCnt();
+    commonConfig._isOpenMemoryMonitor = cfgMgr->GetIsOpenMemoryMonitor();
+    commonConfig._memoryMonitorPrintIntervalSeconds = cfgMgr->GetMemoryMonitorPrintIntervalSeconds();
 
     auto &connectorCfg = _totalCfgs->_connectorCfgs;
     connectorCfg._connectTimeOutMs = cfgMgr->GetConnectorConnectTimeOutMs();

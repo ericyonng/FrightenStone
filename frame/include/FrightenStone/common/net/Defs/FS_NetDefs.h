@@ -77,16 +77,18 @@
 #pragma region CommonCfg
 #define SVR_CFG_COMMONCFG_SEG                "CommonCfg"
 
-#define SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY      "MaxSessionQuantity"          // 最大会话数
-#define SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT          "100064"                      // 默认的最大会话数
-#define SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY            "TransferQuantity"
-#define SVR_CFG_COMMONCFG_TRANSFER_QUANTITY                "8"                          // 数据传输支持8线程
-#define SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY_KEY          "DispatcherQuantity"         // 消息分发器数量
-#define SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY              "1"                          // 消息分发器数量
-// #define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY            "AcceptorQuantity"           // 监听器数量
-// #define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY                 "1"                         // 监听器数量
-#define SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY        "IsOpenMemoryMonitor"       // 是否开启内存监控
-#define SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR            "1"                         // 默认开启内存监控
+#define SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT_KEY            "MaxSessionQuantity"        // 最大会话数
+#define SVR_CFG_COMMONCFG_SESSION_QUANTITY_LIMIT                "100064"                    // 默认的最大会话数
+#define SVR_CFG_COMMONCFG_TRANSFER_QUANTITY_KEY                 "TransferQuantity"
+#define SVR_CFG_COMMONCFG_TRANSFER_QUANTITY                     "8"                         // 数据传输支持8线程
+#define SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY_KEY               "DispatcherQuantity"        // 消息分发器数量
+#define SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY                   "1"                         // 消息分发器数量
+// #define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY              "AcceptorQuantity"          // 监听器数量
+// #define SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY                  "1"                         // 监听器数量
+#define SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY            "IsOpenMemoryMonitor"       // 是否开启内存监控
+#define SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR                "1"                         // 默认开启内存监控
+#define SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC_KEY       "MemoryMonitorIntervalSecconds"     // 内存监控日志时间间隔
+#define SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC            "10"                               // 默认10s打印一次日志
 #pragma endregion
 
 #pragma region Acceptor default config

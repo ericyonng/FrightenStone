@@ -132,6 +132,7 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
 
     #pragma region memory monitor
     _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR);
+    _ini->WriteStr(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC_KEY, SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC);
     #pragma endregion
 
     // 检查是否写入正确
@@ -228,6 +229,30 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
+    auto monitorSeconds = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC_KEY, 0);
+    if(monitorSeconds != atoi(SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC))
+    {
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC[%lld] not match SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC[%u] default")
+                                , monitorSeconds, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC)));
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
+    }
+
+    auto connectorTimeOut = _ini->ReadInt(SVR_CFG_CONNECTOR_SEG, SVR_CFG_CONNECTOR_CONNECT_TIME_OUT_KEY, 0);
+    if(connectorTimeOut != atoi(SVR_CFG_CONNECTOR_CONNECT_TIME_OUT))
+    {
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_CONNECTOR_CONNECT_TIME_OUT[%lld] not match SVR_CFG_CONNECTOR_CONNECT_TIME_OUT[%u] default")
+                                , connectorTimeOut, static_cast<UInt32>(atoi(SVR_CFG_CONNECTOR_CONNECT_TIME_OUT)));
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
+    }
+
+    auto resolutionInterval = _ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY, 0);
+    if(resolutionInterval != atoi(SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL))
+    {
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL[%lld] not match SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL[%u] default")
+                                , resolutionInterval, static_cast<UInt32>(atoi(SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL)));
+        return StatusDefs::IocpAcceptor_InitDefIniFail;
+    }
+
     return StatusDefs::Success;
 }
 
@@ -266,6 +291,7 @@ void IFS_ConfigMgr::_ReadCfgs()
     
     _dispatcherResolutionIntervalMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY, 0));
     _isOpenMemoryMonitor = static_cast<bool>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, 0));
+    _memoryMonitorPrintIntervalSeconds = static_cast<UInt32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC_KEY, 0));
 }
 
 void IFS_ConfigMgr::_ChangeLineBetweenSegs()
