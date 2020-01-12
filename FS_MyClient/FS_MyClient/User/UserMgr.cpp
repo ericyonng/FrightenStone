@@ -137,7 +137,7 @@ void UserMgr::RemoveUser(UInt64 sessionId)
 
 User *UserMgr::NewUser(UInt64 sessionId)
 {
-    auto user = new User(sessionId, ++_curMaxUserId, _dispatcher);
+    auto user = new User(sessionId, ++_curMaxUserId, _logic);
     _sessionIdRefUsers.insert(std::make_pair(sessionId, user));
     _userIdRefUsers.insert(std::make_pair(_curMaxUserId, user));
     return user;

@@ -35,6 +35,8 @@
 
  // defs ...
 #include "FrightenStone/common/net/Defs/NetCfgDefs.h"
+#include "FrightenStone/common/net/Defs/FS_ConnectInfo.h"
+#include "FrightenStone/common/net/Defs/EngineCompDefs.h"
 
  // Impl ...
  // Interface ...
@@ -47,10 +49,8 @@
 #include "FrightenStone/common/net/Impl/IFS_MsgDispatcher.h"
 #include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 #include "FrightenStone/common/net/Impl/IFS_NetEngine.h"
+#include "FrightenStone/common/net/Impl/IFS_Connector.h"
 
-#include "FrightenStone/common/net/Impl/FS_ClientCfgMgr.h"
-#include "FrightenStone/common/net/Impl/FS_IocpTcpClient.h"
-#include "FrightenStone/common/net/Impl/FS_TcpClient.h"
 
 #endif
 

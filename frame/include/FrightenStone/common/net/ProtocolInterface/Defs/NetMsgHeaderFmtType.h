@@ -40,8 +40,8 @@ class BASE_EXPORT NetMsgHeaderFmtType
 {
 public:
     /* 类型定义 */
-    typedef UInt16 PacketLenDataType;       // 包头长度类型 32位64位以及跨平台占用的字节数都是固定的
-    typedef UInt16 CmdDataType;             // 包头协议号类型 32位64位以及跨平台占用的字节数都是固定的
+    typedef UInt32 PacketLenDataType;       // 包头长度类型 32位64位以及跨平台占用的字节数都是固定的
+    typedef UInt32 CmdDataType;             // 包头协议号类型 32位64位以及跨平台占用的字节数都是固定的
 
     // 消息头格式: [4字节长度][4字节cmd]
     static const UInt32 _msgHeaderSize;

@@ -122,7 +122,7 @@ Int32 FS_IocpConnector::Connect(const FS_ConnectInfo &connectInfo)
     sockaddr_in  sin = {};
     if(!SocketUtil::FillTcpAddrInfo(connectInfo._ip.c_str(), connectInfo._port, AF_INET, sin))
     {
-        g_Log->e<FS_TcpClient>(_LOGFMT_("FillTcpAddrInfo fail ip[%s] port[%hu]"), connectInfo._ip.c_str(), connectInfo._port);
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("FillTcpAddrInfo fail ip[%s] port[%hu]"), connectInfo._ip.c_str(), connectInfo._port);
         return StatusDefs::FS_TcpClient_ConnectFail;
     }
 
@@ -227,7 +227,7 @@ Int32 FS_IocpConnector::_Connect(SOCKET sock, const sockaddr_in &sin, const FS_C
 
     if(isTimeOut)
     {
-        g_Log->e<FS_TcpClient>(_LOGFMT_("<socket=%llu> connect <%s:%hu> timeout failed...")
+        g_Log->e<FS_IocpConnector>(_LOGFMT_("<socket=%llu> connect <%s:%hu> timeout failed...")
                                , sock, connectInfo._ip.c_str(), connectInfo._port);
         return StatusDefs::FS_IocpConnector_ConnectTimeOut;
     }

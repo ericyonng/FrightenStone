@@ -376,8 +376,12 @@ void IFS_NetEngine::_PrintInfo(const TimeSlice &dis)
 {
     const auto &sendSpeed = SocketUtil::ToFmtSpeedPerSec(_sendMsgBytesPerSecond);
     const auto &recvSpeed = SocketUtil::ToFmtSpeedPerSec(_recvMsgBytesPerSecond);
+
+    // 单线程下static是安全的
     static FS_String transferBalanceInfo;
     static FS_String dispatcherBalanceInfo;
+    static FS_String toPrintInfo;
+
     transferBalanceInfo.Clear();
     dispatcherBalanceInfo.Clear();
     for(auto &transfer : _msgTransfers)
@@ -385,15 +389,22 @@ void IFS_NetEngine::_PrintInfo(const TimeSlice &dis)
     for(auto &dispatcher : _msgDispatchers)
         dispatcherBalanceInfo.AppendFormat("%d,", dispatcher->GetSessionCnt());
 
-    g_Log->custom("<%lld ms> transfercnt<%d,balance info:%s>, dispatcher<%d,balance info:%s>, "
-                  "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
-                  "Recv[%lld pps], RecvSpeed<%s>, SendSpeed<%s>"
-                  , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size()), transferBalanceInfo.c_str()
-                  , (Int32)(_msgDispatchers.size()), dispatcherBalanceInfo.c_str()
-                  , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore)
-                  , (Int64)(_heartbeatTimeOutDisconnected), (Int64)(_sessionDisconnectedCnt)
-                  , Int64(_recvMsgCountPerSecond), recvSpeed.c_str()
-                  , sendSpeed.c_str());
+    // 要打印的数据
+    toPrintInfo.Clear();
+    toPrintInfo.AppendFormat("<%lld ms> transfercnt<%d,balance info:%s>, dispatcher<%d,balance info:%s>, "
+                             "online<%lld> historyonline<%lld>, timeout<%lld> offline<%lld>, "
+                             "Recv[%lld pps], RecvSpeed<%s>, SendSpeed<%s>"
+                             , dis.GetTotalMilliSeconds(), (Int32)(_msgTransfers.size()), transferBalanceInfo.c_str()
+                             , (Int32)(_msgDispatchers.size()), dispatcherBalanceInfo.c_str()
+                             , (Int64)(_curSessionConnecting), (Int64)(_sessionConnectedBefore)
+                             , (Int64)(_heartbeatTimeOutDisconnected), (Int64)(_sessionDisconnectedCnt)
+                             , Int64(_recvMsgCountPerSecond), recvSpeed.c_str()
+                             , sendSpeed.c_str());
+
+    // 自定义打印
+    _ModifyCustomPrintInfo(toPrintInfo);
+
+    g_Log->custom(toPrintInfo.c_str());
 }
 
 Int32 IFS_NetEngine::_ReadConfig()

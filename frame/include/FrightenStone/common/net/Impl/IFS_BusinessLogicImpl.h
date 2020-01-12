@@ -57,6 +57,11 @@ inline void IFS_BusinessLogic::SetTimeWheel(TimeWheel *timeWheel)
     _timeWheel = timeWheel;
 }
 
+inline TimeWheel *IFS_BusinessLogic::GetTimeWheel()
+{
+    return _timeWheel;
+}
+
 template <typename FacadeFactoryType>
 inline Int32 IFS_BusinessLogic::RegisterFacade()
 {

@@ -80,7 +80,9 @@ public:
 
     virtual fs::IUserSys *OnSessionConnected(UInt64 sessionId)
     {
-        return g_UserMgr->NewUser(sessionId);
+        auto newUser = g_UserMgr->NewUser(sessionId);
+        newUser->OnConnected();
+        return newUser;
     }
 
     virtual void OnMsgDispatch(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)

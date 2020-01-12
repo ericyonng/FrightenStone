@@ -21,24 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_TcpClientImpl.h
+ * @file  : StatisticsData.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/04
+ * @date  : 2020/01/13
  * @brief :
- * 
- *
- * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_TcpClient_H__
+
 #pragma once
 
-FS_NAMESPACE_BEGIN
+#include "FrightenStone/exportbase.h"
 
-inline bool FS_TcpClient::IsRun()
+struct StatisticsData
 {
-    return _isConnect && _session;
-}
+    StatisticsData();
+    std::atomic<Int32> _curSucConnectedClient;
+    std::atomic<Int32> _curSendMsgCount;
+    fs::Locker _lock;
+};
 
-FS_NAMESPACE_END
-
-#endif
+extern StatisticsData *g_StaticsData;

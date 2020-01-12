@@ -21,46 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_IocpTcpClientImpl.h
+ * @file  : FS_ClientDefaultCfgDef.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/05
+ * @date  : 2019/12/5
  * @brief :
  * 
  *
  * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_IocpTcpClient_H__
+
 #pragma once
 
-#ifdef _WIN32
+// 客户端配置文件路径
+#define FS_CLIENT_CFG_PATH  "./ClientCfg.ini"
 
-FS_NAMESPACE_BEGIN
+// 段
+#define CLIENT_CFG_SEG  "ClientCfgSeg"
+// 默认目标ip
+#define TARGET_IP_TO_CONNECT_KEY "TargetIp"
+#define TARGET_IP_TO_CONNECT     "127.0.0.1"
+// 默认目标端口
+#define TARGET_PORT_TO_CONNECT_KEY "TargetPort"
+#define TARGET_PORT_TO_CONNECT     "4567"
+// 默认创建多少个客户端
+#define CLIENT_QUANTITY_KEY  "ClientQuantity"
+#define CLIENT_QUANTITY      "1000"
+// 客户端单位时间发包数量
+#define CLIENT_MSG_NUM_PER_PERIOD_KEY  "MsgNumPerPeriod"
+#define CLIENT_MSG_NUM_PER_PERIOD      "1"
+// 客户端发包周期时间
+#define CLIENT_SEND_PERIOD_KEY         "SendPeriod"
+#define CLIENT_SEND_PERIOD             "999"           // ms毫秒为单位
+// 检查接受到的服务端消息id是否连续
+#define CLIENT_CHECK_MSG_ID_KEY         "CheckMsgId"
+#define CLIENT_CHECK_MSG_ID             "1"
+// 收到服务器回应后才发送下一条消息
+#define CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE_KEY "IsSendAfterSvrResArrive"
+#define CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE     "1"
 
-inline void FS_IocpTcpClient::OnInitSocket()
-{
-    _iocp.Create();
-    auto iocpSession = _session->CastTo<FS_IocpSession>();
-
-    const auto sock = _session->GetSocket();
-    const auto sessionId = _session->GetSessionId();
-
-    // 绑定iocp
-    auto st = _iocp.Reg(sock, sessionId);
-    if(st != StatusDefs::Success)
-    {
-        g_Log->e<FS_IocpTcpClient>(_LOGFMT_("reg socket[%llu] sessionId[%llu] fail st[%d]")
-                                     , sock, sessionId, st);
-    }
-}
-
-inline void FS_IocpTcpClient::Close()
-{
-    _iocp.Destroy();
-    FS_TcpClient::Close();
-}
-
-FS_NAMESPACE_END
-
-#endif
-
-#endif

@@ -59,6 +59,7 @@ private:
     UInt64 _curMaxUserId;
     std::map<UInt64, User *> _sessionIdRefUsers;
     std::map<UInt64, User *> _userIdRefUsers;
+
     fs::IFS_MsgDispatcher *_dispatcher;             // 消息分发
     UserFacade *_userFacade;
 };

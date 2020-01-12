@@ -72,8 +72,8 @@ public:
     virtual void Wait();
     virtual void Sinal();
     virtual void Close();
-    bool IsCompAllReady() const;
-    bool IsCompAllFinish() const;
+    bool IsCompAllReady() const;        // 线程安全
+    bool IsCompAllFinish() const;       // 线程安全
 
     /* 组件事件 */
 protected:
@@ -87,6 +87,7 @@ protected:
 protected:
     virtual void _Monitor(FS_ThreadPool *threadPool);
     void _PrintInfo(const TimeSlice &dis);
+    virtual void _ModifyCustomPrintInfo(FS_String &customStr) {}
 
     /* 启服关服时序调用 */
 protected:

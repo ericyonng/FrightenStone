@@ -30,16 +30,12 @@
  * 
  */
 #include "stdafx.h"
-#include "FrightenStone/common/net/Impl/FS_ClientCfgMgr.h"
+#include "FS_MyClient/FS_MyClient/ClientCfgs/FS_ClientCfgMgr.h"
 #include <FrightenStone/common/component/Impl/File/FS_IniFile.h>
-#include <FrightenStone/common/net/Defs/FS_ClientDefaultCfgDef.h>
-#include <FrightenStone/common/status/status.h>
-#include <FrightenStone/common/log/Log.h>
+#include "FS_MyClient/FS_MyClient/ClientCfgs/Defs/FS_ClientDefaultCfgDef.h"
 
-fs::FS_ClientCfgMgr *g_ClientCfgMgr = NULL;
+FS_ClientCfgMgr *g_ClientCfgMgr = NULL;
 
-FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_ClientCfgMgr, __DEF_OBJ_POOL_OBJ_NUM__);
 FS_ClientCfgMgr::FS_ClientCfgMgr()
 {
     g_ClientCfgMgr = this;
@@ -49,7 +45,7 @@ FS_ClientCfgMgr::~FS_ClientCfgMgr()
 {
 }
 
-Int32 FS_ClientCfgMgr::_InitCustomCfgs(FS_IniFile *iniOperator)
+Int32 FS_ClientCfgMgr::_InitCustomCfgs(fs::FS_IniFile *iniOperator)
 {
     // 写入默认配置
     iniOperator->WriteStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, TARGET_IP_TO_CONNECT);
@@ -61,7 +57,7 @@ Int32 FS_ClientCfgMgr::_InitCustomCfgs(FS_IniFile *iniOperator)
     iniOperator->WriteStr(CLIENT_CFG_SEG, CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE_KEY, CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE);
 
     // 检查是否写入正确
-    FS_String result;
+    fs::FS_String result;
     iniOperator->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", result);
     if(result != TARGET_IP_TO_CONNECT)
     {
@@ -121,15 +117,13 @@ Int32 FS_ClientCfgMgr::_InitCustomCfgs(FS_IniFile *iniOperator)
     return StatusDefs::Success;
 }
 
-void FS_ClientCfgMgr::_ReadCustomCfgs(FS_IniFile *iniOperator)
+void FS_ClientCfgMgr::_ReadCustomCfgs(fs::FS_IniFile *iniOperator)
 {
     iniOperator->ReadStr(CLIENT_CFG_SEG, TARGET_IP_TO_CONNECT_KEY, "", _ip);
     _port = static_cast<UInt16>(iniOperator->ReadUInt(CLIENT_CFG_SEG, TARGET_PORT_TO_CONNECT_KEY, 0));
     _clientQuantity = static_cast<Int32>(iniOperator->ReadInt(CLIENT_CFG_SEG, CLIENT_QUANTITY_KEY, 0));
     _msgNumPerPeriod = static_cast<Int32>(iniOperator->ReadInt(CLIENT_CFG_SEG, CLIENT_MSG_NUM_PER_PERIOD_KEY, 0));
-    _sendPeriod = static_cast<Int32>(iniOperator->ReadInt(CLIENT_CFG_SEG, CLIENT_SEND_PERIOD_KEY, 0));
+    _sendPeriodMs = static_cast<Int32>(iniOperator->ReadInt(CLIENT_CFG_SEG, CLIENT_SEND_PERIOD_KEY, 0));
     _checkMsgId = iniOperator->ReadInt(CLIENT_CFG_SEG, CLIENT_CHECK_MSG_ID_KEY, 0) != 0;
     _isSendAfterSvrResArrive = iniOperator->ReadInt(CLIENT_CFG_SEG, CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE_KEY, 0) != 0;
 }
-
-FS_NAMESPACE_END

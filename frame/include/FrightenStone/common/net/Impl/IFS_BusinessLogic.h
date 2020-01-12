@@ -85,6 +85,8 @@ public:
     void SetDispatcher(IFS_MsgDispatcher *dispatcher);
     IFS_MsgDispatcher *GetDispatcher();
     void SetTimeWheel(TimeWheel *timeWheel);
+    TimeWheel *GetTimeWheel();
+
     // 订阅协议
     virtual void SubscribeProtocol(UInt32 protocolCmd, IDelegate<void, UInt64, NetMsgDecoder *> *handler);
     virtual void InvokeProtocolHandler(UInt64 sessionId, NetMsgDecoder *msgDecoder);

@@ -28,20 +28,23 @@
  */
 #include "stdafx.h"
 #include "FS_MyClient/FS_MyClient/User/User.h"
+#include "FS_MyClient/FS_MyClient/ClientCfgs/FS_ClientCfgMgr.h"
+#include "FS_MyClient/FS_MyClient/Defs/StatisticsData.h"
 
-User::User(UInt64 sessionId, UInt64 userId, fs::IFS_MsgDispatcher *dispatcher)
+User::User(UInt64 sessionId, UInt64 userId, fs::IFS_BusinessLogic *logic)
     :_sessionId(sessionId)
     , _userId(userId)
     , _recvMsgId(1)
     , _sendMsgId(1)
-    , _dispatcher(dispatcher)
+    , _logic(logic)
+    ,_sendTest(NULL)
 {
-
+    _dispatcher = _logic->GetDispatcher();
 }
 
 User::~User()
 {
-
+    Fs_SafeFree(_sendTest);
 }
 
 Int32 User::Login(fs::LoginData *loginData)
@@ -91,4 +94,32 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
 void User::OnDisconnect()
 {
     g_Log->net<User>(" session id[%llu] user disconnect", _sessionId);
+    _sendTest->Cancel();
+}
+
+void User::OnConnected()
+{
+    _sendTest = new fs::FS_Timer(_logic->GetTimeWheel());
+    _sendTest->SetTimeOutHandler(this, &User::_OnSendTest);
+    ++g_StaticsData->_curSucConnectedClient;
+
+    // 初始化消息
+    auto &loginData = _testLogin._loginData;
+    loginData._msgId = 1;   // 初始值为1
+    strcpy(loginData._pwd, "123456");
+    strcpy(loginData._userName, "shy");
+
+    // 启动定时器
+    _sendTest->Schedule(g_ClientCfgMgr->GetSendPeriodMs());
+}
+
+void User::_OnSendTest(fs::FS_Timer *timer, const fs::Time &lastTimeoutTime, const fs::Time &curTimeWheelTime)
+{
+    _dispatcher->SendData(_sessionId, &_testLogin);
+
+    // 统计
+    auto &staticLock = g_StaticsData->_lock;
+    staticLock.Lock();
+    ++g_StaticsData->_curSendMsgCount;
+    staticLock.Unlock();
 }

@@ -21,54 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_ClientCfgMgrImpl.h
+ * @file  : StatisticsData.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/12/5
+ * @date  : 2020/01/13
  * @brief :
- * 
- *
- * 
  */
+#include "stdafx.h"
+#include "FS_MyClient/FS_MyClient/Defs/StatisticsData.h"
 
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_ClientCfgMgr_H__
-#pragma once
+extern StatisticsData *g_StaticsData = NULL;
 
-FS_NAMESPACE_BEGIN
-inline FS_String FS_ClientCfgMgr::GetTargetSvrIp() const
+StatisticsData::StatisticsData()
+    :_curSucConnectedClient(0)
+    ,_curSendMsgCount(0)
 {
-    return _ip;
+    g_StaticsData = this;
 }
-
-inline UInt16 FS_ClientCfgMgr::GetTargetSvrPort() const
-{
-    return _port;
-}
-
-inline Int32 FS_ClientCfgMgr::GetClientQuantity() const
-{
-    return _clientQuantity;
-}
-
-inline Int32 FS_ClientCfgMgr::GetMsgNumPerPeriod() const
-{
-    return _msgNumPerPeriod;
-}
-
-inline Int32 FS_ClientCfgMgr::GetSendPeriod() const
-{
-    return _sendPeriod;
-}
-
-inline bool FS_ClientCfgMgr::NeedCheckMsgId() const
-{
-    return _checkMsgId;
-}
-
-inline bool FS_ClientCfgMgr::IsSendAfterSvrResArrive() const
-{
-    return _isSendAfterSvrResArrive;
-}
-
-FS_NAMESPACE_END
-
-#endif

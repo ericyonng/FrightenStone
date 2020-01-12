@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_ClientDefaultCfgDef.h
+ * @file  : FS_ClientCfgMgrImpl.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2019/12/5
  * @brief :
@@ -29,35 +29,40 @@
  *
  * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Defs_FS_ClientDefaultCfgDef_H__
-#define __Frame_Include_FrightenStone_Common_Net_Defs_FS_ClientDefaultCfgDef_H__
+
 #pragma once
 
-// 客户端配置文件路径
-#define FS_CLIENT_CFG_PATH  "./ClientCfg.ini"
+inline fs::FS_String FS_ClientCfgMgr::GetTargetSvrIp() const
+{
+    return _ip;
+}
 
-// 段
-#define CLIENT_CFG_SEG  "ClientCfgSeg"
-// 默认目标ip
-#define TARGET_IP_TO_CONNECT_KEY "TargetIp"
-#define TARGET_IP_TO_CONNECT     "127.0.0.1"
-// 默认目标端口
-#define TARGET_PORT_TO_CONNECT_KEY "TargetPort"
-#define TARGET_PORT_TO_CONNECT     "4567"
-// 默认创建多少个客户端
-#define CLIENT_QUANTITY_KEY  "ClientQuantity"
-#define CLIENT_QUANTITY      "1000"
-// 客户端单位时间发包数量
-#define CLIENT_MSG_NUM_PER_PERIOD_KEY  "MsgNumPerPeriod"
-#define CLIENT_MSG_NUM_PER_PERIOD      "1"
-// 客户端发包周期时间
-#define CLIENT_SEND_PERIOD_KEY         "SendPeriod"
-#define CLIENT_SEND_PERIOD             "999"           // ms毫秒为单位
-// 检查接受到的服务端消息id是否连续
-#define CLIENT_CHECK_MSG_ID_KEY         "CheckMsgId"
-#define CLIENT_CHECK_MSG_ID             "1"
-// 收到服务器回应后才发送下一条消息
-#define CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE_KEY "IsSendAfterSvrResArrive"
-#define CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE     "1"
-#endif
+inline UInt16 FS_ClientCfgMgr::GetTargetSvrPort() const
+{
+    return _port;
+}
 
+inline Int32 FS_ClientCfgMgr::GetClientQuantity() const
+{
+    return _clientQuantity;
+}
+
+inline Int32 FS_ClientCfgMgr::GetMsgNumPerPeriod() const
+{
+    return _msgNumPerPeriod;
+}
+
+inline Int32 FS_ClientCfgMgr::GetSendPeriodMs() const
+{
+    return _sendPeriodMs;
+}
+
+inline bool FS_ClientCfgMgr::NeedCheckMsgId() const
+{
+    return _checkMsgId;
+}
+
+inline bool FS_ClientCfgMgr::IsSendAfterSvrResArrive() const
+{
+    return _isSendAfterSvrResArrive;
+}

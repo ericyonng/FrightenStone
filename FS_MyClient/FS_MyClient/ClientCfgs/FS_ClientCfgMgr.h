@@ -30,56 +30,46 @@
  * 
  */
 
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_ClientCfgMgr_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_ClientCfgMgr_H__
 #pragma once
 
 #include "FrightenStone/exportbase.h"
 #include <FrightenStone/common/basedefs/BaseDefs.h>
-#include <FrightenStone/common/component/Impl/FS_String.h>
-#include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
-
-FS_NAMESPACE_BEGIN
 
 class FS_IniFile;
 
-class BASE_EXPORT FS_ClientCfgMgr : public IFS_ConfigMgr
+class FS_ClientCfgMgr : public fs::IFS_ConfigMgr
 {
-    OBJ_POOL_CREATE_DEF(FS_ClientCfgMgr);
 public:
     FS_ClientCfgMgr();
     ~FS_ClientCfgMgr();
 
     /* 具体配置get接口 */
 public:
-    FS_String GetTargetSvrIp() const;
+    fs::FS_String GetTargetSvrIp() const;
     UInt16 GetTargetSvrPort() const;
     Int32 GetClientQuantity() const;
     Int32 GetMsgNumPerPeriod() const;
-    Int32 GetSendPeriod() const;
+    Int32 GetSendPeriodMs() const;
     bool NeedCheckMsgId() const;
     bool IsSendAfterSvrResArrive() const;
 
     /* 派生类重写接口 */
 protected:
-    virtual Int32 _InitCustomCfgs(FS_IniFile *iniOperator);
-    virtual void _ReadCustomCfgs(FS_IniFile *iniOperator);
+    virtual Int32 _InitCustomCfgs(fs::FS_IniFile *iniOperator);
+    virtual void _ReadCustomCfgs(fs::FS_IniFile *iniOperator);
 
 private:
     /* 配置缓存 */
-    FS_String _ip;              // 连接的ip
+    fs::FS_String _ip;              // 连接的ip
     UInt16 _port = 0;           // 连接的远程端口
     Int32 _clientQuantity = 0;  // 创建多少个客户端
     Int32 _msgNumPerPeriod = 0; // 每周期多少个消息
-    Int32 _sendPeriod = 0;      // 发送时间周期
+    Int32 _sendPeriodMs = 0;      // 发送时间周期
     bool _checkMsgId = 0;       // 是否检测消息id,用于检测是否丢包等
     bool _isSendAfterSvrResArrive = 0;  // 是否在收到服务器返回后继续发送,若为false则会按照时间周期不停的发送
 };
 
-FS_NAMESPACE_END
+#include <FS_MyClient/FS_MyClient/ClientCfgs/FS_ClientCfgMgrImpl.h>
 
-#include <FrightenStone/common/net/Impl/FS_ClientCfgMgrImpl.h>
+extern FS_ClientCfgMgr *g_ClientCfgMgr;                       // 客户端配置
 
-extern BASE_EXPORT fs::FS_ClientCfgMgr *g_ClientCfgMgr;                       // 客户端配置
-
-#endif

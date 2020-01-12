@@ -35,10 +35,12 @@
 #include "FS_MyClient/FS_MyClient/User/UserMgrFactory.h"
 #include "FS_MyClient/FS_MyClient/User/UserMgr.h"
 #include "FS_MyClient/FS_MyClient/User/User.h"
-
-static fs::FS_ClientCfgMgr g_CfgMgr;
+#include "FS_MyClient/FS_MyClient/ClientCfgs/FS_ClientCfgMgr.h"
+#include "FS_MyClient/FS_MyClient/Defs/StatisticsData.h"
 
 #ifdef _WIN32
+
+StatisticsData g_StaticsticsForSimulation;
 
 class MyLogic : public fs::IFS_BusinessLogic
 {
@@ -84,7 +86,9 @@ public:
 
     virtual fs::IUserSys *OnSessionConnected(UInt64 sessionId)
     {
-        return g_UserMgr->NewUser(sessionId);
+        auto newUser = g_UserMgr->NewUser(sessionId);
+        newUser->OnConnected();
+        return newUser;
     }
 
     virtual void OnMsgDispatch(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
@@ -114,12 +118,20 @@ class FS_MyClient : public fs::IFS_NetEngine
 public:
     FS_MyClient()
     {
-        _config = new fs::IFS_ConfigMgr;
+        _config = new FS_ClientCfgMgr;
     }
     ~FS_MyClient()
     {
         fs::STLUtil::DelVectorContainer(_logics);
         Fs_SafeFree(_config);
+    }
+
+public:
+    void Connect(const fs::FS_ConnectInfo &info)
+    {
+        Int32 st = _connector->Connect(info);
+        if(st != StatusDefs::Success)
+            g_Log->w<FS_MyClient>(_LOGFMT_("connect to svr fail..."), st);
     }
 
 protected:
@@ -156,16 +168,65 @@ protected:
         logics = _logics;
     }
 
+    virtual void _ModifyCustomPrintInfo(fs::FS_String &toPrintInfo)
+    {
+        auto &staticsLock = g_StaticsData->_lock;
+        staticsLock.Lock();
+        Int32 hasSend = g_StaticsData->_curSendMsgCount;
+        g_StaticsData->_curSendMsgCount = 0;
+        staticsLock.Unlock();
+
+        toPrintInfo.AppendFormat("hasSendCount<%d> hopeconnect<%d>,realconnect<%d>."
+                                 , g_ClientCfgMgr->GetClientQuantity()
+                                 , hasSend, (Int32)g_StaticsData->_curSucConnectedClient);
+    }
+
+
 private:
-    fs::IFS_ConfigMgr * _config;
+    FS_ClientCfgMgr * _config;
     std::vector<fs::IFS_BusinessLogic *> _logics;
+};
+
+class ClientSimulationTask
+{
+public:
+    ClientSimulationTask(FS_MyClient *engine)
+    {
+        _netEngine = engine;
+    }
+    ~ClientSimulationTask() {}
+
+public:
+    void Run(fs::FS_ThreadPool *pool)
+    {
+        // 等待组件全部启动完成
+        fs::EngineCompsMethods::WaitForAllCompsReady(_netEngine);
+        // 执行任务
+        DoSimulationTask();
+    }
+
+    void DoSimulationTask()
+    {
+        // 连接远程
+        fs::FS_ConnectInfo connectInfo;
+        connectInfo._ip = g_ClientCfgMgr->GetTargetSvrIp();
+        connectInfo._port = g_ClientCfgMgr->GetTargetSvrPort();
+
+        auto hopeConnect = g_ClientCfgMgr->GetClientQuantity();
+        for(Int32 i = 0; i < hopeConnect; ++i)
+            _netEngine->Connect(connectInfo);
+    }
+
+private:
+    FS_MyClient *_netEngine;
 };
 // 
 // FS_NAMESPACE_END
 // 
 void FS_ClientRun::Run()
 {
-    fs::IFS_NetEngine *myClient = new FS_MyClient();
+    fs::FS_ThreadPool *pool = new fs::FS_ThreadPool(0, 1);
+    FS_MyClient *myClient = new FS_MyClient();
     auto st = myClient->Init();
 
     if(st == StatusDefs::Success)
@@ -175,13 +236,21 @@ void FS_ClientRun::Run()
         auto st = myClient->Start();
         if(st == StatusDefs::Success)
         {
-            std::cout << "myclient suc start" << std::endl;
+            ClientSimulationTask *simulationTask = new ClientSimulationTask(myClient);
+            auto taskDelegate = fs::DelegatePlusFactory::Create(simulationTask, &ClientSimulationTask::Run);
+            pool->AddTask(taskDelegate);
+
+            g_Log->custom("myclient suc start...");
             getchar();
+            pool->Close();
+            Fs_SafeFree(simulationTask);
         }
         else
         {
             g_Log->e<FS_ClientRun>(_LOGFMT_("Start myclient fail st[%d] server will close now. please check! "));
         }
+
+        g_Log->custom("myclient will close...");
     }
     else
     {
@@ -191,7 +260,6 @@ void FS_ClientRun::Run()
     //serverCore->Wait();
     myClient->Close();
     Fs_SafeFree(myClient);
-    g_Log->FinishModule();
     std::cout << "free myClient end" << std::endl;
     getchar();
 

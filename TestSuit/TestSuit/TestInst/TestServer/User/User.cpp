@@ -29,14 +29,14 @@
 #include "stdafx.h"
 #include "TestInst/TestServer/User/User.h"
 
-User::User(UInt64 sessionId, UInt64 userId, fs::IFS_MsgDispatcher *dispatcher)
+User::User(UInt64 sessionId, UInt64 userId, fs::IFS_BusinessLogic *logic)
     :_sessionId(sessionId)
     , _userId(userId)
     , _recvMsgId(1)
     , _sendMsgId(1)
-    , _dispatcher(dispatcher)
+    , _logic(logic)
 {
-
+    _dispatcher = _logic->GetDispatcher();
 }
 
 User::~User()
@@ -91,4 +91,9 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
 void User::OnDisconnect()
 {
     g_Log->net<User>(" session id[%llu] user disconnect", _sessionId);
+}
+
+void User::OnConnected()
+{
+
 }

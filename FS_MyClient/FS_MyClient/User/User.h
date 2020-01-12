@@ -36,7 +36,7 @@
 class User : public fs::IUserSys
 {
 public:
-    User(UInt64 sessionId, UInt64 userId, fs::IFS_MsgDispatcher *dispatcher);
+    User(UInt64 sessionId, UInt64 userId, fs::IFS_BusinessLogic *dispatcher);
     ~User();
 
 public:
@@ -55,6 +55,10 @@ public:
     // NetMsg_DataHeader内部会拷贝到缓冲区
     void SendData(fs::NetMsg_DataHeader *msgData);
     void OnDisconnect();
+    void OnConnected();
+
+private:
+    void _OnSendTest(fs::FS_Timer *timer, const fs::Time &lastTimeoutTime, const fs::Time &curTimeWheelTime);
 
 private:
     UInt64 _sessionId;
@@ -65,6 +69,10 @@ private:
     // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
     Int32 _sendMsgId = 1;
     fs::IFS_MsgDispatcher *_dispatcher;
+    fs::IFS_BusinessLogic *_logic;
+
+    fs::FS_Timer *_sendTest;
+    fs::LoginReq _testLogin;
 };
 
 #include "FS_MyClient/FS_MyClient/User/UserImpl.h"
