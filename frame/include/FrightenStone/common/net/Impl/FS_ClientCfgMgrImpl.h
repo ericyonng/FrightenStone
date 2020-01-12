@@ -49,11 +49,6 @@ inline Int32 FS_ClientCfgMgr::GetClientQuantity() const
     return _clientQuantity;
 }
 
-inline Int32 FS_ClientCfgMgr::GetThreadQuantity() const
-{
-    return _threadQuantity;
-}
-
 inline Int32 FS_ClientCfgMgr::GetMsgNumPerPeriod() const
 {
     return _msgNumPerPeriod;
@@ -64,16 +59,6 @@ inline Int32 FS_ClientCfgMgr::GetSendPeriod() const
     return _sendPeriod;
 }
 
-inline UInt64 FS_ClientCfgMgr::GetSendBufferSize() const
-{
-    return _sendBufferSize;
-}
-
-inline UInt64 FS_ClientCfgMgr::GetRecvBufferSize() const
-{
-    return _recvBufferSize;
-}
-
 inline bool FS_ClientCfgMgr::NeedCheckMsgId() const
 {
     return _checkMsgId;
@@ -82,21 +67,6 @@ inline bool FS_ClientCfgMgr::NeedCheckMsgId() const
 inline bool FS_ClientCfgMgr::IsSendAfterSvrResArrive() const
 {
     return _isSendAfterSvrResArrive;
-}
-
-inline Int32 FS_ClientCfgMgr::GetMemPoolBufferCntInit() const
-{
-    return _memPoolBufferCntInit;
-}
-
-inline UInt64 FS_ClientCfgMgr::GetMemPoolAllocMaxBytes() const
-{
-    return _memPoolAllocMaxBytes;
-}
-
-inline Int64 FS_ClientCfgMgr::GetHeartbeatDeadTimeInterval() const
-{
-    return _heartbeatInterval;
 }
 
 FS_NAMESPACE_END

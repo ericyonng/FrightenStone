@@ -40,9 +40,12 @@
 #include "frame/src/common/log/Defs/LogCaches.h"
 
 #pragma region log config options
+#undef LOG_THREAD_INTERVAL_MS_TIME
 #define LOG_THREAD_INTERVAL_MS_TIME 100         // 日志线程写日志间隔时间ms
-#define LOG_SIZE_LIMIT  67108864                // 日志尺寸限制64MB
+#undef LOG_SIZE_LIMIT
+#define LOG_SIZE_LIMIT  268435456               // 日志尺寸限制256MB
 // #define LOG_SIZE_LIMIT  -1                   // 无限制
+#undef ENABLE_OUTPUT_CONSOLE
 #define ENABLE_OUTPUT_CONSOLE 1                 // 开启控制台打印
 #pragma endregion
 
@@ -51,7 +54,6 @@ FS_NAMESPACE_BEGIN
 FS_Log::FS_Log()
     : _threadPool(NULL)
     , _threadWorkIntervalMsTime(LOG_THREAD_INTERVAL_MS_TIME)
-    , _threadWriteLogDelegate(NULL)
     , _levelRefHook{NULL}
     , _levelRefBeforeLogHook{NULL}
     , _logFiles{NULL}
@@ -138,7 +140,7 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     _ReadConfig();
 
     // 初始化日志文件
-    LogDefs::LogInitHelper<LogDefs::LOG_NUM_MAX>::InitLog(this);
+    ASSERT(LogDefs::LogInitHelper<LogDefs::LOG_NUM_MAX>::InitLog(this));
 
     // 初始化缓冲
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
@@ -146,10 +148,10 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
 
     // 初始化线程池并添加写日志任务,每个日志文件一个独立的线程
     _threadPool = new FS_ThreadPool(0, LogDefs::LOG_QUANTITY);
-    _threadWriteLogDelegate = DelegatePlusFactory::Create(this, &FS_Log::_OnThreadWriteLog);
     for(Int32 i = LogDefs::LOG_NUM_BEGIN; i < LogDefs::LOG_QUANTITY; ++i)
     {
-        ITask *logTask = new LogTask(_threadPool, _threadWriteLogDelegate, _threadWorkIntervalMsTime, i, *_wakeupToWriteLog[i]);
+        auto writeLogDelegate = DelegatePlusFactory::Create(this, &FS_Log::_OnThreadWriteLog);
+        ITask *logTask = new LogTask(_threadPool, writeLogDelegate, _threadWorkIntervalMsTime, i, *_wakeupToWriteLog[i]);
         ASSERT(_threadPool->AddTask(*logTask, true));
     }
 
@@ -172,7 +174,6 @@ void FS_Log::FinishModule()
     _threadPool->Close();
 
     // 清理数据
-    Fs_SafeFree(_threadWriteLogDelegate);
     fs::STLUtil::DelArray(_logDatas);
     fs::STLUtil::DelArray(_logFiles);
 

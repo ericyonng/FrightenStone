@@ -51,8 +51,9 @@ public:
     virtual Int32 Run();
 
 protected:
-    IDelegate<void, Int32> *_taskDelegate;
-    FS_ThreadPool *_pool;
+    IDelegate<void, Int32> *_taskDelegate;  // 本日志线程释放
+
+    FS_ThreadPool *_pool;                   // 外部资源
     Int32 _workIntervalMsTime;    // 写日志时间间隔
     Int32 _logFileIndex;
     ConditionLocker &_lock;     // 外部立即唤醒线程的机制

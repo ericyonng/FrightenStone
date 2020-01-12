@@ -50,52 +50,30 @@ public:
     FS_ClientCfgMgr();
     ~FS_ClientCfgMgr();
 
-public:
-    Int32 Init(const char *clientCfgPath = "./ClientCfg.ini");
-    FS_String GetStr(const char *segment, const char *key, const char *defaultStr = "") const;
-    Int64 GetInt(const char *segment, const char *key, Int64 defaultInt = -1) const;
-
     /* 具体配置get接口 */
 public:
     FS_String GetTargetSvrIp() const;
     UInt16 GetTargetSvrPort() const;
     Int32 GetClientQuantity() const;
-    Int32 GetThreadQuantity() const;
     Int32 GetMsgNumPerPeriod() const;
     Int32 GetSendPeriod() const;
-    UInt64 GetSendBufferSize() const;
-    UInt64 GetRecvBufferSize() const;
     bool NeedCheckMsgId() const;
     bool IsSendAfterSvrResArrive() const;
-    Int32 GetMemPoolBufferCntInit() const;
-    UInt64 GetMemPoolAllocMaxBytes() const;
-    Int64 GetHeartbeatDeadTimeInterval() const;
 
-public:
-    void Lock();
-    void Unlock();
+    /* 派生类重写接口 */
+protected:
+    virtual Int32 _InitCustomCfgs(FS_IniFile *iniOperator);
+    virtual void _ReadCustomCfgs(FS_IniFile *iniOperator);
 
 private:
-    Int32 _InitDefCfgs();
-    void _ReadAllCfgs();
-
-private:
-    FS_IniFile *_ini;
-
     /* 配置缓存 */
-    FS_String _ip;
-    UInt16 _port = 0;
-    Int32 _clientQuantity = 0;
-    Int32 _threadQuantity = 0;
-    Int32 _msgNumPerPeriod = 0;
-    Int32 _sendPeriod = 0;
-    UInt64 _sendBufferSize = 0;
-    UInt64 _recvBufferSize = 0;
-    bool _checkMsgId = 0;
-    bool _isSendAfterSvrResArrive = 0;
-    Int32 _memPoolBufferCntInit = 0;
-    UInt64 _memPoolAllocMaxBytes = 0;
-    Int64 _heartbeatInterval = 0;
+    FS_String _ip;              // 连接的ip
+    UInt16 _port = 0;           // 连接的远程端口
+    Int32 _clientQuantity = 0;  // 创建多少个客户端
+    Int32 _msgNumPerPeriod = 0; // 每周期多少个消息
+    Int32 _sendPeriod = 0;      // 发送时间周期
+    bool _checkMsgId = 0;       // 是否检测消息id,用于检测是否丢包等
+    bool _isSendAfterSvrResArrive = 0;  // 是否在收到服务器返回后继续发送,若为false则会按照时间周期不停的发送
 };
 
 FS_NAMESPACE_END

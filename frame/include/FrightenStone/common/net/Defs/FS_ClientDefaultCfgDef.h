@@ -47,35 +47,17 @@
 // 默认创建多少个客户端
 #define CLIENT_QUANTITY_KEY  "ClientQuantity"
 #define CLIENT_QUANTITY      "1000"
-// 线程数量
-#define CLIENT_THREAD_QUANTITY_KEY  "ClientThreadQuantity"
-#define CLIENT_THREAD_QUANTITY      "8"
 // 客户端单位时间发包数量
 #define CLIENT_MSG_NUM_PER_PERIOD_KEY  "MsgNumPerPeriod"
 #define CLIENT_MSG_NUM_PER_PERIOD      "1"
 // 客户端发包周期时间
 #define CLIENT_SEND_PERIOD_KEY         "SendPeriod"
 #define CLIENT_SEND_PERIOD             "999"           // ms毫秒为单位
-// 客户端发送缓冲区大小
-#define CLIENT_SEND_BUFFER_SIZE_KEY     "SendBufferSize"
-#define CLIENT_SEND_BUFFER_SIZE         "10240"         // 默认10KB
-// 客户端接受缓冲区大小
-#define CLIENT_RECV_BUFFER_SIZE_KEY     "RecvBufferSize"
-#define CLIENT_RECV_BUFFER_SIZE         "10240"         // 默认10KB
 // 检查接受到的服务端消息id是否连续
 #define CLIENT_CHECK_MSG_ID_KEY         "CheckMsgId"
 #define CLIENT_CHECK_MSG_ID             "1"
 // 收到服务器回应后才发送下一条消息
 #define CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE_KEY "IsSendAfterSvrResArrive"
 #define CLIENT_IS_SEND_AFTER_SVR_RES_ARRIVE     "1"
-// 初始buffer数量
-#define CLIENT_MEMPOOL_BUFFER_CNT_INIT_KEY  "MemPoolBufferCntInit"
-#define CLIENT_MEMPOOL_BUFFER_CNT_INIT      "1024"
-// 内存池分配上限
-#define CLIENT_MEMPOOL_ALLOC_MAX_BYTES_KEY  "MemPoolAllocMaxBytes"
-#define CLIENT_MEMPOOL_ALLOC_MAX_BYTES      "549755813888"          // 512MB
-// 心跳时间
-#define CLIENT_HEARTBEATINTERVAL_KEY  "HeartBeatInterval"
-#define CLIENT_HEARTBEATINTERVAL      "3000000"          // 300s
 #endif
 

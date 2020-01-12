@@ -90,7 +90,31 @@ Int32 IFS_ConfigMgr::Init(const Byte8 *iniPath)
     return StatusDefs::Success;
 }
 
+Int32 IFS_ConfigMgr::_InitCustomCfgs(FS_IniFile *iniOperator)
+{
+    return StatusDefs::Success;
+}
+
 Int32 IFS_ConfigMgr::_InitDefCfgs()
+{
+    Int32 st = _InitBaseCfgs();
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitBaseCfgs fail st[%d]"), st);
+        return st;
+    }
+
+    st = _InitCustomCfgs(_ini);
+    if(st != StatusDefs::Success)
+    {
+        g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitCustomCfgs fail st[%d]"), st);
+        return st;
+    }
+
+    return StatusDefs::Success;
+}
+
+Int32 IFS_ConfigMgr::_InitBaseCfgs()
 {
     #pragma region listener
     // ip 默认只有一组地址
@@ -169,7 +193,7 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
     if(heartbeatTime != atoll(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL))
     {
         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%lld] not match SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL[%u] default")
-                                      , heartbeatTime, static_cast<UInt32>(atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL)));
+                                , heartbeatTime, static_cast<UInt32>(atoi(SVR_CFG_HEARTBEAT_DEAD_TIME_INTERVAL)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
@@ -177,7 +201,7 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
     if(preBufferCnt != atoi(SVR_CFG_PREPARE_POOL_BUFFER_CNT))
     {
         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_PREPARE_POOL_BUFFER_CNT[%lld] not match SVR_CFG_PREPARE_POOL_BUFFER_CNT[%u] default")
-                                      , preBufferCnt, static_cast<UInt32>(atoi(SVR_CFG_PREPARE_POOL_BUFFER_CNT)));
+                                , preBufferCnt, static_cast<UInt32>(atoi(SVR_CFG_PREPARE_POOL_BUFFER_CNT)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
@@ -185,7 +209,7 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
     if(memPoolMBPerDispatcher != atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER))
     {
         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%lld] not match SVR_CFG_MAX_MEMPOOL_MB_PER_TRANSFER[%u] default")
-                                      , memPoolMBPerDispatcher, static_cast<UInt32>(atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER)));
+                                , memPoolMBPerDispatcher, static_cast<UInt32>(atoi(SVR_CFG_MAX_MEMPOOL_MB_PER_DISPATCHER)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
@@ -193,7 +217,7 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
     if(dispatcherCnt != atoi(SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY))
     {
         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY[%u] default")
-                                      , dispatcherCnt, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY)));
+                                , dispatcherCnt, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_DISPATCHER_QUANTITY)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
@@ -201,7 +225,7 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
     if(maxAllowMB != atoi(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED))
     {
         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED[%lld] not match SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED[%u] default")
-                                      , maxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED)));
+                                , maxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_MAX_ALLOW_OBJPOOL_MB_OCCUPIED)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
@@ -209,23 +233,23 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
     if(memPoolMaxAllowMB != atoi(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED))
     {
         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED[%lld] not match SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED[%u] default")
-                                      , memPoolMaxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED)));
+                                , memPoolMaxAllowMB, static_cast<UInt32>(atoi(SVR_CFG_MAX_ALLOW_MEMPOOL_MB_OCCUPIED)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
-//     auto acceptorQuatity = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, 0);
-//     if(acceptorQuatity != atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY))
-//     {
-//         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%u] default")
-//                                       , acceptorQuatity, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY)));
-//         return StatusDefs::IocpAcceptor_InitDefIniFail;
-//     }
+    //     auto acceptorQuatity = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY_KEY, 0);
+    //     if(acceptorQuatity != atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY))
+    //     {
+    //         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%lld] not match SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY[%u] default")
+    //                                       , acceptorQuatity, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_ACCEPTOR_QUANTITY)));
+    //         return StatusDefs::IocpAcceptor_InitDefIniFail;
+    //     }
 
     auto isOpenMonitor = _ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, 0);
     if(isOpenMonitor != atoi(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR))
     {
         g_Log->e<IFS_ConfigMgr>(_LOGFMT_("_InitDefCfgs fail SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR[%lld] not match SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR[%u] default")
-                                      , isOpenMonitor, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR)));
+                                , isOpenMonitor, static_cast<UInt32>(atoi(SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR)));
         return StatusDefs::IocpAcceptor_InitDefIniFail;
     }
 
@@ -258,9 +282,15 @@ Int32 IFS_ConfigMgr::_InitDefCfgs()
 
 void IFS_ConfigMgr::_ReadCfgs()
 {
+    _ReadBaseCfgs();
+    _ReadCustomCfgs(_ini);
+}
+
+void IFS_ConfigMgr::_ReadBaseCfgs()
+{
     // ip与port可能是多组
     FS_String ips, ports;
-    _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "",ips);
+    _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_IP_KEY, "", ips);
     _ini->ReadStr(SVR_CFG_ACCEPTOR_SEG, SVR_CFG_ACCEPTOR_PORT_KEY, "", ports);
     auto multiIp = ips.Split(IniFileDefs::_groupDataSeparateFlag);
     auto multiPort = ports.Split(IniFileDefs::_groupDataSeparateFlag);
@@ -288,7 +318,7 @@ void IFS_ConfigMgr::_ReadCfgs()
 
     _acceptorQuantity = static_cast<UInt32>(acceptorQuantity);
     _connectorConnectTimeOutMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_CONNECTOR_SEG, SVR_CFG_CONNECTOR_CONNECT_TIME_OUT_KEY, 0));
-    
+
     _dispatcherResolutionIntervalMs = static_cast<Int64>(_ini->ReadInt(SVR_CFG_DISPATCHER_SEG, SVR_CFG_DISPATCHER_RESOLUTION_INTERVAL_KEY, 0));
     _isOpenMemoryMonitor = static_cast<bool>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_IS_OPEN_MEMORY_MONITOR_KEY, 0));
     _memoryMonitorPrintIntervalSeconds = static_cast<UInt32>(_ini->ReadInt(SVR_CFG_COMMONCFG_SEG, SVR_CFG_COMMONCFG_MEMORY_MONITOR_INTERVAL_SEC_KEY, 0));

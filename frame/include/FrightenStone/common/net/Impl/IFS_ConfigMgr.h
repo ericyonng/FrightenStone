@@ -77,12 +77,21 @@ public:
 
     bool GetIsOpenMemoryMonitor() const;
     UInt32 GetMemoryMonitorPrintIntervalSeconds() const;
+    
+    /* 派生类重写接口 */ 
+protected:
+    virtual Int32 _InitCustomCfgs(FS_IniFile *iniOperator);
+    virtual void _ReadCustomCfgs(FS_IniFile *iniOperator) {}
 
 private:
     Int32 _InitDefCfgs();
+    Int32 _InitBaseCfgs();
+
     void _ReadCfgs();
-    void _WriteIniHeaderAnnotation();
-    void _ChangeLineBetweenSegs();
+    void _ReadBaseCfgs();
+
+    void _WriteIniHeaderAnnotation();   // 初始化时候ini文件头注释
+    void _ChangeLineBetweenSegs();      // 段之间空行间隔
 
 private:
     FS_IniFile *_ini;

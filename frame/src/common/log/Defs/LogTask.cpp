@@ -50,7 +50,7 @@ LogTask::LogTask(FS_ThreadPool *pool, IDelegate<void, Int32> *taskDelegate, Int3
 
 LogTask::~LogTask()
 {
-
+    Fs_SafeFree(_taskDelegate);
 }
 
 Int32 LogTask::Run()
