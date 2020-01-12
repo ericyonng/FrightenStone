@@ -36,10 +36,11 @@
 #include "FrightenStone/common/assist/utils/Impl/SystemUtil.h"
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(FS_TlsTable, 32);
 
 FS_TlsTable::~FS_TlsTable()
 {
-    STLUtil::DelMapContainer(_elementTypeRefElements);
+    STLUtil::DelMapContainer<std::map<Int32, ITlsBase *>, AssistObjsDefs::DelMethods::SelfRelease>(_elementTypeRefElements);
 }
 
 void FS_TlsTable::Erase(Int32 type)

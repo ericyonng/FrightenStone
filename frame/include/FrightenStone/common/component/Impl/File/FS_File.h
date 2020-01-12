@@ -42,6 +42,7 @@
 #include "FrightenStone/common/asyn/Lock/Lock.h"
 // #include <string>
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -50,6 +51,7 @@ class FS_String;
 
 class BASE_EXPORT FS_File
 {
+    OBJ_POOL_CREATE_DEF(FS_File);
 public:
     FS_File();
     virtual ~FS_File();

@@ -45,6 +45,7 @@ FS_NAMESPACE_BEGIN
 // 消息数据字节流 字节流结构：buff = [长度] + [字节流区]
 class BASE_EXPORT FS_MsgWriteStream :public FS_Stream
 {
+    OBJ_POOL_CREATE_DEF(FS_MsgWriteStream);
 public:
     FS_MsgWriteStream(char *data, int size, bool isDelete = false, bool isPoolCreate = false);
     FS_MsgWriteStream(int size = 1024);
@@ -59,7 +60,7 @@ public:
     *       4. - Finish 字节流结束，请在结束时务必调用Finish以便发送消息正确！！！
     */
 public:
-    void SetNetMsgCmd(UInt16 cmd);
+    void SetNetMsgCmd(UInt32 cmd);
     bool WriteString(const char *str, Int32 len);
     bool WriteString(const char *str);
     void Finish();

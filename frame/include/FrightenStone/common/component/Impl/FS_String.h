@@ -41,6 +41,7 @@
 #include "FrightenStone/common/basedefs/DataType/DataType.h"
 #include "FrightenStone/common/basedefs/Macro/MacroDefs.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 class FS_String;
@@ -52,6 +53,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_String
 {
+    OBJ_POOL_CREATE_DEF(FS_String);
 public:
     typedef std::vector<FS_String> _These, FS_Strings;
     typedef std::string::size_type size_type;

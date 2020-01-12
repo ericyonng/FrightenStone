@@ -43,6 +43,7 @@
 #include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 #include "FrightenStone/common/net/Defs/IFS_Buffer.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -51,6 +52,7 @@ class FS_Iocp;
 
 class BASE_EXPORT FS_IocpSession : public IFS_Session
 {
+    OBJ_POOL_CREATE_DEF(FS_IocpSession);
 public:
     FS_IocpSession(UInt64 sessionId
                    , UInt32 transferCompId
@@ -63,8 +65,6 @@ public:
 
     // 操作
 public:
-    NetMsg_DataHeader *FrontRecvMsg();
-    void PopFrontRecvMsg();
 
     // IoDataBase *MakeSendIoData();
 

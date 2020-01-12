@@ -58,14 +58,14 @@ struct LogInitHelper<_##log_path##_##log_name##_>                               
     {                                                                                           \
         if (_##log_path##_##log_name##_ > base)                                                 \
              LogInitHelper<_##log_path##_##log_name##_-1>::InitLog(logMgr);                     \
-        logMgr->CreateLogFile(_##log_path##_##log_name##_,"./"#log_path"/", #log_name".log"); \
+        logMgr->CreateLogFile(_##log_path##_##log_name##_,"./"#log_path"/", #log_name".log");   \
         return true;                                                                            \
     }                                                                                           \
 };
 
 // log文件结束
 #define DECLEAR_LOG_END(LOG_NUMBER, line)                                                       \
-enum {LOG_NUMBER = ExcludeCommentHelper<line>::realvalue};\
+enum {LOG_NUMBER = ExcludeCommentHelper<line>::realvalue};                                      \
 enum {LOG_QUANTITY = ExcludeCommentHelper<line>::realvalue + 1};
 
 // 便利宏

@@ -40,7 +40,7 @@
 #ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
-
+OBJ_POOL_CREATE_DEF_IMPL(FS_IocpSession, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_IocpSession::~FS_IocpSession()
 {
@@ -49,16 +49,6 @@ FS_IocpSession::~FS_IocpSession()
 
 }
 
-NetMsg_DataHeader *FS_IocpSession::FrontRecvMsg()
-{
-    return _recvBuffer->CastToData<NetMsg_DataHeader>();
-}
-
-void FS_IocpSession::PopFrontRecvMsg()
-{
-    if(HasMsgToRead())
-        _recvBuffer->PopFront(FrontRecvMsg()->_packetLength);
-}
 // 
 // IoDataBase *FS_IocpSession::MakeSendIoData()
 // {

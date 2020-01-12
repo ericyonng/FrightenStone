@@ -64,21 +64,28 @@ void UserFacade::_RegisterProtocols()
     _logic->SubscribeProtocol(fs::ProtocolCmd::CheckHeartReq, fs::DelegatePlusFactory::Create(this, &UserFacade::_OnUserCheckHeartReq));
 }
 
-void UserFacade::_OnUserLoginReq(UInt64 userId, fs::NetMsg_DataHeader *msgData)
+void UserFacade::_OnUserLoginReq(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
 {
-    fs::LoginReq *login = static_cast<fs::LoginReq *>(msgData);
-    auto user = g_UserMgr->GetUserByUserId(userId);
+    auto user = g_UserMgr->GetUserBySessionId(sessionId);
     if(!user)
         return;
 
-    auto st = user->Login(&login->_loginData);
+    fs::LoginReq login;
+    if(!login.DeserializeFrom(msgDecoder))
+    {
+        g_Log->e<UserFacade>(_LOGFMT_("sessionId[%llu] login req DeserializeFrom msgDecoder error len[%u]")
+                             ,sessionId, msgDecoder->GetMsgLen());
+        return;
+    }
+
+    auto st = user->Login(&login._loginData);
     user->SucRecvMsg();
     fs::LoginRes ret;
     ret._msgId = user->GetSendMsgId();
     user->SendData(&ret);
 }
 
-void UserFacade::_OnUserLogoutReq(UInt64 userId, fs::NetMsg_DataHeader *msgData)
+void UserFacade::_OnUserLogoutReq(UInt64 userId, fs::NetMsgDecoder *msgDecoder)
 {
     // TODO:
     auto user = g_UserMgr->GetUserByUserId(userId);
@@ -119,7 +126,7 @@ void UserFacade::_OnUserLogoutReq(UInt64 userId, fs::NetMsg_DataHeader *msgData)
 //     s.Finish();
 }
 
-void UserFacade::_OnUserCheckHeartReq(UInt64 userId, fs::NetMsg_DataHeader *msgData)
+void UserFacade::_OnUserCheckHeartReq(UInt64 userId, fs::NetMsgDecoder *msgDecoder)
 {
     // TODO:
     auto user = g_UserMgr->GetUserByUserId(userId);

@@ -21,58 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : LogData.h
+ * @file  : NetMsgHeaderFmtType.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/6/13
+ * @date  : 2020/01/11
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Src_Common_Log_Defs_LogData_H__
-#define __Frame_Src_Common_Log_Defs_LogData_H__
+#ifndef __Frame_Include_FrightenStone_Common_Net_ProtocolInterface_Defs_NetMsgHeaderFmtType_H__
+#define __Frame_Include_FrightenStone_Common_Net_ProtocolInterface_Defs_NetMsgHeaderFmtType_H__
+
 #pragma once
+
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
-#include "FrightenStone/common/component/Impl/FS_String.h"
-#include "FrightenStone/common/component/Impl/Time.h"
-#include "FrightenStone/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
-class FS_String;
-class Time;
 
-class BASE_EXPORT LogLevel
+class BASE_EXPORT NetMsgHeaderFmtType
 {
 public:
-    enum LevelEnums
-    {
-        Begin = 0,          // å¼€å§‹
-        Warning = Begin,
-        Debug,
-        Info,
-        Error,
+    /* ÀàĞÍ¶¨Òå */
+    typedef UInt16 PacketLenDataType;       // °üÍ·³¤¶ÈÀàĞÍ 32Î»64Î»ÒÔ¼°¿çÆ½Ì¨Õ¼ÓÃµÄ×Ö½ÚÊı¶¼ÊÇ¹Ì¶¨µÄ
+    typedef UInt16 CmdDataType;             // °üÍ·Ğ­ÒéºÅÀàĞÍ 32Î»64Î»ÒÔ¼°¿çÆ½Ì¨Õ¼ÓÃµÄ×Ö½ÚÊı¶¼ÊÇ¹Ì¶¨µÄ
 
-        Crash,
-        Net,
-        Memleak,
-        MemPool,
-        ObjPool,
-        Sys,
-        Any,
-        Custom,
-
-        End,
-    };
-
-    static const char *GetDescription(Int32 level);
-};
-
-struct BASE_EXPORT LogData
-{
-public:
-    Time _logTime;                  // æ—¶é—´ generate inside
-    FS_String _logToWrite;          // æ ¼å¼åŒ–çš„æ—¥å¿—å­—ç¬¦ä¸² %s<%s>[%s][%s]line:%d %s
+    // ÏûÏ¢Í·¸ñÊ½: [4×Ö½Ú³¤¶È][4×Ö½Úcmd]
+    static const UInt32 _msgHeaderSize;
+    static const UInt32 _msgPacketLenSize;
+    static const UInt32 _msgCmdSize;
 };
 
 FS_NAMESPACE_END

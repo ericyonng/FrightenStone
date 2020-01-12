@@ -48,6 +48,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_DEF_IMPL(FS_Log, 1);
+
 FS_Log::FS_Log()
     : _threadPool(NULL)
     , _threadWorkIntervalMsTime(LOG_THREAD_INTERVAL_MS_TIME)
@@ -284,6 +286,7 @@ void FS_Log::_WriteLog(Int32 level, Int32 fileUniqueIndex, LogData *logData)
     if(_isFinish)
     {
         _flielocker[fileUniqueIndex]->Unlock();
+        Fs_SafeFree(logData);
         return;
     }
     _logDatas[fileUniqueIndex]->push_back(logData);

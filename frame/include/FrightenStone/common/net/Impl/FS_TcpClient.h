@@ -37,6 +37,7 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include <FrightenStone/common/net/Defs/FS_NetDefs.h>
 #include <FrightenStone/common/component/Impl/FS_Delegate.h>
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -46,6 +47,7 @@ class IMemoryAlloctor;
 
 class BASE_EXPORT FS_TcpClient
 {
+    OBJ_POOL_CREATE_DEF(FS_TcpClient);
 public:
     FS_TcpClient();
     virtual ~FS_TcpClient();

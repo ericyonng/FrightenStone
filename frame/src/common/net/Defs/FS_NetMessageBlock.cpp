@@ -21,43 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : NetDataHeader.h
+ * @file  : FS_NetMessageBlock.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/11/27
+ * @date  : 2020/01/12
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_ProtocolInterface_Defs_NetDataHeader_H__
-#define __Frame_Include_FrightenStone_Common_Net_ProtocolInterface_Defs_NetDataHeader_H__
-#pragma once
-
-#include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
-#include "FrightenStone/common/status/status.h"
+#include "stdafx.h"
+#include "FrightenStone/common/net/Defs/FS_NetMessageBlock.h"
 
 FS_NAMESPACE_BEGIN
-
-struct BASE_EXPORT NetMsg_DataHeader
-{
-    NetMsg_DataHeader();
-
-    // 提供序列化反序列化接口
-    // 序列化反序列化（ObjType 必须有SerialzieTo(FS_Stream *), DeserializeFrom(FS_Stream *)接口）
-    // 序列化反序列化（ObjType 必须有bool SerializeTo(FS_Stream *) const, bool DeserializeFrom(FS_Stream *)接口）
-    // bool SerializeTo(FS_Stream *str);
-    UInt16 _packetLength;           // 包长度
-    UInt16 _cmd;                    // 命令
-};
-
-inline NetMsg_DataHeader::NetMsg_DataHeader()
-{
-    _packetLength = 0;
-    _cmd = 0;
-}
-
+OBJ_POOL_CREATE_DEF_IMPL(FS_NetMsgBufferBlock, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(FS_NetArrivedMsg, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(FS_NetSessionWillConnectMsg, __DEF_OBJ_POOL_OBJ_NUM__);
 FS_NAMESPACE_END
-
-#endif
-

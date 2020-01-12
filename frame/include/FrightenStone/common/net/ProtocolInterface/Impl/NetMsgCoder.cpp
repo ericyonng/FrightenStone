@@ -21,44 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : LogFileType.h
+ * @file  : NetMsgCoder.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/11/27
+ * @date  : 2020/01/12
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Src_Common_Log_Defs_LogFileType_H__
-#define __Frame_Src_Common_Log_Defs_LogFileType_H__
-#pragma once
-
-#include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "stdafx.h"
+#include "FrightenStone/common/net/ProtocolInterface/Impl/NetMsgCoder.h"
+#include "FrightenStone/common/net/ProtocolInterface/Impl/NetDataHeader.h"
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(NetMsgCoder, __DEF_OBJ_POOL_OBJ_NUM__);
 
-// 请在LogDefs.h添加响应的日志文件定义，
-// 并在virtual Int32 FS_Log::_GetLogFileIndex(Int32 logTypeEnum); 填充响应的实现
-class BASE_EXPORT LogFileType
+void NetMsgCoder::Finish()
 {
-public:
-    enum 
-    {
-        Begin = 0,
-        Crash = Begin,
-        Details,
-        Memleak,
-        Mempool,
-        ObjPool,
-        Net,
-        Sys,
-        Any,
-        Custom,
-        Testcode,
-    };
-};
-
+    // 1.起始位置写入长度
+    *(reinterpret_cast<NetMsgHeaderFmtType::PacketLenDataType *>(_buffer + _curHeaderPos)) =
+        static_cast<NetMsgHeaderFmtType::PacketLenDataType>(_wrLen);
+    // 2.记入当前偏移位置
+    _curHeaderPos += _wrLen;
+    // 3.更新剩余空间
+    // 4.写入的数据长度归零
+    _wrLen = 0;
+}
 FS_NAMESPACE_END
-
-#endif

@@ -56,6 +56,7 @@
 #ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(FS_IocpMsgDispatcher, 32);
 
 FS_IocpMsgDispatcher::MessageQueueHandler FS_IocpMsgDispatcher::_msgBlockHandler[NetMessageBlockType::End] = 
 {NULL,
@@ -77,6 +78,7 @@ FS_IocpMsgDispatcher::FS_IocpMsgDispatcher(IFS_NetEngine *netEngine, UInt32 comp
     ,_sessionBufferAlloctor(NULL)
     ,_printAlloctorOccupiedInfo(NULL)
     ,_curSessionQuatity(0)
+    ,_msgDecoder(NULL)
 {
 }
 
@@ -95,6 +97,7 @@ FS_IocpMsgDispatcher::~FS_IocpMsgDispatcher()
     for(auto &iterDelegateInfo : _sessionIdRefUserDisconnected)
         STLUtil::DelListContainer(iterDelegateInfo.second);
     _sessionIdRefUserDisconnected.clear();
+    Fs_SafeFree(_msgDecoder);
 
 //     _CrtMemCheckpoint(&s2);
 //     if(_CrtMemDifference(&s3, &s1, &s2))
@@ -114,6 +117,7 @@ Int32 FS_IocpMsgDispatcher::BeforeStart(const NetEngineTotalCfgs &cfgs)
     *_cfgs = cfgs._dispatcherCfgs;
     _timeWheel = new TimeWheel(_cfgs->_dispatcherResolutionInterval);
     _pool = new FS_ThreadPool(0, 1);
+    _msgDecoder = new NetMsgDecoder;
 
     // 缓存分配器
     _sessionBufferAlloctor = new MemoryAlloctorWithLimit(FS_BUFF_SIZE_DEF, _cfgs->_prepareBufferPoolCnt, _cfgs->_maxAlloctorBytesPerDispatcher);
@@ -266,7 +270,7 @@ void FS_IocpMsgDispatcher::SendData(UInt64 sessionId, NetMsg_DataHeader *msg)
     {
         g_Log->w<FS_IocpMsgDispatcher>(_LOGFMT_("sessionid[%llu] send msg cmd[%hu] len[%hu] fail")
                                      , sessionId
-                                     , msg->_cmd, msg->_packetLength);
+                                     , msg->_cmd);
     }
 
     if(_DoPostSend(session))
@@ -495,9 +499,6 @@ void FS_IocpMsgDispatcher::_PrintAlloctorOccupiedInfo()
     memInfo.AppendFormat("\n【iocp dispatcher alloctor occupied info】\n");
     memInfo.AppendFormat("dispatcher compId[%u] threadId[%llu] alloctor occupied info:[", _compId, _transferThreadId);
     _sessionBufferAlloctor->MemInfoToString(memInfo);
-    memInfo.AppendFormat("total occupied bytes[%llu], in used bytes[%llu]."
-                         , _sessionBufferAlloctor->GetOccupiedBytes()
-                         , _sessionBufferAlloctor->GetInUsedBytes());
     memInfo.AppendFormat(" ]");
     memInfo.AppendFormat("\n【+++++++++++++++++++++++++ End ++++++++++++++++++++++++++】\n");
     g_Log->mempool("%s", memInfo.c_str());
@@ -687,17 +688,18 @@ void FS_IocpMsgDispatcher::_OnMsgArrived(FS_NetArrivedMsg *arrivedMsg)
 void FS_IocpMsgDispatcher::_OnSessionMsgHandle(FS_IocpSession *session)
 {
     auto recvBuffer = session->CastToRecvBuffer();
-    NetMsg_DataHeader *frontMsg = NULL;
+    const Byte8 *buffer = NULL;
     const UInt64 sessionId = session->GetSessionId();
+
     while(recvBuffer->HasMsg())
     {
-        frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
+        _msgDecoder->Decode(recvBuffer->GetData());
         // TODO:处理单一消息业务逻辑部分
         if(_logic)
-            _logic->OnMsgDispatch(sessionId, frontMsg);
+            _logic->OnMsgDispatch(sessionId, _msgDecoder);
 
         _engine->_HandleCompEv_RecvMsgAmount();
-        recvBuffer->PopFront(frontMsg->_packetLength);
+        recvBuffer->PopFront(_msgDecoder->GetMsgLen());
     }
 }
 

@@ -40,6 +40,7 @@
 #include "FrightenStone/common/net/Impl/IFS_Connector.h"
 #include <FrightenStone/common/component/Impl/FS_String.h>
 #include "FrightenStone/common/asyn/asyn.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -48,6 +49,8 @@ struct ConnectorCfgs;
 
 class BASE_EXPORT FS_IocpConnector : public IFS_Connector
 {
+    OBJ_POOL_CREATE_DEF(FS_IocpConnector);
+
 public:
     FS_IocpConnector(IFS_NetEngine *netEngine
                      , UInt32 compId

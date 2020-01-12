@@ -39,6 +39,7 @@
 #include "FrightenStone/common/asyn/asyn.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/status/status.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -155,14 +156,11 @@ private:
 // 任意组合多对多
 // 每个通过订阅主题方式产生generatorId与consumerid映射
 // 通过消息类型推算出所在的generatorId与consumerId这样
-class RapidMq
-{
-public:
-};
 
 // 单向无线程并发消息队列
 class BASE_EXPORT ConcurrentMessageQueueNoThread
 {
+    OBJ_POOL_CREATE_DEF(ConcurrentMessageQueueNoThread);
 public:
     ConcurrentMessageQueueNoThread(UInt32 generatorQuantity, UInt32 consumerQuantity = 1);
     ~ConcurrentMessageQueueNoThread();
@@ -219,6 +217,7 @@ private:
 // 只能单向,只能从生产者到消费者 无线程同步消息队列
 class BASE_EXPORT MessageQueueNoThread
 {
+    OBJ_POOL_CREATE_DEF(MessageQueueNoThread);
 public:
     MessageQueueNoThread();
     ~MessageQueueNoThread();

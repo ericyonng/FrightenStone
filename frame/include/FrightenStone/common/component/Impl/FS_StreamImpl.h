@@ -34,20 +34,22 @@
 
 FS_NAMESPACE_BEGIN
 inline FS_Stream::FS_Stream()
-    :_buff(NULL)
-    ,_size(0)
+    :_size(0)
     ,_writePos(0)
     ,_readPos(0)
     ,_needDelete(false)
     ,_isPoolCreate(false)
+    ,_buff(NULL)
 {
 }
 
 inline FS_Stream::FS_Stream(Byte8 *data, Int32 size, bool needDelete, bool isPoolCreate)
-    :_buff(data)
-    , _size(size)
+    :_size(size)
+    , _writePos(0)
+    ,_readPos(0)
     , _needDelete(needDelete)
     ,_isPoolCreate(isPoolCreate)
+    ,_buff(NULL)
 {
 }
 
@@ -298,7 +300,7 @@ inline bool FS_Stream::Write(const ObjType &n)
     }
 
     // 将要写入的数据 拷贝到缓冲区尾部
-    memcpy(_buff + _writePos, &n, static_cast<size_t>(len));
+    ::memcpy(_buff + _writePos, &n, static_cast<size_t>(len));
 
     // 计算已写入数据尾部位置
     OffsetWrLenOnWrChange(len);

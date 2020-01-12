@@ -38,6 +38,7 @@
 #include <assert.h>
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(FS_File, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_File::FS_File()
     :_fp(NULL)

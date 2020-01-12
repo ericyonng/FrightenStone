@@ -46,6 +46,8 @@
 #include "FrightenStone/common/net/Defs/EngineCompDefs.h"
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(FS_IocpPoller, 32);
+
 // poller¼àÊÓÆ÷·½·¨
 FS_IocpPoller::MonitorHandler FS_IocpPoller::_monitorHandler[PollerDefs::MonitorType_End] = {
 NULL

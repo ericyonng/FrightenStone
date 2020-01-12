@@ -45,13 +45,10 @@ FS_NAMESPACE_BEGIN
 // 消息数据字节流
 class BASE_EXPORT FS_MsgReadStream :public FS_Stream
 {
+    OBJ_POOL_CREATE_DEF(FS_MsgReadStream);
 public:
-    FS_MsgReadStream(NetMsg_DataHeader *header);
     FS_MsgReadStream(char *data, Int32 size, bool isDelete = false, bool isPoolCreate = false);
     virtual ~FS_MsgReadStream();
-
-public:
-    UInt16 GetNetMsgCmd();
 };
 
 

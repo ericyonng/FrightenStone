@@ -95,13 +95,13 @@ inline void IFS_Buffer::PopFront(Int64 bytesLen)
 
 inline bool IFS_Buffer::PushBack(const Byte8 *data, size_t len)
 {
-    // 1.判断剩余空间是否足够
+    // 1.判断剩余空间是否足够 由外部判断canpush
     size_t rest = _bufferSize - _curPos;
-    if(rest < len)
-    {
-        g_Log->e<IFS_Buffer>(_LOGFMT_("rest buffer size[%llu] not enough to match data len[%llu]"), rest, len);
-        return false;
-    }
+//     if(rest < len)
+//     {
+//         g_Log->e<IFS_Buffer>(_LOGFMT_("rest buffer size[%llu] not enough to match data len[%llu]"), rest, len);
+//         return false;
+//     }
 
     // 2.拷贝数据
     ::memcpy(_buff + _curPos, data, len);
@@ -151,26 +151,14 @@ inline Int64 IFS_Buffer::GetRest() const
     return _bufferSize - _curPos;
 }
 
-inline char *IFS_Buffer::GetData()
+inline Byte8 *IFS_Buffer::GetData()
 {
     return _buff;
 }
 
-inline const char *IFS_Buffer::GetData() const
+inline const Byte8 *IFS_Buffer::GetData() const
 {
     return _buff;
-}
-
-template<typename ObjType>
-inline ObjType *IFS_Buffer::CastToData()
-{
-    return reinterpret_cast<ObjType *>(_buff);
-}
-
-template<typename ObjType>
-inline const ObjType *IFS_Buffer::CastToData() const
-{
-    return reinterpret_cast<const ObjType *>(_buff);
 }
 
 template<typename ObjType>

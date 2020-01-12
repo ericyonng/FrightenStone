@@ -34,7 +34,7 @@
 #include "FrightenStone/common/memorypool/memorypool.h"
 
 FS_NAMESPACE_BEGIN
-
+OBJ_POOL_CREATE_DEF_IMPL(FS_Stream, __DEF_OBJ_POOL_OBJ_NUM__);
 FS_Stream::FS_Stream(int size)
 {
     _size = size;

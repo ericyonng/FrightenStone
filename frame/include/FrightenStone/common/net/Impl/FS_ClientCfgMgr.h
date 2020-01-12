@@ -45,6 +45,7 @@ class FS_IniFile;
 
 class BASE_EXPORT FS_ClientCfgMgr : public IFS_ConfigMgr
 {
+    OBJ_POOL_CREATE_DEF(FS_ClientCfgMgr);
 public:
     FS_ClientCfgMgr();
     ~FS_ClientCfgMgr();

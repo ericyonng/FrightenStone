@@ -39,6 +39,7 @@
 #include "FrightenStone/common/component/Impl/FS_String.h"
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,6 +48,7 @@ FS_NAMESPACE_BEGIN
 // 若是由内存池创建的缓冲区，在写入时支持缓冲区自增长
 class BASE_EXPORT FS_Stream
 {
+    OBJ_POOL_CREATE_DEF(FS_Stream);
 public:
     FS_Stream();
     FS_Stream(Byte8 *data, Int32 size, bool needDelete = false, bool isPoolCreate = false);
@@ -135,16 +137,16 @@ private:
 
 private:
     // 缓冲区总的空间大小，字节长度
-    Int32 _size = 0;
+    Int32 _size;
     // 已写入数据的尾部位置，已写入数据长度
-    Int32 _writePos = 0;
+    Int32 _writePos;
     // 已读取数据的尾部位置
-    Int32 _readPos = 0;
+    Int32 _readPos;
     // _buff是外部传入的数据块时是否应该被释放
-    bool _needDelete = true;
-    bool _isPoolCreate = false;
+    bool _needDelete;
+    bool _isPoolCreate;
     // 数据缓冲区
-    char *_buff = NULL;
+    char *_buff;
 };
 
 FS_NAMESPACE_END

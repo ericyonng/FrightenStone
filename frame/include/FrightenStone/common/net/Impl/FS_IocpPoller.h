@@ -37,6 +37,7 @@
 #include "FrightenStone/common/net/Defs/PollerDefs.h"
 
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 #ifdef _WIN32
 
@@ -52,6 +53,7 @@ class IFS_NetEngine;
 
 class BASE_EXPORT FS_IocpPoller : public IFS_BasePoller
 {
+    OBJ_POOL_CREATE_DEF(FS_IocpPoller);
 public:
     FS_IocpPoller(IFS_EngineComp *engineComp, Int32 monitorType);
     ~FS_IocpPoller();

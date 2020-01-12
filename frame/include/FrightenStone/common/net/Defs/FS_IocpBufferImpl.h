@@ -95,13 +95,14 @@ inline bool FS_IocpBuffer::HasMsg() const
 {
     // 判断消息缓冲区的数据长度大于消息头NetMsg_DataHeader长度
     auto len = GetLength();
-    if(len >= sizeof(NetMsg_DataHeader))
+    if(len >= NetMsgHeaderFmtType::_msgHeaderSize)
     {
         // 这时就可以知道当前消息的长度
-        auto header = CastToData<NetMsg_DataHeader>();
+        const NetMsgHeaderFmtType::PacketLenDataType *packetLen = 
+            reinterpret_cast<const NetMsgHeaderFmtType::PacketLenDataType *>(_buff);
 
         // 判断消息缓冲区的数据长度大于消息长度
-        return len >= header->_packetLength;
+        return len >= *packetLen;
     }
 
     return false;

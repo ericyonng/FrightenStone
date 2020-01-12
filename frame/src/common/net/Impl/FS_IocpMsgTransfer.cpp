@@ -60,6 +60,8 @@
 #ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(FS_IocpMsgTransfer, __DEF_OBJ_POOL_OBJ_NUM__);
+
 FS_IocpMsgTransfer::FS_IocpMsgTransfer(UInt32 compId, IFS_NetEngine *netEngine)
     :IFS_MsgTransfer(compId, netEngine)
     ,_sessionCnt{0}

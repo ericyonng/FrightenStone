@@ -87,24 +87,25 @@ public:
         return g_UserMgr->NewUser(sessionId);
     }
 
-    virtual void OnMsgDispatch(UInt64 sessionId, fs::NetMsg_DataHeader *msgData)
+    virtual void OnMsgDispatch(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
     {
         auto user = g_UserMgr->GetUserBySessionId(sessionId);
         if(!user)
             return;
 
-        if(msgData->_cmd >= fs::ProtocolCmd::CMD_End ||
-           msgData->_cmd <= fs::ProtocolCmd::CMD_Begin)
+        const auto cmd = msgDecoder->GetCmd();
+        if(cmd >= fs::ProtocolCmd::CMD_End ||
+           cmd <= fs::ProtocolCmd::CMD_Begin)
         {
             // TODO:错误的协议号可能遭受试探性攻击
-            g_Log->w<MyLogic>(_LOGFMT_("unknown protocolcmd[%hu] len[%hu] sessionId[%llu]")
-                              , msgData->_cmd, msgData->_packetLength, sessionId);
+            g_Log->w<MyLogic>(_LOGFMT_("unknown protocolcmd[%u] len[%u] sessionId[%llu]")
+                              , cmd, msgDecoder->GetMsgLen(), sessionId);
             return;
         }
 
         // TODO:需不需要对单包数据长度进行限制,保证不会收到长度攻击?
         // if(msgData->_packetLength)
-        InvokeProtocolHandler(msgData->_cmd, user->GetUseId(), msgData);
+        InvokeProtocolHandler(sessionId, msgDecoder);
     }
 };
 // 

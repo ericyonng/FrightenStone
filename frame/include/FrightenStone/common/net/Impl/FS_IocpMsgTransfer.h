@@ -44,6 +44,7 @@
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
 #include "FrightenStone/common/net/Defs/HeartBeatComp.h"
 #include "FrightenStone/common/net/Defs/NetCfgDefs.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -53,7 +54,7 @@ class FS_IocpPoller;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
-
+    OBJ_POOL_CREATE_DEF(FS_IocpMsgTransfer);
 public:
     FS_IocpMsgTransfer(UInt32 compId, IFS_NetEngine *netEngine);
     virtual ~FS_IocpMsgTransfer();

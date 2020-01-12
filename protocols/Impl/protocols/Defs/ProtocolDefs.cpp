@@ -35,6 +35,15 @@
 #include "FrightenStone/common/log/Log.h"
 
 FS_NAMESPACE_BEGIN
+
+OBJ_POOL_CREATE_DEF_IMPL(LoginData, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(LoginReq, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(LoginRes, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(LoginNty, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(CreatePlayerNty, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(CheckHeartReq, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(CheckHeartRes, __DEF_OBJ_POOL_OBJ_NUM__);
+
 const char * ProtocolCmd::GetStr(UInt16 cmd)
 {
     switch(cmd)
@@ -119,20 +128,72 @@ LoginData::LoginData()
 
 LoginReq::LoginReq()
 {
+//     _packetLength = _msgHeaderSize +
+//         sizeof(_loginData._userName) + sizeof(_loginData._pwd) +
+//         sizeof(_loginData._data) + sizeof(_loginData._msgId);
     _packetLength = sizeof(LoginReq);
     _cmd = ProtocolCmd::LoginReq;
 
 }
 
+void LoginReq::SerializeTo(NetMsgCoder *coder)
+{
+    // 写入包体数据
+    coder->Write(_loginData._userName, sizeof(_loginData._userName));
+    coder->Write(_loginData._pwd, sizeof(_loginData._pwd));
+    coder->Write(_loginData._data, sizeof(_loginData._data));
+    coder->Write(_loginData._msgId);
+}
+
+bool LoginReq::DeserializeFrom(NetMsgDecoder *decoder)
+{
+    // 1.包头信息
+    _cmd = decoder->GetCmd();
+    _packetLength = decoder->GetMsgLen();
+
+    // 2.读取包体数据
+    decoder->Read(_loginData._userName, sizeof(_loginData._userName));
+    decoder->Read(_loginData._pwd, sizeof(_loginData._pwd));
+    decoder->Read(_loginData._data, sizeof(_loginData._data));
+    decoder->Read(_loginData._msgId);
+
+    return true;
+}
+
 LoginRes::LoginRes()
 {
+//     _packetLength =_msgHeaderSize+
+//         sizeof(_result) + 
+//         sizeof(data) + 
+//         sizeof(_msgId);
     _packetLength = sizeof(LoginRes);
     _cmd = ProtocolCmd::LoginRes;
     _result = 0;
 }
 
+void LoginRes::SerializeTo(NetMsgCoder *coder)
+{
+    coder->Write(_result);
+    coder->Write(data, sizeof(data));
+    coder->Write(_msgId);
+}
+
+bool LoginRes::DeserializeFrom(NetMsgDecoder *decoder)
+{
+    // 1.包头信息
+    _cmd = decoder->GetCmd();
+    _packetLength = decoder->GetMsgLen();
+
+    // 2.读取数据
+    decoder->Read(_result);
+    decoder->Read(data, sizeof(data));
+    decoder->Read(_msgId);
+    return true;
+}
+
 LoginNty::LoginNty()
 {
+//    _packetLength = _msgHeaderSize + sizeof(_userName) + sizeof(_pwd);
     _packetLength = sizeof(LoginNty);
     _cmd = ProtocolCmd::LoginNty;
 
@@ -140,24 +201,85 @@ LoginNty::LoginNty()
     memset(_pwd, 0, sizeof(_pwd));
 }
 
+void LoginNty::SerializeTo(NetMsgCoder *coder)
+{
+    coder->Write(_userName, sizeof(_userName));
+    coder->Write(_pwd, sizeof(_pwd));
+}
+
+bool LoginNty::DeserializeFrom(NetMsgDecoder *decoder)
+{
+    // 1.解码
+    _cmd = decoder->GetCmd();
+    _packetLength = decoder->GetMsgLen();
+
+    // 2.读取数据
+    decoder->Read(_userName, sizeof(_userName));
+    decoder->Read(_pwd, sizeof(_pwd));
+    return true;
+}
+
 CreatePlayerNty::CreatePlayerNty()
 {
+    // _packetLength = _msgHeaderSize + sizeof(_socket);
     _packetLength = sizeof(CreatePlayerNty);
     _cmd = ProtocolCmd::CreatePlayerNty;
     _socket = 0;
 }
 
+void CreatePlayerNty::SerializeTo(NetMsgCoder *coder)
+{
+    coder->Write(_socket);
+}
+
+bool CreatePlayerNty::DeserializeFrom(NetMsgDecoder *decoder)
+{
+    // 1.解码
+    _cmd = decoder->GetCmd();
+    _packetLength = decoder->GetMsgLen();
+
+    // 2.读取数据
+    decoder->Read(_socket);
+    return true;
+}
+
 CheckHeartReq::CheckHeartReq()
 {
+    // _packetLength = _msgHeaderSize;
     _packetLength = sizeof(CheckHeartReq);
     _cmd = ProtocolCmd::CheckHeartReq;
 }
 
+void CheckHeartReq::SerializeTo(NetMsgCoder *coder)
+{
+}
+
+bool CheckHeartReq::DeserializeFrom(NetMsgDecoder *decoder)
+{
+    _cmd = decoder->GetCmd();
+    _packetLength = decoder->GetMsgLen();
+    return true;
+}
+
 CheckHeartRes::CheckHeartRes()
 {
+    // _packetLength = _msgHeaderSize;
     _packetLength = sizeof(CheckHeartRes);
     _cmd = ProtocolCmd::CheckHeartRes;
 }
+
+
+void CheckHeartRes::SerializeTo(NetMsgCoder *coder)
+{
+}
+
+bool CheckHeartRes::DeserializeFrom(NetMsgDecoder *decoder)
+{
+    _cmd = decoder->GetCmd();
+    _packetLength = decoder->GetMsgLen();
+    return true;
+}
+
 // 
 // void ProtocoalAssist::DelNetMsg(NetMsg_DataHeader *header)
 // {

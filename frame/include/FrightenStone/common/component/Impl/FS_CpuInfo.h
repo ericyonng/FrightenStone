@@ -36,12 +36,13 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/Macro/MacroDefs.h"
 #include "FrightenStone/common/basedefs/DataType/DataType.h"
-
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_CpuInfo
 {
+    OBJ_POOL_CREATE_DEF(FS_CpuInfo);
 public:
     FS_CpuInfo();
     bool Initialize();

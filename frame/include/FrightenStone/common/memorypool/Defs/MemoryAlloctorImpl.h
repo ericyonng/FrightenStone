@@ -57,7 +57,7 @@ inline size_t IMemoryAlloctor::GetEffectiveBlockSize() const
 
 inline size_t IMemoryAlloctor::GetOccupiedBytes() const
 {
-    return _blockSize * _curBlockAmount*_curNodeCnt;
+    return _totalOccupiedSize;
 }
 
 inline size_t IMemoryAlloctor::GetInUsedBytes() const

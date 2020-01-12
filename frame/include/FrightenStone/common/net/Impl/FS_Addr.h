@@ -37,6 +37,7 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/component/Impl/FS_String.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -45,6 +46,7 @@ class IFS_Session;
 // session需要正确连接成功宏，addr才正确
 class BASE_EXPORT FS_Addr
 {
+    OBJ_POOL_CREATE_DEF(FS_Addr);
 public:
     FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo);
     ~FS_Addr();

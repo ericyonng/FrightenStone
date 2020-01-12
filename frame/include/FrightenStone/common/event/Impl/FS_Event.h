@@ -37,11 +37,13 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/component/Impl/FS_String.h"
 #include "FrightenStone/common/component/Impl/SmartVar/SmartVar.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Event
 {
+    OBJ_POOL_CREATE_DEF(FS_Event);
 public:
     FS_Event(int id = 0, bool dontDelAfterFire = false);
     virtual ~FS_Event();

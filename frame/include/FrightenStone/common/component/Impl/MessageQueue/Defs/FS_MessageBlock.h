@@ -37,11 +37,14 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/component/Impl/FS_Stream.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT FS_MessageBlock
 {
+    OBJ_POOL_CREATE_DEF(FS_MessageBlock);
+
     FS_MessageBlock();
     virtual ~FS_MessageBlock();
 

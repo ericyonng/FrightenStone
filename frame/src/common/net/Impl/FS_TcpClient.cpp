@@ -40,6 +40,7 @@
 #include <FrightenStone/common/net/Defs/FS_IocpBuffer.h>
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(FS_TcpClient, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_TcpClient::FS_TcpClient()
     :_session(NULL)
@@ -146,15 +147,15 @@ void FS_TcpClient::DoMsg()
 {
     //循环 判断是否有消息需要处理
 #ifdef _WIN32
-    auto recvBuffer = _session->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
-    while(recvBuffer->HasMsg())
-    {
-        // 处理网络消息
-        auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
-        OnNetMsg(frontMsg);
-        // 移除消息队列（缓冲区）最前的一条数据       
-        recvBuffer->PopFront(frontMsg->_packetLength);
-    }
+//     auto recvBuffer = _session->GetRecvBuffer()->CastToBuffer<FS_IocpBuffer>();
+//     while(recvBuffer->HasMsg())
+//     {
+//         // 处理网络消息
+//         auto frontMsg = recvBuffer->CastToData<NetMsg_DataHeader>();
+//         OnNetMsg(frontMsg);
+//         // 移除消息队列（缓冲区）最前的一条数据       
+//         recvBuffer->PopFront(frontMsg->_packetLength);
+//     }
 #else
     // TODO:linux
 #endif

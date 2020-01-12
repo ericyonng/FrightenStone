@@ -43,6 +43,7 @@
 
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__);
 
 IFS_Session::IFS_Session(UInt64 sessionId
                          , UInt32 transferCompId
@@ -128,9 +129,9 @@ bool IFS_Session::PushMsgToSend(NetMsg_DataHeader *header)
         _toSend.push_back(buffer);
     }
 
-    if(!buffer->PushBack(reinterpret_cast<const char *>(header), header->_packetLength))
+    if(!buffer->PushBack(header))
     {
-        g_Log->e<IFS_Session>(_LOGFMT_("push back data fail cmd[%hu] len[%hu]")
+        g_Log->e<IFS_Session>(_LOGFMT_("push back data fail cmd[%u] len[%u]")
                               , header->_cmd
                               , header->_packetLength);
         return false;

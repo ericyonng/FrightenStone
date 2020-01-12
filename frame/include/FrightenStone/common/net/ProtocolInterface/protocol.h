@@ -35,8 +35,12 @@
 #pragma once
 
 // defs ...
-#include "FrightenStone/common/net/ProtocolInterface/Defs/NetDataHeader.h"
+#include "FrightenStone/common/net/ProtocolInterface/Impl/NetDataHeader.h"
+#include "FrightenStone/common/net/ProtocolInterface/Defs/NetMsgHeaderFmtType.h"
 
 // Impl ...
+#include "FrightenStone/common/net/ProtocolInterface/Impl/NetMsgDecoder.h"
+#include "FrightenStone/common/net/ProtocolInterface/Impl/NetMsgCoder.h"
+
 // Interface ...
 #endif // !__Frame_Include_FrightenStone_Common_Net_Protocol_Protocol_H__

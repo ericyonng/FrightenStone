@@ -35,6 +35,8 @@
 #include "FrightenStone/common/assist/utils/Impl/RTTIUtil.h"
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(IFS_BusinessLogic, 16);
+
 IFS_BusinessLogic::~IFS_BusinessLogic()
 {
     _BeforeFacadesClose();
@@ -86,7 +88,7 @@ void IFS_BusinessLogic::Close()
 }
 
 // ¶©ÔÄÐ­Òé
-void IFS_BusinessLogic::SubscribeProtocol(Int32 protocolCmd, IDelegate<void, UInt64, NetMsg_DataHeader *> *handler)
+void IFS_BusinessLogic::SubscribeProtocol(UInt32 protocolCmd, IDelegate<void, UInt64, NetMsgDecoder *> *handler)
 {
     auto iterHandler = _protocolCmdRefHandlers.find(protocolCmd);
     if(iterHandler != _protocolCmdRefHandlers.end())
@@ -100,17 +102,17 @@ void IFS_BusinessLogic::SubscribeProtocol(Int32 protocolCmd, IDelegate<void, UIn
     _protocolCmdRefHandlers.insert(std::make_pair(protocolCmd, handler));
 }
 
-void IFS_BusinessLogic::InvokeProtocolHandler(Int32 protocolCmd, UInt64 userId, NetMsg_DataHeader *msgData)
+void IFS_BusinessLogic::InvokeProtocolHandler(UInt64 sessionId, NetMsgDecoder *msgDecoder)
 {
-    auto iterHandler = _protocolCmdRefHandlers.find(protocolCmd);
+    auto iterHandler = _protocolCmdRefHandlers.find(msgDecoder->GetCmd());
     if(iterHandler == _protocolCmdRefHandlers.end())
     {
-        g_Log->e<IFS_BusinessLogic>(_LOGFMT_("userId[%llu], protocolCmd[%d] have no handler!"), userId, protocolCmd);
+        g_Log->e<IFS_BusinessLogic>(_LOGFMT_("sessionId[%llu], protocolCmd[%u] have no handler!"), sessionId, msgDecoder->GetCmd());
         return;
     }
 
     auto handler = iterHandler->second;
-    handler->Invoke(userId, msgData);
+    handler->Invoke(sessionId, msgDecoder);
 }
 
 Int32 IFS_BusinessLogic::RegisterFacade(IFS_FacadeFactory *facadeFactory)

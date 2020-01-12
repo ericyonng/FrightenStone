@@ -43,6 +43,8 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_DEF_IMPL(IFS_ConfigMgr, __DEF_OBJ_POOL_OBJ_NUM__);
+
 FS_String IFS_ConfigMgr::_bindAnyIp = "Any";
 
 IFS_ConfigMgr::IFS_ConfigMgr()

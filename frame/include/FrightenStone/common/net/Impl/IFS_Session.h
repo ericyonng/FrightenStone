@@ -37,6 +37,7 @@
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/component/Impl/Time.h"
 #include "FrightenStone/common/net/Defs/FS_NetDefs.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -50,6 +51,8 @@ class  IFS_Buffer;
 // 只支持单线程
 class BASE_EXPORT IFS_Session
 {
+    OBJ_POOL_CREATE_DEF(IFS_Session);
+
 public:
     explicit IFS_Session(UInt64 sessionId
                          , UInt32 transferCompId

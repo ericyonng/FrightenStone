@@ -37,20 +37,20 @@ inline FS_MsgWriteStream::FS_MsgWriteStream(char *data, int size, bool isDelete,
     :FS_Stream(data, size, isDelete, isPoolCreate)
 {
     // 预先占领消息长度所需空间 避免写入字节流时覆盖了长度位置
-    Write<UInt16>(0);
+    Write<NetMsgHeaderFmtType::PacketLenDataType>(0);
 }
 
 inline FS_MsgWriteStream::FS_MsgWriteStream(int size)
     :FS_Stream(size)
 {
     // 预先占领消息长度所需空间 避免写入字节流时覆盖了长度位置
-    Write<UInt16>(0);
+    Write<NetMsgHeaderFmtType::PacketLenDataType>(0);
 }
 
 #pragma region write bytes
-inline void FS_MsgWriteStream::SetNetMsgCmd(UInt16 cmd)
+inline void FS_MsgWriteStream::SetNetMsgCmd(UInt32 cmd)
 {
-    Write<UInt16>(cmd);
+    Write<NetMsgHeaderFmtType::CmdDataType>(cmd);
 }
 
 inline bool FS_MsgWriteStream::WriteString(const char *str, Int32 len)
@@ -71,7 +71,7 @@ inline void FS_MsgWriteStream::Finish()
     SetWritePos(0);
 
     // 写入字节流长度
-    Write<UInt16>(pos);
+    Write<NetMsgHeaderFmtType::PacketLenDataType>(pos);
 
     // 重新还原当前写入位置
     SetWritePos(pos);

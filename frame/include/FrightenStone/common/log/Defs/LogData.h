@@ -37,6 +37,7 @@
 #include "FrightenStone/common/component/Impl/FS_String.h"
 #include "FrightenStone/common/component/Impl/Time.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 class FS_String;
@@ -70,6 +71,8 @@ public:
 
 struct BASE_EXPORT LogData
 {
+    OBJ_POOL_CREATE_DEF(LogData);
+
 public:
     Time _logTime;                  // 时间 generate inside
     FS_String _logToWrite;          // 格式化的日志字符串 %s<%s>[%s][%s]line:%d %s

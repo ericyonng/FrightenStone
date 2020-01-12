@@ -33,12 +33,14 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/component/Impl/FS_String.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
 class FS_IniFile;
 class BASE_EXPORT IFS_ConfigMgr
 {
+    OBJ_POOL_CREATE_DEF(IFS_ConfigMgr);
 public:
     static FS_String _bindAnyIp;    // 绑定任意ip:"Any"
 

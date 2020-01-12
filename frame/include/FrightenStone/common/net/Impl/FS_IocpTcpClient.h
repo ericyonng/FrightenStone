@@ -44,11 +44,13 @@
 #include <FrightenStone/common/net/Impl/FS_IocpSession.h>
 #include <FrightenStone/common/net/Impl/FS_Addr.h>
 #include "FrightenStone/common/net/Defs/IoEvDefs.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_IocpTcpClient : public FS_TcpClient
 {
+    OBJ_POOL_CREATE_DEF(FS_IocpTcpClient);
 public:
     FS_IocpTcpClient();
     ~FS_IocpTcpClient();

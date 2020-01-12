@@ -37,11 +37,14 @@
 #include <FrightenStone/exportbase.h>
 #include <FrightenStone/common/basedefs/BaseDefs.h>
 #include <FrightenStone/common/component/Impl/TimeSlice.h>
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT CommonCfgs
 {
+    OBJ_POOL_CREATE_DEF(CommonCfgs);
+
     CommonCfgs();
     Int32 _maxSessionQuantityLimit;                     // 最大连接数
     UInt32 _acceptorQuantityLimit;                      // 监听端口数量
@@ -52,23 +55,27 @@ struct BASE_EXPORT CommonCfgs
 
 struct BASE_EXPORT ConnectorCfgs
 {
+    OBJ_POOL_CREATE_DEF(ConnectorCfgs);
     ConnectorCfgs();
     Int64 _connectTimeOutMs;                             // 连接超时时间
 };
 
 struct BASE_EXPORT AcceptorCfgs
 {
+    OBJ_POOL_CREATE_DEF(AcceptorCfgs);
     FS_String _ip;
     UInt16 _port;
 };
 
 struct BASE_EXPORT TransferCfgs
 {
+    OBJ_POOL_CREATE_DEF(TransferCfgs);
     TransferCfgs();
 };
 
 struct BASE_EXPORT DispatcherCfgs
 {
+    OBJ_POOL_CREATE_DEF(DispatcherCfgs);
     DispatcherCfgs();
     Int64 _heartbeatDeadTimeMsInterval;                  // 每个session的心跳间隔时间 单位ms
     Int32 _prepareBufferPoolCnt;                         // 预创建的buffer数量
@@ -78,18 +85,21 @@ struct BASE_EXPORT DispatcherCfgs
 
 struct BASE_EXPORT ObjPoolCfgs
 {
+    OBJ_POOL_CREATE_DEF(ObjPoolCfgs);
     ObjPoolCfgs();
     UInt64 _maxAllowObjPoolBytesOccupied;               // 对象池最大占用内存空间
 };
 
 struct BASE_EXPORT MempoolCfgs
 {
+    OBJ_POOL_CREATE_DEF(MempoolCfgs);
     MempoolCfgs();
     UInt64 _maxAllowMemPoolBytesOccupied;               // 内存池最大占用内存空间
 };
 
 struct BASE_EXPORT NetEngineTotalCfgs
 {
+    OBJ_POOL_CREATE_DEF(NetEngineTotalCfgs);
     CommonCfgs _commonCfgs;
     ConnectorCfgs _connectorCfgs;
     AcceptorCfgs *_acceptorCfgs;        // 监视器是一组配置,数量配置在CommonCfgs中

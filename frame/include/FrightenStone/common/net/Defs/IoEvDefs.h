@@ -32,11 +32,13 @@
 #pragma once
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT IoEvent
 {
+    OBJ_POOL_CREATE_DEF(IoEvent);
     IoEvent();
     UInt64 _sessionId;       // 会话id
     void *_ioData;          // 网络数据信息由dispatcher进行解析 iocp 是IoDataBase

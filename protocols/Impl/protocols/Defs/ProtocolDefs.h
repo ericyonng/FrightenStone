@@ -38,6 +38,7 @@
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 #pragma region 
 #ifndef SOCKET_CACHE_SIZE
@@ -86,8 +87,37 @@ public:
 //     char _buffer[0];
 // };
 
+/*
+*
+* 网络消息请遵循:
+*               1.读取网络消息务必DeserializeFrom,
+*               2.发送网络消息需要SerializeTo,
+*               3.避免因为内存对齐问题导致数据错乱
+* 网络消息编码 :
+                1.先bindbuffer,初始化缓冲区
+                2.调用start,给包头长度位占位
+                3.再调用SetCmd写入cmd消息协议号
+                4.写入消息数据
+                5.调用finish
+                6.若有多个消息可以start->setcmd->write->finish循环
+
+* 网络消息解码 :
+                1.先调用decode预解码
+                2.给消息协议号_cmd与长度赋值_packetLength
+                3.调用Read按照消息体中数据顺序读取数据
+
+* 注意         :
+                1.serialize NetMsgCoder *coder的外部需要做绑定,start->setcmd,以及finish的工作
+                2.DeserializeFrom  NetMsgDecoder *decoder 的外部需要预先Decode
+                3.每个消息包的len在构造时需要对每个基本类型数据进行计算尺寸,不可直接sizeof包类型
+                ,因为虚表以及内存对齐会导致len长度与包序列化的字节长度不一致
+*/
+
+/////////////////////////////////////////////////////////
+///
 struct LoginData
 {
+    OBJ_POOL_CREATE_DEF(LoginData);
     LoginData();
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
@@ -97,41 +127,63 @@ struct LoginData
 
 struct LoginReq : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE_DEF(LoginReq);
     LoginReq();
     LoginData _loginData;
+
+    virtual void SerializeTo(NetMsgCoder *coder);
+    virtual bool DeserializeFrom(NetMsgDecoder *decoder);
 };
 
 struct LoginRes : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE_DEF(LoginRes);
     LoginRes();
 
     Int32 _result;
     char data[88];
     Int32 _msgId;
+
+    virtual void SerializeTo(NetMsgCoder *coder);
+    virtual bool DeserializeFrom(NetMsgDecoder *decoder);
 };
 
 struct LoginNty : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE_DEF(LoginNty);
     LoginNty();
     
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
+
+    virtual void SerializeTo(NetMsgCoder *coder);
+    virtual bool DeserializeFrom(NetMsgDecoder *decoder);
 };
 
 struct CreatePlayerNty : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE_DEF(CreatePlayerNty);
     CreatePlayerNty();
     Int32 _socket;
+
+    virtual void SerializeTo(NetMsgCoder *coder);
+    virtual bool DeserializeFrom(NetMsgDecoder *decoder);
 };
 
 struct CheckHeartReq : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE_DEF(CheckHeartReq);
     CheckHeartReq();
+    virtual void SerializeTo(NetMsgCoder *coder);
+    virtual bool DeserializeFrom(NetMsgDecoder *decoder);
 };
 
 struct CheckHeartRes : public NetMsg_DataHeader
 {
+    OBJ_POOL_CREATE_DEF(CheckHeartRes);
     CheckHeartRes();
+    virtual void SerializeTo(NetMsgCoder *coder);
+    virtual bool DeserializeFrom(NetMsgDecoder *decoder);
 };
 
 // class BASE_EXPORT ProtocoalAssist

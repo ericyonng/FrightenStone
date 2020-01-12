@@ -43,7 +43,7 @@ public:
 
 private:
     void _RegisterProtocols();
-    void _OnUserLoginReq(UInt64 userId, fs::NetMsg_DataHeader *msgData);
-    void _OnUserLogoutReq(UInt64 userId, fs::NetMsg_DataHeader *msgData);
-    void _OnUserCheckHeartReq(UInt64 userId, fs::NetMsg_DataHeader *msgData);
+    void _OnUserLoginReq(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder);
+    void _OnUserLogoutReq(UInt64 userId, fs::NetMsgDecoder *msgDecoder);
+    void _OnUserCheckHeartReq(UInt64 userId, fs::NetMsgDecoder *msgDecoder);
 };

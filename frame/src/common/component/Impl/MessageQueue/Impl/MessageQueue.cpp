@@ -43,6 +43,9 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_DEF_IMPL(ConcurrentMessageQueueNoThread, 32);
+OBJ_POOL_CREATE_DEF_IMPL(MessageQueueNoThread, 32);
+
 MessageQueue::MessageQueue()
     :_msgGeneratorChange{false}
     ,_msgConsumerQueueChange(false)

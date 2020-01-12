@@ -36,6 +36,10 @@
 #include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
+
+OBJ_POOL_CREATE_DEF_IMPL(LogDataCache, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(LogCaches, __DEF_OBJ_POOL_OBJ_NUM__);
+
 LogDataCache::LogDataCache()
     :_cache{new std::list<LogData *>}
 {

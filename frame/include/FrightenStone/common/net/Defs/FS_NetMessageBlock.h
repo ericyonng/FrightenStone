@@ -37,6 +37,7 @@
 #include "FrightenStone/common/net/Defs/IoEvDefs.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 #ifdef _WIN32
 // #include "ws2def.h"
@@ -64,6 +65,8 @@ public:
 
 struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
 {
+    OBJ_POOL_CREATE_DEF(FS_NetMsgBufferBlock);
+
     FS_NetMsgBufferBlock();
     ~FS_NetMsgBufferBlock();
 
@@ -83,6 +86,7 @@ struct BASE_EXPORT FS_NetMsgBufferBlock : public FS_MessageBlock
 // 会话消息到达
 struct BASE_EXPORT FS_NetArrivedMsg : public FS_NetMsgBufferBlock
 {
+    OBJ_POOL_CREATE_DEF(FS_NetArrivedMsg);
     FS_NetArrivedMsg();
     ~FS_NetArrivedMsg();
 
@@ -93,6 +97,7 @@ struct BASE_EXPORT FS_NetArrivedMsg : public FS_NetMsgBufferBlock
 // 会话消息连入
 struct BASE_EXPORT FS_NetSessionWillConnectMsg : public FS_NetMsgBufferBlock
 {
+    OBJ_POOL_CREATE_DEF(FS_NetSessionWillConnectMsg);
     FS_NetSessionWillConnectMsg();
     ~FS_NetSessionWillConnectMsg();
 

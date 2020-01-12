@@ -34,12 +34,6 @@
 
 FS_NAMESPACE_BEGIN
 
-inline FS_MsgReadStream::FS_MsgReadStream(NetMsg_DataHeader *header)
-    :FS_MsgReadStream((char *)header, header->_packetLength)
-{
-
-}
-
 inline FS_MsgReadStream::FS_MsgReadStream(char *data, Int32 size, bool isDelete, bool isPoolCreate)
     :FS_Stream(data, size, isDelete, isPoolCreate)
 {
@@ -53,13 +47,6 @@ inline FS_MsgReadStream::FS_MsgReadStream(char *data, Int32 size, bool isDelete,
 
 inline FS_MsgReadStream::~FS_MsgReadStream()
 {
-}
-
-inline UInt16 FS_MsgReadStream::GetNetMsgCmd()
-{
-    UInt16 cmd = 0;
-    Read<UInt16>(cmd);
-    return cmd;
 }
 
 FS_NAMESPACE_END

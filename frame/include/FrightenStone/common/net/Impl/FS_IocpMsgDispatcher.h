@@ -44,6 +44,7 @@
 #include "FrightenStone/common/component/Impl/TimeSlice.h"
 #include "FrightenStone/common/net/Defs/HeartBeatComp.h"
 #include "FrightenStone/common/net/Defs/FS_NetMessageBlock.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -59,9 +60,11 @@ class FS_IocpSession;
 struct FS_NetSessionWillConnectMsg;
 struct FS_NetArrivedMsg;
 struct FS_NetMsgBufferBlock;
+class NetMsgDecoder;
 
 class BASE_EXPORT FS_IocpMsgDispatcher : public IFS_MsgDispatcher
 {
+    OBJ_POOL_CREATE_DEF(FS_IocpMsgDispatcher);
 public:
     FS_IocpMsgDispatcher(IFS_NetEngine *netEngine, UInt32 compId);
     virtual ~FS_IocpMsgDispatcher();
@@ -149,7 +152,10 @@ private:
     std::set<FS_IocpSession *> _toPostRecv;
     std::set<FS_IocpSession *> _toPostSend;
     std::set<FS_IocpSession *> _toRemove;
-    
+
+    /* 协议相关 */
+    NetMsgDecoder *_msgDecoder;
+
     // 消息队列处理器
     typedef void (FS_IocpMsgDispatcher::*MessageQueueHandler)(FS_NetMsgBufferBlock *msgBlock);
     static MessageQueueHandler _msgBlockHandler[NetMessageBlockType::End];

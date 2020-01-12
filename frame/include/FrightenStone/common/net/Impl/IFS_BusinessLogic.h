@@ -45,6 +45,7 @@
 #include "FrightenStone/common/net/Impl/FS_MsgWriteStream.h"
 #include <FrightenStone/common/component/Impl/FS_Delegate.h>
 #include "FrightenStone/common/component/Impl/FS_String.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -56,6 +57,7 @@ class IFS_Facade;
 
 class BASE_EXPORT IFS_BusinessLogic
 {
+    OBJ_POOL_CREATE_DEF(IFS_BusinessLogic);
 public:
     IFS_BusinessLogic();
     virtual ~IFS_BusinessLogic();
@@ -75,7 +77,7 @@ public:
 
     /* 网络事件 */
 public:
-    virtual void OnMsgDispatch(UInt64 sessionId, NetMsg_DataHeader *msgData) = 0;
+    virtual void OnMsgDispatch(UInt64 sessionId, NetMsgDecoder *msgDecoder) = 0;
     virtual void OnSessionDisconnected(UInt64 sessionId, std::list<IDelegate<void, UInt64> *> *disconnectedDelegate) = 0;
     virtual IUserSys *OnSessionConnected(UInt64 sessionId) = 0;
 
@@ -84,8 +86,8 @@ public:
     IFS_MsgDispatcher *GetDispatcher();
     void SetTimeWheel(TimeWheel *timeWheel);
     // 订阅协议
-    virtual void SubscribeProtocol(Int32 protocolCmd, IDelegate<void, UInt64, NetMsg_DataHeader *> *handler);
-    virtual void InvokeProtocolHandler(Int32 protocolCmd, UInt64 userId, NetMsg_DataHeader *msgData);
+    virtual void SubscribeProtocol(UInt32 protocolCmd, IDelegate<void, UInt64, NetMsgDecoder *> *handler);
+    virtual void InvokeProtocolHandler(UInt64 sessionId, NetMsgDecoder *msgDecoder);
     template <typename FacadeFactoryType>
     Int32 RegisterFacade();
     virtual Int32 RegisterFacade(IFS_FacadeFactory *facadeFactory);
@@ -125,7 +127,7 @@ protected:
     std::atomic_bool _isInit;
     IFS_MsgDispatcher *_dispatcher;     // 消息分发
     TimeWheel *_timeWheel;              // 时间轮盘
-    std::map<Int32, IDelegate<void, UInt64, NetMsg_DataHeader *> *> _protocolCmdRefHandlers;
+    std::map<UInt32, IDelegate<void, UInt64, NetMsgDecoder *> *> _protocolCmdRefHandlers;
 };
 
 

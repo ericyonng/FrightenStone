@@ -32,6 +32,33 @@
 #include "stdafx.h"
 #include "FrightenStone/common/net/Defs/IFS_Buffer.h"
 #include "FrightenStone/common/assist/utils/utils.h"
+#include "FrightenStone/common/net/ProtocolInterface/protocol.h"
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(IFS_Buffer, __DEF_OBJ_POOL_OBJ_NUM__);
+
+bool IFS_Buffer::PushBack(NetMsg_DataHeader *netMsg)
+{
+    // 1.判断剩余空间是否足够 外部判断canpush
+    size_t rest = _bufferSize - _curPos;
+    //size_t len = static_cast<size_t>(netMsg->_packetLength);
+//     if(rest < len)
+//     {
+//         g_Log->e<IFS_Buffer>(_LOGFMT_("rest buffer size[%llu] not enough to match data len[%llu]"), rest, len);
+//         return false;
+//     }
+
+    // 2.拷贝数据
+    Int64 len = netMsg->SerializeTo(_buff + _curPos);
+    if(len < 0)
+    {
+        g_Log->e<IFS_Buffer>(_LOGFMT_("netMsg serialize to buffer fail, cmd[%u], len[%llu]"), netMsg->_cmd, len);
+        return false;
+    }
+
+    // 3.变更当前位置
+    _curPos += len;
+    return true;
+}
+
 FS_NAMESPACE_END

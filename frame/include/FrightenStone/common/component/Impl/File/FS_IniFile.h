@@ -40,6 +40,7 @@
 #include "FrightenStone/common/basedefs/Macro/MacroDefs.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include <FrightenStone/common/component/Impl/FS_String.h>
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -47,6 +48,7 @@ class FS_String;
 class Locker;
 class BASE_EXPORT FS_IniFile
 {
+    OBJ_POOL_CREATE_DEF(FS_IniFile);
 public:
     FS_IniFile();
     virtual ~FS_IniFile();

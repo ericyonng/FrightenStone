@@ -39,12 +39,16 @@
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/net/Defs/FS_NetDefs.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
+
+struct NetMsg_DataHeader;
 
 // buffer不可给其他线程使用，只能在单线程中 避免IMemoryAlloctor未定义出错 IMemoryAlloctor 是外部传入，外部释放
 class BASE_EXPORT IFS_Buffer
 {
+    OBJ_POOL_CREATE_DEF(IFS_Buffer);
 public:
     // 支持内存分配器
     IFS_Buffer(size_t bufferSize, IMemoryAlloctor *memAlloctor);
@@ -57,6 +61,7 @@ public:
 
     void PopFront(Int64 bytesLen);
     bool PushBack(const Byte8 *data, size_t len);
+    bool PushBack(NetMsg_DataHeader *netMsg);
     bool CanPush(size_t len);
     void Clear();
     bool IsEmpty() const;
@@ -64,13 +69,9 @@ public:
     Int64 GetLength() const;
     Int64 GetTotalSize() const;
     Int64 GetRest() const;
-    char *GetData();
-    const char *GetData() const;
+    Byte8 *GetData();
+    const Byte8 *GetData() const;
 
-    template<typename ObjType>
-    ObjType *CastToData();
-    template<typename ObjType>
-    const ObjType *CastToData() const;
     template<typename ObjType>
     ObjType *CastToBuffer();
     template<typename ObjType>
@@ -86,11 +87,11 @@ private:
 protected:
     UInt64 _sessionId;      // FS_Packet生命周期内不变更
     SOCKET _socket;         // FS_Packet生命周期内不变更
-
-private:
+    
+protected:
     IMemoryAlloctor *_alloctor;
     Int64 _bufferSize;
-    char *_buff;
+    Byte8 *_buff;
     Int64 _curPos;     // 当前数据末尾位置
 };
 

@@ -38,6 +38,7 @@
 #include "FrightenStone/common/component/Impl/TimeSlice.h"
 #include <list>
 #include "FrightenStone/common/memorypool/memorypool.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -54,6 +55,7 @@ public:
 
 class BASE_EXPORT TimeData
 {
+    OBJ_POOL_CREATE_DEF(TimeData);
 public:
     explicit TimeData(FS_Timer *timer);
     virtual ~TimeData();
@@ -87,6 +89,7 @@ public:
 
 class BASE_EXPORT AsynTimeData
 {
+    OBJ_POOL_CREATE_DEF(AsynTimeData);
 public:
     AsynTimeData();
     Int32 _opType;                      // AsynOpType

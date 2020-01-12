@@ -36,6 +36,8 @@
 #ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
+OBJ_POOL_CREATE_DEF_IMPL(BufferQueueNode, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(IoDataBase, __DEF_OBJ_POOL_OBJ_NUM__);
 
 BufferQueueNode::~BufferQueueNode()
 {

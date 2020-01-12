@@ -30,7 +30,7 @@
  * 
  */
 #include "stdafx.h"
-#include "frame/src/common/log/Defs/LogData.h"
+#include "FrightenStone/common/log/Defs/LogData.h"
 
 FS_NAMESPACE_BEGIN
 static const char *__g_LogLevelDescription[LogLevel::End + 1] = 
@@ -55,5 +55,7 @@ const char *LogLevel::GetDescription(Int32 level)
 {
     return __g_LogLevelDescription[level];
 }
+
+OBJ_POOL_CREATE_DEF_IMPL(LogData, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_NAMESPACE_END

@@ -44,6 +44,7 @@
 #include "FrightenStone/common/component/Impl/FS_ThreadPool.h"
 #include "FrightenStone/common/asyn/asyn.h"
 #include "FrightenStone/common/component/Impl/FS_String.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -58,6 +59,7 @@ class IFS_NetEngine;
 
 class BASE_EXPORT FS_IocpAcceptor : public IFS_Acceptor
 {
+    OBJ_POOL_CREATE_DEF(FS_IocpAcceptor);
 public:
     FS_IocpAcceptor(UInt32 compId
                     , Locker &sessionLocker

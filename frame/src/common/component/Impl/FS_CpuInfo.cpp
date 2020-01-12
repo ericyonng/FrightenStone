@@ -40,7 +40,7 @@
 #include "FrightenStone/common/component/Impl/FS_CpuInfo.h"
 
 FS_NAMESPACE_BEGIN
-
+OBJ_POOL_CREATE_DEF_IMPL(FS_CpuInfo, 32);
 FS_CpuInfo::FS_CpuInfo()
     :_isInit(false)
 #ifdef _WIN32

@@ -36,11 +36,13 @@
 #pragma once
 
 #include "FrightenStone/common/component/Impl/File/FS_File.h"
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT LogFile :public FS_File
 {
+    OBJ_POOL_CREATE_DEF(LogFile);
 public:
     LogFile();
     virtual ~LogFile();

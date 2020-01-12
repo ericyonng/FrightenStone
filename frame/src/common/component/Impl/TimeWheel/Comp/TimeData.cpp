@@ -37,6 +37,9 @@
 
 FS_NAMESPACE_BEGIN
 
+OBJ_POOL_CREATE_DEF_IMPL(TimeData, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DEF_IMPL(AsynTimeData, __DEF_OBJ_POOL_OBJ_NUM__);
+
 bool TimeDataLess::operator ()(const TimeData *l, const TimeData *r) const
 {
     if(!l || !r)

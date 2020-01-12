@@ -40,6 +40,7 @@
 #include <map>
 #include "FrightenStone/common/memorypool/memorypool.h"
 #include <iostream>
+#include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -124,6 +125,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT SmartVar
 {
+    OBJ_POOL_CREATE_DEF(SmartVar);
 public:
     typedef std::map<SmartVar, SmartVar> Dict;
     typedef FS_String Str;
