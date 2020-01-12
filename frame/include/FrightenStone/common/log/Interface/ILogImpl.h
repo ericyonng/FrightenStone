@@ -140,20 +140,6 @@ inline void ILog::net(const char *fmt, const Args&... args)
 }
 
 template<typename... Args>
-inline void ILog::memleak(const char *fmt, const Args&... args)
-{
-    // 构建日志数据
-    LogData *newLogData = new LogData;
-    newLogData->_logTime.FlushTime();
-    newLogData->_logToWrite.AppendFormat("%s<%s>: "
-                                   , newLogData->_logTime.ToString().c_str()
-                                   , LogLevel::GetDescription(LogLevel::Memleak))
-                            .AppendFormat(fmt, args...) << FS_String::endl;
-
-    _WriteLog(LogLevel::Memleak, _GetLogFileIndex(LogFileType::Memleak), newLogData);
-}
-
-template<typename... Args>
 inline void ILog::mempool(const char *fmt, const Args&... args)
 {
     // 构建日志数据
@@ -195,21 +181,6 @@ inline void ILog::sys(const char *funcName, Int32 codeLine, const char *fmt, con
         .AppendFormat(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::Sys, _GetLogFileIndex(LogFileType::Sys), newLogData);
-}
-
-template<typename ObjType, typename... Args>
-inline void ILog::any(const char *fmt, const Args&... args)
-{
-    // 构建日志数据
-    LogData *newLogData = new LogData;
-    newLogData->_logTime.FlushTime();
-    newLogData->_logToWrite.AppendFormat("%s<%s>[%s]: "
-                                         , newLogData->_logTime.ToString().c_str()
-                                         , LogLevel::GetDescription(LogLevel::Any)
-                                         , RTTIUtil::GetByType<ObjType>())
-        .AppendFormat(fmt, args...) << FS_String::endl;
-
-    _WriteLog(LogLevel::Any, _GetLogFileIndex(LogFileType::Any), newLogData);
 }
 
 template<typename... Args>

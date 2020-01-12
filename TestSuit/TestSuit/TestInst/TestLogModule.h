@@ -62,7 +62,7 @@ public:
         while(true)
         {
             fs::SystemUtil::Sleep(1000);
-            g_Log->any<TestLogModule>("hello linux");
+            g_Log->custom("hello linux");
             std::cout << "g_Log suc" << std::endl;
         }
 //         g_EasyGlobal2->Init();

@@ -54,11 +54,6 @@ public:
     };
 };
 
-class BASE_EXPORT ServerCompsMethods
-{
-public:
-    static void WaitForAllCompsReady(const IFS_NetEngine *engine);
-};
 
 FS_NAMESPACE_END
 

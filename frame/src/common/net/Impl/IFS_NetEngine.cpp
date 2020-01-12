@@ -42,6 +42,7 @@
 #include "FrightenStone/common/net/Impl/FS_ConfigMgrFactory.h"
 #include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 #include "FrightenStone/common/net/Defs/ServerCompsDef.h"
+#include "FrightenStone/common/net/Defs/EngineCompDefs.h"
 
 #include "FrightenStone/common/component/Impl/SmartVar/SmartVar.h"
 #include "FrightenStone/common/assist/utils/Impl/FS_TlsUtil.h"
@@ -270,6 +271,10 @@ void IFS_NetEngine::Close()
     // 最后处理
     _AfterClose();
 
+    g_Log->custom("waiting for all comps close...");
+    EngineCompsMethods::WaitForAllCompsFinish(this);
+    g_Log->custom("all comps close now!\nserver will close");
+
     SocketUtil::ClearSocketEnv();
 
     Fs_SafeFree(_pool);
@@ -343,7 +348,7 @@ void IFS_NetEngine::_HandleCompEv_Disconnected(UInt64 sessionId,  UInt32 accepto
 void IFS_NetEngine::_Monitor(FS_ThreadPool *threadPool)
 {
     g_Log->custom("waiting for all comps ready...");
-    ServerCompsMethods::WaitForAllCompsReady(this);
+    EngineCompsMethods::WaitForAllCompsReady(this);
     g_Log->custom("all comps ready now!\nserver suc start");
 
     Time nowTime;

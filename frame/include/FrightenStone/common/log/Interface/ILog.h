@@ -88,10 +88,6 @@ public:
     template<typename ObjType, typename... Args>
     void net(const char *fmt, const Args&... args);
 
-    // 内存泄漏日志
-    // 请使用便利宏_LOGFMT_
-    template<typename... Args>
-    void memleak(const char *fmt, const Args&... args);
     // 请使用便利宏_LOGFMT_
     template<typename... Args>
     void mempool(const char *fmt, const Args&... args);
@@ -103,8 +99,6 @@ public:
     // 请使用便利宏_LOGFMT_
     template<typename ObjType, typename... Args>
     void sys(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
-    template<typename ObjType, typename... Args>
-    void any(const char *fmt, const Args&... args);
     template<typename... Args>
     void custom(const char *fmt, const Args&... args);
 

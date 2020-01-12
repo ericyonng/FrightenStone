@@ -121,7 +121,7 @@ public:
 
         g_consumCount += countMsg;
         end.FlushTime();
-        g_Log->any<ComsumerTask>("comsumer[%u] end consum [%lld] totalmsgs[%llu] msgs escape time[%llu]"
+        g_Log->custom("comsumer[%u] end consum [%lld] totalmsgs[%llu] msgs escape time[%llu]"
                                  ,_id, countMsg, UInt64(g_consumCount), (end - start).GetTotalMicroSeconds());
     }
 
@@ -157,7 +157,7 @@ public:
         }
 
         end.FlushTime();
-        g_Log->any<ComsumerTask>("comsumer[1] end consum [%lld] msgs escape time[%llu]"
+        g_Log->custom("comsumer[1] end consum [%lld] msgs escape time[%llu]"
                                  , countMsg, (end - start).GetTotalMicroSeconds());
     }
     
@@ -213,7 +213,7 @@ public:
         }
 
         end.FlushTime();
-        g_Log->any<GeneratorTask>("queue id[%u] count[%lld] thread end eslcape time[%lld]"
+        g_Log->custom("queue id[%u] count[%lld] thread end eslcape time[%lld]"
                                   , _queueId, count, (end - start).GetTotalMicroSeconds());
         return StatusDefs::Success;
     }
@@ -272,7 +272,7 @@ public:
         }
         
         getchar();
-        g_Log->any<TestMessageQueue2>(_LOGFMT_("will close all test"));
+        g_Log->custom(_LOGFMT_("will close all test"));
         g_testMsgQueue.BeforeClose();
         pool->Close();
         g_testMsgQueue.Close();

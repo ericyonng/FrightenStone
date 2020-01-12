@@ -64,7 +64,6 @@ class LogCaches;
 
 class BASE_EXPORT FS_Log : public ILog
 {
-    OBJ_POOL_CREATE_DEF(FS_Log);
 public:
     FS_Log();
     virtual ~FS_Log();

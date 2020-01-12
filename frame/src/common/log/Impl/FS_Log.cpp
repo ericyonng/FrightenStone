@@ -48,8 +48,6 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_Log, 1);
-
 FS_Log::FS_Log()
     : _threadPool(NULL)
     , _threadWorkIntervalMsTime(LOG_THREAD_INTERVAL_MS_TIME)
@@ -60,10 +58,10 @@ FS_Log::FS_Log()
     , _logDatas{NULL}
     , _logCaches{NULL}
 {
-    // log根目录名以进程名+Log
-    auto programName = FS_FileUtil::ExtractFileWithoutExtension(SystemUtil::GetCurProgramName().RemoveZeroTail());
-    programName.AppendFormat("%s", "Log");
-    InitModule(programName.c_str());
+    // log根目录名以进程名+Log 不可放在构造初始化日志太早了
+//     auto programName = FS_FileUtil::ExtractFileWithoutExtension(SystemUtil::GetCurProgramName().RemoveZeroTail());
+//     programName.AppendFormat("%s", "Log");
+    // InitModule(programName.c_str());
 }
 
 FS_Log::~FS_Log()
@@ -313,16 +311,12 @@ Int32 FS_Log::_GetLogFileIndex(Int32 logTypeEnum)
 {
     switch(logTypeEnum)
     {
-        case LogFileType::Any:
-            return LogDefs::_SYSLOG_Any_;
         case LogFileType::Crash:
             return LogDefs::_SYSLOG_crash_;
         case LogFileType::Custom:
             return LogDefs::_SYSLOG_Custom_;
         case LogFileType::Details:
             return LogDefs::_SYSLOG_details_;
-        case LogFileType::Memleak:
-            return LogDefs::_SYSLOG_memleak_;
         case LogFileType::Mempool:
             return LogDefs::_SYSLOG_mempool_;
         case LogFileType::Net:
@@ -331,8 +325,6 @@ Int32 FS_Log::_GetLogFileIndex(Int32 logTypeEnum)
             return LogDefs::_SYSLOG_objpool_;
         case LogFileType::Sys:
             return LogDefs::_SYSLOG_sys_;
-        case LogFileType::Testcode:
-            return LogDefs::_TESTLOG_testcode_;
         default:
             break;
     }
@@ -377,7 +369,6 @@ void FS_Log::_SetConsoleColor(Int32 level)
         break;
         case LogLevel::Error:
         case LogLevel::Crash:
-        case LogLevel::Memleak:
         {
             SystemUtil::SetConsoleColor(FS_ConsoleColor::Fg_Red | FS_ConsoleColor::Bg_Black);
         }

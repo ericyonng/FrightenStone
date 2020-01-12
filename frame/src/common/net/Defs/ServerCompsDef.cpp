@@ -33,15 +33,4 @@
 
 FS_NAMESPACE_BEGIN
 
-void ServerCompsMethods::WaitForAllCompsReady(const IFS_NetEngine *engine)
-{
-    while(true)
-    {
-        if(engine->IsCompAllReady())
-            break;
-
-        SystemUtil::Sleep(1000);
-    }
-}
-
 FS_NAMESPACE_END

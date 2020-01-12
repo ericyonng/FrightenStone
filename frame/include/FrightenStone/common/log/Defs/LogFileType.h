@@ -48,14 +48,11 @@ public:
         Begin = 0,
         Crash = Begin,
         Details,
-        Memleak,
         Mempool,
         ObjPool,
         Net,
         Sys,
-        Any,
         Custom,
-        Testcode,
     };
 };
 

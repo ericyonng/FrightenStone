@@ -56,11 +56,9 @@ public:
 
         Crash,
         Net,
-        Memleak,
         MemPool,
         ObjPool,
         Sys,
-        Any,
         Custom,
 
         End,
