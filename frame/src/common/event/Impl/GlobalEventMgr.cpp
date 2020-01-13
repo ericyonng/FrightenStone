@@ -29,6 +29,9 @@
 #include "stdafx.h"
 #include "FrightenStone/common/event/Impl/GlobalEventMgr.h"
 #include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
+#include "FrightenStone/common/log/Log.h"
+
+#define FS_EVENT_GIVE_WARNING_QUANTITY      100         // 当某个事件被监听达到100个以上时需要打印日志警告
 
 FS_NAMESPACE_BEGIN
 
@@ -42,9 +45,37 @@ GlobalEventMgr::~GlobalEventMgr()
     STLUtil::DelMapContainer(_eventFilters);
 }
 
-void GlobalEventMgr::FireEvent(Int32 id)
+void GlobalEventMgr::FireEvent(FS_Event *ev)
 {
+    BeforeFireEvent();
+    _FireEvent(ev);
+    AfterFireEvent();
 
+    if(!ev->IsDontDelAfterFire())
+        Fs_SafeFree(ev);
 }
+
+void GlobalEventMgr::_FireEvent(FS_Event *ev)
+{
+    _ListenersMap::iterator mIt = _listeners.find(ev->GetId());
+    if(mIt != _listeners.end())
+    {
+        _Listeners &listeners = mIt->second;
+
+        size_t listenerSz = listeners.size();
+        // 当一个事件的监听数量大于100时给个warning打印
+        if(listenerSz > FS_EVENT_GIVE_WARNING_QUANTITY)
+            g_Log->w<GlobalEventMgr>(_LOGFMT_("_FireEvent listener sz %u, eventId %d"), listenerSz, ev->GetId());
+
+        for(_Listeners::iterator lIt = listeners.begin();
+            lIt != listeners.end();
+            lIt++)
+        {
+            _Listener &listener = *lIt;
+            listener._listenCallBack->Invoke(ev);
+        }
+    }
+}
+
 FS_NAMESPACE_END
 

@@ -36,7 +36,7 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType, typename... Args>
-ObjType *FS_ClassFactory::Create(Args&&... args)
+inline ObjType *FS_ClassFactory::Create(Args&&... args)
 {
     return new ObjType(std::forward<Args>(args)...);
 }

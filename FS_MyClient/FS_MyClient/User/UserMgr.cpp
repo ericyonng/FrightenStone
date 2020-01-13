@@ -48,7 +48,6 @@ UserMgr::~UserMgr()
 
 Int32 UserMgr::OnInitialize()
 {
-    _dispatcher = _logic->GetDispatcher();
     _userFacade->BindLogic(_logic);
 
     Int32 st = _userFacade->OnInitialize();
@@ -137,7 +136,7 @@ void UserMgr::RemoveUser(UInt64 sessionId)
 
 User *UserMgr::NewUser(UInt64 sessionId)
 {
-    auto user = new User(sessionId, ++_curMaxUserId, _logic);
+    auto user = new User(sessionId, ++_curMaxUserId);
     _sessionIdRefUsers.insert(std::make_pair(sessionId, user));
     _userIdRefUsers.insert(std::make_pair(_curMaxUserId, user));
     return user;

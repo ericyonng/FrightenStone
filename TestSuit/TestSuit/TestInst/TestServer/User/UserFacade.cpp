@@ -30,6 +30,8 @@
 #include "TestInst/TestServer/User/UserFacade.h"
 #include "TestInst/TestServer/User/UserMgr.h"
 #include "TestInst/TestServer/User/User.h"
+#include "TestInst/TestServer/User/IUserMgr.h"
+#include "TestInst/TestServer/GlobalObjs/GlobalObjsDef.h"
 
 Int32 UserFacade::OnInitialize()
 {
@@ -85,10 +87,10 @@ void UserFacade::_OnUserLoginReq(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder
     user->SendData(&ret);
 }
 
-void UserFacade::_OnUserLogoutReq(UInt64 userId, fs::NetMsgDecoder *msgDecoder)
+void UserFacade::_OnUserLogoutReq(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
 {
     // TODO:
-    auto user = g_UserMgr->GetUserByUserId(userId);
+    auto user = g_UserMgr->GetUserBySessionId(sessionId);
     if(!user)
         return;
 
@@ -126,10 +128,10 @@ void UserFacade::_OnUserLogoutReq(UInt64 userId, fs::NetMsgDecoder *msgDecoder)
     //     s.Finish();
 }
 
-void UserFacade::_OnUserCheckHeartReq(UInt64 userId, fs::NetMsgDecoder *msgDecoder)
+void UserFacade::_OnUserCheckHeartReq(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
 {
     // TODO:
-    auto user = g_UserMgr->GetUserByUserId(userId);
+    auto user = g_UserMgr->GetUserBySessionId(sessionId);
     if(!user)
         return;
 

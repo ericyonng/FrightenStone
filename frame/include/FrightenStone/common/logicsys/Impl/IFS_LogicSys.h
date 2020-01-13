@@ -36,12 +36,28 @@
 
 FS_NAMESPACE_BEGIN
 
+class ILogicSysInfo;
+class IFS_MsgDispatcher;
+class FS_String;
+
 class BASE_EXPORT IFS_LogicSys
 {
 public:
     IFS_LogicSys();
     virtual ~IFS_LogicSys();
-    
+
+public:
+    void BindDispatcher(IFS_MsgDispatcher *dispatcher);
+
+public:
+    const FS_String &GetSysName() const;
+    const ILogicSysInfo *GetSysInfo() const;
+    void SetSysInfo(const ILogicSysInfo *sysInfo);
+
+protected:
+    IFS_MsgDispatcher *_dispatcher;
+    const ILogicSysInfo *_sysInfo;
+
 };
 FS_NAMESPACE_END
 

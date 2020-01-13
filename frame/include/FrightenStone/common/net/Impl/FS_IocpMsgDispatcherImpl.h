@@ -47,6 +47,16 @@ inline Int32 FS_IocpMsgDispatcher::GetSessionCnt() const
     return _curSessionQuatity;
 }
 
+inline TimeWheel *FS_IocpMsgDispatcher::GetTimeWheel()
+{
+    return _timeWheel;
+}
+
+inline const IFS_Session *FS_IocpMsgDispatcher::GetSession(UInt64 sessionId) const
+{
+    return reinterpret_cast<const IFS_Session *>(_GetSession(sessionId));
+}
+
 inline void FS_IocpMsgDispatcher::_RemoveFromPostRecvQueue(FS_IocpSession *session)
 {
     _toPostRecv.erase(session);
@@ -72,6 +82,16 @@ inline FS_IocpSession *FS_IocpMsgDispatcher::_GetSession(UInt64 sessionId)
 
     return iterSession->second;
 }
+
+inline const FS_IocpSession *FS_IocpMsgDispatcher::_GetSession(UInt64 sessionId) const
+{
+    auto iterSession = _sessions.find(sessionId);
+    if(iterSession == _sessions.end())
+        return NULL;
+
+    return iterSession->second;
+}
+
 
 FS_NAMESPACE_END
 

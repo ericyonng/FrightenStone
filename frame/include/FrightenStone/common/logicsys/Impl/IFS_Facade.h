@@ -36,6 +36,7 @@
 FS_NAMESPACE_BEGIN
 
 class IFS_BusinessLogic;
+class IFS_MsgDispatcher;
 
 class BASE_EXPORT IFS_Facade
 {
@@ -56,7 +57,8 @@ protected:
 
     bool _inited;
     bool _started;
-    IFS_BusinessLogic * _logic;
+    IFS_MsgDispatcher *_dispatcher;
+    IFS_BusinessLogic *_logic;
 };
 
 FS_NAMESPACE_END

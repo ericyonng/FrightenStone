@@ -31,11 +31,12 @@
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "TestInst/TestServer/User/IUserMgr.h"
 
 class User;
 class UserFacade;
 
-class UserMgr : public fs::IBaseLogicSysMgr
+class UserMgr : public IUserMgr
 {
 public:
     UserMgr();
@@ -50,18 +51,41 @@ public:
     void WillClose();
 
 public:
+    // 注册User系统
+    virtual Int32 RegisterUserSys(fs::IFS_LogicSysFactory *sysFactory);
+
+    // 取得User系统信息
+    virtual const fs::ILogicSysInfo *GetSysInfo(const fs::FS_String &sysName) const;
+    // 取得User系统工厂
+    virtual const fs::IFS_LogicSysFactory *GetSysFactory(const fs::FS_String &sysName) const;
+    // 取得User系统工厂字典
+    virtual const std::map<fs::FS_String, fs::IFS_LogicSysFactory *> &GetSysFactoriesDict() const;
+    // 取得User系统信息列表
+    virtual const std::vector<fs::ILogicSysInfo *> &GetSysInfosList() const;
+
+public:
+    // 创建用户
+    virtual Int32 CreateUser(UInt64 sessionId);
+
+public:
     User *GetUserBySessionId(UInt64 sessionId);
     User *GetUserByUserId(UInt64 userId);
     void RemoveUser(UInt64 sessionId);
-    User *NewUser(UInt64 sessionId);
+    
+private:
+    User *_NewUser(UInt64 sessionId);
+
+private:
+    void _ClearUsers();
 
 private:
     UInt64 _curMaxUserId;
     std::map<UInt64, User *> _sessionIdRefUsers;
     std::map<UInt64, User *> _userIdRefUsers;
 
-    fs::IFS_MsgDispatcher *_dispatcher;             // 消息分发
     UserFacade *_userFacade;
-};
 
-extern UserMgr *g_UserMgr;
+    std::vector<fs::ILogicSysInfo *> _sysInfoList;                                  // 系统信息列表
+    std::map<fs::FS_String, fs::ILogicSysInfo *> _sysNameRefSysInfoDict;            // 用户系统信息
+    std::map<fs::FS_String, fs::IFS_LogicSysFactory *> _sysNameRefUserSysFactory;   // 用户系统工厂
+};

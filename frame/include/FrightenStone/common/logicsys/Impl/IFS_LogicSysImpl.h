@@ -31,11 +31,28 @@
 
 FS_NAMESPACE_BEGIN
 inline IFS_LogicSys::IFS_LogicSys()
+    :_dispatcher(NULL)
+    ,_sysInfo(NULL)
 {
 }
 
 inline IFS_LogicSys::~IFS_LogicSys()
 {
+}
+
+inline void IFS_LogicSys::BindDispatcher(fs::IFS_MsgDispatcher *dispatcher)
+{
+    _dispatcher = dispatcher;
+}
+
+inline const ILogicSysInfo *IFS_LogicSys::GetSysInfo() const
+{
+    return _sysInfo;
+}
+
+inline void IFS_LogicSys::SetSysInfo(const ILogicSysInfo *sysInfo)
+{
+    _sysInfo = sysInfo;
 }
 
 FS_NAMESPACE_END

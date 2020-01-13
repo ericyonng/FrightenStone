@@ -31,18 +31,16 @@
 #pragma once
 FS_NAMESPACE_BEGIN
 
-template<typename LogicSysType>
-inline LogicSysInfo<LogicSysType>::LogicSysInfo()
+template <typename LogicSys>
+inline LogicSysInfo<LogicSys>::LogicSysInfo()
 {
-
+    _sysName = RTTIUtil::GetByType<LogicSys>();
 }
 
-template<typename LogicSysType>
-inline LogicSysInfo<LogicSysType>::~LogicSysInfo()
+template <typename LogicSys>
+inline LogicSysInfo<LogicSys>::~LogicSysInfo()
 {
-
 }
-
 FS_NAMESPACE_END
 
 #endif

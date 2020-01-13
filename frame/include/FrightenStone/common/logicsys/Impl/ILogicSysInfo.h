@@ -34,15 +34,28 @@
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/component/Impl/FS_String.h"
+#include "FrightenStone/common/assist/utils/Impl/RTTIUtil.h"
 
 FS_NAMESPACE_BEGIN
+
 
 class BASE_EXPORT ILogicSysInfo
 {
 public:
     ILogicSysInfo() {}
     virtual ~ILogicSysInfo() {}
+
+    // 取得系统名
+    const FS_String &GetSysName() const { return _sysName; }
+    FS_String ToString() const;
+
+protected:
+    FS_String _sysName;
 };
+
+
+
 
 FS_NAMESPACE_END
 

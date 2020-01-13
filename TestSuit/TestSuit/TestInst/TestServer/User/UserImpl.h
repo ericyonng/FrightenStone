@@ -32,6 +32,36 @@ inline void User::SucRecvMsg()
 {
     ++_recvMsgId;
 }
+// 取得指定用户系统(泛型方法)
+template <typename UserSys>
+inline UserSys *User::GetSys()
+{
+    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
+    if(UNLIKELY(sysName == ""))
+        return NULL;
+
+    return static_cast<UserSys *>(GetSys(sysName));
+}
+
+template <typename UserSys>
+inline const UserSys *User::GetSys() const
+{
+    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
+    if(UNLIKELY(sysName == ""))
+        return NULL;
+
+    return static_cast<UserSys *>(GetSys(sysName));
+}
+
+inline std::vector<fs::IUserSys *> &User::GetSyss()
+{
+    return _userSysList;
+}
+
+inline const std::vector<fs::IUserSys *> &User::GetSyss() const
+{
+    return _userSysList;
+}
 
 inline UInt64 User::GetSessionId() const
 {

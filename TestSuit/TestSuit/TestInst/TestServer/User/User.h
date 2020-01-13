@@ -32,10 +32,12 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 
+class IUserMgr;
+
 class User : public fs::IUserSys
 {
 public:
-    User(UInt64 sessionId, UInt64 userId, fs::IFS_BusinessLogic *logic);
+    User(IUserMgr *userMgr, UInt64 sessionId, UInt64 userId);
     ~User();
 
 public:
@@ -43,6 +45,21 @@ public:
     Int32 Logout();
     void CheckHeart();
     void SucRecvMsg();
+
+public:
+    // 取得指定用户系统(泛型方法)
+    template <typename UserSys>
+    UserSys *GetSys();
+    template <typename UserSys>
+    const UserSys *GetSys() const;
+
+    // 取得指定用户系统(非泛型方法)
+    fs::IUserSys *GetSys(const fs::FS_String &sysName);
+    const fs::IUserSys *GetSys(const fs::FS_String &sysName) const;
+
+    // 取得用户系统列表
+    std::vector<fs::IUserSys *> &GetSyss();
+    const std::vector<fs::IUserSys *> &GetSyss() const;
 
 public:
     virtual UInt64 GetSessionId() const;
@@ -57,6 +74,15 @@ public:
     void OnConnected();
 
 private:
+    void _AddSys(fs::IUserSys *sys);
+    fs::IUserSys *_CreateSys(const fs::ILogicSysInfo *sysInfo);
+    void _RemoveSyss();
+
+    Int32 _Create();
+
+private:
+    friend class UserMgr;
+
     UInt64 _sessionId;
     UInt64 _userId;
     // 用于server检测接收到的消息ID是否连续 每收到一个客户端消息会自增1以便与客户端的msgid校验，不匹配则报错处理（说明丢包等）
@@ -64,8 +90,12 @@ private:
     // 测试接收发逻辑用
     // 用于client检测接收到的消息ID是否连续 每发送一个消息会自增1以便与客户端的sendmsgid校验，不匹配则客户端报错（说明丢包等）
     Int32 _sendMsgId = 1;
-    fs::IFS_BusinessLogic *_logic;
-    fs::IFS_MsgDispatcher *_dispatcher;
+
+    IUserMgr *_userMgr;
+
+    std::vector<fs::IUserSys *> _userSysList;                       // 用户系统列表
+    std::map<fs::FS_String, fs::IUserSys *> _userSysNameRefSyss;    // 用户系统集;         key: 系统名, value: 系统
+    std::map<fs::FS_String, fs::IUserSys *> _iuserSysNameRefSyss;   //; 用户系统接口集;    key: 系统对应的接口类名, value: 系统
 };
 
 #include "TestInst/TestServer/User/UserImpl.h"

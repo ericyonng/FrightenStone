@@ -565,6 +565,7 @@ void FS_IocpMsgDispatcher::_OnSessionDisconnected(FS_IocpSession *session)
 void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *connectedMsg)
 {
     const UInt64 sessionId = connectedMsg->_sessionId;
+    ++_curSessionQuatity;
 
     // 创建session对象并初始化
     auto newSession = FS_SessionFactory::Create(sessionId
@@ -585,7 +586,14 @@ void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *conn
                                    , addr->GetAddr().c_str()
                                    , addr->GetPort());
 
-    auto newUser = _logic->OnSessionConnected(sessionId);
+    const Int32 st = _logic->OnSessionConnected(sessionId);
+    if(st != StatusDefs::Success)
+    {
+        // 失败则移除session
+        _MaskCloseSession(newSession);
+        return;
+    }
+
     auto userDisconnectedDelegates = connectedMsg->_onUserDisconnectedRes;
     if(userDisconnectedDelegates)
     {
@@ -599,7 +607,6 @@ void FS_IocpMsgDispatcher::_OnSessionConnected(FS_NetSessionWillConnectMsg *conn
     // post recv 刷新心跳时间
     if(_DoPostRecv(newSession))
         newSession->UpdateHeartBeatExpiredTime();
-    ++_curSessionQuatity;
 }
 
 void FS_IocpMsgDispatcher::_OnMsgArrived(FS_NetArrivedMsg *arrivedMsg)
@@ -708,6 +715,13 @@ void FS_IocpMsgDispatcher::_OnSessionMsgHandle(FS_IocpSession *session)
         _engine->_HandleCompEv_RecvMsgAmount();
         recvBuffer->PopFront(_msgDecoder->GetMsgLen());
     }
+}
+
+void FS_IocpMsgDispatcher::_MaskCloseSession(FS_IocpSession *session)
+{
+    session->EnableDisconnect();
+    session->MaskClose();
+    _toRemove.insert(session);
 }
 
 FS_NAMESPACE_END

@@ -21,33 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_LogicSysFactory.h
+ * @file  : IUserMgr.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2020/1/8
+ * @date  : 2020/01/13
  * @brief :
  */
-#ifndef __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_LogicSysFactory_H__
-#define __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_LogicSysFactory_H__
 
 #pragma once
+
 #include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
 
-FS_NAMESPACE_BEGIN
-
-class IFS_LogicSys;
-class ILogicSysInfo;
-
-class BASE_EXPORT IFS_LogicSysFactory
+class IUserMgr : public fs::IBaseLogicSysMgr
 {
 public:
-    IFS_LogicSysFactory() {}
-    virtual ~IFS_LogicSysFactory() {}
+    // 注册User系统(模板方法)
+    template <typename IUserSysFactory>
+    Int32 RegisterUserSys();
+    // 注册User系统
+    virtual Int32 RegisterUserSys(fs::IFS_LogicSysFactory *sysFactory) = 0;
 
-    virtual IFS_LogicSys *CreateSys() const = 0;
-    virtual ILogicSysInfo *CreateSysInfo() const = 0;
+    // 取得User系统信息
+    virtual const fs::ILogicSysInfo *GetSysInfo(const fs::FS_String &sysName) const = 0;
+    // 取得User系统工厂
+    virtual const fs::IFS_LogicSysFactory *GetSysFactory(const fs::FS_String &sysName) const = 0;
+    // 取得User系统工厂字典
+    virtual const std::map<fs::FS_String, fs::IFS_LogicSysFactory *> &GetSysFactoriesDict() const = 0;
+    // 取得User系统信息列表
+    virtual const std::vector<fs::ILogicSysInfo *> &GetSysInfosList() const = 0;
+
+    // 创建用户
+    virtual Int32 CreateUser(UInt64 sessionId) = 0;
+
+    // 获取用户
+    virtual User *GetUserBySessionId(UInt64 sessionId) = 0;
+    // 移除用户
+    virtual void RemoveUser(UInt64 sessionId) = 0;
 };
 
-FS_NAMESPACE_END
-
-#endif
+#include "TestInst/TestServer/User/IUserMgrImpl.h"

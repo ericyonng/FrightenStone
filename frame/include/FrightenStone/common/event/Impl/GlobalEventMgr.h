@@ -34,6 +34,8 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/event/Impl/EventManager.h"
+#include "FrightenStone/common/event/Impl/FS_Event.h"
+#include "FrightenStone/common/event/Impl/IFS_EventFilter.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -65,6 +67,7 @@ private:
 };
 
 FS_NAMESPACE_END
+
 #include "FrightenStone/common/event/Impl/GlobalEventMgrImpl.h"
 
 #endif

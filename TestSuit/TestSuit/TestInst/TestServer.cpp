@@ -33,8 +33,9 @@
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
 #include "FrightenStone/exportbase.h"
 #include "TestInst/TestServer/User/UserMgrFactory.h"
-#include "TestInst/TestServer/User/UserMgr.h"
 #include "TestInst/TestServer/User/User.h"
+#include "TestInst/TestServer/GlobalObjs/GlobalObjsDef.h"
+#include "TestInst/TestServer/User/IUserMgr.h"
 
 class MyLogic : public fs::IFS_BusinessLogic
 {
@@ -78,11 +79,18 @@ public:
         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }
 
-    virtual fs::IUserSys *OnSessionConnected(UInt64 sessionId)
+    virtual Int32 OnSessionConnected(UInt64 sessionId)
     {
-        auto newUser = g_UserMgr->NewUser(sessionId);
+        auto ret = g_UserMgr->CreateUser(sessionId);
+        if(ret != StatusDefs::Success)
+        {
+            g_Log->e<MyLogic>(_LOGFMT_("create new user fail ret[%d] sessionId[%llu]"), ret, sessionId);
+            return ret;
+        }
+
+        auto newUser = g_UserMgr->GetUserBySessionId(sessionId);
         newUser->OnConnected();
-        return newUser;
+        return StatusDefs::Success;
     }
 
     virtual void OnConnectorConnectOpFinish()

@@ -84,11 +84,11 @@ public:
         // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
     }
 
-    virtual fs::IUserSys *OnSessionConnected(UInt64 sessionId)
+    virtual Int32 OnSessionConnected(UInt64 sessionId)
     {
         auto newUser = g_UserMgr->NewUser(sessionId);
         newUser->OnConnected();
-        return newUser;
+        return StatusDefs::Success;
     }
 
     virtual void OnConnectorConnectOpFinish()

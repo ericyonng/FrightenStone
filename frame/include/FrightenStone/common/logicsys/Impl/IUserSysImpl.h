@@ -32,6 +32,30 @@
 
 FS_NAMESPACE_BEGIN
 
+inline IUserSys::IUserSys()
+{
+
+}
+
+inline Int32 IUserSys::OnCreate()
+{
+    return StatusDefs::Success;
+}
+
+inline void IUserSys::OnAfterCreate()
+{
+}
+
+inline Int32 IUserSys::_Create(User *user)
+{
+    _user = user;
+    return OnCreate();
+}
+
+inline void IUserSys::_AfterCreate()
+{
+}
+
 FS_NAMESPACE_END
 
 #endif

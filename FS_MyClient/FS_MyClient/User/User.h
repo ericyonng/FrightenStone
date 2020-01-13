@@ -36,7 +36,7 @@
 class User : public fs::IUserSys
 {
 public:
-    User(UInt64 sessionId, UInt64 userId, fs::IFS_BusinessLogic *dispatcher);
+    User(UInt64 sessionId, UInt64 userId);
     ~User();
 
 public:

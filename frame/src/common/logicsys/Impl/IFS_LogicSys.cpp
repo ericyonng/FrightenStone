@@ -21,33 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_LogicSysFactory.h
+ * @file  : IFS_LogicSys.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2020/1/8
+ * @date  : 2020/01/14
  * @brief :
  */
-#ifndef __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_LogicSysFactory_H__
-#define __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_LogicSysFactory_H__
+#include "stdafx.h"
+#include "FrightenStone/common/logicsys/Impl/IFS_LogicSys.h"
+#include "FrightenStone/common/component/Impl/FS_String.h"
+#include "FrightenStone/common/logicsys/Impl/ILogicSysInfo.h"
 
-#pragma once
-#include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
+namespace
+{
+    const fs::FS_String __emptyStr;
+}
 
 FS_NAMESPACE_BEGIN
 
-class IFS_LogicSys;
-class ILogicSysInfo;
-
-class BASE_EXPORT IFS_LogicSysFactory
+const FS_String &IFS_LogicSys::GetSysName() const
 {
-public:
-    IFS_LogicSysFactory() {}
-    virtual ~IFS_LogicSysFactory() {}
-
-    virtual IFS_LogicSys *CreateSys() const = 0;
-    virtual ILogicSysInfo *CreateSysInfo() const = 0;
-};
+    return _sysInfo ? _sysInfo->GetSysName() : __emptyStr;
+}
 
 FS_NAMESPACE_END
-
-#endif

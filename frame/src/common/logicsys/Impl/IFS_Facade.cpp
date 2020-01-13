@@ -28,8 +28,12 @@
  */
 #include "stdafx.h"
 #include "FrightenStone/common/logicsys/Impl/IFS_Facade.h"
+#include "FrightenStone/common/net/Impl/IFS_BusinessLogic.h"
 
 FS_NAMESPACE_BEGIN
-
-
+void IFS_Facade::BindLogic(IFS_BusinessLogic *logic)
+{
+    _logic = logic;
+    _dispatcher = _logic->GetDispatcher();
+}
 FS_NAMESPACE_END

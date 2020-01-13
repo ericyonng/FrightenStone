@@ -33,14 +33,11 @@ FS_NAMESPACE_BEGIN
 inline IFS_Facade::IFS_Facade()
     :_inited(false)
     , _started(false)
-    , _logic(NULL) 
+    , _dispatcher(NULL) 
+    ,_logic(NULL)
 {
 }
 
-inline void IFS_Facade::BindLogic(IFS_BusinessLogic *logic)
-{
-    _logic = logic;
-}
 FS_NAMESPACE_END
 
 #endif

@@ -37,11 +37,11 @@ FS_NAMESPACE_BEGIN
 
 class EventManager;
 
-class BASE_EXPORT IEventFilter
+class BASE_EXPORT IFS_EventFilter
 {
 public:
-    IEventFilter() {}
-    virtual ~IEventFilter() {}
+    IFS_EventFilter() {}
+    virtual ~IFS_EventFilter() {}
 
 public:
     virtual void Register(EventManager &evMgr) = 0;

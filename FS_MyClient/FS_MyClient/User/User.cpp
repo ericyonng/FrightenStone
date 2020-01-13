@@ -31,15 +31,13 @@
 #include "FS_MyClient/FS_MyClient/ClientCfgs/FS_ClientCfgMgr.h"
 #include "FS_MyClient/FS_MyClient/Defs/StatisticsData.h"
 
-User::User(UInt64 sessionId, UInt64 userId, fs::IFS_BusinessLogic *logic)
+User::User(UInt64 sessionId, UInt64 userId)
     :_sessionId(sessionId)
     , _userId(userId)
     , _recvMsgId(1)
     , _sendMsgId(1)
-    , _logic(logic)
     ,_sendTest(NULL)
 {
-    _dispatcher = _logic->GetDispatcher();
 }
 
 User::~User()

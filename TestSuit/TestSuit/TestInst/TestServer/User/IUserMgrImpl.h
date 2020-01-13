@@ -21,33 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_LogicSysFactory.h
+ * @file  : IUserMgrImpl.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2020/1/8
+ * @date  : 2020/01/13
  * @brief :
  */
-#ifndef __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_LogicSysFactory_H__
-#define __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_LogicSysFactory_H__
-
 #pragma once
-#include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
 
-FS_NAMESPACE_BEGIN
-
-class IFS_LogicSys;
-class ILogicSysInfo;
-
-class BASE_EXPORT IFS_LogicSysFactory
+template <typename IUserSysFactory>
+inline Int32 IUserMgr::RegisterUserSys()
 {
-public:
-    IFS_LogicSysFactory() {}
-    virtual ~IFS_LogicSysFactory() {}
+    auto userSysFactory = new IUserSysFactory();
+    int regRet = RegisterUserSys(userSysFactory);
+    if(regRet != StatusDefs::Success)
+        delete userSysFactory;
 
-    virtual IFS_LogicSys *CreateSys() const = 0;
-    virtual ILogicSysInfo *CreateSysInfo() const = 0;
-};
-
-FS_NAMESPACE_END
-
-#endif
+    return regRet;
+}

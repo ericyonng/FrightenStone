@@ -37,12 +37,12 @@
 
 FS_NAMESPACE_BEGIN
 
-template<typename LogicSysType>
+template <typename LogicSys>
 class LogicSysInfo : public ILogicSysInfo
 {
 public:
     LogicSysInfo();
-    ~LogicSysInfo();
+    virtual ~LogicSysInfo();
 };
 
 FS_NAMESPACE_END

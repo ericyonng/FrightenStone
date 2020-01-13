@@ -47,6 +47,7 @@ class  IFS_MsgTransfer;
 class  IFS_BusinessLogic;
 class  ConcurrentMessageQueueNoThread;
 struct DispatcherCfgs;
+class IFS_Session;
 
 class BASE_EXPORT IFS_MsgDispatcher : public IFS_EngineComp
 {
@@ -60,6 +61,8 @@ public:
     virtual void CloseSession(UInt64 sessionId) = 0;
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic) = 0;
     virtual Int32 GetSessionCnt() const = 0;
+    virtual TimeWheel *GetTimeWheel() = 0;
+    virtual const IFS_Session *GetSession(UInt64 sessionId) const = 0;
 
     // 获取生产者id
     virtual UInt32 GetGeneratorId() const;

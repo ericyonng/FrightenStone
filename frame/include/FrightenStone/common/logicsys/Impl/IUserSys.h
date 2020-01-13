@@ -33,19 +33,37 @@
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
 #include "FrightenStone/common/logicsys/Impl/IFS_LogicSys.h"
+#include "FrightenStone/common/status/status.h"
+
+class User;
 
 FS_NAMESPACE_BEGIN
+
+class IFS_BusinessLogic;
+class IFS_MsgDispatcher;
 
 class BASE_EXPORT IUserSys : public IFS_LogicSys
 {
 public:
-    IUserSys() {}
+    IUserSys();
     ~IUserSys() {}
     virtual void Release() { delete this; }
 
 public:
     virtual UInt64 GetSessionId() const = 0;
     virtual void Close() = 0;
+
+    virtual Int32 OnCreate();
+    virtual void OnAfterCreate();
+    
+private:
+    Int32 _Create(User *user);
+    void _AfterCreate();
+
+private:
+    friend class User;
+
+    User *_user;        // TODO:业务逻辑层需要移出引擎框架
 };
 
 FS_NAMESPACE_END

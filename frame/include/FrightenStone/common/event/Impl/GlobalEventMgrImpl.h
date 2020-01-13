@@ -29,8 +29,34 @@
 #ifdef __Frame_Include_FrightenStone_Common_Event_Impl_GlobalEventMgr_H__
 #pragma once
 
+FS_NAMESPACE_BEGIN
+
 inline void GlobalEventMgr::FireEvent(Int32 id)
 {
-    FireEvent(new LLBC_Event(id));
+    FireEvent(new FS_Event(id));
 }
+
+template <typename Filter>
+inline Int64 GlobalEventMgr::AddEventFilter()
+{
+    ++_curEventFilterId;
+    auto *filter = new Filter();
+    filter->Register(*this);
+    _eventFilters.insert(std::make_pair(_curEventFilterId, filter));
+    return _curEventFilterId;
+}
+
+inline void GlobalEventMgr::RemoveEventFilter(Int64 filterId)
+{
+    auto it = _eventFilters.find(filterId);
+    if(it == _eventFilters.end())
+        return;
+
+    it->second->UnRegister(*this);
+    Fs_SafeFree(it->second);
+    _eventFilters.erase(it);
+}
+
+FS_NAMESPACE_END
+
 #endif

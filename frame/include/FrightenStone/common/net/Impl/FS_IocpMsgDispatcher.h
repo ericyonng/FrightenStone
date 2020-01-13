@@ -79,6 +79,8 @@ public:
     virtual void AfterClose();
     virtual void BindBusinessLogic(IFS_BusinessLogic *businessLogic);
     virtual Int32 GetSessionCnt() const;
+    virtual TimeWheel *GetTimeWheel();
+    virtual const IFS_Session *GetSession(UInt64 sessionId) const;
     // 发送消息msg在内部会被拷贝到缓冲区
     virtual void SendData(UInt64 sessionId, NetMsg_DataHeader *msg);
     virtual void CloseSession(UInt64 sessionId);
@@ -109,6 +111,7 @@ private:
     /* 杂项 */
 private:
     FS_IocpSession *_GetSession(UInt64 sessionId);
+    const FS_IocpSession *_GetSession(UInt64 sessionId) const;
     void _PrintAlloctorOccupiedInfo();
 
     /* 消息队列处理 */
@@ -130,6 +133,9 @@ private:
     void _OnMsgArrived(FS_NetArrivedMsg *arrivedMsg);
     // 会话消息处理
     void _OnSessionMsgHandle(FS_IocpSession *session);
+
+private:
+    void _MaskCloseSession(FS_IocpSession *session);
 
 private:
     DispatcherCfgs *_cfgs;

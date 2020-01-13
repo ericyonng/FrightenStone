@@ -30,12 +30,12 @@
 #include "TestInst/TestServer/User/UserMgr.h"
 #include "TestInst/TestServer/User/User.h"
 #include "TestInst/TestServer/User/UserFacade.h"
+#include "TestInst/TestServer/GlobalObjs/GlobalObjsDef.h"
 
-UserMgr *g_UserMgr = NULL;
+IUserMgr *g_UserMgr = NULL;
 
 UserMgr::UserMgr()
     :_curMaxUserId(0)
-    ,_dispatcher(NULL)
 {
     _userFacade = new UserFacade;
     g_UserMgr = this;
@@ -43,12 +43,12 @@ UserMgr::UserMgr()
 
 UserMgr::~UserMgr()
 {
+    _ClearUsers();
     Fs_SafeFree(_userFacade);
 }
 
 Int32 UserMgr::OnInitialize()
 {
-    _dispatcher = _logic->GetDispatcher();
     _userFacade->BindLogic(_logic);
 
     Int32 st = _userFacade->OnInitialize();
@@ -97,12 +97,76 @@ void UserMgr::Close()
 
 void UserMgr::WillClose()
 {
-    for(auto &iterUser : _sessionIdRefUsers)
+    _ClearUsers();
+
+}
+
+Int32 UserMgr::RegisterUserSys(fs::IFS_LogicSysFactory *sysFactory)
+{
+    auto sysInfo = sysFactory->CreateSysInfo();
+
+    auto &sysName = sysInfo->GetSysName();
+    if(GetSysInfo(sysName))
     {
-        auto user = iterUser.second;
-        user->OnDisconnect();
-        user->Close();
+        g_Log->e<UserMgr>(_LOGFMT_("RegisterUserSys: User sys name[%s] repeat"), sysName.c_str());
+
+        delete sysInfo;
+        return StatusDefs::Repeat;
     }
+    
+    _sysInfoList.push_back(sysInfo);
+    _sysNameRefSysInfoDict.insert(std::make_pair(sysName, sysInfo));
+    _sysNameRefUserSysFactory.insert(std::make_pair(sysName, sysFactory));
+
+    g_Log->i<UserMgr>(_LOGFMT_("Register game sys: [%s]")
+                      , sysInfo->ToString().c_str());
+
+    return StatusDefs::Success;
+}
+
+const fs::ILogicSysInfo * UserMgr::GetSysInfo(const fs::FS_String &sysName) const
+{
+    auto it = _sysNameRefSysInfoDict.find(sysName);
+    return it != _sysNameRefSysInfoDict.end() ? it->second : NULL;
+}
+
+const fs::IFS_LogicSysFactory *UserMgr::GetSysFactory(const fs::FS_String &sysName) const
+{
+    auto it = _sysNameRefUserSysFactory.find(sysName);
+    return it != _sysNameRefUserSysFactory.end() ? it->second : NULL;
+}
+
+const std::map<fs::FS_String, fs::IFS_LogicSysFactory *> & UserMgr::GetSysFactoriesDict() const
+{
+    return _sysNameRefUserSysFactory;
+}
+
+const std::vector<fs::ILogicSysInfo *> &UserMgr::GetSysInfosList() const
+{
+    return _sysInfoList;
+}
+
+Int32 UserMgr::CreateUser(UInt64 sessionId)
+{
+    g_Log->i<UserMgr>(_LOGFMT_("will create new user, sessionId[%llu]"), sessionId);
+
+    auto newUser = _NewUser(sessionId);
+    Int32 ret = newUser->_Create();
+    if(ret != StatusDefs::Success)
+    {
+        FS_Release(newUser);
+
+        g_Log->e<UserMgr>(_LOGFMT_("Create new user failed, call User::Create() return error, sessionId: %llu, ret:%d")
+                          , sessionId, ret);
+        return ret;
+    }
+
+    // Log: CreateUser成功
+    g_Log->i<UserMgr>(_LOGFMT_("Create new user success, sessionId: %llu"), sessionId);
+
+    // TODO:创建用户完成事件
+
+    return StatusDefs::Success;
 }
 
 User *UserMgr::GetUserBySessionId(UInt64 sessionId)
@@ -135,10 +199,25 @@ void UserMgr::RemoveUser(UInt64 sessionId)
     _userIdRefUsers.erase(userId);
 }
 
-User *UserMgr::NewUser(UInt64 sessionId)
+User *UserMgr::_NewUser(UInt64 sessionId)
 {
-    auto user = new User(sessionId, ++_curMaxUserId, _logic);
+    auto user = new User(this, sessionId, ++_curMaxUserId);
+    user->BindDispatcher(_dispatcher);
     _sessionIdRefUsers.insert(std::make_pair(sessionId, user));
     _userIdRefUsers.insert(std::make_pair(_curMaxUserId, user));
     return user;
+}
+
+void UserMgr::_ClearUsers()
+{
+    for(auto &iterUser : _sessionIdRefUsers)
+    {
+        auto user = iterUser.second;
+        user->OnDisconnect();
+        user->Close();
+    }
+
+    _sysInfoList.clear();
+    fs::STLUtil::DelMapContainer(_sysNameRefSysInfoDict);
+    fs::STLUtil::DelMapContainer(_sysNameRefUserSysFactory);
 }
