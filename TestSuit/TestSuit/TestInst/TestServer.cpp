@@ -32,11 +32,11 @@
 #include "stdafx.h"
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
 #include "FrightenStone/exportbase.h"
-#include "TestInst/TestServer/User/UserMgrFactory.h"
-#include "TestInst/TestServer/User/User.h"
-#include "TestInst/TestServer/GlobalObjs/GlobalObjsDef.h"
-#include "TestInst/TestServer/User/IUserMgr.h"
-#include "TestInst/TestServer/GlobalSys/GlobalSys.h"
+#include "Logic/Common/LogicCommon.h"
+#include "Logic/Modules/User/User.h"
+#include "Logic/Modules/GlobalSys/GlobalSys.h"
+#include "Logic/Modules/Common/ModuleCommon.h"
+#include "Logic/Modules/TestSys/TestSys.h"
 
 class MyLogic : public fs::IFS_BusinessLogic
 {
@@ -53,9 +53,14 @@ public:
 public:
     virtual void OnRegisterFacades()
     {
-        // 注册facades
+        // 注册基础部件
         RegisterFacade<UserMgrFactory>();
         RegisterFacade<GlobalSysMgrFactory>();
+
+        // 注册其他
+        RegisterFacade<TestSysFactory>();
+        RegisterFacade<TestSysGlobalFactory>();
+
     }
 
     virtual void OnSessionDisconnected(UInt64 sessionId, std::list<fs::IDelegate<void, UInt64> *> *disconnectedDelegate)

@@ -69,6 +69,7 @@ Int32 IFS_BusinessLogic::Start()
         return st;
     }
 
+    _isInit = true;
     return StatusDefs::Success;
 }
 

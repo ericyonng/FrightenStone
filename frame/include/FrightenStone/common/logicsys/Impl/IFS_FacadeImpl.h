@@ -38,6 +38,11 @@ inline IFS_Facade::IFS_Facade()
 {
 }
 
+inline IFS_MsgDispatcher *IFS_Facade::GetDispatcher()
+{
+    return _dispatcher;
+}
+
 FS_NAMESPACE_END
 
 #endif

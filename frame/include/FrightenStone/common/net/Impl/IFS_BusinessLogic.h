@@ -77,7 +77,7 @@ public:
     virtual Int32 BeforeStart();
     // 启动facades
     virtual Int32 Start();
-    virtual void AfterStart() { _isInit = true;}
+    virtual void AfterStart() { }
     virtual void WillClose();
     virtual void BeforeClose();
     virtual void Close();

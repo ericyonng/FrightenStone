@@ -32,6 +32,7 @@
 #pragma once
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/status/status.h"
 
 FS_NAMESPACE_BEGIN
 
@@ -46,12 +47,13 @@ public:
     // initialize在businesslogic的start做,但在IFS_Facade的beforestart与start之前
     virtual Int32 OnInitialize() = 0;
     // BeforeStart与Start在businesslogic的Start做
-    virtual Int32 BeforeStart() = 0;
-    virtual Int32 Start() = 0;
+    virtual Int32 BeforeStart();
+    virtual Int32 Start();
     virtual void WillClose() {}
-    virtual void BeforeClose() = 0;
-    virtual void Close() = 0;
+    virtual void BeforeClose() {}
+    virtual void Close() {}
     virtual void BindLogic(IFS_BusinessLogic *logic);
+    IFS_MsgDispatcher *GetDispatcher();
     
 protected:
     friend class IFS_BusinessLogic;

@@ -31,9 +31,22 @@
 #include "FrightenStone/common/net/Impl/IFS_BusinessLogic.h"
 
 FS_NAMESPACE_BEGIN
+Int32 IFS_Facade::BeforeStart() 
+{ 
+    return StatusDefs::Success; 
+}
+
+Int32 IFS_Facade::Start() 
+{
+    return StatusDefs::Success; 
+}
+
 void IFS_Facade::BindLogic(IFS_BusinessLogic *logic)
 {
     _logic = logic;
     _dispatcher = _logic->GetDispatcher();
 }
+
+
+
 FS_NAMESPACE_END

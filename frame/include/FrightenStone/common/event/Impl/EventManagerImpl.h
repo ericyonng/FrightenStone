@@ -73,6 +73,18 @@ inline EventManager::~EventManager()
         }
     }
 }
+template <typename ObjectType>
+inline FS_ListenerStub EventManager::AddListener(int id,
+                                    ObjectType *obj,
+                                    void (ObjectType::*listener)(FS_Event *),
+                                    const FS_ListenerStub &bindedStub)
+{
+    if(!obj || !listener)
+        return FS_INVALID_LISTENER_STUB;
+
+    auto listenerDelegate = DelegatePlusFactory::Create(obj, listener);
+    return AddListener(id, listenerDelegate, bindedStub);
+}
 
 inline int EventManager::RemoveListenerX(FS_ListenerStub &stub)
 {

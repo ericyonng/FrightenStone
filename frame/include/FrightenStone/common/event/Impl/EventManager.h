@@ -56,18 +56,24 @@ public:
      * @param[in] id         - event Id.
      * @param[in] listener   - event listener.
      * @param[in] bindedStub - the binded stub, if not specified, will auto gen stub. 指定的存根若存在则销毁当前的delegate
-     * @return LLBC_ListenerStub - return FS_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
+     * @return FS_ListenerStub - return FS_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
      * delegate由内部释放，外部不释放
      */
     virtual FS_ListenerStub AddListener(int id,
                                           IDelegate<void, FS_Event *> *listener,
                                           const FS_ListenerStub &bindedStub = FS_INVALID_LISTENER_STUB);
 
+    template <typename ObjectType>
+    FS_ListenerStub AddListener(int id,
+                                  ObjectType *obj,
+                                  void (ObjectType::*listener)(FS_Event *),
+                                  const FS_ListenerStub &bindedStub = FS_INVALID_LISTENER_STUB);
+
     /**
      * Remove event listener.
      * @param[in] id - event Id.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
-     *               specially, if return LLBC_FAILED,  and fetch the last error is pending,
+     * @return int - success if return StatusDefs::success, otherwise return Error.
+     *               specially, if return Error,  and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
     virtual int RemoveListener(int id);
@@ -75,8 +81,8 @@ public:
     /**
      * Remove event listener using listener stub.
      * @param[in] stub - event listener stub.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED,
-     *               specially, if return LLBC_FAILED, and fetch the last error is pending,
+     * @return int - success if return success, otherwise return Error,
+     *               specially, if return Error, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
     virtual int RemoveListener(const FS_ListenerStub &stub);
@@ -84,8 +90,8 @@ public:
     /**
      * Remove event listener using listener stub and clear the listener stub.
      * @param[in] stub - event listener stub.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED,
-     *               specially, if return LLBC_FAILED, and fetch the last error is pending,
+     * @return int - success if return success, otherwise return Error,
+     *               specially, if return Error, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
     virtual int RemoveListenerX(FS_ListenerStub &stub);
