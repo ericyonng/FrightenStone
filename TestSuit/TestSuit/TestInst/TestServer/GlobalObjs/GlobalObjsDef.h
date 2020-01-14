@@ -30,3 +30,4 @@
 #pragma once
 
 class IUserMgr; extern IUserMgr *g_UserMgr;         // 用户管理系统
+class IGlobalSysMgr; extern IGlobalSysMgr *g_GlobalSysMgr;  // 全局系统管理

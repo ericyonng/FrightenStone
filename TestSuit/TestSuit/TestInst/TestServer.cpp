@@ -36,6 +36,7 @@
 #include "TestInst/TestServer/User/User.h"
 #include "TestInst/TestServer/GlobalObjs/GlobalObjsDef.h"
 #include "TestInst/TestServer/User/IUserMgr.h"
+#include "TestInst/TestServer/GlobalSys/GlobalSys.h"
 
 class MyLogic : public fs::IFS_BusinessLogic
 {
@@ -54,6 +55,7 @@ public:
     {
         // 注册facades
         RegisterFacade<UserMgrFactory>();
+        RegisterFacade<GlobalSysMgrFactory>();
     }
 
     virtual void OnSessionDisconnected(UInt64 sessionId, std::list<fs::IDelegate<void, UInt64> *> *disconnectedDelegate)

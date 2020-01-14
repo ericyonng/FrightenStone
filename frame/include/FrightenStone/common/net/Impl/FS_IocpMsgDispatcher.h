@@ -99,6 +99,8 @@ private:
     void _WillRemoveSessions();
     // 清除所有会话
     void _ClearAllSessions();
+    // 通知所有系统关服 只能在业务线程做
+    void _CloseLogicSvc();
 
     /* 操作会话 */
     bool _DoPostRecv(FS_IocpSession *session);

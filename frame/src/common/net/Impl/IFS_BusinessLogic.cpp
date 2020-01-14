@@ -39,6 +39,7 @@ OBJ_POOL_CREATE_DEF_IMPL(IFS_BusinessLogic, 16);
 
 IFS_BusinessLogic::~IFS_BusinessLogic()
 {
+    _WillCloseFacades();
     _BeforeFacadesClose();
     _CloseFacades();
     _DestroyWillRegFacades();
@@ -73,15 +74,23 @@ Int32 IFS_BusinessLogic::Start()
 
 void IFS_BusinessLogic::WillClose()
 {
+    if(!_isInit)
+        return;
 }
 
 void IFS_BusinessLogic::BeforeClose()
 {
+    if(!_isInit)
+        return;
+
     _BeforeFacadesClose();
 }
 
 void IFS_BusinessLogic::Close()
 {
+    if(!_isInit)
+        return;
+
     _CloseFacades();
     _DestroyWillRegFacades();
     STLUtil::DelMapContainer(_protocolCmdRefHandlers);
@@ -302,6 +311,20 @@ Int32 IFS_BusinessLogic::_StartFacades()
     g_Log->e<IFS_BusinessLogic>(_LOGFMT_("has some unhandled facade when do start startIndex[%llu] size[%llu]"), startIndex, facadesSize);
 
     return StatusDefs::Failed;
+}
+
+void IFS_BusinessLogic::_WillCloseFacades()
+{
+    for(_Facades::reverse_iterator it = _facades.rbegin();
+        it != _facades.rend();
+        ++it)
+    {
+        IFS_Facade *facade = *it;
+        if(!facade->_started)
+            continue;
+
+        facade->WillClose();
+    }
 }
 
 void IFS_BusinessLogic::_BeforeFacadesClose()

@@ -48,6 +48,7 @@ public:
     // BeforeStart与Start在businesslogic的Start做
     virtual Int32 BeforeStart() = 0;
     virtual Int32 Start() = 0;
+    virtual void WillClose() {}
     virtual void BeforeClose() = 0;
     virtual void Close() = 0;
     virtual void BindLogic(IFS_BusinessLogic *logic);

@@ -81,7 +81,7 @@ public:
     virtual void WillClose();
     virtual void BeforeClose();
     virtual void Close();
-    virtual void AfterClose() {}
+    virtual void AfterClose() { if(!_isInit)return; }
 
     /* 网络事件 */
 public:
@@ -109,6 +109,9 @@ public:
 protected:
     Int32 _InitFacades();
     Int32 _StartFacades();
+
+    // will close->beforeclose->close->destroy都是在业务线程做
+    void _WillCloseFacades();
     void _BeforeFacadesClose();
     void _CloseFacades();
     void _DestroyWillRegFacades();

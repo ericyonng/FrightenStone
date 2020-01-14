@@ -333,6 +333,9 @@ void FS_IocpMsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
     _RunAFrame(hasMsg);
 
     _ClearAllSessions();
+
+    // 系统关服
+    _CloseLogicSvc();
     g_Log->sys<FS_IocpMsgDispatcher>(_LOGFMT_("dispatcher process thread end compId[%u],threadId[%llu]")
                                      , _compId, SystemUtil::GetCurrentThreadId());
 }
@@ -438,6 +441,17 @@ void FS_IocpMsgDispatcher::_ClearAllSessions()
         session->EnableDisconnect();
         _OnSessionDisconnected(session);
         iterSession = _sessions.erase(iterSession);
+    }
+}
+
+void FS_IocpMsgDispatcher::_CloseLogicSvc()
+{
+    if(_logic)
+    {
+        _logic->WillClose();
+        _logic->BeforeClose();
+        _logic->Close();
+        _logic->AfterClose();
     }
 }
 
