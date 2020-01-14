@@ -32,11 +32,6 @@
 #include "stdafx.h"
 #include "TestSuit/TestSuit/TestInst/TestServer.h"
 #include "FrightenStone/exportbase.h"
-#include "Logic/Common/LogicCommon.h"
-#include "Logic/Modules/User/User.h"
-#include "Logic/Modules/GlobalSys/GlobalSys.h"
-#include "Logic/Modules/Common/ModuleCommon.h"
-#include "Logic/Modules/TestSys/TestSys.h"
 
 class MyLogic : public fs::IFS_BusinessLogic
 {
@@ -53,50 +48,27 @@ public:
 public:
     virtual void OnRegisterFacades()
     {
-        // 注册基础部件
-        RegisterFacade<UserMgrFactory>();
-        RegisterFacade<GlobalSysMgrFactory>();
-
-        // 注册其他
-        RegisterFacade<TestSysFactory>();
-        RegisterFacade<TestSysGlobalFactory>();
-
+        // 注册系统
     }
 
     virtual void OnSessionDisconnected(UInt64 sessionId, std::list<fs::IDelegate<void, UInt64> *> *disconnectedDelegate)
     {
-        auto user = g_UserMgr->GetUserBySessionId(sessionId);
-        if(user)
+        if(disconnectedDelegate)
         {
-            if(disconnectedDelegate)
+            for(auto iterDelegate = disconnectedDelegate->begin(); iterDelegate != disconnectedDelegate->end(); )
             {
-                for(auto iterDelegate = disconnectedDelegate->begin(); iterDelegate != disconnectedDelegate->end(); )
-                {
-                    auto item = *iterDelegate;
-                    item->Invoke(sessionId);
-                    FS_Release(item);
-                    iterDelegate = disconnectedDelegate->erase(iterDelegate);
-                }
+                auto item = *iterDelegate;
+                item->Invoke(sessionId);
+                FS_Release(item);
+                iterDelegate = disconnectedDelegate->erase(iterDelegate);
             }
-
-            user->OnDisconnect();
         }
 
-        g_UserMgr->RemoveUser(sessionId);
-        // g_Log->any<MyLogic>("sessionid[%llu] Disconnected", sessionId);
+        g_Log->i<MyLogic>(_LOGFMT_("sessionid[%llu] Disconnected"), sessionId);
     }
 
     virtual Int32 OnSessionConnected(UInt64 sessionId)
     {
-        auto ret = g_UserMgr->CreateUser(sessionId);
-        if(ret != StatusDefs::Success)
-        {
-            g_Log->e<MyLogic>(_LOGFMT_("create new user fail ret[%d] sessionId[%llu]"), ret, sessionId);
-            return ret;
-        }
-
-        auto newUser = g_UserMgr->GetUserBySessionId(sessionId);
-        newUser->OnConnected();
         return StatusDefs::Success;
     }
 
@@ -107,10 +79,6 @@ public:
 
     virtual void OnMsgDispatch(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
     {
-        auto user = g_UserMgr->GetUserBySessionId(sessionId);
-        if(!user)
-            return;
-
         const auto cmd = msgDecoder->GetCmd();
         if(cmd >= fs::ProtocolCmd::CMD_End || 
            cmd <= fs::ProtocolCmd::CMD_Begin)
