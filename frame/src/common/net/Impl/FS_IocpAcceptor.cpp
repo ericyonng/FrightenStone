@@ -48,7 +48,6 @@
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/socket/socket.h"
 #include "FrightenStone/common/net/Impl/IFS_Session.h"
-#include "FrightenStone/common/net/Impl/FS_SessionMgr.h"
 #include "FrightenStone/common/assist/utils/Impl/SystemUtil.h"
 #include "FrightenStone/common/component/Impl/File/FS_IniFile.h"
 

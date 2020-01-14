@@ -21,64 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : UserImpl.h
+ * @file  : IUserSys.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2020/1/8
  * @brief :
  */
+#ifndef __Logic_Common_LogicBase_Impl_IUserSys_H__
+#define __Logic_Common_LogicBase_Impl_IUserSys_H__
 
 #pragma once
-inline void User::SucRecvMsg()
-{
-    ++_recvMsgId;
-}
-// 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
+#include "FrightenStone/exportbase.h"
+#include "Logic/Common/LogicBase/Impl/IFS_LogicSys.h"
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
+class User;
 
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
+class IUserSys : public IFS_LogicSys
 {
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
+public:
+    IUserSys();
+    ~IUserSys() {}
+    virtual void Release() { delete this; }
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
+public:
+    virtual UInt64 GetSessionId() const = 0;
+    virtual void Close() = 0;
 
-inline std::vector<IUserSys *> &User::GetSyss()
-{
-    return _userSysList;
-}
+    virtual Int32 OnCreate();
+    virtual void OnAfterCreate();
+    
+private:
+    Int32 _Create(User *user);
+    void _AfterCreate();
 
-inline const std::vector<IUserSys *> &User::GetSyss() const
-{
-    return _userSysList;
-}
+private:
+    friend class User;
 
-inline UInt64 User::GetSessionId() const
-{
-    return _sessionId;
-}
+    User *_user;        // TODO:业务逻辑层需要移出引擎框架
+};
 
-inline UInt64 User::GetUseId() const
-{
-    return _userId;
-}
+#include "Logic/Common/LogicBase/Impl/IUserSysImpl.h"
 
-inline Int32 User::GetRecvMsgId() const
-{
-    return _recvMsgId;
-}
-
-inline Int32 User::GetSendMsgId() const
-{
-    return _sendMsgId;
-}
+#endif

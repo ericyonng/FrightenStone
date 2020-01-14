@@ -21,46 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IUserMgr.h
+ * @file  : GlobalSysMgr.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2020/01/13
+ * @date  : 2020/1/14
  * @brief :
  */
 
 #pragma once
 
 #include "FrightenStone/exportbase.h"
-#include "Logic/Common/LogicBase/Impl/IBaseLogicSysMgr.h"
+#include "TestInst/TestServer/GlobalSys/Impl/IGlobalSysMgr.h"
 
-class IFS_LogicSysFactory;
-class ILogicSysInfo;
-class User;
-
-class IUserMgr : public IBaseLogicSysMgr
+class GlobalSysMgr : public IGlobalSysMgr
 {
 public:
-    // 注册User系统(模板方法)
-    template <typename IUserSysFactory>
-    Int32 RegisterUserSys();
-    // 注册User系统
-    virtual Int32 RegisterUserSys(IFS_LogicSysFactory *sysFactory) = 0;
+    GlobalSysMgr();
+    virtual ~GlobalSysMgr();
 
-    // 取得User系统信息
-    virtual const ILogicSysInfo *GetSysInfo(const fs::FS_String &sysName) const = 0;
-    // 取得User系统工厂
-    virtual const IFS_LogicSysFactory *GetSysFactory(const fs::FS_String &sysName) const = 0;
-    // 取得User系统工厂字典
-    virtual const std::map<fs::FS_String, IFS_LogicSysFactory *> &GetSysFactoriesDict() const = 0;
-    // 取得User系统信息列表
-    virtual const std::vector<ILogicSysInfo *> &GetSysInfosList() const = 0;
+public:
+    virtual Int32 RegisterGlobalSys(fs::IFS_LogicSysFactory *sysFactory);
 
-    // 创建用户
-    virtual Int32 CreateUser(UInt64 sessionId) = 0;
+public:
+    /* 主线程执行 */
+    virtual Int32 OnInitialize();
+    virtual Int32 BeforeStart();
+    virtual Int32 Start();
+    ///////////////////////////////////////
 
-    // 获取用户
-    virtual User *GetUserBySessionId(UInt64 sessionId) = 0;
-    // 移除用户
-    virtual void RemoveUser(UInt64 sessionId) = 0;
+    /* 业务线程执行 */ 
+    virtual void BeforeClose();
+    virtual void Close();
+    ///////////////////////////////
+
+public:
+    virtual const fs::ILogicSysInfo *GetSysInfo(const fs::FS_String &globalSysName) const;
+    virtual const std::vector<fs::ILogicSysInfo *> &GetSysInfosList() const;
+    virtual const std::map<fs::FS_String, fs::ILogicSysInfo *> &GetSysInfosDict() const;
+    virtual fs::IGlobalSys *GetSys(const fs::FS_String &sysName);
+
+private:
+    void _Cleanup();
+
+private:
+    std::vector<fs::ILogicSysInfo *> _sysInfosList;
+    std::map<fs::FS_String, fs::ILogicSysInfo *> _sysInfosDict;
+
+    std::map<fs::FS_String, fs::IGlobalSys *> _globalSysNameRefGlobalSyss;
+    std::map<fs::FS_String, fs::IGlobalSys *> _globalSysNameRefIGlobalSyss; // 带"I"的global系统基类接口
 };
-
-#include "TestInst/TestServer/User/IUserMgrImpl.h"

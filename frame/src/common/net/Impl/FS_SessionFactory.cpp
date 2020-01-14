@@ -32,7 +32,6 @@
 #include "stdafx.h"
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Impl/FS_IocpSession.h"
-#include "FrightenStone/common/net/Impl/FS_SessionMgr.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 
 FS_NAMESPACE_BEGIN

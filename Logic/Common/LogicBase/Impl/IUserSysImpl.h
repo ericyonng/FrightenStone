@@ -21,64 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : UserImpl.h
+ * @file  : IUserSysImpl.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2020/1/8
  * @brief :
  */
+#ifdef __Logic_Common_LogicBase_Impl_IUserSys_H__
 
 #pragma once
-inline void User::SucRecvMsg()
-{
-    ++_recvMsgId;
-}
-// 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
 
-    return static_cast<UserSys *>(GetSys(sysName));
+inline IUserSys::IUserSys()
+{
+
 }
 
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
+inline Int32 IUserSys::OnCreate()
 {
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
-
-    return static_cast<UserSys *>(GetSys(sysName));
+    return StatusDefs::Success;
 }
 
-inline std::vector<IUserSys *> &User::GetSyss()
+inline void IUserSys::OnAfterCreate()
 {
-    return _userSysList;
 }
 
-inline const std::vector<IUserSys *> &User::GetSyss() const
+inline Int32 IUserSys::_Create(User *user)
 {
-    return _userSysList;
+    _user = user;
+    return OnCreate();
 }
 
-inline UInt64 User::GetSessionId() const
+inline void IUserSys::_AfterCreate()
 {
-    return _sessionId;
 }
 
-inline UInt64 User::GetUseId() const
-{
-    return _userId;
-}
-
-inline Int32 User::GetRecvMsgId() const
-{
-    return _recvMsgId;
-}
-
-inline Int32 User::GetSendMsgId() const
-{
-    return _sendMsgId;
-}
+#endif

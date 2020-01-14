@@ -21,64 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : UserImpl.h
+ * @file  : IFS_LogicSysImpl.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2020/1/8
  * @brief :
  */
-
+#ifdef __Logic_Common_LogicBase_Impl_IFS_LogicSys_H__
 #pragma once
-inline void User::SucRecvMsg()
-{
-    ++_recvMsgId;
-}
-// 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
 
-    return static_cast<UserSys *>(GetSys(sysName));
+inline IFS_LogicSys::IFS_LogicSys()
+    :_dispatcher(NULL)
+    ,_sysInfo(NULL)
+{
 }
 
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
+inline IFS_LogicSys::~IFS_LogicSys()
 {
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
-
-    return static_cast<UserSys *>(GetSys(sysName));
 }
 
-inline std::vector<IUserSys *> &User::GetSyss()
+inline void IFS_LogicSys::BindDispatcher(fs::IFS_MsgDispatcher *dispatcher)
 {
-    return _userSysList;
+    _dispatcher = dispatcher;
 }
 
-inline const std::vector<IUserSys *> &User::GetSyss() const
+inline const ILogicSysInfo *IFS_LogicSys::GetSysInfo() const
 {
-    return _userSysList;
+    return _sysInfo;
 }
 
-inline UInt64 User::GetSessionId() const
+inline void IFS_LogicSys::SetSysInfo(const ILogicSysInfo *sysInfo)
 {
-    return _sessionId;
+    _sysInfo = sysInfo;
 }
 
-inline UInt64 User::GetUseId() const
-{
-    return _userId;
-}
-
-inline Int32 User::GetRecvMsgId() const
-{
-    return _recvMsgId;
-}
-
-inline Int32 User::GetSendMsgId() const
-{
-    return _sendMsgId;
-}
+#endif

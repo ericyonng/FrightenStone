@@ -21,64 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : UserImpl.h
+ * @file  : GlobalObjsDef.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2020/1/8
+ * @date  : 2020/01/14
  * @brief :
  */
 
 #pragma once
-inline void User::SucRecvMsg()
-{
-    ++_recvMsgId;
-}
-// 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
-
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
-
-    return static_cast<UserSys *>(GetSys(sysName));
-}
-
-inline std::vector<IUserSys *> &User::GetSyss()
-{
-    return _userSysList;
-}
-
-inline const std::vector<IUserSys *> &User::GetSyss() const
-{
-    return _userSysList;
-}
-
-inline UInt64 User::GetSessionId() const
-{
-    return _sessionId;
-}
-
-inline UInt64 User::GetUseId() const
-{
-    return _userId;
-}
-
-inline Int32 User::GetRecvMsgId() const
-{
-    return _recvMsgId;
-}
-
-inline Int32 User::GetSendMsgId() const
-{
-    return _sendMsgId;
-}
+class IUserMgr; extern IUserMgr *g_UserMgr;         // 用户管理系统
+class IGlobalSysMgr; extern IGlobalSysMgr *g_GlobalSysMgr;  // 全局系统管理

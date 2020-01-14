@@ -277,6 +277,8 @@ project "TestSuit"
 
     -- files
     files {
+		"../../Logic/**.h",
+        "../../Logic/**.cpp",
         "../../TestSuit/**.h",
         "../../TestSuit/**.cpp",
 		"../../protocols/**.h",
@@ -344,6 +346,8 @@ project "FS_MyClient"
 
     -- files
     files {
+		"../../Logic/**.h",
+        "../../Logic/**.cpp",
         "../../FS_MyClient/**.h",
         "../../FS_MyClient/**.cpp",
 		"../../protocols/**.h",

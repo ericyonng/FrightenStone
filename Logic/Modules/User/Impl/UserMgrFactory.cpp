@@ -21,64 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : UserImpl.h
+ * @file  : UserMgrFactory.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2020/1/8
+ * @date  : 2020/1/9
  * @brief :
  */
+#include "stdafx.h"
+#include "Logic/Modules/User/Impl/UserMgrFactory.h"
+#include "Logic/Modules/User/Impl/UserMgr.h"
 
-#pragma once
-inline void User::SucRecvMsg()
+fs::IFS_Facade * UserMgrFactory::Create()
 {
-    ++_recvMsgId;
-}
-// 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
-
-    return static_cast<UserSys *>(GetSys(sysName));
-}
-
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
-
-    return static_cast<UserSys *>(GetSys(sysName));
-}
-
-inline std::vector<IUserSys *> &User::GetSyss()
-{
-    return _userSysList;
-}
-
-inline const std::vector<IUserSys *> &User::GetSyss() const
-{
-    return _userSysList;
-}
-
-inline UInt64 User::GetSessionId() const
-{
-    return _sessionId;
-}
-
-inline UInt64 User::GetUseId() const
-{
-    return _userId;
-}
-
-inline Int32 User::GetRecvMsgId() const
-{
-    return _recvMsgId;
-}
-
-inline Int32 User::GetSendMsgId() const
-{
-    return _sendMsgId;
+    return new UserMgr();
 }

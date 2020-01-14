@@ -21,64 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : UserImpl.h
+ * @file  : LogicSysInfo.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2020/1/8
  * @brief :
  */
+#ifndef __Logic_Common_LogicBase_Impl_LogicSysInfo_H__
+#define __Logic_Common_LogicBase_Impl_LogicSysInfo_H__
 
 #pragma once
-inline void User::SucRecvMsg()
-{
-    ++_recvMsgId;
-}
-// 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
+#include "FrightenStone/exportbase.h"
+#include "Logic/Common/LogicBase/Impl/ILogicSysInfo.h"
 
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
+template <typename LogicSys>
+class LogicSysInfo : public ILogicSysInfo
 {
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
+public:
+    LogicSysInfo();
+    virtual ~LogicSysInfo();
+};
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
+#include "Logic/Common/LogicBase/Impl/LogicSysInfoImpl.h"
 
-inline std::vector<IUserSys *> &User::GetSyss()
-{
-    return _userSysList;
-}
-
-inline const std::vector<IUserSys *> &User::GetSyss() const
-{
-    return _userSysList;
-}
-
-inline UInt64 User::GetSessionId() const
-{
-    return _sessionId;
-}
-
-inline UInt64 User::GetUseId() const
-{
-    return _userId;
-}
-
-inline Int32 User::GetRecvMsgId() const
-{
-    return _recvMsgId;
-}
-
-inline Int32 User::GetSendMsgId() const
-{
-    return _sendMsgId;
-}
+#endif

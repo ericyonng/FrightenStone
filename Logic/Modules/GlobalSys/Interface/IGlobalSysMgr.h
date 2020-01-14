@@ -21,64 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : UserImpl.h
+ * @file  : IGlobalSysMgr.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2020/1/8
+ * @date  : 2020/1/14
  * @brief :
  */
-
 #pragma once
-inline void User::SucRecvMsg()
-{
-    ++_recvMsgId;
-}
-// 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
+#include "FrightenStone/exportbase.h"
+#include "Logic/Common/LogicBase/Impl/IBaseLogicSysMgr.h"
 
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
+class IFS_LogicSysFactory;
+class ILogicSysInfo;
+class IGlobalSys;
+
+class IGlobalSysMgr : public IBaseLogicSysMgr
 {
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
+public:
+    // 注册GlobalSys
+    template <typename GlobalSysFactoryType>
+    Int32 RegisterGlobalSys();
+    virtual Int32 RegisterGlobalSys(IFS_LogicSysFactory *sysFactory) = 0;
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
+    // SysInfo获取
+    virtual const ILogicSysInfo *GetSysInfo(const fs::FS_String &globalSysName) const = 0;
+    virtual const std::vector<ILogicSysInfo *> &GetSysInfosList() const = 0;
+    virtual const std::map<fs::FS_String, ILogicSysInfo *> &GetSysInfosDict() const = 0;
 
-inline std::vector<IUserSys *> &User::GetSyss()
-{
-    return _userSysList;
-}
+public:
+    // GlobalSys获取
+    template <typename GlobalSysType>
+    GlobalSysType *GetSys();
+    virtual IGlobalSys *GetSys(const fs::FS_String &sysName) = 0;
+};
 
-inline const std::vector<IUserSys *> &User::GetSyss() const
-{
-    return _userSysList;
-}
-
-inline UInt64 User::GetSessionId() const
-{
-    return _sessionId;
-}
-
-inline UInt64 User::GetUseId() const
-{
-    return _userId;
-}
-
-inline Int32 User::GetRecvMsgId() const
-{
-    return _recvMsgId;
-}
-
-inline Int32 User::GetSendMsgId() const
-{
-    return _sendMsgId;
-}
+#include "Logic/Modules/GlobalSys/Interface/IGlobalSysMgrImpl.h"

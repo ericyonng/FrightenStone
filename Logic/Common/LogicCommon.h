@@ -21,15 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_SessionMgrImpl.h
+ * @file  : LogicCommon.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2020/1/14
  * @brief :
- * 
- *
- * 
  */
-#ifdef __Frame_Include_FrightenStone_Common_Net_Impl_FS_SessionMgr_H__
+#ifndef __Logic_Common_LogicCommon_H__
+#define __Logic_Common_LogicCommon_H__
+
 #pragma once
+
+#include "Logic/Common/LogicBase/LogicBase.h"
 
 #endif

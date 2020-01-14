@@ -21,49 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : FS_SessionMgr.h
+ * @file  : ModuleCommon.h
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2019/9/30
+ * @date  : 2020/1/14
  * @brief :
- * 
- *
- * 
  */
-#ifndef __Frame_Include_FrightenStone_Common_Net_Impl_FS_SessionMgr_H__
-#define __Frame_Include_FrightenStone_Common_Net_Impl_FS_SessionMgr_H__
+#ifndef __Logic_Modules_Common_ModuleCommon_H__
+#define __Logic_Modules_Common_ModuleCommon_H__
 #pragma once
 
-#include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
-
-FS_NAMESPACE_BEGIN
-
-class IFS_Session;
-
-class BASE_EXPORT FS_SessionMgr
-{
-public:
-    FS_SessionMgr();
-    ~FS_SessionMgr();
-
-public:
-    Int32 BeforeStart();
-    Int32 Start();
-    Int32 AfterStart();
-    virtual void WillClose() {} // 断开与模块之间的依赖
-    void BeforeClose();
-    void Close();
-    void AfterClose();
-
-    void AddNewSession(UInt64 sessionId, IFS_Session *session);
-    void EraseSession(UInt64 sessionId);
-
-private:
-    std::map<UInt64, IFS_Session *> _sessions;
-};
-
-FS_NAMESPACE_END
-
-#include "FrightenStone/common/net/Impl/FS_SessionMgrImpl.h"
+#include "Logic/Modules/Common/GlobalObjs/GlobalObjsDef.h"
 
 #endif

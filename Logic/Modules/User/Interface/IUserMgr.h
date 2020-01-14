@@ -27,13 +27,16 @@
  * @brief :
  */
 
+#ifndef __Logic_Modules_User_Interface_H__
+#define __Logic_Modules_User_Interface_H__
+
 #pragma once
 
 #include "FrightenStone/exportbase.h"
 #include "Logic/Common/LogicBase/Impl/IBaseLogicSysMgr.h"
 
-class IFS_LogicSysFactory;
 class ILogicSysInfo;
+class IFS_LogicSysFactory;
 class User;
 
 class IUserMgr : public IBaseLogicSysMgr
@@ -63,4 +66,6 @@ public:
     virtual void RemoveUser(UInt64 sessionId) = 0;
 };
 
-#include "TestInst/TestServer/User/IUserMgrImpl.h"
+#include "Logic/Modules/User/Impl/IUserMgrImpl.h"
+
+#endif

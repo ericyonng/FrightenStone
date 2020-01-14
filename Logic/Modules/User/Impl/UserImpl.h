@@ -33,24 +33,24 @@ inline void User::SucRecvMsg()
     ++_recvMsgId;
 }
 // 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
+template <typename UserSysType>
+inline UserSysType *User::GetSys()
 {
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
+    auto sysName = fs::RTTIUtil::GetByType<UserSysType>();
     if(UNLIKELY(sysName == ""))
         return NULL;
 
-    return static_cast<UserSys *>(GetSys(sysName));
+    return static_cast<UserSysType *>(GetSys(sysName));
 }
 
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
+template <typename UserSysType>
+inline const UserSysType *User::GetSys() const
 {
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
+    auto sysName = fs::RTTIUtil::GetByType<UserSysType>();
     if(UNLIKELY(sysName == ""))
         return NULL;
 
-    return static_cast<UserSys *>(GetSys(sysName));
+    return static_cast<UserSysType *>(GetSys(sysName));
 }
 
 inline std::vector<IUserSys *> &User::GetSyss()

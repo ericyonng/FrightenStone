@@ -21,64 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : UserImpl.h
+ * @file  : IFS_LogicSysFactory.h
  * @author: ericyonng<120453674@qq.com>
  * @date  : 2020/1/8
  * @brief :
  */
+#ifndef __Logic_Common_LogicBase_Impl_IFS_LogicSysFactory_H__
+#define __Logic_Common_LogicBase_Impl_IFS_LogicSysFactory_H__
 
 #pragma once
-inline void User::SucRecvMsg()
-{
-    ++_recvMsgId;
-}
-// 取得指定用户系统(泛型方法)
-template <typename UserSys>
-inline UserSys *User::GetSys()
-{
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
+#include "FrightenStone/exportbase.h"
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
+class IFS_LogicSys;
+class ILogicSysInfo;
 
-template <typename UserSys>
-inline const UserSys *User::GetSys() const
+class IFS_LogicSysFactory
 {
-    auto sysName = fs::RTTIUtil::GetByType<UserSys>();
-    if(UNLIKELY(sysName == ""))
-        return NULL;
+public:
+    IFS_LogicSysFactory() {}
+    virtual ~IFS_LogicSysFactory() {}
 
-    return static_cast<UserSys *>(GetSys(sysName));
-}
+    virtual IFS_LogicSys *CreateSys() const = 0;
+    virtual ILogicSysInfo *CreateSysInfo() const = 0;
+};
 
-inline std::vector<IUserSys *> &User::GetSyss()
-{
-    return _userSysList;
-}
-
-inline const std::vector<IUserSys *> &User::GetSyss() const
-{
-    return _userSysList;
-}
-
-inline UInt64 User::GetSessionId() const
-{
-    return _sessionId;
-}
-
-inline UInt64 User::GetUseId() const
-{
-    return _userId;
-}
-
-inline Int32 User::GetRecvMsgId() const
-{
-    return _recvMsgId;
-}
-
-inline Int32 User::GetSendMsgId() const
-{
-    return _sendMsgId;
-}
+#endif
