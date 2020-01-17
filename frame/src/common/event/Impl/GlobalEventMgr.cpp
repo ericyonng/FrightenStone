@@ -21,46 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : IFS_Facade.h
+ * @file  : GlobalEventMgr.cpp
  * @author: ericyonng<120453674@qq.com>
- * @date  : 2020/1/8
+ * @date  : 2020/1/13
  * @brief :
  */
-#ifndef __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_Facade_H__
-#define __Frame_Include_FrightenStone_Common_Logicsys_Impl_IFS_Facade_H__
-
-#pragma once
-#include "FrightenStone/exportbase.h"
-#include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "stdafx.h"
+#include "FrightenStone/common/event/Impl/GlobalEventMgr.h"
+#include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
 
 FS_NAMESPACE_BEGIN
 
-class IFS_BusinessLogic;
-
-class BASE_EXPORT IFS_Facade
+GlobalEventMgr::GlobalEventMgr()
+    :_curEventFilterId(0)
 {
-public:
-    IFS_Facade();
-    virtual ~IFS_Facade() {}
-    // initialize在businesslogic的start做,但在IFS_Facade的beforestart与start之前
-    virtual Int32 OnInitialize() = 0;
-    // BeforeStart与Start在businesslogic的Start做
-    virtual Int32 BeforeStart() = 0;
-    virtual Int32 Start() = 0;
-    virtual void BeforeClose() = 0;
-    virtual void Close() = 0;
-    virtual void BindLogic(IFS_BusinessLogic *logic);
-    
-protected:
-    friend class IFS_BusinessLogic;
 
-    bool _inited;
-    bool _started;
-    IFS_BusinessLogic * _logic;
-};
+}
+GlobalEventMgr::~GlobalEventMgr()
+{
+    STLUtil::DelMapContainer(_eventFilters);
+}
 
+void GlobalEventMgr::FireEvent(Int32 id)
+{
+
+}
 FS_NAMESPACE_END
 
-#include "FrightenStone/common/logicsys/Impl/IFS_FacadeImpl.h"
-
-#endif

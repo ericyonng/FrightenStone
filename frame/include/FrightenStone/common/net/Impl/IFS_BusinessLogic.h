@@ -26,7 +26,15 @@
  * @date  : 2019/10/20
  * @brief :
  * 
- *
+ *      facade逻辑:
+                    1.在beforestart时候先通过factory将每个系统的facade缓存与willregfacade中
+                    2.在start的时候先将每个facade initialize
+                    3.再执行facade的beforestart与start启动系统(基于facade启动)
+                    4.可以通过globalsys与usersys在执行到beforestart的时候二次注册到globalsys或者usersys，让globalsys与usersys模块在start的时候创建出真正的系统对象(基于globalsysy或者usersys启动)并执行对应的beforestart与start启动系统,
+                    5.若注册到globalsys或者usersys时,对象的获取可以根据globalsysy通过getsys或者usersys通过getsys取到
+        usersys或者globalsys的创建过程:
+                    1.先在initilize时候将factory重新注册到globalsysmgr或者usermgr中,这时候global或者user会createsysinfo取得子系统字符串等系统信息,并映射到字典
+                    2.user connected之后会创建user对象这个时候usermgr会通过createsys将子系统关联到user身上等
  * 
  */
 
