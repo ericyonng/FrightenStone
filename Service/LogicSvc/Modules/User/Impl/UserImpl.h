@@ -84,7 +84,7 @@ inline Int32 User::GetSendMsgId() const
     return _sendMsgId;
 }
 
-#pragma region User级别事件接口
+#pragma region User events
 template <typename ObjectType>
 inline fs::FS_ListenerStub User::AddListener(Int32 id,
                                         ObjectType *obj,
