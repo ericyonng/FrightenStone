@@ -32,6 +32,7 @@
 #include "FrightenStone/common/net/Defs/BufferQueueNode.h"
 #include "FrightenStone/common/net/Impl/FS_Addr.h"
 #include "FrightenStone/common/net/Defs/IFS_NetBuffer.h"
+#include "FrightenStone/common/net/Defs/CancelIoReason.h"
 
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/status/status.h"
@@ -271,7 +272,7 @@ void FS_Session::CancelPostedEventsAndMaskClose()
 }
 
 #else
-void FS_Session::Bind(FS_EpollPoller *transferPoller)
+void FS_Session::Bind(FS_EpollTransferPoller *transferPoller)
 {
     _transferPoller = transferPoller;
     _epoll = _transferPoller->GetEpollObj();

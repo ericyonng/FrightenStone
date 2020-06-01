@@ -33,7 +33,6 @@
 #include "FrightenStone/common/net/Impl/FS_EpollAcceptPoller.h"
 #include "FrightenStone/common/net/Impl/FS_Epoll.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
-#include "FrightenStone/common/net/Defs/FS_EpollEvMessageBlock.h"
 #include "FrightenStone/common/net/Defs/MessageBlockUtil.h"
 #include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
 #include "FrightenStone/common/net/Impl/IFS_MsgTransfer.h"
@@ -53,7 +52,7 @@ Int32 FS_EpollAcceptPoller::BeforeStart()
     _pool = new FS_ThreadPool(0, 2);
     _epoll = new FS_Epoll;
 
-    st = _epoll->Create();
+    Int32 st = _epoll->Create();
     if (st != StatusDefs::Success)
     {
         g_Log->e<FS_EpollAcceptPoller>(_LOGFMT_("create epoll fail st[%d]"), st);

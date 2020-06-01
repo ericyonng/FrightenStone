@@ -39,6 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
+#ifdef _WIN32
 FS_MessageBlock * MessageBlockUtil::BuildIocpMsgArrivedMsgBlock(UInt32 compId, UInt32 generatorId, IoEvent *ev, Int32 errorCode)
 {
     IocpMsgArrivedMsgBlock *block = new IocpMsgArrivedMsgBlock();
@@ -49,6 +50,7 @@ FS_MessageBlock * MessageBlockUtil::BuildIocpMsgArrivedMsgBlock(UInt32 compId, U
     block->_errorCode = errorCode;
     return block;
 }
+#endif
 
 FS_MessageBlock * MessageBlockUtil::BuildSessionConnectedNetMsgBlock(
     UInt32 compId
@@ -90,22 +92,6 @@ FS_MessageBlock * MessageBlockUtil::BuildPostAsynConnectionToConnectorMsgBlock(U
 }
 
 #ifndef _WIN32
-
-FS_MessageBlock * MessageBlockUtil::BuildTransferEpollEvSessionWillConnectMsg(UInt32 compId, UInt32 generatorId, FS_EpollPoller *poller, BriefSessionInfo *newSessionInfo)
-{
-    EpollEvSessionWillConnectMsg *block = new EpollEvSessionWillConnectMsg;
-    block->_compId = compId;
-    block->_acceptorCompId = newSessionInfo->_acceptorCompId;
-    block->_generatorId = generatorId;
-    block->_sessionId = newSessionInfo->_sessionId;
-    block->_sock = newSessionInfo->_sock;
-    block->_addrInfo = *newSessionInfo->_addrInfo;
-    block->_onUserDisconnectedRes = newSessionInfo->_userDisconnectedRes;
-    block->_stub = newSessionInfo->_stub;
-    newSessionInfo->_userDisconnectedRes = NULL;
-    block->_poller = poller;
-    return block;
-}
 
 FS_MessageBlock * MessageBlockUtil::BuildEpollEvEpollInEvMsgBlock(UInt64 sessionId)
 {

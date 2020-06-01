@@ -29,8 +29,6 @@
 #ifndef __Frame_Include_FrightenStone_Common_Net_Impl_IFS_AcceptorPoller_H__
 #define __Frame_Include_FrightenStone_Common_Net_Impl_IFS_AcceptorPoller_H__
 
-#ifdef _WIN32
-
 #pragma once
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
@@ -82,7 +80,5 @@ protected:
 FS_NAMESPACE_END
 
 #include "FrightenStone/common/net/Impl/IFS_AcceptorPollerImpl.h"
-
-#endif
 
 #endif

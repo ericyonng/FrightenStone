@@ -141,7 +141,7 @@ protected:
     friend class FS_IocpAcceptor;
     friend class FS_IocpMsgDispatcher;
     friend class FS_EpollMsgDispatcher;
-    friend class FS_EpollPoller;
+    friend class FS_EpollTransferPoller;
     friend class IFS_BasePoller;
     friend class FS_EpollConnector;
     friend class IFS_AcceptorPoller;
