@@ -252,9 +252,9 @@ Int32 SocketUtil::GetSockName(SOCKET sock, sockaddr_in &addrInfo, Int32 &lastErr
 {
     if(!sock || sock == INVALID_SOCKET)
         return StatusDefs::Socket_ParamError;
-
+    
     Int32 addrSize = sizeof(addrInfo);
-    if(getsockname(sock, (sockaddr *)(&addrInfo), &addrSize) != 0)
+    if(getsockname(sock, (sockaddr *)(&addrInfo), reinterpret_cast<socklen_t *>(&addrSize)) != 0)
     {
 #ifdef _WIN32
         lastError = WSAGetLastError();
