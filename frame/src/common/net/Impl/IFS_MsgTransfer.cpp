@@ -55,7 +55,8 @@ bool IFS_MsgTransfer::OnWillConnect(BriefSessionInfo *newSessionInfo)
 #ifndef _WIN32
     // TODO:OnWillConnect
     g_Log->i<IFS_MsgTransfer>(_LOGFMT_(" on will connect new brief session info:\n[%s]"), newSessionInfo->ToString().c_str());
-    if (!poller->OnWillConnect(newSessionInfo->_sock, newSessionInfo->_sessionId))
+    auto epollTransferPoller = reinterpret_cast<FS_EpollTransferPoller *>(poller);
+    if (!epollTransferPoller->OnWillConnect(newSessionInfo->_sock, newSessionInfo->_sessionId))
     {
         g_Log->e<IFS_MsgTransfer>(_LOGFMT_("compId[%u] compType[%d] sock[%d] sessionId[%llu] has already connect or it is not free before")
             , _compId, _compType, newSessionInfo->_sock, newSessionInfo->_sessionId);
