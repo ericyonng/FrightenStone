@@ -80,7 +80,7 @@ public:
     void OnDisconnect();
     void OnConnected();
 
-    #pragma region User级别事件接口
+    #pragma region User Level Events
 public:
     // 添加User级别事件Listener
     template <typename ObjectType>
