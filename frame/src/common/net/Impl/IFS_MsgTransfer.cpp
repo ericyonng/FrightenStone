@@ -35,6 +35,7 @@
 #include "FrightenStone/common/net/Impl/IFS_BasePoller.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 #include "FrightenStone/common/net/Defs/FS_ConnectInfo.h"
+#include "FrightenStone/common/net/Impl/FS_EpollTransferPoller.h"
 
 #include "FrightenStone/common/component/Impl/MessageQueue/MessageQueue.h"
 #include "FrightenStone/common/log/Log.h"
