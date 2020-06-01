@@ -34,9 +34,7 @@
 #ifndef _WIN32
 
 #include "FrightenStone/common/net/Impl/IFS_AcceptorPoller.h"
-#include "FrightenStone/common/net/Defs/FS_EpollEvMessageBlock.h"
 #include "FrightenStone/common/net/Defs/FS_NetDefs.h"
-
 #include "FrightenStone/common/asyn/asyn.h"
 #include "FrightenStone/common/objpool/objpool.h"
 

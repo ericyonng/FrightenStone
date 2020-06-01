@@ -33,7 +33,6 @@
 #include "FrightenStone/common/net/Impl/FS_EpollAcceptPoller.h"
 #include "FrightenStone/common/net/Impl/FS_Epoll.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
-#include "FrightenStone/common/net/Defs/FS_EpollEvMessageBlock.h"
 #include "FrightenStone/common/net/Defs/MessageBlockUtil.h"
 #include "FrightenStone/common/net/Impl/IFS_EngineComp.h"
 #include "FrightenStone/common/net/Impl/IFS_MsgTransfer.h"

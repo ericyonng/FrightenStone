@@ -3,6 +3,18 @@
 # @brief 3rd scripts
 #!/usr/bin/env bash
 
+# 版本
+VER="debug"
+if [ -n "$1" ]
+then
+VER="$1"
+    if [ $VER != "debug" ]
+    then
+	    $VER="release"
+	if
+if
+
+# 路径
 SCRIPT_PATH=$(cd '$(dirname "$0")'; pwd)
 
 # install szrz
