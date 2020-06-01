@@ -52,7 +52,7 @@ Int32 FS_EpollAcceptPoller::BeforeStart()
     _pool = new FS_ThreadPool(0, 2);
     _epoll = new FS_Epoll;
 
-    st = _epoll->Create();
+    Int32 st = _epoll->Create();
     if (st != StatusDefs::Success)
     {
         g_Log->e<FS_EpollAcceptPoller>(_LOGFMT_("create epoll fail st[%d]"), st);
