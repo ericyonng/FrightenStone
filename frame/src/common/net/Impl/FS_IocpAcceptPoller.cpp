@@ -27,6 +27,9 @@
  * @brief :
  */
 #include "stdafx.h"
+
+#ifdef _WIN32
+
 #include "FrightenStone/common/net/Impl/FS_IocpAcceptPoller.h"
 #include <FrightenStone/common/net/Impl/FS_Iocp.h>
 #include "FrightenStone/common/net/Defs/IocpDefs.h"
@@ -46,7 +49,6 @@
 #include "FrightenStone/common/socket/socket.h"
 #include "FrightenStone/common/net/Defs/EngineCompDefs.h"
 
-#ifdef _WIN32
 
 FS_NAMESPACE_BEGIN
 OBJ_POOL_CREATE_DEF_IMPL(FS_IocpAcceptPoller, 32);
