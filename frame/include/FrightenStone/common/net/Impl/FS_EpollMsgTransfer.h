@@ -40,6 +40,7 @@
 FS_NAMESPACE_BEGIN
 class FS_EpollPoller;
 struct BriefSessionInfo;
+class FS_EpollTransferPoller;
 
 class BASE_EXPORT FS_EpollMsgTransfer : public IFS_MsgTransfer
 {
