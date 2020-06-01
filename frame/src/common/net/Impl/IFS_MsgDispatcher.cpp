@@ -38,6 +38,9 @@
 #include "FrightenStone/common/net/Defs/NetMessageBlock.h"
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Defs/IFS_NetBuffer.h"
+#include "FrightenStone/common/net/Defs/CancelIoReason.h"
+
+#include "FrightenStone/common/crashhandle/CrashHandle.h"
 
 #pragma region platform relation
 #ifdef _WIN32
