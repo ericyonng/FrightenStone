@@ -46,6 +46,8 @@
 #include "FrightenStone/common/socket/socket.h"
 #include "FrightenStone/common/net/Defs/EngineCompDefs.h"
 
+#ifdef _WIN32
+
 FS_NAMESPACE_BEGIN
 OBJ_POOL_CREATE_DEF_IMPL(FS_IocpAcceptPoller, 32);
 
@@ -242,3 +244,5 @@ void FS_IocpAcceptPoller::_AcceptorMonitor(FS_ThreadPool *pool)
 }
 
 FS_NAMESPACE_END
+
+#endif
