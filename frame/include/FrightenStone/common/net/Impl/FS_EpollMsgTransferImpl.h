@@ -36,7 +36,7 @@ FS_NAMESPACE_BEGIN
 // ªÒ»°poller
 inline IFS_BasePoller *FS_EpollMsgTransfer::GetPoller()
 {
-    return _poller;
+    return reinterpret_cast<IFS_BasePoller *>(_poller);
 }
 
 FS_NAMESPACE_END
