@@ -48,6 +48,7 @@ class IFS_Session;
 class IFS_NetEngine;
 struct BriefListenAddrInfo;
 struct AcceptorCfgs;
+class IFS_AcceptorPoller;
 
 class BASE_EXPORT IFS_Acceptor : public IFS_EngineComp
 {
