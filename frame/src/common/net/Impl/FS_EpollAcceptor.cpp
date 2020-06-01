@@ -36,7 +36,7 @@
 #include "FrightenStone/common/net/Impl/FS_SessionFactory.h"
 #include "FrightenStone/common/net/Impl/FS_Addr.h"
 #include "FrightenStone/common/net/Defs/EpollDefs.h"
-#include "FrightenStone/common/net/Defs/FS_EpollBuffer.h"
+#include "FrightenStone/common/net/Defs/IFS_NetBuffer.h"
 #include "FrightenStone/common/net/Impl/IFS_ConfigMgr.h"
 #include "FrightenStone/common/net/Defs/BriefSessionInfo.h"
 #include "FrightenStone/common/net/Defs/BriefListenAddrInfo.h"
