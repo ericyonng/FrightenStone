@@ -47,7 +47,9 @@ struct FS_ConnectInfo;
 class BASE_EXPORT MessageBlockUtil
 {
 public:
+#ifdef _WIN32
     static FS_MessageBlock *BuildIocpMsgArrivedMsgBlock(UInt32 compId, UInt32 generatorId, IoEvent *ev, Int32 errorCode);
+#endif
     static FS_MessageBlock *BuildSessionConnectedNetMsgBlock(UInt32 compId
         , UInt32 generatorId
         , IFS_BasePoller *poller
@@ -57,7 +59,6 @@ public:
 
     #pragma region epoll
     #ifndef _WIN32
-
     static FS_MessageBlock *BuildEpollEvEpollInEvMsgBlock(UInt64 sessionId);
     static FS_MessageBlock *BuildEpollEvEpollOutEvMsgBlock(UInt64 sessionId);
     #endif    

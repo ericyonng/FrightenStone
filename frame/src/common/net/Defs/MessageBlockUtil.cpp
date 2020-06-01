@@ -39,6 +39,7 @@
 
 FS_NAMESPACE_BEGIN
 
+#ifdef _WIN32
 FS_MessageBlock * MessageBlockUtil::BuildIocpMsgArrivedMsgBlock(UInt32 compId, UInt32 generatorId, IoEvent *ev, Int32 errorCode)
 {
     IocpMsgArrivedMsgBlock *block = new IocpMsgArrivedMsgBlock();
@@ -49,6 +50,7 @@ FS_MessageBlock * MessageBlockUtil::BuildIocpMsgArrivedMsgBlock(UInt32 compId, U
     block->_errorCode = errorCode;
     return block;
 }
+#endif
 
 FS_MessageBlock * MessageBlockUtil::BuildSessionConnectedNetMsgBlock(
     UInt32 compId

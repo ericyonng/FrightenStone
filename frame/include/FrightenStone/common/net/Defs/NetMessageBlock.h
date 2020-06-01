@@ -38,6 +38,7 @@
 #include "FrightenStone/common/net/Defs/FS_NetDefs.h"
 #include "FrightenStone/common/net/Defs/IoEvDefs.h"
 #include "FrightenStone/common/component/Impl/FS_Delegate.h"
+#include "FrightenStone/common/net/Defs/EpollDefs.h"
 
 #ifdef _WIN32
 class IFS_NetModule;
