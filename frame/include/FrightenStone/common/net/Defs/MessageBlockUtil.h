@@ -57,10 +57,6 @@ public:
 
     #pragma region epoll
     #ifndef _WIN32
-    static FS_MessageBlock *BuildTransferEpollEvSessionWillConnectMsg(UInt32 compId
-                                                                      , UInt32 generatorId
-                                                                      , FS_EpollPoller *poller
-                                                                      , BriefSessionInfo *newSessionInfo);
 
     static FS_MessageBlock *BuildEpollEvEpollInEvMsgBlock(UInt64 sessionId);
     static FS_MessageBlock *BuildEpollEvEpollOutEvMsgBlock(UInt64 sessionId);
