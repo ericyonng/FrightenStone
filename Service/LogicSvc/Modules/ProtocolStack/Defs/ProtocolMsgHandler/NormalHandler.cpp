@@ -109,8 +109,8 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     // 网络包过大直接杀掉
     if (len >= fs::NetMsgHeaderFmtType::_msgHeaderSize && *packetLen > bufferSize)
     {
-        g_Log->w<NormalHandler>(_LOGFMT_("net package len larger than recv buffer size packetlen[%u], buffersize[%lld]")
-            , *packetLen, bufferSize);
+        g_Log->w<NormalHandler>(_LOGFMT_("sessionId[%llu] addr[%s] cur buffer data len[%lld] net package len larger than recv buffer size packetlen[%u], buffersize[%lld]")
+            , sessionId, session->GetAddr()->ToString().c_str(), len, *packetLen, bufferSize);
         user->Close(UserCloseReasonType::NetPackageTooLarge);
     }
 }
