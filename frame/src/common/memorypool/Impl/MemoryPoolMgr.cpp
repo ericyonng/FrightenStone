@@ -123,8 +123,7 @@ void *MemoryPoolMgr::Alloc(size_t bytes)
     }
 
     // 非内存池分配
-    auto alignBytes = __FS_MEMORY_ALIGN__(bytes);
-    alignBytes += sizeof(MemoryBlock);
+    auto alignBytes = __FS_MEMORY_ALIGN__(bytes + sizeof(MemoryBlock));
 
     char *cache = reinterpret_cast<char *>(::malloc(alignBytes));
     MemoryBlock *block = reinterpret_cast<MemoryBlock*>(cache);
@@ -142,8 +141,7 @@ void *MemoryPoolMgr::Realloc(void *ptr, size_t bytes)
     MemoryBlock *block = reinterpret_cast<MemoryBlock*>(reinterpret_cast<char*>(ptr) - sizeof(MemoryBlock));
     if(UNLIKELY(!block->_isInPool))
     {
-        auto alignBytes = __FS_MEMORY_ALIGN__(bytes);
-        alignBytes += sizeof(MemoryBlock);
+        auto alignBytes = __FS_MEMORY_ALIGN__(bytes + sizeof(MemoryBlock));
 
         char *newCache = reinterpret_cast<char *>(::realloc(block, alignBytes));
         block = reinterpret_cast<MemoryBlock *>(newCache);

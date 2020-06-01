@@ -61,8 +61,8 @@ public:
     static void Run()
     {
         size_t alignBeforeSize = sizeof(TestMemAlignObj<Int64>);
-        size_t alignSize = __FS_MEMORY_ALIGN__(sizeof(TestMemAlignObj<Int64>));
-        size_t offSetAlignSize = alignSize + sizeof(TestMemAlignHeader);
+        size_t alignSize = __FS_MEMORY_ALIGN__(sizeof(TestMemAlignObj<Int64>) + sizeof(TestMemAlignHeader));
+        size_t offSetAlignSize = alignSize;
         std::cout << "alignBeforeSize=" << alignBeforeSize << " alignSize=" << alignSize << " offSetAlignSize" << offSetAlignSize << std::endl;
 
         char *memBlock = static_cast<char *>(::malloc(offSetAlignSize));
