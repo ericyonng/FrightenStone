@@ -44,7 +44,7 @@ class IFS_NetBuffer;
 class FS_Iocp;
 struct IoDataBase;
 #else
-class FS_EpollPoller;
+class FS_EpollTransferPoller;
 struct EpollIoData;
 class FS_Epoll;
 #endif
@@ -88,7 +88,7 @@ public:
     void OnSendSuc(Int64 transferBytes, IoDataBase *ioData);
     void OnRecvSuc(Int64 transferBytes, IoDataBase *ioData);
 #else
-    void Bind(FS_EpollPoller *transferPoller);
+    void Bind(FS_EpollTransferPoller *transferPoller);
     bool IsRecvIoCanceled() const;
     bool IsSendIoCaceled() const;
 
@@ -114,7 +114,7 @@ private:
 #else
     bool _isRecvIoCanceled;
     bool _isSendIoCanceled;
-    FS_EpollPoller *_transferPoller;
+    FS_EpollTransferPoller *_transferPoller;
     FS_Epoll *_epoll;
 #endif
     #pragma endregion

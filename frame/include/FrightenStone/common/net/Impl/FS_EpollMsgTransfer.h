@@ -38,7 +38,6 @@
 #include "FrightenStone/common/objpool/objpool.h"
 
 FS_NAMESPACE_BEGIN
-class FS_EpollPoller;
 struct BriefSessionInfo;
 class FS_EpollTransferPoller;
 
