@@ -13,7 +13,7 @@ FS_ROOT_DIR = "../../"
 -- build directory
 FS_BUILD_DIR = "../../build/"
 
-SCRIPT_PATH=$(cd '$(dirname "$0")'; pwd)
+SCRIPT_PATH=${cd '$(dirname "$0")'; pwd}
 
 if IS_WINDOWS then
     -- FS_OUTPUT_DIR = FS_OUTPUT_BASE_DIR .. "/$(Configuration)"
