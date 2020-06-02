@@ -13,7 +13,8 @@ COREDUMPFLAG="$2"
 if [ -n "$1" ]
 then
 VER="$1"
-OUTPUT_DIR=$SCRIPT_PATH/output/gmake/
+OUTPUT_DIR=${SCRIPT_PATH}/output/gmake/
+ls ${OUTPUT_DIR}
 
 	if [ $VER = "debug" ]
 	then
@@ -21,14 +22,14 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/
 		for libName in $DEBUG_LIBS
 		do
 			rm -f /usr/lib64/$libName
-			ln -sv $OUTPUT_DIR/$libName /usr/lib64/$libName
+			ln -sv ${OUTPUT_DIR}/$libName /usr/lib64/$libName
 		done
 	else
 		# 创建release版本的so连接符号
 		for libName in $RELEASE_LIBS
 		do
 			rm -f /usr/lib64/$libName
-			ln -sv $OUTPUT_DIR/$libName /usr/lib64/$libName
+			ln -sv ${OUTPUT_DIR}/$libName /usr/lib64/$libName
 		done
 	fi
 	
