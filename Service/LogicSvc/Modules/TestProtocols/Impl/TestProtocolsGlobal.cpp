@@ -256,13 +256,14 @@ void TestProtocolsGlobal::_TestBlackList()
         }
 
         auto user = g_UserMgr->GetUserBySessionId(sessionId);
-        BUFFER256 randData{
-            // 前4字节长度
-            Byte8(127), Byte8(127), Byte8(127), Byte8(127),
-            // 后4字节cmd
-            Byte8(127), Byte8(127), Byte8(127), Byte8(127),
-            Byte8(0) };
+//         BUFFER256 randData{
+//             // 前4字节长度
+//             Byte8(127), Byte8(127), Byte8(127), Byte8(127),
+//             // 后4字节cmd
+//             Byte8(127), Byte8(127), Byte8(127), Byte8(127),
+//             Byte8(0) };
 
+        BUFFER256 randData;
         user->SendData(randData, sizeof(randData));
 #ifdef _DEBUG
         g_Log->i<TestProtocolsGlobal>(_LOGFMT_("sessionId[%llu], has send a rand data"), sessionId);
