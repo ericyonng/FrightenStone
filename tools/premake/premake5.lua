@@ -82,7 +82,7 @@ function include_libfs(do_post_build)
         "/usr/include/",
 		}
         libdirs {
-            FS_ROOT_DIR .. "/usr/lib64/",
+            FS_ROOT_DIR .. "/usr/lib/",
         }
     filter {}
 
