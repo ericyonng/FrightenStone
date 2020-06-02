@@ -13,7 +13,7 @@ COREDUMPFLAG="$2"
 if [ -n "$1" ]
 then
 VER="$1"
-OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
+OUTPUT_DIR=$SCRIPT_PATH/output/gmake/
 
 	if [ $VER = "debug" ]
 	then
