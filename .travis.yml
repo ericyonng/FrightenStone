@@ -12,10 +12,10 @@ install:
     # - if[[ "${TRAVIS_OS_NAME}" == "linux"]]; then sudo apt-get install -y uuid-dev; fi
 
 script:
-    - sudo ./necessarysoft.sh
-    - sudo ./runfirstly_scripts.sh
-    - sudo ./linuxmakefile_build.sh
-    - sudo cd ./build/gmake
+    - ./necessarysoft.sh
+    - ./runfirstly_scripts.sh
+    - ./linuxmakefile_build.sh
+    - cd ./build/gmake
     - make clean;make
     
 notifications:
