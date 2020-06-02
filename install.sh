@@ -12,6 +12,7 @@ COREDUMPFLAG="$2"
 OUTPUT_DIR=${SCRIPT_PATH}/output/gmake/
 sudo ln -sv $SCRIPT_PATH/Service/Cfgs ${OUTPUT_DIR}/Cfgs
 
+# 动态库连接
 if [ -n "$1" ]
 then
 VER="$1"
@@ -20,6 +21,8 @@ VER="$1"
 		# 创建debug版本的so连接符号
 		for libName in $DEBUG_LIBS
 		do
+			sudo rm -f /usr/lib64/$libName
+			sudo ln -sv ${OUTPUT_DIR}/$libName /usr/lib64/$libName
 			sudo rm -f /usr/lib/$libName
 			sudo ln -sv ${OUTPUT_DIR}/$libName /usr/lib/$libName
 		done
@@ -27,6 +30,8 @@ VER="$1"
 		# 创建release版本的so连接符号
 		for libName in $RELEASE_LIBS
 		do
+			sudo rm -f /usr/lib64/$libName
+			sudo ln -sv ${OUTPUT_DIR}/$libName /usr/lib64/$libName
 			sudo rm -f /usr/lib/$libName
 			sudo ln -sv ${OUTPUT_DIR}/$libName /usr/lib/$libName
 		done
