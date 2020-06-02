@@ -14,7 +14,7 @@ install:
 script:
     - sudo chmod 777 *.sh
     - ./necessarysoft.sh
-    - ./runfirstly_scripts.sh
+    - ./runfirstly_scripts.sh debug
     - ./linuxmakefile_build.sh
     - cd ./build/gmake
     - make clean;make
