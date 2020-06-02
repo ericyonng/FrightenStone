@@ -4,7 +4,7 @@
 #!/usr/bin/env bash
 
 # 变量与等号之间不可以有空格，否则会被当成命令
-SCRIPT_PATH=$(cd '$(dirname "$0")'; pwd)
+SCRIPT_PATH="$(cd $(dirname $0); pwd)"
 DEBUG_LIBS={"libFrightenstone_debug.so"}
 RELEASE_LIBS={"libFrightenstone.so"}
 OPEN_COREDUMP="opencoredump"

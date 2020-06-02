@@ -15,7 +15,7 @@ VER="$1"
 if
 
 # 路径
-SCRIPT_PATH=$(cd '$(dirname "$0")'; pwd)
+SCRIPT_PATH="$(cd $(dirname $0); pwd)"
 
 # install szrz
 # yum -y install lrzsz

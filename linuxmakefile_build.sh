@@ -3,7 +3,7 @@
 # @brief generate makefile
 #!/usr/bin/env bash
 
-SCRIPT_PATH=$(cd '$(dirname "$0")'; pwd)
+SCRIPT_PATH="$(cd $(dirname $0); pwd)"
 PREMAKE_SCRIPT_PATH=$SCRIPT_PATH/tools/premake
 PREMAKE_TOOL=$PREMAKE_SCRIPT_PATH/linux_premake5
 
