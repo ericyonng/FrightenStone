@@ -9,7 +9,7 @@ os:
 sudo: yes
 install:
     # linux platform install instructions
-    - if[[ "${TRAVIS_OS_NAME}" == "linux"]]; then sudo apt-get install -y uuid-dev; fi
+    # - if[[ "${TRAVIS_OS_NAME}" == "linux"]]; then sudo apt-get install -y uuid-dev; fi
 
 script:
     - sudo ./necessarysoft.sh
