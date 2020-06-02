@@ -78,7 +78,3 @@ echo -e "fs.file-max=1024000 \n" >> ${SYSCTL_CONF_PATH}
 
 # 生效
 sysctl -p
-
-# 配置文件目录连接
-#ln -sv $SCRIPT_PATH/Service/Cfgs ${OUTPUT_DIR}/Cfgs
-

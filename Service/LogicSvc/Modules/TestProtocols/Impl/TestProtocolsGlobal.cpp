@@ -258,10 +258,10 @@ void TestProtocolsGlobal::_TestBlackList()
         auto user = g_UserMgr->GetUserBySessionId(sessionId);
         BUFFER256 randData{
             // 前4字节长度
-            255, 255, 255, 255,
+            Byte8(127), Byte8(127), Byte8(127), Byte8(127),
             // 后4字节cmd
-            255, 255, 255, 255,
-            0 };
+            Byte8(127), Byte8(127), Byte8(127), Byte8(127),
+            Byte8(0) };
 
         user->SendData(randData, sizeof(randData));
 #ifdef _DEBUG
