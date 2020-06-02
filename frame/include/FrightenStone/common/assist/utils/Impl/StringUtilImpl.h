@@ -187,7 +187,7 @@ inline FS_String StringUtil::Num2Str(ObjType val, Int32 radix)
 
     FS_String str;
     if(radix == 16)
-        str._buffer += "0x";
+        str.GetRaw() += "0x";
 
     UInt64 ptrVal = 0;
     ::memcpy(&ptrVal, &val, sizeof(ObjType) > sizeof(UInt64) ? sizeof(UInt64) : sizeof(ObjType));
