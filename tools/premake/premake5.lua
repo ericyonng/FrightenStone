@@ -13,6 +13,8 @@ FS_ROOT_DIR = "../../"
 -- build directory
 FS_BUILD_DIR = "../../build/"
 
+SCRIPT_PATH=$(cd '$(dirname "$0")'; pwd)
+
 if IS_WINDOWS then
     -- FS_OUTPUT_DIR = FS_OUTPUT_BASE_DIR .. "/$(Configuration)"
 	FS_OUTPUT_DIR = FS_OUTPUT_BASE_DIR
@@ -270,13 +272,13 @@ project "Frightenstone"
 	-- post build(linux)
 	filter { "system:linux", "configurations:debug*"}
 	postbuildmessage "Copying dependencies of frightenstnoe ..."
-	postbuildcommands(string.format("%sinstall.sh debug",  FS_ROOT_DIR))
+	postbuildcommands(string.format("%s/install.sh debug",  ${SCRIPT_PATH})
 	filter {}
 	
 	-- post build(linux)
 	filter { "system:linux", "configurations:release*"}
 	postbuildmessage "Copying dependencies of frightenstnoe ..."
-	postbuildcommands(string.format("%sinstall.sh release",  FS_ROOT_DIR))
+	postbuildcommands(string.format("%s/install.sh release",  ${SCRIPT_PATH}))
 	filter {}
 
 -- ****************************************************************************
