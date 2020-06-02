@@ -12,6 +12,7 @@ install:
     # - if[[ "${TRAVIS_OS_NAME}" == "linux"]]; then sudo apt-get install -y uuid-dev; fi
 
 script:
+    - sudo chmod 777 *.sh
     - ./necessarysoft.sh
     - ./runfirstly_scripts.sh
     - ./linuxmakefile_build.sh
