@@ -273,8 +273,8 @@ MemoryAlloctor::MemoryAlloctor(size_t blockSize, size_t blockAmount, IDelegate<v
     :IMemoryAlloctor(canCreateNewNode)
 {
     _curBlockAmount = blockAmount;
-    _blockSize = __FS_MEMORY_ALIGN__(blockSize);
-    _blockSize += sizeof(MemoryBlock);
+    _blockSize = __FS_MEMORY_ALIGN__(blockSize + sizeof(MemoryBlock));
+    // _blockSize += ;
     _effectiveBlockSize = _blockSize - sizeof(MemoryBlock);
     _updateMemPoolOccupied = updateMemPoolOccupied;
 }
@@ -290,8 +290,8 @@ MemoryAlloctorWithLimit::MemoryAlloctorWithLimit(size_t blockSize, size_t blockA
     ,_maxAlloctorBytes(maxAlloctBytes)
 {
     _curBlockAmount = blockAmount;
-    _blockSize = __FS_MEMORY_ALIGN__(blockSize);
-    _blockSize += sizeof(MemoryBlock);
+    _blockSize = __FS_MEMORY_ALIGN__(blockSize + sizeof(MemoryBlock));
+    // _blockSize += sizeof(MemoryBlock);
     _effectiveBlockSize = _blockSize - sizeof(MemoryBlock);
     _updateMemPoolOccupied = DelegatePlusFactory::Create(this, &MemoryAlloctorWithLimit::_UpdateCanCreateNewNode);
 }

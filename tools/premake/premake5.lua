@@ -270,13 +270,13 @@ project "Frightenstone"
 	-- post build(linux)
 	filter { "system:linux", "configurations:debug*"}
 	postbuildmessage "Copying dependencies of frightenstnoe ..."
-	postbuildcommands(string.format("%sinstall.sh debug",  FS_ROOT_DIR))
+	postbuildcommands(string.format("%sbuilding.sh debug",  FS_ROOT_DIR))
 	filter {}
 	
 	-- post build(linux)
 	filter { "system:linux", "configurations:release*"}
 	postbuildmessage "Copying dependencies of frightenstnoe ..."
-	postbuildcommands(string.format("%sinstall.sh release",  FS_ROOT_DIR))
+	postbuildcommands(string.format("%sbuilding.sh release",  FS_ROOT_DIR))
 	filter {}
 
 -- ****************************************************************************

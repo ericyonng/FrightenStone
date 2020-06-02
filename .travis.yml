@@ -1,2 +1,26 @@
-language:c++
-os:windows
+language: cpp
+compiler:
+    - g++
+    - clang++
+    
+os:
+    - linux
+    
+sudo: yes
+install:
+    # linux platform install instructions
+    # - if[[ "${TRAVIS_OS_NAME}" == "linux"]]; then sudo apt-get install -y uuid-dev; fi
+
+script:
+    - sudo chmod 777 *.sh
+    - ./config_env.sh
+    - ./linuxmakefile_build.sh
+    - cd ./build/gmake
+    - make clean;make
+    
+notifications:
+    email:
+        recipients:
+            - 120453674@qq.com # ericyonng
+        on_success: change
+        on_failure: always

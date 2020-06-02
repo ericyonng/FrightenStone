@@ -4,7 +4,7 @@
 #!/usr/bin/env bash
 
 # 变量与等号之间不可以有空格，否则会被当成命令
-SCRIPT_PATH=$(cd '$(dirname "$0")'; pwd)
+SCRIPT_PATH="$(cd $(dirname $0); pwd)"
 DEBUG_LIBS=("libFrightenstone_debug.so")
 RELEASE_LIBS=("libFrightenstone.so")
 OPEN_COREDUMP="opencoredump"
@@ -13,22 +13,23 @@ COREDUMPFLAG="$2"
 if [ -n "$1" ]
 then
 VER="$1"
-OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
+OUTPUT_DIR=${SCRIPT_PATH}/output/gmake/
+ls ${OUTPUT_DIR}
 
 	if [ $VER = "debug" ]
 	then
 		# 创建debug版本的so连接符号
 		for libName in $DEBUG_LIBS
 		do
-			rm -f /usr/lib64/$libName
-			ln -sv $OUTPUT_DIR/$libName /usr/lib64/$libName
+			sudo rm -f /usr/lib64/$libName
+			sudo ln -sv ${OUTPUT_DIR}/$libName /usr/lib64/$libName
 		done
 	else
 		# 创建release版本的so连接符号
 		for libName in $RELEASE_LIBS
 		do
-			rm -f /usr/lib64/$libName
-			ln -sv $OUTPUT_DIR/$libName /usr/lib64/$libName
+			sudo rm -f /usr/lib64/$libName
+			sudo ln -sv ${OUTPUT_DIR}/$libName /usr/lib64/$libName
 		done
 	fi
 	
@@ -63,7 +64,7 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 				echo "it is already setted unlimited forever"
 			else
 				echo "will set unlimited forever"
-				echo -e "@root soft core unlimited \n@root hard core unlimited\n" >> ${LIMITS_CONF_PATH}
+				sudo echo -e "@root soft core unlimited \n@root hard core unlimited\n" >> ${LIMITS_CONF_PATH}
 			fi
 			
 			# 设置cordump 系统级别	 
@@ -73,7 +74,7 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 				echo "core dump format is already setted forever"
 			else
 				echo "will set core dump format forever"
-				echo -e "kernel.core_pattern=${SET_PATTEN}\nkernel.core_uses_pid=0\n" >> ${SYSCTL_CONF_PATH}
+				sudo echo -e "kernel.core_pattern=${SET_PATTEN}\nkernel.core_uses_pid=0\n" >> ${SYSCTL_CONF_PATH}
 				# sysctl -p
 			fi
 		fi
@@ -81,18 +82,21 @@ OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
 	
 	# 修改当前系统最大文件描述符打开数量
 	echo "modify file describe quantity"
-	sed -i "/hard nofile/d" ${LIMITS_CONF_PATH}
-	sed -i "/soft nofile/d" ${LIMITS_CONF_PATH}
-	echo -e "* hard nofile 1024000 \n* soft nofile 1024000 \n" >> ${LIMITS_CONF_PATH}
+	sudo sed -i "/hard nofile/d" ${LIMITS_CONF_PATH}
+	sudo sed -i "/soft nofile/d" ${LIMITS_CONF_PATH}
+	sudo echo -e "* hard nofile 1024000 \n* soft nofile 1024000 \n" >> ${LIMITS_CONF_PATH}
 	
 	# 修改系统级的最大文件描述符数量
 	echo "modify file describe quantity at system level"	
-	sed -i "/fs.file-max/d" ${SYSCTL_CONF_PATH}
-	echo -e "fs.file-max=1024000 \n" >> ${SYSCTL_CONF_PATH}	
+	sudo sed -i "/fs.file-max/d" ${SYSCTL_CONF_PATH}
+	sudo echo -e "fs.file-max=1024000 \n" >> ${SYSCTL_CONF_PATH}	
 	
 	# 生效
-	sysctl -p
+	sudo sysctl -p
 fi
+
+sudo ln -sv $SCRIPT_PATH/Service/Cfgs ${OUTPUT_DIR}/Cfgs
+
 
 
 

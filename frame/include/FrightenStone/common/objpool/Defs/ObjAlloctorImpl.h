@@ -36,7 +36,7 @@ FS_NAMESPACE_BEGIN
 
 // objtype的blocksize必须是void *尺寸的整数倍
 template<typename ObjType>
-const size_t IObjAlloctor<ObjType>::_objBlockSize = __FS_MEMORY_ALIGN__(sizeof(ObjType)) + sizeof(ObjBlock<ObjType>);
+const size_t IObjAlloctor<ObjType>::_objBlockSize = __FS_MEMORY_ALIGN__(sizeof(ObjType) + sizeof(ObjBlock<ObjType>));
 
 template<typename ObjType>
 inline IObjAlloctor<ObjType>::IObjAlloctor(size_t blockAmount)

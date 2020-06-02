@@ -35,7 +35,7 @@
 FS_NAMESPACE_BEGIN
 
 template<typename ObjType>
-const size_t AlloctorNode<ObjType>::_objBlockSize = __FS_MEMORY_ALIGN__(sizeof(ObjType)) + sizeof(ObjBlock<ObjType>);
+const size_t AlloctorNode<ObjType>::_objBlockSize = __FS_MEMORY_ALIGN__(sizeof(ObjType) + sizeof(ObjBlock<ObjType>));
 
 template<typename ObjType>
 inline AlloctorNode<ObjType>::AlloctorNode(size_t capacity)
