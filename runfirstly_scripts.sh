@@ -4,15 +4,15 @@
 #!/usr/bin/env bash
 
 # 版本
-VER="debug"
-if [ -n "$1" ]
-then
-VER="$1"
-    if [ $VER != "debug" ]
-    then
-	    $VER="release"
-	if
-if
+# VER="debug"
+# if [ -n "$1" ]
+# then
+# VER="$1"
+#    if [ $VER != "debug" ]
+#    then
+#	    $VER="release"
+#	if
+# if
 
 # 路径
 SCRIPT_PATH="$(cd $(dirname $0); pwd)"
@@ -23,24 +23,24 @@ SCRIPT_PATH="$(cd $(dirname $0); pwd)"
 # install uuid soft package
 # install openssl
 
-mkdir /usr/local/openssl
-rm -rf /usr/local/openssl/*
-rm -rf /usr/include/openssl
-rm -rf /usr/lib/libcrypto.so
-rm -rf /usr/lib/libssl.so
-rm -rf /usr/lib/libcrypto.so.1.0.0
-rm -rf /usr/lib/libssl.so.1.0.0
+sudo rm -rf /usr/local/openssl
+sudo mkdir /usr/local/openssl
+sudo rm -rf /usr/include/openssl
+sudo rm -rf /usr/lib/libcrypto.so
+sudo rm -rf /usr/lib/libssl.so
+sudo rm -rf /usr/lib/libcrypto.so.1.0.0
+sudo rm -rf /usr/lib/libssl.so.1.0.0
 
-cp -fR $SCRIPT_PATH/3rd/openssl/linux/* /usr/local/openssl/
-ln -sv /usr/local/openssl/include/openssl /usr/include/openssl
-ln -sv /usr/local/openssl/lib/libcrypto.so.1.0.0 /usr/lib/libcrypto.so
-ln -sv /usr/local/openssl/lib/libssl.so.1.0.0 /usr/lib/libssl.so
-ln -sv /usr/local/openssl/lib/libcrypto.so.1.0.0 /usr/lib/libcrypto.so.1.0.0
-ln -sv /usr/local/openssl/lib/libssl.so.1.0.0 /usr/lib/libssl.so.1.0.0
+sudo cp -fR $SCRIPT_PATH/3rd/openssl/linux/* /usr/local/openssl/
+sudo ln -sv /usr/local/openssl/include/openssl /usr/include/openssl
+sudo ln -sv /usr/local/openssl/lib/libcrypto.so /usr/lib/libcrypto.so
+sudo ln -sv /usr/local/openssl/lib/libssl.so /usr/lib/libssl.so
+sudo ln -sv /usr/local/openssl/lib/libcrypto.so.1.0.0 /usr/lib/libcrypto.so.1.0.0
+sudo ln -sv /usr/local/openssl/lib/libssl.so.1.0.0 /usr/lib/libssl.so.1.0.0
 
 
 # coredump设置永久生效
-OUTPUT_DIR=$SCRIPT_PATH/output/gmake/$VER
+OUTPUT_DIR=$SCRIPT_PATH/output/gmake/
 LIMITS_CONF_PATH="/etc/security/limits.conf"
 echo "set forever unlimited"
 if grep -qE ".*@root soft core unlimited.*" ${LIMITS_CONF_PATH}

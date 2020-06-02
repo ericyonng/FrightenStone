@@ -18,12 +18,12 @@ if [ -n "$1" ]
 then
 VER="$1"
 OUTPUT_DIR=${SCRIPT_PATH}/output/gmake/
-sudo export PATH=$PATH:${SCRIPT_PATH}/output/gmake/
+# sudo export PATH=$PATH:${SCRIPT_PATH}/output/gmake/
 
 	if [ $VER = "debug" ]
 	then
 	    sudo rm -f /usr/lib/libFrightenstone_debug.so
-		sudo ln -sv ${OUTPUT_DIR}/libFrightenstone_debug.so /usr/lib/libFrightenstone_debug.so
+		sudo ln -sv ${OUTPUT_DIR}libFrightenstone_debug.so /usr/lib/libFrightenstone_debug.so
 		# 创建debug版本的so连接符号
 		# for libName in $DEBUG_LIBS
 		# do
@@ -32,7 +32,7 @@ sudo export PATH=$PATH:${SCRIPT_PATH}/output/gmake/
 		# done
 	else
 		sudo rm -f /usr/lib/libFrightenstone.so
-		sudo ln -sv ${OUTPUT_DIR}/libFrightenstone.so /usr/lib/libFrightenstone.so
+		sudo ln -sv ${OUTPUT_DIR}libFrightenstone.so /usr/lib/libFrightenstone.so
 		# 创建release版本的so连接符号
 		# for libName in $RELEASE_LIBS
 		# do
