@@ -11,7 +11,7 @@ SCRIPT_PATH="$(cd $(dirname $0); pwd)"
 # COREDUMPFLAG="$2"
 
 # 配置环境变量
-sudo export PATH=$PATH:${SCRIPT_PATH}/output/gmake/
+# sudo export PATH=$PATH:${SCRIPT_PATH}/output/gmake/
 sudo ln -sv $SCRIPT_PATH/Service/Cfgs ${OUTPUT_DIR}/Cfgs
 
 if [ -n "$1" ]
