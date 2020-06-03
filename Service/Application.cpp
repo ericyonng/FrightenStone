@@ -67,7 +67,10 @@ void FS_Application::Run()
         st = Start();
         if(st == StatusDefs::Success)
         {
-            getchar();
+            while (true)
+            {
+                fs::SystemUtil::Sleep(1000);
+            }
         }
         else
         {
