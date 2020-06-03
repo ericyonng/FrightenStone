@@ -417,8 +417,10 @@ void FS_EpollTransferPoller::_OnPreDistributeEvPoller(FS_ThreadPool *pool)
                 auto &ev = evs[i];
                 if (ev.events & (EPOLLHUP | EPOLLERR))
                 {
-                    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("hup or err ev of sock sessionId[%llu] trigs on epoll poller compid[%u]")
-                        , ev.data.u64, compId);
+                    const Int32 sockErr = error;
+                    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("hup or err ev of sock sessionId[%llu] trigs on epoll poller compid[%u] EPOLLHUP[%d] EPOLLERR[%d] sockErr[%d:%s]")
+                        , ev.data.u64, compId, ev.events&EPOLLHUP, ev.events&EPOLLERR
+                        , sockErr, SystemUtil::GetErrString(sockErr).c_str());
 
                     // 取消会话io
                     CancelRecvIo(ev.data.u64, CancelIoReason::EpollHupOrError, true);
@@ -496,8 +498,10 @@ void FS_EpollTransferPoller::_OnReadPoller(FS_ThreadPool *pool)
 
         for (auto iterBlock = messageBlockList->begin(); iterBlock != messageBlockList->end();)
         {
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new recv will come "));
             evMsgBlock = reinterpret_cast<FS_NetMsgBlock *>(*iterBlock);
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new recv will come _messageType[%d] compId[%u]")
+                , evMsgBlock->_messageType, evMsgBlock->_compId);
+
             (this->*_msgBlockHandler[evMsgBlock->_messageType])(evMsgBlock);
             Fs_SafeFree(evMsgBlock);
             iterBlock = messageBlockList->erase(iterBlock);
@@ -540,8 +544,9 @@ void FS_EpollTransferPoller::_OnSendPoller(FS_ThreadPool *pool)
 
         for (auto iterBlock = messageBlockList->begin(); iterBlock != messageBlockList->end();)
         {
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new data to send"));
             evMsgBlock = reinterpret_cast<FS_NetMsgBlock *>(*iterBlock);
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new data to send messageType[%d], compId[%u]")
+                , evMsgBlock->_messageType, evMsgBlock->_compId);
             (this->*_msgBlockHandler[evMsgBlock->_messageType])(evMsgBlock);
             Fs_SafeFree(evMsgBlock);
             iterBlock = messageBlockList->erase(iterBlock);
@@ -735,7 +740,7 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
                     , sessionId, len, sockErrorCode);
             }
-            else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_BufferFull)
+            else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_HaveNoDataToSend)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
 
                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send not buffer full and remove session")
@@ -951,7 +956,7 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
                     , sessionId, len, sockErrorCode);
             }
-            else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_BufferFull)
+            else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_HaveNoDataToSend)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
                 // 其他错误则断开网络连接
                 _sessionIdRefSenderEvStatus.erase(iterStatus);
@@ -1100,9 +1105,9 @@ Int32 FS_EpollTransferPoller::_OnSend(SOCKET sock, Byte8 *buff, Int64 buffLen, I
     {
         if (buffLen <= 0)
         {
-            sockErrorCode = StatusDefs::FS_SockError_BufferFull;
+            sockErrorCode = StatusDefs::FS_SockError_HaveNoDataToSend;
 
-            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("buff not enough sock[%d] buff address[0x%p] FS_SockError_BufferFull")
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("buff have no data sock[%d] buff address[0x%p] FS_SockError_HaveNoDataToSend")
                 , sock, buff);
             ret = StatusDefs::SockError;
             break;

@@ -68,7 +68,7 @@ void TestProtocolsGlobal::OnInitialize()
 void TestProtocolsGlobal::OnLocalServerReady()
 {
     // 向对端发起连接
-    // _TestConnect();
+    _TestConnect();
 }
 
 void TestProtocolsGlobal::OnLocalServerStartup()

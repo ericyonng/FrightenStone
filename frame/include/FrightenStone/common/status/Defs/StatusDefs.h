@@ -200,6 +200,7 @@ namespace StatusDefs
         FS_SockError_EAGAIN = 4201,                             // 网络io结束
         FS_SockError_UnknownError = 4202,                       // 网络io未知错误
         FS_SockError_BufferFull = 4203,                         // 缓冲区满
+        FS_SockError_HaveNoDataToSend = 4204,                   // 没有可发送的数据
         #pragma endregion
 
         #pragma region FS_EpollConnector[4300, 4399]
