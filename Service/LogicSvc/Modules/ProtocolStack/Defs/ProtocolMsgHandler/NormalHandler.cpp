@@ -69,9 +69,11 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     // 1.缓冲有效数据长度大于包头长度说明包头数据到达
     // 2.与包长度比较，若有效数据长度比包长度大说明至少存在一个整包
     // 3.一个网络包比缓冲区还大是不允许出现的，若出现则直接kill掉连接
+    // 4.packetLen不可为0，避免死循环
     //fs::Time s, e;
-    while (len >= fs::NetMsgHeaderFmtType::_msgHeaderSize && 
-        len >= *packetLen)
+    for (; *packetLen &&
+        (len >= fs::NetMsgHeaderFmtType::_msgHeaderSize) &&
+        (len >= *packetLen);)
     {
         // 1.解码
         if (!_msgDecoder->Decode(buffer))
@@ -97,7 +99,7 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
 
         // 弹出消息
         recvBuffer->PopFront(_msgDecoder->GetMsgLen());
-        
+
         // 统计一个包
         g_ThisApp->HandleCompEv_RecvMsgAmount();
 
