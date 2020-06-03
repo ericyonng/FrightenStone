@@ -89,10 +89,10 @@ void TestInsts::Run()
     // TestServer::Run();
     //TestUtf8C17toC11::Run();
     //TestMessageQueue2::Run();
-    //TestServer::Run();
+    TestServer::Run();
     //TestMemAlign::Run();
     //TestEpoll::Run();
-    TestObjPool::Run();
+    //TestObjPool::Run();
     getchar();
     // TestJson::Run();
 }
