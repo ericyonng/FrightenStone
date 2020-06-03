@@ -23,4 +23,4 @@ notifications:
         recipients:
             - 120453674@qq.com # ericyonng
         on_success: change
-        on_failure: always
+        on_failure: change
