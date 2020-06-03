@@ -43,7 +43,7 @@ public:
     MemoryHelper();
     ~MemoryHelper();
 
-    static MemoryHelper *GetInstance();
+    // static MemoryHelper *GetInstance();
 
     void Start(UInt64 maxObjPoolBytesLimit, UInt64 maxGlobalMemoryPoolBytesLimit);
     void Finish();
@@ -57,10 +57,16 @@ private:
     std::list<IDelegate<void, UInt64> *> _objPoolSetMaxAllowOccupiedBytes;
 };
 
+// inline MemoryHelper *MemoryHelper::GetInstance()
+// {
+//     static BASE_EXPORT MemoryHelper helper;
+//     return &helper;
+// }
+
 FS_NAMESPACE_END
 
 #include "FrightenStone/common/memoryhelper/Impl/MemoryHelperImpl.h"
 
-// extern BASE_EXPORT fs::MemoryHelper *g_MemoryHelper;
+extern BASE_EXPORT fs::MemoryHelper *g_MemoryHelper;
 
 #endif

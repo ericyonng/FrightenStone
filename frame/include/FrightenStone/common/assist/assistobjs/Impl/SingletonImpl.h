@@ -36,7 +36,7 @@ FS_NAMESPACE_BEGIN
 // Locker Singleton<ObjType, delMethod>::_locker;
 
 template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
-std::mutex Singleton<ObjType, delMethod>::_mtx;
+Locker Singleton<ObjType, delMethod>::_lock;
 
 template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
 SmartPtr<ObjType, delMethod> Singleton<ObjType, delMethod>::_pObj = NULL;
@@ -44,12 +44,16 @@ SmartPtr<ObjType, delMethod> Singleton<ObjType, delMethod>::_pObj = NULL;
 template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
 inline ObjType *Singleton<ObjType, delMethod>::GetInstance()
 {
-    std::lock_guard<std::mutex> lck(_mtx);
-    ObjType *pObj = _pObj;
+    _lock.Lock();
     if (_pObj)
-        return _pObj;
+    {
+        ObjType *ptr = _pObj;
+        _lock.Unlock();
+        return ptr;
+    }
 
     _pObj = new ObjType;
+    _lock.Unlock();
 
     return _pObj;
 }
@@ -58,11 +62,16 @@ template<typename ObjType, AssistObjsDefs::DelMethods delMethod>
 template<typename... Args>
 inline ObjType *Singleton<ObjType, delMethod>::GetInstance(Args... args)
 {
-    std::lock_guard<std::mutex> lck(_mtx);
+    _lock.Lock();
     if (_pObj)
-        return _pObj;
+    {
+        ObjType *ptr = _pObj;
+        _lock.Unlock();
+        return ptr;
+    }
 
     _pObj = new ObjType(std::forward<Args>(args)...);
+    _lock.Unlock();
     return _pObj;
 }
 

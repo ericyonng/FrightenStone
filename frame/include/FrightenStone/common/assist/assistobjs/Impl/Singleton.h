@@ -47,6 +47,7 @@
 
 FS_NAMESPACE_BEGIN
 
+// 单例请确保在程序进行全局对象初始化时候不适用singleton或者，全局初始化期间不调用单例创建,避免单例中锁可能因为初始化顺序而未来得及创建
 template<typename ObjType, AssistObjsDefs::DelMethods delMethod = AssistObjsDefs::Delete>
 class Singleton
 {
@@ -64,7 +65,7 @@ private:
 
 private:
     static SmartPtr<ObjType, delMethod> _pObj;
-    static std::mutex _mtx;
+    static Locker _lock;
 };
 
 FS_NAMESPACE_END
