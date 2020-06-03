@@ -540,6 +540,7 @@ void FS_EpollTransferPoller::_OnSendPoller(FS_ThreadPool *pool)
 
         for (auto iterBlock = messageBlockList->begin(); iterBlock != messageBlockList->end();)
         {
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new data to send"));
             evMsgBlock = reinterpret_cast<FS_NetMsgBlock *>(*iterBlock);
             (this->*_msgBlockHandler[evMsgBlock->_messageType])(evMsgBlock);
             Fs_SafeFree(evMsgBlock);
