@@ -64,19 +64,16 @@ inline IObjAlloctor<ObjType>::~IObjAlloctor()
 template<typename ObjType>
 inline void *IObjAlloctor<ObjType>::Alloc()
 {
-    _locker.Lock();
-    auto ptr = MixAllocNoLocker();
-    _locker.Unlock();
-    return ptr;
+    std::lock_guard<std::mutex> lck(_locker);
+    return MixAllocNoLocker();
 }
 
 template<typename ObjType>
 inline void IObjAlloctor<ObjType>::Free(void *ptr)
 {
-    _locker.Lock();
+    std::lock_guard<std::mutex> lck(_locker);
     // free的对象构成链表用于下次分配
     MixFreeNoLocker(ptr);
-    _locker.Unlock();
 }
 
 template<typename ObjType>
@@ -155,14 +152,14 @@ inline void *IObjAlloctor<ObjType>::AllocNoLocker()
     }
 
     // 分配新节点
-    if(_alloctedInCurNode >= _lastNode->_blockCnt)
-    {
-        // 即将增加的内存大于允许占用的内存
-        if((g_curObjPoolOccupiedBytes + 2 * _objBlockSize*_nodeCapacity) > _objpoolAllowedMaxOccupiedBytes)
-            return NULL;
-
-        _NewNode();
-    }
+//     if(_alloctedInCurNode >= _lastNode->_blockCnt)
+//     {
+//         // 即将增加的内存大于允许占用的内存
+//         if((g_curObjPoolOccupiedBytes + 2 * _objBlockSize*_nodeCapacity) > _objpoolAllowedMaxOccupiedBytes)
+//             return NULL;
+// 
+//         _NewNode();
+//     }
 
     // 内存池中分配对象
     auto ptr = reinterpret_cast<char *>(_curNodeObjs) + _alloctedInCurNode * _objBlockSize;
@@ -220,39 +217,29 @@ inline void IObjAlloctor<ObjType>::DeleteWithoutDestructor(ObjType *ptr)
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetObjInUse()
 {
-    _locker.Lock();
-    auto cnt = _objInUse;
-    _locker.Unlock();
-
-    return cnt;
+    std::lock_guard<std::mutex> lck(_locker);
+    return _objInUse;
 }
 
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetTotalObjBlocks()
 {
-    _locker.Lock();
-    auto cnt = _totalBlockCnt;
-    _locker.Unlock();
-    return cnt;
+    std::lock_guard<std::mutex> lck(_locker);
+    return _totalBlockCnt;
 }
 
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetNodeCnt()
 {
-    _locker.Lock();
-    auto cnt = _nodeCnt;
-    _locker.Unlock();
-
-    return cnt;
+    std::lock_guard<std::mutex> lck(_locker);
+    return _nodeCnt;
 }
 
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetBytesOccupied()
 {
-    _locker.Lock();
-    auto cnt = _bytesOccupied;
-    _locker.Unlock();
-    return cnt;
+    std::lock_guard<std::mutex> lck(_locker);
+    return _bytesOccupied;
 }
 
 template<typename ObjType>
@@ -262,15 +249,9 @@ inline size_t IObjAlloctor<ObjType>::GetObjBlockSize()
 }
 
 template<typename ObjType>
-inline void IObjAlloctor<ObjType>::Lock()
+inline std::mutex &IObjAlloctor<ObjType>::GetMtx()
 {
-    _locker.Lock();
-}
-
-template<typename ObjType>
-inline void IObjAlloctor<ObjType>::UnLock()
-{
-    _locker.Unlock();
+    return _locker;
 }
 
 template<typename ObjType>
