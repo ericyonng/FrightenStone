@@ -417,7 +417,7 @@ void FS_EpollTransferPoller::_OnPreDistributeEvPoller(FS_ThreadPool *pool)
                 auto &ev = evs[i];
                 if (ev.events & (EPOLLHUP | EPOLLERR))
                 {
-                    const Int32 sockErr = error;
+                    const Int32 sockErr = errno;
                     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("hup or err ev of sock sessionId[%llu] trigs on epoll poller compid[%u] EPOLLHUP[%d] EPOLLERR[%d] sockErr[%d:%s]")
                         , ev.data.u64, compId, ev.events&EPOLLHUP, ev.events&EPOLLERR
                         , sockErr, SystemUtil::GetErrString(sockErr).c_str());
