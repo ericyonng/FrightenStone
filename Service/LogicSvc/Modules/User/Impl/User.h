@@ -42,7 +42,7 @@ class IUserSys;
 // TODO:还要对user进行扩展：user工厂类,系统节点user,真实人user等
 class User
 {
-    OBJ_POOL_CREATE_DEF(User);
+    OBJ_POOL_CREATE_ANCESTOR(User);
 public:
     User(IUserMgr *userMgr, UInt64 sessionId, UInt64 userId);
     ~User();

@@ -63,7 +63,7 @@ public:
 
 struct BASE_EXPORT IoDataBase
 {
-    OBJ_POOL_CREATE_DEF(IoDataBase);
+    OBJ_POOL_CREATE_ANCESTOR(IoDataBase);
 public:
     IoDataBase():_node(NULL){}
     ~IoDataBase();

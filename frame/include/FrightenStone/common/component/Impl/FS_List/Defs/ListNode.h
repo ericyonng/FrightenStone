@@ -43,7 +43,7 @@ FS_NAMESPACE_BEGIN
 template<typename ObjType>
 struct ListNode
 {
-    OBJ_POOL_CREATE_DEF(ListNode<ObjType>);
+    OBJ_POOL_CREATE_TEMPLATE_ANCESTOR(ListNode<ObjType>, ListNode);
 
 public:
     ListNode(ObjType obj);

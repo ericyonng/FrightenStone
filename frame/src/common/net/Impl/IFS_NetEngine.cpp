@@ -57,7 +57,7 @@
 #include "FrightenStone/common/component/Impl/MessageQueue/MessageQueue.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(IFS_NetEngine, 2);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(IFS_NetEngine, 1);
 
 IFS_NetEngine::~IFS_NetEngine()
 {

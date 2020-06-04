@@ -41,7 +41,7 @@
 
 class MyClientLogic : public LogicSvc
 {
-    OBJ_POOL_CREATE_DEF(MyClientLogic);
+    OBJ_POOL_CREATE_DERIVE(MyClientLogic, LogicSvc);
 public:
     MyClientLogic() :LogicSvc(ServiceType::ClientSimulation){}
     virtual ~MyClientLogic()
@@ -66,11 +66,11 @@ public:
 
 };
 
-OBJ_POOL_CREATE_DEF_IMPL(MyClientLogic, 1);
+OBJ_POOL_CREATE_DERIVE_IMPL(MyClientLogic, 1);
 
 class MyClient : public FS_Application
 {
-    //OBJ_POOL_CREATE_DEF(MyClient);
+    OBJ_POOL_CREATE_DERIVE(MyClient, FS_Application);
 public:
     MyClient() {}
     ~MyClient() {}
@@ -100,6 +100,7 @@ protected:
                                  ,realConnect);
     }
 };
+OBJ_POOL_CREATE_DERIVE_IMPL(MyClient, 1);
 //OBJ_POOL_CREATE_DEF_IMPL(MyClient, 1);
 
 // 

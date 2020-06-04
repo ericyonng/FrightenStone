@@ -34,7 +34,7 @@
 
 class BlackListCfg
 {
-    OBJ_POOL_CREATE_DEF(BlackListCfg);
+    OBJ_POOL_CREATE_ANCESTOR(BlackListCfg);
 
 public:
     BlackListCfg();

@@ -71,7 +71,7 @@ public:
 
 struct BASE_EXPORT LogData
 {
-    OBJ_POOL_CREATE_DEF(LogData);
+    OBJ_POOL_CREATE_ANCESTOR(LogData);
 
     Time _logTime;                  // 时间 generate inside
     FS_String _logToWrite;          // 格式化的日志字符串 %s<%s>[%s][%s]line:%d %s

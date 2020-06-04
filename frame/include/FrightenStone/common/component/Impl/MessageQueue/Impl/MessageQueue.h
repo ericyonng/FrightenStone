@@ -160,7 +160,7 @@ private:
 // 单向无线程并发消息队列
 class BASE_EXPORT ConcurrentMessageQueueNoThread
 {
-    OBJ_POOL_CREATE_DEF(ConcurrentMessageQueueNoThread);
+    OBJ_POOL_CREATE_ANCESTOR(ConcurrentMessageQueueNoThread);
 public:
     ConcurrentMessageQueueNoThread(UInt32 generatorQuantity, UInt32 consumerQuantity = 1);
     ~ConcurrentMessageQueueNoThread();
@@ -219,7 +219,7 @@ private:
 // 只能单向,只能从生产者到消费者 无线程同步消息队列
 class BASE_EXPORT MessageQueueNoThread
 {
-    OBJ_POOL_CREATE_DEF(MessageQueueNoThread);
+    OBJ_POOL_CREATE_ANCESTOR(MessageQueueNoThread);
 public:
     MessageQueueNoThread();
     ~MessageQueueNoThread();

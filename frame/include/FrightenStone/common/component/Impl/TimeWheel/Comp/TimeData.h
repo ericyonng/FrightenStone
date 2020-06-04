@@ -55,7 +55,7 @@ public:
 
 class BASE_EXPORT TimeData
 {
-    OBJ_POOL_CREATE_DEF(TimeData);
+    OBJ_POOL_CREATE_ANCESTOR(TimeData);
 public:
     explicit TimeData(FS_Timer *timer);
     virtual ~TimeData();
@@ -89,7 +89,7 @@ public:
 
 class BASE_EXPORT AsynTimeData
 {
-    OBJ_POOL_CREATE_DEF(AsynTimeData);
+    OBJ_POOL_CREATE_ANCESTOR(AsynTimeData);
 public:
     AsynTimeData();
     Int32 _opType;                      // AsynOpType

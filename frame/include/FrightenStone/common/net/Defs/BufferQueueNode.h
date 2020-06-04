@@ -40,7 +40,7 @@ FS_NAMESPACE_BEGIN
 class IFS_NetBuffer;
 struct BASE_EXPORT BufferQueueNode
 {
-    OBJ_POOL_CREATE_DEF(BufferQueueNode);
+    OBJ_POOL_CREATE_ANCESTOR(BufferQueueNode);
     BufferQueueNode();
     ~BufferQueueNode();
 

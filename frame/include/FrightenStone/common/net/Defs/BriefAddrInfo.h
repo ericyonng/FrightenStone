@@ -38,7 +38,7 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT BriefAddrInfo
 {
-    OBJ_POOL_CREATE_DEF(BriefAddrInfo);
+    OBJ_POOL_CREATE_ANCESTOR(BriefAddrInfo);
     BriefAddrInfo();
 
     FS_String _ip;

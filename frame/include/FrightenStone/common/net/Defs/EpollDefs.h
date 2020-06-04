@@ -89,7 +89,7 @@ public:
 
 struct BASE_EXPORT EpollIoData
 {
-    OBJ_POOL_CREATE_DEF(EpollIoData);
+    OBJ_POOL_CREATE_ANCESTOR(EpollIoData);
 
     EpollIoData():_node(NULL), _data(NULL), _dateLen(0) {}
     ~EpollIoData();

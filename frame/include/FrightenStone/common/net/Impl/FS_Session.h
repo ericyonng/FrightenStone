@@ -51,7 +51,7 @@ class FS_Epoll;
 
 class BASE_EXPORT FS_Session : public IFS_Session
 {
-    OBJ_POOL_CREATE_DEF(FS_Session);
+    OBJ_POOL_CREATE_DERIVE(FS_Session, IFS_Session);
 public:
     FS_Session(BuildSessionInfo &buildData);
     virtual ~FS_Session();

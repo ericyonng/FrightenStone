@@ -42,8 +42,6 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_EpollMsgTransfer, 32)
-
 FS_EpollMsgTransfer::FS_EpollMsgTransfer(UInt32 compId, IFS_NetEngine *engine)
     :IFS_MsgTransfer(compId, engine)
     , _poller(NULL)

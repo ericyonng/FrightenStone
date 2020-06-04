@@ -40,7 +40,7 @@ static const std::map<const char*, SmartVar> __emptyConstantStrKeyParams;
 FS_NAMESPACE_END
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_Event, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(FS_Event, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_Event::FS_Event(int id /*= 0*/, bool dontDelAfterFire /*= false*/)
     : _id(id)

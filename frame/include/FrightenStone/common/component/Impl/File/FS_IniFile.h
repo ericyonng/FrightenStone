@@ -48,7 +48,7 @@ class FS_String;
 class Locker;
 class BASE_EXPORT FS_IniFile
 {
-    OBJ_POOL_CREATE_DEF(FS_IniFile);
+    OBJ_POOL_CREATE_ANCESTOR(FS_IniFile);
 public:
     FS_IniFile();
     virtual ~FS_IniFile();

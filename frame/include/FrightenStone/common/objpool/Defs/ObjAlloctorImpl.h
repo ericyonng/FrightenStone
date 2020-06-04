@@ -85,6 +85,8 @@ inline void IObjAlloctor<ObjType>::InitPool()
     if(_header)
         return;
 
+    // 初始化类名
+    _objTypeName = typeid(ObjType).name();
     // 初始化节点
     _header = new AlloctorNode<ObjType>(_nodeCapacity);
     _lastNode = _header;

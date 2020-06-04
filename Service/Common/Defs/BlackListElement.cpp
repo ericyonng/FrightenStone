@@ -29,7 +29,7 @@
 #include "stdafx.h"
 #include "Service/LogicSvc/Modules/ProtocolStack/Defs/BlackListElement.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(BlackListElement, OBJ_POOL_LOGIC_DEF_INIT_NUM);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(BlackListElement, OBJ_POOL_LOGIC_DEF_INIT_NUM);
 
 BlackListElement::BlackListElement()
     :_expireTime(0)

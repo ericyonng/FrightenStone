@@ -33,7 +33,7 @@
 #include "Service/LogicSvc/Modules/TestProtocols/Defs/FS_ClientCfgMgr.h"
 #include "Service/LogicSvc/Modules/TestProtocols/Defs/FS_ClientDefaultCfgDef.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_ClientCfgMgr, 1)
+OBJ_POOL_CREATE_DERIVE_IMPL(FS_ClientCfgMgr, 1)
 FS_ClientCfgMgr *g_ClientCfgMgr = NULL;
 
 FS_ClientCfgMgr::FS_ClientCfgMgr()

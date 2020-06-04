@@ -43,7 +43,7 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT FS_MessageBlock
 {
-    OBJ_POOL_CREATE_DEF(FS_MessageBlock);
+    OBJ_POOL_CREATE_ANCESTOR(FS_MessageBlock);
 
     FS_MessageBlock();
     virtual ~FS_MessageBlock();

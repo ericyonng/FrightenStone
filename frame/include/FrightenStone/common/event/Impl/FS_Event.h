@@ -44,7 +44,7 @@ FS_NAMESPACE_BEGIN
 // 避免使用const char *,可能实际上不是你预期的样子(const char *其实质是一个地址或者数值)
 class BASE_EXPORT FS_Event
 {
-    OBJ_POOL_CREATE_DEF(FS_Event);
+    OBJ_POOL_CREATE_ANCESTOR(FS_Event);
 public:
     FS_Event(int id = 0, bool dontDelAfterFire = false);
     virtual ~FS_Event();

@@ -62,7 +62,7 @@ struct FS_ConnectInfo;
 // 注意:各个模块启线程应该放到after start做，所有的数据准备不应该在afeterstart做
 class BASE_EXPORT IFS_NetEngine
 {
-    OBJ_POOL_CREATE_DEF(IFS_NetEngine);
+    OBJ_POOL_CREATE_ANCESTOR(IFS_NetEngine);
 public:
     IFS_NetEngine();
     virtual ~IFS_NetEngine();

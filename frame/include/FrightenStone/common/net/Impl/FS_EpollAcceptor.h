@@ -43,7 +43,6 @@ FS_NAMESPACE_BEGIN
 class FS_EpollAcceptPoller;
 class BASE_EXPORT FS_EpollAcceptor : public IFS_Acceptor
 {
-    OBJ_POOL_CREATE_DEF(FS_EpollAcceptor);
 public:
     FS_EpollAcceptor(UInt32 compId
                     , Locker &sessionLocker

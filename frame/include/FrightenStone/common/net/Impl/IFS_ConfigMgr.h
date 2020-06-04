@@ -40,7 +40,7 @@ FS_NAMESPACE_BEGIN
 class FS_IniFile;
 class BASE_EXPORT IFS_ConfigMgr
 {
-    OBJ_POOL_CREATE_DEF(IFS_ConfigMgr);
+    OBJ_POOL_CREATE_ANCESTOR(IFS_ConfigMgr);
 public:
     static FS_String _bindAnyIp;    // 绑定任意ip:"Any"
 

@@ -35,7 +35,7 @@
 #include "FrightenStone/common/assist/utils/Impl/RTTIUtil.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(IFS_BusinessLogic, 16);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(IFS_BusinessLogic, 16);
 
 IFS_BusinessLogic::~IFS_BusinessLogic()
 {

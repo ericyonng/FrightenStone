@@ -65,7 +65,7 @@ class FS_Session;
 
 class BASE_EXPORT IFS_BusinessLogic
 {
-    OBJ_POOL_CREATE_DEF(IFS_BusinessLogic);
+    OBJ_POOL_CREATE_ANCESTOR(IFS_BusinessLogic);
 public:
     IFS_BusinessLogic(Int32 serviceId);
     virtual ~IFS_BusinessLogic();

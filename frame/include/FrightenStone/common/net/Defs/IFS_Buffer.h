@@ -47,7 +47,7 @@ FS_NAMESPACE_BEGIN
 // buffer不可给其他线程使用，只能在单线程中 避免IMemoryAlloctor未定义出错 IMemoryAlloctor 是外部传入，外部释放
 class BASE_EXPORT IFS_Buffer
 {
-    OBJ_POOL_CREATE_DEF(IFS_Buffer);
+    OBJ_POOL_CREATE_ANCESTOR(IFS_Buffer);
 public:
     // 支持内存分配器
     IFS_Buffer(size_t bufferSize, IMemoryAlloctor *memAlloctor);

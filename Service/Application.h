@@ -35,7 +35,7 @@
 
 class FS_Application : public fs::IFS_NetEngine
 {
-    OBJ_POOL_CREATE_DEF(FS_Application);
+    OBJ_POOL_CREATE_DERIVE(FS_Application, IFS_NetEngine);
 public:
     FS_Application();
     virtual ~FS_Application();

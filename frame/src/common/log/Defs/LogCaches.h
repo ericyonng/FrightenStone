@@ -40,7 +40,7 @@ FS_NAMESPACE_BEGIN
 
 struct LogDataCache
 {
-    OBJ_POOL_CREATE_DEF(LogDataCache);
+    OBJ_POOL_CREATE_ANCESTOR(LogDataCache);
     LogDataCache();
     ~LogDataCache();
 
@@ -52,7 +52,7 @@ class LogFile;
 
 class LogCaches
 {
-    OBJ_POOL_CREATE_DEF(LogCaches);
+    OBJ_POOL_CREATE_ANCESTOR(LogCaches);
 public:
     LogCaches();
     virtual ~LogCaches();

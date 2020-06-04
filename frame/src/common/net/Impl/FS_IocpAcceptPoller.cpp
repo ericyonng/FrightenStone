@@ -51,7 +51,6 @@
 
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_IocpAcceptPoller, 32);
 
 Int32 FS_IocpAcceptPoller::BeforeStart()
 {

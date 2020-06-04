@@ -35,7 +35,7 @@
 
 class ProtocolTypeCfg
 {
-    OBJ_POOL_CREATE_DEF(ProtocolTypeCfg);
+    OBJ_POOL_CREATE_ANCESTOR(ProtocolTypeCfg);
 public:
     ProtocolTypeCfg();
     ~ProtocolTypeCfg();

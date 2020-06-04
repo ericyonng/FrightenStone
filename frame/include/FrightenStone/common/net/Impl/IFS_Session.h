@@ -50,7 +50,7 @@ class  IFS_NetBuffer;
 
 struct BASE_EXPORT BuildSessionInfo
 {
-    OBJ_POOL_CREATE_DEF(BuildSessionInfo);
+    OBJ_POOL_CREATE_ANCESTOR(BuildSessionInfo);
 
     UInt64 _sessionId = 0;
     UInt32 _transferCompId = 0;
@@ -68,7 +68,7 @@ struct BASE_EXPORT BuildSessionInfo
 // 只支持单线程
 class BASE_EXPORT IFS_Session
 {
-    OBJ_POOL_CREATE_DEF(IFS_Session);
+    OBJ_POOL_CREATE_ANCESTOR(IFS_Session);
 
 public:
     explicit IFS_Session(BuildSessionInfo &buildInfo);

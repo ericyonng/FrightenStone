@@ -35,7 +35,7 @@
 #ifndef _WIN32
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_Epoll, 32);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(FS_Epoll, 32);
 
 FS_Epoll::FS_Epoll()
     :_ev{static_cast<UInt32>(EpollDefs::InvalidFd)}

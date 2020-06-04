@@ -10,7 +10,7 @@
 
 class TestObjPoolObj
 {
-    OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper);
+    OBJ_POOL_CREATE_ANCESTOR(TestObjPoolObj);
 public:
     TestObjPoolObj(Int64 i):_int64obj(i) {}
     ~TestObjPoolObj() 
@@ -22,7 +22,7 @@ private:
     Int64 _int64obj;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10000000)
+OBJ_POOL_CREATE_ANCESTOR_IMPL(TestObjPoolObj, 10000000)
 
 
 class TestObjPoolObj2

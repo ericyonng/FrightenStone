@@ -32,7 +32,7 @@
 #include "Service/ServiceType.h"
 #include "Service/Common/LogicCommon.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(FS_Application, 1);
+OBJ_POOL_CREATE_DERIVE_IMPL(FS_Application, 1);
 FS_Application *g_ThisApp = NULL;
 FS_Application::FS_Application()
     :_config(NULL)

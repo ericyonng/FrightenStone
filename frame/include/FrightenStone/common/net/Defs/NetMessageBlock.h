@@ -95,7 +95,7 @@ public:
 
 struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
 {
-    OBJ_POOL_CREATE_DEF(FS_NetMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(FS_NetMsgBlock, FS_MessageBlock);
 
     FS_NetMsgBlock(UInt32 compId = 0, UInt32 generatorId = 0, Int32 messageType = NetMessageType::None);
     ~FS_NetMsgBlock();
@@ -108,7 +108,7 @@ struct BASE_EXPORT FS_NetMsgBlock : public FS_MessageBlock
 // 会话消息连入
 struct BASE_EXPORT SessionConnectedNetMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(SessionConnectedNetMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(SessionConnectedNetMsgBlock, FS_NetMsgBlock);
 
     SessionConnectedNetMsgBlock(UInt32 compId, UInt32 generatorId);
     ~SessionConnectedNetMsgBlock();
@@ -138,7 +138,7 @@ struct BASE_EXPORT SessionConnectedNetMsgBlock : public FS_NetMsgBlock
 // 连接失败
 struct BASE_EXPORT PostConnectionFailureToDispatcherMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(PostConnectionFailureToDispatcherMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(PostConnectionFailureToDispatcherMsgBlock, FS_NetMsgBlock);
 
     PostConnectionFailureToDispatcherMsgBlock(const FS_ConnectInfo &connectInfo, Int32 resultCode);
 
@@ -149,7 +149,7 @@ struct BASE_EXPORT PostConnectionFailureToDispatcherMsgBlock : public FS_NetMsgB
 // 异步连接返回
 struct BASE_EXPORT PostAsynConnectionToConnectorMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(PostAsynConnectionToConnectorMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(PostAsynConnectionToConnectorMsgBlock, FS_NetMsgBlock);
 
     PostAsynConnectionToConnectorMsgBlock(const FS_ConnectInfo &connectInfo);
 
@@ -160,7 +160,7 @@ struct BASE_EXPORT PostAsynConnectionToConnectorMsgBlock : public FS_NetMsgBlock
 // 连接断开
 struct BASE_EXPORT SessionDisconnectedMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(SessionDisconnectedMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(SessionDisconnectedMsgBlock, FS_NetMsgBlock);
 
     SessionDisconnectedMsgBlock(UInt64 sessionId);
     UInt64 _sessionId;
@@ -171,7 +171,7 @@ struct BASE_EXPORT SessionDisconnectedMsgBlock : public FS_NetMsgBlock
 // 会话消息到达
 struct BASE_EXPORT IocpMsgArrivedMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(IocpMsgArrivedMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(IocpMsgArrivedMsgBlock, FS_NetMsgBlock);
     IocpMsgArrivedMsgBlock();
     ~IocpMsgArrivedMsgBlock();
 
@@ -183,7 +183,7 @@ struct BASE_EXPORT IocpMsgArrivedMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT EpollEvArriveMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(EpollEvArriveMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(EpollEvArriveMsgBlock, FS_NetMsgBlock);
 
     EpollEvArriveMsgBlock();
     ~EpollEvArriveMsgBlock() {}
@@ -194,7 +194,7 @@ struct BASE_EXPORT EpollEvArriveMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT EpollEvEpollInEvMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(EpollEvEpollInEvMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(EpollEvEpollInEvMsgBlock, FS_NetMsgBlock);
     EpollEvEpollInEvMsgBlock();
     ~EpollEvEpollInEvMsgBlock() {}
 
@@ -203,7 +203,7 @@ struct BASE_EXPORT EpollEvEpollInEvMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT EpollEvEpollOutEvMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(EpollEvEpollOutEvMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(EpollEvEpollOutEvMsgBlock, FS_NetMsgBlock);
     EpollEvEpollOutEvMsgBlock();
     ~EpollEvEpollOutEvMsgBlock() {}
 
@@ -212,7 +212,7 @@ struct BASE_EXPORT EpollEvEpollOutEvMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT PostRecvMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(PostRecvMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(PostRecvMsgBlock, FS_NetMsgBlock);
 
     PostRecvMsgBlock();
 
@@ -222,7 +222,7 @@ struct BASE_EXPORT PostRecvMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT PostSendMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(PostSendMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(PostSendMsgBlock, FS_NetMsgBlock);
 
     PostSendMsgBlock();
 
@@ -232,7 +232,7 @@ struct BASE_EXPORT PostSendMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT EpollRecvDataMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(EpollRecvDataMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(EpollRecvDataMsgBlock, FS_NetMsgBlock);
 
     EpollRecvDataMsgBlock(UInt32 compId, UInt32 generatorId);
 
@@ -244,7 +244,7 @@ struct BASE_EXPORT EpollRecvDataMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT EpollSendSucMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(EpollSendSucMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(EpollSendSucMsgBlock, FS_NetMsgBlock);
 
     EpollSendSucMsgBlock(UInt32 compId, UInt32 generatorId);
 
@@ -257,7 +257,7 @@ struct BASE_EXPORT EpollSendSucMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT PostCancelIoToRecverMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(PostCancelIoToRecverMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(PostCancelIoToRecverMsgBlock, FS_NetMsgBlock);
 
     PostCancelIoToRecverMsgBlock(UInt64 sessionId, Int32 reason, bool giveRes);
 
@@ -268,7 +268,7 @@ struct BASE_EXPORT PostCancelIoToRecverMsgBlock : public FS_NetMsgBlock
 
 struct BASE_EXPORT PostCancelIoToSenderMsgBlock : public FS_NetMsgBlock
 {
-    OBJ_POOL_CREATE_DEF(PostCancelIoToSenderMsgBlock);
+    OBJ_POOL_CREATE_DERIVE(PostCancelIoToSenderMsgBlock, FS_NetMsgBlock);
 
     PostCancelIoToSenderMsgBlock(UInt64 sessionId, Int32 reason, bool giveRes);
 

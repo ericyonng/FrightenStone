@@ -29,7 +29,7 @@
 #include "stdafx.h"
 #include "Service/LogicSvc/Modules/NodeConnection/Defs/PendingStubInfo.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(PendingStubInfo, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(PendingStubInfo, __DEF_OBJ_POOL_OBJ_NUM__);
 
 PendingStubInfo::PendingStubInfo()
     :_pendingStub(0)
