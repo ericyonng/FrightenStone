@@ -42,7 +42,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_CpuInfo
 {
-    OBJ_POOL_CREATE_DEF(FS_CpuInfo);
+    OBJ_POOL_CREATE_ANCESTOR(FS_CpuInfo);
 public:
     FS_CpuInfo();
     bool Initialize();

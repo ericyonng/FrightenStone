@@ -53,7 +53,7 @@
 // #include "TestSuit/TestSuit/TestInst/TestXor.h"
 // #include "TestSuit/TestSuit/TestInst/TestCrashHandle.h"
 // #include "TestSuit/TestSuit/TestInst/TestMemoryPool.h"
-// #include "TestSuit/TestSuit/TestInst/TestObjPool.h"
+#include "TestSuit/TestSuit/TestInst/TestObjPool.h"
 // #include "TestSuit/TestSuit/TestInst/TestMathUtil.h"
 // #include "TestSuit/TestSuit/TestInst/TestIocpExample.h"
 // #include "TestSuit/TestSuit/TestInst/TestEvent.h"
@@ -90,7 +90,9 @@ void TestInsts::Run()
     //TestUtf8C17toC11::Run();
     //TestMessageQueue2::Run();
     TestServer::Run();
+    //TestMemAlign::Run();
     //TestEpoll::Run();
+    //TestObjPool::Run();
     getchar();
     // TestJson::Run();
 }

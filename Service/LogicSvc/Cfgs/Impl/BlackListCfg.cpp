@@ -30,7 +30,7 @@
 #include "Service/LogicSvc/Cfgs/Impl/BlackListCfg.h"
 #include "Service/LogicSvc/Cfgs/Defs/CommonInclude.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(BlackListCfg, FS_CFG_OBJPOLL_DEF_NUM)
+OBJ_POOL_CREATE_ANCESTOR_IMPL(BlackListCfg, FS_CFG_OBJPOLL_DEF_NUM);
 
 BlackListCfg::BlackListCfg()
     :_breakCount(0)

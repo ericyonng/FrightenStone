@@ -41,6 +41,11 @@ inline size_t fs::ListNode<ObjType>::GetMemleakNum()
     return _objPoolHelper->GetMemleakObjNum();
 }
 
+template<typename ObjType>
+inline void fs::ListNode<ObjType>::ListNode_objpooldetect() 
+{
+}
+
 FS_NAMESPACE_BEGIN
 
 // template<typename ObjType>

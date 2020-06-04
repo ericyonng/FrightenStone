@@ -46,7 +46,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT IFS_NetBuffer : public IFS_Buffer
 {
-    OBJ_POOL_CREATE_DEF(IFS_NetBuffer);
+    OBJ_POOL_CREATE_DERIVE(IFS_NetBuffer, IFS_Buffer);
 public:
     IFS_NetBuffer(size_t bufferSize, IMemoryAlloctor *memAlloctor);
     ~IFS_NetBuffer();

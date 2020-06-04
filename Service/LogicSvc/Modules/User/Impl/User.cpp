@@ -31,7 +31,7 @@
 #include "Service/LogicSvc/Modules/User/Interface/IUserMgr.h"
 #include "Service/LogicSvc/Modules/User/Impl/IUserSys.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(User, OBJ_POOL_LOGIC_DEF_INIT_NUM);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(User, OBJ_POOL_LOGIC_DEF_INIT_NUM);
 
 User::User(IUserMgr *userMgr, UInt64 sessionId, UInt64 userId)
     :_sessionId(sessionId)

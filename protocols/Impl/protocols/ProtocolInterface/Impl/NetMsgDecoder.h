@@ -38,7 +38,7 @@ FS_NAMESPACE_BEGIN
 
 class NetMsgDecoder
 {
-    OBJ_POOL_CREATE_DEF(NetMsgDecoder);
+    OBJ_POOL_CREATE_ANCESTOR(NetMsgDecoder);
 public:
     NetMsgDecoder();
     virtual ~NetMsgDecoder() {}

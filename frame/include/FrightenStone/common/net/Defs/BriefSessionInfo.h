@@ -45,7 +45,7 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT BriefSessionInfo
 {
-    OBJ_POOL_CREATE_DEF(BriefSessionInfo);
+    OBJ_POOL_CREATE_ANCESTOR(BriefSessionInfo);
 
     BriefSessionInfo();
     ~BriefSessionInfo();

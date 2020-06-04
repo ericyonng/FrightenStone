@@ -49,7 +49,6 @@ class IFS_NetEngine;
 
 class BASE_EXPORT IFS_AcceptorPoller : public IFS_BasePoller
 {
-    OBJ_POOL_CREATE_DEF(IFS_AcceptorPoller);
 public:
     IFS_AcceptorPoller(IFS_EngineComp *engineComp, Int32 monitorType);
     ~IFS_AcceptorPoller();

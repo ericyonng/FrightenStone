@@ -65,8 +65,8 @@ void Locker::Lock()
 
 void Locker::Unlock()
 {
-    if(UNLIKELY(!_metaLocker.load()))
-        _Init();
+//     if(UNLIKELY(!_metaLocker.load()))
+//         _Init();
 
 #ifdef _WIN32
     LeaveCriticalSection(&_metaLocker.load()->_handle);
@@ -79,8 +79,8 @@ void Locker::Unlock()
 
 bool Locker::TryLock()
 {
-    if(UNLIKELY(!_metaLocker.load()))
-        _Init();
+//     if(UNLIKELY(!_metaLocker.load()))
+//         _Init();
 
 #ifdef _WIN32
     return TryEnterCriticalSection(&_metaLocker.load()->_handle);

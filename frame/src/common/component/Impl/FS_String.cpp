@@ -37,7 +37,7 @@
 #include <set>
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_String, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(FS_String, __DEF_OBJ_POOL_OBJ_NUM__);
 
 #ifdef _WIN32
 const char *FS_String::endl = "\r\n";

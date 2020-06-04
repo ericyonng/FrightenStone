@@ -38,7 +38,7 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT IoEvent
 {
-    OBJ_POOL_CREATE_DEF(IoEvent);
+    OBJ_POOL_CREATE_ANCESTOR(IoEvent);
     IoEvent();
     UInt64 _sessionId;       // 会话id
     void *_ioData;          // 网络数据信息由dispatcher进行解析 iocp 是IoDataBase

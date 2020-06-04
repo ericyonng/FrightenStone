@@ -82,7 +82,7 @@ public:
 
 // struct BASE_EXPORT NetMsg_Buffer : public NetMsg_DataHeader
 // {
-//     OBJ_POOL_CREATE_DEF(NetMsg_Buffer);
+//     OBJ_POOL_CREATE_ANCESTOR(NetMsg_Buffer);
 //     NetMsg_Buffer();
 // 
 //     char _buffer[0];
@@ -118,7 +118,7 @@ public:
 ///
 struct LoginData
 {
-    OBJ_POOL_CREATE_DEF(LoginData);
+    OBJ_POOL_CREATE_ANCESTOR(LoginData);
     LoginData();
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
@@ -128,7 +128,7 @@ struct LoginData
 
 struct LoginReq : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(LoginReq);
+    OBJ_POOL_CREATE_DERIVE(LoginReq, NetMsg_DataHeader);
     LoginReq();
     LoginData _loginData;
 
@@ -139,7 +139,7 @@ struct LoginReq : public NetMsg_DataHeader
 
 struct LoginRes : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(LoginRes);
+    OBJ_POOL_CREATE_DERIVE(LoginRes, NetMsg_DataHeader);
     LoginRes();
 
     Int32 _result;
@@ -153,7 +153,7 @@ struct LoginRes : public NetMsg_DataHeader
 
 struct LoginNty : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(LoginNty);
+    OBJ_POOL_CREATE_DERIVE(LoginNty, NetMsg_DataHeader);
     LoginNty();
     
     char _userName[MAX_NAME_LEN];
@@ -166,7 +166,7 @@ struct LoginNty : public NetMsg_DataHeader
 
 struct CreatePlayerNty : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(CreatePlayerNty);
+    OBJ_POOL_CREATE_DERIVE(CreatePlayerNty, NetMsg_DataHeader);
     CreatePlayerNty();
     Int32 _socket;
 
@@ -177,7 +177,7 @@ struct CreatePlayerNty : public NetMsg_DataHeader
 
 struct CheckHeartReq : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(CheckHeartReq);
+    OBJ_POOL_CREATE_DERIVE(CheckHeartReq, NetMsg_DataHeader);
     CheckHeartReq();
     virtual bool SerializeToByteBuffer(NetMsgCoder *coder);
     virtual void SerializeToStringBuffer(NetMsgCoder *coder);
@@ -186,7 +186,7 @@ struct CheckHeartReq : public NetMsg_DataHeader
 
 struct CheckHeartRes : public NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(CheckHeartRes);
+    OBJ_POOL_CREATE_DERIVE(CheckHeartRes, NetMsg_DataHeader);
     CheckHeartRes();
     virtual bool SerializeToByteBuffer(NetMsgCoder *coder);
     virtual void SerializeToStringBuffer(NetMsgCoder *coder);

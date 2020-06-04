@@ -34,7 +34,7 @@
 // 黑民单过期队列成员
 struct BlackListElement
 {
-    OBJ_POOL_CREATE_DEF(BlackListElement);
+    OBJ_POOL_CREATE_ANCESTOR(BlackListElement);
     BlackListElement();
     Int64 _expireTime;              // 过期时间最大值是永久黑名单
     UInt64 _breakRuleCount;         // 违规次数

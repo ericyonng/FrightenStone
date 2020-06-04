@@ -36,7 +36,7 @@
 #include "FrightenStone/common/assist/utils/Impl/SystemUtil.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_TlsTable, 32);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(FS_TlsTable, 32);
 
 FS_TlsTable::~FS_TlsTable()
 {

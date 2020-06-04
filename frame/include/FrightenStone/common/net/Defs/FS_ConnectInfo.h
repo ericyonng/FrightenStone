@@ -44,7 +44,7 @@ FS_NAMESPACE_BEGIN
 
 struct BASE_EXPORT FS_ConnectInfo
 {
-    OBJ_POOL_CREATE_DEF(FS_ConnectInfo);
+    OBJ_POOL_CREATE_ANCESTOR(FS_ConnectInfo);
 
     FS_ConnectInfo():_port(0), _stub(0){}
 

@@ -53,7 +53,6 @@
 
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(FS_EpollAcceptor, __DEF_OBJ_POOL_OBJ_NUM__);
 
 FS_EpollAcceptor::FS_EpollAcceptor(UInt32 compId
                                  , Locker &sessionLocker

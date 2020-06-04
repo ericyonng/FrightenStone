@@ -57,7 +57,7 @@
 #include "FrightenStone/common/component/Impl/MessageQueue/MessageQueue.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(IFS_NetEngine, 2);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(IFS_NetEngine, 1);
 
 IFS_NetEngine::~IFS_NetEngine()
 {
@@ -98,6 +98,7 @@ Int32 IFS_NetEngine::Init()
     }
 
     // 4.log初始化 NULL默认以程序名为基准创建目录
+    g_Log = ILog::GetInstance();
     ret = g_Log->InitModule(NULL);
     if(ret != StatusDefs::Success)
     {

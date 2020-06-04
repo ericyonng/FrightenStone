@@ -56,7 +56,6 @@ struct IoDataBase;
 
 class BASE_EXPORT FS_IocpAcceptPoller : public IFS_AcceptorPoller
 {
-    OBJ_POOL_CREATE_DEF(FS_IocpAcceptPoller);
 public:
     FS_IocpAcceptPoller(IFS_EngineComp *engineComp);
     ~FS_IocpAcceptPoller();

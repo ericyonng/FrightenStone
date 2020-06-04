@@ -35,7 +35,7 @@
 
 class PendingStubInfo
 {
-    OBJ_POOL_CREATE_DEF(PendingStubInfo);
+    OBJ_POOL_CREATE_ANCESTOR(PendingStubInfo);
 public:
     PendingStubInfo();
     ~PendingStubInfo();

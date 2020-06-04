@@ -38,7 +38,7 @@ FS_NAMESPACE_BEGIN
 // 编码器会在start时预留长度位,真正的数据只从start之后开始,finish时候会在长度位写入真实流长度
 class NetMsgCoder
 {
-    OBJ_POOL_CREATE_DEF(NetMsgCoder);
+    OBJ_POOL_CREATE_ANCESTOR(NetMsgCoder);
 public:
     NetMsgCoder();
     virtual ~NetMsgCoder() {}

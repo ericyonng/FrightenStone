@@ -33,9 +33,9 @@
 #include "FrightenStone/common/component/Defs/TlsElementDefs.h"
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(Tls_Rtti, 16);
-OBJ_POOL_CREATE_DEF_IMPL(Tls_MemoryPool, 16);
-OBJ_POOL_CREATE_DEF_IMPL(Tls_Counter, 16);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(Tls_Rtti, 16);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(Tls_MemoryPool, 16);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(Tls_Counter, 16);
 Tls_MemoryPool::Tls_MemoryPool()
 {
     _pool = IMemoryPoolMgr::NewInstance(BuildMemoryPoolMgr());

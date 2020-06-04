@@ -53,7 +53,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_String
 {
-    OBJ_POOL_CREATE_DEF(FS_String);
+    OBJ_POOL_CREATE_ANCESTOR(FS_String);
 public:
     typedef std::vector<FS_String> _These, FS_Strings;
     typedef std::string::size_type size_type;

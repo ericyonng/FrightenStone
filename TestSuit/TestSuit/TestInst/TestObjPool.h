@@ -10,9 +10,9 @@
 
 class TestObjPoolObj
 {
-    OBJ_POOL_CREATE(TestObjPoolObj, _objPoolHelper);
+    OBJ_POOL_CREATE_ANCESTOR(TestObjPoolObj);
 public:
-    TestObjPoolObj() {}
+    TestObjPoolObj(Int64 i):_int64obj(i) {}
     ~TestObjPoolObj() 
     {
         //std::cout << "析构" << std::endl;
@@ -22,13 +22,13 @@ private:
     Int64 _int64obj;
 };
 
-OBJ_POOL_CREATE_IMPL(TestObjPoolObj, _objPoolHelper, 10)
+OBJ_POOL_CREATE_ANCESTOR_IMPL(TestObjPoolObj, 10000000)
 
 
 class TestObjPoolObj2
 {
 public:
-    TestObjPoolObj2() {}
+    TestObjPoolObj2(Int64 i):_int64obj(i) {}
     ~TestObjPoolObj2() {}
 
 private:
@@ -41,6 +41,9 @@ public:
     static void Run()
     {
         g_Log->InitModule("TestObjPool");
+        fs::FS_TlsUtil::CreateUtilTlsHandle();
+        g_MemoryPool->InitPool();
+
 /*        Int32 i = 0;*/
 //         while(1)
 //         {
@@ -57,9 +60,25 @@ public:
         std::vector<TestObjPoolObj *> *vecObj = new std::vector<TestObjPoolObj *>;
         vecObj->resize(TEST_OBJ_NUM);
         timeNow1.FlushTime();
+        auto &poolHelper = TestObjPoolObj::_objPoolHelper;
+        auto poolAlloctor = poolHelper->_alloctor;
+        auto sizeobj = sizeof(TestObjPoolObj);
         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
         {
-            (*vecObj)[i] = new TestObjPoolObj;
+           // std::lock_guard<std::mutex> lck(poolAlloctor->GetMtx());
+            //TestObjPoolObj::New(i);
+            //g_MemoryPool->Alloc(sizeobj);
+            new TestObjPoolObj(i);
+        }
+        timeNow2.FlushTime();
+        std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
+
+        timeNow1.FlushTime();
+       
+        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
+        {
+            new TestObjPoolObj2(i);
+            //g_MemoryPool->Alloc(sizeobj);
         }
         timeNow2.FlushTime();
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
@@ -67,15 +86,7 @@ public:
         timeNow1.FlushTime();
         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
         {
-            new TestObjPoolObj2;
-        }
-        timeNow2.FlushTime();
-        std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
-
-        timeNow1.FlushTime();
-        for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
-        {
-            delete (*vecObj)[i];
+            //delete (*vecObj)[i];
         }
         timeNow2.FlushTime();
          std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;

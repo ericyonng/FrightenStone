@@ -39,7 +39,7 @@
 
 #pragma region macro
 #undef __DEF_OBJ_POOL_OBJ_NUM__
-#define __DEF_OBJ_POOL_OBJ_NUM__            512
+#define __DEF_OBJ_POOL_OBJ_NUM__            1
 // #undef __OBJPOOL_ALIGN_BYTES__
 // #define __OBJPOOL_ALIGN_BYTES__             (sizeof(void *)<<1)    // 默认16字节对齐 涉及到跨cache line开销
 #undef __OBJ_POOL_MAX_ALLOW_BYTES_DEF__

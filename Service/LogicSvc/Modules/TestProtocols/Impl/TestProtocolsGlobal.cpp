@@ -68,7 +68,7 @@ void TestProtocolsGlobal::OnInitialize()
 void TestProtocolsGlobal::OnLocalServerReady()
 {
     // 向对端发起连接
-    // _TestConnect();
+    _TestConnect();
 }
 
 void TestProtocolsGlobal::OnLocalServerStartup()
@@ -78,10 +78,10 @@ void TestProtocolsGlobal::OnLocalServerStartup()
         return;
 
     // 测试发送登陆包
-    // _TestSendLogin();
+    _TestSendLogin();
     // 测试黑民单系统
     // _StartTestBlackList();
-    _TestBlackList();
+    // _TestBlackList();
 }
 
 void TestProtocolsGlobal::OnLoginRes(UInt64 sessionId, fs::NetMsgDecoder *decoder)

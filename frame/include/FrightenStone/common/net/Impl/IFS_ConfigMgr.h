@@ -40,7 +40,7 @@ FS_NAMESPACE_BEGIN
 class FS_IniFile;
 class BASE_EXPORT IFS_ConfigMgr
 {
-    OBJ_POOL_CREATE_DEF(IFS_ConfigMgr);
+    OBJ_POOL_CREATE_ANCESTOR(IFS_ConfigMgr);
 public:
     static FS_String _bindAnyIp;    // 绑定任意ip:"Any"
 
@@ -99,8 +99,8 @@ private:
 
     void _WriteIniHeaderAnnotation();   // 初始化时候ini文件头注释
     void _ChangeLineBetweenSegs();      // 段之间空行间隔
-
-private:
+    
+protected:
     FS_IniFile *_ini;
 
     std::vector<std::pair<FS_String, UInt16>> _ipPortVec;

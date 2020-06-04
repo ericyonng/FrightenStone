@@ -46,7 +46,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Epoll : public IFS_NetModule
 {
-    OBJ_POOL_CREATE_DEF(FS_Epoll);
+    OBJ_POOL_CREATE_ANCESTOR(FS_Epoll);
 public:
     FS_Epoll();
     ~FS_Epoll();

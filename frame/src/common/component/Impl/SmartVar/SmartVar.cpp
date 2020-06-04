@@ -37,7 +37,7 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(SmartVar, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(SmartVar, __DEF_OBJ_POOL_OBJ_NUM__);
 
 std::map<unsigned int, FS_String> SmartVarRtti::_rttiTypeRefString;
 const FS_String SmartVarRtti::_nullString;

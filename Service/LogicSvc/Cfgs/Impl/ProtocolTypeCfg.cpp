@@ -30,7 +30,7 @@
 #include "Service/LogicSvc/Cfgs/Defs/CommonInclude.h"
 #include "Service/LogicSvc/Cfgs/Impl/ProtocolTypeCfg.h"
 
-OBJ_POOL_CREATE_DEF_IMPL(ProtocolTypeCfg, FS_CFG_OBJPOLL_DEF_NUM)
+OBJ_POOL_CREATE_ANCESTOR_IMPL(ProtocolTypeCfg, FS_CFG_OBJPOLL_DEF_NUM)
 
 ProtocolTypeCfg::ProtocolTypeCfg()
     :_handlerType(0)

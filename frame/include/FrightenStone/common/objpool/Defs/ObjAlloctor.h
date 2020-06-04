@@ -113,6 +113,7 @@ protected:
     AlloctorNode<ObjType> *_header;         // 头节点
     AlloctorNode<ObjType> *_lastNode;       // 最新的节点
     size_t _objpoolAllowedMaxOccupiedBytes; // 对象池允许的最大占用
+    std::string _objTypeName;               // 类名
 
     // 内存泄漏相关
     size_t          _nodeCnt;               // 节点个数

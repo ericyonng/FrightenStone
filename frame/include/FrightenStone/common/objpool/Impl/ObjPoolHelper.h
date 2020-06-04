@@ -44,6 +44,7 @@
 
 FS_NAMESPACE_BEGIN
 
+// 注意对象池创建的类其派生类也必须是对象池创建的否则会导致不可预料的内存问题
 // 支持线程安全 尽量设置线程不安全避免加锁开销,不支持stl容器等自带分配器的对象
 template<typename ObjType>
 class ObjPoolHelper
@@ -73,7 +74,10 @@ FS_NAMESPACE_END
 #include "FrightenStone/common/objpool/Impl/ObjPoolHelperImpl.h"
 
 /// 内存池创建对象便利宏
-// 声明中需要添加 便利宏不支持基本数据类型 基本数据类型请直接定义一个helper对象
+// 禁止直接使用 OBJ_POOL_CREATE 直接使用会大概率出现内存非法写入到其他对象内存区 ！！！！！！！！！！！！！！！！！！！！！
+// 禁止直接使用 OBJ_POOL_CREATE 直接使用会大概率出现内存非法写入到其他对象内存区！！！！！！！！！！！！！！！！！！！！！
+// 禁止直接使用 OBJ_POOL_CREATE 直接使用会大概率出现内存非法写入到其他对象内存区！！！！！！！！！！！！！！！！！！！！！
+#pragma region WarningSeriously Dont Use objpoolcreate derectly!!!!!!!!!!
 #undef  OBJ_POOL_CREATE
 #define OBJ_POOL_CREATE(ObjType, _objpool_helper)                                                                   \
 public:                                                                                                             \
@@ -108,23 +112,117 @@ public:                                                                         
             _objpool_helper->_alloctor->DeleteWithoutDestructor(ptr);                                               \
         }                                                                                                           \
                                                                                                                     \
+public:                                                                                                             \
         static fs::ObjPoolHelper<ObjType> *_objpool_helper
 
-// 在实现文件中需要添加
+// 禁止直接使用 OBJ_POOL_CREATE_IMPL 直接使用会大概率出现内存非法写入到其他对象内存区 ！！！！！！！！！！！！！！
+// 禁止直接使用 OBJ_POOL_CREATE_IMPL 直接使用会大概率出现内存非法写入到其他对象内存区！！！！！！！！！！！！！！！
+// 禁止直接使用 OBJ_POOL_CREATE_IMPL 直接使用会大概率出现内存非法写入到其他对象内存区！！！！！！！！！！！！！！！
 #undef OBJ_POOL_CREATE_IMPL
 #define OBJ_POOL_CREATE_IMPL(ObjType, _objpool_helper, objAmount)                                                   \
 fs::ObjPoolHelper<ObjType> *ObjType::_objpool_helper = new fs::ObjPoolHelper<ObjType>(objAmount);                   \
 size_t ObjType::GetMemleakNum()                                                                                     \
 {                                                                                                                   \
     return _objpool_helper->GetMemleakObjNum();                                                                     \
-}
+}                                                                                                                   
+#pragma  endregion
 
-// 默认以_objPoolHelper命名对象池变量名
-#undef OBJ_POOL_CREATE_DEF
-#define OBJ_POOL_CREATE_DEF(ObjType)    OBJ_POOL_CREATE(ObjType, _objPoolHelper)
+/* 祖先类对象池创建 */
+#pragma region ancestor
+#undef OBJ_POOL_CREATE_ANCESTOR
+// 请祖先类与派生类选择性使用,
+// 使用各自类的_objpooldetect自检函数，可以实现在编译器检查出基类是不是对象池创建的
+// 若祖先类是对象池创建的那么派生出来的子类必须是对象池创建的,
+// 否则会出现当前对象非法访问本类其他实例内存区，造成不可挽回的内存非法访问，
+#define OBJ_POOL_CREATE_ANCESTOR(ObjType)                                                                           \
+OBJ_POOL_CREATE(ObjType, _objPoolHelper);                                                                           \
+public:                                                                                                             \
+    void ObjType##_objpooldetect();
 
-// 默认以_objPoolHelper命名对象池变量名
-#undef OBJ_POOL_CREATE_DEF_IMPL
-#define OBJ_POOL_CREATE_DEF_IMPL(ObjType, objAmount) OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)
+#undef OBJ_POOL_CREATE_ANCESTOR_IMPL
+// 请祖先类与派生类选择性使用,
+// 使用各自类的_objpooldetect自检函数，可以实现在编译器检查出基类是不是对象池创建的
+// 若祖先类是对象池创建的那么派生出来的子类必须是对象池创建的,
+// 否则会出现当前对象非法访问本类其他实例内存区，造成不可挽回的内存非法访问，
+#define OBJ_POOL_CREATE_ANCESTOR_IMPL(ObjType, objAmount)                                                           \
+OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)                                                            \
+void ObjType::ObjType##_objpooldetect(){}
+#pragma endregion
+
+/* 派生类对象池创建 */
+#pragma region derive
+#undef OBJ_POOL_CREATE_DERIVE
+// 请祖先类与派生类选择性使用,
+// 使用各自类的_objpooldetect自检函数，可以实现在编译器检查出基类是不是对象池创建的
+// 若祖先类是对象池创建的那么派生出来的子类必须是对象池创建的,
+// 否则会出现当前对象非法访问本类其他实例内存区，造成不可挽回的内存非法访问，
+#define OBJ_POOL_CREATE_DERIVE(ObjType, Parent)                                                                     \
+OBJ_POOL_CREATE(ObjType, _objPoolHelper);                                                                           \
+public:                                                                                                             \
+    void ObjType##_objpooldetect(){ Parent::Parent##_objpooldetect(); }                                                 
+
+#undef OBJ_POOL_CREATE_DERIVE_IMPL
+// 请祖先类与派生类选择性使用,
+// 使用各自类的_objpooldetect自检函数，可以实现在编译器检查出基类是不是对象池创建的
+// 若祖先类是对象池创建的那么派生出来的子类必须是对象池创建的,
+// 否则会出现当前对象非法访问本类其他实例内存区，造成不可挽回的内存非法访问，
+#define OBJ_POOL_CREATE_DERIVE_IMPL(ObjType, objAmount)                                                             \
+OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)                                                            
+#pragma endregion
+
+/* 祖先类是模版类的 */
+#pragma region ancestor
+#undef OBJ_POOL_CREATE_TEMPLATE_ANCESTOR
+// 请祖先类与派生类选择性使用,
+// 使用各自类的_objpooldetect自检函数，可以实现在编译器检查出基类是不是对象池创建的
+// 若祖先类是对象池创建的那么派生出来的子类必须是对象池创建的,
+// 否则会出现当前对象非法访问本类其他实例内存区，造成不可挽回的内存非法访问，
+// TempClassName是不带模版参数的模版类名字
+#define OBJ_POOL_CREATE_TEMPLATE_ANCESTOR(ObjType, TempClassName)                                                   \
+OBJ_POOL_CREATE(ObjType, _objPoolHelper);                                                                           \
+public:                                                                                                             \
+    void TempClassName##_objpooldetect();
+
+#undef OBJ_POOL_CREATE_TEMPLATE_ANCESTOR_IMPL
+// 请祖先类与派生类选择性使用,
+// 使用各自类的_objpooldetect自检函数，可以实现在编译器检查出基类是不是对象池创建的
+// 若祖先类是对象池创建的那么派生出来的子类必须是对象池创建的,
+// 否则会出现当前对象非法访问本类其他实例内存区，造成不可挽回的内存非法访问，
+#define OBJ_POOL_CREATE_TEMPLATE_ANCESTOR_IMPL(ObjType, objAmount)                                                  \
+OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)                                                            \
+void ObjType::ObjType##_objpooldetect(){}
+#pragma endregion
+
+/* 派生类父类是模版类的对象池创建 */
+#pragma region derive
+#undef OBJ_POOL_CREATE_DERIVE_BASE_TEMPLATE
+// 请祖先类与派生类选择性使用,
+// 使用各自类的_objpooldetect自检函数，可以实现在编译器检查出基类是不是对象池创建的
+// 若祖先类是对象池创建的那么派生出来的子类必须是对象池创建的,
+// 否则会出现当前对象非法访问本类其他实例内存区，造成不可挽回的内存非法访问，
+// ParentTempClassName是父类不戴模版参数的类名
+#define OBJ_POOL_CREATE_DERIVE_BASE_TEMPLATE(ObjType, Parent, ParentTempClassName)                                  \
+OBJ_POOL_CREATE(ObjType, _objPoolHelper);                                                                           \
+public:                                                                                                             \
+    void ObjType##_objpooldetect(){ Parent::ParentTempClassName##_objpooldetect(); }                                 
+
+#undef OBJ_POOL_CREATE_DERIVE_BASE_TEMPLATE_IMPL
+// 请祖先类与派生类选择性使用,
+// 使用各自类的_objpooldetect自检函数，可以实现在编译器检查出基类是不是对象池创建的
+// 若祖先类是对象池创建的那么派生出来的子类必须是对象池创建的,
+// 否则会出现当前对象非法访问本类其他实例内存区，造成不可挽回的内存非法访问，
+#define OBJ_POOL_CREATE_DERIVE_BASE_TEMPLATE_IMPL(ObjType, objAmount)                                               \
+OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)                                                            
+#pragma endregion
+
+// #undef OBJ_POOL_CREATE_DEF
+// // 默认以_objPoolHelper命名对象池变量名
+// // 注意对象池创建的类其派生类也必须是对象池创建的否则会导致不可预料的内存问题
+// #define OBJ_POOL_CREATE_DEF(ObjType)    OBJ_POOL_CREATE(ObjType, _objPoolHelper)
+// 
+// // 默认以_objPoolHelper命名对象池变量名
+// // 注意对象池创建的类其派生类也必须是对象池创建的否则会导致不可预料的内存问题
+// #undef OBJ_POOL_CREATE_DEF_IMPL
+// #define OBJ_POOL_CREATE_DEF_IMPL(ObjType, objAmount) OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)
 
 #endif

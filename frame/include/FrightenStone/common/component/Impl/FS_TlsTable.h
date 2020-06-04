@@ -48,7 +48,7 @@ struct ITlsBase;
 // 请保证线程周期内都不会释放,数组类型元素请在外部包装成派生于ITlsBase基类的结构体，再进行存储
 class BASE_EXPORT FS_TlsTable
 {
-    OBJ_POOL_CREATE_DEF(FS_TlsTable);
+    OBJ_POOL_CREATE_ANCESTOR(FS_TlsTable);
 public:
     FS_TlsTable();
     ~FS_TlsTable();

@@ -37,6 +37,7 @@ class ProtocolProtectorGlobal;
 
 class LogicSvc :public fs::IFS_BusinessLogic
 {
+    OBJ_POOL_CREATE_DERIVE(LogicSvc, IFS_BusinessLogic);
 public:
     LogicSvc(Int32 serviceId);
     ~LogicSvc() {}

@@ -50,7 +50,7 @@ class NetMsgDecoder;
 
 struct NetMsg_DataHeader
 {
-    OBJ_POOL_CREATE_DEF(NetMsg_DataHeader);
+    OBJ_POOL_CREATE_ANCESTOR(NetMsg_DataHeader);
 
     NetMsg_DataHeader();
     virtual ~NetMsg_DataHeader();

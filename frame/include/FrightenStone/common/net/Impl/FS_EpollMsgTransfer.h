@@ -43,7 +43,6 @@ class FS_EpollTransferPoller;
 
 class BASE_EXPORT FS_EpollMsgTransfer : public IFS_MsgTransfer
 {
-    OBJ_POOL_CREATE_DEF(FS_EpollMsgTransfer);
 public:
     FS_EpollMsgTransfer(UInt32 compId, IFS_NetEngine *engine);
     ~FS_EpollMsgTransfer();

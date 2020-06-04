@@ -44,7 +44,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT FS_Timer
 {
-    OBJ_POOL_CREATE_DEF(FS_Timer);
+    OBJ_POOL_CREATE_ANCESTOR(FS_Timer);
 
 public:
     // 默认使用的时间轮盘对象是g_BusinessTimeWheel 若g_BusinessTimeWheel为NULL 使用的是g_TimeWheel

@@ -32,6 +32,7 @@
 #include "Service/ServiceType.h"
 #include "Service/Common/LogicCommon.h"
 
+OBJ_POOL_CREATE_DERIVE_IMPL(FS_Application, 1);
 FS_Application *g_ThisApp = NULL;
 FS_Application::FS_Application()
     :_config(NULL)
@@ -57,17 +58,24 @@ void FS_Application::Run()
     }
 
     _config = _NewConfigMgr();
-    auto st = Init();
+    auto st = IFS_NetEngine::Init();
     if(st != StatusDefs::Success)
     {
         printf("AppName[%s] init fail st[%d]", _appName.c_str(), st);
     }
     else
     {
-        st = Start();
+        st = IFS_NetEngine::Start();
         if(st == StatusDefs::Success)
         {
+#ifndef _WIN32
+            while (true)
+            {
+                fs::SystemUtil::Sleep(1000);
+            }
+#else
             getchar();
+#endif
         }
         else
         {

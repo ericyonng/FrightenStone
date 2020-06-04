@@ -60,7 +60,6 @@ class FS_IocpAcceptPoller;
 
 class BASE_EXPORT FS_IocpAcceptor : public IFS_Acceptor
 {
-    OBJ_POOL_CREATE_DEF(FS_IocpAcceptor);
 public:
     FS_IocpAcceptor(UInt32 compId
                     , Locker &sessionLocker

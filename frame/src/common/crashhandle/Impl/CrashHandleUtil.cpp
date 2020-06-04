@@ -177,6 +177,8 @@ static LONG WINAPI __AppCrashHandler(::EXCEPTION_POINTERS *exception)
     __GetExceptionBackTrace(cache.ContextRecord, backTrace);
     errMsg.AppendFormat("\nStack BackTrace:\n%s", backTrace.c_str());
     g_Log->crash("\n[ ******** crash info ******** ]%s\n[ ******** End ******** ]\n", errMsg.c_str());
+    g_Log->FlushAllFile();
+    g_Log->FinishModule();
 
     return EXCEPTION_EXECUTE_HANDLER;
 }

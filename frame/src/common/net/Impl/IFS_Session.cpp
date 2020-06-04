@@ -41,8 +41,8 @@
 
 
 FS_NAMESPACE_BEGIN
-OBJ_POOL_CREATE_DEF_IMPL(IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__);
-OBJ_POOL_CREATE_DEF_IMPL(BuildSessionInfo, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(IFS_Session, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_ANCESTOR_IMPL(BuildSessionInfo, __DEF_OBJ_POOL_OBJ_NUM__);
 
 IFS_Session::IFS_Session(BuildSessionInfo &buildInfo)
     :_isDestroy(false)

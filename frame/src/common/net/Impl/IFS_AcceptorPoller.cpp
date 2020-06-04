@@ -39,8 +39,6 @@
 
 FS_NAMESPACE_BEGIN
 
-OBJ_POOL_CREATE_DEF_IMPL(IFS_AcceptorPoller, 32);
-
 bool IFS_AcceptorPoller::OnSessionDisconnected(UInt64 sessionId)
 {
     _locker->Lock();

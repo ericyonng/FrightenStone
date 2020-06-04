@@ -46,7 +46,7 @@ class IFS_Session;
 // session需要正确连接成功宏，addr才正确
 class BASE_EXPORT FS_Addr
 {
-    OBJ_POOL_CREATE_DEF(FS_Addr);
+    OBJ_POOL_CREATE_ANCESTOR(FS_Addr);
 public:
     FS_Addr(IFS_Session *session, const sockaddr_in *addrInfo);
     ~FS_Addr();

@@ -42,7 +42,7 @@ FS_NAMESPACE_BEGIN
 
 class BASE_EXPORT LogFile :public FS_File
 {
-    OBJ_POOL_CREATE_DEF(LogFile);
+    OBJ_POOL_CREATE_DERIVE(LogFile, FS_File);
 public:
     LogFile();
     virtual ~LogFile();

@@ -40,6 +40,7 @@ class FS_IniFile;
 
 class FS_ClientCfgMgr : public fs::IFS_ConfigMgr
 {
+    OBJ_POOL_CREATE_DERIVE(FS_ClientCfgMgr, IFS_ConfigMgr);
 public:
     FS_ClientCfgMgr();
     ~FS_ClientCfgMgr();

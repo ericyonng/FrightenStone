@@ -53,7 +53,6 @@ class FS_IocpTransferPoller;
 
 class BASE_EXPORT FS_IocpMsgTransfer : public IFS_MsgTransfer
 {
-    OBJ_POOL_CREATE_DEF(FS_IocpMsgTransfer);
 public:
     FS_IocpMsgTransfer(UInt32 compId, IFS_NetEngine *netEngine);
     virtual ~FS_IocpMsgTransfer();
