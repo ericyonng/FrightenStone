@@ -221,16 +221,17 @@ template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetObjInUse()
 {
     _locker.Lock();
-    const size_t inUse = _objInUse;
+    auto cnt = _objInUse;
     _locker.Unlock();
-    return inUse;
+
+    return cnt;
 }
 
 template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetTotalObjBlocks()
 {
     _locker.Lock();
-    const size_t cnt = _totalBlockCnt;
+    auto cnt = _totalBlockCnt;
     _locker.Unlock();
     return cnt;
 }
@@ -239,8 +240,9 @@ template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetNodeCnt()
 {
     _locker.Lock();
-    const size_t cnt = _nodeCnt;
+    auto cnt = _nodeCnt;
     _locker.Unlock();
+
     return cnt;
 }
 
@@ -248,9 +250,9 @@ template<typename ObjType>
 inline size_t IObjAlloctor<ObjType>::GetBytesOccupied()
 {
     _locker.Lock();
-    const size_t bytes = _bytesOccupied;
+    auto cnt = _bytesOccupied;
     _locker.Unlock();
-    return bytes;
+    return cnt;
 }
 
 template<typename ObjType>
@@ -266,7 +268,7 @@ inline void IObjAlloctor<ObjType>::Lock()
 }
 
 template<typename ObjType>
-inline void IObjAlloctor<ObjType>::Unlock()
+inline void IObjAlloctor<ObjType>::UnLock()
 {
     _locker.Unlock();
 }

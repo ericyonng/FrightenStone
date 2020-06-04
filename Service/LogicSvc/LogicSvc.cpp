@@ -45,6 +45,7 @@
 
 #include "Service/LogicSvc/Cfgs/Cfgs.h"
 
+OBJ_POOL_CREATE_DEF_IMPL(LogicSvc, 1)
 void LogicSvc::Release()
 {
     delete this;

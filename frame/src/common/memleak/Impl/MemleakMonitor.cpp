@@ -39,7 +39,6 @@
 
 // static std::mutex g_MemleakMonitorGuard;
 //std::atomic<fs::MemleakMonitor *> g_MemleakMonitor = { NULL };
-fs::MemleakMonitor *g_MemleakMonitor;
 
 FS_NAMESPACE_BEGIN
 
@@ -47,6 +46,7 @@ MemleakMonitor::MemleakMonitor()
     :_printInfoPool(new FS_ThreadPool(0, 1))
     ,_printInfoIntervalMilliSec(1)
 {
+    
 }
 
 MemleakMonitor::~MemleakMonitor()
@@ -56,15 +56,15 @@ MemleakMonitor::~MemleakMonitor()
     STLUtil::DelMapContainer(_objNameRefPrintCallback);
     _threadIdRefMemPoolPrintCallbacks.clear();
 }
-// 
-// MemleakMonitor *MemleakMonitor::GetInstance()
-// {
-//     static std::mutex g_mutex;
-//     std::lock_guard<std::mutex> lck(g_mutex);
-//     static MemleakMonitor *monitor = new MemleakMonitor;
-// 
-//     return monitor;
-// }
+
+MemleakMonitor *MemleakMonitor::GetInstance()
+{
+    static std::mutex g_mutex;
+    std::lock_guard<std::mutex> lck(g_mutex);
+    static MemleakMonitor *monitor = new MemleakMonitor;
+
+    return monitor;
+}
 
 Int32 MemleakMonitor::BeforeStart(UInt32 printIntervalSeconds)
 {

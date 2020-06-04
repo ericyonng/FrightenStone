@@ -32,24 +32,24 @@
 #include "FrightenStone/common/assist/utils/Impl/STLUtil.h"
 #include "FrightenStone/common/memorypool/memorypool.h"
 
-fs::MemoryHelper *g_MemoryHelper;
+// fs::MemoryHelper *g_MemoryHelper = NULL;
 
-//static std::mutex g_MemoryHelperGuard;
+// static std::mutex g_MemoryHelperGuard;
 
 FS_NAMESPACE_BEGIN
 MemoryHelper::~MemoryHelper()
 {
     Finish();
 }
-// 
-// MemoryHelper *MemoryHelper::GetInstance()
-// {
-//     static std::mutex g_mutex;
-//     std::lock_guard<std::mutex> lck(g_mutex);
-//     static MemoryHelper *helper = new MemoryHelper;
-// 
-//     return helper;
-// }
+
+MemoryHelper *MemoryHelper::GetInstance()
+{
+    static std::mutex g_mutex;
+    std::lock_guard<std::mutex> lck(g_mutex);
+    static MemoryHelper *helper = new MemoryHelper;
+
+    return helper;
+}
 
 void MemoryHelper::Start(UInt64 maxObjPoolBytesLimit, UInt64 maxGlobalMemoryPoolBytesLimit)
 {

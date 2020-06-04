@@ -233,7 +233,7 @@ void IFS_MsgDispatcher::Close()
 void IFS_MsgDispatcher::AfterClose()
 {
     // 内存分配器占用情况打印结束
-    g_MemleakMonitor->UnRegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
+    MemleakMonitor::GetInstance()->UnRegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
 
     if (_sessionBufferAlloctor)
         _sessionBufferAlloctor->FinishMemory();
@@ -290,7 +290,7 @@ void IFS_MsgDispatcher::_OnBusinessProcessThread(FS_ThreadPool *pool)
 
     // 初始化配置
     _transferThreadId = SystemUtil::GetCurrentThreadId();
-    g_MemleakMonitor->RegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
+    MemleakMonitor::GetInstance()->RegisterMemPoolPrintCallback(_transferThreadId, _printAlloctorOccupiedInfo);
 
     // 等待其他组件ready
     MaskReady(true);

@@ -41,6 +41,7 @@
 
 class MyClientLogic : public LogicSvc
 {
+    OBJ_POOL_CREATE_DEF(MyClientLogic);
 public:
     MyClientLogic() :LogicSvc(ServiceType::ClientSimulation){}
     virtual ~MyClientLogic()
@@ -65,8 +66,11 @@ public:
 
 };
 
+OBJ_POOL_CREATE_DEF_IMPL(MyClientLogic, 1);
+
 class MyClient : public FS_Application
 {
+    //OBJ_POOL_CREATE_DEF(MyClient);
 public:
     MyClient() {}
     ~MyClient() {}
@@ -96,6 +100,8 @@ protected:
                                  ,realConnect);
     }
 };
+//OBJ_POOL_CREATE_DEF_IMPL(MyClient, 1);
+
 // 
 // class ClientSimulationTask
 // {

@@ -219,14 +219,12 @@ void MemoryPoolMgr::_FreePoolPtr(void *ptr)
 void MemoryPoolMgr::_RegisterPrintCallback()
 {
     _printCallback = const_cast<IDelegate<void> *>(DelegatePlusFactory::Create(this, &MemoryPoolMgr::PrintMemPoolInfo));
-    if (!g_MemleakMonitor)
-        g_MemleakMonitor = new MemleakMonitor;
-    g_MemleakMonitor->RegisterMemPoolPrintCallback(_curThreadId, _printCallback);
+    MemleakMonitor::GetInstance()->RegisterMemPoolPrintCallback(_curThreadId, _printCallback);
 }
 
 void MemoryPoolMgr::_UnRegisterPrintCallback(UInt64 threadId)
 {
-    g_MemleakMonitor->UnRegisterMemPoolPrintCallback(threadId, _printCallback);
+    MemleakMonitor::GetInstance()->UnRegisterMemPoolPrintCallback(threadId, _printCallback);
     FS_Release(_printCallback);
 }
 

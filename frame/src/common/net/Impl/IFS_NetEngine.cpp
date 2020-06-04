@@ -176,13 +176,13 @@ Int32 IFS_NetEngine::Start()
         return StatusDefs::NotInit;
 
     // 1.内存助手
-    g_MemoryHelper->Start(_totalCfgs->_objPoolCfgs._maxAllowObjPoolBytesOccupied, _totalCfgs->_mempoolCfgs._maxAllowMemPoolBytesOccupied);
-    g_MemleakMonitor->BeforeStart(_totalCfgs->_commonCfgs._memoryMonitorPrintIntervalSeconds);
+    MemoryHelper::GetInstance()->Start(_totalCfgs->_objPoolCfgs._maxAllowObjPoolBytesOccupied, _totalCfgs->_mempoolCfgs._maxAllowMemPoolBytesOccupied);
+    MemleakMonitor::GetInstance()->BeforeStart(_totalCfgs->_commonCfgs._memoryMonitorPrintIntervalSeconds);
 
     // 2.内存监控
     if(_totalCfgs->_commonCfgs._isOpenMemoryMonitor)
     {
-        g_MemleakMonitor->Start();
+        MemleakMonitor::GetInstance()->Start();
     }
 
     // 3.初始化线程对象
@@ -289,8 +289,8 @@ void IFS_NetEngine::Close()
     Fs_SafeFree(_cpuInfo);
 
     // 当前日志全部着盘
-    g_MemleakMonitor->Finish();
-    g_MemoryHelper->Finish();
+    MemleakMonitor::GetInstance()->Finish();
+    MemoryHelper::GetInstance()->Finish();
     g_Log->FlushAllFile();
     g_Log->FinishModule();
     g_MemoryPool->FinishPool();

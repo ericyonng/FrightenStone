@@ -39,23 +39,17 @@ void ObjPoolMethods::PrintObjPoolInfo(const char *objName, size_t nodeCnt, size_
 
 void ObjPoolMethods::RegisterToMemleakMonitor(const char *objName, IDelegate<size_t, Int64 &, Int64 &, const char *> *callback)
 {
-    if (!g_MemleakMonitor)
-        g_MemleakMonitor = new MemleakMonitor;
-    g_MemleakMonitor->RegisterObjPoolCallback(objName, callback);
+    MemleakMonitor::GetInstance()->RegisterObjPoolCallback(objName, callback);
 }
 
 void ObjPoolMethods::UnRegisterMemleakDelegate(const char *objName)
 {
-    if (!g_MemleakMonitor)
-        g_MemleakMonitor = new MemleakMonitor;
-    g_MemleakMonitor->UnRegisterObjPool(objName);
+    MemleakMonitor::GetInstance()->UnRegisterObjPool(objName);
 }
 
 void ObjPoolMethods::RegisterModifyAllowMaxBytes(IDelegate<void, UInt64> *callback)
 {
-    if (!g_MemoryHelper)
-        g_MemoryHelper = new MemoryHelper;
-    g_MemoryHelper->RegisterObjPoolModifyMaxAllowBytesCallback(callback);
+    MemoryHelper::GetInstance()->RegisterObjPoolModifyMaxAllowBytesCallback(callback);
 }
 
 FS_NAMESPACE_END

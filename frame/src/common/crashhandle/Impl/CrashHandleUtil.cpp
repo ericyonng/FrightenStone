@@ -421,7 +421,7 @@ void CrashHandleUtil::_OnAfterCrashLogHook(const LogData *logData)
 {
 #ifdef _WIN32
     // 内存泄漏信息
-    g_MemleakMonitor->PrintObjPoolInfo();
+    MemleakMonitor::GetInstance()->PrintObjPoolInfo();
 
     // 系统内存情况
     g_Log->sys<CrashHandleUtil>(_LOGFMT_("TotalPhysMemSize[%llu];AvailPhysMemSize[%llu] mem use rate[MemoryLoad:[%llu]]")

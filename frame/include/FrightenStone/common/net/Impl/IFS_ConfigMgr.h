@@ -99,8 +99,8 @@ private:
 
     void _WriteIniHeaderAnnotation();   // 初始化时候ini文件头注释
     void _ChangeLineBetweenSegs();      // 段之间空行间隔
-
-private:
+    
+protected:
     FS_IniFile *_ini;
 
     std::vector<std::pair<FS_String, UInt16>> _ipPortVec;

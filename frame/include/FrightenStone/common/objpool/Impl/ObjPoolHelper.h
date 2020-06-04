@@ -44,6 +44,7 @@
 
 FS_NAMESPACE_BEGIN
 
+// 注意对象池创建的类其派生类也必须是对象池创建的否则会导致不可预料的内存问题
 // 支持线程安全 尽量设置线程不安全避免加锁开销,不支持stl容器等自带分配器的对象
 template<typename ObjType>
 class ObjPoolHelper
@@ -108,6 +109,7 @@ public:                                                                         
             _objpool_helper->_alloctor->DeleteWithoutDestructor(ptr);                                               \
         }                                                                                                           \
                                                                                                                     \
+public:                                                                                                             \
         static fs::ObjPoolHelper<ObjType> *_objpool_helper
 
 // 在实现文件中需要添加
@@ -117,13 +119,16 @@ fs::ObjPoolHelper<ObjType> *ObjType::_objpool_helper = new fs::ObjPoolHelper<Obj
 size_t ObjType::GetMemleakNum()                                                                                     \
 {                                                                                                                   \
     return _objpool_helper->GetMemleakObjNum();                                                                     \
-}
+}                                                                                                                   
 
-// 默认以_objPoolHelper命名对象池变量名
+
 #undef OBJ_POOL_CREATE_DEF
+// 默认以_objPoolHelper命名对象池变量名
+// 注意对象池创建的类其派生类也必须是对象池创建的否则会导致不可预料的内存问题
 #define OBJ_POOL_CREATE_DEF(ObjType)    OBJ_POOL_CREATE(ObjType, _objPoolHelper)
 
 // 默认以_objPoolHelper命名对象池变量名
+// 注意对象池创建的类其派生类也必须是对象池创建的否则会导致不可预料的内存问题
 #undef OBJ_POOL_CREATE_DEF_IMPL
 #define OBJ_POOL_CREATE_DEF_IMPL(ObjType, objAmount) OBJ_POOL_CREATE_IMPL(ObjType, _objPoolHelper, objAmount)
 

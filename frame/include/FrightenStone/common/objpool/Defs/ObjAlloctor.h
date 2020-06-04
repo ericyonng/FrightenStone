@@ -90,7 +90,7 @@ public:
     size_t GetBytesOccupied();
     size_t GetObjBlockSize();
     void Lock();
-    void Unlock();
+    void UnLock();
     #pragma endregion
 
     void SetAllowMaxOccupiedBytes(UInt64 maxBytes);     // 线程不安全
@@ -119,7 +119,6 @@ protected:
     size_t          _bytesOccupied;         // 对象池占用内存大小 = _objBlockSize * _nodeCnt * node._capacity
     size_t          _objInUse;              // 正在使用的对象
     size_t          _totalBlockCnt;         // 总的块数量
-    // std::mutex      _locker;
     Locker          _locker;                // 线程安全
 };
 

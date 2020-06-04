@@ -49,7 +49,7 @@ public:
     MemleakMonitor();
     virtual ~MemleakMonitor();
 
-   // static MemleakMonitor *GetInstance();
+    static MemleakMonitor *GetInstance();
     Int32 BeforeStart(UInt32 printIntervalSeconds);
     void Start();
     void Finish();
@@ -83,15 +83,8 @@ private:
     UInt32 _printInfoIntervalMilliSec;
 };
 
-// inline  MemleakMonitor *MemleakMonitor::GetInstance()
-// {
-//     static MemleakMonitor monitor;
-// 
-//     return &monitor;
-// }
-
 FS_NAMESPACE_END
 
-extern BASE_EXPORT fs::MemleakMonitor *g_MemleakMonitor;
+// extern BASE_EXPORT std::atomic<fs::MemleakMonitor *> g_MemleakMonitor;
 
 #endif

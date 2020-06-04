@@ -112,7 +112,7 @@ public:
           timeNow2.FlushTime();
           std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;
 // 
-          g_MemleakMonitor->PrintObjPoolInfo(fs::RTTIUtil::GetByType<TestObjPoolObj>());
+          fs::MemleakMonitor::GetInstance()->PrintObjPoolInfo(fs::RTTIUtil::GetByType<TestObjPoolObj>());
 
 
 //         g_Log->w<TestObjPool>(_LOGFMT_("HELLO"));

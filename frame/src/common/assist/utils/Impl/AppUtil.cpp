@@ -101,13 +101,13 @@ Int32 AppUtil::Init()
 Int32 AppUtil::Start(UInt64 maxAllowObjPoolBytesOccupied, UInt64 maxAllowMemPoolBytesOccupied, bool enableMemMonitor, UInt32 memMonitorPrintLogIntervalSeconds)
 {
     // 1.内存助手
-    g_MemoryHelper->Start(maxAllowObjPoolBytesOccupied, maxAllowMemPoolBytesOccupied);
-    g_MemleakMonitor->BeforeStart(memMonitorPrintLogIntervalSeconds);
+    MemoryHelper::GetInstance()->Start(maxAllowObjPoolBytesOccupied, maxAllowMemPoolBytesOccupied);
+    MemleakMonitor::GetInstance()->BeforeStart(memMonitorPrintLogIntervalSeconds);
 
     // 2.内存监控
     if(enableMemMonitor)
     {
-        g_MemleakMonitor->Start();
+        MemleakMonitor::GetInstance()->Start();
     }
 
     return StatusDefs::Success;
@@ -124,8 +124,8 @@ void AppUtil::Finish()
     SocketUtil::ClearSocketEnv();
 
     // 关闭内存监控
-    g_MemleakMonitor->Finish();
-    g_MemoryHelper->Finish();
+    MemleakMonitor::GetInstance()->Finish();
+    MemoryHelper::GetInstance()->Finish();
 
     // 当前日志全部着盘
     g_Log->FlushAllFile();
