@@ -68,10 +68,14 @@ void FS_Application::Run()
         st = IFS_NetEngine::Start();
         if(st == StatusDefs::Success)
         {
+#ifndef _WIN32
             while (true)
             {
                 fs::SystemUtil::Sleep(1000);
             }
+#else
+            getchar();
+#endif
         }
         else
         {
