@@ -59,16 +59,17 @@ public:
          fs::Time timeNow1, timeNow2;
         std::vector<TestObjPoolObj *> *vecObj = new std::vector<TestObjPoolObj *>;
         vecObj->resize(TEST_OBJ_NUM);
-        timeNow1.FlushTime();
         auto &poolHelper = TestObjPoolObj::_objPoolHelper;
         auto poolAlloctor = poolHelper->_alloctor;
         auto sizeobj = sizeof(TestObjPoolObj);
+        timeNow1.FlushTime();
         for(Int32 i = 0; i < TEST_OBJ_NUM; ++i)
         {
            // std::lock_guard<std::mutex> lck(poolAlloctor->GetMtx());
             //TestObjPoolObj::New(i);
-            //g_MemoryPool->Alloc(sizeobj);
-            new TestObjPoolObj(i);
+            //g_MemoryPool->Alloc(sizeobj);;
+            TestObjPoolObj::Delete(TestObjPoolObj::New(i));
+            //new TestObjPoolObj(i);
         }
         timeNow2.FlushTime();
         std::cout << "escape :" << (timeNow2 - timeNow1).GetTotalMicroSeconds() << std::endl;

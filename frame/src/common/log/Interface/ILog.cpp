@@ -34,12 +34,18 @@
 #include "frame/src/common/log/Impl/FS_Log.h"
 #include "FrightenStone/common/status/status.h"
     
-fs::ILog *g_Log = NULL;
+fs::ILog *g_Log = fs::ILog::GetInstance();
 FS_NAMESPACE_BEGIN
 
 ILog *ILog::GetInstance()
 {
-    return Singleton<FS_Log, AssistObjsDefs::NoDel>::GetInstance();
+    static Locker lck;
+    lck.Lock();
+    auto newLog = new FS_Log;
+    lck.Unlock();
+
+    return newLog;
+    // return Singleton<FS_Log, AssistObjsDefs::NoDel>::GetInstance();
 }
 
 FS_NAMESPACE_END
