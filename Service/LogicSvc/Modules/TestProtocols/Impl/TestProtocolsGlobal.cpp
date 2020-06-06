@@ -144,7 +144,7 @@ void TestProtocolsGlobal::_OnUserLoginRes(fs::FS_Event *ev)
 
 void TestProtocolsGlobal::_OnAfterSessionDisconnected(fs::FS_Event *ev)
 {
-    _TestBlackList();
+//    _TestBlackList();
 }
 
 void TestProtocolsGlobal::_OnSendTimeOut(fs::FS_Timer *timer, const fs::Time &lastTime, const fs::Time &curTime)

@@ -148,6 +148,7 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
     if (!session|| !session->IsValid())
     {
         g_Log->w< User>(_LOGFMT_("user disconnect sessionId[%llu], userId[%llu] or is not valid"), _sessionId, _userId);
+        _dispatcher->CloseSession(_sessionId);
         return;
     }
 
