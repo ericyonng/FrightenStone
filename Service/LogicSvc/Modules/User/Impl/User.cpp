@@ -171,8 +171,8 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
     if (wrSize < 0)
     {// 缓冲空间不足
         // 不需要写入回滚,因为curpos没有被改变
-//         // 写入回滚
-//         buffer->RollbackPush(msgData->GetCoderBytesWriten());
+        // 写入回滚
+        // buffer->RollbackPush(msgData->GetCoderBytesWriten());
 
         // 新建空间重新写入
         buffer = session->NewSendBuffer();
