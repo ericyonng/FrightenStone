@@ -50,28 +50,27 @@ User::~User()
     Fs_SafeFree(_eventMgr);
 }
 
-Int32 User::Login(fs::LoginData *loginData)
-{
-//     if(loginData->_msgId != _recvMsgId)
-//     {// 当前消息ID和本地收消息次数不匹配
-//         g_Log->i<User>(_LOGFMT_("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>")
-//                       , _sessionId, loginData->_msgId
-//                       , _recvMsgId, loginData->_msgId - _recvMsgId);
-//     }
-
-    // 打印
-//     g_Log->custom("user[%s]-pwd[%s]-msgid[%d] login suc", 
-//                   loginData->_userName
-//                   , loginData->_pwd
-//                   , loginData->_msgId);
-
-    //g_Log->i<User>(_LOGFMT_("username[%s], pwd[%s] suc login"), loginData->_userName, loginData->_pwd);
-
-    _FireLogin(_sessionId, _userId, loginData->_msgId);
-
-    return StatusDefs::Success;
-}
-
+// Int32 User::Login(fs::LoginData *loginData)
+// {
+// //     if(loginData->_msgId != _recvMsgId)
+// //     {// 当前消息ID和本地收消息次数不匹配
+// //         g_Log->i<User>(_LOGFMT_("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>")
+// //                       , _sessionId, loginData->_msgId
+// //                       , _recvMsgId, loginData->_msgId - _recvMsgId);
+// //     }
+// 
+//     // 打印
+// //     g_Log->custom("user[%s]-pwd[%s]-msgid[%d] login suc", 
+// //                   loginData->_userName
+// //                   , loginData->_pwd
+// //                   , loginData->_msgId);
+// 
+//     //g_Log->i<User>(_LOGFMT_("username[%s], pwd[%s] suc login"), loginData->_userName, loginData->_pwd);
+// 
+// 
+//     return StatusDefs::Success;
+// }
+// 
 Int32 User::Logout()
 {
 #ifndef _WIN32
@@ -311,11 +310,3 @@ Int32 User::_Create(bool isShowLog)
     return StatusDefs::Success;
 }
 
-void User::_FireLogin(UInt64 sessionId, UInt64 userId, Int32 recvMsgId)
-{
-    fs::FS_Event *ev = new fs::FS_Event(EventIds::User_Login);
-    (*ev)[FS_EventParam::SessionId] = GetSessionId();
-    (*ev)[FS_EventParam::UserId] = GetUseId();
-    (*ev)[FS_EventParam::RecvMsgId] = recvMsgId;
-    g_GlobalEventMgr->FireEvent(ev);
-}

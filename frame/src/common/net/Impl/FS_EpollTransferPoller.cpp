@@ -1033,8 +1033,8 @@ Int32 FS_EpollTransferPoller::_OnRecv(SOCKET sock, Byte8 *buff, Int64 buffLen, I
         if (buffLen <= 0)
         {
             sockErrorCode = StatusDefs::FS_SockError_BufferFull;
-            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("buff not enough sock[%d] buff address[0x%p] FS_SockError_BufferFull")
-                , sock, buff);
+//             g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("buff not enough sock[%d] buff address[0x%p] FS_SockError_BufferFull")
+//                 , sock, buff);
             ret = StatusDefs::SockError;
             break;
         }
@@ -1082,8 +1082,8 @@ Int32 FS_EpollTransferPoller::_OnSend(SOCKET sock, Byte8 *buff, Int64 buffLen, I
         {
             sockErrorCode = StatusDefs::FS_SockError_HaveNoDataToSend;
 
-            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("buff have no data sock[%d] buff address[0x%p] FS_SockError_HaveNoDataToSend")
-                , sock, buff);
+//             g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("buff have no data sock[%d] buff address[0x%p] FS_SockError_HaveNoDataToSend")
+//                 , sock, buff);
             ret = StatusDefs::SockError;
             break;
         }
