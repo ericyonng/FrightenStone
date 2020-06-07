@@ -249,7 +249,7 @@ bool FS_EpollTransferPoller::PushSendMsg(EpollIoData *ioData)
 
 void FS_EpollTransferPoller::CancelRecvIo(UInt64 sessionId, Int32 reason, bool giveRes)
 {
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will cancel recv io sessionId[%llu] [reason:%s]"), sessionId, CancelIoReason::GetStr(reason).c_str());
+    // g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will cancel recv io sessionId[%llu] [reason:%s]"), sessionId, CancelIoReason::GetStr(reason).c_str());
 
     // 只需要分别向recver与sender发送cancel消息，recver与sender直接向dispatcher返回transfer为0的消息即可认定为会话断开
     // TODO:post recver cancel
@@ -258,7 +258,7 @@ void FS_EpollTransferPoller::CancelRecvIo(UInt64 sessionId, Int32 reason, bool g
 
 void FS_EpollTransferPoller::CancelSendIo(UInt64 sessionId, Int32 reason, bool giveRes)
 {
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will cancel send io sessionId[%llu] [reason:%s]"), sessionId, CancelIoReason::GetStr(reason).c_str());
+    // g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will cancel send io sessionId[%llu] [reason:%s]"), sessionId, CancelIoReason::GetStr(reason).c_str());
 
     // 只需要分别向recver与sender发送cancel消息，recver与sender直接向dispatcher返回transfer为0的消息即可认定为会话断开
     _PostCancelToSender(sessionId, reason, giveRes);
@@ -295,8 +295,8 @@ bool FS_EpollTransferPoller::OnWillConnect(SOCKET sock, UInt64 sessionId)
     _sessionIdRefSenderIoData[sessionId] = NULL;
     _sendLock.Unlock();
 
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_(" epoll poller type[%d] new sessionId[%llu] sock[%d] init status")
-        , _monitorType, sessionId, sock);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_(" epoll poller type[%d] new sessionId[%llu] sock[%d] init status")
+//         , _monitorType, sessionId, sock);
 
     return true;
 
@@ -344,8 +344,6 @@ void FS_EpollTransferPoller::_OnTransferEvMonitorPoller(FS_ThreadPool *pool)
     g_Log->sys<FS_EpollTransferPoller>(_LOGFMT_("epoll transfer monitor working..."));
     _engineComp->MaskReady(true);
     EngineCompsMethods::WaitForAllCompsReady(engine);
-    Int64 loop = 0;
-    Int64 trigCount = 0;
     while (pool->IsPoolWorking())
     {
         ret = _epoll->Wait(1000);
@@ -358,21 +356,11 @@ void FS_EpollTransferPoller::_OnTransferEvMonitorPoller(FS_ThreadPool *pool)
         }
 
         if (ret <= 0)
-        {
-            ++loop;
-            if (loop >= 5)
-            {
-                loop = 0;
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("epoll block"));
-            }
             continue;
-        }
 
-        loop = 0;
-        ++trigCount;
         evs = _epoll->GetEvs();
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("[%d] new transfer epoll poller ev on compid[%u] trigCount[%lld]")
-            , ret, compId, trigCount);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("[%d] new transfer epoll poller ev on compid[%u] trigCount[%lld]")
+//             , ret, compId, trigCount);
         auto newEvMessageBlock = new EpollEvArriveMsgBlock;
         newEvMessageBlock->_triggerAmount = ret;
         ::memcpy(newEvMessageBlock->_ev, evs, sizeof(*evs)*ret);
@@ -398,13 +386,10 @@ void FS_EpollTransferPoller::_OnPreDistributeEvPoller(FS_ThreadPool *pool)
     g_Log->sys<FS_EpollTransferPoller>(_LOGFMT_("epoll pre distribute ev poller working..."));
     ULong timeoutMilisec = INFINITE;
     bool isMqWorking = true;
-    Int64 trigCount = 0;
     while (true)
     {
         _innerEvThread2MsgPreHandleMq->WaitForPoping(messageBlockList, timeoutMilisec);
         isMqWorking = _innerEvThread2MsgPreHandleMq->IsWorking();
-        ++trigCount;
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("trigCount[%lld]"), trigCount);
         if (!pool->IsPoolWorking() && messageBlockList->empty())
             break;
 
@@ -432,8 +417,6 @@ void FS_EpollTransferPoller::_OnPreDistributeEvPoller(FS_ThreadPool *pool)
 
                 if (ev.events & EPOLLIN)
                 {
-                    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("epollin ev of sock sessionId[%llu] trigs on epoll poller compid[%u]")
-                        , ev.data.u64, compId);
                     auto newMsgBlock = MessageBlockUtil::BuildEpollEvEpollInEvMsgBlock(ev.data.u64);
                     if (!_recverMailBox->Push(newMsgBlock))
                     {
@@ -445,8 +428,6 @@ void FS_EpollTransferPoller::_OnPreDistributeEvPoller(FS_ThreadPool *pool)
 
                 if (ev.events & EPOLLOUT)
                 {
-                    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("epollout ev of sock sessionId[%llu] trigs on epoll poller compid[%u]")
-                        , ev.data.u64, compId);
                     // 先判断sessionId是否存在
                     auto newMsgBlock = MessageBlockUtil::BuildEpollEvEpollOutEvMsgBlock(ev.data.u64);
                     if (!_senderMailBox->Push(newMsgBlock))
@@ -486,21 +467,18 @@ void FS_EpollTransferPoller::_OnReadPoller(FS_ThreadPool *pool)
     g_Log->sys<FS_EpollTransferPoller>(_LOGFMT_("epoll read poller working..."));
     ULong timeoutMilisec = INFINITE;
     bool isMqWorking = true;
-    Int64 trigCount = 0;
     while (true)
     {
         _recverMailBox->WaitForPoping(messageBlockList, timeoutMilisec);
         isMqWorking = _recverMailBox->IsWorking();
-        ++trigCount;
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("trigCount[%lld]"), trigCount);
         if (!pool->IsPoolWorking() && messageBlockList->empty())
             break;
 
         for (auto iterBlock = messageBlockList->begin(); iterBlock != messageBlockList->end();)
         {
             evMsgBlock = reinterpret_cast<FS_NetMsgBlock *>(*iterBlock);
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new recv will come _messageType[%d] compId[%u]")
-                , evMsgBlock->_messageType, evMsgBlock->_compId);
+//             g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new recv will come _messageType[%d] compId[%u]")
+//                 , evMsgBlock->_messageType, evMsgBlock->_compId);
 
             (this->*_msgBlockHandler[evMsgBlock->_messageType])(evMsgBlock);
             Fs_SafeFree(evMsgBlock);
@@ -532,21 +510,18 @@ void FS_EpollTransferPoller::_OnSendPoller(FS_ThreadPool *pool)
     g_Log->sys<FS_EpollTransferPoller>(_LOGFMT_("epoll send poller working..."));
     ULong timeoutMilisec = INFINITE;
     bool isMqWorking = true;
-    Int64 trigCount = 0;
     while (true)
     {
         _senderMailBox->WaitForPoping(messageBlockList, timeoutMilisec);
         isMqWorking = _senderMailBox->IsWorking();
-        ++trigCount;
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("trigCount[%lld]"), trigCount);
         if (!pool->IsPoolWorking() && messageBlockList->empty())
             break;
 
         for (auto iterBlock = messageBlockList->begin(); iterBlock != messageBlockList->end();)
         {
             evMsgBlock = reinterpret_cast<FS_NetMsgBlock *>(*iterBlock);
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new data to send messageType[%d], compId[%u]")
-                , evMsgBlock->_messageType, evMsgBlock->_compId);
+//             g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("new data to send messageType[%d], compId[%u]")
+//                 , evMsgBlock->_messageType, evMsgBlock->_compId);
             (this->*_msgBlockHandler[evMsgBlock->_messageType])(evMsgBlock);
             Fs_SafeFree(evMsgBlock);
             iterBlock = messageBlockList->erase(iterBlock);
@@ -570,10 +545,10 @@ void FS_EpollTransferPoller::_OnSendPoller(FS_ThreadPool *pool)
 
 void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
 {
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a readable msg is coming msgtype[%d], generatorId[%u], compId[%u]")
-        , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a readable msg is coming msgtype[%d], generatorId[%u], compId[%u]")
+//         , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
 
-    _AddCount("EpollReadable");
+    //_AddCount("EpollReadable");
     _recvLock.Lock();
     do
     {
@@ -581,8 +556,8 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
         EpollEvEpollInEvMsgBlock *block = reinterpret_cast<EpollEvEpollInEvMsgBlock *>(messageBlock);
         const UInt64 sessionId = block->_sessionId;
 
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a readable msg is coming sessionId[%llu]")
-            , sessionId);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a readable msg is coming sessionId[%llu]")
+//             , sessionId);
         auto iterStatus = _sessionIdRefRecverEvStatus.find(sessionId);
         if (iterStatus == _sessionIdRefRecverEvStatus.end())
             break;
@@ -617,8 +592,8 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
 
         // 5.post 数据收发结束message到dispatcher
         //（收到数据post，解除iodata的托管状态）并移除_sessionIdRefRecverEvIoData映射关系
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post recv suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
-            , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post recv suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
+//             , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
 
         if (bytesOffset)
         {
@@ -635,8 +610,8 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
             {// 若是因为eagain或者EWOULDBLOCK原因导致结束的则说明没有数据可读设置触发状态为false
              // 接收结束
                 iterStatus->second = false;
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv eagain or ewouldblock")
-                    , sessionId, len, sockErrorCode);
+//                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv eagain or ewouldblock")
+//                     , sessionId, len, sockErrorCode);
             }
             else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_BufferFull)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
@@ -646,12 +621,12 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
                 _sessionIdRefRecverEvIoData.erase(sessionId);
                 _PostRecvMsgToDispatcher(sessionId, 0, NULL);
 
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv not buffer full and remove session")
+                g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv not buffer full and remove session")
                     , sessionId, len, sockErrorCode);
             }
 
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] eagain or ewouldblock")
-                , sessionId, len, sockErrorCode);
+//             g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] eagain or ewouldblock")
+//                 , sessionId, len, sockErrorCode);
             break;
         }
         else if (len == 0)
@@ -660,7 +635,7 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
             _sessionIdRefRecverEvStatus.erase(iterStatus);
             _sessionIdRefRecverEvIoData.erase(sessionId);
             _PostRecvMsgToDispatcher(sessionId, 0, NULL);
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv len is zero and remove session")
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv len is zero and remove session")
                 , sessionId, len, sockErrorCode);
             break;
         }
@@ -670,10 +645,10 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
 
 void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
 {
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a writable msg is coming msgtype[%d], generatorId[%u], compId[%u]")
-        , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a writable msg is coming msgtype[%d], generatorId[%u], compId[%u]")
+//         , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
 
-    _AddCount("EpollWritable");
+    // _AddCount("EpollWritable");
     _sendLock.Lock();
     do
     {
@@ -681,8 +656,8 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
         EpollEvEpollOutEvMsgBlock *block = reinterpret_cast<EpollEvEpollOutEvMsgBlock *>(messageBlock);
         const UInt64 sessionId = block->_sessionId;
 
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a writable msg is coming sessionId[%llu]")
-            , sessionId);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a writable msg is coming sessionId[%llu]")
+//             , sessionId);
 
         auto iterStatus = _sessionIdRefSenderEvStatus.find(sessionId);
         if (iterStatus == _sessionIdRefSenderEvStatus.end())
@@ -718,8 +693,8 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
 
         // 5.post 数据收发结束message到dispatcher
         //（收到数据post，解除iodata的托管状态）并移除_sessionIdRefRecverEvIoData映射关系
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post send suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
-            , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post send suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
+//             , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
 
         if (bytesOffset)
         {
@@ -737,13 +712,13 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
              // 发送结束
                 iterStatus->second = false;
 
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
-                    , sessionId, len, sockErrorCode);
+//                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
+//                     , sessionId, len, sockErrorCode);
             }
             else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_HaveNoDataToSend)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
 
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send not buffer full and remove session")
+                g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send not buffer full and remove session")
                     , sessionId, len, sockErrorCode);
 
                 // 其他错误则断开网络连接
@@ -761,7 +736,7 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
             _sessionIdRefSenderIoData.erase(sessionId);
             _sessionIdRefSenderEvStatus.erase(iterStatus);
             _PostSendSucMsgToDispatcher(sessionId, 0, NULL);
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send len is zeror and remove session")
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send len is zeror and remove session")
                 , sessionId, len, sockErrorCode);
             break;
         }
@@ -771,10 +746,10 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
 
 void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
 {
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a recv msg posted from dispatcher is coming msgtype[%d], generatorId[%u], compId[%u]")
-        , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a recv msg posted from dispatcher is coming msgtype[%d], generatorId[%u], compId[%u]")
+//         , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
 
-    _AddCount("BePostedRecv");
+    // _AddCount("BePostedRecv");
     _recvLock.Lock();
     do
     {
@@ -783,8 +758,8 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
         const UInt64 sessionId = block->_sessionId;
         const SOCKET sock = block->_ioData->_sock;
 
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a recv msg posted from dispatcher is coming sock[%d] sessionId[%llu]")
-            , sock, sessionId);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a recv msg posted from dispatcher is coming sock[%d] sessionId[%llu]")
+//             , sock, sessionId);
 
         auto iterStatus = _sessionIdRefRecverEvStatus.find(sessionId);
         if (iterStatus == _sessionIdRefRecverEvStatus.end())
@@ -822,8 +797,8 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
 
         // 5.post 数据收发结束message到dispatcher
         //（收到数据post，解除iodata的托管状态）并移除_sessionIdRefRecverEvIoData映射关系
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post recv suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
-            , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post recv suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
+//             , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
 
         if (bytesOffset)
         {
@@ -846,8 +821,8 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
              // 接收结束
                 iterStatus->second = false;
 
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv eagain or ewouldblock")
-                    , sessionId, len, sockErrorCode);
+//                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv eagain or ewouldblock")
+//                     , sessionId, len, sockErrorCode);
             }
             else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_BufferFull)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
@@ -856,7 +831,7 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
                 _sessionIdRefRecverEvIoData.erase(sessionId);
                 _PostRecvMsgToDispatcher(sessionId, 0, NULL);
 
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv not buffer full and remove session")
+                g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv not buffer full and remove session")
                     , sessionId, len, sockErrorCode);
             }
 
@@ -868,7 +843,7 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
             _sessionIdRefRecverEvStatus.erase(iterStatus);
             _sessionIdRefRecverEvIoData.erase(sessionId);
             _PostRecvMsgToDispatcher(sessionId, 0, NULL);
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv len is zeror and remove session")
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv len is zeror and remove session")
                 , sessionId, len, sockErrorCode);
             break;
         }
@@ -878,10 +853,10 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
 
 void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
 {
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a send msg posted from dispatcher is coming msgtype[%d], generatorId[%u], compId[%u]")
-        , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a send msg posted from dispatcher is coming msgtype[%d], generatorId[%u], compId[%u]")
+//         , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
 
-    _AddCount("BePostedSend");
+    // _AddCount("BePostedSend");
     _sendLock.Lock();
     do
     {
@@ -890,8 +865,8 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
         const SOCKET sock = block->_ioData->_sock;
         const UInt64 sessionId = block->_sessionId;
 
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a send msg posted from dispatcher is coming sessionId[%llu]")
-            , sessionId);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a send msg posted from dispatcher is coming sessionId[%llu]")
+//             , sessionId);
 
         auto iterStatus = _sessionIdRefSenderEvStatus.find(sessionId);
         if (iterStatus == _sessionIdRefSenderEvStatus.end())
@@ -929,8 +904,8 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
 
         // 5.post 数据收发结束message到dispatcher
         //（收到数据post，解除iodata的托管状态）并移除_sessionIdRefRecverEvIoData映射关系
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post send suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
-            , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post send suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
+//             , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
 
         if (bytesOffset)
         {
@@ -953,8 +928,8 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
              // 发送结束
                 iterStatus->second = false;
 
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
-                    , sessionId, len, sockErrorCode);
+//                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
+//                     , sessionId, len, sockErrorCode);
             }
             else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_HaveNoDataToSend)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
@@ -963,7 +938,7 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
                 _sessionIdRefSenderIoData.erase(sessionId);
                 _PostSendSucMsgToDispatcher(sessionId, 0, NULL);
 
-                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send not buffer full and remove session")
+                g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send not buffer full and remove session")
                     , sessionId, len, sockErrorCode);
             }
 
@@ -976,7 +951,7 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
             _sessionIdRefSenderIoData.erase(sessionId);
             _PostSendSucMsgToDispatcher(sessionId, 0, NULL);
 
-            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send len is zeror and remove session")
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send len is zeror and remove session")
                 , sessionId, len, sockErrorCode);
             break;
         }
@@ -986,8 +961,8 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
 
 void FS_EpollTransferPoller::_OnBePostedCancleIoToRecver(FS_NetMsgBlock *messageBlock)
 {
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a cancel io to recver is coming msgtype[%d], generatorId[%u], compId[%u]")
-        , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a cancel io to recver is coming msgtype[%d], generatorId[%u], compId[%u]")
+//         , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
     _recvLock.Lock();
     do
     {
@@ -1005,8 +980,8 @@ void FS_EpollTransferPoller::_OnBePostedCancleIoToRecver(FS_NetMsgBlock *message
             break;
         }
 
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a cancel io to recver is coming sessionId[%llu] reason[%s], giveRes[%d]")
-            , sessionId, CancelIoReason::GetStr(reason).c_str(), giveRes);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a cancel io to recver is coming sessionId[%llu] reason[%s], giveRes[%d]")
+//             , sessionId, CancelIoReason::GetStr(reason).c_str(), giveRes);
 
         _sessionIdRefRecverEvStatus.erase(sessionId);
         _sessionIdRefRecverEvIoData.erase(sessionId);
@@ -1018,8 +993,8 @@ void FS_EpollTransferPoller::_OnBePostedCancleIoToRecver(FS_NetMsgBlock *message
 
 void FS_EpollTransferPoller::_OnBePostedCancleIoToSender(FS_NetMsgBlock *messageBlock)
 {
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a cancel io to sender is coming msgtype[%d], generatorId[%u], compId[%u]")
-        , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a cancel io to sender is coming msgtype[%d], generatorId[%u], compId[%u]")
+//         , messageBlock->_messageType, messageBlock->_generatorId, messageBlock->_compId);
     _sendLock.Lock();
     do
     {
@@ -1036,8 +1011,8 @@ void FS_EpollTransferPoller::_OnBePostedCancleIoToSender(FS_NetMsgBlock *message
             break;
         }
 
-        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a cancel io to sender is coming sessionId[%llu] reason[%s], giveRes[%d]")
-            , sessionId, CancelIoReason::GetStr(reason).c_str(), giveRes);
+//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("a cancel io to sender is coming sessionId[%llu] reason[%s], giveRes[%d]")
+//             , sessionId, CancelIoReason::GetStr(reason).c_str(), giveRes);
 
         _sessionIdRefSenderEvStatus.erase(sessionId);
         _sessionIdRefSenderIoData.erase(sessionId);
@@ -1090,8 +1065,8 @@ Int32 FS_EpollTransferPoller::_OnRecv(SOCKET sock, Byte8 *buff, Int64 buffLen, I
         }
     } while (0);
 
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sock[%d], buff[0x%p], bufflen[%lld], sockErrorCode[%d] ret[%d], error[%d %s]")
-        , sock, buff, buffLen, sockErrorCode, ret, err, err != -1 ? (strerror(err)) : "no error");
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sock[%d], buff[0x%p], bufflen[%lld], sockErrorCode[%d] ret[%d], error[%d %s]")
+//         , sock, buff, buffLen, sockErrorCode, ret, err, err != -1 ? (strerror(err)) : "no error");
 
     return ret;
 }
@@ -1148,18 +1123,18 @@ Int32 FS_EpollTransferPoller::_OnSend(SOCKET sock, Byte8 *buff, Int64 buffLen, I
 
     } while (0);
 
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sock[%d], buff[0x%p], bufflen[%lld], sockErrorCode[%d] ret[%d], error[%d %s]")
-        , sock, buff, buffLen, sockErrorCode, ret, err, err != -1 ? (strerror(err)) : "no error");
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sock[%d], buff[0x%p], bufflen[%lld], sockErrorCode[%d] ret[%d], error[%d %s]")
+//         , sock, buff, buffLen, sockErrorCode, ret, err, err != -1 ? (strerror(err)) : "no error");
     return ret;
 }
 
 void FS_EpollTransferPoller::_OnRecvRemoveSession(SOCKET sock, UInt64 sessionId)
 {
     // 打印日志
-    g_Log->net<FS_EpollTransferPoller>("_OnRecvRemoveSession generatorId[%u] sock[%d] sessionId[%llu] will remove"
-        , _generatorId, sock, sessionId);
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("generatorId[%u] sock[%d] sessionid[%llu] will remove from poller")
-        , _generatorId, sock, sessionId);
+//     g_Log->net<FS_EpollTransferPoller>("_OnRecvRemoveSession generatorId[%u] sock[%d] sessionId[%llu] will remove"
+//         , _generatorId, sock, sessionId);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("generatorId[%u] sock[%d] sessionid[%llu] will remove from poller")
+//         , _generatorId, sock, sessionId);
 
     _sessionIdRefRecverEvStatus.erase(sessionId);
     _sessionIdRefRecverEvIoData.erase(sessionId);
@@ -1169,10 +1144,10 @@ void FS_EpollTransferPoller::_OnRecvRemoveSession(SOCKET sock, UInt64 sessionId)
 void FS_EpollTransferPoller::_OnSendRemoveSession(SOCKET sock, UInt64 sessionId)
 {
     // 打印日志
-    g_Log->net<FS_EpollTransferPoller>("_OnSendRemoveSession generatorId[%u] sock[%d] sessionId[%llu] will remove"
-        , _generatorId, sock, sessionId);
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("_OnSendRemoveSession generatorId[%u] sock[%d] sessionId[%llu] will remove")
-        , _generatorId, sock, sessionId);
+//     g_Log->net<FS_EpollTransferPoller>("_OnSendRemoveSession generatorId[%u] sock[%d] sessionId[%llu] will remove"
+//         , _generatorId, sock, sessionId);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("_OnSendRemoveSession generatorId[%u] sock[%d] sessionId[%llu] will remove")
+//         , _generatorId, sock, sessionId);
     _sessionIdRefSenderEvStatus.erase(sessionId);
     _sessionIdRefSenderIoData.erase(sessionId);
     _PostSendSucMsgToDispatcher(sessionId, 0, NULL);
@@ -1199,8 +1174,8 @@ void FS_EpollTransferPoller::_PostRecvMsgToDispatcher(UInt64 sessionId, Int64 tr
     newMessageBlock->_isSessionInRecverMonitor = _sessionIdRefRecverEvStatus.find(sessionId) != _sessionIdRefRecverEvStatus.end();
     _mq->Push(_generatorId, newMessageBlock);
 
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("has post recv msg to dispatcher compId[%u] _generatorId[%u] sessionId[%llu] transferBytes[%lld]")
-        , _engineComp->GetCompId(), _generatorId, sessionId, transferBytes);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("has post recv msg to dispatcher compId[%u] _generatorId[%u] sessionId[%llu] transferBytes[%lld]")
+//         , _engineComp->GetCompId(), _generatorId, sessionId, transferBytes);
 }
 
 void FS_EpollTransferPoller::_PostSendSucMsgToDispatcher(UInt64 sessionId, Int64 transferBytes, EpollIoData *ioData)
@@ -1212,8 +1187,8 @@ void FS_EpollTransferPoller::_PostSendSucMsgToDispatcher(UInt64 sessionId, Int64
     newMessageBlock->_isSessionInSenderMonitor = _sessionIdRefSenderEvStatus.find(sessionId) != _sessionIdRefSenderEvStatus.end();
     _mq->Push(_generatorId, newMessageBlock);
 
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("has post send suc msg to dispatcher compId[%u] _generatorId[%u] sessionId[%llu] transferBytes[%lld]")
-        , _engineComp->GetCompId(), _generatorId, sessionId, transferBytes);
+//     g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("has post send suc msg to dispatcher compId[%u] _generatorId[%u] sessionId[%llu] transferBytes[%lld]")
+//         , _engineComp->GetCompId(), _generatorId, sessionId, transferBytes);
 }
 
 void FS_EpollTransferPoller::_AddCount(const FS_String &name)
@@ -1229,7 +1204,7 @@ void FS_EpollTransferPoller::_AddCount(const FS_String &name)
         iterCount = nameRefCount.insert(std::make_pair(name, 0)).first;
 
     ++iterCount->second;
-    g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("name[%s] count[%lld]"), name.c_str(), iterCount->second);
+   // g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("name[%s] count[%lld]"), name.c_str(), iterCount->second);
 }
 
 void FS_EpollTransferPoller::_InitMsgBlockHandlers()

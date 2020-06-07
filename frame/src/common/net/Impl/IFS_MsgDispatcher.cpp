@@ -383,7 +383,7 @@ void IFS_MsgDispatcher::_CheckHeartbeat()
         _toRemove.insert(session);
 
 #ifndef _WIN32
-        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("session heartbeat time out: %s"), session->ToString().c_str());
+      //  g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("session heartbeat time out: %s"), session->ToString().c_str());
 #endif
     }
 }
@@ -519,7 +519,7 @@ bool IFS_MsgDispatcher::_DoPostRecv(FS_Session *session)
     // session不可post或者已经post完成不可重复post
     if (session->IsPostRecv())
     {
-        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] is already posted recv."), session->GetSessionId());
+        g_Log->w<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] is already posted recv."), session->GetSessionId());
         return true;
     }
 
@@ -533,7 +533,7 @@ bool IFS_MsgDispatcher::_DoPostRecv(FS_Session *session)
     }
 
 #ifndef _WIN32
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("suc post a recv msg sessionId[%llu]"), session->GetSessionId());
+   // g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("suc post a recv msg sessionId[%llu]"), session->GetSessionId());
 #endif
     return true;
 }
@@ -551,14 +551,14 @@ bool IFS_MsgDispatcher::_DoPostSend(FS_Session *session)
     Int32 st = session->PostSend();
     if (st != StatusDefs::Success)
     {
-        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("PostSend fail st[%d] sessionId[%llu]"), session->GetSessionId());
+        g_Log->w<IFS_MsgDispatcher>(_LOGFMT_("PostSend fail st[%d] sessionId[%llu]"), session->GetSessionId());
         session->MaskClose();
         _toRemove.insert(session);
         return false;
     }
 
 #ifndef _WIN32
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("suc post a send msg sessionId[%llu]"), session->GetSessionId());
+    // g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("suc post a send msg sessionId[%llu]"), session->GetSessionId());
 #endif
     return true;
 }
@@ -572,10 +572,10 @@ void IFS_MsgDispatcher::_RemoveSessionGracefully(FS_Session *session)
         , session->GetAddr()->ToString().c_str());
 
 #ifndef _WIN32
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] sock[%llu] disconnected address<%s> prepare remove")
-        , sessionId
-        , session->GetSocket()
-        , session->GetAddr()->ToString().c_str());
+//     g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] sock[%llu] disconnected address<%s> prepare remove")
+//         , sessionId
+//         , session->GetSocket()
+//         , session->GetAddr()->ToString().c_str());
 #endif
 
     session->MaskClose();
@@ -616,10 +616,10 @@ void IFS_MsgDispatcher::_OnSessionDisconnectedNoFree(FS_Session *session)
         , session->GetAddr()->ToString().c_str());
 
 #ifndef _WIN32
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] sock[%llu] disconnected address<%s>")
-        , sessionId
-        , session->GetSocket()
-        , session->GetAddr()->ToString().c_str());
+//     g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] sock[%llu] disconnected address<%s>")
+//         , sessionId
+//         , session->GetSocket()
+//         , session->GetAddr()->ToString().c_str());
 #endif
 
     // 断连回调
@@ -660,8 +660,8 @@ void IFS_MsgDispatcher::_OnSessionDisconnectedNoFree(FS_Session *session)
 void IFS_MsgDispatcher::_OnSessionConnected(SessionConnectedNetMsgBlock *connectedMsg)
 {
 #ifndef _WIN32
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_(" new session is coming. _OnSessionConnected connectedMsg info:\n[%s]")
-        , connectedMsg->ToString().c_str());
+//     g_Log->i<IFS_MsgDispatcher>(_LOGFMT_(" new session is coming. _OnSessionConnected connectedMsg info:\n[%s]")
+//         , connectedMsg->ToString().c_str());
 #endif
 
     const UInt64 sessionId = connectedMsg->_sessionId;
@@ -703,15 +703,15 @@ void IFS_MsgDispatcher::_OnSessionConnected(SessionConnectedNetMsgBlock *connect
         , EngineCompType::GetStr(newSession->GetSrcCompType()).c_str());
 
 #ifndef _WIN32
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
-        " protocol port[%hu], src comp type[%d:%s]")
-        , sessionId
-        , newSession->GetSocket()
-        , addr->GetAddr().c_str()
-        , addr->GetPort()
-        , newSession->GetProtocolPort()
-        , newSession->GetSrcCompType()
-        , EngineCompType::GetStr(newSession->GetSrcCompType()).c_str());
+//     g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("new session connected: id<%llu>,socket<%llu>,remote ip[%s:%hu]"
+//         " protocol port[%hu], src comp type[%d:%s]")
+//         , sessionId
+//         , newSession->GetSocket()
+//         , addr->GetAddr().c_str()
+//         , addr->GetPort()
+//         , newSession->GetProtocolPort()
+//         , newSession->GetSrcCompType()
+//         , EngineCompType::GetStr(newSession->GetSrcCompType()).c_str());
 #endif
 
     // 设置断开回调
@@ -728,7 +728,7 @@ void IFS_MsgDispatcher::_OnSessionConnected(SessionConnectedNetMsgBlock *connect
     const Int32 st = _logic->OnSessionConnected(sessionId, connectedMsg->_stub);
     if (st != StatusDefs::Success)
     {
-        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("_logic->OnSessionConnected fail st[%d] sessionId[%llu]"), st, sessionId);
+        g_Log->w<IFS_MsgDispatcher>(_LOGFMT_("_logic->OnSessionConnected fail st[%d] sessionId[%llu]"), st, sessionId);
 
         // 失败则移除session
         _DelayCloseSession(newSession);
@@ -739,7 +739,7 @@ void IFS_MsgDispatcher::_OnSessionConnected(SessionConnectedNetMsgBlock *connect
     if (newSession->IsValid())
     {
         if (!_DoPostRecv(newSession))
-            g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("_DoPostRecv fail sessionId[%llu]"), sessionId);
+            g_Log->w<IFS_MsgDispatcher>(_LOGFMT_("_DoPostRecv fail sessionId[%llu]"), sessionId);
     }
 }
 
@@ -890,8 +890,8 @@ void IFS_MsgDispatcher::_OnMsgArrived(IocpMsgArrivedMsgBlock *arrivedMsg)
 #else
 void IFS_MsgDispatcher::_OnMsgRecv(EpollRecvDataMsgBlock *recvMsg)
 {
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("a recv io msg from transfer generatorId[%u] compId[%u] is coming handle sessionId[%llu] transferBytes[%lld]")
-        , recvMsg->_generatorId, recvMsg->_compId, recvMsg->_sessionId, recvMsg->_transferBytes);
+//     g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("a recv io msg from transfer generatorId[%u] compId[%u] is coming handle sessionId[%llu] transferBytes[%lld]")
+//         , recvMsg->_generatorId, recvMsg->_compId, recvMsg->_sessionId, recvMsg->_transferBytes);
 
     EpollIoData *ioData = reinterpret_cast<EpollIoData *>(recvMsg->_ioData);
     const UInt64 sessionId = recvMsg->_sessionId;
@@ -904,8 +904,8 @@ void IFS_MsgDispatcher::_OnMsgRecv(EpollRecvDataMsgBlock *recvMsg)
         g_Log->net<IFS_MsgDispatcher>("_OnMsgRecv sessionId[%llu] is removed before.\n stack trace back:\n%s"
             , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
 
-        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("_OnMsgRecv sessionId[%llu] is removed before.\n stack trace back:\n%s")
-            , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+//         g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("_OnMsgRecv sessionId[%llu] is removed before.\n stack trace back:\n%s")
+//             , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
         return;
     }
 
@@ -918,12 +918,12 @@ void IFS_MsgDispatcher::_OnMsgRecv(EpollRecvDataMsgBlock *recvMsg)
             transferBytes,
             session->IsDelayClose()
             , session->ToString().c_str());
-        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("_OnMsgRecv sessionId[%llu] sock[%llu] bytesTrans[%llu] will disconnect IsDelayClose[%d] sessionInfo:\n%s")
-            , sessionId
-            , session->GetSocket(),
-            transferBytes,
-            session->IsDelayClose()
-            , session->ToString().c_str());
+//         g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("_OnMsgRecv sessionId[%llu] sock[%llu] bytesTrans[%llu] will disconnect IsDelayClose[%d] sessionInfo:\n%s")
+//             , sessionId
+//             , session->GetSocket(),
+//             transferBytes,
+//             session->IsDelayClose()
+//             , session->ToString().c_str());
 
         if (!isRegisterInMonitor) // 已经不在recv注册队列中可以不用cancel
             session->SetRecvIoCanceled();
@@ -949,8 +949,8 @@ void IFS_MsgDispatcher::_OnMsgRecv(EpollRecvDataMsgBlock *recvMsg)
 
 void IFS_MsgDispatcher::_OnMsgSendSuc(EpollSendSucMsgBlock *sendSucMsg)
 {
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("a send suc io msg from transfer generatorId[%u] compId[%u] is coming handle sessionId[%llu] transferBytes[%lld]")
-        , sendSucMsg->_generatorId, sendSucMsg->_compId, sendSucMsg->_sessionId, sendSucMsg->_transferBytes);
+//     g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("a send suc io msg from transfer generatorId[%u] compId[%u] is coming handle sessionId[%llu] transferBytes[%lld]")
+//         , sendSucMsg->_generatorId, sendSucMsg->_compId, sendSucMsg->_sessionId, sendSucMsg->_transferBytes);
 
     EpollIoData *ioData = reinterpret_cast<EpollIoData *>(sendSucMsg->_ioData);
     const UInt64 sessionId = sendSucMsg->_sessionId;
@@ -963,8 +963,8 @@ void IFS_MsgDispatcher::_OnMsgSendSuc(EpollSendSucMsgBlock *sendSucMsg)
         g_Log->net<IFS_MsgDispatcher>("sessionId[%llu] is removed before.\n stack trace back:\n%s"
             , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
 
-        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] is removed before.\n stack trace back:\n%s")
-            , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
+//         g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] is removed before.\n stack trace back:\n%s")
+//             , sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
         return;
     }
 
@@ -978,12 +978,12 @@ void IFS_MsgDispatcher::_OnMsgSendSuc(EpollSendSucMsgBlock *sendSucMsg)
             , session->IsDelayClose()
             , session->ToString().c_str());
 
-        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("_OnMsgSendSuc sessionId[%llu] sock[%llu] bytesTrans[%lld] disconnected IsDelayClose[%d], sessionInfo:\n%s")
-            , sessionId
-            , session->GetSocket()
-            , transferBytes
-            , session->IsDelayClose()
-            , session->ToString().c_str());
+//         g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("_OnMsgSendSuc sessionId[%llu] sock[%llu] bytesTrans[%lld] disconnected IsDelayClose[%d], sessionInfo:\n%s")
+//             , sessionId
+//             , session->GetSocket()
+//             , transferBytes
+//             , session->IsDelayClose()
+//             , session->ToString().c_str());
 
         if (!isRegisterInMonitor)
             session->SetSendIoCanceled();

@@ -245,7 +245,7 @@ void FS_Session::OnSendSuc(Int64 transferBytes, EpollIoData *ioData)
     }
 
 #ifndef _WIN32
-    g_Log->i<FS_Session>(_LOGFMT_("send suc transferBytes[%lld] sessionId[%llu]"), transferBytes, _sessionId);
+   // g_Log->i<FS_Session>(_LOGFMT_("send suc transferBytes[%lld] sessionId[%llu]"), transferBytes, _sessionId);
 #endif
 }
 
@@ -259,7 +259,7 @@ void FS_Session::OnRecvSuc(Int64 transferBytes, EpollIoData *ioData)
     ioData->_callback->Invoke(transferBytes);
 
 #ifndef _WIN32
-    g_Log->i<FS_Session>(_LOGFMT_("recv suc transferBytes[%lld] sessionId[%llu]"), transferBytes, _sessionId);
+    //g_Log->i<FS_Session>(_LOGFMT_("recv suc transferBytes[%lld] sessionId[%llu]"), transferBytes, _sessionId);
 #endif
 }
 
@@ -280,7 +280,7 @@ void FS_Session::Bind(FS_EpollTransferPoller *transferPoller)
 
 void FS_Session::CancelRecvIoAndMaskClose(Int32 reason, bool giveRes /* = false */)
 {
-    g_Log->i<FS_Session>(_LOGFMT_("will cancel recv io sessionId[%llu] giveRes[%d]"), GetSessionId(), giveRes);
+    // g_Log->i<FS_Session>(_LOGFMT_("will cancel recv io sessionId[%llu] giveRes[%d]"), GetSessionId(), giveRes);
     MaskClose();
     if (!_isRecvIoCanceled)
     {
@@ -291,7 +291,7 @@ void FS_Session::CancelRecvIoAndMaskClose(Int32 reason, bool giveRes /* = false 
 
 void FS_Session::CancelSendIoAndMaskClose(Int32 reason, bool giveRes /*= false*/)
 {
-    g_Log->i<FS_Session>(_LOGFMT_("will cancel send io sessionId[%llu] giveRes[%d]"), GetSessionId(), giveRes);
+    // g_Log->i<FS_Session>(_LOGFMT_("will cancel send io sessionId[%llu] giveRes[%d]"), GetSessionId(), giveRes);
     MaskClose();
     if (!_isSendIoCanceled)
     {

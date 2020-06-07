@@ -67,8 +67,8 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         reinterpret_cast<const fs::NetMsgHeaderFmtType::PacketLenDataType *>(buffer);
 
     auto addr = session->GetAddr();
-    g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
-        , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
+//     g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
+//         , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
 
     // 1.缓冲有效数据长度大于包头长度说明包头数据到达
     // 2.与包长度比较，若有效数据长度比包长度大说明至少存在一个整包
@@ -82,23 +82,30 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         // 1.解码
         if (!_msgDecoder->Decode(buffer))
         {
-            g_Log->i<NormalHandler>(_LOGFMT_("Decode error sessionId[%llu]")
+            g_Log->w<NormalHandler>(_LOGFMT_("Decode error sessionId[%llu]")
                 , sessionId);
+
+            g_Log->netpackage<NormalHandler>(_LOGFMT_("Decode error sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
+                , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
+
             user->Close(UserCloseReasonType::DecodeFail);
             break;
         }
 
-        g_Log->net<NormalHandler>("cmd[%u] msg iscoming len[%u]"
-            , _msgDecoder->GetCmd(), _msgDecoder->GetMsgLen());
+//         g_Log->net<NormalHandler>("cmd[%u] msg iscoming len[%u]"
+//             , _msgDecoder->GetCmd(), _msgDecoder->GetMsgLen());
 
-        g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] msgdecode info: %s")
-            , sessionId, _msgDecoder->ToString().c_str());
+//         g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] msgdecode info: %s")
+//             , sessionId, _msgDecoder->ToString().c_str());
 
         // 协议处理回调
         //s.FlushTime();
         if (!g_ProtocolStackMgr->InvokeProtocolHandler(sessionId, _msgDecoder))
         {
-            g_Log->i<NormalHandler>(_LOGFMT_("InvokeProtocolHandler error sessionId[%llu]")
+            g_Log->netpackage<NormalHandler>(_LOGFMT_("InvokeProtocolHandler error sessionId[%llu] msgdecode info: %s")
+                , sessionId, _msgDecoder->ToString().c_str());
+
+            g_Log->w<NormalHandler>(_LOGFMT_("InvokeProtocolHandler error sessionId[%llu]")
                 , sessionId);
             user->Close(UserCloseReasonType::NoProtocolHandler);
         }
@@ -109,8 +116,8 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         // 弹出消息
         recvBuffer->PopFront(_msgDecoder->GetMsgLen());
 
-        g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu]  after msg handled recvbuffer info: %s")
-            , sessionId, recvBuffer->ToString().c_str());
+//         g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu]  after msg handled recvbuffer info: %s")
+//             , sessionId, recvBuffer->ToString().c_str());
 
         // 统计一个包
         g_ThisApp->HandleCompEv_RecvMsgAmount();
@@ -120,12 +127,12 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
             break;
     }
 
-    g_Log->netpackage<NormalHandler>(_LOGFMT_("after msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
-        , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
-
     // 网络包过大直接杀掉
     if (len >= fs::NetMsgHeaderFmtType::_msgHeaderSize && *packetLen > bufferSize)
     {
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("net package len larger than recv buffer size sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
+            , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
+
         g_Log->w<NormalHandler>(_LOGFMT_("sessionId[%llu] addr[%s] cur buffer data len[%lld] net package len larger than recv buffer size packetlen[%u], buffersize[%lld]")
             , sessionId, session->GetAddr()->ToString().c_str(), len, *packetLen, bufferSize);
         user->Close(UserCloseReasonType::NetPackageTooLarge);
