@@ -54,6 +54,7 @@ public:
         Sys,
         Custom,
         PerformanceAnalysis,
+        NetPackage,
     };
 };
 

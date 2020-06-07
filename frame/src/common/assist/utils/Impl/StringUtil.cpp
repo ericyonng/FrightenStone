@@ -161,6 +161,27 @@ bool StringUtil::ToHexString(const FS_String &src, FS_String &outHexString)
     return true;
 }
 
+bool StringUtil::ToHexString(const Byte8 *buff, Int64 len, FS_String &outHexString)
+{
+    if (UNLIKELY(!len))
+        return false;
+
+    char cache[16] = { 0 };
+    Int64 cacheLen = 0;
+    for (Int64 i = 0; i < len; ++i)
+    {
+        cacheLen = static_cast<Int64>(sprintf(cache, "%02x", static_cast<U8>(buff[static_cast<Int32>(i)])));
+        if (cacheLen < 0LL)
+        {
+            printf("sprintf fail src[%lld]:%d", i, buff[static_cast<Int32>(i)]);
+            continue;
+        }
+        outHexString << cache;
+    }
+
+    return true;
+}
+
 void StringUtil::PreInstertTime(const Time &time, FS_String &src)
 {
     src << time.ToStringOfMillSecondPrecision();

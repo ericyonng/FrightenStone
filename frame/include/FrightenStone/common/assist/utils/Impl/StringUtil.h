@@ -70,6 +70,7 @@ public:
     static FS_String Num2Str(ObjType val, Int32 radix = 10);
     static bool MakeMd5(const FS_String &src, FS_String &outMd5);
     static bool ToHexString(const FS_String &src, FS_String &outHexString);
+    static bool ToHexString(const Byte8 *buff, Int64 len, FS_String &outHexString);
     static void PreInstertTime(const Time &time, FS_String &src);
 
     static void SplitString(const FS_String &str,

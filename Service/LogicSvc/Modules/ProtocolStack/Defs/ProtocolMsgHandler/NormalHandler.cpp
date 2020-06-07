@@ -66,6 +66,10 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     const fs::NetMsgHeaderFmtType::PacketLenDataType *packetLen =
         reinterpret_cast<const fs::NetMsgHeaderFmtType::PacketLenDataType *>(buffer);
 
+    auto addr = session->GetAddr();
+    g_Log->netpackage<User>(_LOGFMT_("before msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
+        , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
+
     // 1.缓冲有效数据长度大于包头长度说明包头数据到达
     // 2.与包长度比较，若有效数据长度比包长度大说明至少存在一个整包
     // 3.一个网络包比缓冲区还大是不允许出现的，若出现则直接kill掉连接
@@ -84,15 +88,17 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
             break;
         }
 
-#ifdef _DEBUG
         g_Log->net<NormalHandler>("cmd[%u] msg iscoming len[%u]"
             , _msgDecoder->GetCmd(), _msgDecoder->GetMsgLen());
-#endif
 
         // 协议处理回调
         //s.FlushTime();
         if (!g_ProtocolStackMgr->InvokeProtocolHandler(sessionId, _msgDecoder))
+        {
+            g_Log->i<NormalHandler>(_LOGFMT_("InvokeProtocolHandler error sessionId[%llu]")
+                , sessionId);
             user->Close(UserCloseReasonType::NoProtocolHandler);
+        }
 
         //e.FlushTime();
         //Int64 useTime = (s - e).GetTotalMilliSeconds();
@@ -107,6 +113,9 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         if (!session->IsValid())
             break;
     }
+
+    g_Log->netpackage<User>(_LOGFMT_("after msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
+        , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
 
     // 网络包过大直接杀掉
     if (len >= fs::NetMsgHeaderFmtType::_msgHeaderSize && *packetLen > bufferSize)

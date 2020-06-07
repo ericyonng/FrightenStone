@@ -41,6 +41,7 @@
 #include "FrightenStone/common/net/Defs/FS_NetDefs.h"
 #include "FrightenStone/common/objpool/objpool.h"
 #include "FrightenStone/common/component/Impl/FS_String.h"
+#include "FrightenStone/common/assist/utils/Impl/StringUtil.h"
 
 FS_NAMESPACE_BEGIN
 

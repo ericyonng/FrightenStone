@@ -331,6 +331,8 @@ Int32 FS_Log::_GetLogFileIndex(Int32 logTypeEnum)
             return LogDefs::_SYSLOG_sys_;
         case LogFileType::PerformanceAnalysis:
             return LogDefs::_SYSLOG_PerformanceAnalysis_;
+        case LogFileType::NetPackage:
+            return LogDefs::_SYSLOG_NetPackage_;
         default:
             break;
     }

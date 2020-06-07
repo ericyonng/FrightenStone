@@ -163,6 +163,10 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
     if(buffer->IsFull())
         buffer = session->NewSendBuffer();
 
+    auto addr = session->GetAddr();
+    g_Log->netpackage<User>(_LOGFMT_("before send sessionId[%llu] addrinfo[%s] raw:\n%s")
+        , _sessionId, addr->ToString().c_str(), buffer->ToString().c_str());
+
     Int64 *curPos = NULL;
     Int64 wrSize = msgData->SerializeTo(buffer->GetStartPush(curPos), static_cast<UInt64>(buffer->GetRest()));
     if (wrSize < 0)
@@ -178,6 +182,9 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
 
     // buffer写入位置变更
     *curPos += wrSize;
+
+    g_Log->netpackage<User>(_LOGFMT_("after write data sessionId[%llu] addrinfo[%s] wrSize[%lld] raw:\n%s")
+        , _sessionId, addr->ToString().c_str(), wrSize, buffer->ToString().c_str());
 
     if (session->IsPostSend())
         return;

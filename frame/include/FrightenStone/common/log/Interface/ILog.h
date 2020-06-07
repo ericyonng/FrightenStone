@@ -112,6 +112,12 @@ public:
     void performance(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     #pragma endregion
 
+    // 网络包
+    // 请使用便利宏_LOGFMT_
+    template<typename ObjType, typename... Args>
+    void netpackage(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+#pragma endregion
+
     /* 功能函数 */
     #pragma region
 public:

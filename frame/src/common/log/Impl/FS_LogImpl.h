@@ -54,10 +54,11 @@ inline const IDelegate<void, LogData *> *FS_Log::_InstallBeforeLogHookFunc(Int32
 
 inline bool FS_Log::_IsAllowToConsole(Int32 level) const
 {
-    if(level == LogLevel::Net ||
-       level == LogLevel::MemPool ||
-       level == LogLevel::ObjPool ||
-       level == LogLevel::PerformanceAnalysis)
+    if (level == LogLevel::Net ||
+        level == LogLevel::MemPool ||
+        level == LogLevel::ObjPool ||
+        level == LogLevel::PerformanceAnalysis ||
+        level == LogLevel::NetPackage)
         return false;
 
     return true;
