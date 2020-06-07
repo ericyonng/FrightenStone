@@ -66,6 +66,11 @@ inline void IFS_NetEngine::Sinal()
     _waitForClose.Unlock();
 }
 
+inline FS_String IFS_NetEngine::GetAppName() const
+{
+    return _appName;
+}
+
 inline const IFS_EngineComp *IFS_NetEngine::GetCompById(UInt32 compId) const
 {
     auto iterComp = _compIdRefComps.find(compId);
