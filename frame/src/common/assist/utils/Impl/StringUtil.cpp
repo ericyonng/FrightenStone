@@ -166,11 +166,13 @@ bool StringUtil::ToHexString(const Byte8 *buff, Int64 len, FS_String &outHexStri
     if (UNLIKELY(!len))
         return false;
 
+    // 每16字节一行
     char cache[16] = { 0 };
     Int64 cacheLen = 0;
     for (Int64 i = 0; i < len; ++i)
     {
-        cacheLen = static_cast<Int64>(sprintf(cache, "%02x", static_cast<U8>(buff[static_cast<Int32>(i)])));
+        cacheLen = static_cast<Int64>(sprintf(cache, "%02x%s"
+            , static_cast<U8>(buff[static_cast<Int32>(i)]), ((i + 1) % 16 == 0) ? "\n" : " "));
         if (cacheLen < 0LL)
         {
             printf("sprintf fail src[%lld]:%d", i, buff[static_cast<Int32>(i)]);

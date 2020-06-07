@@ -67,7 +67,7 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         reinterpret_cast<const fs::NetMsgHeaderFmtType::PacketLenDataType *>(buffer);
 
     auto addr = session->GetAddr();
-    g_Log->netpackage<User>(_LOGFMT_("before msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
+    g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
         , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
 
     // 1.缓冲有效数据长度大于包头长度说明包头数据到达
@@ -91,6 +91,9 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         g_Log->net<NormalHandler>("cmd[%u] msg iscoming len[%u]"
             , _msgDecoder->GetCmd(), _msgDecoder->GetMsgLen());
 
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] msgdecode info: %s")
+            , sessionId, _msgDecoder->ToString().c_str());
+
         // 协议处理回调
         //s.FlushTime();
         if (!g_ProtocolStackMgr->InvokeProtocolHandler(sessionId, _msgDecoder))
@@ -106,6 +109,9 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         // 弹出消息
         recvBuffer->PopFront(_msgDecoder->GetMsgLen());
 
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu]  after msg handled recvbuffer info: %s")
+            , sessionId, recvBuffer->ToString().c_str());
+
         // 统计一个包
         g_ThisApp->HandleCompEv_RecvMsgAmount();
 
@@ -114,7 +120,7 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
             break;
     }
 
-    g_Log->netpackage<User>(_LOGFMT_("after msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
+    g_Log->netpackage<NormalHandler>(_LOGFMT_("after msg handle sessionId[%llu] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
         , sessionId, addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
 
     // 网络包过大直接杀掉
