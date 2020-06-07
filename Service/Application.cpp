@@ -68,7 +68,7 @@ void FS_Application::Run()
         fs::FS_String path;
         fs::SystemUtil::GetProgramPath(true, path);
         g_Log->i<FS_Application>(_LOGFMT_("cur app path %s  get programpath %s"), GetAppName().c_str(), path.c_str());
-
+        std::cout << "log path" << g_Log->GetLogRootPath().c_str() << std::endl;
         st = IFS_NetEngine::Start();
         if(st == StatusDefs::Success)
         {

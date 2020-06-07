@@ -34,6 +34,11 @@
 
 FS_NAMESPACE_BEGIN
 
+inline FS_String FS_Log::GetLogRootPath() const
+{
+    return _rootDirName;
+}
+
 inline IDelegate<void, const LogData *> *FS_Log::_InstallLogHookFunc(Int32 level, IDelegate<void, const LogData *> *delegate)
 {
     if(!_levelRefHook[level])

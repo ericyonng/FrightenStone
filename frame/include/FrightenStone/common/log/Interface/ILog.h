@@ -62,6 +62,7 @@ public:
     virtual Int32 InitModule(const Byte8 *rootDir = NULL) = 0;
     virtual void FinishModule() = 0;
     virtual void FlushAllFile() = 0;
+    virtual FS_String GetLogRootPath() const = 0;
 
     /* 日志打印接口 */
     #pragma region
