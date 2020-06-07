@@ -119,7 +119,9 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     // 根目录
     if(!rootDirName)
     {
-        auto programName = FS_FileUtil::ExtractFileWithoutExtension(SystemUtil::GetCurProgramName().RemoveZeroTail());
+        FS_String procPath;
+        SystemUtil::GetProgramPath(true, procPath);
+        auto programName = FS_FileUtil::ExtractFileWithoutExtension(procPath.RemoveZeroTail());
         programName.AppendFormat("%s", "Log");
         _rootDirName = programName;
     }
