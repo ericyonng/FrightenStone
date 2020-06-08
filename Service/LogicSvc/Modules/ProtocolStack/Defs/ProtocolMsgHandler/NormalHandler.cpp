@@ -66,9 +66,13 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     const fs::NetMsgHeaderFmtType::PacketLenDataType *packetLen =
         reinterpret_cast<const fs::NetMsgHeaderFmtType::PacketLenDataType *>(buffer);
 
+    auto logic = _dispatcher->GetLogic();
     auto addr = session->GetAddr();
-    g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] socket[%d] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
-        , sessionId, session->GetSocket(), addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
+    if (logic->GetServiceId() == ServiceType::ClientSimulation)
+    {
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] socket[%d] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
+            , sessionId, session->GetSocket(), addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
+    }
 
     // 1.缓冲有效数据长度大于包头长度说明包头数据到达
     // 2.与包长度比较，若有效数据长度比包长度大说明至少存在一个整包

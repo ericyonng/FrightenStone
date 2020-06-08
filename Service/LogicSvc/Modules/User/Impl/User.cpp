@@ -31,6 +31,8 @@
 #include "Service/LogicSvc/Modules/User/Interface/IUserMgr.h"
 #include "Service/LogicSvc/Modules/User/Impl/IUserSys.h"
 
+#include "Service/ServiceType.h"
+
 OBJ_POOL_CREATE_ANCESTOR_IMPL(User, OBJ_POOL_LOGIC_DEF_INIT_NUM);
 
 User::User(IUserMgr *userMgr, UInt64 sessionId, UInt64 userId)
@@ -162,9 +164,13 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
     if(buffer->IsFull())
         buffer = session->NewSendBuffer();
 
+    auto logic = _dispatcher->GetLogic();
    auto addr = session->GetAddr();
-    g_Log->netpackage<User>(_LOGFMT_("before send sessionId[%llu] socket[%d] addrinfo[%s] cmd[%u] len[%u] raw:\n%s")
-        , _sessionId, session->GetSocket(), addr->ToString().c_str(), msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+   if (logic->GetServiceId() != ServiceType::ClientSimulation)
+   {
+       g_Log->netpackage<User>(_LOGFMT_("before send sessionId[%llu] socket[%d] addrinfo[%s] cmd[%u] len[%u] raw:\n%s")
+           , _sessionId, session->GetSocket(), addr->ToString().c_str(), msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+   }
 
     Int64 *curPos = NULL;
     Int64 wrSize = msgData->SerializeTo(buffer->GetStartPush(curPos), static_cast<UInt64>(buffer->GetRest()));
@@ -182,8 +188,11 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
     // buffer写入位置变更
     *curPos += wrSize;
 
-    g_Log->netpackage<User>(_LOGFMT_("after write data sessionId[%llu] socket[%d] addrinfo[%s] wrSize[%lld] cmd[%u], len[%u] raw:\n%s")
-        , _sessionId, session->GetSocket(), addr->ToString().c_str(), wrSize, msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+    if (logic->GetServiceId() != ServiceType::ClientSimulation)
+    {
+        g_Log->netpackage<User>(_LOGFMT_("after write data sessionId[%llu] socket[%d] addrinfo[%s] wrSize[%lld] cmd[%u], len[%u] raw:\n%s")
+            , _sessionId, session->GetSocket(), addr->ToString().c_str(), wrSize, msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+    }
 
     if (session->IsPostSend())
         return;
