@@ -163,8 +163,8 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
         buffer = session->NewSendBuffer();
 
    auto addr = session->GetAddr();
-    g_Log->netpackage<User>(_LOGFMT_("before send sessionId[%llu] addrinfo[%s] cmd[%u] len[%u] raw:\n%s")
-        , _sessionId, addr->ToString().c_str(), msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+    g_Log->netpackage<User>(_LOGFMT_("before send sessionId[%llu] socket[%d] addrinfo[%s] cmd[%u] len[%u] raw:\n%s")
+        , _sessionId, session->GetSocket(), addr->ToString().c_str(), msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
 
     Int64 *curPos = NULL;
     Int64 wrSize = msgData->SerializeTo(buffer->GetStartPush(curPos), static_cast<UInt64>(buffer->GetRest()));
@@ -182,8 +182,8 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
     // buffer写入位置变更
     *curPos += wrSize;
 
-    g_Log->netpackage<User>(_LOGFMT_("after write data sessionId[%llu] addrinfo[%s] wrSize[%lld] cmd[%u], len[%u] raw:\n%s")
-        , _sessionId, addr->ToString().c_str(), wrSize, msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+    g_Log->netpackage<User>(_LOGFMT_("after write data sessionId[%llu] socket[%d] addrinfo[%s] wrSize[%lld] cmd[%u], len[%u] raw:\n%s")
+        , _sessionId, session->GetSocket(), addr->ToString().c_str(), wrSize, msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
 
     if (session->IsPostSend())
         return;
