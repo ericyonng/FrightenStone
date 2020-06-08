@@ -141,8 +141,8 @@ bool StringUtil::MakeMd5(const FS_String &src, FS_String &outMd5)
 
 bool StringUtil::ToHexString(const FS_String &src, FS_String &outHexString)
 {
-    if(UNLIKELY(!src.GetLength()))
-        return false;
+//     if(UNLIKELY(!src.GetLength()))
+//         return false;
 
     char cache[16] = {0};
     Int64 cacheLen = 0;
@@ -163,8 +163,8 @@ bool StringUtil::ToHexString(const FS_String &src, FS_String &outHexString)
 
 bool StringUtil::ToHexString(const Byte8 *buff, Int64 len, FS_String &outHexString)
 {
-    if (UNLIKELY(!len))
-        return false;
+//     if (UNLIKELY(!len))
+//         return false;
 
     // 每16字节一行
     char cache[16] = { 0 };
