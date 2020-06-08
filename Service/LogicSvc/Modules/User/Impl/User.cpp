@@ -188,11 +188,11 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
     // buffer写入位置变更
     *curPos += wrSize;
 
-    if (logic->GetServiceId() != ServiceType::ClientSimulation)
-    {
-        g_Log->netpackage<User>(_LOGFMT_("after write data sessionId[%llu] socket[%d] addrinfo[%s] wrSize[%lld] cmd[%u], len[%u] raw:\n%s")
-            , _sessionId, session->GetSocket(), addr->ToString().c_str(), wrSize, msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
-    }
+//     if (logic->GetServiceId() != ServiceType::ClientSimulation)
+//     {
+//         g_Log->netpackage<User>(_LOGFMT_("after write data sessionId[%llu] socket[%d] addrinfo[%s] wrSize[%lld] cmd[%u], len[%u] raw:\n%s")
+//             , _sessionId, session->GetSocket(), addr->ToString().c_str(), wrSize, msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+//     }
 
     if (session->IsPostSend())
         return;
