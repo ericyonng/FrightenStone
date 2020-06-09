@@ -119,7 +119,7 @@ inline bool IFS_Buffer::IsEmpty() const
 
 inline bool IFS_Buffer::IsFull() const
 {
-    return _bufferSize == _curPos;
+    return _bufferSize <= _curPos;
 }
 
 inline Int64 IFS_Buffer::GetLength() const

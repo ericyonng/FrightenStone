@@ -46,7 +46,8 @@ FS_String IFS_Buffer::ToString() const
     StringUtil::ToHexString(_buff, _curPos, raw);
     info.AppendFormat("bufferSize:%lld\n", _bufferSize)
         .AppendFormat("buff address:0x%p\n", _buff)
-        .AppendFormat("curPos:%lld\n", _curPos).AppendFormat("buffer data:\n%s\n", raw.c_str());
+        .AppendFormat("curPos:%lld\n", _curPos)
+        .AppendFormat("buffer data:\n%s\n", raw.c_str());
 
     return info;
 }
