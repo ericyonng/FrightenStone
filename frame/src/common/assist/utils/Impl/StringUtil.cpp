@@ -161,7 +161,7 @@ bool StringUtil::ToHexString(const FS_String &src, FS_String &outHexString)
     return true;
 }
 
-bool StringUtil::ToHexString(const Byte8 *buff, Int64 len, FS_String &outHexString)
+bool StringUtil::ToHexStringView(const Byte8 *buff, Int64 len, FS_String &outHexString)
 {
 //     if (UNLIKELY(!len))
 //         return false;

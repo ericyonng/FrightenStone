@@ -1048,7 +1048,7 @@ Int32 FS_EpollTransferPoller::_OnRecv(SOCKET sock, Byte8 *buff, Int64 buffLen, I
         if (ret > 0)
         {
             FS_String hexStr;
-            StringUtil::ToHexString(buff, ret, hexStr);
+            StringUtil::ToHexStringView(buff, ret, hexStr);
             g_Log->netpackage<FS_EpollTransferPoller>(_LOGFMT_("socket[%d], buf[%p], len[%lld] of buff size, real recv[%d], net hex data:\n%s\n")
                 , sock, buff, buffLen, ret, hexStr.c_str());
         }
@@ -1106,7 +1106,7 @@ Int32 FS_EpollTransferPoller::_OnSend(SOCKET sock, Byte8 *buff, Int64 buffLen, I
         if (ret > 0)
         {
             FS_String hexStr;
-            StringUtil::ToHexString(buff, ret, hexStr);
+            StringUtil::ToHexStringView(buff, ret, hexStr);
             g_Log->netpackage<FS_EpollTransferPoller>(_LOGFMT_("socket[%d], buf[%p], len[%lld] to send, real send[%d], net hex data:\n%s\n")
                 , sock, buff, buffLen, ret, hexStr.c_str());
         }

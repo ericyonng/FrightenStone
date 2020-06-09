@@ -256,6 +256,7 @@ void UserMgr::_OnUserLoginReq(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
     }
 
 #ifndef _WIN32
+    g_Log->i<UserMgr>(_LOGFMT_("login req msg decoder info:%s"), msgDecoder->ToString().c_str());
     g_Log->i<UserMgr>(_LOGFMT_("user[%s], pwd[%s] msgId[%d] log in"), login._loginData._userName, login._loginData._pwd, login._loginData._msgId);
 #endif
     _FireLogin(sessionId, user->GetUseId(), login._loginData._msgId);
@@ -280,6 +281,7 @@ void UserMgr::_OnUserLoginRes(UInt64 sessionId, fs::NetMsgDecoder *msgDecoder)
     }
 
 #ifndef _WIN32
+    g_Log->i<UserMgr>(_LOGFMT_("loginRes msg decoder info: %s"), msgDecoder->ToString().c_str());
     g_Log->i<UserMgr>(_LOGFMT_("sessionId[%llu], msgId[%d] log in"), sessionId, loginRes._msgId);
 #endif
 
