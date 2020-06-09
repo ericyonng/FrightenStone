@@ -79,7 +79,7 @@ inline bool NetMsgCoder::Start<FS_String>()
 {
     _wrLen += NetMsgHeaderFmtType::_msgPacketLenSize;
     auto buffer = reinterpret_cast<FS_String *>(_buffer);
-    buffer->AppendBitData(reinterpret_cast<const char *>(_wrLen), NetMsgHeaderFmtType::_msgPacketLenSize);
+    buffer->AppendBitData(reinterpret_cast<const char *>(&_wrLen), NetMsgHeaderFmtType::_msgPacketLenSize);
     return true;
 }
 
