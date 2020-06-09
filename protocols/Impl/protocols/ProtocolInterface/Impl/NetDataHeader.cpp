@@ -65,7 +65,7 @@ Int64 NetMsg_DataHeader::SerializeTo(char *buffer, UInt64 bufferSize)
 
     // 4.½áÊø
     _coder->Finish<Byte8>();
-    _packetLength = _coder->GetTotalWriteBytes();
+    _packetLength = static_cast<UInt32>(_coder->GetTotalWriteBytes());
     return _packetLength;
 }
 
@@ -84,7 +84,7 @@ Int64 NetMsg_DataHeader::SerializeTo(FS_String &buffer)
 
     // 3.½áÊø
     _coder->Finish<FS_String>();
-    _packetLength = _coder->GetTotalWriteBytes();
+    _packetLength = static_cast<UInt32>(_coder->GetTotalWriteBytes());
     return _packetLength;
 }
 
