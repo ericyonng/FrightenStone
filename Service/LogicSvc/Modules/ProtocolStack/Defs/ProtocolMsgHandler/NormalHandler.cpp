@@ -96,11 +96,11 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
             break;
         }
 
-//         g_Log->net<NormalHandler>("cmd[%u] msg iscoming len[%u]"
-//             , _msgDecoder->GetCmd(), _msgDecoder->GetMsgLen());
+        g_Log->net<NormalHandler>("cmd[%u] msg iscoming len[%u]"
+            , _msgDecoder->GetCmd(), _msgDecoder->GetMsgLen());
 
-//         g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] msgdecode info: %s")
-//             , sessionId, _msgDecoder->ToString().c_str());
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] msgdecode info: %s")
+            , sessionId, _msgDecoder->ToString().c_str());
 
         // 协议处理回调
         //s.FlushTime();
@@ -125,8 +125,8 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         // 弹出消息
         recvBuffer->PopFront(_msgDecoder->GetMsgLen());
 
-//         g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu]  after msg handled recvbuffer info: %s")
-//             , sessionId, recvBuffer->ToString().c_str());
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu]  after msg handled recvbuffer info: %s")
+            , sessionId, recvBuffer->ToString().c_str());
 
         // 统计一个包
         g_ThisApp->HandleCompEv_RecvMsgAmount();
