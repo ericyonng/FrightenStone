@@ -68,7 +68,7 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
 
     auto logic = _dispatcher->GetLogic();
     auto addr = session->GetAddr();
-    if (logic->GetServiceId() == ServiceType::ClientSimulation)
+    //if (logic->GetServiceId() == ServiceType::ClientSimulation)
     {
         g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] socket[%d] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
             , sessionId, session->GetSocket(), addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
@@ -112,6 +112,11 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
             g_Log->w<NormalHandler>(_LOGFMT_("InvokeProtocolHandler error sessionId[%llu]")
                 , sessionId);
             user->Close(UserCloseReasonType::NoProtocolHandler);
+        }
+        else
+        {
+            g_Log->netpackage<NormalHandler>(_LOGFMT_("InvokeProtocolHandler suc sessionId[%llu] socket[%d] addrinfo[%s] curbufferlen[%lld], packetlen[%u] _msgDecoder info:\n%s")
+                , sessionId, session->GetSocket(), addr->ToString().c_str(), len, *packetLen, _msgDecoder->ToString().c_str());
         }
 
         //e.FlushTime();

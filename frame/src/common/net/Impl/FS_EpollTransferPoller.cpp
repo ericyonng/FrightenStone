@@ -966,7 +966,6 @@ void FS_EpollTransferPoller::_OnBePostedCancleIoToRecver(FS_NetMsgBlock *message
     _recvLock.Lock();
     do
     {
-
         // 1.ÅÐ¶ÏsessionIdÊÇ·ñ±»ÒÆ³ý
         PostCancelIoToRecverMsgBlock *block = reinterpret_cast<PostCancelIoToRecverMsgBlock *>(messageBlock);
         const UInt64 sessionId = block->_sessionId;
