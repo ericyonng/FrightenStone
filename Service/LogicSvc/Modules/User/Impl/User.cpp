@@ -178,9 +178,10 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
            , _sessionId, session->GetSocket(), addr->ToString().c_str(), msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
    }
 
-   fs::FS_String rawData;
+   fs::FS_String rawData, hexRaw;
    msgData->SerializeTo(rawData);
-   g_Log->net<User>("sessionId[%llu] socket[%d] send data rawData %s", _sessionId, session->GetSocket(), rawData.c_str());
+   fs::StringUtil::ToHexStringView(rawData.c_str(), rawData.GetLength(), hexRaw);
+   g_Log->net<User>("sessionId[%llu] socket[%d] send data rawData %s", _sessionId, session->GetSocket(), hexRaw.c_str());
 
     Int64 *curPos = NULL;
     Int64 wrSize = msgData->SerializeTo(buffer->GetStartPush(curPos), static_cast<UInt64>(buffer->GetRest()));
