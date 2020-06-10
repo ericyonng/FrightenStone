@@ -90,8 +90,8 @@ void TestInsts::Run()
     // TestServer::Run();
     //TestUtf8C17toC11::Run();
     //TestMessageQueue2::Run();
-    // TestServer::Run();
-    TestNetBuffer::Run();
+    TestServer::Run();
+    // TestNetBuffer::Run();
     //TestMemAlign::Run();
     //TestEpoll::Run();
     //TestObjPool::Run();
