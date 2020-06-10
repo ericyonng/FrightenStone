@@ -133,12 +133,12 @@ void TestProtocolsMgr::_OnLogin(fs::FS_Event *ev)
     fs::LoginRes ret;
     ret._msgId = _sendMsgID;
 
-    fs::FS_String rawData;
-    auto rawBytes = ret.SerializeTo(rawData);
-    fs::FS_String hexData;
-    fs::StringUtil::ToHexString(rawData, hexData);
+//     fs::FS_String rawData;
+//     auto rawBytes = ret.SerializeTo(rawData);
+//     fs::FS_String hexData;
+//     fs::StringUtil::ToHexString(rawData, hexData);
 
-    g_Log->net<TestProtocolsMgr>("will login res rawBytes[%lld] hex data[%s]", rawBytes, hexData.c_str());
+    // g_Log->net<TestProtocolsMgr>("will login res rawBytes[%lld] hex data[%s]", rawBytes, hexData.c_str());
     AddSendMsgId();
     user->SendData(&ret);
 }
