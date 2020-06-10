@@ -70,10 +70,11 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         reinterpret_cast<const fs::NetMsgHeaderFmtType::PacketLenDataType *>(buffer);
 
     //if (logic->GetServiceId() == ServiceType::ClientSimulation)
-//     {
-//         g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] socket[%d] addrinfo[%s] packetlen[%u] recvBuffer raw:\n%s")
-//             , sessionId, session->GetSocket(), addr->ToString().c_str(), *packetLen, recvBuffer->ToString().c_str());
-//     }
+    auto addr = session->GetAddr();
+    {
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] socket[%d] addrinfo[%s] packetlen[%u] recvBuffer raw:\n%s")
+            , sessionId, session->GetSocket(), addr->ToString().c_str(), *packetLen, recvBuffer->ToString().c_str());
+    }
 
     // 1.缓冲有效数据长度大于包头长度说明包头数据到达
     // 2.与包长度比较，若有效数据长度比包长度大说明至少存在一个整包
@@ -81,7 +82,6 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     // 4.packetLen不可为0，避免死循环
     //fs::Time s, e;
     Int64 bytesToPop = 0;
-    auto addr = session->GetAddr();
     for (;;)
     {
         // 判断是否有完整包
@@ -155,8 +155,8 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     const Int64 len = recvBuffer->GetLength();
     if (len >= fs::NetMsgHeaderFmtType::_msgHeaderSize && *packetLen > bufferSize)
     {
-        g_Log->netpackage<NormalHandler>(_LOGFMT_("net package len larger than recv buffer size sessionId[%llu] socket[%d] addrinfo[%s] curbufferlen[%lld], packetlen[%u] recvBuffer raw:\n%s")
-            , sessionId, session->GetSocket(), addr->ToString().c_str(), len, *packetLen, recvBuffer->ToString().c_str());
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("net package len larger than recv buffer size sessionId[%llu] socket[%d] addrinfo[%s] curbufferlen[%lld], packetlen[%u] bytesToPop[%lld] recvBuffer raw:\n%s")
+            , sessionId, session->GetSocket(), addr->ToString().c_str(), len, *packetLen, bytesToPop, recvBuffer->ToString().c_str());
 
         g_Log->w<NormalHandler>(_LOGFMT_("sessionId[%llu] addr[%s] cur buffer data len[%lld] net package len larger than recv buffer size packetlen[%u], buffersize[%lld]")
             , sessionId, session->GetAddr()->ToString().c_str(), len, *packetLen, bufferSize);
