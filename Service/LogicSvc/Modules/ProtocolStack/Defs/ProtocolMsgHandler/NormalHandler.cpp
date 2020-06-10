@@ -53,12 +53,6 @@ NormalHandler::~NormalHandler()
 void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
 {// 返回若不是success，则会直接杀端
 
-    if (!session->IsValid())
-    {
-        g_Log->w<NormalHandler>(_LOGFMT_("session is invalid sessionid[%llu]"), session->GetSessionId());
-        return;
-    }
-
     // 会话缓冲区
     auto recvBuffer = session->GetRecvBuffer();
     const UInt64 sessionId = session->GetSessionId();
@@ -88,6 +82,7 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     Int64 bytesToPop = 0;
     for (;;)
     {
+        // 判断是否有完整包
         packetLen = reinterpret_cast<const fs::NetMsgHeaderFmtType::PacketLenDataType *>(buffer + bytesToPop);
         const Int64 len = recvBuffer->GetLength() - bytesToPop;
         if (!(*packetLen) ||
@@ -137,9 +132,6 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
         //e.FlushTime();
         //Int64 useTime = (s - e).GetTotalMilliSeconds();
         // recvBuffer->PopFront(_msgDecoder->GetMsgLen());
-
-        g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu]  after msg handled recvbuffer info: %s")
-            , sessionId, recvBuffer->ToString().c_str());
 
         // 统计一个包
         g_ThisApp->HandleCompEv_RecvMsgAmount();

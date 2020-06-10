@@ -165,8 +165,8 @@ void User::SendData(fs::NetMsg_DataHeader *msgData)
     fs::IFS_NetBuffer *buffer = session->GetSendBuffer();
     if (buffer->IsFull())
     {
-        g_Log->w<User>(_LOGFMT_("sessionId[%llu] socket[%d] buffer to send is full buffer info[%s]")
-            , _sessionId, session->GetSocket(), buffer->ToString().c_str());
+//         g_Log->w<User>(_LOGFMT_("sessionId[%llu] socket[%d] buffer to send is full buffer info[%s]")
+//             , _sessionId, session->GetSocket(), buffer->ToString().c_str());
         buffer = session->NewSendBuffer();
     }
 
