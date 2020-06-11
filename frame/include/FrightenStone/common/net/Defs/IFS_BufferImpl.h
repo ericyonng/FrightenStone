@@ -56,7 +56,7 @@ inline void IFS_Buffer::PopFront(Int64 bytesLen)
                              bytesLen, _curPos);
     }
 
-    bytesLen = _curPos > bytesLen ? bytesLen : _curPos;
+    bytesLen = ((_curPos > bytesLen) ? bytesLen : _curPos);
     size_t n = _curPos - bytesLen;
 
     // TODO:如果考虑性能清零可不执行
