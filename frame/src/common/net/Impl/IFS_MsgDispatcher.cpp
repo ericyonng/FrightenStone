@@ -383,7 +383,7 @@ void IFS_MsgDispatcher::_CheckHeartbeat()
         _toRemove.insert(session);
 
 #ifndef _WIN32
-      //  g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("session heartbeat time out: %s"), session->ToString().c_str());
+      g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("session heartbeat time out: %s"), session->ToString().c_str());
 #endif
     }
 }
