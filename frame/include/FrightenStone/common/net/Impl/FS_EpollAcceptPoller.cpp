@@ -171,7 +171,7 @@ void FS_EpollAcceptPoller::_OnAcceptorEvMonitorPoller(FS_ThreadPool *pool)
 
         if (ret == -1)
         {
-            g_Log->w<FS_EpollAcceptPoller>(_LOGFMT_("epoll wait fail ret[%d] errorno[%d]"), ret, errno);
+            g_Log->w<FS_EpollAcceptPoller>(_LOGFMT_("epoll wait fail ret[%d] errorno[%d:%s]"), ret, errno, strerror(errno));
         }
 
         if (ret <= 0)

@@ -349,12 +349,14 @@ void FS_EpollTransferPoller::_OnTransferEvMonitorPoller(FS_ThreadPool *pool)
         ret = _epoll->Wait(1000);
         if (_epoll->IsDestroy())
             break;
-
+        
+        // 其他错误
         if (ret == -1)
         {
-            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("epoll wait fail ret[%d] errorno[%d]"), ret, errno);
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("epoll wait fail ret[%d] errorno[%d:%s]"), ret, errno, strerror(errno));
         }
-
+        
+        // 其他错误
         if (ret <= 0)
             continue;
 

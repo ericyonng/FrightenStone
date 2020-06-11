@@ -72,8 +72,8 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     //if (logic->GetServiceId() == ServiceType::ClientSimulation)
     auto addr = session->GetAddr();
     {
-        g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] socket[%d] addrinfo[%s] packetlen[%u] recvBuffer raw:\n%s")
-            , sessionId, session->GetSocket(), addr->ToString().c_str(), *packetLen, recvBuffer->ToString().c_str());
+        g_Log->netpackage<NormalHandler>(_LOGFMT_("before msg handle sessionId[%llu] socket[%d] theadid[%llu] addrinfo[%s] packetlen[%u] recvBuffer raw:\n%s")
+            , sessionId, session->GetSocket(), fs::SystemUtil::GetCurrentThreadId(), addr->ToString().c_str(), *packetLen, recvBuffer->ToString().c_str());
     }
 
     // 1.缓冲有效数据长度大于包头长度说明包头数据到达
@@ -147,8 +147,8 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     if(bytesToPop)
         recvBuffer->PopFront(bytesToPop);
 
-    g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] socket[%d] bytesToPop[%lld] after msg handled recvbuffer info: %s")
-        , sessionId, session->GetSocket(), bytesToPop, recvBuffer->ToString().c_str());
+    g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] socket[%d] threadid[%llu] bytesToPop[%lld] after msg handled recvbuffer info: %s")
+        , sessionId, session->GetSocket(), fs::SystemUtil::GetCurrentThreadId(), bytesToPop, recvBuffer->ToString().c_str());
 
     // 网络包过大直接杀掉
     packetLen = reinterpret_cast<const fs::NetMsgHeaderFmtType::PacketLenDataType *>(buffer);
