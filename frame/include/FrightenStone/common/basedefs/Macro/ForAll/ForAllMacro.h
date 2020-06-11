@@ -275,7 +275,7 @@ private:\
 {                                                                   \
     size_t chg = cpyBytes;                                          \
     for(;chg--;)                                                    \
-        *(dest + cpyBytes) = *(src + cpyBytes);                     \
+        *(dest + chg) = *(src + chg);                               \
 }
 
 
