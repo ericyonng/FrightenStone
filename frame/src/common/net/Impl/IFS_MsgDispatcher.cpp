@@ -377,6 +377,10 @@ void IFS_MsgDispatcher::_CheckHeartbeat()
         if (session->GetHeartBeatExpiredTime() > _curTime)
             break;
 
+#ifndef _WIN32
+        g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("before session heartbeat time out: %s"), session->ToString().c_str());
+#endif
+
         _engine->HandleCompEv_HeartBeatTimeOut();
         iterSession = _sessionHeartbeatQueue.erase(iterSession);
         session->MaskClose();
@@ -566,10 +570,11 @@ bool IFS_MsgDispatcher::_DoPostSend(FS_Session *session)
 void IFS_MsgDispatcher::_RemoveSessionGracefully(FS_Session *session)
 {// 仅仅close掉socket，并等待transfer返回, ondisconnected才是真正的断开
     const auto sessionId = session->GetSessionId();
-    g_Log->net<IFS_MsgDispatcher>("sessionId[%llu] sock[%llu] disconnected address<%s> prepare remove"
+    g_Log->net<IFS_MsgDispatcher>("sessionId[%llu] sock[%llu] disconnected address<%s> prepare remove \nstackbacktrace: \n%s"
         , sessionId
         , session->GetSocket()
-        , session->GetAddr()->ToString().c_str());
+        , session->GetAddr()->ToString().c_str()
+        , CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
 
 #ifndef _WIN32
 //     g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("sessionId[%llu] sock[%llu] disconnected address<%s> prepare remove")

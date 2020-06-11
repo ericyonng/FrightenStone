@@ -39,6 +39,8 @@
 #include "FrightenStone/common/net/Defs/FS_NetDefs.h"
 #include "FrightenStone/common/objpool/objpool.h"
 #include "FrightenStone/common/net/Defs/FS_BufferFactory.h"
+#include "FrightenStone/common/log/Log.h"
+#include "FrightenStone/common/crashhandle/CrashHandle.h"
 
 FS_NAMESPACE_BEGIN
 

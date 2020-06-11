@@ -365,7 +365,7 @@ void FS_EpollTransferPoller::_OnTransferEvMonitorPoller(FS_ThreadPool *pool)
 //             , ret, compId, trigCount);
         auto newEvMessageBlock = new EpollEvArriveMsgBlock;
         newEvMessageBlock->_triggerAmount = ret;
-        ::memcpy(newEvMessageBlock->_ev, evs, sizeof(*evs)*ret);
+        ::memcpy((char *)(newEvMessageBlock->_ev), evs, sizeof(*evs)*ret);
         if (!_innerEvThread2MsgPreHandleMq->Push(newEvMessageBlock))
         {
             g_Log->e<FS_EpollTransferPoller>(_LOGFMT_("push new ev message block fail, stack capture:\n%s")
@@ -562,7 +562,10 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
 //             , sessionId);
         auto iterStatus = _sessionIdRefRecverEvStatus.find(sessionId);
         if (iterStatus == _sessionIdRefRecverEvStatus.end())
+        {
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] no connect"), sessionId);
             break;
+        }
 
         // 2.设置_sessionIdRefRecverEvStatus为触发状态
         iterStatus->second = true;
@@ -570,12 +573,18 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
         // 3.获取_sessionIdRefRecverEvIoData,iodata，若没有说明dispatcher还没post
         auto iterIoData = _sessionIdRefRecverEvIoData.find(sessionId);
         if (iterIoData == _sessionIdRefRecverEvIoData.end())
+        {
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] no io data"), sessionId);
             break;
+        }
 
         // 4.持续的读取网络数据直到eagain或者EWOULDBLOCK,或者iodata的缓冲满为止
         EpollIoData *ioData = iterIoData->second;
         if (!ioData) // ioData在刚刚连接上时候为空
+        {
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] ioData is zero"), sessionId);
             break;
+        }
 
         const SOCKET sock = ioData->_sock;
 
@@ -594,8 +603,8 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
 
         // 5.post 数据收发结束message到dispatcher
         //（收到数据post，解除iodata的托管状态）并移除_sessionIdRefRecverEvIoData映射关系
-//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post recv suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
-//             , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
+        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post recv suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
+            , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
 
         if (bytesOffset)
         {
@@ -612,8 +621,8 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
             {// 若是因为eagain或者EWOULDBLOCK原因导致结束的则说明没有数据可读设置触发状态为false
              // 接收结束
                 iterStatus->second = false;
-//                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv eagain or ewouldblock")
-//                     , sessionId, len, sockErrorCode);
+                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv eagain or ewouldblock")
+                    , sessionId, len, sockErrorCode);
             }
             else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_BufferFull)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
@@ -627,8 +636,8 @@ void FS_EpollTransferPoller::_OnEpollReadableEv(FS_NetMsgBlock *messageBlock)
                     , sessionId, len, sockErrorCode);
             }
 
-//             g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] eagain or ewouldblock")
-//                 , sessionId, len, sockErrorCode);
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] eagain or ewouldblock")
+                , sessionId, len, sockErrorCode);
             break;
         }
         else if (len == 0)
@@ -663,20 +672,28 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
 
         auto iterStatus = _sessionIdRefSenderEvStatus.find(sessionId);
         if (iterStatus == _sessionIdRefSenderEvStatus.end())
+        {
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu], no connect"), sessionId);
             break;
-
+        }
         // 2.设置_sessionIdRefRecverEvStatus为触发状态
         iterStatus->second = true;
 
         // 3.获取_sessionIdRefRecverEvIoData,iodata，若没有说明dispatcher还没post
         auto iterIoData = _sessionIdRefSenderIoData.find(sessionId);
         if (iterIoData == _sessionIdRefSenderIoData.end())
+        {
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu], no io data"), sessionId);
             break;
+        }
 
         // 4.持续的读取网络数据直到eagain或者EWOULDBLOCK,或者iodata的缓冲满为止
         EpollIoData *ioData = iterIoData->second;
         if (!ioData)
+        {
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu], ioData is zero"), sessionId);
             break;
+        }
 
         const SOCKET sock = ioData->_sock;
 
@@ -695,8 +712,8 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
 
         // 5.post 数据收发结束message到dispatcher
         //（收到数据post，解除iodata的托管状态）并移除_sessionIdRefRecverEvIoData映射关系
-//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post send suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
-//             , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
+        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post send suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
+            , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
 
         if (bytesOffset)
         {
@@ -714,8 +731,8 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
              // 发送结束
                 iterStatus->second = false;
 
-//                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
-//                     , sessionId, len, sockErrorCode);
+                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
+                    , sessionId, len, sockErrorCode);
             }
             else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_HaveNoDataToSend)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
@@ -728,6 +745,9 @@ void FS_EpollTransferPoller::_OnEpollWritableEv(FS_NetMsgBlock *messageBlock)
                 _sessionIdRefSenderEvStatus.erase(iterStatus);
                 _PostSendSucMsgToDispatcher(sessionId, 0, NULL);
             }
+
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d]")
+                , sessionId, len, sockErrorCode);
 
             break;
         }
@@ -765,7 +785,10 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
 
         auto iterStatus = _sessionIdRefRecverEvStatus.find(sessionId);
         if (iterStatus == _sessionIdRefRecverEvStatus.end())
+        {
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionid[%llu] no connect"), sessionId);
             break;
+        }
 
         // 2. 插入iodata
         auto iterIoData = _sessionIdRefRecverEvIoData.find(sessionId);
@@ -776,12 +799,18 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
 
         // 2.判断sock的触发状态
         if (!iterStatus->second)
+        {
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionid[%llu] no recv event"), sessionId);
             break;
+        }
 
         // 3.持续的读取网络数据直到eagain或者EWOULDBLOCK,或者iodata的缓冲满为止
         EpollIoData *ioData = iterIoData->second;
         if (!ioData)
+        {
+            g_Log->e<FS_EpollTransferPoller>(_LOGFMT_("sessionid[%llu] post a NULL iodata"), sessionId);
             break;
+        }
 
         // 4. 读取数据
         Int32 len = 0;
@@ -799,8 +828,8 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
 
         // 5.post 数据收发结束message到dispatcher
         //（收到数据post，解除iodata的托管状态）并移除_sessionIdRefRecverEvIoData映射关系
-//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post recv suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
-//             , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
+        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post recv suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
+            , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
 
         if (bytesOffset)
         {
@@ -823,8 +852,8 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
              // 接收结束
                 iterStatus->second = false;
 
-//                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv eagain or ewouldblock")
-//                     , sessionId, len, sockErrorCode);
+                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] recv eagain or ewouldblock")
+                    , sessionId, len, sockErrorCode);
             }
             else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_BufferFull)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
@@ -837,6 +866,8 @@ void FS_EpollTransferPoller::_OnBePostedRecv(FS_NetMsgBlock *messageBlock)
                     , sessionId, len, sockErrorCode);
             }
 
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] ")
+                , sessionId, len, sockErrorCode);
             break;
         }
         else if (len == 0)
@@ -872,7 +903,10 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
 
         auto iterStatus = _sessionIdRefSenderEvStatus.find(sessionId);
         if (iterStatus == _sessionIdRefSenderEvStatus.end())
+        {
+            g_Log->w<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] no connect"), sessionId);
             break;
+        }
 
         // 2. 插入iodata
         auto iterIoData = _sessionIdRefSenderIoData.find(sessionId);
@@ -883,12 +917,17 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
 
         // 2.判断sock的触发状态
         if (!iterStatus->second)
+        {
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] no send event"), sessionId);
             break;
-
+        }
         // 3.持续的读取网络数据直到eagain或者EWOULDBLOCK,或者iodata的缓冲满为止
         EpollIoData *ioData = iterIoData->second;
         if (!ioData)
+        {
+            g_Log->e<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] post a null iodata"), sessionId);
             break;
+        }
 
         // 4. 读取数据
         Int32 len = 0;
@@ -906,8 +945,8 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
 
         // 5.post 数据收发结束message到dispatcher
         //（收到数据post，解除iodata的托管状态）并移除_sessionIdRefRecverEvIoData映射关系
-//         g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post send suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
-//             , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
+        g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("will post send suc msg to dispatcher buff[0x%p] buffsize[%lld] bytesOffset[%lld] sessionId[%llu] len[%d] sockErrorCode[%d]")
+            , buff, leftBufferSize, bytesOffset, sessionId, len, sockErrorCode);
 
         if (bytesOffset)
         {
@@ -930,8 +969,8 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
              // 发送结束
                 iterStatus->second = false;
 
-//                 g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
-//                     , sessionId, len, sockErrorCode);
+                g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d] send eagain or ewouldblock")
+                    , sessionId, len, sockErrorCode);
             }
             else if (sockErrorCode != StatusDefs::Success && sockErrorCode != StatusDefs::FS_SockError_HaveNoDataToSend)
             {// 若是因为iodata缓冲满导致结束，说明可能还有数据，则触发状态仍然为true
@@ -944,6 +983,8 @@ void FS_EpollTransferPoller::_OnBePostedSend(FS_NetMsgBlock *messageBlock)
                     , sessionId, len, sockErrorCode);
             }
 
+            g_Log->i<FS_EpollTransferPoller>(_LOGFMT_("sessionId[%llu] len[%d] sockerrorcode[%d]")
+                , sessionId, len, sockErrorCode);
             break;
         }
         else if (len == 0)
