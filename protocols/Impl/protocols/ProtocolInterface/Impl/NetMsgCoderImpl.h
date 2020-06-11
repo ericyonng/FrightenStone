@@ -103,7 +103,10 @@ inline bool NetMsgCoder::WriteByte(DataType &data)
     if (!_CheckSizeAndMaskNotEnough(addSize))
         return false;
 
-    ::memcpy((char *)(_buffer) + _curHeaderPos + _wrLen, &data, addSize);
+    Byte8 *ptr = (char *)(_buffer)+_curHeaderPos + _wrLen;
+    Byte8 *src = reinterpret_cast<Byte8 *>(&data);
+    FS_MEMCPY(ptr, src, addSize);
+    // ::memcpy((char *)(_buffer)+_curHeaderPos + _wrLen, &data, addSize);
     _wrLen += addSize;
     return true;
 }
@@ -113,7 +116,9 @@ inline bool NetMsgCoder::WriteByte(const Byte8 *data, UInt64 dataLen)
     if (!_CheckSizeAndMaskNotEnough(dataLen))
         return false;
 
-    ::memcpy((char *)(_buffer) + _curHeaderPos + _wrLen, data, dataLen);
+    Byte8 *ptr = (char *)(_buffer)+_curHeaderPos + _wrLen;
+    FS_MEMCPY(ptr, data, dataLen);
+    // ::memcpy((char *)(_buffer) + _curHeaderPos + _wrLen, data, dataLen);
     _wrLen += dataLen;
     return true;
 }
