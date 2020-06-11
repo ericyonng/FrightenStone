@@ -121,6 +121,7 @@ inline void IFS_MsgDispatcher::CloseSession(UInt64 sessionId)
     if (!session)
         return;
 
+    g_Log->net<IFS_MsgDispatcher>("sessionId[%llu] will close %s", sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
     _DelayCloseSession(session);
 }
 

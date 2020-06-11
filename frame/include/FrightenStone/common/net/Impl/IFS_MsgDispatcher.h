@@ -43,6 +43,7 @@
 #include "FrightenStone/common/net/Defs/HeartBeatComp.h"
 
 #include "FrightenStone/common/log/Log.h"
+#include "FrightenStone/common/crashhandle/CrashHandle.h"
 
 FS_NAMESPACE_BEGIN
 
