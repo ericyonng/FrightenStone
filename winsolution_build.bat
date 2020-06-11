@@ -7,6 +7,7 @@ echo Visual Studio solution and project files generate tool.
 echo For now supported Visual Studio versions:
 echo    vs2015
 echo    vs2017
+echo    vs2019
 set /p choose=Please input:
 
 cd tools\premake && win_premake5.exe %choose%
