@@ -63,8 +63,9 @@ inline void IFS_Buffer::PopFront(Int64 bytesLen)
     // ::memset(_buff, 0, bytesLen);
 
     // 后面还有没数据，若有数据挪到buf头
-    if(n > 0)
-        ::memcpy(_buff, _buff + bytesLen, n);
+    if (n > 0)
+        FS_MEMCPY(_buff, _buff + bytesLen, n);
+        // ::memcpy(_buff, _buff + bytesLen, n);
 
     _curPos = n;
 }
@@ -80,7 +81,8 @@ inline void IFS_Buffer::PushBack(const Byte8 *data, size_t len)
 //     }
 
     // 2.拷贝数据
-    ::memcpy(_buff + _curPos, data, len);
+    FS_MEMCPY(_buff + _curPos, data, len);
+    // ::memcpy(_buff + _curPos, data, len);
 
     // 3.变更当前位置
     _curPos += len;

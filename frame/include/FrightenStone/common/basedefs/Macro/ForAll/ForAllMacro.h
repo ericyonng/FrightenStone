@@ -269,4 +269,16 @@ private:\
 #define __FS_MEMORY_ALIGN__(BYTES)  \
 (BYTES) / __MEMORY_ALIGN_BYTES__ * __MEMORY_ALIGN_BYTES__ + ((BYTES)%__MEMORY_ALIGN_BYTES__ ? __MEMORY_ALIGN_BYTES__ : 0)
 
+// memcpy
+#undef FS_MEMCPY
+#define FS_MEMCPY(dest, src, cpyBytes)                              \
+{                                                                   \
+    size_t chg = cpyBytes;                                          \
+    for(;chg--;)                                                    \
+        *(dest + cpyBytes) = *(src + cpyBytes);                     \
+}
+
+
+
+
 #endif // !__Frame_Include_FrightenStone_Common_BaseDefs_Macro_MacroDefs_ForAll_ForAllMacro_H__

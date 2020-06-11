@@ -98,7 +98,8 @@ Int32 FS_Session::PostRecv()
     if (recvBuffer->IsFull())
     {
         // 很少情况会让接收缓冲区爆满 因为postrecv总是在消息消费完之后抛的,能爆满说明有一个网络包的大小已经超过了缓冲大小,无法立即消费
-        g_Log->w<FS_Session>(_LOGFMT_("buffer is full have create new buffer to recv data"));
+        g_Log->w<FS_Session>(_LOGFMT_("buffer is full cant recv data stack trace back:\n%s\nsession info:\n%s\n")
+            , CrashHandleUtil::FS_CaptureStackBackTrace().c_str(), ToString().c_str());
         return StatusDefs::Success;
     }
 
