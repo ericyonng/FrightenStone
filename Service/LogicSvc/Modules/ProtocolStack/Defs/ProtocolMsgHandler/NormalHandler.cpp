@@ -147,8 +147,8 @@ void NormalHandler::OnSessionMsgHandle(fs::FS_Session *session)
     if(bytesToPop)
         recvBuffer->PopFront(bytesToPop);
 
-//     g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] socket[%d] bytesToPop[%lld] after msg handled recvbuffer info: %s")
-//         , sessionId, session->GetSocket(), bytesToPop, recvBuffer->ToString().c_str());
+    g_Log->netpackage<NormalHandler>(_LOGFMT_("sessionId[%llu] socket[%d] bytesToPop[%lld] after msg handled recvbuffer info: %s")
+        , sessionId, session->GetSocket(), bytesToPop, recvBuffer->ToString().c_str());
 
     // 网络包过大直接杀掉
     packetLen = reinterpret_cast<const fs::NetMsgHeaderFmtType::PacketLenDataType *>(buffer);
