@@ -10,6 +10,7 @@ FS_HEADER_DIR = "../../frame/frameheader/"
 FS_OUTPUT_BASE_DIR = "../../output/" .. _ACTION
 -- root directory
 FS_ROOT_DIR = "../../"
+WIN_FS_ROOT_DIR = ".\\..\\..\\"
 -- build directory
 FS_BUILD_DIR = "../../build/"
 
@@ -355,6 +356,11 @@ project "TestSuit"
     -- optimize
     set_optimize_opts()
 	
+	-- set post build commands.
+    filter { "system:windows" }
+        postbuildcommands(string.format("start %srunfirstly_scripts.bat %s", WIN_FS_ROOT_DIR, _ACTION))
+    filter {}
+	
 	-- core library testsuite compile setting
 project "FS_MyClient"
     -- language, kind
@@ -429,6 +435,11 @@ project "FS_MyClient"
 
     -- optimize
     set_optimize_opts()
+	
+	-- set post build commands.
+    filter { "system:windows" }
+        postbuildcommands(string.format("start %srunfirstly_scripts.bat %s", WIN_FS_ROOT_DIR, _ACTION))
+    filter {}
 	
 if IS_WINDOWS == false then
 	print("builddir = " .. FS_BUILD_DIR)
