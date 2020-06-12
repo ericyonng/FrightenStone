@@ -51,6 +51,7 @@ public:
     static int ClearSocketEnv();
     static Int32 SetNoBlock(SOCKET socket);
     static Int32 SetBlock(SOCKET socket);
+    static Int32 SetCloseOnExec(SOCKET socket);
     static Int32 MakeReUseAddr(SOCKET socket);
     static Int32 MakeNoDelay(SOCKET socket);
     static Int32 DestroySocket(SOCKET &socket);
@@ -86,7 +87,7 @@ public:
     // 套接字api函数
 #pragma region socket api
     static SOCKET CreateSock(Int32 protoFamily = AF_INET    // ipv4 default
-                             , Int32 type = SOCK_STREAM     // 默认字节流, udp是 SOCK_DGRAM 报文
+                             , Int32 type = __FS_TCP_SOCKTYPE__     // 默认字节流, udp是 SOCK_DGRAM 报文
                              , Int32 protocol = IPPROTO_TCP // 默认tcp协议
     );
     static Int32 Bind(SOCKET sock, const BriefAddrInfo &briefAddr

@@ -118,7 +118,7 @@ SOCKET IFS_Acceptor::_InitSocket()
     }
 
     // ipv4 的流数据
-    _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    _sock = socket(AF_INET, __FS_TCP_SOCKTYPE__, IPPROTO_TCP);
     if(INVALID_SOCKET == _sock)
     {
         g_Log->e<IFS_Acceptor>(_LOGFMT_("create socket failed..."));

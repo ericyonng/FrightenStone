@@ -72,5 +72,12 @@ FS_NAMESPACE_END
 #define __FS_DATA_1GB__     1073741824
 #endif
 
+#undef __FS_TCP_SOCKTYPE__
+#ifdef _WIN32
+#define __FS_TCP_SOCKTYPE__  SOCK_STREAM
+#else
+#define  __FS_TCP_SOCKTYPE__ (SOCK_STREAM | SOCK_CLOEXEC)       // SOCK_CLOEXEC是当服务器宕掉后还可以仍然使用端口避免设备掉线
+#endif
+
 #endif
 
