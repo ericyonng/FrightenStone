@@ -46,13 +46,18 @@ source $SCRIPT_PATH/linuxmakefile_build.sh
 cd $SCRIPT_PATH/$BUILD_PATH
 if [ NEED_CLEAN = 1 ]
 then
+    echo 'clean $VER...'
     make clean config=$VER;
 fi
+echo 'making $VER...'
 make config=$VER
 
 # quit build dir
 cd $SCRIPT_PATH
 
 # install default:opencoredump
+echo "installing..."
 source $SCRIPT_PATH/install.sh $VER opencoredump
+
+echo "Done!"
 
