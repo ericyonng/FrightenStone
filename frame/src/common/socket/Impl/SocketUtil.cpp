@@ -163,7 +163,7 @@ Int32 SocketUtil::SetCloseOnExec(SOCKET socket)
     // close-on-exec
     Int32 flags = ::fcntl(socket, F_GETFD, 0);
     flags |= FD_CLOEXEC;
-    Int32 ret = ::fcntl(sockfd, F_SETFD, flags);
+    Int32 ret = ::fcntl(socket, F_SETFD, flags);
     if (ret == -1)
         return StatusDefs::Socket_FcntlError;
 #endif
