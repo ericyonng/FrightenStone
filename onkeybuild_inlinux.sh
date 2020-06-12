@@ -37,10 +37,10 @@ fi
 sudo chmod 777 $SCRIPT_PATH/*.sh
 
 # run firstly
-sudo source $SCRIPT_PATH/runfirstly_scripts.sh
+source $SCRIPT_PATH/runfirstly_scripts.sh
 
 # generate make files
-sudo source $SCRIPT_PATH/linuxmakefile_build.sh
+source $SCRIPT_PATH/linuxmakefile_build.sh
 
 # build
 cd $SCRIPT_PATH/$BUILD_PATH
@@ -54,5 +54,5 @@ make config=$VER
 cd $SCRIPT_PATH
 
 # install default:opencoredump
-sudo source $SCRIPT_PATH/install.sh $VER opencoredump
+source $SCRIPT_PATH/install.sh $VER opencoredump
 
