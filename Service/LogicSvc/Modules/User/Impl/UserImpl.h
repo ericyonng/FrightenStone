@@ -74,7 +74,7 @@ inline const fs::FS_Session *User::GetSession() const
     return _dispatcher->GetSession(_sessionId);
 }
 
-#pragma region User级别事件接口
+#pragma region User
 template <typename ObjectType>
 inline fs::FS_ListenerStub User::AddListener(Int32 id,
                                         ObjectType *obj,
