@@ -117,6 +117,7 @@ inline bool IFS_Session::CanDisconnect() const
 
 inline void IFS_Session::MaskClose()
 {
+    g_Log->net<IFS_Session>("mask close stackbacktrace:\n %s", CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
     _maskClose = true;
 }
 

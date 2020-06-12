@@ -62,6 +62,7 @@ public:
     virtual Int32 InitModule(const Byte8 *rootDir = NULL) = 0;
     virtual void FinishModule() = 0;
     virtual void FlushAllFile() = 0;
+    virtual FS_String GetLogRootPath() const = 0;
 
     /* 日志打印接口 */
     #pragma region
@@ -111,6 +112,12 @@ public:
     template<typename ObjType, typename... Args>
     void performance(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
     #pragma endregion
+
+    // 网络包
+    // 请使用便利宏_LOGFMT_
+    template<typename ObjType, typename... Args>
+    void netpackage(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args);
+#pragma endregion
 
     /* 功能函数 */
     #pragma region

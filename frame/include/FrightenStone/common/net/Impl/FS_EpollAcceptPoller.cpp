@@ -171,7 +171,7 @@ void FS_EpollAcceptPoller::_OnAcceptorEvMonitorPoller(FS_ThreadPool *pool)
 
         if (ret == -1)
         {
-            g_Log->w<FS_EpollAcceptPoller>(_LOGFMT_("epoll wait fail ret[%d] errorno[%d]"), ret, errno);
+            g_Log->w<FS_EpollAcceptPoller>(_LOGFMT_("epoll wait fail ret[%d] errorno[%d:%s]"), ret, errno, strerror(errno));
         }
 
         if (ret <= 0)
@@ -225,7 +225,7 @@ void FS_EpollAcceptPoller::_OnPreHandleAcceptEvPoller(FS_ThreadPool *pool)
             {
                 // accept 直到eagain
                 sockFd = ::accept(_bindAcceptorSock, reinterpret_cast<sockaddr *>(&inAddr), &addrSize);
-                g_Log->i<FS_EpollAcceptPoller>(_LOGFMT_("accept a new connect acceptorSock[%d] new sock[%d]"), _bindAcceptorSock, sockFd);
+                // g_Log->i<FS_EpollAcceptPoller>(_LOGFMT_("accept a new connect acceptorSock[%d] new sock[%d]"), _bindAcceptorSock, sockFd);
                 if (sockFd > 0)
                 {
                     // 建立连接
@@ -235,7 +235,7 @@ void FS_EpollAcceptPoller::_OnPreHandleAcceptEvPoller(FS_ThreadPool *pool)
                 {
                     if (errno == EAGAIN || errno == EWOULDBLOCK)
                     {
-                        g_Log->i<FS_EpollAcceptPoller>(_LOGFMT_("EAGAIN or EWOULDBLOCK coming when accept in a dead loop]"));
+                        // g_Log->i<FS_EpollAcceptPoller>(_LOGFMT_("EAGAIN or EWOULDBLOCK coming when accept in a dead loop]"));
                         break;
                     }
                 }
@@ -253,9 +253,9 @@ void FS_EpollAcceptPoller::_OnPreHandleAcceptEvPoller(FS_ThreadPool *pool)
         }
 
         // 没有事件要处理等待下次事件的到来
-        g_Log->i<FS_EpollAcceptPoller>(_LOGFMT_("wait for new connect in the future"));
+        // g_Log->i<FS_EpollAcceptPoller>(_LOGFMT_("wait for new connect in the future"));
         _preHandlerGuard.DeadWait();
-        g_Log->i<FS_EpollAcceptPoller>(_LOGFMT_("new connect is coming"));
+        // g_Log->i<FS_EpollAcceptPoller>(_LOGFMT_("new connect is coming"));
         _preHandlerGuard.Unlock();
     }
 

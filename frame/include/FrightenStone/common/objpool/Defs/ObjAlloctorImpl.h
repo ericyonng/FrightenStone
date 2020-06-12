@@ -121,10 +121,7 @@ template<typename ObjType>
 inline void *IObjAlloctor<ObjType>::MixAllocNoLocker()
 {
     auto ptr = AllocNoLocker();
-    if(ptr)
-        return ptr;
-
-    return _AllocFromSys();
+    return ptr ? ptr : _AllocFromSys();
 }
 
 template<typename ObjType>

@@ -72,6 +72,7 @@ namespace LogDefs
     GENERAL_ADDLOG(SYSLOG, sys)             // 系统信息（用于分析）
     GENERAL_ADDLOG(SYSLOG, Custom)          // 自定义的日志格式内容
     GENERAL_ADDLOG(SYSLOG, PerformanceAnalysis) // 性能分析
+    GENERAL_ADDLOG(SYSLOG, NetPackage)      // 网络包
     DECLEAR_GENERAL_LOG_END()
 };
  

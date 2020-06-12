@@ -98,7 +98,8 @@ Int32 FS_Session::PostRecv()
     if (recvBuffer->IsFull())
     {
         // 很少情况会让接收缓冲区爆满 因为postrecv总是在消息消费完之后抛的,能爆满说明有一个网络包的大小已经超过了缓冲大小,无法立即消费
-        g_Log->w<FS_Session>(_LOGFMT_("buffer is full have create new buffer to recv data"));
+        g_Log->w<FS_Session>(_LOGFMT_("buffer is full cant recv data stack trace back:\n%s\nsession info:\n%s\n")
+            , CrashHandleUtil::FS_CaptureStackBackTrace().c_str(), ToString().c_str());
         return StatusDefs::Success;
     }
 
@@ -245,7 +246,7 @@ void FS_Session::OnSendSuc(Int64 transferBytes, EpollIoData *ioData)
     }
 
 #ifndef _WIN32
-    g_Log->i<FS_Session>(_LOGFMT_("send suc transferBytes[%lld] sessionId[%llu]"), transferBytes, _sessionId);
+   // g_Log->i<FS_Session>(_LOGFMT_("send suc transferBytes[%lld] sessionId[%llu]"), transferBytes, _sessionId);
 #endif
 }
 
@@ -259,7 +260,7 @@ void FS_Session::OnRecvSuc(Int64 transferBytes, EpollIoData *ioData)
     ioData->_callback->Invoke(transferBytes);
 
 #ifndef _WIN32
-    g_Log->i<FS_Session>(_LOGFMT_("recv suc transferBytes[%lld] sessionId[%llu]"), transferBytes, _sessionId);
+    //g_Log->i<FS_Session>(_LOGFMT_("recv suc transferBytes[%lld] sessionId[%llu]"), transferBytes, _sessionId);
 #endif
 }
 
@@ -280,7 +281,7 @@ void FS_Session::Bind(FS_EpollTransferPoller *transferPoller)
 
 void FS_Session::CancelRecvIoAndMaskClose(Int32 reason, bool giveRes /* = false */)
 {
-    g_Log->i<FS_Session>(_LOGFMT_("will cancel recv io sessionId[%llu] giveRes[%d]"), GetSessionId(), giveRes);
+    // g_Log->i<FS_Session>(_LOGFMT_("will cancel recv io sessionId[%llu] giveRes[%d]"), GetSessionId(), giveRes);
     MaskClose();
     if (!_isRecvIoCanceled)
     {
@@ -291,7 +292,7 @@ void FS_Session::CancelRecvIoAndMaskClose(Int32 reason, bool giveRes /* = false 
 
 void FS_Session::CancelSendIoAndMaskClose(Int32 reason, bool giveRes /*= false*/)
 {
-    g_Log->i<FS_Session>(_LOGFMT_("will cancel send io sessionId[%llu] giveRes[%d]"), GetSessionId(), giveRes);
+    // g_Log->i<FS_Session>(_LOGFMT_("will cancel send io sessionId[%llu] giveRes[%d]"), GetSessionId(), giveRes);
     MaskClose();
     if (!_isSendIoCanceled)
     {

@@ -34,6 +34,11 @@
 
 FS_NAMESPACE_BEGIN
 
+inline FS_String FS_Log::GetLogRootPath() const
+{
+    return _rootDirName;
+}
+
 inline IDelegate<void, const LogData *> *FS_Log::_InstallLogHookFunc(Int32 level, IDelegate<void, const LogData *> *delegate)
 {
     if(!_levelRefHook[level])
@@ -54,10 +59,11 @@ inline const IDelegate<void, LogData *> *FS_Log::_InstallBeforeLogHookFunc(Int32
 
 inline bool FS_Log::_IsAllowToConsole(Int32 level) const
 {
-    if(level == LogLevel::Net ||
-       level == LogLevel::MemPool ||
-       level == LogLevel::ObjPool ||
-       level == LogLevel::PerformanceAnalysis)
+    if (level == LogLevel::Net ||
+        level == LogLevel::MemPool ||
+        level == LogLevel::ObjPool ||
+        level == LogLevel::PerformanceAnalysis ||
+        level == LogLevel::NetPackage)
         return false;
 
     return true;

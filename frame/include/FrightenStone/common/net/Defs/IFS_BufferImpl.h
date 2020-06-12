@@ -56,15 +56,16 @@ inline void IFS_Buffer::PopFront(Int64 bytesLen)
                              bytesLen, _curPos);
     }
 
-    bytesLen = _curPos > bytesLen ? bytesLen : _curPos;
+    bytesLen = ((_curPos > bytesLen) ? bytesLen : _curPos);
     size_t n = _curPos - bytesLen;
 
     // TODO:如果考虑性能清零可不执行
     // ::memset(_buff, 0, bytesLen);
 
     // 后面还有没数据，若有数据挪到buf头
-    if(n > 0)
-        ::memcpy(_buff, _buff + bytesLen, n);
+    if (n > 0)
+        FS_MEMCPY(_buff, _buff + bytesLen, n);
+        // ::memcpy(_buff, _buff + bytesLen, n);
 
     _curPos = n;
 }
@@ -80,7 +81,8 @@ inline void IFS_Buffer::PushBack(const Byte8 *data, size_t len)
 //     }
 
     // 2.拷贝数据
-    ::memcpy(_buff + _curPos, data, len);
+    FS_MEMCPY(_buff + _curPos, data, len);
+    // ::memcpy(_buff + _curPos, data, len);
 
     // 3.变更当前位置
     _curPos += len;
@@ -119,7 +121,7 @@ inline bool IFS_Buffer::IsEmpty() const
 
 inline bool IFS_Buffer::IsFull() const
 {
-    return _bufferSize == _curPos;
+    return _bufferSize <= _curPos;
 }
 
 inline Int64 IFS_Buffer::GetLength() const

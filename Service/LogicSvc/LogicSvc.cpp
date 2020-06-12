@@ -215,8 +215,8 @@ Int32 LogicSvc::OnSessionConnected(UInt64 sessionId, UInt64 stub)
     EventPtrSetParam(ev, Stub, stub);
     g_GlobalEventMgr->FireEvent(ev);
 
-    g_Log->net<LogicSvc>("new sessionId[%llu] stub[%llu] connected "
-                  , sessionId, stub);
+//     g_Log->net<LogicSvc>("new sessionId[%llu] stub[%llu] connected "
+//                   , sessionId, stub);
 
     return StatusDefs::Success;
 }

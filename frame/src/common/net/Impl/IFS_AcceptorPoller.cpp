@@ -86,7 +86,7 @@ void IFS_AcceptorPoller::_HandleSessionWillConnect(IFS_NetEngine *netEngine, SOC
         newSessionInfo._srcCompType = _engineComp->GetCompType();
         newSessionInfo._protocolPort = _engineComp->CastTo<IFS_Acceptor>()->GetListenPort();
 #ifndef _WIN32
-        g_Log->i<IFS_AcceptorPoller>(_LOGFMT_("new session will post to dispatcher sessionId[%llu]"), curMaxSession);
+        // g_Log->i<IFS_AcceptorPoller>(_LOGFMT_("new session will post to dispatcher sessionId[%llu]"), curMaxSession);
 #endif
         if(!netEngine->HandleCompEv_WillConnect(&newSessionInfo))
         {

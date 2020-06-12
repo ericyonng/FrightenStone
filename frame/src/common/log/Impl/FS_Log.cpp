@@ -119,7 +119,9 @@ Int32 FS_Log::InitModule(const Byte8 *rootDirName)
     // 根目录
     if(!rootDirName)
     {
-        auto programName = FS_FileUtil::ExtractFileWithoutExtension(SystemUtil::GetCurProgramName().RemoveZeroTail());
+        FS_String procPath;
+        SystemUtil::GetProgramPath(true, procPath);
+        auto programName = FS_FileUtil::ExtractFileWithoutExtension(procPath.RemoveZeroTail());
         programName.AppendFormat("%s", "Log");
         _rootDirName = programName;
     }
@@ -229,7 +231,7 @@ Int32 FS_Log::CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const cha
             break;
 
         // 2.创建文件夹
-        FS_String logName = "./";
+        FS_String logName;
         logName += (_rootDirName + "/" + logPath);
         if(!FS_DirectoryUtil::CreateDir(logName))
         {
@@ -331,6 +333,8 @@ Int32 FS_Log::_GetLogFileIndex(Int32 logTypeEnum)
             return LogDefs::_SYSLOG_sys_;
         case LogFileType::PerformanceAnalysis:
             return LogDefs::_SYSLOG_PerformanceAnalysis_;
+        case LogFileType::NetPackage:
+            return LogDefs::_SYSLOG_NetPackage_;
         default:
             break;
     }

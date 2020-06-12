@@ -55,7 +55,7 @@ bool IFS_MsgTransfer::OnWillConnect(BriefSessionInfo *newSessionInfo)
 
 #ifndef _WIN32
     // TODO:OnWillConnect
-    g_Log->i<IFS_MsgTransfer>(_LOGFMT_(" on will connect new brief session info:\n[%s]"), newSessionInfo->ToString().c_str());
+    // g_Log->i<IFS_MsgTransfer>(_LOGFMT_(" on will connect new brief session info:\n[%s]"), newSessionInfo->ToString().c_str());
     auto epollTransferPoller = reinterpret_cast<FS_EpollTransferPoller *>(poller);
     if (!epollTransferPoller->OnWillConnect(newSessionInfo->_sock, newSessionInfo->_sessionId))
     {

@@ -74,6 +74,7 @@ public:
     virtual Int32 InitModule(const Byte8 *rootDirName = NULL);
     virtual void FinishModule();
     virtual void FlushAllFile();
+    virtual FS_String GetLogRootPath() const;
     virtual Int32 CreateLogFile(Int32 fileUnqueIndex, const char *logPath, const char *fileName); // 线程不安全
     
 protected:

@@ -442,9 +442,7 @@ void IFS_NetEngine::_Monitor(FS_ThreadPool *threadPool)
         {
             _lastStatisticsTime = nowTime;
 
-            #ifdef _WIN32
             _PrintInfo(timeSlice);
-            #endif
 
             // ÷ÿ÷√≤Œ ˝
             _recvMsgCountPerSecond = 0;

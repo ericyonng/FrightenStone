@@ -124,7 +124,7 @@ void TestProtocolsMgr::_OnLogin(fs::FS_Event *ev)
     auto recvMsgId = ev->GetParam(FS_EventParam::RecvMsgId).AsInt32();
     if(_checkMsgId && recvMsgId != _recvMsgID)
     {
-        g_Log->i<TestProtocolsMgr>(_LOGFMT_("recieve msg id[%d] local recvmsgid for check is[%d]"), recvMsgId, _recvMsgID);
+        g_Log->w<TestProtocolsMgr>(_LOGFMT_("recieve msg id[%d] local recvmsgid for check is[%d]"), recvMsgId, _recvMsgID);
     }
 
     ++_recvMsgID;
@@ -132,6 +132,13 @@ void TestProtocolsMgr::_OnLogin(fs::FS_Event *ev)
     auto user = GetUser();
     fs::LoginRes ret;
     ret._msgId = _sendMsgID;
+
+//     fs::FS_String rawData;
+//     auto rawBytes = ret.SerializeTo(rawData);
+//     fs::FS_String hexData;
+//     fs::StringUtil::ToHexString(rawData, hexData);
+
+    // g_Log->net<TestProtocolsMgr>("will login res rawBytes[%lld] hex data[%s]", rawBytes, hexData.c_str());
     AddSendMsgId();
     user->SendData(&ret);
 }

@@ -48,8 +48,8 @@ public:
     // 获取程序目录
     static Int32 GetProgramPath(bool isCurrentProcess, FS_String &processPath, UInt64 pid = 0);
     // 获取当前进程名
-    static FS_String GetCurProgramName();   // 带绝对路径
-    static FS_String GetApplicationName();  // 不带路径仅程序名
+    static FS_String GetCurProgramName();   // 带扩展名
+    static FS_String GetApplicationName();  // 扩展名
     // 获取线程id
     static UInt64 GetCurrentThreadId();
     // 获取进程id

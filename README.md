@@ -33,4 +33,5 @@
 * 框架正在持续开发中，接受各种建议吐槽
 * **Attention**:region 注释会尽量使用简洁的英文，CI可能会报错哈QVQ
 * 多个重要组件移植于[LLBC](https://github.com/lailongwei/llbc "Source from lailongwei:llbc")、 [nlohmann/Json](https://github.com/nlohmann/json "json")、 [OpenSSL](https://github.com/openssl/openssl)、 [TinyUtf8](https://github.com/DuffsDevice/tiny-utf8 "source from DuffsDevice")， 再次感谢开源作者的贡献，开发过程中给予了我很大的帮助
+* 两个分支:master(稳定分支)/Develop（开发分支，不稳定）
 

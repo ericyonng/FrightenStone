@@ -65,8 +65,8 @@ Int64 NetMsg_DataHeader::SerializeTo(char *buffer, UInt64 bufferSize)
 
     // 4.结束
     _coder->Finish<Byte8>();
-
-    return _coder->GetTotalWriteBytes();
+    _packetLength = static_cast<UInt32>(_coder->GetTotalWriteBytes());
+    return _packetLength;
 }
 
 Int64 NetMsg_DataHeader::SerializeTo(FS_String &buffer)
@@ -84,8 +84,8 @@ Int64 NetMsg_DataHeader::SerializeTo(FS_String &buffer)
 
     // 3.结束
     _coder->Finish<FS_String>();
-
-    return _coder->GetTotalWriteBytes();
+    _packetLength = static_cast<UInt32>(_coder->GetTotalWriteBytes());
+    return _packetLength;
 }
 
 // 从网络缓冲区反序列化得到消息

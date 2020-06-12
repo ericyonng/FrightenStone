@@ -48,9 +48,9 @@ public:
     ~User();
 
 public:
-    Int32 Login(fs::LoginData *loginData);
-    Int32 Logout();
-    void CheckHeart();
+//     Int32 Login(fs::LoginData *loginData);
+     Int32 Logout();
+     void CheckHeart();
 
 public:
     // 取得指定用户系统(泛型方法)
@@ -115,7 +115,7 @@ private:
 
     Int32 _Create(bool isShowLog = false);
 
-    void _FireLogin(UInt64 sessionId, UInt64 userId, Int32 recvMsgId);
+    // void _FireLogin(UInt64 sessionId, UInt64 userId, Int32 recvMsgId);
 
 private:
     friend class UserMgr;

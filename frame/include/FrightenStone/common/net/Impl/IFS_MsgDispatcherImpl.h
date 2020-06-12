@@ -121,6 +121,7 @@ inline void IFS_MsgDispatcher::CloseSession(UInt64 sessionId)
     if (!session)
         return;
 
+    g_Log->net<IFS_MsgDispatcher>("sessionId[%llu] will close %s", sessionId, CrashHandleUtil::FS_CaptureStackBackTrace().c_str());
     _DelayCloseSession(session);
 }
 
@@ -194,9 +195,9 @@ inline void IFS_MsgDispatcher::_UpdateSessionHeartbeat(FS_Session *session)
     _sessionHeartbeatQueue.insert(session);
 
 #ifndef _WIN32
-    const auto &newExpiredTime = session->GetHeartBeatExpiredTime();
-    g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("new heartbeattime[%lld] %s")
-        , newExpiredTime.GetMilliTimestamp(), newExpiredTime.ToString().c_str());
+//     const auto &newExpiredTime = session->GetHeartBeatExpiredTime();
+//     g_Log->i<IFS_MsgDispatcher>(_LOGFMT_("new heartbeattime[%lld] %s")
+//         , newExpiredTime.GetMilliTimestamp(), newExpiredTime.ToString().c_str());
 #endif
 }
 

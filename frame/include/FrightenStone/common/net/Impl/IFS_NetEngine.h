@@ -79,6 +79,7 @@ public:
     bool IsAllTransferIoFinish() const;   // 线程安全
     bool IsServicePort(UInt16 port) const;
     bool IsRealUserPort(UInt16 port) const;
+    FS_String GetAppName() const;
 
     std::vector<IFS_EngineComp *> *GetCompByType(Int32 compType);
     const IFS_EngineComp *GetCompById(UInt32 compId) const;

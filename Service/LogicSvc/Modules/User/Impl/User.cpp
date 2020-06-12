@@ -31,6 +31,8 @@
 #include "Service/LogicSvc/Modules/User/Interface/IUserMgr.h"
 #include "Service/LogicSvc/Modules/User/Impl/IUserSys.h"
 
+#include "Service/ServiceType.h"
+
 OBJ_POOL_CREATE_ANCESTOR_IMPL(User, OBJ_POOL_LOGIC_DEF_INIT_NUM);
 
 User::User(IUserMgr *userMgr, UInt64 sessionId, UInt64 userId)
@@ -50,32 +52,31 @@ User::~User()
     Fs_SafeFree(_eventMgr);
 }
 
-Int32 User::Login(fs::LoginData *loginData)
-{
-//     if(loginData->_msgId != _recvMsgId)
-//     {// 当前消息ID和本地收消息次数不匹配
-//         g_Log->i<User>(_LOGFMT_("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>")
-//                       , _sessionId, loginData->_msgId
-//                       , _recvMsgId, loginData->_msgId - _recvMsgId);
-//     }
-
-    // 打印
-//     g_Log->custom("user[%s]-pwd[%s]-msgid[%d] login suc", 
-//                   loginData->_userName
-//                   , loginData->_pwd
-//                   , loginData->_msgId);
-
-    //g_Log->i<User>(_LOGFMT_("username[%s], pwd[%s] suc login"), loginData->_userName, loginData->_pwd);
-
-    _FireLogin(_sessionId, _userId, loginData->_msgId);
-
-    return StatusDefs::Success;
-}
-
+// Int32 User::Login(fs::LoginData *loginData)
+// {
+// //     if(loginData->_msgId != _recvMsgId)
+// //     {// 当前消息ID和本地收消息次数不匹配
+// //         g_Log->i<User>(_LOGFMT_("OnMsgDispatch sessionId<%llu> msgID<%d> _nRecvMsgID<%d> diff<%d>")
+// //                       , _sessionId, loginData->_msgId
+// //                       , _recvMsgId, loginData->_msgId - _recvMsgId);
+// //     }
+// 
+//     // 打印
+// //     g_Log->custom("user[%s]-pwd[%s]-msgid[%d] login suc", 
+// //                   loginData->_userName
+// //                   , loginData->_pwd
+// //                   , loginData->_msgId);
+// 
+//     //g_Log->i<User>(_LOGFMT_("username[%s], pwd[%s] suc login"), loginData->_userName, loginData->_pwd);
+// 
+// 
+//     return StatusDefs::Success;
+// }
+// 
 Int32 User::Logout()
 {
 #ifndef _WIN32
-    g_Log->i<User>(_LOGFMT_("userId[%llu] sessionId[%llu] logout"), _userId, _sessionId);
+    // g_Log->i<User>(_LOGFMT_("userId[%llu] sessionId[%llu] logout"), _userId, _sessionId);
 #endif
     return StatusDefs::Success;
 }
@@ -137,46 +138,83 @@ void User::Close(Int32 reason)
 void User::SendData(fs::NetMsg_DataHeader *msgData)
 {
     // dispatcher是否关闭
-    if (_dispatcher->IsClose())
-    {
-        g_Log->w< User>(_LOGFMT_("dispatcher is close sessionId[%llu], userId[%llu]"), _sessionId, _userId);
-        return;
-    }
+//     if (_dispatcher->IsClose())
+//     {
+//         g_Log->w< User>(_LOGFMT_("dispatcher is close sessionId[%llu], userId[%llu]"), _sessionId, _userId);
+//         return;
+//     }
 
     // session是否有效
     auto session = _dispatcher->GetSession(_sessionId);
     if (!session|| !session->IsValid())
     {
         g_Log->w< User>(_LOGFMT_("user disconnect sessionId[%llu], userId[%llu] or is not valid"), _sessionId, _userId);
+
+        // TODO??why
+        _dispatcher->CloseSession(_sessionId);
         return;
     }
 
-    if (msgData->_packetLength > FS_BUFF_SIZE_DEF)
-    {
-        g_Log->e<User>(_LOGFMT_("cant send a package larger than buffer, buffersize[%d] package len[%u]")
-            , FS_BUFF_SIZE_DEF, msgData->_packetLength);
-        return;
-    }
+//     if (msgData->_packetLength > FS_BUFF_SIZE_DEF)
+//     {
+//         g_Log->e<User>(_LOGFMT_("cant send a package larger than buffer, buffersize[%d] package len[%u]")
+//             , FS_BUFF_SIZE_DEF, msgData->_packetLength);
+//         return;
+//     }
 
     fs::IFS_NetBuffer *buffer = session->GetSendBuffer();
-    if(buffer->IsFull())
-        buffer = session->NewSendBuffer();
+//     if (buffer->IsFull())
+//     {
+// //         g_Log->w<User>(_LOGFMT_("sessionId[%llu] socket[%d] buffer to send is full buffer info[%s]")
+// //             , _sessionId, session->GetSocket(), buffer->ToString().c_str());
+//         buffer = session->NewSendBuffer();
+//     }
+
+//     auto logic = _dispatcher->GetLogic();
+//    auto addr = session->GetAddr();
+//    if (logic->GetServiceId() != ServiceType::ClientSimulation)
+//    {
+//        g_Log->netpackage<User>(_LOGFMT_("before send sessionId[%llu] socket[%d] addrinfo[%s] cmd[%u] len[%u] raw:\n%s")
+//            , _sessionId, session->GetSocket(), addr->ToString().c_str(), msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+//    }
+
+//    fs::FS_String rawData, hexRaw;
+//    msgData->SerializeTo(rawData);
+//    fs::StringUtil::ToHexStringView(rawData.c_str(), rawData.GetLength(), hexRaw);
+//   g_Log->net<User>("sessionId[%llu] socket[%d] send data rawData %s", _sessionId, session->GetSocket(), hexRaw.c_str());
 
     Int64 *curPos = NULL;
     Int64 wrSize = msgData->SerializeTo(buffer->GetStartPush(curPos), static_cast<UInt64>(buffer->GetRest()));
     if (wrSize < 0)
     {// 缓冲空间不足
         // 不需要写入回滚,因为curpos没有被改变
-//         // 写入回滚
-//         buffer->RollbackPush(msgData->GetCoderBytesWriten());
+        // 写入回滚
+        // buffer->RollbackPush(msgData->GetCoderBytesWriten());
+
+//         g_Log->w<User>(_LOGFMT_("sessionId[%llu], socket[%d] buffer capicity not enough rest[%lld], curPos[%lld]")
+//             , _sessionId, session->GetSocket(), buffer->GetRest(), *curPos);
 
         // 新建空间重新写入
         buffer = session->NewSendBuffer();
         wrSize = msgData->SerializeTo(buffer->GetStartPush(curPos), static_cast<UInt64>(buffer->GetRest()));
+
+        if (wrSize < 0)
+        {
+            g_Log->e<User>(_LOGFMT_("sessionId[%llu], socket[%d], buffer capicity not enough %s, will close")
+                , _sessionId, session->GetSocket(), buffer->ToString().c_str());
+            _dispatcher->CloseSession(_sessionId);
+            return;
+        }
     }
 
     // buffer写入位置变更
     *curPos += wrSize;
+
+//     if (logic->GetServiceId() != ServiceType::ClientSimulation)
+//     {
+//         g_Log->netpackage<User>(_LOGFMT_("after write data sessionId[%llu] socket[%d] addrinfo[%s] wrSize[%lld] cmd[%u], len[%u] raw:\n%s")
+//             , _sessionId, session->GetSocket(), addr->ToString().c_str(), wrSize, msgData->_cmd, msgData->_packetLength, buffer->ToString().c_str());
+//     }
 
     if (session->IsPostSend())
         return;
@@ -192,14 +230,14 @@ void User::SendData(const Byte8 *msgData, UInt64 msgLen)
 void User::OnDisconnect()
 {
 #ifndef _WIN32
-    g_Log->net<User>(" session id[%llu] user disconnect", _sessionId);
+   // g_Log->net<User>(" session id[%llu] user disconnect", _sessionId);
 #endif
 
     _RemoveSyss();
 
 #ifndef _WIN32
-    g_Log->i<User>(_LOGFMT_(" sessionId[%llu] disconnected")
-        , _sessionId);
+//     g_Log->i<User>(_LOGFMT_(" sessionId[%llu] disconnected")
+//         , _sessionId);
 #endif
 }
 
@@ -211,10 +249,10 @@ void User::OnConnected()
 
 #ifndef _WIN32
     // 打印地址信息
-    auto session = _dispatcher->GetSession(_sessionId);
-    auto addr = session->GetAddr();
-    g_Log->i<User>(_LOGFMT_(" new user connected sessionId[%llu] addr info[%s]")
-        , _sessionId, addr->ToString().c_str());
+//     auto session = _dispatcher->GetSession(_sessionId);
+//     auto addr = session->GetAddr();
+//     g_Log->i<User>(_LOGFMT_(" new user connected sessionId[%llu] addr info[%s]")
+//         , _sessionId, addr->ToString().c_str());
 #endif
 }
 
@@ -303,11 +341,3 @@ Int32 User::_Create(bool isShowLog)
     return StatusDefs::Success;
 }
 
-void User::_FireLogin(UInt64 sessionId, UInt64 userId, Int32 recvMsgId)
-{
-    fs::FS_Event *ev = new fs::FS_Event(EventIds::User_Login);
-    (*ev)[FS_EventParam::SessionId] = GetSessionId();
-    (*ev)[FS_EventParam::UserId] = GetUseId();
-    (*ev)[FS_EventParam::RecvMsgId] = recvMsgId;
-    g_GlobalEventMgr->FireEvent(ev);
-}

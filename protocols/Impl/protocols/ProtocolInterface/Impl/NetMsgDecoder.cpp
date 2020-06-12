@@ -47,4 +47,19 @@ bool NetMsgDecoder::Read(Byte8 *data, UInt64 readLen)
     return true;
 }
 
+FS_String NetMsgDecoder::ToString() const
+{
+    FS_String info;
+    FS_String raw;
+    StringUtil::ToHexStringView(_buffer, _len, raw);
+    info.AppendFormat("cmd[%u], len[%u], package raw:\n%s\n", _cmd, _len, raw.c_str());
+    return info;
+}
+
+void NetMsgDecoder::ToString(fs::FS_String &hexData) const
+{
+    hexData.AppendFormat("cmd[%u], len[%u], package raw:\n", _cmd, _len);
+    StringUtil::ToHexStringView(_buffer, _len, hexData);
+}
 FS_NAMESPACE_END
+

@@ -63,6 +63,8 @@ public:
 
         PerformanceAnalysis,
 
+        NetPackage,
+
         End,
     };
 

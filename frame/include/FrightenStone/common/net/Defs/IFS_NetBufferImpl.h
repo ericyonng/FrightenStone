@@ -173,7 +173,7 @@ inline FS_String IFS_NetBuffer::ToString() const
 
 #ifdef _WIN32
     info.AppendFormat("%s\n", IFS_Buffer::ToString().c_str())
-        .AppendFormat("_sessionId[%llu], _sock[%d], ioData info: _sessionId[%llu], _sock[%d], _data[0x%p], _datalen[%lld]"
+        .AppendFormat("_sessionId[%llu], _sock[%d], ioData info: _sessionId[%llu], _sock[%d], _data[0x%p], _datalen[%llu]"
                       , _sessionId, _socket, _ioData._sessionId, _ioData._sock, _ioData._wsaBuff.buf, _ioData._wsaBuff.len);
 #else
     info.AppendFormat("%s\n", IFS_Buffer::ToString().c_str())

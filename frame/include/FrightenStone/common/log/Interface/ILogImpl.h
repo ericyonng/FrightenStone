@@ -201,9 +201,34 @@ inline void ILog::performance(const char *funcName, Int32 codeLine, const char *
     // 构建日志数据
     LogData *newLogData = new LogData;
     newLogData->_logTime.FlushTime();
-    newLogData->_logToWrite.AppendFormat(fmt, args...) << FS_String::endl;
+    newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
+        , newLogData->_logTime.ToString().c_str()
+        , LogLevel::GetDescription(LogLevel::Sys)
+        , RTTIUtil::GetByType<ObjType>()
+        , funcName
+        , codeLine)
+        .AppendFormat(fmt, args...) << FS_String::endl;
 
     _WriteLog(LogLevel::PerformanceAnalysis, _GetLogFileIndex(LogFileType::PerformanceAnalysis), newLogData);
+}
+
+// 网络包
+// 请使用便利宏_LOGFMT_
+template<typename ObjType, typename... Args>
+inline void ILog::netpackage(const char *funcName, Int32 codeLine, const char *fmt, const Args&... args)
+{
+    // 构建日志数据
+    LogData *newLogData = new LogData;
+    newLogData->_logTime.FlushTime();
+    newLogData->_logToWrite.AppendFormat("%s<%s>[%s][%s][line:%d]: "
+        , newLogData->_logTime.ToString().c_str()
+        , LogLevel::GetDescription(LogLevel::Sys)
+        , RTTIUtil::GetByType<ObjType>()
+        , funcName
+        , codeLine)
+        .AppendFormat(fmt, args...) << FS_String::endl;
+
+    _WriteLog(LogLevel::NetPackage, _GetLogFileIndex(LogFileType::NetPackage), newLogData);
 }
 
 template<typename ObjType>

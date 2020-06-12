@@ -57,6 +57,8 @@ public:
     UInt32 GetMsgLen() const;
     UInt32 GetCmd() const;
     const Byte8 *GetMsgBuffer() const;
+    FS_String ToString() const;
+    void ToString(fs::FS_String &hexData) const;
     
 protected:
     UInt32 _cmd;                                    // 消息协议号
