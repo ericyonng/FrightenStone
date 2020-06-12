@@ -17,6 +17,6 @@ fi
 REMOTE_NAME=$(git remote)
 
 sudo chmod 777 $SCRIPT_PATH/*.sh
-git update-index +x *.sh
+git update-index --chmod +x *.sh
 git commit -m "commit shell file mode"
 git push $REMOTE_NAME $REMOTE_BRANCH_NAME
