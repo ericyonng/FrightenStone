@@ -71,6 +71,7 @@ namespace StatusDefs
         Socket_Error = 508,                                     // 套接字操作错误
         Socket_SetNoBlockParamError = 508,                      // 设置套接字非阻塞失败
         Socket_FillTcpAddrInfoFailure = 509,                    // 填充地址信息失败
+        Socket_FcntlError = 510,                                // fcnt函数调用失败
         #pragma endregion
 
         #pragma region Trigger[600, 699]

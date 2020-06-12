@@ -88,7 +88,7 @@ FS_NAMESPACE_BEGIN
 // void PostAccept(SOCKET sockServer, IO_DATA_BASE *ioData)
 // {
 //     ioData->_ioType = IO_Defs::IO_ACCEPT;
-//     ioData->_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+//     ioData->_sock = socket(AF_INET, __FS_TCP_SOCKTYPE__, IPPROTO_TCP);
 //     if(!__g_fnAccept(sockServer
 //                  , ioData->_sock
 //                  , ioData->_buff

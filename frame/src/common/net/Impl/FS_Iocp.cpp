@@ -34,6 +34,7 @@
 #include "FrightenStone/common/net/Defs/IocpDefs.h"
 #include "FrightenStone/common/net/Defs/IoEvDefs.h"
 
+#include "FrightenStone/common/socket/socket.h"
 #include "FrightenStone/common/log/Log.h"
 #include "FrightenStone/common/status/status.h"
 #include "FrightenStone/common/crashhandle/CrashHandle.h"
@@ -186,7 +187,7 @@ Int32 FS_Iocp::LoadAcceptEx(SOCKET listenSocket)
 Int32 FS_Iocp::PostAccept(SOCKET listenSocket, IoDataBase *ioData)
 {
     ioData->_ioType = IocpDefs::IO_ACCEPT;
-    ioData->_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ioData->_sock = socket(AF_INET, __FS_TCP_SOCKTYPE__, IPPROTO_TCP);
     if(!_fnAcceptEx(listenSocket
                     , ioData->_sock
                     , ioData->_wsaBuff.buf

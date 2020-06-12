@@ -143,7 +143,7 @@ Int32 IFS_Connector::Connect(UInt32 dispatcherConsumerId, const FS_ConnectInfo &
 
         // 校验目标连接是否已经成功连接
         // 1.初始化socket
-        SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        SOCKET sock = socket(AF_INET, __FS_TCP_SOCKTYPE__, IPPROTO_TCP);
         if (INVALID_SOCKET == sock)
         {
             g_Log->e<IFS_Connector>(_LOGFMT_("create socket failed"));

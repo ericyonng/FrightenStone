@@ -157,6 +157,19 @@ Int32 SocketUtil::SetBlock(SOCKET socket)
 
 }
 
+Int32 SocketUtil::SetCloseOnExec(SOCKET socket)
+{
+#ifndef _WIN32
+    // close-on-exec
+    Int32 flags = ::fcntl(socket, F_GETFD, 0);
+    flags |= FD_CLOEXEC;
+    Int32 ret = ::fcntl(sockfd, F_SETFD, flags);
+    if (ret == -1)
+        return StatusDefs::Socket_FcntlError;
+#endif
+
+    return StatusDefs::Success;
+}
 
 Int32 SocketUtil::MakeReUseAddr(SOCKET socket)
 {
@@ -502,7 +515,7 @@ bool SocketUtil::IsValidSock(SOCKET sock)
 }
 
 SOCKET SocketUtil::CreateSock(Int32 protoFamily /*= AF_INET /* ipv4 default */
-                              , Int32 type /*= SOCK_STREAM /* 默认字节流, udp是 SOCK_DGRAM 报文 */
+                              , Int32 type /*= __FS_TCP_SOCKTYPE__ /* 默认字节流, udp是 SOCK_DGRAM 报文 */
                               , Int32 protocol /*= IPPROTO_TCP /* 默认tcp协议 */)
 {
     return socket(protoFamily, type, protocol);
