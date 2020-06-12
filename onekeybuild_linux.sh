@@ -34,7 +34,7 @@ then
 fi
 
 # give scripts right
-sudo chmod 777 $SCRIPT_PATH/*.sh
+# sudo chmod 777 $SCRIPT_PATH/*.sh
 
 # run firstly
 source $SCRIPT_PATH/runfirstly_scripts.sh
@@ -44,12 +44,12 @@ source $SCRIPT_PATH/linuxmakefile_build.sh
 
 # build
 cd $SCRIPT_PATH/$BUILD_PATH
-if [ NEED_CLEAN = 1 ]
+if [ $NEED_CLEAN = 1 ]
 then
-    echo 'clean $VER...'
+    echo -e "clean $VER..."
     make clean config=$VER;
 fi
-echo 'making $VER...'
+echo -e "making $VER..."
 make config=$VER
 
 # quit build dir
