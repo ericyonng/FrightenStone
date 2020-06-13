@@ -233,6 +233,11 @@ void TestProtocolsGlobal::_TestSendLogin()
     }
 }
 
+void TestProtocolsGlobal::_TestCheckNet()
+{
+
+}
+
 void TestProtocolsGlobal::_OnTestBlackListTimer(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curWheelTime)
 {
     _TestBlackList();

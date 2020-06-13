@@ -179,6 +179,10 @@ inline UInt64 NetMsgCoder::GetTotalWriteBytes() const
 
 inline bool NetMsgCoder::_CheckSizeAndMaskNotEnough(size_t appendSize)
 {
+    // TODO:如果之前已经失败了但是_wrlen并没有增长，这里若有新的appendsize进来且恰好满足_curHeaderPos + _wrLen + appendSize < _bufferSize
+//     if (_isBufferNotEnough)
+//         return false;
+
     if (_curHeaderPos + _wrLen + appendSize > _bufferSize)
     {
         _isBufferNotEnough = true;
@@ -190,6 +194,9 @@ inline bool NetMsgCoder::_CheckSizeAndMaskNotEnough(size_t appendSize)
 
 inline bool NetMsgCoder::_CheckSizeNoMaskNotEnough(size_t appendSize) const
 {
+    // TODO:如果之前已经失败了但是_wrlen并没有增长，这里若有新的appendsize进来且恰好满足_curHeaderPos + _wrLen + appendSize < _bufferSize
+    //     if (_isBufferNotEnough)
+    //         return false;
     if (_curHeaderPos + _wrLen + appendSize > _bufferSize)
         return false;
 

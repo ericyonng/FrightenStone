@@ -61,6 +61,7 @@ private:
     void _SendAllUserLoginReq();
     void _TestConnect();
     void _TestSendLogin();
+    void _TestCheckNet();
 
     /* ²âÊÔºÚÃûµ¥ */
     void _OnTestBlackListTimer(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curWheelTime);

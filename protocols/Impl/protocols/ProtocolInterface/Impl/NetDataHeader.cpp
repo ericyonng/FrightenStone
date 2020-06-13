@@ -97,7 +97,11 @@ bool NetMsg_DataHeader::DeserializeFrom(const char *buffer)
     // 1.预解码
     _decoder->Decode(buffer);
 
-    // 2.实际包体数据读取
+    // 2.包头信息
+    _cmd = _decoder->GetCmd();
+    _packetLength = _decoder->GetMsgLen();
+
+    // 3.实际包体数据读取
     if(!DeserializeFrom(_decoder))
     {
         g_Log->w<NetMsg_DataHeader>(_LOGFMT_("cmd[%u] len[%u] DeserializeFrom fail")

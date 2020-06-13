@@ -43,6 +43,8 @@ OBJ_POOL_CREATE_DERIVE_IMPL(LoginNty, __DEF_OBJ_POOL_OBJ_NUM__);
 OBJ_POOL_CREATE_DERIVE_IMPL(CreatePlayerNty, __DEF_OBJ_POOL_OBJ_NUM__);
 OBJ_POOL_CREATE_DERIVE_IMPL(CheckHeartReq, __DEF_OBJ_POOL_OBJ_NUM__);
 OBJ_POOL_CREATE_DERIVE_IMPL(CheckHeartRes, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DERIVE_IMPL(CheckNetReq, __DEF_OBJ_POOL_OBJ_NUM__);
+OBJ_POOL_CREATE_DERIVE_IMPL(CheckNetRes, __DEF_OBJ_POOL_OBJ_NUM__);
 
 const char * ProtocolCmd::GetStr(UInt16 cmd)
 {
@@ -103,6 +105,10 @@ const char * ProtocolCmd::GetStr(UInt16 cmd)
             return "CheckHeartRes";
         }
         break;
+        case ProtocolCmd::CheckNetReq:
+            return "CheckNetReq";
+        case ProtocolCmd::CheckNetRes:
+            return "CheckNetRes";
         default:
         {
             g_Log->w<ProtocolCmd>(_LOGFMT_("unknown net msg cmd[%hu]"), cmd);
@@ -157,10 +163,6 @@ void LoginReq::SerializeToStringBuffer(NetMsgCoder *coder)
 
 bool LoginReq::DeserializeFrom(NetMsgDecoder *decoder)
 {
-    // 1.包头信息
-    _cmd = decoder->GetCmd();
-    _packetLength = decoder->GetMsgLen();
-
     // 2.读取包体数据
     decoder->Read(_loginData._userName, sizeof(_loginData._userName));
     decoder->Read(_loginData._pwd, sizeof(_loginData._pwd));
@@ -198,10 +200,6 @@ void LoginRes::SerializeToStringBuffer(NetMsgCoder *coder)
 
 bool LoginRes::DeserializeFrom(NetMsgDecoder *decoder)
 {
-    // 1.包头信息
-    _cmd = decoder->GetCmd();
-    _packetLength = decoder->GetMsgLen();
-
     // 2.读取数据
     decoder->Read(_result);
     decoder->Read(data, sizeof(data));
@@ -234,10 +232,6 @@ void LoginNty::SerializeToStringBuffer(NetMsgCoder *coder)
 
 bool LoginNty::DeserializeFrom(NetMsgDecoder *decoder)
 {
-    // 1.解码
-    _cmd = decoder->GetCmd();
-    _packetLength = decoder->GetMsgLen();
-
     // 2.读取数据
     decoder->Read(_userName, sizeof(_userName));
     decoder->Read(_pwd, sizeof(_pwd));
@@ -265,10 +259,6 @@ void CreatePlayerNty::SerializeToStringBuffer(NetMsgCoder *coder)
 
 bool CreatePlayerNty::DeserializeFrom(NetMsgDecoder *decoder)
 {
-    // 1.解码
-    _cmd = decoder->GetCmd();
-    _packetLength = decoder->GetMsgLen();
-
     // 2.读取数据
     decoder->Read(_socket);
     return true;
@@ -292,8 +282,6 @@ void CheckHeartReq::SerializeToStringBuffer(NetMsgCoder *coder)
 
 bool CheckHeartReq::DeserializeFrom(NetMsgDecoder *decoder)
 {
-    _cmd = decoder->GetCmd();
-    _packetLength = decoder->GetMsgLen();
     return true;
 }
 
@@ -317,8 +305,77 @@ void CheckHeartRes::SerializeToStringBuffer(NetMsgCoder *coder)
 
 bool CheckHeartRes::DeserializeFrom(NetMsgDecoder *decoder)
 {
-    _cmd = decoder->GetCmd();
-    _packetLength = decoder->GetMsgLen();
+    return true;
+}
+
+
+CheckNetReq::CheckNetReq()
+    :_requireMsgId(0)
+{
+    // _packetLength = _msgHeaderSize;
+    _packetLength = sizeof(CheckNetReq);
+    _cmd = ProtocolCmd::CheckNetReq;
+}
+
+
+
+bool CheckNetReq::SerializeToByteBuffer(NetMsgCoder *coder)
+{
+    // 写入包体数据
+    coder->WriteByte(_requireMsgId);
+    coder->WriteByte(_userName, sizeof(_userName));
+    coder->WriteByte(_pwd, sizeof(_pwd));
+    coder->WriteByte(_data, sizeof(_data));
+    return true;
+}
+
+void CheckNetReq::SerializeToStringBuffer(NetMsgCoder *coder)
+{
+    coder->WriteToString(_requireMsgId);
+    coder->WriteToString(_userName, sizeof(_userName));
+    coder->WriteToString(_pwd, sizeof(_pwd));
+    coder->WriteToString(_data, sizeof(_data));
+}
+
+bool CheckNetReq::DeserializeFrom(NetMsgDecoder *decoder)
+{
+    decoder->Read(_requireMsgId);
+    decoder->Read(_userName, sizeof(_userName));
+    decoder->Read(_pwd, sizeof(_pwd));
+    decoder->Read(_data, sizeof(_data));
+    return true;
+}
+
+CheckNetRes::CheckNetRes()
+    :_recvMsgId(0)
+{
+    _packetLength = sizeof(CheckNetRes);
+    _cmd = ProtocolCmd::CheckNetRes;
+}
+
+bool CheckNetRes::SerializeToByteBuffer(NetMsgCoder *coder)
+{
+    coder->WriteByte(_recvMsgId);
+    coder->WriteByte(_userName, sizeof(_userName));
+    coder->WriteByte(_pwd, sizeof(_pwd));
+    coder->WriteByte(_data, sizeof(_data));
+    return true;
+}
+
+void CheckNetRes::SerializeToStringBuffer(NetMsgCoder *coder)
+{
+    coder->WriteToString(_recvMsgId);
+    coder->WriteToString(_userName, sizeof(_userName));
+    coder->WriteToString(_pwd, sizeof(_pwd));
+    coder->WriteToString(_data, sizeof(_data));
+}
+
+bool CheckNetRes::DeserializeFrom(NetMsgDecoder *decoder)
+{
+    decoder->Read(_recvMsgId);
+    decoder->Read(_userName, sizeof(_userName));
+    decoder->Read(_pwd, sizeof(_pwd));
+    decoder->Read(_data, sizeof(_data));
     return true;
 }
 
