@@ -57,7 +57,12 @@ void TestProtocolsMgr::BuildLoginData(fs::LoginData &data)
     data._msgId = _sendMsgID;
 }
 
-void TestProtocolsMgr::OnSendLoginReqSuc()
+void TestProtocolsMgr::BuildCheckNetData(fs::CheckNetReq &data)
+{
+    data._requireMsgId = _sendMsgID;
+}
+
+void TestProtocolsMgr::OnSendReqSuc()
 {
     g_StaticsData->_lock.Lock();
     ++g_StaticsData->_curSendMsgCount;

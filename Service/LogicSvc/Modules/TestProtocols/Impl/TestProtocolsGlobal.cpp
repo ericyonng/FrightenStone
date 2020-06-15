@@ -78,7 +78,9 @@ void TestProtocolsGlobal::OnLocalServerStartup()
         return;
 
     // 测试发送登陆包
-    _TestSendLogin();
+    // _TestSendLogin();
+    // 测试网络收发包
+    _TestCheckNet();
     // 测试黑民单系统
     // _StartTestBlackList();
     // _TestBlackList();
@@ -87,6 +89,56 @@ void TestProtocolsGlobal::OnLocalServerStartup()
 void TestProtocolsGlobal::OnLoginRes(UInt64 sessionId, fs::NetMsgDecoder *decoder)
 {
 
+}
+
+void TestProtocolsGlobal::OnCheckNetRes(UInt64 sessionId, fs::NetMsgDecoder *decoder)
+{
+    auto user = g_UserMgr->GetUserBySessionId(sessionId);
+    if (!user)
+    {
+        g_Log->e<TestProtocolsGlobal>(_LOGFMT_("sessionId[%llu], cmd[%u], msglen[%u] user not exists")
+            , sessionId, decoder->GetCmd(), decoder->GetMsgLen());
+        return;
+    }
+
+    fs::CheckNetRes res;
+    if (!res.DeserializeFrom(decoder))
+    {
+        g_Log->e<TestProtocolsGlobal>(_LOGFMT_("check net res package deserialize fail sessionId[%llu], cmd[%u], msglen[%u]")
+            , sessionId, decoder->GetCmd(), decoder->GetMsgLen());
+        return;
+    }
+
+    if (!_isSendAfterSvrResArrive)
+        return;
+
+    auto testProtocolMgr = user->GetSys<ITestProtocolsMgr>();
+    if (_checkMsgId)
+        testProtocolMgr->CheckRecvMsg(res._recvMsgId);
+
+    testProtocolMgr->BuildCheckNetData(_checkNetReq);
+    testProtocolMgr->AddSendMsgId();
+    user->SendData(&_checkNetReq);
+    testProtocolMgr->OnSendReqSuc();
+}
+
+void TestProtocolsGlobal::OnCheckNetReq(UInt64 sessionId, fs::NetMsgDecoder *decoder)
+{
+    auto user = g_UserMgr->GetUserBySessionId(sessionId);
+    if (!user)
+    {
+        g_Log->e<TestProtocolsGlobal>(_LOGFMT_("sessionId[%llu], cmd[%u], msglen[%u] user not exists")
+            , sessionId, decoder->GetCmd(), decoder->GetMsgLen());
+        return;
+    }
+
+    fs::CheckNetReq req;
+    if (!req.DeserializeFrom(decoder))
+    {
+        g_Log->e<TestProtocolsGlobal>(_LOGFMT_("check net req package deserialize fail sessionId[%llu], cmd[%u], msglen[%u]")
+            , sessionId, decoder->GetCmd(), decoder->GetMsgLen());
+        return;
+    }
 }
 
 void TestProtocolsGlobal::_RegisterEvents()
@@ -139,7 +191,7 @@ void TestProtocolsGlobal::_OnUserLoginRes(fs::FS_Event *ev)
     testProtocolMgr->BuildLoginData(_sendReq._loginData);
     testProtocolMgr->AddSendMsgId();
     user->SendData(&_sendReq);
-    testProtocolMgr->OnSendLoginReqSuc();
+    testProtocolMgr->OnSendReqSuc();
 }
 
 void TestProtocolsGlobal::_OnAfterSessionDisconnected(fs::FS_Event *ev)
@@ -154,7 +206,8 @@ void TestProtocolsGlobal::_OnSendTimeOut(fs::FS_Timer *timer, const fs::Time &la
     if(_isSendAfterSvrResArrive)
         return;
 
-    _SendAllUserLoginReq();
+    // _SendAllUserLoginReq();
+    _TestCheckNet();
     _sendTimer->Schedule(_sendPeriodMs);
 
 //     auto nowTime = static_cast<Int64>(fs::Time::NowMilliTimestamp());
@@ -181,7 +234,7 @@ void TestProtocolsGlobal::_SendAllUserLoginReq()
             testProtocolsMgr->BuildLoginData(_sendReq._loginData);
             testProtocolsMgr->AddSendMsgId();
             user->SendData(&_sendReq);
-            testProtocolsMgr->OnSendLoginReqSuc();
+            testProtocolsMgr->OnSendReqSuc();
         }
     }
 }
@@ -235,7 +288,24 @@ void TestProtocolsGlobal::_TestSendLogin()
 
 void TestProtocolsGlobal::_TestCheckNet()
 {
+    strcpy(_checkNetReq._userName, "shy");
+    strcpy(_checkNetReq._pwd, "123456");
+    memset(_checkNetReq._data, 0, sizeof(_checkNetReq._data));
 
+    auto &allUsers = g_UserMgr->GetAllUsers();
+    for (Int32 i = 0; i < _sendNumPerPeriod; ++i)
+    {// 单位时间发_sendNumPerPeriod条消息
+        for (auto &iterUser : allUsers)
+        {
+            auto &user = iterUser.second;
+            auto testProtocolsMgr = user->GetSys<ITestProtocolsMgr>();
+
+            testProtocolsMgr->BuildCheckNetData(_checkNetReq);
+            testProtocolsMgr->AddSendMsgId();
+            user->SendData(&_checkNetReq);
+            testProtocolsMgr->OnSendReqSuc();
+        }
+    }
 }
 
 void TestProtocolsGlobal::_OnTestBlackListTimer(fs::FS_Timer *timer, const fs::Time &lastWheelTime, const fs::Time &curWheelTime)

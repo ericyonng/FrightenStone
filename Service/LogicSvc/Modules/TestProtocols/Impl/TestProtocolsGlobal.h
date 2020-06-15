@@ -45,6 +45,8 @@ public:
 
 public:
     void OnLoginRes(UInt64 sessionId, fs::NetMsgDecoder *decoder);
+    void OnCheckNetRes(UInt64 sessionId, fs::NetMsgDecoder *decoder);
+    void OnCheckNetReq(UInt64 sessionId, fs::NetMsgDecoder *decoder);
 
 private:
     void _RegisterEvents();
@@ -81,6 +83,7 @@ private:
     bool _isSendAfterSvrResArrive = 0;  // 是否在收到服务器返回后继续发送,若为false则会按照时间周期不停的发送
     fs::LoginReq _sendReq;
     Int64 _lastTime;
+    fs::CheckNetReq _checkNetReq;
     
     std::set<UInt64> _testConnectPendingStubs;
 

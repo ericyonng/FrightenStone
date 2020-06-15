@@ -41,5 +41,7 @@ public:
 private:
     void _RegisterProtocols();
     void _OnLoginRes(UInt64 sessionId, fs::NetMsgDecoder *decoder);
+    void _OnCheckNetRes(UInt64 sessionId, fs::NetMsgDecoder *decoder);
+    void _OnCheckNetReq(UInt64 sessionId, fs::NetMsgDecoder *decoder);
 };
 #endif

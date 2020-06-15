@@ -37,8 +37,9 @@ class ITestProtocolsMgr : public IUserSys
 {
 public:
     virtual void BuildLoginData(fs::LoginData &data) = 0;
+    virtual void BuildCheckNetData(fs::CheckNetReq &data) = 0;
     virtual void CheckRecvMsg(Int32 recvMsgId) = 0;
-    virtual void OnSendLoginReqSuc() = 0;
+    virtual void OnSendReqSuc() = 0;
     virtual Int32 GetSendMsgId() const = 0;
     virtual void AddSendMsgId() = 0;
 };

@@ -45,7 +45,8 @@ public:
 
 public:
     void BuildLoginData(fs::LoginData &data);
-    void OnSendLoginReqSuc();
+    void BuildCheckNetData(fs::CheckNetReq &data);
+    void OnSendReqSuc();
     void CheckRecvMsg(Int32 recvMsgId);
     virtual Int32 GetSendMsgId() const;
     virtual void AddSendMsgId();
