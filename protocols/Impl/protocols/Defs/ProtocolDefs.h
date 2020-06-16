@@ -212,7 +212,7 @@ struct CheckNetReq : public NetMsg_DataHeader
     virtual void SerializeToStringBuffer(NetMsgCoder *coder);
     virtual bool DeserializeFrom(NetMsgDecoder *decoder);
 
-    Int64 _requireMsgId;
+    Int32 _requireMsgId;
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
     char _data[24];
@@ -228,7 +228,7 @@ struct CheckNetRes : public NetMsg_DataHeader
     virtual void SerializeToStringBuffer(NetMsgCoder *coder);
     virtual bool DeserializeFrom(NetMsgDecoder *decoder);
 
-    Int64 _recvMsgId;
+    Int32 _recvMsgId;
     char _userName[MAX_NAME_LEN];
     char _pwd[MAX_PWD_LEN];
     char _data[24];

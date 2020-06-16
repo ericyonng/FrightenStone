@@ -89,6 +89,32 @@ void TestProtocolsMgr::AddSendMsgId()
     ++_sendMsgID;
 }
 
+void TestProtocolsMgr::OnCheckNetReq(const fs::CheckNetReq &req)
+{
+    auto recvMsgId = req._requireMsgId;
+    if (_checkMsgId && recvMsgId != _recvMsgID)
+    {
+        g_Log->w<TestProtocolsMgr>(_LOGFMT_("recieve msg id[%d] local recvmsgid for check is[%d]"), recvMsgId, _recvMsgID);
+    }
+
+    ++_recvMsgID;
+
+    auto user = GetUser();
+    fs::CheckNetRes res;
+    strcpy(res._userName, req._userName);
+    strcpy(res._pwd, req._pwd);
+    res._recvMsgId = _sendMsgID;
+
+    //     fs::FS_String rawData;
+    //     auto rawBytes = ret.SerializeTo(rawData);
+    //     fs::FS_String hexData;
+    //     fs::StringUtil::ToHexString(rawData, hexData);
+
+    // g_Log->net<TestProtocolsMgr>("will login res rawBytes[%lld] hex data[%s]", rawBytes, hexData.c_str());
+    AddSendMsgId();
+    user->SendData(&res);
+}
+
 void TestProtocolsMgr::_RegisterEvents()
 {
     if(_onSessionConnected)

@@ -109,6 +109,7 @@ void TestProtocolsGlobal::OnCheckNetRes(UInt64 sessionId, fs::NetMsgDecoder *dec
         return;
     }
 
+    g_Log->i<TestProtocolsGlobal>(_LOGFMT_("check net res id[%d], username[%s], pwd[%s]"), res._recvMsgId, res._userName, res._pwd);
     if (!_isSendAfterSvrResArrive)
         return;
 
@@ -139,6 +140,12 @@ void TestProtocolsGlobal::OnCheckNetReq(UInt64 sessionId, fs::NetMsgDecoder *dec
             , sessionId, decoder->GetCmd(), decoder->GetMsgLen());
         return;
     }
+
+    g_Log->i<TestProtocolsGlobal>(_LOGFMT_("check net req id[%d], userName[%s], pwd[%s]")
+        , req._requireMsgId, req._userName, req._pwd);
+
+    auto testProtocolsMgr = user->GetSys<ITestProtocolsMgr>();
+    testProtocolsMgr->OnCheckNetReq(req);
 }
 
 void TestProtocolsGlobal::_RegisterEvents()

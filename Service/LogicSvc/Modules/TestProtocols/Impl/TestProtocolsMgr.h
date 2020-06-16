@@ -50,6 +50,7 @@ public:
     void CheckRecvMsg(Int32 recvMsgId);
     virtual Int32 GetSendMsgId() const;
     virtual void AddSendMsgId();
+    virtual void OnCheckNetReq(const fs::CheckNetReq &req);
 
 private:
     void _RegisterEvents();

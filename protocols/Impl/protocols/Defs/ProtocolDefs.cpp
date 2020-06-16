@@ -311,6 +311,9 @@ bool CheckHeartRes::DeserializeFrom(NetMsgDecoder *decoder)
 
 CheckNetReq::CheckNetReq()
     :_requireMsgId(1)
+    , _userName{ 0 }
+    , _pwd{ 0 }
+    , _data{0}
 {
     // _packetLength = _msgHeaderSize;
     _packetLength = sizeof(CheckNetReq);
@@ -348,6 +351,9 @@ bool CheckNetReq::DeserializeFrom(NetMsgDecoder *decoder)
 
 CheckNetRes::CheckNetRes()
     :_recvMsgId(1)
+    ,_userName{0}
+    ,_pwd{0}
+    , _data{0}
 {
     _packetLength = sizeof(CheckNetRes);
     _cmd = ProtocolCmd::CheckNetRes;
