@@ -109,7 +109,7 @@ void TestProtocolsGlobal::OnCheckNetRes(UInt64 sessionId, fs::NetMsgDecoder *dec
         return;
     }
 
-    g_Log->i<TestProtocolsGlobal>(_LOGFMT_("check net res id[%d], username[%s], pwd[%s]"), res._recvMsgId, res._userName, res._pwd);
+    g_Log->net<TestProtocolsGlobal>("check net res id[%d], username[%s], pwd[%s]", res._recvMsgId, res._userName, res._pwd);
     if (!_isSendAfterSvrResArrive)
         return;
 
@@ -214,7 +214,7 @@ void TestProtocolsGlobal::_OnSendTimeOut(fs::FS_Timer *timer, const fs::Time &la
         return;
 
     // _SendAllUserLoginReq();
-    _TestCheckNet();
+    _SendAllUserCheckNet();
     _sendTimer->Schedule(_sendPeriodMs);
 
 //     auto nowTime = static_cast<Int64>(fs::Time::NowMilliTimestamp());
@@ -295,10 +295,26 @@ void TestProtocolsGlobal::_TestSendLogin()
 
 void TestProtocolsGlobal::_TestCheckNet()
 {
+    // 测试发送登陆包
+    _sendNumPerPeriod = g_ClientCfgMgr->GetMsgNumPerPeriod();
+    _sendPeriodMs = g_ClientCfgMgr->GetSendPeriodMs();
+    _checkMsgId = g_ClientCfgMgr->NeedCheckMsgId();
+    _isSendAfterSvrResArrive = g_ClientCfgMgr->IsSendAfterSvrResArrive();
+
     strcpy(_checkNetReq._userName, "shy");
     strcpy(_checkNetReq._pwd, "123456");
     memset(_checkNetReq._data, 0, sizeof(_checkNetReq._data));
 
+    if (!_isSendAfterSvrResArrive)
+        _sendTimer->Schedule(_sendPeriodMs);
+    else
+    {
+        _SendAllUserCheckNet();
+    }
+}
+
+void TestProtocolsGlobal::_SendAllUserCheckNet()
+{
     auto &allUsers = g_UserMgr->GetAllUsers();
     for (Int32 i = 0; i < _sendNumPerPeriod; ++i)
     {// 单位时间发_sendNumPerPeriod条消息
