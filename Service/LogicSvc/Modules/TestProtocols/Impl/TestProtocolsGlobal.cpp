@@ -141,7 +141,7 @@ void TestProtocolsGlobal::OnCheckNetReq(UInt64 sessionId, fs::NetMsgDecoder *dec
         return;
     }
 
-    g_Log->i<TestProtocolsGlobal>(_LOGFMT_("check net req id[%d], userName[%s], pwd[%s]")
+    g_Log->net<TestProtocolsGlobal>("check net req id[%d], userName[%s], pwd[%s]"
         , req._requireMsgId, req._userName, req._pwd);
 
     auto testProtocolsMgr = user->GetSys<ITestProtocolsMgr>();
