@@ -74,6 +74,9 @@ public:
         CreatePlayerNty = 9,        // 
         CheckHeartReq = 15,         // 客户端心跳包
         CheckHeartRes = 16,         // 心跳包反馈，按理不用反馈给客户端减少服务端压力
+
+        CheckNetReq = 17,           // 网络包测试
+        CheckNetRes = 18,           // 网络包测试
         CMD_End,
     };
 
@@ -198,6 +201,38 @@ struct CheckHeartRes : public NetMsg_DataHeader
 // public:
 //     static void DelNetMsg(NetMsg_DataHeader *header);
 // };
+
+struct CheckNetReq : public NetMsg_DataHeader
+{
+    OBJ_POOL_CREATE_DERIVE(CheckNetReq, NetMsg_DataHeader);
+
+    CheckNetReq();
+
+    virtual bool SerializeToByteBuffer(NetMsgCoder *coder);
+    virtual void SerializeToStringBuffer(NetMsgCoder *coder);
+    virtual bool DeserializeFrom(NetMsgDecoder *decoder);
+
+    Int32 _requireMsgId;
+    char _userName[MAX_NAME_LEN];
+    char _pwd[MAX_PWD_LEN];
+    char _data[24];
+};
+
+struct CheckNetRes : public NetMsg_DataHeader
+{
+    OBJ_POOL_CREATE_DERIVE(CheckNetRes, NetMsg_DataHeader);
+
+    CheckNetRes();
+
+    virtual bool SerializeToByteBuffer(NetMsgCoder *coder);
+    virtual void SerializeToStringBuffer(NetMsgCoder *coder);
+    virtual bool DeserializeFrom(NetMsgDecoder *decoder);
+
+    Int32 _recvMsgId;
+    char _userName[MAX_NAME_LEN];
+    char _pwd[MAX_PWD_LEN];
+    char _data[24];
+};
 
 FS_NAMESPACE_END
 

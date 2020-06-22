@@ -34,25 +34,30 @@ then
 fi
 
 # give scripts right
-sudo chmod 777 $SCRIPT_PATH/*.sh
+# sudo chmod 777 $SCRIPT_PATH/*.sh
 
 # run firstly
-sudo source $SCRIPT_PATH/runfirstly_scripts.sh
+source $SCRIPT_PATH/runfirstly_scripts.sh
 
 # generate make files
-sudo source $SCRIPT_PATH/linuxmakefile_build.sh
+source $SCRIPT_PATH/linuxmakefile_build.sh
 
 # build
 cd $SCRIPT_PATH/$BUILD_PATH
-if [ NEED_CLEAN = 1 ]
+if [ $NEED_CLEAN = 1 ]
 then
+    echo -e "clean $VER..."
     make clean config=$VER;
 fi
+echo -e "making $VER..."
 make config=$VER
 
 # quit build dir
 cd $SCRIPT_PATH
 
 # install default:opencoredump
-sudo source $SCRIPT_PATH/install.sh $VER opencoredump
+echo "installing..."
+source $SCRIPT_PATH/install.sh $VER opencoredump
+
+echo "Done!"
 

@@ -40,11 +40,25 @@ Int32 TestProtocolsGlobalFacade::OnInitialize()
 
 void TestProtocolsGlobalFacade::_RegisterProtocols()
 {
-   // g_ProtocolStackMgr->SubscribeProtocol(fs::ProtocolCmd::LoginRes, this, &TestProtocolsGlobalFacade::_OnLoginRes);
+    // g_ProtocolStackMgr->SubscribeProtocol(fs::ProtocolCmd::LoginRes, this, &TestProtocolsGlobalFacade::_OnLoginRes);
+    g_ProtocolStackMgr->SubscribeProtocol(fs::ProtocolCmd::CheckNetRes, this, &TestProtocolsGlobalFacade::_OnCheckNetRes);
+    g_ProtocolStackMgr->SubscribeProtocol(fs::ProtocolCmd::CheckNetReq, this, &TestProtocolsGlobalFacade::_OnCheckNetReq);
 }
 
 void TestProtocolsGlobalFacade::_OnLoginRes(UInt64 sessionId, fs::NetMsgDecoder *decoder)
 {
     auto testProtocolsGlobal = g_GlobalSysMgr->GetSys<TestProtocolsGlobal>();
     testProtocolsGlobal->OnLoginRes(sessionId, decoder);
+}
+
+void TestProtocolsGlobalFacade::_OnCheckNetRes(UInt64 sessionId, fs::NetMsgDecoder *decoder)
+{
+    auto testProtocolsGlobal = g_GlobalSysMgr->GetSys<TestProtocolsGlobal>();
+    testProtocolsGlobal->OnCheckNetRes(sessionId, decoder);
+}
+
+void TestProtocolsGlobalFacade::_OnCheckNetReq(UInt64 sessionId, fs::NetMsgDecoder *decoder)
+{
+    auto testProtocolsGlobal = g_GlobalSysMgr->GetSys<TestProtocolsGlobal>();
+    testProtocolsGlobal->OnCheckNetReq(sessionId, decoder);
 }
