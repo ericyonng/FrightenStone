@@ -30,7 +30,7 @@
 #define __Test_TestDaemon_H__
 
 #pragma once
-
+#include "stdafx.h"
 #define BD_MAX_CLOSE 8192
 
 class TestDaemon
