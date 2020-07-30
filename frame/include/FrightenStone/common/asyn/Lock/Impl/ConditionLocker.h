@@ -57,6 +57,7 @@ public:
     bool HasWaiter();
     void Broadcast();
     void ResetSinal();
+    void ResetSinalFlag();
 #pragma endregion
 
     #pragma region inner
@@ -82,6 +83,12 @@ inline bool ConditionLocker::HasWaiter()
 {
     return _waitCnt > 0;
 }
+
+inline void ConditionLocker::ResetSinalFlag()
+{
+    _isSinal = false;
+}
+
 FS_NAMESPACE_END
 
 #endif // !__Frame_Include_FrightenStone_Common_Asyn_Lock_Impl_ConditionLocker_H__

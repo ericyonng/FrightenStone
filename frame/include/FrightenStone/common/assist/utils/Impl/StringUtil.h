@@ -78,6 +78,8 @@ public:
                      std::vector<FS_String> &destStrList,
                      bool justSplitFirst = false,
                      char escapeChar = '\0');
+    // src原文,start:第一个字符串,end第一个结尾
+    static FS_String CutString(const FS_String &src, const FS_String &start, const FS_String &end);
     static FS_String FilterOutString(const FS_String &str, const FS_String &filterStr);
 };
 

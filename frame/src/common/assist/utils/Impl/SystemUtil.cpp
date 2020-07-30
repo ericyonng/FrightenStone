@@ -45,9 +45,29 @@
 #include "process.h"
 #include "sysinfoapi.h"
 #else
+
 // linux:
-#include <sys/types.h>
 #include <signal.h>
+#include <sys/resource.h>
+#include <unistd.h>
+#include <limits.h> // 含有PATH_MAX
+#include<errno.h>
+#include<fcntl.h>
+
+ // linux socket环境 以及相关网络接口
+#include<sys/types.h>
+#include<sys/stat.h>
+#include <sys/socket.h>     // 含有 getaddrinfo等
+#include <netdb.h>          //
+
+#include<semaphore.h>
+#include <pthread.h>
+#include<sys/time.h>
+
+#include <signal.h>#include<sys/param.h>#include<sys/types.h>#include<sys/stat.h>
+
+// 估计的要关闭的文件描述符最大值
+#define BD_MAX_CLOSE 8192
 #endif
 #pragma endregion
 
@@ -512,6 +532,58 @@ FS_String SystemUtil::GetErrString(Int32 err)
 #endif
 }
 
+void SystemUtil::TurnDaemon(const FS_String &stdIoRedirect /*= ""*/)
+{
+#ifndef _WIN32
+    // 避免僵尸进程
+    signal(SIGCHLD, SIG_IGN);
+    // 杀死会话组组长时进程组所有进程都会收到该信号,该信号默认处理是终止进程
+    signal(SIGHUP, SIG_IGN);
+
+    // 成为新会话组组长并脱离控制终端,且以后不可再打开控制终端
+    if (fork() != 0) {
+        exit(0);
+    }
+    setsid();
+    if (fork() != 0) {
+        exit(0);
+    }
+
+    // 修改默认文件创建权限与工作目录(默认设置到根目录)
+    umask(0);
+    chdir("/");
+
+    // 关闭打开的文件
+    int maxFd = sysconf(_SC_OPEN_MAX);
+    if (maxFd == -1)
+        maxFd = BD_MAX_CLOSE;
+
+    for (int i = 0; i < maxFd; ++i)
+        close(i);
+
+    // 重定向标准输入输出
+    close(STDIN_FILENO);
+    //LibString ioRedirect = stdIoRedirect.GetLength() ? stdIoRedirect : "/dev/null";
+    LibString ioRedirect = stdIoRedirect.GetLength() ? (LibString("/") + LibDirectoryUtil::GetFileNameInPath(stdIoRedirect))
+        : "/dev/null";
+
+    int fd = open(ioRedirect.c_str(), O_RDWR | O_CREAT);
+    if (fd != STDIN_FILENO)
+        exit(0);
+    if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO)
+        exit(0);
+    if (dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO)
+        exit(0);
+#endif
+}
+
+void SystemUtil::ChgWorkDir(const FS_String &workDir)
+{
+#ifndef _WIN32
+    if (workDir.GetLength())
+        chdir(workDir.c_str());
+#endif
+}
 FS_NAMESPACE_END
 
 

@@ -234,6 +234,24 @@ void StringUtil::SplitString(const FS_String &str, const FS_String &separator, s
     }
 }
 
+FS_String StringUtil::CutString(const FS_String &src, const FS_String &start, const FS_String &end)
+{
+    // 原文
+    auto &raw = src.GetRaw();
+    // 找起始位置
+    auto startPos = raw.find(start.c_str(), 0);
+    if (startPos == std::string::npos)
+        return "";
+
+    // 找结尾
+    auto endPos = raw.find(end.c_str(), startPos + start.GetLength());
+    if (endPos == std::string::npos)
+        return "";
+
+    // 截取原文
+    return raw.substr(startPos, endPos - startPos + end.GetLength());
+}
+
 FS_String StringUtil::FilterOutString(const FS_String &str, const FS_String &filterStr)
 {
     std::vector<FS_String> strings;

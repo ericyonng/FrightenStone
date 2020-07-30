@@ -36,9 +36,9 @@
 
 #include "FrightenStone/exportbase.h"
 #include "FrightenStone/common/basedefs/BaseDefs.h"
+#include "FrightenStone/common/component/Impl/FS_String.h"
 
 FS_NAMESPACE_BEGIN
-class FS_String;
 struct ProcessMemInfo;
 
 class BASE_EXPORT SystemUtil
@@ -106,6 +106,11 @@ public:
     static void Sleep(UInt64 milliSec, UInt64 microSec = 0);
     // 获取错误码字符串
     static FS_String GetErrString(Int32 err);
+
+    // 后台程序
+    static void TurnDaemon(const FS_String &stdIoRedirect = "");
+    // 设置工作目录
+    static void ChgWorkDir(const FS_String &workDir);
 };
 
 FS_NAMESPACE_END
