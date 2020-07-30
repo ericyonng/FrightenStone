@@ -564,7 +564,7 @@ void SystemUtil::TurnDaemon(const FS_String &stdIoRedirect /*= ""*/)
     // 重定向标准输入输出
     close(STDIN_FILENO);
     //LibString ioRedirect = stdIoRedirect.GetLength() ? stdIoRedirect : "/dev/null";
-    LibString ioRedirect = stdIoRedirect.GetLength() ? (LibString("/") + LibDirectoryUtil::GetFileNameInPath(stdIoRedirect))
+    FS_String ioRedirect = stdIoRedirect.GetLength() ? (FS_String("/") + FS_DirectoryUtil::GetFileNameInPath(stdIoRedirect))
         : "/dev/null";
 
     int fd = open(ioRedirect.c_str(), O_RDWR | O_CREAT);
