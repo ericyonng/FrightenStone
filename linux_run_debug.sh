@@ -29,7 +29,7 @@ VER="$1"
 	fi
 else
 		# release版本的可执行文件
-	for binName in $RELEASE_BINS
+	for binName in $DEBUG_BINS
 	do
         nohup ${RUN_PATH}/$binName >myout.file 2>&1 &
 		echo "$binName run sucess"
