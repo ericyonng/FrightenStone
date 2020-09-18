@@ -7,7 +7,8 @@
 SCRIPT_PATH="$(cd $(dirname $0); pwd)"
 
 # 远程分支名
-REMOTE_BRANCH_NAME="master"
+#REMOTE_BRANCH_NAME="master"
+REMOTE_BRANCH_NAME="Develop"
 if [ -n "$1" ]
 then
     REMOTE_BRANCH_NAME="$1"
