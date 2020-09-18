@@ -31,7 +31,7 @@
 
 void TestAppUtil::Run()
 {
-    // app»·¾³³õÊ¼»¯
+    // appç¯å¢ƒåˆå§‹åŒ–
     auto st = fs::AppUtil::Init();
     if(st != StatusDefs::Success)
     {
@@ -40,7 +40,7 @@ void TestAppUtil::Run()
         return;
     }
 
-    // Æô¶¯
+    // å¯åŠ¨
     st = fs::AppUtil::Start();
     if(st != StatusDefs::Success)
     {
@@ -51,12 +51,12 @@ void TestAppUtil::Run()
 
     g_Log->custom("app start suc press any key to finish ...");
 
-    // ¾²Ä¬×èÈû
+    // é™é»˜é˜»å¡
     fs::AppUtil::Wait();
 
     g_Log->custom("app will finish ...");
 
-    // ½áÊø
+    // ç»“æŸ
     fs::AppUtil::Finish();
 
     std::cout << "app finished." << std::endl;
