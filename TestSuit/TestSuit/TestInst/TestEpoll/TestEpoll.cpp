@@ -37,12 +37,12 @@ void TestEpoll::Run()
 {
     //fs::FS_Epoll epollEv;
 
-    // 1.app³õÊ¼»¯
+    // 1.appåˆå§‹åŒ–
     auto st = fs::AppUtil::Init();
     if(st != StatusDefs::Success)
         return;
 
-    // 2.Æô¶¯
+    // 2.å¯åŠ¨
     st = fs::AppUtil::Start();
     if(st != StatusDefs::Success)
     {
@@ -53,7 +53,7 @@ void TestEpoll::Run()
     do
     {
 
-        // ´´½¨epoll
+        // åˆ›å»ºepoll
         fs::FS_Epoll *ev = new fs::FS_Epoll;
         auto st = ev->Create();
         if(st != StatusDefs::Success)
@@ -62,7 +62,7 @@ void TestEpoll::Run()
             break;
         }
 
-        // ´´½¨Ì×½Ó×Ö
+        // åˆ›å»ºå¥—æ¥å­—
         auto listenSock = fs::SocketUtil::CreateSock();
         if(listenSock == INVALID_SOCKET)
         {
@@ -70,11 +70,11 @@ void TestEpoll::Run()
             break;
         }
 
-        // ¼òÒªµØÖ·
+        // ç®€è¦åœ°å€
         fs::BriefAddrInfo addrInfo;
         addrInfo._port = TEST_EPOLL_PORT;
 
-        // °ó¶¨
+        // ç»‘å®š
         st = fs::SocketUtil::Bind(listenSock, addrInfo);
         if(st != StatusDefs::Success)
         {
@@ -82,7 +82,7 @@ void TestEpoll::Run()
             break;
         }
 
-        // ¼àÌı
+        // ç›‘å¬
         st = fs::SocketUtil::Listen(listenSock);
         if(st != StatusDefs::Success)
         {
@@ -112,13 +112,13 @@ void TestEpoll::Run()
                 {
                     do
                     {
-                        // accept Ö±µ½eagain
+                        // accept ç›´åˆ°eagain
                         struct sockaddr_in inAddr;
                         socklen_t addrSize = static_cast<socklen_t>(sizeof(inAddr));
                         auto newSock = ::accept(listenSock, reinterpret_cast<sockaddr *>(&inAddr), &addrSize);
                         if(newSock > 0)
                         {
-                            // ½¨Á¢Á¬½Ó
+                            // å»ºç«‹è¿æ¥
                             g_Log->custom("accept suc newSock[%d]", newSock);
                             ::close(newSock);
                         }
@@ -138,22 +138,22 @@ void TestEpoll::Run()
         }
     } while(0);
 
-    // ÇåÀí
+    // æ¸…ç†
     fs::AppUtil::Finish();
 
 
-    // 1.³õÊ¼»¯
-    // 1.´´½¨Ì×½Ó×Ö
-    // 2.°ó¶¨
-    // 3.listen¼àÌı
-    // 4.¼ÓÈëepoll¼àÌı
+    // 1.åˆå§‹åŒ–
+    // 1.åˆ›å»ºå¥—æ¥å­—
+    // 2.ç»‘å®š
+    // 3.listenç›‘å¬
+    // 4.åŠ å…¥epollç›‘å¬
     // 5.epoll wait
-    // 6.ÅĞ¶ÏÊÇ·ñĞÂÁ¬½Ó
+    // 6.åˆ¤æ–­æ˜¯å¦æ–°è¿æ¥
     // 7.accept
-    // 8.¼ÓÈëepoll¼àÌı
+    // 8.åŠ å…¥epollç›‘å¬
     // ...
-    // ÍË³öÏú»ÙÌ×½Ó×Ö
-    // Ïú»Ùepoll×ÊÔ´
+    // é€€å‡ºé”€æ¯å¥—æ¥å­—
+    // é”€æ¯epollèµ„æº
 }
 #endif
 

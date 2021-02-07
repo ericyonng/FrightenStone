@@ -21,43 +21,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file  : TestAppUtil.cpp
+ * @file  : TestDaemon.h
  * @author: Eric Yonng<120453674@qq.com>
- * @date  : 2020/3/16
+ * @date  : 2020/07/18
  * @brief :
  */
+#ifndef __Test_TestDaemon_H__
+#define __Test_TestDaemon_H__
+
+#pragma once
 #include "stdafx.h"
-#include "TestInst/TestAppUtil.h"
+#define BD_MAX_CLOSE 8192
 
-void TestAppUtil::Run()
+class TestDaemon
 {
-    // appÁéØÂ¢ÉÂàùÂßãÂåñ
-    auto st = fs::AppUtil::Init();
-    if(st != StatusDefs::Success)
+public:
+    static void Run()
     {
-        fs::AppUtil::Finish();
-        std::cout << "app init fail st:"<< st << "..." << std::endl;
-        return;
+#ifndef _WIN32
+        // ±‹√‚Ω© ¨Ω¯≥Ã
+        signal(SIGCHLD, SIG_IGN);
+        // …±À¿ª·ª∞◊È◊È≥§ ±Ω¯≥Ã◊ÈÀ˘”–Ω¯≥Ã∂ºª· ’µΩ∏√–≈∫≈,∏√–≈∫≈ƒ¨»œ¥¶¿Ì «÷’÷πΩ¯≥Ã
+        signal(SIGHUP, SIG_IGN);
+        if (fork() != 0) {
+            exit(0);
+        }
+        setsid();
+        if (fork() != 0) {
+            exit(0);
+        }
+
+        umask(0);
+        chdir("/");
+
+        int maxFd = sysconf(_SC_OPEN_MAX);
+        if (maxFd == -1)
+            maxFd = BD_MAX_CLOSE;
+
+        for (int i = 0; i < maxFd; ++i)
+            close(i);
+
+        close(STDIN_FILENO);
+        int fd = open("/dev/null", O_RDWR);
+        if (fd != STDIN_FILENO)
+            exit(0);
+        if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO)
+            exit(0);
+        if (dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO)
+            exit(0);
+
+        while (true)
+        {
+            sleep(1);
+        }
+#endif
     }
-
-    // ÂêØÂä®
-    st = fs::AppUtil::Start();
-    if(st != StatusDefs::Success)
-    {
-        g_Log->e<TestAppUtil>(_LOGFMT_("app start fail st[%d]"), st);
-        fs::AppUtil::Finish();
-        return;
-    }
-
-    g_Log->custom("app start suc press any key to finish ...");
-
-    // ÈùôÈªòÈòªÂ°û
-    fs::AppUtil::Wait();
-
-    g_Log->custom("app will finish ...");
-
-    // ÁªìÊùü
-    fs::AppUtil::Finish();
-
-    std::cout << "app finished." << std::endl;
-}
+};
+#endif

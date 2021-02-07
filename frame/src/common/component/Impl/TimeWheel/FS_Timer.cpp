@@ -77,9 +77,9 @@ Int32 FS_Timer::Schedule(const Time &startTime, Int64 milliSecPeriod)
     _periodCache = milliSecPeriod * Time::_microSecondPerMilliSecond;
     // TimeSlice slice(0, milliSecPeriod, 0);
 
-    // 过期时间
+    // 过期时间 TODO:bug 无论转盘动不动都是start_time+period否则若在转动轮盘时设置的是starttime那么下次将被立即处理
     _lastTimeOutTime = startTime;
-    const auto &expiredTime = _timeData->_isRotatingWheel ? startTime : (startTime + _periodCache);
+    const auto &expiredTime = startTime + _periodCache;
 
     // 送时间轮盘中移除
     if (_timeData->_timeWheelUniqueId)

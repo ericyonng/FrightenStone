@@ -74,6 +74,7 @@
 #include "TestInst/TestAppUtil.h"
 #include "TestInst/TestEpoll/TestEpoll.h"
 #include "TestInst/TestNetBuffer.h"
+#include "TestInst/TestDaemon.h"
 
 void TestInsts::Run()
 {
@@ -91,6 +92,7 @@ void TestInsts::Run()
     //TestUtf8C17toC11::Run();
     //TestMessageQueue2::Run();
     TestServer::Run();
+    // TestDaemon::Run();
     // TestNetBuffer::Run();
     //TestMemAlign::Run();
     //TestEpoll::Run();

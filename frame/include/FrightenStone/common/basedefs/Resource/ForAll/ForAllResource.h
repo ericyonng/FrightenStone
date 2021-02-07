@@ -78,6 +78,9 @@
 #include<semaphore.h>
 #include <pthread.h>
 #include<sys/time.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #endif
 
 

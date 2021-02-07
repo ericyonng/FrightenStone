@@ -10,5 +10,6 @@ yum -y install gdb						# 调试
 yum -y install lrzsz					# 从linux环境中传输文件
 yum -y install libuuid-devel.x86_64		# uuid 唯一id生成
 yum -y install iftop					# iftop 流量监控
+yum -y install curl                     # curl
 yum -y update							# 更新软件包
 

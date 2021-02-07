@@ -208,7 +208,12 @@ FS_String::_These FS_String::Split(const FS_String &sep, std::string::size_type 
             break;
 
         substrs.push_back(_buffer.substr(idx, findIdx - idx));
-        if((idx = findIdx + 1) == this->size())
+        if (onlyLikely)
+            idx = findIdx + 1;
+        else
+            idx = findIdx + sep._buffer.size();
+
+        if(idx == this->size())
         {
             substrs.push_back(FS_String());
             break;

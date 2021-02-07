@@ -53,7 +53,8 @@ VER="$1"
 	
 	# 参数设置
 	LIMITS_CONF_PATH="/etc/security/limits.conf"
-	SET_PATTEN="${OUTPUT_DIR}core_%e_timestamp_%t_pid_%p_signal_%s"   
+	# SET_PATTEN="${OUTPUT_DIR}core_%e_timestamp_%t_pid_%p_signal_%s" 
+	SET_PATTEN="./core_%e_timestamp_%t_pid_%p_signal_%s"  
 	SYSCTL_CONF_PATH="/etc/sysctl.conf"
 	
 	# coredump设置永久生效
