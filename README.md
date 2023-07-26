@@ -8,7 +8,7 @@
 
 [![License](https://img.shields.io/github/license/ericyonng/FrightenStone.svg?style=popout "https://shields.io/category/license")](https://opensource.org/licenses/MIT) 
 
-当前项目的第二版：[Version](https://github.com/ericyonng/CrystalNet/tree/main),以后都在该版本上开发
+当前项目的第二版：[CrystalNet](https://github.com/ericyonng/CrystalNet/tree/main),以后都在该版本上开发
 
 **作者**: ericyonng
 
